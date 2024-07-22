@@ -1,5 +1,9 @@
+import dataclasses
+import shutil
 import tempfile
 import typing
+import uuid
+
 import pydantic
 import pathlib
 import importlib
@@ -27,12 +31,12 @@ from .generator import (
 logger = logging.getLogger(__name__)
 
 
-class _ToolPointer(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
-
+# TODO (GLENN): Numpy and Pydantic don't really play well together...
+@dataclasses.dataclass
+class _ToolPointer:
     identifier: pydantic.UUID4
     embedding: numpy.ndarray
-    tool: ToolDescriptor
+    tool: langchain_core.tools.StructuredTool
 
 
 class Provider(pydantic.BaseModel, abc.ABC):
@@ -45,6 +49,11 @@ class Provider(pydantic.BaseModel, abc.ABC):
 
     _tools: typing.List[typing.Type[_ToolPointer]] = list()
     _modules: typing.Dict = dict()
+    _output_directory: pathlib.Path
+
+    def __init__(self, /, **data: typing.Any):
+        super(Provider, self).__init__(**data)
+        self._output_directory = pathlib.Path(tempfile.mkdtemp())
 
     @abc.abstractmethod
     def semantic(self, objective: str) -> typing.List[langchain_core.tools.StructuredTool]:
@@ -54,7 +63,7 @@ class Provider(pydantic.BaseModel, abc.ABC):
     def get(self, _id: str) -> langchain_core.tools.StructuredTool:
         pass
 
-    def _load_from_source(self, filename: pathlib.Path, entry: ToolDescriptor):
+    def _load_from_source(self, filename: pathlib.Path, entry: ToolDescriptor, tool_filter=None):
         # TODO (GLENN): We should avoid blindly putting things in our path.
         if not str(filename.parent.absolute()) in sys.path:
             sys.path.append(str(filename.parent.absolute()))
@@ -62,16 +71,22 @@ class Provider(pydantic.BaseModel, abc.ABC):
         if filename.stem not in self._modules:
             self._modules[filename.stem] = importlib.import_module(filename.stem)
 
-        # TODO (GLENN): We need a better identifier than just the name and description.
         for name, tool in inspect.getmembers(self._modules[filename.stem]):
-            if not isinstance(tool, ToolDescriptor):
+            if not isinstance(tool, langchain_core.tools.StructuredTool):
                 continue
-            if name == entry.name and tool.description == entry.description:
+            if tool_filter is None or tool_filter(tool):
                 self._tools.append(_ToolPointer(
                     identifier=entry.identifier,
                     embedding=entry.encoding,
                     tool=tool
                 ))
+                break
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        shutil.rmtree(str(self._output_directory.absolute()))
 
 
 class LocalProvider(Provider):
@@ -84,19 +99,23 @@ class LocalProvider(Provider):
                 entry = ToolDescriptor.model_validate_json(line)
                 match entry.kind:
                     case ToolKind.PythonFunction:
-                        self._load_from_source(entry.source, entry)
+                        # TODO (GLENN): We need a better identifier than just the name and description.
+                        tool_filter = lambda t: entry.name == t.name and entry.description == t.description
+                        self._load_from_source(entry.source, entry, tool_filter)
 
                     case ToolKind.SQLPPQuery:
-                        with tempfile.NamedTemporaryFile() as tmp_fp:
+                        with open(self._output_directory / (str(uuid.uuid4()) + '.py'), 'w') as tmp_fp:
                             SQLPPCodeGenerator(
                                 tool_descriptor=entry
                             ).write(tmp_fp)
+                            self._load_from_source(pathlib.Path(tmp_fp.name), entry)
 
                     case ToolKind.SemanticSearch:
-                        with tempfile.NamedTemporaryFile() as tmp_fp:
+                        with open(self._output_directory / (str(uuid.uuid4()) + '.py'), 'w') as tmp_fp:
                             SemanticSearchCodeGenerator(
                                 tool_descriptor=entry
                             ).write(tmp_fp)
+                            self._load_from_source(pathlib.Path(tmp_fp.name), entry)
 
     def semantic(self, objective: str, k: typing.Union[int | None] = 1) \
             -> typing.List[langchain_core.tools.StructuredTool]:

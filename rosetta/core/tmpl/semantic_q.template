@@ -11,7 +11,7 @@ import typing
 import sentence_transformers
 import os
 
-import rosetta.tools
+import rosetta.core.tools
 
 _BUCKET_NAME = "<<BUCKET_NAME_PLACEHOLDER>>"
 
@@ -38,7 +38,7 @@ def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
     return couchbase.cluster.Cluster(conn_string, couchbase.options.ClusterOptions(authenticator))
 
 
-@rosetta.tools.tool(infer_schema=True)
+@rosetta.core.tools.tool(infer_schema=True)
 def <<TOOL_NAME_PLACEHOLDER>>(question: _ArgumentInput) -> typing.List[str]:
     """
     <<TOOL_DESCRIPTION_PLACEHOLDER>>

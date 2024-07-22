@@ -139,6 +139,7 @@ class SQLPPCodeGenerator(_CodeGenerator):
                 .replace('<<TOOL_DESCRIPTION_PLACEHOLDER>>', sqlpp_descriptor.description)
             logger.debug('The following code has been generated:\n' + instance_string)
             fp.write(instance_string)
+            fp.flush()
 
 
 class SemanticSearchCodeGenerator(_CodeGenerator):
@@ -179,3 +180,4 @@ class SemanticSearchCodeGenerator(_CodeGenerator):
                 .replace('<<TOOL_DESCRIPTION_PLACEHOLDER>>', sst_descriptor.description)
             logger.debug('The following code has been generated:\n' + instance_string)
             fp.write(instance_string)
+            fp.flush()

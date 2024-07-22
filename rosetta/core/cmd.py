@@ -5,6 +5,8 @@ import shutil
 import logging
 import os
 
+DEFAULT_CATALOG_FILENAME = '.out/tool_catalog.json'
+
 logger = logging.getLogger(__name__)
 
 
@@ -17,20 +19,9 @@ def cmd_initialize(sentence_models: typing.List[str], **_):
 
 
 # TODO (GLENN): Define a 'clean' action for Capella.
-def cmd_clean(build_dir: str, catalog_file: str, messages_dir: str, **_):
-    build_path = pathlib.Path(build_dir)
+def cmd_clean(catalog_file: str, messages_dir: str, **_):
     catalog_path = pathlib.Path(catalog_file)
     messages_path = pathlib.Path(messages_dir)
-
-    # TODO (GLENN): Be a little more conservative here...
-    if build_path.exists():
-        if not build_path.is_dir():
-            logger.warning('Non-directory specified for build_dir!')
-            os.remove(build_path.absolute())
-        else:
-            shutil.rmtree(build_path.absolute())
-    else:
-        logger.debug('build_dir does not exist. No deletion action has occurred for build_dir.')
 
     # TODO (GLENN): This will change when we expand to more than just tools.
     if catalog_path.exists():
@@ -56,9 +47,13 @@ def cmd_index(tool_dirs: typing.List[str], catalog_file: str, embedding_model: s
     import rosetta.core.tools
     import sentence_transformers
 
+    catalog_file_path = pathlib.Path(catalog_file)
+    if catalog_file == DEFAULT_CATALOG_FILENAME and not catalog_file_path.parent.exists():
+        os.mkdir(catalog_file_path.parent)
+
     # TODO (GLENN): Define an 'index' action for Capella.
     rosetta.core.tools.LocalRegistrar(
-        catalog_file=pathlib.Path(catalog_file),
+        catalog_file=catalog_file_path,
         embedding_model=sentence_transformers.SentenceTransformer(embedding_model)
     ).index([pathlib.Path(p) for p in tool_dirs])
 
@@ -86,19 +81,12 @@ def main():
     # Define the 'rosetta clean' command.
     clean_parser = subparsers.add_parser(
         name='clean',
-        description='Delete all compile-time / register-time / runtime artifacts.'
-    )
-    clean_parser.add_argument(
-        '-bd', '--build_dir',
-        nargs='*',
-        type=str,
-        default='.out',
-        help='Location of the generated tools to remove.'
+        description='Delete all index-time / runtime artifacts.'
     )
     clean_parser.add_argument(
         '-cf', '--catalog_file',
         type=str,
-        default='.out/tool_catalog.json',
+        default=DEFAULT_CATALOG_FILENAME,
         help='Name of the tool catalog to remove.'
     )
     clean_parser.add_argument(
@@ -124,7 +112,7 @@ def main():
     index_parser.add_argument(
         '-cf', '--catalog_file',
         type=str,
-        default='.out/tool_catalog.json',
+        default=DEFAULT_CATALOG_FILENAME,
         help='Name of the tool catalog to-be-generated.'
     )
     index_parser.add_argument(

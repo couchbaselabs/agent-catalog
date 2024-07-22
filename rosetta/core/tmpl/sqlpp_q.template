@@ -7,7 +7,7 @@ import couchbase.cluster
 import langchain_core.tools
 import os
 
-import rosetta.tools
+import rosetta.core.tools
 
 _SQLPP_QUERY = """
 <<SQLPP_QUERY_PLACEHOLDER>>
@@ -28,7 +28,7 @@ def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
     return couchbase.cluster.Cluster(conn_string, couchbase.options.ClusterOptions(authenticator))
 
 
-@rosetta.tools.tool(infer_schema=True)
+@rosetta.core.tools.tool(infer_schema=True)
 def <<TOOL_NAME_PLACEHOLDER>>(argument_input: _ArgumentInput) -> _ToolOutput:
     """
     <<TOOL_DESCRIPTION_PLACEHOLDER>>

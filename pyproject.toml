@@ -1,12 +1,13 @@
 [tool.poetry]
-name = "rosetta"
+name = "rosetta-core"
 version = "0.1.0"
 description = "Core library associated with agentic workflows in Couchbase."
-repository = "https://github.com/couchbaselabs/rosetta-alpha"
+repository = "https://github.com/couchbaselabs/rosetta-core"
 authors = [
     "Glenn Galvizo <glenn.galvizo@couchbase.com>"
 ]
 readme = "README.md"
+packages = [{include = "rosetta"}]
 
 [tool.poetry.scripts]
 rosetta = "rosetta.core.cmd:main"
