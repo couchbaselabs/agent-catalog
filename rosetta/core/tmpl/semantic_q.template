@@ -1,0 +1,65 @@
+""" This file has been generated automatically by Rosetta at <<GENERATION_DATE_PLACEHOLDER>> as a semantic_search tool. """
+from __future__ import annotations
+
+import couchbase.auth
+import couchbase.options
+import couchbase.cluster
+import couchbase.search
+import couchbase.vector_search
+import langchain_core.tools
+import typing
+import sentence_transformers
+import os
+
+import rosetta.tools
+
+_BUCKET_NAME = "<<BUCKET_NAME_PLACEHOLDER>>"
+
+_SCOPE_NAME = "<<SCOPE_NAME_PLACEHOLDER>>"
+
+_COLLECTION_NAME = "<<COLLECTION_NAME_PLACEHOLDER>>"
+
+_VECTOR_INDEX_NAME = "<<VECTOR_INDEX_NAME_PLACEHOLDER>>"
+
+_VECTOR_FIELD_NAME = "<<VECTOR_FIELD_NAME_PLACEHOLDER>>"
+
+_TEXT_FIELD_NAME = "<<TEXT_FIELD_NAME_PLACEHOLDER>>"
+
+
+<<ARGUMENT_SCHEMA_PLACEHOLDER>>
+
+
+def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
+    authenticator = couchbase.auth.PasswordAuthenticator(
+        username=os.getenv('CB_USERNAME'),
+        password=os.getenv('CB_PASSWORD')
+    )
+    conn_string = os.getenv('CB_CONN_STRING')
+    return couchbase.cluster.Cluster(conn_string, couchbase.options.ClusterOptions(authenticator))
+
+
+@rosetta.tools.tool(infer_schema=True)
+def <<TOOL_NAME_PLACEHOLDER>>(question: _ArgumentInput) -> typing.List[str]:
+    """
+    <<TOOL_DESCRIPTION_PLACEHOLDER>>
+    """
+    cluster = _get_couchbase_cluster()
+    bucket = cluster.bucket(_BUCKET_NAME)
+    scope = bucket.scope(_SCOPE_NAME)
+    collection = scope.collection(_COLLECTION_NAME)
+
+    embedding_model = sentence_transformers.SentenceTransformer('<<EMBEDDING_MODEL_PLACEHOLDER>>')
+    _embedding = embedding_model.encode(str(question))
+    for_q = list(_embedding.astype('float64'))
+    vector_req = couchbase.vector_search.VectorSearch.from_vector_query(
+        couchbase.vector_search.VectorQuery(_VECTOR_FIELD_NAME, for_q, num_candidates=3)
+    )
+    search_req = couchbase.search.SearchRequest.create(couchbase.search.MatchNoneQuery())
+    search_req = search_req.with_vector_search(vector_req)
+    search_opt = couchbase.options.SearchOptions(fields=["*"])
+    search_result = scope.search(_VECTOR_INDEX_NAME, search_req, search_opt)
+
+    tool_results = []
+    for r in search_result.rows():
+        tool_results.append(collection.get(r.id).content_as[dict][_TEXT_FIELD_NAME])
+    return tool_results

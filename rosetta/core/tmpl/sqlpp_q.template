@@ -1,0 +1,45 @@
+""" This file has been generated automatically by Rosetta at <<GENERATION_DATE_PLACEHOLDER>> as a sqlpp_query tool. """
+from __future__ import annotations
+
+import couchbase.auth
+import couchbase.options
+import couchbase.cluster
+import langchain_core.tools
+import os
+
+import rosetta.tools
+
+_SQLPP_QUERY = """
+<<SQLPP_QUERY_PLACEHOLDER>>
+"""
+
+<<ARGUMENT_SCHEMA_PLACEHOLDER>>
+
+
+<<OUTPUT_SCHEMA_PLACEHOLDER>>
+
+
+def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
+    authenticator = couchbase.auth.PasswordAuthenticator(
+        username=os.getenv('CB_USERNAME'),
+        password=os.getenv('CB_PASSWORD')
+    )
+    conn_string = os.getenv('CB_CONN_STRING')
+    return couchbase.cluster.Cluster(conn_string, couchbase.options.ClusterOptions(authenticator))
+
+
+@rosetta.tools.tool(infer_schema=True)
+def <<TOOL_NAME_PLACEHOLDER>>(argument_input: _ArgumentInput) -> _ToolOutput:
+    """
+    <<TOOL_DESCRIPTION_PLACEHOLDER>>
+    """
+    cluster = _get_couchbase_cluster()
+    query_results = cluster.query(
+        _SQLPP_QUERY,
+        couchbase.options.QueryOptions(named_parameters=argument_input.dict())
+    )
+
+    tool_results = []
+    for result in query_results:
+        tool_results.append(_ToolOutput(**result))
+    return tool_results
