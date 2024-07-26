@@ -6,12 +6,12 @@ The core for a Couchbase-backed agentic workflow SDK.
 
 1. Ensure that you have `python3.11` and `poetry` installed.
    ```bash
-   python3 pip install poetry
+   python3 -m pip install poetry
    ```
 2. Clone this repository -- make sure that you have an SSH key setup!
-    ```bash
-    git clone git@github.com:couchbaselabs/rosetta-core.git
-    ```
+   ```bash
+   git clone git@github.com:couchbaselabs/rosetta-core.git
+   ```
 3. Install the dependencies from `pyproject.toml`.
    ```bash
    poetry install 
