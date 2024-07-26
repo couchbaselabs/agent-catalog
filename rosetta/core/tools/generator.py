@@ -27,7 +27,7 @@ class _SQLPPToolDescriptor(pydantic.BaseModel):
     sqlpp_query: str
 
     # In JSON-schema.
-    parameters: typing.Dict
+    input_schema: typing.Dict
     output_schema: typing.Dict
 
 
@@ -36,7 +36,7 @@ class _SemanticSearchToolDescriptor(pydantic.BaseModel):
     description: str
 
     # In JSON-schema.
-    parameters: typing.Dict
+    input_schema: typing.Dict
 
     # For our vector search.
     bucket: str
@@ -51,7 +51,7 @@ class _SemanticSearchToolDescriptor(pydantic.BaseModel):
 class _CodeGenerator(pydantic.BaseModel, abc.ABC):
     tool_descriptor: ToolDescriptor
     template_directory: pathlib.Path = pydantic.Field(
-        default=(pathlib.Path(__file__).parent.parent / 'tmpl').resolve(),
+        default=(pathlib.Path(__file__).parent / 'tmpl').resolve(),
         description='Location of the the template files.'
     )
 
@@ -109,7 +109,7 @@ class SQLPPCodeGenerator(_CodeGenerator):
                 name=front_matter['Name'],
                 description=front_matter['Description'].strip(),
                 sqlpp_query=sqlpp_query,
-                parameters=json.loads(front_matter['Parameters']),
+                input_schema=json.loads(front_matter['Input']),
                 output_schema=json.loads(front_matter['Output'])
             )
 
@@ -119,7 +119,7 @@ class SQLPPCodeGenerator(_CodeGenerator):
         # TODO (GLENN): Infer the output_schema in the future by first running the query.
         # Generate a Pydantic model for the argument and output schemas.
         argument_model_code = self._generate_model(
-            json_schema=json.dumps(sqlpp_descriptor.parameters),
+            json_schema=json.dumps(sqlpp_descriptor.input_schema),
             class_name=ArgumentModelClassNameInTemplates
         )
         output_model_code = self._generate_model(
@@ -150,7 +150,7 @@ class SemanticSearchCodeGenerator(_CodeGenerator):
         return _SemanticSearchToolDescriptor(
             name=parsed_desc['Name'],
             description=parsed_desc['Description'].strip(),
-            parameters=json.loads(parsed_desc['Parameters']),
+            input_schema=json.loads(parsed_desc['Input']),
             **parsed_desc['Vector Search']
         )
 
@@ -159,7 +159,7 @@ class SemanticSearchCodeGenerator(_CodeGenerator):
 
         # Generate a Pydantic model for the argument schema.
         argument_model_code = self._generate_model(
-            json_schema=json.dumps(sst_descriptor.parameters),
+            json_schema=json.dumps(sst_descriptor.input_schema),
             class_name=ArgumentModelClassNameInTemplates
         )
 

@@ -7,10 +7,10 @@ authors = [
     "Glenn Galvizo <glenn.galvizo@couchbase.com>"
 ]
 readme = "README.md"
-packages = [{include = "rosetta"}]
+packages = [{ include = "rosetta" }]
 
 [tool.poetry.scripts]
-rosetta = "rosetta.core.cmd:main"
+rosetta = "rosetta.core.cmd.main:main"
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -25,6 +25,8 @@ pydantic = "^2.8.2"
 requests = "^2.32.3"
 PyYAML = "^6.0.1"
 datamodel-code-generator = "^0.25.8"
+semchunk = "^2.2.0"
+fastapi = "^0.111.1"
 
 # Note:
 #   This dependency is purely for the StructuredTool (BaseTool) type.

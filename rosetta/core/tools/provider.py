@@ -3,7 +3,6 @@ import shutil
 import tempfile
 import typing
 import uuid
-
 import pydantic
 import pathlib
 import importlib
@@ -56,7 +55,7 @@ class Provider(pydantic.BaseModel, abc.ABC):
         self._output_directory = pathlib.Path(tempfile.mkdtemp())
 
     @abc.abstractmethod
-    def semantic(self, objective: str) -> typing.List[langchain_core.tools.StructuredTool]:
+    def get_tools_for(self, objective: str) -> typing.List[langchain_core.tools.StructuredTool]:
         pass
 
     @abc.abstractmethod
@@ -117,7 +116,7 @@ class LocalProvider(Provider):
                             ).write(tmp_fp)
                             self._load_from_source(pathlib.Path(tmp_fp.name), entry)
 
-    def semantic(self, objective: str, k: typing.Union[int | None] = 1) \
+    def get_tools_for(self, objective: str, k: typing.Union[int | None] = 1) \
             -> typing.List[langchain_core.tools.StructuredTool]:
         # Compute the distance between our tool embeddings and our objective embeddings.
         objective_embedding = self.embedding_model.encode(objective)

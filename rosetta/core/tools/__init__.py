@@ -3,7 +3,7 @@ from .provider import (
     LocalProvider,
     CapellaProvider
 )
-from .registry import (
+from .registrar import (
     Registrar,
     LocalRegistrar,
     CapellaRegistrar
