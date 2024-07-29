@@ -55,5 +55,10 @@ def version():
     """Print the version of this tool."""
     cmd_version()
 
+@main.command()
+def web():
+    """Start a web server."""
+    cmd_web()
+
 if __name__ == '__main__':
     main()

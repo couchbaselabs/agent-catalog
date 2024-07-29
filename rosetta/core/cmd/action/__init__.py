@@ -14,6 +14,15 @@ from .index import (
 from .version import (
     cmd_version
 )
+from .web import (
+    cmd_web
+)
+
+def register_blueprints(app):
+    # app.register_blueprint(clean.blueprint)
+    # app.register_blueprint(init.blueprint)
+    # app.register_blueprint(index.blueprint)
+    app.register_blueprint(version.blueprint)
 
 # ...and our defaults.
 DEFAULT_OUTPUT_DIRECTORY = '.out'
