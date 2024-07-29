@@ -8,7 +8,7 @@ default_pcf = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / ('prompt' + DEFAULT_CATALO
 default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_HISTORY_DIR).absolute())
 
 
-@click.group()
+@click.group(epilog='See: https://docs.couchbase.com/ for more details.')
 def main():
     """A command line tool for Rosetta."""
     pass
@@ -25,7 +25,8 @@ def main():
 @click.option('-hd', '--history-dir',
               default=default_hd,
               help=f'Directory for processing history (default: {default_hd}).')
-def init(embedding_models, output_dir, history_dir):
+@click.pass_context
+def init(ctx, embedding_models, output_dir, history_dir):
     """Initialize the environment (e.g., download & cache models, etc)."""
     cmd_init_local(embedding_models=embedding_models,
                    output_dir=output_dir,
@@ -42,7 +43,8 @@ def init(embedding_models, output_dir, history_dir):
 @click.option('-hd', '--history-dir',
               default=default_hd,
               help=f'Directory of processing history to clean (default: {default_hd}).')
-def clean(tool_catalog_file, prompt_catalog_file, history_dir):
+@click.pass_context
+def clean(ctx, tool_catalog_file, prompt_catalog_file, history_dir):
     """Clean up generated files, etc."""
     cmd_clean_local(tool_catalog_file=tool_catalog_file,
                     prompt_catalog_file=prompt_catalog_file,
@@ -57,10 +59,11 @@ def clean(tool_catalog_file, prompt_catalog_file, history_dir):
 @click.option('-em', '--embedding-model',
               default=DEFAULT_EMBEDDING_MODEL,
               help=f'Embedding model when building the catalog file (default: {DEFAULT_EMBEDDING_MODEL}).')
-def index(tool_dirs, tool_catalog_file, embedding_model):
+@click.pass_context
+def index(ctx, tool_dirs, tool_catalog_file, embedding_model):
     """Walk directory tree source files to build a catalog file.
 
-Source files scanned include *.py, *.sqlpp, *.yaml, etc."""
+    Source files scanned include *.py, *.sqlpp, *.yaml, etc."""
     cmd_index_local(tool_dirs=tool_dirs,
                     tool_catalog_file=tool_catalog_file,
                     embedding_model=embedding_model)
@@ -79,7 +82,8 @@ def version():
 @click.option('--debug/--no-debug',
               default=True,
               help='Debug mode (default: True).')
-def web():
+@click.pass_context
+def web(ctx, host_port, debug):
     """Start local web server."""
     cmd_web(host_port, debug)
 
