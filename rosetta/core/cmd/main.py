@@ -60,7 +60,7 @@ def clean(tool_catalog_file, prompt_catalog_file, history_dir):
 def index(tool_dirs, tool_catalog_file, embedding_model):
     """Walk directory tree source files to build a catalog file.
 
-Source files scanned include *.py, *.sqlpp, *.yaml, etc."""
+    Source files scanned include *.py, *.sqlpp, *.yaml, etc."""
     cmd_index_local(tool_dirs=tool_dirs,
                     tool_catalog_file=tool_catalog_file,
                     embedding_model=embedding_model)
