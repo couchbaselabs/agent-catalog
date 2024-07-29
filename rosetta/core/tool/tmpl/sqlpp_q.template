@@ -4,10 +4,9 @@ from __future__ import annotations
 import couchbase.auth
 import couchbase.options
 import couchbase.cluster
-import langchain_core.tools
 import os
 
-import rosetta.core.tools
+import rosetta.core.tool
 
 _SQLPP_QUERY = """
 <<SQLPP_QUERY_PLACEHOLDER>>
@@ -28,15 +27,24 @@ def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
     return couchbase.cluster.Cluster(conn_string, couchbase.options.ClusterOptions(authenticator))
 
 
-@rosetta.core.tools.tool(infer_schema=True)
+@rosetta.core.tool.tool(infer_schema=True)
 def <<TOOL_NAME_PLACEHOLDER>>(argument_input: _ArgumentInput) -> _ToolOutput:
     """
     <<TOOL_DESCRIPTION_PLACEHOLDER>>
     """
     cluster = _get_couchbase_cluster()
+
+    # We need to safeguard against weird LLM function calls.
+    if isinstance(argument_input, dict):
+        named_parameters = argument_input
+    elif isinstance(argument_input, _ArgumentInput):
+        named_parameters = argument_input.dict()
+    else:
+        raise ValueError("Bad input given to SQL++ tool!")
+
     query_results = cluster.query(
         _SQLPP_QUERY,
-        couchbase.options.QueryOptions(named_parameters=argument_input.dict())
+        couchbase.options.QueryOptions(named_parameters=named_parameters)
     )
 
     tool_results = []
