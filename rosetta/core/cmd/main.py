@@ -9,19 +9,19 @@ def main():
     pass
 
 @main.command()
-@click.option('-sm', '--sentence-models',
+@click.option('-em', '--embedding-model',
               multiple=True,
               default=['sentence-transformers/all-MiniLM-L12-v2'],
-              help='SBERT models to download ahead of time.')
+              help='Emedding models to download and cache.')
 @click.option('-od', '--output-directory',
               default=DEFAULT_OUTPUT_DIRECTORY,
-              help='Location of the output directory to initialize (for non-CB-backed agents).')
-@click.option('-hist', '--history-directory',
+              help='Location of output directory for generated files, etc.')
+@click.option('-hd', '--history-dir',
               default=str((pathlib.Path(DEFAULT_OUTPUT_DIRECTORY) / DEFAULT_HISTORY_DIRECTORY).absolute()),
               help='Place to store the agent action history (relative to the output_directory).')
-def init(sentence_models, output_directory, history_directory):
-    """Initialize the runtime environment (e.g., install sentence_transformers models)."""
-    cmd_initialize_local(sentence_models=sentence_models,
+def init(embedding_models, output_directory, history_directory):
+    """Initialize the environment (e.g., download & cache models, etc)."""
+    cmd_initialize_local(embedding_models=embedding_models,
                          output_directory=output_directory,
                          history_directory=history_directory)
 
@@ -57,7 +57,7 @@ def version():
 
 @main.command()
 def web():
-    """Start a web server."""
+    """Start a local web server."""
     cmd_web()
 
 if __name__ == '__main__':

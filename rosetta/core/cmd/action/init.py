@@ -4,11 +4,11 @@ import os
 import couchbase.auth
 
 
-def cmd_initialize_local(sentence_models: typing.List[str], output_directory: str, history_directory: str, **_):
+def cmd_initialize_local(embedding_models: typing.List[str], output_directory: str, history_directory: str, **_):
     import sentence_transformers
 
     # Download any embedding models that need to be used at runtime.
-    for model in sentence_models:
+    for model in embedding_models:
         sentence_transformers.SentenceTransformer(model)
 
     # Initialize our directories.
