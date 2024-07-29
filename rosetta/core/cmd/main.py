@@ -43,5 +43,10 @@ def index(tool_dirs, catalog_file, embedding_model):
     """Walk one or more directories and build a tool catalog from Python tools and descriptor files (*.sqlpp and *.yaml)."""
     cmd_index_local(tool_dirs=tool_dirs, catalog_file=catalog_file, embedding_model=embedding_model)
 
+@main.command()
+def version():
+    """Print the version of this tool."""
+    cmd_version()
+
 if __name__ == '__main__':
     main()
