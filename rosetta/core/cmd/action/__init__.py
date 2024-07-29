@@ -4,8 +4,8 @@ from .clean import (
     cmd_clean_local
 )
 from .init import (
-    cmd_initialize_couchbase,
-    cmd_initialize_local
+    cmd_init_couchbase,
+    cmd_init_local
 )
 from .index import (
     cmd_index_couchbase,
@@ -25,8 +25,8 @@ def register_blueprints(app):
     app.register_blueprint(version.blueprint)
 
 # ...and our defaults.
-DEFAULT_OUTPUT_DIRECTORY = '.out'
-DEFAULT_HISTORY_DIRECTORY = 'history'
+DEFAULT_OUTPUT_DIR = '.out'
+DEFAULT_HISTORY_DIR = 'history'
 DEFAULT_CATALOG_FILENAME = 'catalog.json'
 DEFAULT_EMBEDDING_MODEL = 'sentence-transformers/all-MiniLM-L12-v2'
 DEFAULT_WEB_HOST_PORT = '127.0.0.1:5555'

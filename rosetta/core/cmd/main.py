@@ -3,8 +3,8 @@ import click
 
 from .action import *
 
-default_cf = str((pathlib.Path(DEFAULT_OUTPUT_DIRECTORY) / DEFAULT_CATALOG_FILENAME).absolute())
-default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIRECTORY) / DEFAULT_HISTORY_DIRECTORY).absolute())
+default_cf = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_CATALOG_FILENAME).absolute())
+default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_HISTORY_DIR).absolute())
 
 @click.group()
 def main():
@@ -16,17 +16,17 @@ def main():
               multiple=True,
               default=[DEFAULT_EMBEDDING_MODEL],
               help=f'Embedding models to download and cache (default: {DEFAULT_EMBEDDING_MODEL}).')
-@click.option('-od', '--output-directory',
-              default=DEFAULT_OUTPUT_DIRECTORY,
-              help=f'Directory for output, generated files, etc. (default: {DEFAULT_OUTPUT_DIRECTORY}).')
+@click.option('-od', '--output-dir',
+              default=DEFAULT_OUTPUT_DIR,
+              help=f'Directory for output, generated files, etc. (default: {DEFAULT_OUTPUT_DIR}).')
 @click.option('-hd', '--history-dir',
               default=default_hd,
               help=f'Directory for processing history (default: {default_hd}).')
-def init(embedding_models, output_directory, history_directory):
+def init(embedding_models, output_dir, history_dir):
     """Initialize the environment (e.g., download & cache models, etc)."""
-    cmd_initialize_local(embedding_models=embedding_models,
-                         output_directory=output_directory,
-                         history_directory=history_directory)
+    cmd_init_local(embedding_models=embedding_models,
+                         output_dir=output_dir,
+                         history_dir=history_dir)
 
 @main.command()
 @click.option('-cf', '--catalog-file',
