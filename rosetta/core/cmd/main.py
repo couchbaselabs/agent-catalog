@@ -9,9 +9,12 @@ default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_HISTORY_DIR).absolu
 
 
 @click.group(epilog='See: https://docs.couchbase.com/ for more details.')
-def main():
+@click.option('-v', '--verbose', is_flag=True, help='Enable verbose output.')
+@click.pass_context
+def main(ctx, verbose):
     """A command line tool for Rosetta."""
-    pass
+    ctx.obj = ctx.obj or {}
+    ctx.obj['verbose'] = verbose
 
 
 @main.command()
@@ -70,7 +73,8 @@ def index(ctx, tool_dirs, tool_catalog_file, embedding_model):
 
 
 @main.command()
-def version():
+@click.pass_context
+def version(ctx):
     """Print the version of this tool."""
     cmd_version()
 
