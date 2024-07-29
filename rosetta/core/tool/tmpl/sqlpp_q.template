@@ -4,9 +4,12 @@ from __future__ import annotations
 import couchbase.auth
 import couchbase.options
 import couchbase.cluster
+import typing
 import os
 
 import rosetta.core.tool
+
+_IS_LIST_VALUED = <<IS_LIST_VALUED_PLACEHOLDER>>
 
 _SQLPP_QUERY = """
 <<SQLPP_QUERY_PLACEHOLDER>>
@@ -28,7 +31,7 @@ def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
 
 
 @rosetta.core.tool.tool(infer_schema=True)
-def <<TOOL_NAME_PLACEHOLDER>>(argument_input: _ArgumentInput) -> _ToolOutput:
+def <<TOOL_NAME_PLACEHOLDER>>(argument_input: _ArgumentInput) -> typing.Union[typing.List[_ToolOutput] | _ToolOutput]:
     """
     <<TOOL_DESCRIPTION_PLACEHOLDER>>
     """
@@ -48,6 +51,11 @@ def <<TOOL_NAME_PLACEHOLDER>>(argument_input: _ArgumentInput) -> _ToolOutput:
     )
 
     tool_results = []
-    for result in query_results:
-        tool_results.append(_ToolOutput(**result))
-    return tool_results
+    if _IS_LIST_VALUED:
+        for result in query_results:
+            tool_results.append(_ToolOutput(**result))
+        return tool_results
+    else:
+        # TODO (GLENN): Clean this up.
+        for result in query_results:
+            return _ToolOutput(**result)

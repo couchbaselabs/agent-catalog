@@ -116,14 +116,22 @@ class SQLPPCodeGenerator(_CodeGenerator):
     def write(self, fp):
         sqlpp_descriptor = self._build_tool_descriptor()
 
-        # TODO (GLENN): Infer the output_schema in the future by first running the query.
-        # Generate a Pydantic model for the argument and output schemas.
+        # Generate a Pydantic model for the argument schema...
         argument_model_code = self._generate_model(
             json_schema=json.dumps(sqlpp_descriptor.input_schema),
             class_name=ArgumentModelClassNameInTemplates
         )
+
+        # ...and the output schema.
+        # TODO (GLENN): Infer the output_schema in the future by first running the query.
+        if sqlpp_descriptor.output_schema['type'] == 'array':
+            is_list_valued = True
+            codegen_output_schema = sqlpp_descriptor.output_schema['items']
+        else:
+            is_list_valued = False
+            codegen_output_schema = sqlpp_descriptor.output_schema
         output_model_code = self._generate_model(
-            json_schema=json.dumps(sqlpp_descriptor.output_schema),
+            json_schema=json.dumps(codegen_output_schema),
             class_name=OutputModelClassNameInTemplates
         )
 
@@ -135,6 +143,7 @@ class SQLPPCodeGenerator(_CodeGenerator):
                 .replace('<<SQLPP_QUERY_PLACEHOLDER>>', sqlpp_descriptor.sqlpp_query) \
                 .replace('<<ARGUMENT_SCHEMA_PLACEHOLDER>>', argument_model_code) \
                 .replace('<<OUTPUT_SCHEMA_PLACEHOLDER>>', output_model_code) \
+                .replace('<<IS_LIST_VALUED_PLACEHOLDER>>', "True" if is_list_valued else "False") \
                 .replace('<<TOOL_NAME_PLACEHOLDER>>', sqlpp_descriptor.name) \
                 .replace('<<TOOL_DESCRIPTION_PLACEHOLDER>>', sqlpp_descriptor.description)
             logger.debug('The following code has been generated:\n' + instance_string)
