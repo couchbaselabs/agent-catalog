@@ -1,96 +1,75 @@
-import argparse
 import pathlib
+import click
 
-# We will just pull everything from action into here.
 from .action import *
 
-parser = argparse.ArgumentParser(
-    description='A command line interface for Rosetta.'
-)
-subparsers = parser.add_subparsers(required=True)
+default_cf = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_CATALOG_FILENAME).absolute())
+default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_HISTORY_DIR).absolute())
 
-
-def _add_init_parser():
-    init_parser = subparsers.add_parser(
-        name='init',
-        description='Initialize the runtime environment (e.g., install sentence_transformers models).'
-    )
-    init_parser.add_argument(
-        '-sm', '--sentence_models',
-        nargs='+',
-        type=str,
-        default=['sentence-transformers/all-MiniLM-L12-v2'],
-        help='SBERT models to download ahead of time.'
-    )
-    init_parser.add_argument(
-        '-od', '--output_directory',
-        type=str,
-        default=DEFAULT_OUTPUT_DIRECTORY,
-        help='Location of the output directory to initialize (for non-CB-backed agents).'
-    )
-    init_parser.add_argument(
-        '-hist', '--history_directory',
-        type=str,
-        default=(pathlib.Path(DEFAULT_OUTPUT_DIRECTORY) / DEFAULT_HISTORY_DIRECTORY).absolute(),
-        help='Place to store the agent action history (relative to the output_directory).'
-    )
-    init_parser.set_defaults(func=cmd_initialize_local)
-
-
-def _add_clean_parser():
-    clean_parser = subparsers.add_parser(
-        name='clean',
-        description='Delete all index-time / runtime artifacts.'
-    )
-    clean_parser.add_argument(
-        '-cf', '--catalog_file',
-        type=str,
-        default=(pathlib.Path(DEFAULT_OUTPUT_DIRECTORY) / DEFAULT_CATALOG_FILENAME).absolute(),
-        help='Name of the tool catalog to remove.'
-    )
-    clean_parser.add_argument(
-        '-hd', '--history_dir',
-        type=str,
-        default=(pathlib.Path(DEFAULT_OUTPUT_DIRECTORY) / DEFAULT_HISTORY_DIRECTORY).absolute(),
-        help='Location of any agent messages to remove.'
-    )
-    clean_parser.set_defaults(func=cmd_clean_local)
-
-
-def _add_index_parser():
-    index_parser = subparsers.add_parser(
-        name='index',
-        description='Walk one or more directories and build a tool catalog from Python tools and descriptor '
-                    'files (*.sqlpp and *.yaml).'
-    )
-    index_parser.add_argument(
-        'tool_dirs',
-        type=str,
-        nargs='+',
-        help='Location of the tools (*.py) and tool descriptors (*.sqlpp and *.yaml) to index.'
-    )
-    index_parser.add_argument(
-        '-cf', '--catalog_file',
-        type=str,
-        default=(pathlib.Path(DEFAULT_OUTPUT_DIRECTORY) / DEFAULT_CATALOG_FILENAME).absolute(),
-        help='Name of the tool catalog to-be-generated (relative to the output directory).'
-    )
-    index_parser.add_argument(
-        '-em', '--embedding_model',
-        type=str,
-        default='sentence-transformers/all-MiniLM-L12-v2',
-        help='Embedding model to use when building the tool catalog.'
-    )
-    index_parser.set_defaults(func=cmd_index_local)
-
-
+@click.group()
 def main():
-    _add_init_parser()
-    _add_clean_parser()
-    _add_index_parser()
-    arguments = parser.parse_args()
-    arguments.func(**vars(arguments))
+    """A command line tool for Rosetta."""
+    pass
 
+@main.command()
+@click.option('-em', '--embedding-model',
+              multiple=True,
+              default=[DEFAULT_EMBEDDING_MODEL],
+              help=f'Embedding models to download and cache (default: {DEFAULT_EMBEDDING_MODEL}).')
+@click.option('-od', '--output-dir',
+              default=DEFAULT_OUTPUT_DIR,
+              help=f'Directory for output, generated files, etc. (default: {DEFAULT_OUTPUT_DIR}).')
+@click.option('-hd', '--history-dir',
+              default=default_hd,
+              help=f'Directory for processing history (default: {default_hd}).')
+def init(embedding_models, output_dir, history_dir):
+    """Initialize the environment (e.g., download & cache models, etc)."""
+    cmd_init_local(embedding_models=embedding_models,
+                         output_dir=output_dir,
+                         history_dir=history_dir)
+
+@main.command()
+@click.option('-cf', '--catalog-file',
+              default=default_cf,
+              help=f'Path of catalog file to clean (default: {default_cf}).')
+@click.option('-hd', '--history-dir',
+              default=default_hd,
+              help=f'Directory of processing history to clean (default: {default_hd}).')
+def clean(catalog_file, history_dir):
+    """Clean up generated files, etc."""
+    cmd_clean_local(catalog_file=catalog_file, history_dir=history_dir)
+
+@main.command()
+@click.argument('tool_dirs', nargs=-1, required=True)
+@click.option('-cf', '--catalog-file',
+              default=default_cf,
+              help=f'Path of catalog file to output (default: {default_cf}).')
+@click.option('-em', '--embedding-model',
+              default=DEFAULT_EMBEDDING_MODEL,
+              help=f'Embedding model when building the catalog file (default: {DEFAULT_EMBEDDING_MODEL}).')
+def index(tool_dirs, catalog_file, embedding_model):
+    """Walk directory tree source files to build a catalog file.
+
+Source files scanned include *.py, *.sqlpp, *.yaml, etc."""
+    cmd_index_local(tool_dirs=tool_dirs,
+                    catalog_file=catalog_file,
+                    embedding_model=embedding_model)
+
+@main.command()
+def version():
+    """Print the version of this tool."""
+    cmd_version()
+
+@main.command()
+@click.option('--host-port',
+              default=DEFAULT_WEB_HOST_PORT,
+              help=f'The host:port to listen on (default: {DEFAULT_WEB_HOST_PORT}).')
+@click.option('--debug/--no-debug',
+              default=True,
+              help='Debug mode (default: True).')
+def web():
+    """Start local web server."""
+    cmd_web(host_port, debug)
 
 if __name__ == '__main__':
     main()

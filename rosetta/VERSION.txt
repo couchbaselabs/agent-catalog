@@ -1,0 +1,5 @@
+# NOTE: This should be replaced during build/packaging
+# by the output of `git describe --long --always`.
+# For example: "v0.1.0-0-g6f9305e".
+
+vMajor.Minor.Micro-N-GITSHA
