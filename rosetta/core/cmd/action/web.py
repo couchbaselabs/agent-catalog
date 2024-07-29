@@ -2,15 +2,16 @@ import importlib.resources
 
 import flask
 
-def cmd_web():
+def cmd_web(host_port, debug=True):
     app = flask.Flask(__name__)
 
     from rosetta.core.cmd.action import register_blueprints
 
     register_blueprints(app)
 
-    # TODO: Allow configurable HOST, PORT, etc.
-    app.run(host='0.0.0.0', port=5555, debug=True)
+    host, port = host_port.split(':')
+
+    app.run(host=host, port=port, debug=debug)
 
 if __name__ == "__main__":
     cmd_web()

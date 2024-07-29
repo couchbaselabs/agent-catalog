@@ -3,22 +3,25 @@ import click
 
 from .action import *
 
+default_cf = str((pathlib.Path(DEFAULT_OUTPUT_DIRECTORY) / DEFAULT_CATALOG_FILENAME).absolute())
+default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIRECTORY) / DEFAULT_HISTORY_DIRECTORY).absolute())
+
 @click.group()
 def main():
-    """A command line interface for Rosetta."""
+    """A command line tool for Rosetta."""
     pass
 
 @main.command()
 @click.option('-em', '--embedding-model',
               multiple=True,
-              default=['sentence-transformers/all-MiniLM-L12-v2'],
-              help='Embedding models to download and cache.')
+              default=[DEFAULT_EMBEDDING_MODEL],
+              help=f'Embedding models to download and cache (default: {DEFAULT_EMBEDDING_MODEL}).')
 @click.option('-od', '--output-directory',
               default=DEFAULT_OUTPUT_DIRECTORY,
-              help='Location of output directory for generated files, etc.')
+              help=f'Directory for output, generated files, etc. (default: {DEFAULT_OUTPUT_DIRECTORY}).')
 @click.option('-hd', '--history-dir',
-              default=str((pathlib.Path(DEFAULT_OUTPUT_DIRECTORY) / DEFAULT_HISTORY_DIRECTORY).absolute()),
-              help='Place to store the agent action history (relative to the output_directory).')
+              default=default_hd,
+              help=f'Directory for processing history (default: {default_hd}).')
 def init(embedding_models, output_directory, history_directory):
     """Initialize the environment (e.g., download & cache models, etc)."""
     cmd_initialize_local(embedding_models=embedding_models,
@@ -27,25 +30,27 @@ def init(embedding_models, output_directory, history_directory):
 
 @main.command()
 @click.option('-cf', '--catalog-file',
-              default=str((pathlib.Path(DEFAULT_OUTPUT_DIRECTORY) / DEFAULT_CATALOG_FILENAME).absolute()),
-              help='Name of the tool catalog to remove.')
+              default=default_cf,
+              help=f'Path of catalog file to clean (default: {default_cf}).')
 @click.option('-hd', '--history-dir',
-              default=str((pathlib.Path(DEFAULT_OUTPUT_DIRECTORY) / DEFAULT_HISTORY_DIRECTORY).absolute()),
-              help='Location of any agent messages to remove.')
+              default=default_hd,
+              help=f'Directory of processing history to clean (default: {default_hd}).')
 def clean(catalog_file, history_dir):
-    """Delete all index-time / runtime artifacts."""
+    """Clean up generated files, etc."""
     cmd_clean_local(catalog_file=catalog_file, history_dir=history_dir)
 
 @main.command()
 @click.argument('tool_dirs', nargs=-1, required=True)
 @click.option('-cf', '--catalog-file',
-              default=str((pathlib.Path(DEFAULT_OUTPUT_DIRECTORY) / DEFAULT_CATALOG_FILENAME).absolute()),
-              help='Name of the tool catalog to-be-generated (relative to the output directory).')
+              default=default_cf,
+              help=f'Path of catalog file to output (default: {default_cf}).')
 @click.option('-em', '--embedding-model',
-              default='sentence-transformers/all-MiniLM-L12-v2',
-              help='Embedding model to use when building the tool catalog.')
+              default=DEFAULT_EMBEDDING_MODEL,
+              help=f'Embedding model when building the catalog file (default: {DEFAULT_EMBEDDING_MODEL}).')
 def index(tool_dirs, catalog_file, embedding_model):
-    """Walk one or more directories and build a catalog from Python source and descriptor files (*.sqlpp and *.yaml)."""
+    """Walk directory tree source files to build a catalog file.
+
+Source files scanned include *.py, *.sqlpp, *.yaml, etc."""
     cmd_index_local(tool_dirs=tool_dirs,
                     catalog_file=catalog_file,
                     embedding_model=embedding_model)
@@ -56,9 +61,15 @@ def version():
     cmd_version()
 
 @main.command()
+@click.option('--host-port',
+              default=DEFAULT_WEB_HOST_PORT,
+              help=f'The host:port to listen on (default: {DEFAULT_WEB_HOST_PORT}).')
+@click.option('--debug/--no-debug',
+              default=True,
+              help='Debug mode (default: True).')
 def web():
-    """Start a local web server."""
-    cmd_web()
+    """Start local web server."""
+    cmd_web(host_port, debug)
 
 if __name__ == '__main__':
     main()

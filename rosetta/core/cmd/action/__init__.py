@@ -28,3 +28,5 @@ def register_blueprints(app):
 DEFAULT_OUTPUT_DIRECTORY = '.out'
 DEFAULT_HISTORY_DIRECTORY = 'history'
 DEFAULT_CATALOG_FILENAME = 'catalog.json'
+DEFAULT_EMBEDDING_MODEL = 'sentence-transformers/all-MiniLM-L12-v2'
+DEFAULT_WEB_HOST_PORT = '127.0.0.1:5555'
