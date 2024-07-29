@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "rosetta-lc"
+version = "0.1.0"
+description = "Langchain Agent that accesses tools w/ Capella"
+authors = ["Kush Khanna"]
+readme = "README.md"
+packages = [{include = "rosetta"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+couchbase = "^4.3.0"
+joblib = "^1.4.2"
+langchain = "^0.2.12"
+langchain-core = "^0.2.28"
+langchain-openai = "^0.1.20"
+pydantic = "2.8.2"
+requests = "^2.32.3"
+python-dotenv = "^1.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
