@@ -8,7 +8,7 @@ default_pcf = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / ('prompt' + DEFAULT_CATALO
 default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_HISTORY_DIR).absolute())
 
 
-@click.group()
+@click.group(epilog='See: https://docs.couchbase.com/ for more details.')
 def main():
     """A command line tool for Rosetta."""
     pass
