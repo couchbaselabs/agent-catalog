@@ -78,8 +78,10 @@ def version():
 @main.command()
 @click.option('--host-port',
               default=DEFAULT_WEB_HOST_PORT,
+              envvar='ROSETTA_WEB_HOST_PORT',
               help=f'The host:port to listen on (default: {DEFAULT_WEB_HOST_PORT}).')
 @click.option('--debug/--no-debug',
+              envvar='ROSETTA_WEB_DEBUG',
               default=True,
               help='Debug mode (default: True).')
 @click.pass_context
