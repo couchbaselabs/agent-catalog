@@ -12,7 +12,7 @@ def main():
 @click.option('-em', '--embedding-model',
               multiple=True,
               default=['sentence-transformers/all-MiniLM-L12-v2'],
-              help='Emedding models to download and cache.')
+              help='Embedding models to download and cache.')
 @click.option('-od', '--output-directory',
               default=DEFAULT_OUTPUT_DIRECTORY,
               help='Location of output directory for generated files, etc.')
