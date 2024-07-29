@@ -19,7 +19,7 @@ class ToolDescriptor(pydantic.BaseModel):
 
     name: str
     description: str
-    encoding: typing.List[float]
+    embedding: typing.List[float]
 
     source: pathlib.Path
     kind: ToolKind

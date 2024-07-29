@@ -53,7 +53,7 @@ class Registrar(pydantic.BaseModel):
                 identifier=uuid.uuid4(),
                 name=tool.name,
                 description=tool.description,
-                encoding=self._encode_description(tool.description),
+                embedding=self._encode_description(tool.description),
                 source=str(filename.absolute()),
                 kind=ToolKind.PythonFunction,
             )
@@ -80,7 +80,7 @@ class Registrar(pydantic.BaseModel):
                 identifier=uuid.uuid4(),
                 name=front_matter['Name'],
                 description=description,
-                encoding=self._encode_description(description),
+                embedding=self._encode_description(description),
                 source=str(filename.absolute()),
                 kind=ToolKind.SQLPPQuery,
             )
@@ -95,7 +95,7 @@ class Registrar(pydantic.BaseModel):
                     identifier=uuid.uuid4(),
                     name=parsed_desc['Name'],
                     description=parsed_desc['Description'].strip(),
-                    encoding=self._encode_description(description),
+                    embedding=self._encode_description(description),
                     source=str(filename.absolute()),
                     kind=ToolKind.SemanticSearch
                 )
@@ -129,5 +129,5 @@ class LocalRegistrar(Registrar):
                 fp.write(entry.model_dump_json() + '\n')
 
 
-class CapellaRegistrar(Registrar):
+class CouchbaseRegistrar(Registrar):
     pass

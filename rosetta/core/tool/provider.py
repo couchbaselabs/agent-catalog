@@ -45,17 +45,20 @@ class Provider(pydantic.BaseModel, abc.ABC):
         default_factory=lambda: sentence_transformers.SentenceTransformer(os.getenv('DEFAULT_SENTENCE_EMODEL')),
         description="Embedding model used to encode the tool descriptions."
     )
+    output_directory: pathlib.Path = pydantic.Field(
+        default_factory=lambda: pathlib.Path(tempfile.mkdtemp()),
+        description="Location to place the generated Python stubs."
+    )
 
     _tools: typing.List[typing.Type[_ToolPointer]] = list()
     _modules: typing.Dict = dict()
-    _output_directory: pathlib.Path
 
     def __init__(self, /, **data: typing.Any):
         super(Provider, self).__init__(**data)
-        self._output_directory = pathlib.Path(tempfile.mkdtemp())
 
     @abc.abstractmethod
-    def get_tools_for(self, objective: str) -> typing.List[langchain_core.tools.StructuredTool]:
+    def get_tools_for(self, objective: str, k: typing.Union[int | None] = 1) \
+            -> typing.List[langchain_core.tools.StructuredTool]:
         pass
 
     @abc.abstractmethod
@@ -76,7 +79,7 @@ class Provider(pydantic.BaseModel, abc.ABC):
             if tool_filter is None or tool_filter(tool):
                 self._tools.append(_ToolPointer(
                     identifier=entry.identifier,
-                    embedding=entry.encoding,
+                    embedding=entry.embedding,
                     tool=tool
                 ))
                 break
@@ -85,7 +88,7 @@ class Provider(pydantic.BaseModel, abc.ABC):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        shutil.rmtree(str(self._output_directory.absolute()))
+        shutil.rmtree(str(self.output_directory.absolute()))
 
 
 class LocalProvider(Provider):
@@ -103,14 +106,14 @@ class LocalProvider(Provider):
                         self._load_from_source(entry.source, entry, tool_filter)
 
                     case ToolKind.SQLPPQuery:
-                        with open(self._output_directory / (str(uuid.uuid4()) + '.py'), 'w') as tmp_fp:
+                        with open(self.output_directory / (str(uuid.uuid4()) + '.py'), 'w') as tmp_fp:
                             SQLPPCodeGenerator(
                                 tool_descriptor=entry
                             ).write(tmp_fp)
                             self._load_from_source(pathlib.Path(tmp_fp.name), entry)
 
                     case ToolKind.SemanticSearch:
-                        with open(self._output_directory / (str(uuid.uuid4()) + '.py'), 'w') as tmp_fp:
+                        with open(self.output_directory / (str(uuid.uuid4()) + '.py'), 'w') as tmp_fp:
                             SemanticSearchCodeGenerator(
                                 tool_descriptor=entry
                             ).write(tmp_fp)
@@ -165,5 +168,5 @@ class LocalProvider(Provider):
         pass
 
 
-class CapellaProvider(Provider):
+class CouchbaseProvider(Provider):
     pass

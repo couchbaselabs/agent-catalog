@@ -1,12 +1,12 @@
 from .provider import (
     Provider,
     LocalProvider,
-    CapellaProvider
+    CouchbaseProvider
 )
 from .registrar import (
     Registrar,
     LocalRegistrar,
-    CapellaRegistrar
+    CouchbaseRegistrar
 )
 
 # For ease of use (and what seems to be universal adoption), we'll use LangChain's BaseTool.
