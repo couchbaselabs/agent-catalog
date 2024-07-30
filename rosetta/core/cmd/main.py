@@ -22,7 +22,7 @@ default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_HISTORY_DIR).absolu
               envvar='ROSETTA_CATALOG',
               show_default=True)
 @click.option('-v', '--verbose',
-              is_flag=True,
+              count=True,
               help='Enable verbose output.',
               envvar='ROSETTA_VERBOSE')
 @click.pass_context
