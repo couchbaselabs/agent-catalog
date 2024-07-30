@@ -20,8 +20,8 @@ from .init import (
 from .publish import (
     cmd_publish
 )
-from .validate import (
-    cmd_validate
+from .status import (
+    cmd_status
 )
 from .version import (
     cmd_version
@@ -38,7 +38,7 @@ def register_blueprints(app):
     # TODO: app.register_blueprint(index.blueprint)
     # TODO: app.register_blueprint(init.blueprint)
     # TODO: app.register_blueprint(publish.blueprint)
-    # TODO: app.register_blueprint(validate.blueprint)
+    # TODO: app.register_blueprint(status.blueprint)
 
     app.register_blueprint(version.blueprint)
 

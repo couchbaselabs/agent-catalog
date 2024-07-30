@@ -17,7 +17,7 @@ default_pcf = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / ('prompt' + DEFAULT_CATALO
 default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_HISTORY_DIR).absolute())
 
 
-@click.group(epilog='See: https://docs.couchbase.com/ for more information.')
+@click.group(epilog='See: https://docs.couchbase.com for more information.')
 @click.option('-c', '--catalog',
               default='./catalog',
               help='Directory of catalog files.',
@@ -107,9 +107,9 @@ def publish(ctx):
 
 @main.command()
 @click.pass_context
-def validate(ctx):
-    """Validate the catalog and other data."""
-    cmd_validate()
+def status(ctx):
+    """Print the status the catalog."""
+    cmd_status(ctx.obj)
 
 
 @main.command()
