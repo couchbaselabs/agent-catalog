@@ -72,6 +72,10 @@ def index(ctx, source_dirs, embedding_model):
 
     Source files scanned include *.py, *.sqlpp, *.yaml, etc."""
 
+    # TODO: The index command should default to the '.' directory / current directory.
+    # TODO: The index command should ignore the '.git' subdirectory.
+    # TODO: The index command should ignore whatever's in the '.gitignore' file.
+
     cmd_index(ctx.obj, source_dirs=source_dirs, embedding_model=embedding_model)
 
 
