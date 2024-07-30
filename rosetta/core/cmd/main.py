@@ -19,7 +19,8 @@ default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_HISTORY_DIR).absolu
 @click.option('-c', '--catalog',
               default='./catalog',
               help='Directory of catalog files.',
-              envvar='ROSETTA_CATALOG')
+              envvar='ROSETTA_CATALOG',
+              show_default=True)
 @click.option('-v', '--verbose',
               is_flag=True,
               help='Enable verbose output.',
@@ -35,7 +36,8 @@ def main(ctx, catalog, verbose):
 @main.command()
 @click.option('-hd', '--history-dir',
               default=default_hd,
-              help=f'Directory of processing history to clean (default: {default_hd}).')
+              help='Directory of processing history to clean.',
+              show_default=True)
 @click.pass_context
 def clean(ctx, history_dir):
     """Clean up generated files, etc."""
@@ -66,7 +68,8 @@ def publish(ctx):
 @click.argument('source_dirs', nargs=-1, required=True)
 @click.option('-em', '--embedding-model',
               default=DEFAULT_EMBEDDING_MODEL,
-              help=f'Embedding model when building the catalog file (default: {DEFAULT_EMBEDDING_MODEL}).')
+              help='Embedding model when building the catalog file.',
+              show_default=True)
 @click.pass_context
 def index(ctx, source_dirs, embedding_model):
     """Walk directory tree source files to build a catalog file.
@@ -84,10 +87,12 @@ def index(ctx, source_dirs, embedding_model):
 @click.option('-em', '--embedding-model',
               multiple=True,
               default=[DEFAULT_EMBEDDING_MODEL],
-              help=f'Embedding models to download and cache (default: {DEFAULT_EMBEDDING_MODEL}).')
+              help='Embedding models to download and cache.',
+              show_default=True)
 @click.option('-hd', '--history-dir',
               default=default_hd,
-              help=f'Directory for processing history (default: {default_hd}).')
+              help='Directory for processing history.',
+              show_default=True)
 @click.pass_context
 def init(ctx, embedding_models, history_dir):
     """Initialize the environment (e.g., download & cache models, etc)."""
@@ -121,11 +126,13 @@ def version(ctx):
 @click.option('--host-port',
               default=DEFAULT_WEB_HOST_PORT,
               envvar='ROSETTA_WEB_HOST_PORT',
-              help=f'The host:port to listen on (default: {DEFAULT_WEB_HOST_PORT}).')
+              help='The host:port to listen on.',
+              show_default=True)
 @click.option('--debug/--no-debug',
               envvar='ROSETTA_WEB_DEBUG',
               default=True,
-              help='Debug mode (default: True).')
+              help='Debug mode.',
+              show_default=True)
 @click.pass_context
 def web(ctx, host_port, debug):
     """Start local web server."""
