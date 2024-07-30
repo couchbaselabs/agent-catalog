@@ -105,7 +105,7 @@ def publish(ctx):
 @main.command()
 @click.pass_context
 def status(ctx):
-    """Print the status the catalog."""
+    """Print the status of the catalog."""
     cmd_status(ctx.obj)
 
 
