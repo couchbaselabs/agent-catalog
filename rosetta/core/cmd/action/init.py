@@ -4,7 +4,7 @@ import os
 import couchbase.auth
 
 
-def cmd_init_local(embedding_models: typing.List[str], output_dir: str, history_dir: str, **_):
+def cmd_init_local(embedding_models: typing.List[str], catalog_dir: str, history_dir: str, **_):
     import sentence_transformers
 
     # Download any embedding models that need to be used at runtime.
@@ -14,16 +14,17 @@ def cmd_init_local(embedding_models: typing.List[str], output_dir: str, history_
         sentence_transformers.SentenceTransformer(model)
 
     # Init directories.
-    output_dir_path = pathlib.Path(output_dir)
-    if not output_dir_path.exists():
-        os.mkdir(output_dir)
+    catalog_dir_path = pathlib.Path(catalog_dir)
+    if not catalog_dir_path.exists():
+        os.mkdir(catalog_dir_path)
 
     history_dir_path = pathlib.Path(history_dir)
     if not history_dir_path.exists():
         os.mkdir(history_dir_path.absolute())
 
 
-def cmd_init_couchbase(embedding_models: typing.List[str], conn_string: str,
-                             authenticator: couchbase.auth.Authenticator, **_):
+def cmd_init_couchbase(embedding_models: typing.List[str],
+                       conn_string: str,
+                       authenticator: couchbase.auth.Authenticator, **_):
     # TODO (GLENN): Add initialization steps to create CB collections here.
     pass

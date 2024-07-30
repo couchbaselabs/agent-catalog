@@ -20,10 +20,12 @@ default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_HISTORY_DIR).absolu
 @click.group(epilog='See: https://docs.couchbase.com/ for more information.')
 @click.option('-c', '--catalog',
               default='./catalog',
-              help='Directory of catalog files.')
+              help='Directory of catalog files.',
+              envvar='ROSETTA_CATALOG')
 @click.option('-v', '--verbose',
               is_flag=True,
-              help='Enable verbose output.')
+              help='Enable verbose output.',
+              envvar='ROSETTA_VERBOSE')
 @click.pass_context
 def main(ctx, catalog, verbose):
     """A command line tool for Rosetta."""
@@ -37,7 +39,7 @@ def main(ctx, catalog, verbose):
               default=default_hd,
               help=f'Directory of processing history to clean (default: {default_hd}).')
 @click.pass_context
-def clean(ctx, tool_catalog_file, prompt_catalog_file, history_dir):
+def clean(ctx, history_dir):
     """Clean up generated files, etc."""
 
     tool_catalog_file = ctx.obj['catalog'] + '/tool_catalog.json'
@@ -63,19 +65,19 @@ def publish(ctx):
 
 
 @main.command()
-@click.argument('tool_dirs', nargs=-1, required=True)
-@click.option('-tcf', '--tool-catalog-file',
-              default=default_tcf,
-              help=f'Path of tool catalog file to output (default: {default_tcf}).')
+@click.argument('source_dirs', nargs=-1, required=True)
 @click.option('-em', '--embedding-model',
               default=DEFAULT_EMBEDDING_MODEL,
               help=f'Embedding model when building the catalog file (default: {DEFAULT_EMBEDDING_MODEL}).')
 @click.pass_context
-def index(ctx, tool_dirs, tool_catalog_file, embedding_model):
+def index(ctx, source_dirs, embedding_model):
     """Walk directory tree source files to build a catalog file.
 
     Source files scanned include *.py, *.sqlpp, *.yaml, etc."""
-    cmd_index_local(tool_dirs=tool_dirs,
+
+    tool_catalog_file = ctx.obj['catalog'] + '/tool_catalog.json'
+
+    cmd_index_local(tool_dirs=source_dirs,
                     tool_catalog_file=tool_catalog_file,
                     embedding_model=embedding_model)
 
@@ -85,17 +87,14 @@ def index(ctx, tool_dirs, tool_catalog_file, embedding_model):
               multiple=True,
               default=[DEFAULT_EMBEDDING_MODEL],
               help=f'Embedding models to download and cache (default: {DEFAULT_EMBEDDING_MODEL}).')
-@click.option('-od', '--output-dir',
-              default=DEFAULT_OUTPUT_DIR,
-              help=f'Directory for output, generated files, etc. (default: {DEFAULT_OUTPUT_DIR}).')
 @click.option('-hd', '--history-dir',
               default=default_hd,
               help=f'Directory for processing history (default: {default_hd}).')
 @click.pass_context
-def init(ctx, embedding_models, output_dir, history_dir):
+def init(ctx, embedding_models, history_dir):
     """Initialize the environment (e.g., download & cache models, etc)."""
     cmd_init_local(embedding_models=embedding_models,
-                   output_dir=output_dir,
+                   output_dir=ctx.obj['catalog'],
                    history_dir=history_dir)
 
 
@@ -132,7 +131,7 @@ def version(ctx):
 @click.pass_context
 def web(ctx, host_port, debug):
     """Start local web server."""
-    cmd_web(host_port, debug)
+    cmd_web(ctx.obj, host_port, debug)
 
 
 if __name__ == '__main__':
