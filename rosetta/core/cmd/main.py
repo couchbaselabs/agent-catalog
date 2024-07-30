@@ -33,18 +33,16 @@ def main(ctx, catalog, verbose):
 
 
 @main.command()
-@click.option('-tcf', '--tool-catalog-file',
-              default=default_tcf,
-              help=f'Path of the tool catalog file to clean (default: {default_tcf}).')
-@click.option('-pcf', '--prompt-catalog-file',
-              default=default_tcf,
-              help=f'Path of the prompt catalog file to clean (default: {default_pcf}).')
 @click.option('-hd', '--history-dir',
               default=default_hd,
               help=f'Directory of processing history to clean (default: {default_hd}).')
 @click.pass_context
 def clean(ctx, tool_catalog_file, prompt_catalog_file, history_dir):
     """Clean up generated files, etc."""
+
+    tool_catalog_file = ctx.obj['catalog'] + '/tool_catalog.json'
+    prompt_catalog_file = ctx.obj['catalog'] + '/prompt_catalog.json'
+
     cmd_clean_local(tool_catalog_file=tool_catalog_file,
                     prompt_catalog_file=prompt_catalog_file,
                     history_dir=history_dir)
