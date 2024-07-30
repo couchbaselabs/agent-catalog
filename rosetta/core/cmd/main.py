@@ -1,3 +1,4 @@
+import json
 import pathlib
 
 import click
@@ -21,6 +22,13 @@ def main(ctx, verbose):
     """A command line tool for Rosetta."""
     ctx.obj = ctx.obj or {}
     ctx.obj['verbose'] = verbose
+
+
+@main.command()
+@click.pass_context
+def env(ctx):
+    """Print this tool's env or configuration variables as JSON."""
+    print(json.dumps(ctx.obj, sort_keys=True, indent=4))
 
 
 @main.command()
@@ -76,6 +84,13 @@ def index(ctx, tool_dirs, tool_catalog_file, embedding_model):
     cmd_index_local(tool_dirs=tool_dirs,
                     tool_catalog_file=tool_catalog_file,
                     embedding_model=embedding_model)
+
+
+@main.command()
+@click.pass_context
+def publish(ctx):
+    """Publish the catalog to a database."""
+    print("TODO")
 
 
 @main.command()
