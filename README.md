@@ -36,4 +36,4 @@ Once you have the `.whl` file, use `pip` to install this `rosetta` build in anot
 pip install dist/rosetta_core-*.*.*-py3-*-any.whl
 ```
 For examples on what an agentic workflow with Rosetta looks like, see
-the [rosetta-sample](https://github.com/couchbaselabs/rosetta-sample) repository.
+the [rosetta-example](https://github.com/couchbaselabs/rosetta-example) repository.
