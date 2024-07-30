@@ -1,7 +1,6 @@
 # Our commands...
 from .clean import (
-    cmd_clean_couchbase,
-    cmd_clean_local
+    cmd_clean
 )
 from .env import (
     cmd_env

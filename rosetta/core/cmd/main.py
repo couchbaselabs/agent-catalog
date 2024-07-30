@@ -43,12 +43,7 @@ def main(ctx, catalog, verbose):
 def clean(ctx, history_dir):
     """Clean up generated files, etc."""
 
-    tool_catalog_file = ctx.obj['catalog'] + '/tool_catalog.json'
-    prompt_catalog_file = ctx.obj['catalog'] + '/prompt_catalog.json'
-
-    cmd_clean_local(tool_catalog_file=tool_catalog_file,
-                    prompt_catalog_file=prompt_catalog_file,
-                    history_dir=history_dir)
+    cmd_clean_local(ctx.obj, history_dir=history_dir)
 
 
 @main.command()
