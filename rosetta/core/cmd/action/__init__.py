@@ -11,6 +11,9 @@ from .index import (
     cmd_index_couchbase,
     cmd_index_local
 )
+from .publish import (
+    cmd_publish
+)
 from .version import (
     cmd_version
 )
@@ -20,9 +23,11 @@ from .web import (
 
 
 def register_blueprints(app):
-    # app.register_blueprint(clean.blueprint)
-    # app.register_blueprint(init.blueprint)
-    # app.register_blueprint(index.blueprint)
+    # TODO: app.register_blueprint(clean.blueprint)
+    # TODO: app.register_blueprint(init.blueprint)
+    # TODO: app.register_blueprint(index.blueprint)
+    # TODO: app.register_blueprint(publish.blueprint)
+
     app.register_blueprint(version.blueprint)
 
 

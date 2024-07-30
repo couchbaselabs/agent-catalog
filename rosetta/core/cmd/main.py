@@ -90,7 +90,7 @@ def index(ctx, tool_dirs, tool_catalog_file, embedding_model):
 @click.pass_context
 def publish(ctx):
     """Publish the catalog to a database."""
-    print("TODO")
+    cmd_publish(ctx.obj)
 
 
 @main.command()
