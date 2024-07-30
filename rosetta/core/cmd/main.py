@@ -18,6 +18,7 @@ default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_HISTORY_DIR).absolu
 @click.group(epilog='See: https://docs.couchbase.com for more information.')
 @click.option('-c', '--catalog',
               default='./catalog',
+              type=click.Path(exists=False, file_okay=False, dir_okay=True),
               help='Directory of catalog files.',
               envvar='ROSETTA_CATALOG',
               show_default=True)
