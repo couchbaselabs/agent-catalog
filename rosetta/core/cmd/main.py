@@ -12,8 +12,6 @@ from .action import *
 dotenv.load_dotenv()
 
 
-default_tcf = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / ('tool' + DEFAULT_CATALOG_SUFFIX)).absolute())
-default_pcf = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / ('prompt' + DEFAULT_CATALOG_SUFFIX)).absolute())
 default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_HISTORY_DIR).absolute())
 
 
