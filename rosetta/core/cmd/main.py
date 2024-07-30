@@ -7,6 +7,8 @@ import dotenv
 from .action import *
 
 
+# TODO: Should we load from ".env.rosetta"?
+# TODO: Or, perhaps even stage specific, like from ".env.rosetta.prod"?
 dotenv.load_dotenv()
 
 
@@ -15,7 +17,7 @@ default_pcf = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / ('prompt' + DEFAULT_CATALO
 default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_HISTORY_DIR).absolute())
 
 
-@click.group(epilog='See: https://docs.couchbase.com/ for more details.')
+@click.group(epilog='See: https://docs.couchbase.com/ for more information.')
 @click.option('-c', '--catalog',
               default='./catalog',
               help='Directory of catalog files.')
