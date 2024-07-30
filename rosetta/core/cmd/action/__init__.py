@@ -9,8 +9,7 @@ from .find import (
     cmd_find
 )
 from .index import (
-    cmd_index_couchbase,
-    cmd_index_local
+    cmd_index
 )
 from .init import (
     cmd_init_couchbase,

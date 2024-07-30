@@ -1,17 +1,14 @@
-import typing
 import pathlib
+import typing
 
 
-def cmd_index_local(tool_dirs: typing.List[str], tool_catalog_file: str, embedding_model: str, **_):
+def cmd_index(ctx, source_dirs: typing.List[str], embedding_model: str, **_):
+    tool_catalog_file = ctx['catalog'] + '/tool_catalog.json'
+
     import rosetta.core.tool
     import sentence_transformers
 
     rosetta.core.tool.LocalRegistrar(
         catalog_file=pathlib.Path(tool_catalog_file),
         embedding_model=sentence_transformers.SentenceTransformer(embedding_model)
-    ).index([pathlib.Path(p) for p in tool_dirs])
-
-
-def cmd_index_couchbase(tool_dirs: typing.List[str], embedding_model: str, **_):
-    # TODO (GLENN): Define an 'index' action for a Couchbase collection.
-    pass
+    ).index([pathlib.Path(p) for p in source_dirs])

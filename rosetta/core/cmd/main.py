@@ -72,11 +72,7 @@ def index(ctx, source_dirs, embedding_model):
 
     Source files scanned include *.py, *.sqlpp, *.yaml, etc."""
 
-    tool_catalog_file = ctx.obj['catalog'] + '/tool_catalog.json'
-
-    cmd_index_local(tool_dirs=source_dirs,
-                    tool_catalog_file=tool_catalog_file,
-                    embedding_model=embedding_model)
+    cmd_index(ctx.obj, source_dirs=source_dirs, embedding_model=embedding_model)
 
 
 @main.command()
