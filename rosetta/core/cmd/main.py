@@ -1,75 +1,112 @@
+import json
 import pathlib
+
 import click
+import dotenv
 
 from .action import *
 
-default_tcf = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / ('tool' + DEFAULT_CATALOG_SUFFIX)).absolute())
-default_pcf = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / ('prompt' + DEFAULT_CATALOG_SUFFIX)).absolute())
-default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_HISTORY_DIR).absolute())
+
+# TODO: Should we load from ".env.rosetta"?
+# TODO: Or, perhaps even stage specific, like from ".env.rosetta.prod"?
+dotenv.load_dotenv()
 
 
-@click.group(epilog='See: https://docs.couchbase.com/ for more details.')
-@click.option('-v', '--verbose', is_flag=True, help='Enable verbose output.')
+default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_HISTORY_DIR))
+
+
+@click.group(epilog='See: https://docs.couchbase.com for more information.')
+@click.option('-c', '--catalog',
+              default='./catalog',
+              type=click.Path(exists=False, file_okay=False, dir_okay=True),
+              help='Directory of catalog files.',
+              envvar='ROSETTA_CATALOG',
+              show_default=True)
+@click.option('-v', '--verbose',
+              count=True,
+              help='Enable verbose output.',
+              envvar='ROSETTA_VERBOSE')
 @click.pass_context
-def main(ctx, verbose):
+def main(ctx, catalog, verbose):
     """A command line tool for Rosetta."""
     ctx.obj = ctx.obj or {}
+    ctx.obj['catalog'] = catalog
     ctx.obj['verbose'] = verbose
 
 
 @main.command()
-@click.option('-em', '--embedding-model',
-              multiple=True,
-              default=[DEFAULT_EMBEDDING_MODEL],
-              help=f'Embedding models to download and cache (default: {DEFAULT_EMBEDDING_MODEL}).')
-@click.option('-od', '--output-dir',
-              default=DEFAULT_OUTPUT_DIR,
-              help=f'Directory for output, generated files, etc. (default: {DEFAULT_OUTPUT_DIR}).')
 @click.option('-hd', '--history-dir',
               default=default_hd,
-              help=f'Directory for processing history (default: {default_hd}).')
+              help='Directory of processing history to clean.',
+              show_default=True)
 @click.pass_context
-def init(ctx, embedding_models, output_dir, history_dir):
-    """Initialize the environment (e.g., download & cache models, etc)."""
-    cmd_init_local(embedding_models=embedding_models,
-                   output_dir=output_dir,
-                   history_dir=history_dir)
-
-
-@main.command()
-@click.option('-tcf', '--tool-catalog-file',
-              default=default_tcf,
-              help=f'Path of the tool catalog file to clean (default: {default_tcf}).')
-@click.option('-pcf', '--prompt-catalog-file',
-              default=default_tcf,
-              help=f'Path of the prompt catalog file to clean (default: {default_pcf}).')
-@click.option('-hd', '--history-dir',
-              default=default_hd,
-              help=f'Directory of processing history to clean (default: {default_hd}).')
-@click.pass_context
-def clean(ctx, tool_catalog_file, prompt_catalog_file, history_dir):
+def clean(ctx, history_dir):
     """Clean up generated files, etc."""
-    cmd_clean_local(tool_catalog_file=tool_catalog_file,
-                    prompt_catalog_file=prompt_catalog_file,
-                    history_dir=history_dir)
+
+    cmd_clean(ctx.obj, history_dir=history_dir)
 
 
 @main.command()
-@click.argument('tool_dirs', nargs=-1, required=True)
-@click.option('-tcf', '--tool-catalog-file',
-              default=default_tcf,
-              help=f'Path of tool catalog file to output (default: {default_tcf}).')
+@click.pass_context
+def env(ctx):
+    """Print this tool's env or configuration variables as JSON."""
+    cmd_env(ctx.obj)
+
+
+@main.command()
+@click.pass_context
+def find(ctx):
+    """Find tools, prompts, etc. from the catalog."""
+    cmd_find(ctx.obj)
+
+
+@main.command()
+@click.argument('source_dirs', nargs=-1, required=True)
 @click.option('-em', '--embedding-model',
               default=DEFAULT_EMBEDDING_MODEL,
-              help=f'Embedding model when building the catalog file (default: {DEFAULT_EMBEDDING_MODEL}).')
+              help='Embedding model when building the catalog file.',
+              show_default=True)
 @click.pass_context
-def index(ctx, tool_dirs, tool_catalog_file, embedding_model):
+def index(ctx, source_dirs, embedding_model):
     """Walk directory tree source files to build a catalog file.
 
     Source files scanned include *.py, *.sqlpp, *.yaml, etc."""
-    cmd_index_local(tool_dirs=tool_dirs,
-                    tool_catalog_file=tool_catalog_file,
-                    embedding_model=embedding_model)
+
+    # TODO: The index command should default to the '.' directory / current directory.
+    # TODO: The index command should ignore the '.git' subdirectory.
+    # TODO: The index command should ignore whatever's in the '.gitignore' file.
+
+    cmd_index(ctx.obj, source_dirs=source_dirs, embedding_model=embedding_model)
+
+
+@main.command()
+@click.option('-em', '--embedding-model', 'embedding_models',
+              multiple=True,
+              default=[DEFAULT_EMBEDDING_MODEL],
+              help='Embedding models to download and cache.',
+              show_default=True)
+@click.option('-hd', '--history-dir',
+              default=default_hd,
+              help='Directory for processing history.',
+              show_default=True)
+@click.pass_context
+def init(ctx, embedding_models, history_dir):
+    """Initialize the environment (e.g., download & cache models, etc)."""
+    cmd_init_local(ctx.obj, embedding_models, history_dir)
+
+
+@main.command()
+@click.pass_context
+def publish(ctx):
+    """Publish the catalog to a database."""
+    cmd_publish(ctx.obj)
+
+
+@main.command()
+@click.pass_context
+def status(ctx):
+    """Print the status of the catalog."""
+    cmd_status(ctx.obj)
 
 
 @main.command()
@@ -83,15 +120,17 @@ def version(ctx):
 @click.option('--host-port',
               default=DEFAULT_WEB_HOST_PORT,
               envvar='ROSETTA_WEB_HOST_PORT',
-              help=f'The host:port to listen on (default: {DEFAULT_WEB_HOST_PORT}).')
+              help='The host:port to listen on.',
+              show_default=True)
 @click.option('--debug/--no-debug',
               envvar='ROSETTA_WEB_DEBUG',
               default=True,
-              help='Debug mode (default: True).')
+              help='Debug mode.',
+              show_default=True)
 @click.pass_context
 def web(ctx, host_port, debug):
     """Start local web server."""
-    cmd_web(host_port, debug)
+    cmd_web(ctx.obj, host_port, debug)
 
 
 if __name__ == '__main__':

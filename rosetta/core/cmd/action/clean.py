@@ -1,47 +1,57 @@
-import pathlib
-import os
-import shutil
-import couchbase.auth
 import logging
+import os
+import pathlib
+import shutil
+
+import couchbase.auth
+import flask
 
 logger = logging.getLogger(__name__)
 
 
-def cmd_clean_local(tool_catalog_file: str, prompt_catalog_file: str, history_dir: str, **_):
-    tool_catalog_path = pathlib.Path(tool_catalog_file)
-    prompt_catalog_path = pathlib.Path(prompt_catalog_file)
-    history_path = pathlib.Path(history_dir)
+def clean_local(ctx, history_dir: str):
+    tool_catalog_file = ctx['catalog'] + '/tool_catalog.json'
+    prompt_catalog_file = ctx['catalog'] + '/prompt_catalog.json'
 
-    # Handle our tool catalog...
-    if tool_catalog_path.exists():
-        if not tool_catalog_path.is_file():
-            logger.warning('Non-file specified for tool_catalog_file! No deletion action has occurred.')
-        else:
-            os.remove(tool_catalog_path.absolute())
-    else:
-        logger.debug('tool_catalog_file does not exist. No deletion action has occurred.')
+    for x in [tool_catalog_file, prompt_catalog_file, history_dir]:
+        if not x or not os.path.exists(x):
+            logger.warning('Skipping file/directory that does not exist: %s', x)
+            continue
 
-    # ...and our prompt catalog.
-    if prompt_catalog_path.exists():
-        if prompt_catalog_path.exists():
-            if not prompt_catalog_path.is_file():
-                logger.warning('Non-file specified for prompt_catalog_file! No deletion action has occurred.')
-            else:
-                os.remove(prompt_catalog_path.absolute())
-        else:
-            logger.debug('prompt_catalog_file does not exist. No deletion action has occurred.')
+        x_path = pathlib.Path(x)
 
-    # TODO (GLENN): Be a little more conservative here...
-    if history_path.exists():
-        if not history_path.is_dir():
-            logger.warning('Non-directory specified for messages_dir!')
-            os.remove(history_path.absolute())
-        else:
-            shutil.rmtree(history_path.absolute())
-    else:
-        logger.debug('history_dir does not exist. No deletion action has occurred for history_dir.')
+        if x_path.is_file():
+            os.remove(x_path.absolute())
+        elif x.is_dir():
+            shutil.rmtree(x_path.absolute())
 
 
 # TODO (GLENN): Define a 'clean' action for a Couchbase collection.
-def cmd_clean_couchbase(conn_string: str, authenticator: couchbase.auth.Authenticator, **_):
+def clean_couchbase(ctx, conn_string: str, authenticator: couchbase.auth.Authenticator, **_):
     pass
+
+
+def cmd_clean(ctx, history_dir: str, **_):
+    if True: # TODO: Should check cmd-line flags on whether to clean local.
+        clean_local(ctx, history_dir)
+
+    if False: # TODO: Should check cmd-line flags on whether to clean database.
+        clean_couchbase(ctx, "TODO", None)
+
+
+blueprint = flask.Blueprint('clean', __name__)
+
+@blueprint.route('/clean', methods=['POST'])
+def route_clean():
+    # TODO: Check creds as it's destructive.
+
+    ctx = flask.current_app.config['ctx']
+
+    if True: # TODO: Should check REST args on whether to clean local.
+        clean_local(ctx, None)
+
+    if False: # TODO: Should check REST args on whether to clean database.
+        clean_couchbase(ctx, "TODO", None)
+
+    return "OK" # TODO.
+
