@@ -1,5 +1,3 @@
-import importlib.resources
-
 import flask
 
 def cmd_web(host_port, debug=True):
