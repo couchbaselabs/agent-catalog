@@ -16,19 +16,68 @@ default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_HISTORY_DIR).absolu
 
 
 @click.group(epilog='See: https://docs.couchbase.com/ for more details.')
-@click.option('-v', '--verbose', is_flag=True, help='Enable verbose output.')
+@click.option('-c', '--catalog',
+              default='./catalog',
+              help='Directory of catalog files.')
+@click.option('-v', '--verbose',
+              is_flag=True,
+              help='Enable verbose output.')
 @click.pass_context
-def main(ctx, verbose):
+def main(ctx, catalog, verbose):
     """A command line tool for Rosetta."""
     ctx.obj = ctx.obj or {}
+    ctx.obj['catalog'] = catalog
     ctx.obj['verbose'] = verbose
+
+
+@main.command()
+@click.option('-tcf', '--tool-catalog-file',
+              default=default_tcf,
+              help=f'Path of the tool catalog file to clean (default: {default_tcf}).')
+@click.option('-pcf', '--prompt-catalog-file',
+              default=default_tcf,
+              help=f'Path of the prompt catalog file to clean (default: {default_pcf}).')
+@click.option('-hd', '--history-dir',
+              default=default_hd,
+              help=f'Directory of processing history to clean (default: {default_hd}).')
+@click.pass_context
+def clean(ctx, tool_catalog_file, prompt_catalog_file, history_dir):
+    """Clean up generated files, etc."""
+    cmd_clean_local(tool_catalog_file=tool_catalog_file,
+                    prompt_catalog_file=prompt_catalog_file,
+                    history_dir=history_dir)
 
 
 @main.command()
 @click.pass_context
 def env(ctx):
     """Print this tool's env or configuration variables as JSON."""
-    print(json.dumps(ctx.obj, sort_keys=True, indent=4))
+    cmd_env(ctx.obj)
+
+
+@main.command()
+@click.pass_context
+def publish(ctx):
+    """Find tools, prompts, etc. from the catalog."""
+    cmd_find(ctx.obj)
+
+
+@main.command()
+@click.argument('tool_dirs', nargs=-1, required=True)
+@click.option('-tcf', '--tool-catalog-file',
+              default=default_tcf,
+              help=f'Path of tool catalog file to output (default: {default_tcf}).')
+@click.option('-em', '--embedding-model',
+              default=DEFAULT_EMBEDDING_MODEL,
+              help=f'Embedding model when building the catalog file (default: {DEFAULT_EMBEDDING_MODEL}).')
+@click.pass_context
+def index(ctx, tool_dirs, tool_catalog_file, embedding_model):
+    """Walk directory tree source files to build a catalog file.
+
+    Source files scanned include *.py, *.sqlpp, *.yaml, etc."""
+    cmd_index_local(tool_dirs=tool_dirs,
+                    tool_catalog_file=tool_catalog_file,
+                    embedding_model=embedding_model)
 
 
 @main.command()
@@ -51,46 +100,17 @@ def init(ctx, embedding_models, output_dir, history_dir):
 
 
 @main.command()
-@click.option('-tcf', '--tool-catalog-file',
-              default=default_tcf,
-              help=f'Path of the tool catalog file to clean (default: {default_tcf}).')
-@click.option('-pcf', '--prompt-catalog-file',
-              default=default_tcf,
-              help=f'Path of the prompt catalog file to clean (default: {default_pcf}).')
-@click.option('-hd', '--history-dir',
-              default=default_hd,
-              help=f'Directory of processing history to clean (default: {default_hd}).')
-@click.pass_context
-def clean(ctx, tool_catalog_file, prompt_catalog_file, history_dir):
-    """Clean up generated files, etc."""
-    cmd_clean_local(tool_catalog_file=tool_catalog_file,
-                    prompt_catalog_file=prompt_catalog_file,
-                    history_dir=history_dir)
-
-
-@main.command()
-@click.argument('tool_dirs', nargs=-1, required=True)
-@click.option('-tcf', '--tool-catalog-file',
-              default=default_tcf,
-              help=f'Path of tool catalog file to output (default: {default_tcf}).')
-@click.option('-em', '--embedding-model',
-              default=DEFAULT_EMBEDDING_MODEL,
-              help=f'Embedding model when building the catalog file (default: {DEFAULT_EMBEDDING_MODEL}).')
-@click.pass_context
-def index(ctx, tool_dirs, tool_catalog_file, embedding_model):
-    """Walk directory tree source files to build a catalog file.
-
-    Source files scanned include *.py, *.sqlpp, *.yaml, etc."""
-    cmd_index_local(tool_dirs=tool_dirs,
-                    tool_catalog_file=tool_catalog_file,
-                    embedding_model=embedding_model)
-
-
-@main.command()
 @click.pass_context
 def publish(ctx):
     """Publish the catalog to a database."""
     cmd_publish(ctx.obj)
+
+
+@main.command()
+@click.pass_context
+def validate(ctx):
+    """Validate the catalog and other data."""
+    cmd_validate()
 
 
 @main.command()
