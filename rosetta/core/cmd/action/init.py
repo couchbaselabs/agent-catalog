@@ -1,10 +1,11 @@
-import typing
-import pathlib
 import os
+import pathlib
+import typing
+
 import couchbase.auth
 
 
-def cmd_init_local(embedding_models: typing.List[str], catalog_dir: str, history_dir: str, **_):
+def cmd_init_local(ctx, embedding_models: typing.List[str], history_dir: str, **_):
     import sentence_transformers
 
     # Download any embedding models that need to be used at runtime.
@@ -14,7 +15,7 @@ def cmd_init_local(embedding_models: typing.List[str], catalog_dir: str, history
         sentence_transformers.SentenceTransformer(model)
 
     # Init directories.
-    catalog_dir_path = pathlib.Path(catalog_dir)
+    catalog_dir_path = pathlib.Path(ctx['catalog'])
     if not catalog_dir_path.exists():
         os.mkdir(catalog_dir_path)
 

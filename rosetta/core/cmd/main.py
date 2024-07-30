@@ -80,7 +80,7 @@ def index(ctx, source_dirs, embedding_model):
 
 
 @main.command()
-@click.option('-em', '--embedding-model',
+@click.option('-em', '--embedding-model', 'embedding_models',
               multiple=True,
               default=[DEFAULT_EMBEDDING_MODEL],
               help='Embedding models to download and cache.',
@@ -92,9 +92,7 @@ def index(ctx, source_dirs, embedding_model):
 @click.pass_context
 def init(ctx, embedding_models, history_dir):
     """Initialize the environment (e.g., download & cache models, etc)."""
-    cmd_init_local(embedding_models=embedding_models,
-                   output_dir=ctx.obj['catalog'],
-                   history_dir=history_dir)
+    cmd_init_local(ctx.obj, embedding_models, history_dir)
 
 
 @main.command()
