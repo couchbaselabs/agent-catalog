@@ -31,13 +31,13 @@ from .web import (
 
 
 def register_blueprints(app):
-    # TODO: app.register_blueprint(clean.blueprint)
     # TODO: app.register_blueprint(find.blueprint)
     # TODO: app.register_blueprint(index.blueprint)
     # TODO: app.register_blueprint(init.blueprint)
     # TODO: app.register_blueprint(publish.blueprint)
     # TODO: app.register_blueprint(status.blueprint)
 
+    app.register_blueprint(clean.blueprint)
     app.register_blueprint(env.blueprint)
     app.register_blueprint(version.blueprint)
 

@@ -4,6 +4,7 @@ import pathlib
 import shutil
 
 import couchbase.auth
+import flask
 
 logger = logging.getLogger(__name__)
 
@@ -13,8 +14,9 @@ def clean_local(ctx, history_dir: str):
     prompt_catalog_file = ctx['catalog'] + '/prompt_catalog.json'
 
     for x in [tool_catalog_file, prompt_catalog_file, history_dir]:
-        if not os.path.exists(x):
+        if not x or not os.path.exists(x):
             logger.warning('Skipping file/directory that does not exist: %s', x)
+            continue
 
         x_path = pathlib.Path(x)
 
@@ -34,5 +36,22 @@ def cmd_clean(ctx, history_dir: str, **_):
         clean_local(ctx, history_dir)
 
     if False: # TODO: Should check cmd-line flags on whether to clean database.
-        clean_couchbase(ctx, conn_str="TODO")
+        clean_couchbase(ctx, "TODO", None)
+
+
+blueprint = flask.Blueprint('clean', __name__)
+
+@blueprint.route('/clean', methods=['POST'])
+def route_clean():
+    # TODO: Check creds as it's destructive.
+
+    ctx = flask.current_app.config['ctx']
+
+    if True: # TODO: Should check REST args on whether to clean local.
+        clean_local(ctx, None)
+
+    if False: # TODO: Should check REST args on whether to clean database.
+        clean_couchbase(ctx, "TODO", None)
+
+    return "OK" # TODO.
 

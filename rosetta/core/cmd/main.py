@@ -12,7 +12,7 @@ from .action import *
 dotenv.load_dotenv()
 
 
-default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_HISTORY_DIR).absolute())
+default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_HISTORY_DIR))
 
 
 @click.group(epilog='See: https://docs.couchbase.com for more information.')
@@ -43,7 +43,7 @@ def main(ctx, catalog, verbose):
 def clean(ctx, history_dir):
     """Clean up generated files, etc."""
 
-    cmd_clean_local(ctx.obj, history_dir=history_dir)
+    cmd_clean(ctx.obj, history_dir=history_dir)
 
 
 @main.command()
