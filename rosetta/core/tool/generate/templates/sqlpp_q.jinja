@@ -1,4 +1,4 @@
-""" This file has been generated automatically by Rosetta at <<GENERATION_DATE_PLACEHOLDER>> as a sqlpp_query tool. """
+""" This file has been generated automatically by Rosetta at {{ time }} as a sqlpp_query tool. """
 from __future__ import annotations
 
 import couchbase.auth
@@ -9,18 +9,11 @@ import os
 
 import rosetta.core.tool
 
-_IS_LIST_VALUED = <<IS_LIST_VALUED_PLACEHOLDER>>
+{{ input_schema.code }}
 
-_SQLPP_QUERY = """
-<<SQLPP_QUERY_PLACEHOLDER>>
-"""
+{{ output_schema.code }}
 
-<<ARGUMENT_SCHEMA_PLACEHOLDER>>
-
-
-<<OUTPUT_SCHEMA_PLACEHOLDER>>
-
-
+# TODO (GLENN): Handle this better.
 def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
     authenticator = couchbase.auth.PasswordAuthenticator(
         username=os.getenv('CB_USERNAME'),
@@ -31,31 +24,32 @@ def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
 
 
 @rosetta.core.tool.tool(infer_schema=True)
-def <<TOOL_NAME_PLACEHOLDER>>(argument_input: _ArgumentInput) -> typing.Union[typing.List[_ToolOutput] | _ToolOutput]:
+def {{ tool.name }}(argument_input: {{ input_schema.name }}) -> {% if list_valued %}typing.List[{{ output_schema.name }}]{% else %}{{ output_schema.name }}{% endif %}:
     """
-    <<TOOL_DESCRIPTION_PLACEHOLDER>>
+    {{ tool.description }}
     """
     cluster = _get_couchbase_cluster()
 
     # We need to safeguard against weird LLM function calls.
     if isinstance(argument_input, dict):
         named_parameters = argument_input
-    elif isinstance(argument_input, _ArgumentInput):
+    elif isinstance(argument_input, {{ input_schema.name }}):
         named_parameters = argument_input.dict()
     else:
         raise ValueError("Bad input given to SQL++ tool!")
 
     query_results = cluster.query(
-        _SQLPP_QUERY,
+        """ {{ tool.sqlpp_query }} """,
         couchbase.options.QueryOptions(named_parameters=named_parameters)
     )
 
     tool_results = []
-    if _IS_LIST_VALUED:
-        for result in query_results:
-            tool_results.append(_ToolOutput(**result))
-        return tool_results
-    else:
-        # TODO (GLENN): Clean this up.
-        for result in query_results:
-            return _ToolOutput(**result)
+    {% if list_valued %}
+    for result in query_results:
+        tool_results.append({{ output_schema.name }}(**result))
+    return tool_results
+    {% else %}
+    # TODO (GLENN): Clean this up.
+    for result in query_results:
+        return {{ output_schema.name }}(**result)
+    {% endif %}

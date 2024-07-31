@@ -1,8 +1,9 @@
 import dataclasses
+import json
+import os
 import shutil
 import tempfile
 import typing
-import uuid
 import pydantic
 import pathlib
 import importlib
@@ -10,39 +11,37 @@ import scipy.signal
 import sentence_transformers
 import langchain_core.tools
 import numpy
-import os
 import logging
 import sklearn
 import inspect
 import abc
 import sys
 
-from .tooling import (
+from .descriptor import (
     ToolDescriptor,
     ToolKind
 )
-
-from .generator import (
+from .generate.generator import (
     SQLPPCodeGenerator,
-    SemanticSearchCodeGenerator
+    SemanticSearchCodeGenerator,
+    HTTPRequestCodeGenerator
 )
 
 logger = logging.getLogger(__name__)
 
 
-# TODO (GLENN): Numpy and Pydantic don't really play well together...
-@dataclasses.dataclass
-class _ToolPointer:
-    identifier: pydantic.UUID4
-    embedding: numpy.ndarray
-    tool: langchain_core.tools.StructuredTool
-
-
 class Provider(pydantic.BaseModel, abc.ABC):
+    # Note: Numpy and Pydantic don't really play well together...
+    @dataclasses.dataclass
+    class _ToolPointer:
+        identifier: pydantic.UUID4
+        embedding: numpy.ndarray
+        tool: langchain_core.tools.StructuredTool
+
     model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
 
+    # TODO (GLENN): This should be in inferred from the catalog.
     embedding_model: sentence_transformers.SentenceTransformer = pydantic.Field(
-        default_factory=lambda: sentence_transformers.SentenceTransformer(os.getenv('DEFAULT_SENTENCE_EMODEL')),
         description="Embedding model used to encode the tool descriptions."
     )
     output_directory: pathlib.Path = pydantic.Field(
@@ -52,9 +51,6 @@ class Provider(pydantic.BaseModel, abc.ABC):
 
     _tools: typing.List[typing.Type[_ToolPointer]] = list()
     _modules: typing.Dict = dict()
-
-    def __init__(self, /, **data: typing.Any):
-        super(Provider, self).__init__(**data)
 
     @abc.abstractmethod
     def get_tools_for(self, objective: str, k: typing.Union[int | None] = 1) \
@@ -77,7 +73,7 @@ class Provider(pydantic.BaseModel, abc.ABC):
             if not isinstance(tool, langchain_core.tools.StructuredTool):
                 continue
             if tool_filter is None or tool_filter(tool):
-                self._tools.append(_ToolPointer(
+                self._tools.append(Provider._ToolPointer(
                     identifier=entry.identifier,
                     embedding=entry.embedding,
                     tool=tool
@@ -92,32 +88,55 @@ class Provider(pydantic.BaseModel, abc.ABC):
 
 
 class LocalProvider(Provider):
-    catalog_location: pathlib.Path
+    catalog_file: pathlib.Path
 
     def __init__(self, /, **data: typing.Any):
         super(LocalProvider, self).__init__(**data)
-        with self.catalog_location.open('r') as fp:
+
+        # Group all entries by their 'source'.
+        with self.catalog_file.open('r') as fp:
+            source_groups = dict()
             for line in fp:
                 entry = ToolDescriptor.model_validate_json(line)
-                match entry.kind:
-                    case ToolKind.PythonFunction:
+                if entry.source not in source_groups:
+                    # Note: we assume that each source only contains one type (kind) of tool.
+                    source_groups[entry.source] = {
+                        'entries': list(),
+                        'kind': entry.kind
+                    }
+                source_groups[entry.source]['entries'].append(entry)
+
+        # Now, iterate through each group.
+        for source, group in source_groups.items():
+            entries = group['entries']
+            match group['kind']:
+                case ToolKind.PythonFunction:
+                    for entry in entries:
                         # TODO (GLENN): We need a better identifier than just the name and description.
                         tool_filter = lambda t: entry.name == t.name and entry.description == t.description
                         self._load_from_source(entry.source, entry, tool_filter)
+                    continue
 
-                    case ToolKind.SQLPPQuery:
-                        with open(self.output_directory / (str(uuid.uuid4()) + '.py'), 'w') as tmp_fp:
-                            SQLPPCodeGenerator(
-                                tool_descriptor=entry
-                            ).write(tmp_fp)
-                            self._load_from_source(pathlib.Path(tmp_fp.name), entry)
+                case ToolKind.SQLPPQuery:
+                    output = SQLPPCodeGenerator(tool_descriptors=entries).generate(self.output_directory)
 
-                    case ToolKind.SemanticSearch:
-                        with open(self.output_directory / (str(uuid.uuid4()) + '.py'), 'w') as tmp_fp:
-                            SemanticSearchCodeGenerator(
-                                tool_descriptor=entry
-                            ).write(tmp_fp)
-                            self._load_from_source(pathlib.Path(tmp_fp.name), entry)
+                case ToolKind.SemanticSearch:
+                    output = SemanticSearchCodeGenerator(tool_descriptors=entries).generate(self.output_directory)
+
+                case ToolKind.HTTPRequest:
+                    continue
+                    # TODO (GLENN): Get HTTP-request tools working.
+                    # output = HTTPRequestCodeGenerator(
+                    #     library_dir=self.library_dir,
+                    #     tool_descriptors=entries
+                    # ).generate(self.output_directory)
+
+                case _:
+                    raise ValueError('Unexpected tool-kind encountered!')
+
+            # For non-Python (native) tools, we expect one Python file per entry.
+            for i in range(len(entries)):
+                self._load_from_source(output[i], entries[i])
 
     def get_tools_for(self, objective: str, k: typing.Union[int | None] = 1) \
             -> typing.List[langchain_core.tools.StructuredTool]:
@@ -137,6 +156,7 @@ class LocalProvider(Provider):
             return [t['tool'] for t in ordered_tools][:k]
 
         else:
+            # TODO (GLENN): Refactor this into a "rerank" method.
             # TODO (GLENN): Get this working!
             a = numpy.array(ordered_tools).reshape(-1, 1)
             s = numpy.linspace(min(a) - 0.01, max(a) + 0.01, num=10000).reshape(-1, 1)

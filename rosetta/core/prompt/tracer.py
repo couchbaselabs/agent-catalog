@@ -18,7 +18,6 @@ class Tracer(pydantic.BaseModel, abc.ABC):
         description="(Agent) version to associate with each accepted prompt."
     )
     embedding_model: sentence_transformers.SentenceTransformer = pydantic.Field(
-        default_factory=lambda: sentence_transformers.SentenceTransformer(os.getenv('DEFAULT_SENTENCE_EMODEL')),
         description="Embedding model used to encode the prompts themselves."
     )
 
@@ -34,11 +33,11 @@ class Tracer(pydantic.BaseModel, abc.ABC):
 
 
 class LocalTracer(Tracer):
-    catalog_location: pathlib.Path
+    catalog_file: pathlib.Path
     _catalog_fp: io.StringIO = None
 
     def __enter__(self):
-        self._catalog_fp = self.catalog_location.open('a')
+        self._catalog_fp = self.catalog_file.open('a')
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
