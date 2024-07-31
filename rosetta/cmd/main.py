@@ -12,38 +12,43 @@ from .cmds import *
 dotenv.load_dotenv()
 
 
-default_hd = str((pathlib.Path(DEFAULT_OUTPUT_DIR) / DEFAULT_HISTORY_DIR))
-
-
 @click.group(epilog='See: https://docs.couchbase.com for more information.')
 @click.option('-c', '--catalog',
               default='./catalog',
               type=click.Path(exists=False, file_okay=False, dir_okay=True),
-              help='Directory of catalog files.',
+              help='''Directory of local catalog files.
+              The local catalog DIRECTORY should be checked into git.''',
               envvar='ROSETTA_CATALOG',
+              show_default=True)
+@click.option('-ca', '--catalog-activity',
+              default='./{CATALOG}-activity',
+              type=click.Path(exists=False, file_okay=False, dir_okay=True),
+              help='''Directory of local catalog-activity files (runtime data based the catalog).
+              The local catalog-activity DIRECTORY should NOT be checked into git,
+              as it holds runtime data like logs, call histories, etc.''',
+              envvar='ROSETTA_CATALOG_ACTIVITY',
               show_default=True)
 @click.option('-v', '--verbose',
               count=True,
               help='Enable verbose output.',
               envvar='ROSETTA_VERBOSE')
 @click.pass_context
-def main(ctx, catalog, verbose):
+def main(ctx, catalog, catalog_activity, verbose):
     """A command line tool for Rosetta."""
-    ctx.obj = ctx.obj or {}
-    ctx.obj['catalog'] = catalog
-    ctx.obj['verbose'] = verbose
+    ctx.obj = ctx.obj or {
+        'catalog': catalog,                # Ex: "./catalog".
+        'catalog_activity': catalog_activity
+            .replace('{CATALOG}', catalog) # Ex: "./{CATALOG}-activity" => "././catalog-activity".
+            .replace('/./', '/'),          # Ex: "././catalog-activity" => "./catalog-activity".
+        'verbose': verbose
+    }
 
 
 @main.command()
-@click.option('-hd', '--history-dir',
-              default=default_hd,
-              help='Directory of processing history to clean.',
-              show_default=True)
 @click.pass_context
-def clean(ctx, history_dir):
+def clean(ctx):
     """Clean up generated files, etc."""
-
-    cmd_clean(ctx.obj, history_dir=history_dir)
+    cmd_clean(ctx.obj)
 
 
 @main.command()
@@ -85,14 +90,10 @@ def index(ctx, source_dirs, embedding_model):
               default=[DEFAULT_EMBEDDING_MODEL],
               help='Embedding models to download and cache.',
               show_default=True)
-@click.option('-hd', '--history-dir',
-              default=default_hd,
-              help='Directory for processing history.',
-              show_default=True)
 @click.pass_context
-def init(ctx, embedding_models, history_dir):
+def init(ctx, embedding_models):
     """Initialize the environment (e.g., download & cache models, etc)."""
-    cmd_init_local(ctx.obj, embedding_models, history_dir)
+    cmd_init_local(ctx.obj, embedding_models)
 
 
 @main.command()
@@ -105,14 +106,14 @@ def publish(ctx):
 @main.command()
 @click.pass_context
 def status(ctx):
-    """Print the status of the catalog."""
+    """Show the status of the catalog."""
     cmd_status(ctx.obj)
 
 
 @main.command()
 @click.pass_context
 def version(ctx):
-    """Print the version of this tool."""
+    """Show the version of this tool."""
     cmd_version()
 
 
