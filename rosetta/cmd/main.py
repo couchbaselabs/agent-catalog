@@ -93,13 +93,13 @@ def find(ctx):
 @click.argument('source_dirs', nargs=-1, required=True)
 @click.option('-em', '--embedding-model',
               default=DEFAULT_EMBEDDING_MODEL,
-              help='Embedding model when building the catalog file.',
+              help='Embedding model when building the local catalog.',
               show_default=True)
 @click.pass_context
 def index(ctx, source_dirs, embedding_model):
-    """Walk directory tree source files to build a catalog file.
+    """Walk source directory files for indexing into the local catalog.
 
-    Source files scanned include *.py, *.sqlpp, *.yaml, etc."""
+    Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc."""
 
     # TODO: The index command should default to the '.' directory / current directory.
     # TODO: The index command should ignore the '.git' subdirectory.
@@ -123,14 +123,14 @@ def init(ctx, embedding_models):
 @main.command()
 @click.pass_context
 def publish(ctx):
-    """Publish the catalog to a database."""
+    """Publish the local catalog to a database."""
     cmd_publish(ctx.obj)
 
 
 @main.command()
 @click.pass_context
 def status(ctx):
-    """Show the status of the catalog."""
+    """Show the status of the local catalog."""
     cmd_status(ctx.obj)
 
 
