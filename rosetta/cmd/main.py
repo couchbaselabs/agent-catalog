@@ -4,7 +4,7 @@ import pathlib
 import click
 import dotenv
 
-from .action import *
+from .cmds import *
 
 
 # TODO: Should we load from ".env.rosetta"?
