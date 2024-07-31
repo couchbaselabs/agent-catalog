@@ -4,7 +4,8 @@ version = "0.1.0"
 description = "Core library associated with agentic workflows in Couchbase."
 repository = "https://github.com/couchbaselabs/rosetta-core"
 authors = [
-    "Glenn Galvizo <glenn.galvizo@couchbase.com>"
+    "Glenn Galvizo <glenn.galvizo@couchbase.com>",
+    "Steve Yen <steve.yen@couchbase.com>"
 ]
 readme = "README.md"
 packages = [{ include = "rosetta" }]
@@ -35,12 +36,16 @@ semchunk = "^2.2.0"
 fastapi = "^0.111.1"
 Flask = "^3.0.3"
 couchbase = "^4.3.0"
-pre-commit = "^3.2.2"
+jinja2 = "^3.1.4"
 
 # Note:
 #   This dependency is purely for the StructuredTool (BaseTool) type.
 #   All agent-frameworks we've seen to-date rely on BaseTool, so this feels like a sane dependency.
-langchain-core = "^0.2.22"
+langchain-core = "^0.2.23"
+
+[tool.poetry.dev-dependencies]
+pre-commit = "^3.2.2"
+
 
 [build-system]
 requires = ["poetry-core"]
