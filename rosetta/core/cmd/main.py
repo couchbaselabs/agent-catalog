@@ -55,7 +55,7 @@ def env(ctx):
 
 @main.command()
 @click.pass_context
-def publish(ctx):
+def find(ctx):
     """Find tools, prompts, etc. from the catalog."""
     cmd_find(ctx.obj)
 
