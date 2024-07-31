@@ -78,7 +78,7 @@ def clean(ctx):
 @main.command()
 @click.pass_context
 def env(ctx):
-    """Print this tool's env or configuration variables as JSON."""
+    """Show this tool's env or configuration variables as JSON."""
     cmd_env(ctx.obj)
 
 
