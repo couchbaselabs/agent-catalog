@@ -9,6 +9,9 @@ class TestSemanticVersion(unittest.TestCase):
 
     def test_semantic_version(self):
         self.assertIsNotNone(semantic_version.Version("0.2.0"))
+        self.assertIsNotNone(semantic_version.Version("0.2.0-alpha"))
+        self.assertIsNotNone(semantic_version.Version("0.2.0-alpha-foo"))
+        self.assertIsNotNone(semantic_version.Version("0.2.0-alpha-foo-bar"))
 
         with self.assertRaises(ValueError):
             self.assertIsNotNone(semantic_version.Version("v0.2.0"))
