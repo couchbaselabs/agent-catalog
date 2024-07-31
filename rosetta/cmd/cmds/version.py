@@ -44,7 +44,15 @@ def version_compare(s1, s2):
     branch2, num_commits2, hash2 = version_parse(s2)
 
     if branch1 != branch2:
+        v1 = Version(branch1)
+        v2 = Version(branch2)
+
+        if v1 > v2:
+            return 1
+        if v1 < v2:
+            return -1
         return None
+
 
     if num_commits1 > num_commits2:
         return 1
