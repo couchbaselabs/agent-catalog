@@ -40,6 +40,7 @@ class Provider(pydantic.BaseModel, abc.ABC):
 
     model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
 
+    # TODO (GLENN): This should be in inferred from the catalog.
     embedding_model: sentence_transformers.SentenceTransformer = pydantic.Field(
         description="Embedding model used to encode the tool descriptions."
     )
@@ -50,9 +51,6 @@ class Provider(pydantic.BaseModel, abc.ABC):
 
     _tools: typing.List[typing.Type[_ToolPointer]] = list()
     _modules: typing.Dict = dict()
-
-    def __init__(self, /, **data: typing.Any):
-        super(Provider, self).__init__(**data)
 
     @abc.abstractmethod
     def get_tools_for(self, objective: str, k: typing.Union[int | None] = 1) \
@@ -90,13 +88,13 @@ class Provider(pydantic.BaseModel, abc.ABC):
 
 
 class LocalProvider(Provider):
-    catalog_location: pathlib.Path
+    catalog_file: pathlib.Path
 
     def __init__(self, /, **data: typing.Any):
         super(LocalProvider, self).__init__(**data)
 
         # Group all entries by their 'source'.
-        with self.local_catalog.tool_file.open('r') as fp:
+        with self.catalog_file.open('r') as fp:
             source_groups = dict()
             for line in fp:
                 entry = ToolDescriptor.model_validate_json(line)
