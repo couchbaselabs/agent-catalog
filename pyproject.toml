@@ -34,6 +34,7 @@ semchunk = "^2.2.0"
 fastapi = "^0.111.1"
 Flask = "^3.0.3"
 couchbase = "^4.3.0"
+pre-commit = "^3.2.2"
 
 # Note:
 #   This dependency is purely for the StructuredTool (BaseTool) type.
