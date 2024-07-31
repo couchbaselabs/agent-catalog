@@ -4,8 +4,8 @@ import typing
 
 import couchbase.auth
 
-from rosetta.core.catalog import VERSION_CATALOG
-from rosetta.core.catalog.version import version, version_compare
+from rosetta.core.catalog import CATALOG_SCHEMA_VERSION
+from rosetta.core.catalog.version import lib_version, lib_version_compare, catalog_schema_version_compare
 
 
 def cmd_init_local(ctx, embedding_models: typing.List[str], **_):
@@ -28,14 +28,14 @@ def cmd_init_local(ctx, embedding_models: typing.List[str], **_):
     # stick with that same embedding model so that all the vectors will
     # be in the same, common, comparable vector space.
 
-    v = version(ctx)
+    lib_v = lib_version(ctx)
 
     meta = {
         # Version of the local catalog data.
-        'version_catalog_schema': VERSION_CATALOG,
+        'catalog_schema_version': CATALOG_SCHEMA_VERSION,
 
-        # Version of the tool that last wrote the local catalog data.
-        'version_tool': v
+        # Version of the SDK library / tool that last wrote the local catalog data.
+        'lib_version': lib_v
     }
 
     meta_path = ctx['catalog'] + '/meta.json'
@@ -44,11 +44,16 @@ def cmd_init_local(ctx, embedding_models: typing.List[str], **_):
         with open(meta_path, 'r') as f:
             meta = json.load(f)
 
-    if version_compare(meta['version_catalog_schema'], v) > 0:
-        raise ValueError('Version of local catalog directory is ahead.')
+    if catalog_schema_version_compare(meta['catalog_schema_version'], CATALOG_SCHEMA_VERSION) > 0:
+        # TODO: Perhaps too strict here and we should instead allow micro versions getting ahead.
+        raise ValueError("Version of local catalog's catalog_schema_version is ahead.")
 
-    meta['version_catalog_schema'] = VERSION_CATALOG
-    meta['version_tool'] = v
+    if lib_version_compare(meta['lib_version'], lib_v) > 0:
+        # TODO: Perhaps too strict here and we should instead allow micro versions getting ahead.
+        raise ValueError("Version of local catalog's lib_version is ahead.")
+
+    meta['catalog_schema_version'] = CATALOG_SCHEMA_VERSION
+    meta['lib_version'] = lib_v
 
     with open(meta_path, 'w') as f:
         json.dump(meta, f)
