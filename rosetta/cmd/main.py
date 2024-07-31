@@ -12,7 +12,31 @@ from .cmds import *
 dotenv.load_dotenv()
 
 
-@click.group(epilog='See: https://docs.couchbase.com for more information.')
+# Support abbreviated command aliases, ex: "rosetta st" ==> "rosetta status".
+# From: https://click.palletsprojects.com/en/8.1.x/advanced/#command-aliases
+class AliasedGroup(click.Group):
+    def get_command(self, ctx, cmd_name):
+        rv = click.Group.get_command(self, ctx, cmd_name)
+        if rv is not None:
+            return rv
+
+        matches = [x for x in self.list_commands(ctx) if x.startswith(cmd_name)]
+        if not matches:
+            return None
+
+        if len(matches) == 1:
+            return click.Group.get_command(self, ctx, matches[0])
+
+        ctx.fail(f"Too many matches: {', '.join(sorted(matches))}")
+
+    def resolve_command(self, ctx, args):
+        # Always return the full command name.
+        _, cmd, args = super().resolve_command(ctx, args)
+        return cmd.name, cmd, args
+
+
+@click.group(cls=AliasedGroup,
+             epilog='See: https://docs.couchbase.com for more information.')
 @click.option('-c', '--catalog',
               default='./catalog',
               type=click.Path(exists=False, file_okay=False, dir_okay=True),
