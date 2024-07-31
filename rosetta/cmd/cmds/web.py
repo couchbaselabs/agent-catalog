@@ -1,5 +1,6 @@
 import flask
 
+
 def cmd_web(ctx, host_port, debug=True):
     app = flask.Flask(__name__)
 

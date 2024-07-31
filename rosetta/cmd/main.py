@@ -138,7 +138,7 @@ def status(ctx):
 @click.pass_context
 def version(ctx):
     """Show the version of this tool."""
-    cmd_version()
+    cmd_version(ctx)
 
 
 @main.command()

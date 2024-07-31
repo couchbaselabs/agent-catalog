@@ -1,4 +1,3 @@
-import logging
 import os
 import pathlib
 import shutil
@@ -6,17 +5,15 @@ import shutil
 import couchbase.auth
 import flask
 
-logger = logging.getLogger(__name__)
-
 
 def clean_local(ctx):
-    tool_catalog_file = ctx['catalog'] + '/tool_catalog.json'
-    prompt_catalog_file = ctx['catalog'] + '/prompt_catalog.json'
-    catalog_activity_dir = ctx['catalog_activity']
+    xs = [ctx['catalog_activity'],
+          ctx['catalog'] + '/tool_catalog.json',
+          ctx['catalog'] + '/prompt_catalog.json',
+          ctx['catalog'] + '/meta.json']
 
-    for x in [tool_catalog_file, prompt_catalog_file, catalog_activity_dir]:
+    for x in xs:
         if not x or not os.path.exists(x):
-            logger.warning('Skipping file/directory that does not exist: %s', x)
             continue
 
         x_path = pathlib.Path(x)

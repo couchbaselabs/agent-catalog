@@ -1,6 +1,17 @@
 import unittest
 
-from rosetta.cmd.cmds.version import version_parse, version_compare
+import semantic_version
+
+from rosetta.core.catalog.version import version_parse, version_compare
+
+
+class TestSemanticVersion(unittest.TestCase):
+
+    def test_semantic_version(self):
+        self.assertIsNotNone(semantic_version.Version("0.2.0"))
+
+        with self.assertRaises(ValueError):
+            self.assertIsNotNone(semantic_version.Version("v0.2.0"))
 
 
 class TestVersionParse(unittest.TestCase):
@@ -10,6 +21,11 @@ class TestVersionParse(unittest.TestCase):
         self.assertEqual(branch, "v0.2.0")
         self.assertEqual(num_commits, 0)
         self.assertEqual(hash, "g6f9305e")
+
+        branch, num_commits, hash = version_parse("v0.1.0-55-g8397417")
+        self.assertEqual(branch, "v0.1.0")
+        self.assertEqual(num_commits, 55)
+        self.assertEqual(hash, "g8397417")
 
     def test_version_parse_with_hyphenated_branch_name(self):
         branch, num_commits, hash = version_parse("v0.1.0-alpha-4-g6f9305e")
@@ -30,6 +46,9 @@ class TestVersionParse(unittest.TestCase):
     def test_invalid_version_format(self):
         with self.assertRaises(ValueError):
             version_parse("invalid-version-string")
+
+        with self.assertRaises(ValueError):
+            version_parse("")
 
     def test_missing_v_prefix(self):
         branch, num_commits, hash = version_parse("0.2.0-0-g6f9305e")
