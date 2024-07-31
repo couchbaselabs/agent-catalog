@@ -42,7 +42,5 @@ def register_blueprints(app):
 
 
 # ...and our defaults.
-DEFAULT_OUTPUT_DIR = '.out'
-DEFAULT_HISTORY_DIR = 'history'
 DEFAULT_EMBEDDING_MODEL = 'sentence-transformers/all-MiniLM-L12-v2'
 DEFAULT_WEB_HOST_PORT = '127.0.0.1:5555'

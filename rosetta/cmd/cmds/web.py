@@ -1,11 +1,12 @@
 import flask
 
+
 def cmd_web(ctx, host_port, debug=True):
     app = flask.Flask(__name__)
 
     app.config['ctx'] = ctx
 
-    from rosetta.core.cmd.action import register_blueprints
+    from rosetta.cmd.cmds import register_blueprints
 
     register_blueprints(app)
 

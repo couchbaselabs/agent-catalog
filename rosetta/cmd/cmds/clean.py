@@ -1,4 +1,3 @@
-import logging
 import os
 import pathlib
 import shutil
@@ -6,23 +5,22 @@ import shutil
 import couchbase.auth
 import flask
 
-logger = logging.getLogger(__name__)
 
+def clean_local(ctx):
+    xs = [ctx['catalog_activity'],
+          ctx['catalog'] + '/tool_catalog.json',
+          ctx['catalog'] + '/prompt_catalog.json',
+          ctx['catalog'] + '/meta.json']
 
-def clean_local(ctx, history_dir: str):
-    tool_catalog_file = ctx['catalog'] + '/tool_catalog.json'
-    prompt_catalog_file = ctx['catalog'] + '/prompt_catalog.json'
-
-    for x in [tool_catalog_file, prompt_catalog_file, history_dir]:
+    for x in xs:
         if not x or not os.path.exists(x):
-            logger.warning('Skipping file/directory that does not exist: %s', x)
             continue
 
         x_path = pathlib.Path(x)
 
         if x_path.is_file():
             os.remove(x_path.absolute())
-        elif x.is_dir():
+        elif x_path.is_dir():
             shutil.rmtree(x_path.absolute())
 
 
@@ -31,9 +29,9 @@ def clean_couchbase(ctx, conn_string: str, authenticator: couchbase.auth.Authent
     pass
 
 
-def cmd_clean(ctx, history_dir: str, **_):
+def cmd_clean(ctx):
     if True: # TODO: Should check cmd-line flags on whether to clean local.
-        clean_local(ctx, history_dir)
+        clean_local(ctx)
 
     if False: # TODO: Should check cmd-line flags on whether to clean database.
         clean_couchbase(ctx, "TODO", None)
