@@ -8,6 +8,7 @@ import flask
 
 def clean_local(ctx):
     xs = [ctx['activity'],
+          # TODO: We should instead glob for all *_catalog.json files?
           ctx['catalog'] + '/tool_catalog.json',
           ctx['catalog'] + '/prompt_catalog.json',
           ctx['catalog'] + '/meta.json']
@@ -25,16 +26,16 @@ def clean_local(ctx):
 
 
 # TODO (GLENN): Define a 'clean' action for a Couchbase collection.
-def clean_couchbase(ctx, conn_string: str, authenticator: couchbase.auth.Authenticator, **_):
+def clean_db(ctx, conn_string: str, authenticator: couchbase.auth.Authenticator, **_):
     pass
 
 
 def cmd_clean(ctx):
-    if True: # TODO: Should check cmd-line flags on whether to clean local.
+    if True: # TODO: Should check cmd-line flags on whether to clean local catalog.
         clean_local(ctx)
 
-    if False: # TODO: Should check cmd-line flags on whether to clean database.
-        clean_couchbase(ctx, "TODO", None)
+    if False: # TODO: Should check cmd-line flags on whether to clean db.
+        clean_db(ctx, "TODO", None)
 
 
 blueprint = flask.Blueprint('clean', __name__)
@@ -45,11 +46,11 @@ def route_clean():
 
     ctx = flask.current_app.config['ctx']
 
-    if True: # TODO: Should check REST args on whether to clean local.
+    if True: # TODO: Should check REST args on whether to clean local catalog.
         clean_local(ctx, None)
 
-    if False: # TODO: Should check REST args on whether to clean database.
-        clean_couchbase(ctx, "TODO", None)
+    if False: # TODO: Should check REST args on whether to clean db.
+        clean_db(ctx, "TODO", None)
 
     return "OK" # TODO.
 

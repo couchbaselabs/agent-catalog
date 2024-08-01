@@ -69,7 +69,7 @@ def main(ctx, catalog, activity, verbose):
 @main.command()
 @click.pass_context
 def clean(ctx):
-    """Clean up generated files, etc."""
+    """Clean up catalog, activity, generated files, etc."""
     cmd_clean(ctx.obj)
 
 
@@ -91,7 +91,7 @@ def find(ctx):
 @click.argument('source_dirs', nargs=-1, required=True)
 @click.option('-em', '--embedding-model',
               default=DEFAULT_EMBEDDING_MODEL,
-              help='Embedding model when building the local catalog.',
+              help='Embedding model when indexing source files into the local catalog.',
               show_default=True)
 @click.pass_context
 def index(ctx, source_dirs, embedding_model):
