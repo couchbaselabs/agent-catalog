@@ -4,6 +4,7 @@ import subprocess
 
 import semantic_version
 
+
 # TODO: Consider grabbing version from the package distribution
 # metadata of rosetta instead of from a VERSION.txt file?
 
