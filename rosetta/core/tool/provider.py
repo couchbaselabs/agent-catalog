@@ -1,16 +1,11 @@
-import dataclasses
-import json
-import os
 import shutil
 import tempfile
 import typing
 import pydantic
 import pathlib
 import importlib
-import scipy.signal
 import sentence_transformers
 import langchain_core.tools
-import numpy
 import logging
 import sklearn
 import inspect
@@ -26,18 +21,15 @@ from .generate.generator import (
     SemanticSearchCodeGenerator,
     HTTPRequestCodeGenerator
 )
+from .reranker import (
+    ToolWithEmbedding,
+    ToolWithDelta
+)
 
 logger = logging.getLogger(__name__)
 
 
 class Provider(pydantic.BaseModel, abc.ABC):
-    # Note: Numpy and Pydantic don't really play well together...
-    @dataclasses.dataclass
-    class _ToolPointer:
-        identifier: pydantic.UUID4
-        embedding: numpy.ndarray
-        tool: langchain_core.tools.StructuredTool
-
     model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
 
     # TODO (GLENN): This should be in inferred from the catalog.
@@ -49,7 +41,7 @@ class Provider(pydantic.BaseModel, abc.ABC):
         description="Location to place the generated Python stubs."
     )
 
-    _tools: typing.List[typing.Type[_ToolPointer]] = list()
+    _tools: typing.List[ToolWithEmbedding] = list()
     _modules: typing.Dict = dict()
 
     @abc.abstractmethod
@@ -124,12 +116,7 @@ class LocalProvider(Provider):
                     output = SemanticSearchCodeGenerator(tool_descriptors=entries).generate(self.output_directory)
 
                 case ToolKind.HTTPRequest:
-                    continue
-                    # TODO (GLENN): Get HTTP-request tools working.
-                    # output = HTTPRequestCodeGenerator(
-                    #     library_dir=self.library_dir,
-                    #     tool_descriptors=entries
-                    # ).generate(self.output_directory)
+                    output = HTTPRequestCodeGenerator(tool_descriptors=entries).generate(self.output_directory)
 
                 case _:
                     raise ValueError('Unexpected tool-kind encountered!')
@@ -138,6 +125,7 @@ class LocalProvider(Provider):
             for i in range(len(entries)):
                 self._load_from_source(output[i], entries[i])
 
+    # TODO (GLENN): Add an option here for choosing / importing a reranking lambda.
     def get_tools_for(self, objective: str, k: typing.Union[int | None] = 1) \
             -> typing.List[langchain_core.tools.StructuredTool]:
         # Compute the distance between our tool embeddings and our objective embeddings.
@@ -149,40 +137,17 @@ class LocalProvider(Provider):
         )
 
         # Order our tools by their distance to the objective.
-        ordered_tools = sorted([
-            {'tool': available_tools[i].tool, 'delta': tool_deltas[i]} for i in range(len(tool_deltas))
-        ], key=lambda t: t['delta'], reverse=True)
+        tools_with_deltas = [
+            ToolWithDelta(
+                tool=available_tools[i].tool,
+                delta=tool_deltas[i]
+            ) for i in range(len(tool_deltas))
+        ]
+        ordered_tools = sorted(tools_with_deltas, key=lambda t: t.delta, reverse=True)
         if k > 0:
-            return [t['tool'] for t in ordered_tools][:k]
-
+            return [t.tool for t in ordered_tools][:k]
         else:
-            # TODO (GLENN): Refactor this into a "rerank" method.
-            # TODO (GLENN): Get this working!
-            a = numpy.array(ordered_tools).reshape(-1, 1)
-            s = numpy.linspace(min(a) - 0.01, max(a) + 0.01, num=10000).reshape(-1, 1)
-
-            # Use KDE to estimate our PDF. We are going to iteratively deepen until we get some local extrema.
-            deepening_factor = 0.1
-            for i in range(-1, 10):
-                working_bandwidth = numpy.float_power(deepening_factor, i)
-                kde = sklearn.neighbors.KernelDensity(
-                    kernel='gaussian',
-                    bandwidth=working_bandwidth
-                ).fit(X=a)
-
-                # Determine our local minima and maxima in between the cosine similarity range.
-                kde_score = kde.score_samples(s)
-                first_minimum = scipy.signal.argrelextrema(kde_score, numpy.less)[0]
-                first_maximum = scipy.signal.argrelextrema(kde_score, numpy.greater)[0]
-                if len(first_minimum) > 0:
-                    logger.debug(f'Using a bandwidth of {working_bandwidth}.')
-                    break
-                else:
-                    logger.debug(f'Bandwidth of {working_bandwidth} was not satisfiable. Deepening.')
-
-            if len(first_minimum) < 1:
-                raise RuntimeError('Could not find satisfiable bandwidth!!')
-            return []
+            raise NotImplementedError('Tool reranking is not yet implemented!')
 
     def get(self, _id: str) -> langchain_core.tools.StructuredTool:
         pass
