@@ -1,6 +1,5 @@
 import flask
 
-# from rosetta.cmd.cmds import register_blueprints
 
 def register_blueprints(app):
     # TODO: app.register_blueprint(find.blueprint)
@@ -12,7 +11,7 @@ def register_blueprints(app):
     app.register_blueprint(clean_blueprint)
 
     from .env import blueprint as env_blueprint
-    app.register_blueprint(env.blueprint)
+    app.register_blueprint(env_blueprint)
 
     from .version import blueprint as version_blueprint
     app.register_blueprint(version_blueprint)
