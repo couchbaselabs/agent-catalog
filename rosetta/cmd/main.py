@@ -38,31 +38,30 @@ class AliasedGroup(click.Group):
 @click.group(cls=AliasedGroup,
              epilog='See: https://docs.couchbase.com for more information.')
 @click.option('-c', '--catalog',
-              default='./catalog',
+              default='.rosetta-catalog',
               type=click.Path(exists=False, file_okay=False, dir_okay=True),
               help='''Directory of local catalog files.
               The local catalog DIRECTORY should be checked into git.''',
               envvar='ROSETTA_CATALOG',
               show_default=True)
-@click.option('-ca', '--catalog-activity',
-              default='{CATALOG}-activity',
+@click.option('-a', '--activity',
+              default='.rosetta-activity',
               type=click.Path(exists=False, file_okay=False, dir_okay=True),
-              help='''Directory of local catalog-activity files (runtime data based on the catalog).
-              The local catalog-activity DIRECTORY should NOT be checked into git,
-              as it holds runtime data like logs, call histories, etc.''',
-              envvar='ROSETTA_CATALOG_ACTIVITY',
+              help='''Directory of local activity files (runtime data).
+              The local activity DIRECTORY should NOT be checked into git,
+              as it holds runtime activity data like logs, call histories, etc.''',
+              envvar='ROSETTA_ACTIVITY',
               show_default=True)
 @click.option('-v', '--verbose',
               count=True,
               help='Enable verbose output.',
               envvar='ROSETTA_VERBOSE')
 @click.pass_context
-def main(ctx, catalog, catalog_activity, verbose):
+def main(ctx, catalog, activity, verbose):
     """A command line tool for Rosetta."""
     ctx.obj = ctx.obj or {
-        'catalog': catalog,                 # Ex: "./catalog".
-        'catalog_activity': catalog_activity
-            .replace('{CATALOG}', catalog), # Ex: "{CATALOG}-activity" => "./catalog-activity".
+        'catalog': catalog,
+        'activity': activity,
         'verbose': verbose
     }
 
@@ -70,14 +69,14 @@ def main(ctx, catalog, catalog_activity, verbose):
 @main.command()
 @click.pass_context
 def clean(ctx):
-    """Clean up generated files, etc."""
+    """Clean up catalog, activity, generated files, etc."""
     cmd_clean(ctx.obj)
 
 
 @main.command()
 @click.pass_context
 def env(ctx):
-    """Show this tool's env or configuration variables as JSON."""
+    """Show this program's env or configuration parameters as JSON."""
     cmd_env(ctx.obj)
 
 
@@ -92,7 +91,7 @@ def find(ctx):
 @click.argument('source_dirs', nargs=-1, required=True)
 @click.option('-em', '--embedding-model',
               default=DEFAULT_EMBEDDING_MODEL,
-              help='Embedding model when building the local catalog.',
+              help='Embedding model when indexing source files into the local catalog.',
               show_default=True)
 @click.pass_context
 def index(ctx, source_dirs, embedding_model):
@@ -105,18 +104,6 @@ def index(ctx, source_dirs, embedding_model):
     # TODO: The index command should ignore whatever's in the '.gitignore' file.
 
     cmd_index(ctx.obj, source_dirs=source_dirs, embedding_model=embedding_model)
-
-
-@main.command()
-@click.option('-em', '--embedding-model', 'embedding_models',
-              multiple=True,
-              default=[DEFAULT_EMBEDDING_MODEL],
-              help='Embedding models to download and cache.',
-              show_default=True)
-@click.pass_context
-def init(ctx, embedding_models):
-    """Initialize the environment (e.g., download & cache models, etc)."""
-    cmd_init_local(ctx.obj, embedding_models)
 
 
 @main.command()
@@ -137,7 +124,7 @@ def status(ctx):
 @click.pass_context
 def version(ctx):
     """Show the version of this tool."""
-    cmd_version(ctx)
+    cmd_version(ctx.obj)
 
 
 @main.command()

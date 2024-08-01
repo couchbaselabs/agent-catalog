@@ -1,44 +1,12 @@
 # Our commands...
-from .clean import (
-    cmd_clean
-)
-from .env import (
-    cmd_env
-)
-from .find import (
-    cmd_find
-)
-from .index import (
-    cmd_index
-)
-from .init import (
-    cmd_init_couchbase,
-    cmd_init_local
-)
-from .publish import (
-    cmd_publish
-)
-from .status import (
-    cmd_status
-)
-from .version import (
-    cmd_version
-)
-from .web import (
-    cmd_web
-)
-
-
-def register_blueprints(app):
-    # TODO: app.register_blueprint(find.blueprint)
-    # TODO: app.register_blueprint(index.blueprint)
-    # TODO: app.register_blueprint(init.blueprint)
-    # TODO: app.register_blueprint(publish.blueprint)
-    # TODO: app.register_blueprint(status.blueprint)
-
-    app.register_blueprint(clean.blueprint)
-    app.register_blueprint(env.blueprint)
-    app.register_blueprint(version.blueprint)
+from .clean import cmd_clean
+from .env import cmd_env
+from .find import cmd_find
+from .index import cmd_index
+from .publish import cmd_publish
+from .status import cmd_status
+from .version import cmd_version
+from .web import cmd_web
 
 
 # ...and our defaults.

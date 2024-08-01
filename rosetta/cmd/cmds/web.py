@@ -1,12 +1,26 @@
 import flask
 
 
+def register_blueprints(app):
+    # TODO: app.register_blueprint(find.blueprint)
+    # TODO: app.register_blueprint(index.blueprint)
+    # TODO: app.register_blueprint(publish.blueprint)
+    # TODO: app.register_blueprint(status.blueprint)
+
+    from .clean import blueprint as clean_blueprint
+    app.register_blueprint(clean_blueprint)
+
+    from .env import blueprint as env_blueprint
+    app.register_blueprint(env_blueprint)
+
+    from .version import blueprint as version_blueprint
+    app.register_blueprint(version_blueprint)
+
+
 def cmd_web(ctx, host_port, debug=True):
     app = flask.Flask(__name__)
 
     app.config['ctx'] = ctx
-
-    from rosetta.cmd.cmds import register_blueprints
 
     register_blueprints(app)
 
