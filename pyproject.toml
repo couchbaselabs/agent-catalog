@@ -5,7 +5,8 @@ description = "Core library associated with agentic workflows in Couchbase."
 repository = "https://github.com/couchbaselabs/rosetta-core"
 authors = [
     "Glenn Galvizo <glenn.galvizo@couchbase.com>",
-    "Steve Yen <steve.yen@couchbase.com>"
+    "Steve Yen <steve.yen@couchbase.com>",
+    "Tanvi Johari <tanvi.johari@couchbase.com>"
 ]
 readme = "README.md"
 packages = [{ include = "rosetta" }]
