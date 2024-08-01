@@ -38,31 +38,30 @@ class AliasedGroup(click.Group):
 @click.group(cls=AliasedGroup,
              epilog='See: https://docs.couchbase.com for more information.')
 @click.option('-c', '--catalog',
-              default='./catalog',
+              default='.rosetta-catalog',
               type=click.Path(exists=False, file_okay=False, dir_okay=True),
               help='''Directory of local catalog files.
               The local catalog DIRECTORY should be checked into git.''',
               envvar='ROSETTA_CATALOG',
               show_default=True)
-@click.option('-ca', '--catalog-activity',
-              default='{CATALOG}-activity',
+@click.option('-a', '--activity',
+              default='.rosetta-activity',
               type=click.Path(exists=False, file_okay=False, dir_okay=True),
-              help='''Directory of local catalog-activity files (runtime data based on the catalog).
-              The local catalog-activity DIRECTORY should NOT be checked into git,
-              as it holds runtime data like logs, call histories, etc.''',
-              envvar='ROSETTA_CATALOG_ACTIVITY',
+              help='''Directory of local activity files (runtime data).
+              The local activity DIRECTORY should NOT be checked into git,
+              as it holds runtime activity data like logs, call histories, etc.''',
+              envvar='ROSETTA_ACTIVITY',
               show_default=True)
 @click.option('-v', '--verbose',
               count=True,
               help='Enable verbose output.',
               envvar='ROSETTA_VERBOSE')
 @click.pass_context
-def main(ctx, catalog, catalog_activity, verbose):
+def main(ctx, catalog, activity, verbose):
     """A command line tool for Rosetta."""
     ctx.obj = ctx.obj or {
-        'catalog': catalog,                 # Ex: "./catalog".
-        'catalog_activity': catalog_activity
-            .replace('{CATALOG}', catalog), # Ex: "{CATALOG}-activity" => "./catalog-activity".
+        'catalog': catalog,
+        'activity': activity,
         'verbose': verbose
     }
 

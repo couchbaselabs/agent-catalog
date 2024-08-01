@@ -11,7 +11,7 @@ from rosetta.core.catalog.version import lib_version, lib_version_compare, catal
 def cmd_init_local(ctx, embedding_models: typing.List[str], **_):
     # Init directories.
     os.makedirs(ctx['catalog'], exist_ok=True)
-    os.makedirs(ctx['catalog_activity'], exist_ok=True)
+    os.makedirs(ctx['activity'], exist_ok=True)
 
     import sentence_transformers
 

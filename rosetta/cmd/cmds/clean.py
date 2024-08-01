@@ -7,7 +7,7 @@ import flask
 
 
 def clean_local(ctx):
-    xs = [ctx['catalog_activity'],
+    xs = [ctx['activity'],
           ctx['catalog'] + '/tool_catalog.json',
           ctx['catalog'] + '/prompt_catalog.json',
           ctx['catalog'] + '/meta.json']
