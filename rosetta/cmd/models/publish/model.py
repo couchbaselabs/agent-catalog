@@ -1,7 +1,7 @@
-import pydantic
+from pydantic import BaseModel
 
 
-class Keyspace(pydantic.BaseModel):
+class Keyspace(BaseModel):
     """Pydantic model to capture keyspace"""
 
     bucket: str
@@ -9,7 +9,7 @@ class Keyspace(pydantic.BaseModel):
     collection: str
 
 
-class CouchbaseConnect(pydantic.BaseModel):
+class CouchbaseConnect(BaseModel):
     """Pydantic model to capture couchbase connection details"""
 
     connection_url: str = "couchbase://lcalhost"
