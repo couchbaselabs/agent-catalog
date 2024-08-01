@@ -107,18 +107,6 @@ def index(ctx, source_dirs, embedding_model):
 
 
 @main.command()
-@click.option('-em', '--embedding-model', 'embedding_models',
-              multiple=True,
-              default=[DEFAULT_EMBEDDING_MODEL],
-              help='Embedding models to download and cache.',
-              show_default=True)
-@click.pass_context
-def init(ctx, embedding_models):
-    """Initialize the environment (e.g., download & cache models, etc)."""
-    cmd_init_local(ctx.obj, embedding_models)
-
-
-@main.command()
 @click.pass_context
 def publish(ctx):
     """Publish the local catalog to a database."""
