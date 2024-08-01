@@ -45,9 +45,9 @@ class AliasedGroup(click.Group):
               envvar='ROSETTA_CATALOG',
               show_default=True)
 @click.option('-ca', '--catalog-activity',
-              default='./{CATALOG}-activity',
+              default='{CATALOG}-activity',
               type=click.Path(exists=False, file_okay=False, dir_okay=True),
-              help='''Directory of local catalog-activity files (runtime data based the catalog).
+              help='''Directory of local catalog-activity files (runtime data based on the catalog).
               The local catalog-activity DIRECTORY should NOT be checked into git,
               as it holds runtime data like logs, call histories, etc.''',
               envvar='ROSETTA_CATALOG_ACTIVITY',
@@ -60,10 +60,9 @@ class AliasedGroup(click.Group):
 def main(ctx, catalog, catalog_activity, verbose):
     """A command line tool for Rosetta."""
     ctx.obj = ctx.obj or {
-        'catalog': catalog,                # Ex: "./catalog".
+        'catalog': catalog,                 # Ex: "./catalog".
         'catalog_activity': catalog_activity
-            .replace('{CATALOG}', catalog) # Ex: "./{CATALOG}-activity" => "././catalog-activity".
-            .replace('/./', '/'),          # Ex: "././catalog-activity" => "./catalog-activity".
+            .replace('{CATALOG}', catalog), # Ex: "{CATALOG}-activity" => "./catalog-activity".
         'verbose': verbose
     }
 
