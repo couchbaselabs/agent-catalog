@@ -1,5 +1,5 @@
-import json
-import pathlib
+import os
+import sys
 
 import click
 import dotenv
@@ -57,7 +57,7 @@ class AliasedGroup(click.Group):
               help='Enable verbose output.',
               envvar='ROSETTA_VERBOSE')
 @click.pass_context
-def main(ctx, catalog, activity, verbose):
+def click_main(ctx, catalog, activity, verbose):
     """A command line tool for Rosetta."""
     ctx.obj = ctx.obj or {
         'catalog': catalog,
@@ -66,38 +66,43 @@ def main(ctx, catalog, activity, verbose):
     }
 
 
-@main.command()
+@click_main.command()
 @click.pass_context
 def clean(ctx):
     """Clean up catalog, activity, generated files, etc."""
     cmd_clean(ctx.obj)
 
 
-@main.command()
+@click_main.command()
 @click.pass_context
 def env(ctx):
     """Show this program's env or configuration parameters as JSON."""
     cmd_env(ctx.obj)
 
 
-@main.command()
+@click_main.command()
 @click.pass_context
 def find(ctx):
     """Find tools, prompts, etc. from the catalog."""
     cmd_find(ctx.obj)
 
 
-@main.command()
-@click.argument('source_dirs', nargs=-1, required=True)
+@click_main.command()
+@click.argument('source_dirs', nargs=-1)
 @click.option('-em', '--embedding-model',
               default=DEFAULT_EMBEDDING_MODEL,
               help='Embedding model when indexing source files into the local catalog.',
               show_default=True)
 @click.pass_context
 def index(ctx, source_dirs, embedding_model):
-    """Walk source directory files for indexing into the local catalog.
+    """Walk source directory trees for indexing source files into the local catalog.
+
+    SOURCE_DIRS defaults to "."
 
     Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc."""
+
+    if not source_dirs:
+        source_dirs = ['.']
 
     # TODO: The index command should default to the '.' directory / current directory.
     # TODO: The index command should ignore the '.git' subdirectory.
@@ -106,28 +111,28 @@ def index(ctx, source_dirs, embedding_model):
     cmd_index(ctx.obj, source_dirs=source_dirs, embedding_model=embedding_model)
 
 
-@main.command()
+@click_main.command()
 @click.pass_context
 def publish(ctx):
     """Publish the local catalog to a database."""
     cmd_publish(ctx.obj)
 
 
-@main.command()
+@click_main.command()
 @click.pass_context
 def status(ctx):
     """Show the status of the local catalog."""
     cmd_status(ctx.obj)
 
 
-@main.command()
+@click_main.command()
 @click.pass_context
 def version(ctx):
     """Show the version of this tool."""
     cmd_version(ctx.obj)
 
 
-@main.command()
+@click_main.command()
 @click.option('--host-port',
               default=DEFAULT_WEB_HOST_PORT,
               envvar='ROSETTA_WEB_HOST_PORT',
@@ -142,6 +147,19 @@ def version(ctx):
 def web(ctx, host_port, debug):
     """Start local web server."""
     cmd_web(ctx.obj, host_port, debug)
+
+
+def main():
+      try:
+          click_main()
+      except Exception as e:
+          click.echo(f"ERROR: {e}", err=True)
+
+          if os.getenv('ROSETTA_DEBUG') is not None:
+              # Set ROSETTA_DEBUG so standard python stack trace is emitted.
+              raise(e)
+
+          sys.exit(1)
 
 
 if __name__ == '__main__':
