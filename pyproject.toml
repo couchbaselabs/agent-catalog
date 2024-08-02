@@ -38,6 +38,8 @@ fastapi = "^0.111.1"
 Flask = "^3.0.3"
 couchbase = "^4.3.0"
 jinja2 = "^3.1.4"
+openapi3-parser = "^1.1.17"
+py-openapi-schema-to-json-schema = "^0.0.3"
 
 # Note:
 #   This dependency is purely for the StructuredTool (BaseTool) type.

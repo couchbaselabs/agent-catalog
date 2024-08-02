@@ -1,0 +1,47 @@
+""" This file has been generated automatically by Rosetta at {{ time }} as a http_request tool. """
+from __future__ import annotations
+
+import urllib3
+import typing
+import json
+import sentence_transformers
+import os
+
+import rosetta.core.tool
+
+{{ input_schema.code }}
+
+
+@rosetta.core.tool.tool(infer_schema=True)
+def {{ tool.name }}(question: {{ input_schema.name }}) -> typing.List[str]:
+    """ {{ tool.description }} """
+    cluster = _get_couchbase_cluster()
+    bucket = cluster.bucket('{{ tool.bucket }}')
+    scope = bucket.scope('{{ tool.scope }}')
+    collection = scope.collection('{{ tool.collection }}')
+
+    # We need to safeguard against weird LLM function calls.
+    if isinstance(question, dict):
+        formatted_question = json.dumps(question)
+    elif isinstance(question, str):
+        formatted_question = question
+    elif isinstance(question, {{ input_schema.name }}):
+        formatted_question = json.dumps(question.dict())
+    else:
+        raise ValueError("Bad input given to tool!")
+
+    embedding_model = sentence_transformers.SentenceTransformer('{{ tool.embedding_model }}')
+    _embedding = embedding_model.encode(formatted_question)
+    for_q = list(_embedding.astype('float64'))
+    vector_req = couchbase.vector_search.VectorSearch.from_vector_query(
+        couchbase.vector_search.VectorQuery('{{ tool.vector_field }}', for_q, num_candidates=3)
+    )
+    search_req = couchbase.search.SearchRequest.create(couchbase.search.MatchNoneQuery())
+    search_req = search_req.with_vector_search(vector_req)
+    search_opt = couchbase.options.SearchOptions(fields=["*"])
+    search_result = scope.search('{{ tool.index }}', search_req, search_opt)
+
+    tool_results = []
+    for r in search_result.rows():
+        tool_results.append(collection.get(r.id).content_as[dict]['{{ tool.text_field }}'])
+    return tool_results

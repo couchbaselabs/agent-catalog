@@ -1,7 +1,7 @@
-import json
 import pydantic
 import sentence_transformers
 import langchain_core.tools
+import openapi_parser
 import logging
 import abc
 import pathlib
@@ -12,7 +12,7 @@ import importlib
 import yaml
 import inspect
 
-from .helper import (
+from .common import (
     get_front_matter_from_dot_sqlpp
 )
 from .descriptor import (
@@ -109,30 +109,44 @@ class Registrar(pydantic.BaseModel):
         if not spec_file.exists():
             logger.error('Could not locate the Open API spec file.')
             raise FileNotFoundError()
-        with spec_file.open('r') as fp:
-            parsed_spec = json.load(fp)
+        parsed_spec = openapi_parser.parse(spec_file.absolute())
 
-        if 'Endpoints' not in desc['Open API']:
-            error_message = f'Bad Open API specification given! Using file: {str(filename.absolute())}'
-            logger.error(error_message)
-            raise KeyError(error_message)
         for endpoint in desc['Open API']['Endpoints']:
+            # TODO (GLENN): Use a structured object here...
             operation, path_item = endpoint.split(' ', 1)
-            if path_item not in parsed_spec['paths']:
+
+            # Walk down our paths...
+            working_paths = [p for p in parsed_spec.paths if p.url == path_item]
+            if len(working_paths) == 0:
                 logger.warning(f'{path_item} not found in Open API specification. Skipping.')
                 continue
+            working_path = working_paths[0]
+
+            # ...and then our operations.
+            working_operations = [op for op in working_path.operations if op.method.value == operation.lower()]
+            if len(working_operations) == 0:
+                logger.warning(f'{endpoint} not found in Open API specification. Skipping.')
+                continue
+            working_operation = working_operations[0]
 
             # We need a description to continue.
-            item_in_spec = parsed_spec['paths'][path_item][operation.lower()]
-            if 'description' not in item_in_spec:
+            if working_operation.description is None:
                 logger.warning(f'No description found for Open API endpoint {endpoint}. Skipping.')
                 continue
-            tool_description = item_in_spec['description']
+            if working_operation.operation_id is None:
+                tool_name = endpoint
+                logger.debug(f'No operation_id found for Open API endpoint {endpoint}. '
+                             f'Using endpoint name as tool name.')
+            else:
+                tool_name = working_operation.operation_id
+
+            # TODO (GLENN): Use a better ID here.
+            # Finally, yield our tool descriptor.
             yield ToolDescriptor(
                 identifier=uuid.uuid4(),
-                name=item_in_spec['operationId'],
-                description=tool_description,
-                embedding=self._encode_description(tool_description),
+                name=tool_name,
+                description=working_operation.description,
+                embedding=self._encode_description(working_operation.description),
                 source=str(filename.absolute()),
                 kind=ToolKind.HTTPRequest,
             )

@@ -2,69 +2,44 @@ import datetime
 import pathlib
 import typing
 import uuid
+import openapi_parser
 import pydantic
-import datamodel_code_generator.model
-import datamodel_code_generator.parser.jsonschema
 import jinja2
 import subprocess
-import abc
-import re
 import json
+import abc
 import yaml
 import logging
 
-from ..helper import (
+from ..common import (
     get_front_matter_from_dot_sqlpp
 )
 from ..descriptor import (
     ToolDescriptor,
     ToolKind
 )
+from .common import (
+    argument_model_class_name_in_templates,
+    output_model_class_name_in_templates,
+    generate_model_from_json_schema,
+)
 
-argument_model_class_name_in_templates = '_ArgumentInput'
-output_model_class_name_in_templates = '_ToolOutput'
 logger = logging.getLogger(__name__)
 
 
-class _FromTemplateCodeGenerator(pydantic.BaseModel, abc.ABC):
+class _BaseCodeGenerator(pydantic.BaseModel):
     tool_descriptors: typing.List[ToolDescriptor]
     template_directory: pathlib.Path = pydantic.Field(
         default=(pathlib.Path(__file__).parent / 'templates').resolve(),
         description='Location of the the template files.'
     )
 
-    @staticmethod
-    def _generate_model(json_schema: str, class_name: str) -> str:
-        last_class_regex = re.compile(r'class \w+\((.*)\):(?!(\n|.)*class)')
-        model_types = datamodel_code_generator.model.get_data_model_types(
-            # TODO (GLENN): LangChain requires v1 Pydantic... hopefully they change this soon.
-            datamodel_code_generator.DataModelType.PydanticBaseModel,
-            target_python_version=datamodel_code_generator.PythonVersion.PY_311
-        )
-
-        # Generate a Pydantic model for the given JSON schema.
-        argument_parser = datamodel_code_generator.parser.jsonschema.JsonSchemaParser(
-            json_schema,
-            data_model_type=model_types.data_model,
-            data_model_root_type=model_types.root_model,
-            data_model_field_type=model_types.field_model,
-            data_type_manager_type=model_types.data_type_manager,
-            dump_resolve_reference_action=model_types.dump_resolve_reference_action
-        )
-        generated_code = str(argument_parser.parse())
-
-        # TODO (GLENN): There might be a better way to do this (using the JsonSchemaParser arguments).
-        generated_code = generated_code \
-            .replace('from __future__ import annotations', '') \
-            .replace('from pydantic import BaseModel', 'from pydantic.v1 import BaseModel')
-        return last_class_regex.sub(rf'class {class_name}(\1):', generated_code)
-
     @abc.abstractmethod
     def generate(self, output_dir: pathlib.Path) -> typing.List[pathlib.Path]:
         pass
 
 
-class SQLPPCodeGenerator(_FromTemplateCodeGenerator):
+class SQLPPCodeGenerator(_BaseCodeGenerator):
     tool_descriptors: typing.List[ToolDescriptor] = pydantic.Field(min_length=1, max_length=1)
 
     class TemplateContext(pydantic.BaseModel):
@@ -95,7 +70,7 @@ class SQLPPCodeGenerator(_FromTemplateCodeGenerator):
         template_context = self._build_template_context()
 
         # Generate a Pydantic model for the argument schema...
-        argument_model_code = self._generate_model(
+        argument_model_code = generate_model_from_json_schema(
             json_schema=json.dumps(template_context.input_schema),
             class_name=argument_model_class_name_in_templates
         )
@@ -108,7 +83,7 @@ class SQLPPCodeGenerator(_FromTemplateCodeGenerator):
         else:
             is_list_valued = False
             codegen_output_schema = template_context.output_schema
-        output_model_code = self._generate_model(
+        output_model_code = generate_model_from_json_schema(
             json_schema=json.dumps(codegen_output_schema),
             class_name=output_model_class_name_in_templates
         )
@@ -140,7 +115,7 @@ class SQLPPCodeGenerator(_FromTemplateCodeGenerator):
         return [output_file]
 
 
-class SemanticSearchCodeGenerator(_FromTemplateCodeGenerator):
+class SemanticSearchCodeGenerator(_BaseCodeGenerator):
     tool_descriptors: typing.List[ToolDescriptor] = pydantic.Field(min_length=1, max_length=1)
 
     class TemplateContext(pydantic.BaseModel):
@@ -174,7 +149,7 @@ class SemanticSearchCodeGenerator(_FromTemplateCodeGenerator):
         template_context = self._build_template_context()
 
         # Generate a Pydantic model for the argument schema.
-        argument_model_code = self._generate_model(
+        argument_model_code = generate_model_from_json_schema(
             json_schema=json.dumps(template_context.input_schema),
             class_name=argument_model_class_name_in_templates
         )
@@ -201,28 +176,29 @@ class SemanticSearchCodeGenerator(_FromTemplateCodeGenerator):
         return [output_file]
 
 
-class HTTPRequestCodeGenerator(_FromTemplateCodeGenerator):
-    jar_location: pathlib.Path = pydantic.Field(
-        description="Location of the OpenAPI generator JAR file."
-    )
-    java_command: typing.List[str] = pydantic.Field(
-        default_factory=lambda: ['java', '-jar'],
-        description="Java runtime to use when invoking the OpenAPI generator JAR."
-    )
-    generate_options: typing.List[str] = pydantic.Field(
-        default_factory=lambda: [
-            'generate',
-            '-g', 'python',
-            '--skip-operation-example',
-            '--skip-validate-spec',
-            '--global-property', 'apiDocs=false',
-            '--global-property', 'modelDocs=false',
-            '--global-property', 'apiTests=false',
-            '--global-property', 'modelTests=false',
-            '--additional-properties', 'generateSourceCodeOnly'
-        ],
-        description="Options used when invoking the OpenAPI generator JAR."
-    )
+class HTTPRequestCodeGenerator(_BaseCodeGenerator):
+    class TemplateContext(pydantic.BaseModel):
+        name: str
+
+
+        # In JSON-schema.
+        input_schema: typing.Dict
+        output_schema: typing.Dict
+
+    def _build_template_context(self) -> TemplateContext:
+        front_matter = yaml.safe_load(get_front_matter_from_dot_sqlpp(self.tool_descriptors[0].source))
+        with self.tool_descriptors[0].source.open('r') as fp:
+            # Our SQL++ query is the entire file.
+            sqlpp_query = fp.read()
+
+            # Build our tool descriptor.
+            return SQLPPCodeGenerator.TemplateContext(
+                name=front_matter['Name'],
+                description=front_matter['Description'].strip(),
+                sqlpp_query=sqlpp_query,
+                input_schema=json.loads(front_matter['Input']),
+                output_schema=json.loads(front_matter['Output'])
+            )
 
     def generate(self, output_dir: pathlib.Path) -> typing.List[pathlib.Path]:
         # TODO (GLENN): We should add this check as a Pydantic validator.
@@ -230,10 +206,18 @@ class HTTPRequestCodeGenerator(_FromTemplateCodeGenerator):
             raise ValueError('Grouped HTTP-Request descriptors must share the same source!')
         with self.tool_descriptors[0].source.open('r') as fp:
             parsed_desc = yaml.safe_load(fp)
+        spec_file = parsed_desc['Open API']['File']
+
+        # From the spec, find all relevant operations.
+        parsed_spec = openapi_parser.parse(pathlib.Path(spec_file).absolute())
+
+
+
+        parsed_spec.paths[0].operations[0].parameters
+
 
         # TODO (GLENN): Harden this.
         # Run the client generator using the source into a temporary folder.
-        spec_file = parsed_desc['Open API']['File']
         jar_output = uuid.uuid4().hex
         jar_command = \
             self.java_command + \
