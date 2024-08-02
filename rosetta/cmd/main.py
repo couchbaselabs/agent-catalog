@@ -88,16 +88,21 @@ def find(ctx):
 
 
 @click_main.command()
-@click.argument('source_dirs', nargs=-1, required=True)
+@click.argument('source_dirs', nargs=-1)
 @click.option('-em', '--embedding-model',
               default=DEFAULT_EMBEDDING_MODEL,
               help='Embedding model when indexing source files into the local catalog.',
               show_default=True)
 @click.pass_context
 def index(ctx, source_dirs, embedding_model):
-    """Walk source directory files for indexing into the local catalog.
+    """Walk source directory trees for indexing source files into the local catalog.
+
+    SOURCE_DIRS defaults to "."
 
     Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc."""
+
+    if not source_dirs:
+        source_dirs = ['.']
 
     # TODO: The index command should default to the '.' directory / current directory.
     # TODO: The index command should ignore the '.git' subdirectory.
