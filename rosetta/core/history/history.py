@@ -16,7 +16,7 @@ class Message(pydantic.BaseModel):
 
 
 class History(pydantic.BaseModel):
-    messages: typing.Optional[typing.List[Message]] = list()
+    messages: typing.Optional[list[Message]] = list()
 
     def __iadd__(self, new_message: Message):
         self.messages.append(new_message)

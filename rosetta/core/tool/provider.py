@@ -12,10 +12,6 @@ import inspect
 import abc
 import sys
 
-from .descriptor import (
-    ToolDescriptor,
-    ToolKind
-)
 from .generate import (
     SQLPPCodeGenerator,
     SemanticSearchCodeGenerator,
@@ -25,6 +21,8 @@ from .reranker import (
     ToolWithEmbedding,
     ToolWithDelta
 )
+from ..catalog.descriptor import ToolDescriptor
+from .types.kind import ToolKind
 
 logger = logging.getLogger(__name__)
 
@@ -41,12 +39,12 @@ class Provider(pydantic.BaseModel, abc.ABC):
         description="Location to place the generated Python stubs."
     )
 
-    _tools: typing.List[ToolWithEmbedding] = list()
-    _modules: typing.Dict = dict()
+    _tools: list[ToolWithEmbedding] = list()
+    _modules: dict = dict()
 
     @abc.abstractmethod
     def get_tools_for(self, objective: str, k: typing.Union[int | None] = 1) \
-            -> typing.List[langchain_core.tools.StructuredTool]:
+            -> list[langchain_core.tools.StructuredTool]:
         pass
 
     @abc.abstractmethod
@@ -65,7 +63,7 @@ class Provider(pydantic.BaseModel, abc.ABC):
             if not isinstance(tool, langchain_core.tools.StructuredTool):
                 continue
             if tool_filter is None or tool_filter(tool):
-                self._tools.append(Provider._ToolPointer(
+                self._tools.append(ToolWithEmbedding(
                     identifier=entry.identifier,
                     embedding=entry.embedding,
                     tool=tool
@@ -124,7 +122,7 @@ class LocalProvider(Provider):
 
     # TODO (GLENN): Add an option here for choosing / importing a reranking lambda.
     def get_tools_for(self, objective: str, k: typing.Union[int | None] = 1) \
-            -> typing.List[langchain_core.tools.StructuredTool]:
+            -> list[langchain_core.tools.StructuredTool]:
         # Compute the distance between our tool embeddings and our objective embeddings.
         objective_embedding = self.embedding_model.encode(objective)
         available_tools = [t for t in self._tools]

@@ -1,5 +1,4 @@
 import pathlib
-import typing
 
 from rosetta.cmd.cmds.init import init_local
 
@@ -9,7 +8,7 @@ from rosetta.cmd.cmds.init import init_local
 # TODO: Or, can we avoid having the user / app-developer needing to provide a --kind option
 #       and instead just index all the different kinds?
 
-def cmd_index(ctx, source_dirs: typing.List[str], embedding_model: str, **_):
+def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
     meta = init_local(ctx, embedding_model)
 
     if not meta['embedding_model']:
