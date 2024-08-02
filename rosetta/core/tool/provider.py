@@ -16,7 +16,7 @@ from .descriptor import (
     ToolDescriptor,
     ToolKind
 )
-from .generate.generator import (
+from .generate import (
     SQLPPCodeGenerator,
     SemanticSearchCodeGenerator,
     HTTPRequestCodeGenerator
@@ -101,29 +101,26 @@ class LocalProvider(Provider):
         # Now, iterate through each group.
         for source, group in source_groups.items():
             entries = group['entries']
-            match group['kind']:
-                case ToolKind.PythonFunction:
-                    for entry in entries:
-                        # TODO (GLENN): We need a better identifier than just the name and description.
-                        tool_filter = lambda t: entry.name == t.name and entry.description == t.description
-                        self._load_from_source(entry.source, entry, tool_filter)
-                    continue
+            if group['kind'] == ToolKind.PythonFunction:
+                for entry in entries:
+                    # TODO (GLENN): We need a better identifier than just the name and description.
+                    tool_filter = lambda t: entry.name == t.name and entry.description == t.description
+                    self._load_from_source(entry.source, entry, tool_filter)
+            else:
+                match group['kind']:
+                    case ToolKind.SQLPPQuery:
+                        generator = SQLPPCodeGenerator
+                    case ToolKind.SemanticSearch:
+                        generator = SemanticSearchCodeGenerator
+                    case ToolKind.HTTPRequest:
+                        generator = HTTPRequestCodeGenerator
+                    case _:
+                        raise ValueError('Unexpected tool-kind encountered!')
 
-                case ToolKind.SQLPPQuery:
-                    output = SQLPPCodeGenerator(tool_descriptors=entries).generate(self.output_directory)
-
-                case ToolKind.SemanticSearch:
-                    output = SemanticSearchCodeGenerator(tool_descriptors=entries).generate(self.output_directory)
-
-                case ToolKind.HTTPRequest:
-                    output = HTTPRequestCodeGenerator(tool_descriptors=entries).generate(self.output_directory)
-
-                case _:
-                    raise ValueError('Unexpected tool-kind encountered!')
-
-            # For non-Python (native) tools, we expect one Python file per entry.
-            for i in range(len(entries)):
-                self._load_from_source(output[i], entries[i])
+                # For non-Python (native) tools, we expect one Python file per entry.
+                output = generator(tool_descriptors=entries).generate(self.output_directory)
+                for i in range(len(entries)):
+                    self._load_from_source(output[i], entries[i])
 
     # TODO (GLENN): Add an option here for choosing / importing a reranking lambda.
     def get_tools_for(self, objective: str, k: typing.Union[int | None] = 1) \
