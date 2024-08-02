@@ -9,9 +9,9 @@ import os
 
 import rosetta.core.tool
 
-{{ input_schema.code }}
+{{ input.code }}
 
-{{ output_schema.code }}
+{{ output.code }}
 
 # TODO (GLENN): Handle this better.
 def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
@@ -24,32 +24,33 @@ def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
 
 
 @rosetta.core.tool.tool(infer_schema=True)
-def {{ tool.name }}(argument_input: {{ input_schema.name }}) -> {% if list_valued %}typing.List[{{ output_schema.name }}]{% else %}{{ output_schema.name }}{% endif %}:
+def {{ tool_metadata.name }}(argument_input: {{ input.type_name }}) \
+        -> {% if output.is_list_valued %}list[{{ output.type_name }}]{% else %}{{ output.type_name }}{% endif %}:
     """
-    {{ tool.description }}
+    {{ tool_metadata.description }}
     """
     cluster = _get_couchbase_cluster()
 
     # We need to safeguard against weird LLM function calls.
     if isinstance(argument_input, dict):
         named_parameters = argument_input
-    elif isinstance(argument_input, {{ input_schema.name }}):
+    elif isinstance(argument_input, {{ input.type_name }}):
         named_parameters = argument_input.dict()
     else:
         raise ValueError("Bad input given to SQL++ tool!")
 
     query_results = cluster.query(
-        """ {{ tool.sqlpp_query }} """,
+        """ {{ sqlpp_query }} """,
         couchbase.options.QueryOptions(named_parameters=named_parameters)
     )
 
     tool_results = []
-    {% if list_valued %}
+    {% if output.is_list_valued %}
     for result in query_results:
-        tool_results.append({{ output_schema.name }}(**result))
+        tool_results.append({{ output.type_name }}(**result))
     return tool_results
     {% else %}
     # TODO (GLENN): Clean this up.
     for result in query_results:
-        return {{ output_schema.name }}(**result)
+        return {{ output.type_name }}(**result)
     {% endif %}

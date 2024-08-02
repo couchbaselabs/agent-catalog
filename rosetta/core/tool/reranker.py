@@ -5,7 +5,6 @@ import numpy
 import dataclasses
 import logging
 import langchain_core.tools
-import typing
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +12,7 @@ logger = logging.getLogger(__name__)
 # Note: Numpy and Pydantic don't really play well together...
 @dataclasses.dataclass
 class ToolWithEmbedding:
-    identifier: pydantic.UUID4
+    identifier: str
     embedding: numpy.ndarray
     tool: langchain_core.tools.StructuredTool
 
@@ -30,7 +29,7 @@ class ClosestClusterReranker(pydantic.BaseModel):
     deepening_factor: float = pydantic.Field(default=0.1, gt=0)
     max_deepen_steps: int = pydantic.Field(default=10, gt=0)
 
-    def __call__(self, ordered_tools: typing.List[ToolWithDelta]):
+    def __call__(self, ordered_tools: list[ToolWithDelta]):
         a = numpy.array(ordered_tools).reshape(-1, 1)
         s = numpy.linspace(min(a) - 0.01, max(a) + 0.01, num=self.kde_distribution_n).reshape(-1, 1)
 
