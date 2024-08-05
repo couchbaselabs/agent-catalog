@@ -122,14 +122,14 @@ def index(ctx, source_dirs, embedding_model):
     "--scope",
     default="rosetta-catalog",
     help="Couchbase Scope where data is inserted.",
-    required=True
+    required=True,
 )
 @click.option(
     "-col",
     "--collection",
     default="rosetta-catalog",
     help="Couchbase Collection where data is inserted.",
-    required=True
+    required=True,
 )
 @click.pass_context
 def publish(ctx, scope, collection):
@@ -145,15 +145,15 @@ def publish(ctx, scope, collection):
 
     # Prompt user to select a bucket - TODO: can take these details from config/kms later
     selected_bucket = click.prompt(
-        "Please select a bucket",
-        type=click.Choice(buckets),
-        show_choices=True
+        "Please select a bucket", type=click.Choice(buckets), show_choices=True
     )
-    click.echo(f"\nInserting documents in : {selected_bucket}.{keyspace_details.scope}.{keyspace_details.collection}")
-    keyspace_details.bucket=selected_bucket
+    click.echo(
+        f"\nInserting documents in : {selected_bucket}.{keyspace_details.scope}.{keyspace_details.collection}"
+    )
+    keyspace_details.bucket = selected_bucket
 
     # TODO: define where data comes from, passing sample data for now
-    cmd_publish(ctx.obj, cluster = cluster, data="doc sample", keyspace=keyspace_details)
+    cmd_publish(ctx.obj, cluster=cluster, data="doc sample", keyspace=keyspace_details)
 
 
 @click_main.command()

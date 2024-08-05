@@ -9,7 +9,8 @@ from ..models.publish.model import CouchbaseConnect, Keyspace
 
 import uuid
 
-def get_connection (ctx, conn:CouchbaseConnect):
+
+def get_connection(ctx, conn: CouchbaseConnect):
     cluster_url = conn.connection_url
     username = conn.username
     password = conn.password
@@ -33,16 +34,18 @@ def get_connection (ctx, conn:CouchbaseConnect):
 
     return cluster
 
+
 def get_buckets(ctx, cluster):
     if cluster:
         buckets = cluster.buckets().get_all_buckets()
         list_buckets = []
 
-        #Get bucket names
+        # Get bucket names
         for bucket_item in buckets:
             bucket_name = bucket_item.name
             list_buckets.append(bucket_name)
         return list_buckets
+
 
 # TODO: define data's schema
 def cmd_publish(ctx, cluster, data, keyspace: Keyspace):
