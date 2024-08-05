@@ -47,9 +47,14 @@ py-openapi-schema-to-json-schema = "^0.0.3"
 #   All agent-frameworks we've seen to-date rely on BaseTool, so this feels like a sane dependency.
 langchain-core = ">0.1.47"
 
-[tool.poetry.dev-dependencies]
-pre-commit = "^3.2.2"
+[tool.pytest.ini_options]
+markers = [
+    "smoke: marks tests for running on each git-push"
+]
 
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.2.2"
+pytest = "^8.3.2"
 
 [build-system]
 requires = ["poetry-core"]

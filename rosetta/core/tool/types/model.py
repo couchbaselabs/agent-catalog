@@ -78,9 +78,7 @@ class HTTPRequestMetadata(_Metadata):
             # These are set by our parent class.
             _specification: openapi_parser.parser.Operation
             _servers: list[openapi_parser.parser.Server]
-            _parent_parameters: list[openapi_parser.parser.Parameter] = (
-                pydantic.Field(default_factory=list)
-            )
+            _parent_parameters: list[openapi_parser.parser.Parameter] = list()
 
             @property
             def parameters(self) -> list[openapi_parser.parser.Parameter]:
