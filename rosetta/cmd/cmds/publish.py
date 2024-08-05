@@ -36,6 +36,8 @@ def cmd_publish(ctx, data, keyspace: Keyspace, conn: CouchbaseConnect):
     except CouchbaseException as e:
         return f"Error connecting to couchbase : {e}"
 
+    # buckets = cluster.buckets().get_all_buckets()
+
     # Get bucket ref
     cb = cluster.bucket(bucket)
 

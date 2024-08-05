@@ -5,6 +5,7 @@ import click
 import dotenv
 
 from .cmds import *
+from .models.publish.model import Keyspace, CouchbaseConnect
 
 
 # TODO: Should we load from ".env.rosetta"?
@@ -35,35 +36,35 @@ class AliasedGroup(click.Group):
         return cmd.name, cmd, args
 
 
-@click.group(cls=AliasedGroup,
-             epilog='See: https://docs.couchbase.com for more information.')
-@click.option('-c', '--catalog',
-              default='.rosetta-catalog',
-              type=click.Path(exists=False, file_okay=False, dir_okay=True),
-              help='''Directory of local catalog files.
-              The local catalog DIRECTORY should be checked into git.''',
-              envvar='ROSETTA_CATALOG',
-              show_default=True)
-@click.option('-a', '--activity',
-              default='.rosetta-activity',
-              type=click.Path(exists=False, file_okay=False, dir_okay=True),
-              help='''Directory of local activity files (runtime data).
+@click.group(cls=AliasedGroup, epilog="See: https://docs.couchbase.com for more information.")
+@click.option(
+    "-c",
+    "--catalog",
+    default=".rosetta-catalog",
+    type=click.Path(exists=False, file_okay=False, dir_okay=True),
+    help="""Directory of local catalog files.
+              The local catalog DIRECTORY should be checked into git.""",
+    envvar="ROSETTA_CATALOG",
+    show_default=True,
+)
+@click.option(
+    "-a",
+    "--activity",
+    default=".rosetta-activity",
+    type=click.Path(exists=False, file_okay=False, dir_okay=True),
+    help="""Directory of local activity files (runtime data).
               The local activity DIRECTORY should NOT be checked into git,
-              as it holds runtime activity data like logs, call histories, etc.''',
-              envvar='ROSETTA_ACTIVITY',
-              show_default=True)
-@click.option('-v', '--verbose',
-              count=True,
-              help='Enable verbose output.',
-              envvar='ROSETTA_VERBOSE')
+              as it holds runtime activity data like logs, call histories, etc.""",
+    envvar="ROSETTA_ACTIVITY",
+    show_default=True,
+)
+@click.option(
+    "-v", "--verbose", count=True, help="Enable verbose output.", envvar="ROSETTA_VERBOSE"
+)
 @click.pass_context
 def click_main(ctx, catalog, activity, verbose):
     """A command line tool for Rosetta."""
-    ctx.obj = ctx.obj or {
-        'catalog': catalog,
-        'activity': activity,
-        'verbose': verbose
-    }
+    ctx.obj = ctx.obj or {"catalog": catalog, "activity": activity, "verbose": verbose}
 
 
 @click_main.command()
@@ -88,11 +89,14 @@ def find(ctx):
 
 
 @click_main.command()
-@click.argument('source_dirs', nargs=-1)
-@click.option('-em', '--embedding-model',
-              default=DEFAULT_EMBEDDING_MODEL,
-              help='Embedding model when indexing source files into the local catalog.',
-              show_default=True)
+@click.argument("source_dirs", nargs=-1)
+@click.option(
+    "-em",
+    "--embedding-model",
+    default=DEFAULT_EMBEDDING_MODEL,
+    help="Embedding model when indexing source files into the local catalog.",
+    show_default=True,
+)
 @click.pass_context
 def index(ctx, source_dirs, embedding_model):
     """Walk source directory trees for indexing source files into the local catalog.
@@ -102,7 +106,7 @@ def index(ctx, source_dirs, embedding_model):
     Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc."""
 
     if not source_dirs:
-        source_dirs = ['.']
+        source_dirs = ["."]
 
     # TODO: The index command should default to the '.' directory / current directory.
     # TODO: The index command should ignore the '.git' subdirectory.
@@ -112,10 +116,17 @@ def index(ctx, source_dirs, embedding_model):
 
 
 @click_main.command()
+@click.argument("keyspace", nargs=1)
 @click.pass_context
-def publish(ctx):
+def publish(ctx, keyspace):
     """Publish the local catalog to a database."""
-    cmd_publish(ctx.obj)
+    k = keyspace.split(".")
+    keyspace_details = Keyspace(bucket=k[0], scope=k[1], collection=k[2])
+    click.echo(keyspace_details)
+    # TODO: maybe take connection details from cmd or config (default for now)
+    connection_details = CouchbaseConnect()
+    # TODO: define where data comes from
+    cmd_publish(ctx.obj, data="", keyspace=keyspace_details, conn=connection_details)
 
 
 @click_main.command()
@@ -133,16 +144,20 @@ def version(ctx):
 
 
 @click_main.command()
-@click.option('--host-port',
-              default=DEFAULT_WEB_HOST_PORT,
-              envvar='ROSETTA_WEB_HOST_PORT',
-              help='The host:port to listen on.',
-              show_default=True)
-@click.option('--debug/--no-debug',
-              envvar='ROSETTA_WEB_DEBUG',
-              default=True,
-              help='Debug mode.',
-              show_default=True)
+@click.option(
+    "--host-port",
+    default=DEFAULT_WEB_HOST_PORT,
+    envvar="ROSETTA_WEB_HOST_PORT",
+    help="The host:port to listen on.",
+    show_default=True,
+)
+@click.option(
+    "--debug/--no-debug",
+    envvar="ROSETTA_WEB_DEBUG",
+    default=True,
+    help="Debug mode.",
+    show_default=True,
+)
 @click.pass_context
 def web(ctx, host_port, debug):
     """Start local web server."""
@@ -150,17 +165,17 @@ def web(ctx, host_port, debug):
 
 
 def main():
-      try:
-          click_main()
-      except Exception as e:
-          click.echo(f"ERROR: {e}", err=True)
+    try:
+        click_main()
+    except Exception as e:
+        click.echo(f"ERROR: {e}", err=True)
 
-          if os.getenv('ROSETTA_DEBUG') is not None:
-              # Set ROSETTA_DEBUG so standard python stack trace is emitted.
-              raise(e)
+        if os.getenv("ROSETTA_DEBUG") is not None:
+            # Set ROSETTA_DEBUG so standard python stack trace is emitted.
+            raise (e)
 
-          sys.exit(1)
+        sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
