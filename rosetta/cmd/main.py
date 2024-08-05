@@ -5,6 +5,7 @@ import click
 import dotenv
 
 from .cmds import *
+from .cmds.publish import get_connection, get_buckets, cmd_publish
 from .models.publish.model import Keyspace, CouchbaseConnect
 
 
@@ -116,17 +117,43 @@ def index(ctx, source_dirs, embedding_model):
 
 
 @click_main.command()
-@click.argument("keyspace", nargs=1)
+@click.option(
+    "-sc",
+    "--scope",
+    default="rosetta-catalog",
+    help="Couchbase Scope where data is inserted.",
+    required=True
+)
+@click.option(
+    "-col",
+    "--collection",
+    default="rosetta-catalog",
+    help="Couchbase Collection where data is inserted.",
+    required=True
+)
 @click.pass_context
-def publish(ctx, keyspace):
+def publish(ctx, scope, collection):
     """Publish the local catalog to a database."""
-    k = keyspace.split(".")
-    keyspace_details = Keyspace(bucket=k[0], scope=k[1], collection=k[2])
-    click.echo(keyspace_details)
-    # TODO: maybe take connection details from cmd or config (default for now)
+    keyspace_details = Keyspace(bucket="", scope=scope, collection=collection)
+
+    # TODO: maybe take connection details from cmd/config/kms (default for now)
     connection_details = CouchbaseConnect()
-    # TODO: define where data comes from
-    cmd_publish(ctx.obj, data="", keyspace=keyspace_details, conn=connection_details)
+
+    # Establish a connection and get buckets
+    cluster = get_connection(ctx, conn=connection_details)
+    buckets = get_buckets(ctx, cluster=cluster)
+
+    # Prompt user to select a bucket - TODO: can take these details from config/kms later
+    selected_bucket = click.prompt(
+        "Please select a bucket",
+        type=click.Choice(buckets),
+        show_choices=True
+    )
+    click.echo(f"\nInserting documents in : {selected_bucket}.{keyspace_details.scope}.{keyspace_details.collection}")
+    keyspace_details.bucket=selected_bucket
+
+    # TODO: define where data comes from, passing sample data for now
+    cmd_publish(ctx.obj, cluster = cluster, data="doc sample", keyspace=keyspace_details)
 
 
 @click_main.command()
