@@ -1,5 +1,3 @@
-import types
-
 import pydantic
 import openapi_parser
 import typing
@@ -70,35 +68,30 @@ class SemanticSearchMetadata(_Metadata):
 
 class HTTPRequestMetadata(_Metadata):
     class OpenAPIMetadata(pydantic.BaseModel):
+        filename: typing.Optional[str] = None
+        url: typing.Optional[str] = None
+
         class OperationMetadata(pydantic.BaseModel):
             path: str
             method: str
 
             # These are set by our parent class.
             _specification: openapi_parser.parser.Operation
-            _parameter_schemas: list[openapi_parser.parser.Schema] = list()
-            _parameter_names: list[str] = list()
             _servers: list[openapi_parser.parser.Server]
+            _parent_parameters: list[openapi_parser.parser.Parameter] = (
+                pydantic.Field(default_factory=list)
+            )
 
             @property
-            def operation_id(self) -> str:
-                return self._specification.operation_id
+            def parameters(self) -> list[openapi_parser.parser.Parameter]:
+                if len(self._specification.parameters) == 0:
+                    return self._parent_parameters
+                else:
+                    return self._specification.parameters
 
             @property
-            def description(self) -> str:
-                return self._specification.description
-
-            @property
-            def parameters(self) -> dict:
-                # TODO (GLENN): I'm pretty sure that openapi_parser handles $ref, but we should double check.
-                output_dict = dict()
-                for name, schema in zip(self._parameter_names, self._parameter_schemas):
-                    output_dict[name] = schema
-                return output_dict
-
-            @property
-            def responses(self) -> list[openapi_parser.parser.Response]:
-                return self._specification.responses
+            def specification(self) -> openapi_parser.parser.Operation:
+                return self._specification
 
             @property
             def servers(self) -> list[str]:
@@ -107,8 +100,6 @@ class HTTPRequestMetadata(_Metadata):
             def __str__(self):
                 return f'{self.method} {self.path}'
 
-        filename: typing.Optional[str] = None
-        url: typing.Optional[str] = None
         operations: list[OperationMetadata]
         _open_api_spec: openapi_parser.parser.Specification
 
@@ -157,15 +148,11 @@ class HTTPRequestMetadata(_Metadata):
                 if specification_operation.operation_id is None:
                     raise ValueError(f'OperationId must be specified for operation {operation}.')
 
-                # Set fields required for model generation.
-                operation._specification = specification_operation
-                if specification_operation.parameters is None and specification_path.parameters is not None:
-                    operation._parameters = specification_path.parameters
-                else:
-                    operation._parameters = specification_operation.parameters
-
                 # TODO (GLENN): openapi_parser doesn't support the option to specify operation servers (OpenAPI 3.1.0).
                 operation._servers = servers
+                operation._specification = specification_operation
+                if specification_path.parameters is not None:
+                    operation._parent_parameters = specification_path.parameters
 
     tool_kind: ToolKind
     open_api: OpenAPIMetadata
