@@ -155,6 +155,8 @@ def publish(ctx, scope, collection):
     # TODO: define where data comes from, passing sample data for now
     cmd_publish(ctx.obj, cluster=cluster, data="doc sample", keyspace=keyspace_details)
 
+    cluster.close()
+
 
 @click_main.command()
 @click.pass_context
