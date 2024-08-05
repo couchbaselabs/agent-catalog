@@ -133,7 +133,10 @@ def index(ctx, source_dirs, embedding_model):
 )
 @click.pass_context
 def publish(ctx, scope, collection):
-    """Publish the local catalog to a database."""
+    """
+    Publish the local catalog to a database.\n
+    rosetta publish -sc <scope_name> -col <collection_name>
+    """
     keyspace_details = Keyspace(bucket="", scope=scope, collection=collection)
 
     # TODO: maybe take connection details from cmd/config/kms (default for now)
