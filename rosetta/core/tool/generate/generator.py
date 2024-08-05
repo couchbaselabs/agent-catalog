@@ -1,6 +1,9 @@
 import datetime
 import pathlib
+import typing
 import uuid
+
+import openapi_parser.parser
 import pydantic
 import jinja2
 import json
@@ -115,23 +118,77 @@ class SemanticSearchCodeGenerator(_BaseCodeGenerator):
 
 
 class HTTPRequestCodeGenerator(_BaseCodeGenerator):
+    body_parameter_collision_handler: typing.Callable[[str], str] = pydantic.Field(default=lambda b: '_' + b)
+
+    @dataclasses.dataclass
+    class InputContext:
+        model: typing.Any
+        json_schema: dict
+        locations_dict: dict
+        content_type: str = \
+            openapi_parser.parser.ContentType.JSON
+
+        @property
+        def locations(self):
+            return f'{json.dumps(self.locations_dict)}'
+
     @pydantic.field_validator('tool_descriptors')
     @classmethod
     def tool_descriptors_must_share_the_same_source(cls, v: list[ToolDescriptor]):
         if any(td.source != v[0].source for td in v):
             raise ValueError('Grouped HTTP-Request descriptors must share the same source!')
 
-    @staticmethod
-    def _create_json_schema_from_parameters(parameters: dict):
-        if len(parameters) == 0:
-            return None
+    def _create_json_schema_from_specification(self, operation: HTTPRequestMetadata.OpenAPIMetadata.OperationMetadata):
+        # Our goal here is to create an easy "interface" for our LLM to call, so we will consolidate parameters
+        # and the request body into one model.
+        base_object = {
+            'type': 'object',
+            'properties': dict()
+        }
+        locations = dict()
 
-        base_object = {'type': 'object', 'properties': dict()}
-        for name, parameter in parameters.items():
-            base_object['properties'][name] = openapi_schema_to_json_schema.to_json_schema(
-                schema=dataclasses.asdict(parameter)
+        # Note: parent parameters are handled in the OperationMetadata class.
+        for parameter in operation.parameters:
+            base_object['properties'][parameter.name] = openapi_schema_to_json_schema.to_json_schema(
+                schema=dataclasses.asdict(parameter.schema)
             )
-        return base_object
+            locations[parameter.name] = parameter.location.value.lower()
+
+        if operation.specification.request_body is not None:
+            json_type_request_content = None
+            for content in operation.specification.request_body.content:
+                match content.type:
+                    case openapi_parser.parser.ContentType.JSON:
+                        json_type_request_content = content
+                        break
+
+                    # TODO (GLENN): Implement other types of request bodies.
+                    case _:
+                        continue
+
+            if json_type_request_content is None:
+                logger.warning("No application/json content (specification) found in the request body!")
+            else:
+                from_request_body = openapi_schema_to_json_schema.to_json_schema(
+                    schema=dataclasses.asdict(json_type_request_content.schema)
+                )
+                for k, v in from_request_body.items():
+                    # If there are name collisions, we will rename the request body parameter.
+                    if k in base_object['properties']:
+                        parameter_name = self.body_parameter_collision_handler(k)
+                    else:
+                        parameter_name = k
+                    base_object['properties'][parameter_name] = v
+                    locations[parameter_name] = 'body'
+
+        if len(base_object['properties']) == 0:
+            return None
+        else:
+            return HTTPRequestCodeGenerator.InputContext(
+                json_schema=base_object,
+                locations_dict=locations,
+                model=None
+            )
 
     def generate(self, output_dir: pathlib.Path) -> list[pathlib.Path]:
         yaml_file = self.tool_descriptors[0].source
@@ -142,14 +199,12 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
         for operation in metadata.open_api.operations:
             # TODO (GLENN): We should try to build a model for the response (output) in the future.
             # Generate a Pydantic model for the input schema.
-            input_schema = self._create_json_schema_from_parameters(operation.parameters)
-            if input_schema is not None:
-                input_model = generate_model_from_json_schema(
-                    json_schema=json.dumps(input_schema),
+            input_context = self._create_json_schema_from_specification(operation)
+            if input_context is not None:
+                input_context.model = generate_model_from_json_schema(
+                    json_schema=json.dumps(input_context.json_schema),
                     class_name=input_model_class_name_in_templates
                 )
-            else:
-                input_model = None
 
             # Instantiate our template...
             with (self.template_directory / 'httpreq_q.jinja').open('r') as tmpl_fp:
@@ -158,7 +213,7 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
                 rendered_code = template.render({
                     'time': generation_time,
                     'tool_metadata': metadata,
-                    'input': input_model,
+                    'input': input_context,
                     'method': operation.method.upper(),
                     'path': operation.path,
                     'urls': operation.servers

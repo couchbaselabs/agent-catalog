@@ -19,7 +19,8 @@ from .generate import (
 )
 from .reranker import (
     ToolWithEmbedding,
-    ToolWithDelta
+    ToolWithDelta,
+    ClosestClusterReranker
 )
 from ..catalog.descriptor import ToolDescriptor
 from .types.kind import ToolKind
@@ -37,6 +38,10 @@ class Provider(pydantic.BaseModel, abc.ABC):
     output_directory: pathlib.Path = pydantic.Field(
         default_factory=lambda: pathlib.Path(tempfile.mkdtemp()),
         description="Location to place the generated Python stubs."
+    )
+    reranker: typing.Callable[[list[ToolWithDelta]], list[ToolWithDelta]] = pydantic.Field(
+        default_factory=ClosestClusterReranker,
+        description="Reranker to use when retrieving tools."
     )
 
     _tools: list[ToolWithEmbedding] = list()
@@ -120,7 +125,6 @@ class LocalProvider(Provider):
                 for i in range(len(entries)):
                     self._load_from_source(output[i], entries[i])
 
-    # TODO (GLENN): Add an option here for choosing / importing a reranking lambda.
     def get_tools_for(self, objective: str, k: typing.Union[int | None] = 1) \
             -> list[langchain_core.tools.StructuredTool]:
         # Compute the distance between our tool embeddings and our objective embeddings.
@@ -131,7 +135,7 @@ class LocalProvider(Provider):
             Y=[objective_embedding]
         )
 
-        # Order our tools by their distance to the objective.
+        # Order our tools by their distance to the objective (larger is "closer").
         tools_with_deltas = [
             ToolWithDelta(
                 tool=available_tools[i].tool,
@@ -140,9 +144,10 @@ class LocalProvider(Provider):
         ]
         ordered_tools = sorted(tools_with_deltas, key=lambda t: t.delta, reverse=True)
         if k > 0:
+            # Note: the inclusion of k here overrides our reranker, if specified.
             return [t.tool for t in ordered_tools][:k]
         else:
-            raise NotImplementedError('Tool reranking is not yet implemented!')
+            return self.reranker(ordered_tools)
 
     def get(self, _id: str) -> langchain_core.tools.StructuredTool:
         pass

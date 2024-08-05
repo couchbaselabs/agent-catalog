@@ -103,9 +103,9 @@ class Registrar(pydantic.BaseModel):
                 for operation in metadata.open_api.operations:
                     yield ToolDescriptor(
                         identifier=self._generate_tool_id(),
-                        name=operation.operation_id,
-                        description=operation.description,
-                        embedding=self._encode_description(operation.description),
+                        name=operation.specification.operation_id,
+                        description=operation.specification.description,
+                        embedding=self._encode_description(operation.specification.description),
                         source=str(filename.absolute()),
                         kind=ToolKind.HTTPRequest
                     )
