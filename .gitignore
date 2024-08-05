@@ -163,3 +163,5 @@ cython_debug/
 
 .rosetta-catalog/
 .rosetta-activity/
+catalog
+catalog-activity
