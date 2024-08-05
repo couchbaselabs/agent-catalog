@@ -22,6 +22,7 @@ jobs:
         with:
           files: 'rosetta/cmd/cmds/init.py'
 
+      # TODO (GLENN): There should be a github action to actually run the test suite (or some infra for this).
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - name: Set up Python Poetry
         uses: mishaga/action-poetry@1
