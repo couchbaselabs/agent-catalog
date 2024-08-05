@@ -14,7 +14,7 @@ The core for a Couchbase-backed agentic workflow SDK.
    ```
 3. Install the dependencies from `pyproject.toml`.
    ```bash
-   poetry install 
+   poetry install
    ```
 4. You should now have the `rosetta` command line tool installed.
    Run the `init` command to download a default SBERT model and test your installation.
@@ -37,3 +37,29 @@ pip install dist/rosetta_core-*.*.*-py3-*-any.whl
 ```
 For examples on what an agentic workflow with Rosetta looks like, see
 the [rosetta-example](https://github.com/couchbaselabs/rosetta-example) repository.
+
+----
+Info for rosetta core developers.
+
+Layout of some important directories & files...
+
+    README.md
+    pyproject.toml
+
+    rosetta/
+      cmd/
+        main.py       -- Main entry point for rosetta command-line tool (CLI).
+        cmds/         -- Each "rosetta SUBCMD" has its own cmds/SUBCMD.py file.
+          ...
+          find.py
+          index.py
+          publish.py
+          version.py
+          web.py      -- Provides an HTML/REST interface for the SUBCMD's.
+
+      core/           -- The core rosetta library used by applications
+                         and by the rosetta CLI.
+
+    tests/ -- Test cases.
+
+    VERSION.txt -- To be generated or updated at build or packaging time.
