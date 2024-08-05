@@ -3,10 +3,10 @@ from .provider import (
     LocalProvider,
     CouchbaseProvider
 )
-from .registrar import (
-    Registrar,
-    LocalRegistrar,
-    CouchbaseRegistrar
+
+from .indexer_old import (
+    Indexer,
+    LocalIndexer
 )
 
 # For ease of use (and what seems to be universal adoption), we'll use LangChain's BaseTool.

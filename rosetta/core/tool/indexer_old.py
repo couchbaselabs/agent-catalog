@@ -1,15 +1,16 @@
-import pydantic
-import sentence_transformers
-import langchain_core.tools
-import logging
 import abc
+import importlib
+import inspect
+import logging
 import pathlib
 import sys
 import typing
 import uuid
-import importlib
+
+import langchain_core.tools
+import pydantic
+import sentence_transformers
 import yaml
-import inspect
 
 from .types import (
     ToolKind,
@@ -18,12 +19,22 @@ from .types import (
     HTTPRequestMetadata
 )
 from .common import get_front_matter_from_dot_sqlpp
+
+# TODO: Should core.tool depend upon core.catalog, or the other
+# way? Ideally, it's not a cross-dependency both ways?
 from ..catalog.descriptor import ToolDescriptor
 
+
+# TODO: Need unified logging approach across rosetta?
+# TODO: Since this is a library, can a custom logger
+# implementation be passed in by the app?
 logger = logging.getLogger(__name__)
 
 
-class Registrar(pydantic.BaseModel):
+# TODO: Old code that's undergoing refactoring...
+
+# TODO: Does Indexer need to be a pydantic model -- is it saved/stored somewhere?
+class Indexer(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
 
     embedding_model: sentence_transformers.SentenceTransformer = pydantic.Field(
@@ -114,7 +125,7 @@ class Registrar(pydantic.BaseModel):
                                f'Not indexing {str(filename.absolute())}.')
 
 
-class LocalRegistrar(Registrar):
+class LocalIndexer(Indexer):
     catalog_file: pathlib.Path
 
     def index(self, module_locations: list[pathlib.Path]):
@@ -137,7 +148,3 @@ class LocalRegistrar(Registrar):
         with self.catalog_file.open('w') as fp:
             for entry in tool_catalog_entries:
                 fp.write(entry.model_dump_json() + '\n')
-
-
-class CouchbaseRegistrar(Registrar):
-    pass
