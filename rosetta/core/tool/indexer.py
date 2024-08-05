@@ -23,7 +23,7 @@ from ..catalog.descriptor import ToolDescriptor
 logger = logging.getLogger(__name__)
 
 
-class Registrar(pydantic.BaseModel):
+class Indexer(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
 
     embedding_model: sentence_transformers.SentenceTransformer = pydantic.Field(
@@ -114,7 +114,7 @@ class Registrar(pydantic.BaseModel):
                                f'Not indexing {str(filename.absolute())}.')
 
 
-class LocalRegistrar(Registrar):
+class LocalIndexer(Indexer):
     catalog_file: pathlib.Path
 
     def index(self, module_locations: list[pathlib.Path]):
@@ -137,7 +137,3 @@ class LocalRegistrar(Registrar):
         with self.catalog_file.open('w') as fp:
             for entry in tool_catalog_entries:
                 fp.write(entry.model_dump_json() + '\n')
-
-
-class CouchbaseRegistrar(Registrar):
-    pass

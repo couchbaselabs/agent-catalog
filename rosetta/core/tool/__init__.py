@@ -4,9 +4,8 @@ from .provider import (
     CouchbaseProvider
 )
 from .indexer import (
-    Registrar,
-    LocalRegistrar,
-    CouchbaseRegistrar
+    Indexer,
+    LocalIndexer
 )
 
 # For ease of use (and what seems to be universal adoption), we'll use LangChain's BaseTool.

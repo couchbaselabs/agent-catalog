@@ -63,7 +63,7 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
     import rosetta.core.tool
     import sentence_transformers
 
-    rosetta.core.tool.LocalRegistrar(
+    rosetta.core.tool.LocalIndexer(
         catalog_file=pathlib.Path(tool_catalog_file),
         embedding_model=sentence_transformers.SentenceTransformer(meta['embedding_model'])
     ).index([pathlib.Path(p) for p in source_dirs])
