@@ -37,6 +37,16 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
         # a hierarchy of catalogs? A hierarchy of catalogs has advanced
         # cases of file deletions, renames/moves & lineage changes
         # and how those changes can shadow lower-level catalog items.
+        #
+        # TODO: If the repo is dirty only because .rosetta-catalog/ is
+        # dirty, then we might consider going ahead and indexing?
+        #
+        # TODO: If the repo is dirty because .rosetta-activity/ is
+        # dirty, then we might print some helper instructions on
+        # adding .rosetta-activity/ to the .gitignore file? Or, should
+        # instead preemptively generate a .rosetta-activity/.gitiginore
+        # file during init_local()?
+        #
         raise ValueError(f"repo is dirty")
 
     source_files = []
