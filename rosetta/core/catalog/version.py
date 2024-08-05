@@ -17,7 +17,7 @@ def lib_version(ctx):
 
     v = '\n'.join([line for line in lines if not line.startswith('#')]).strip()
 
-    if v == 'vMajor.Minor.Micro-N-GITSHA'
+    if v == 'vMajor.Minor.Micro-N-GITSHA':
         # TODO: BUG: This does not work unless we're in the rosetta-core.
 
         # Default to output of `git describe --long --always`.
