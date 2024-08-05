@@ -3,7 +3,7 @@ from .provider import (
     LocalProvider,
     CouchbaseProvider
 )
-from .registrar import (
+from .indexer import (
     Registrar,
     LocalRegistrar,
     CouchbaseRegistrar
