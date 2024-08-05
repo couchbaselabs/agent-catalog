@@ -7,17 +7,13 @@ from couchbase.options import ClusterOptions
 
 from ..models.publish.model import CouchbaseConnect, Keyspace
 
+import uuid
 
-# TODO: define data's schema
-def cmd_publish(ctx, data, keyspace: Keyspace, conn: CouchbaseConnect):
-    # TODO: Implement publish of the local catalog to a database.
 
+def get_connection(ctx, conn: CouchbaseConnect):
     cluster_url = conn.connection_url
     username = conn.username
     password = conn.password
-    bucket = keyspace.bucket
-    scope = keyspace.scope
-    collection = keyspace.collection
 
     # Connect to Couchbase
     if cluster_url == "couchbase://127.0.0.1" or cluster_url == "couchbase://localhost":
@@ -35,6 +31,29 @@ def cmd_publish(ctx, data, keyspace: Keyspace, conn: CouchbaseConnect):
         cluster.wait_until_ready(timedelta(seconds=15))
     except CouchbaseException as e:
         return f"Error connecting to couchbase : {e}"
+
+    return cluster
+
+
+def get_buckets(ctx, cluster):
+    if cluster:
+        buckets = cluster.buckets().get_all_buckets()
+        list_buckets = []
+
+        # Get bucket names
+        for bucket_item in buckets:
+            bucket_name = bucket_item.name
+            list_buckets.append(bucket_name)
+        return list_buckets
+
+
+# TODO: define data's schema
+def cmd_publish(ctx, cluster, data, keyspace: Keyspace):
+    # TODO: Implement publish of the local catalog to a database.
+
+    bucket = keyspace.bucket
+    scope = keyspace.scope
+    collection = keyspace.collection
 
     # Get bucket ref
     cb = cluster.bucket(bucket)
@@ -70,12 +89,12 @@ def cmd_publish(ctx, data, keyspace: Keyspace, conn: CouchbaseConnect):
     # Get collection ref
     cb_coll = cb.scope(scope).collection(collection)
 
-    # Insert every element in pdf as a doc
     # TODO: iterate over input and upsert each tool
-    # TODO: Pre-checks to allow/deny publishing to couchbase collection (git sha?)
+    # TODO: Pre-checks to allow/deny publishing to couchbase collection (git sha? doc sha?)
+
     print("\nUpserting data: ")
     try:
-        key = "abc"  # TODO: decide key to upsert each doc
+        key = uuid.uuid4().hex  # TODO: decide key to upsert each doc
         result = cb_coll.upsert(key, data)
         print(result.key, " added to keyspace")
     except Exception as e:
