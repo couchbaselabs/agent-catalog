@@ -37,14 +37,12 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
     # The repo is the user's application's repo and is NOT the repo of rosetta-core. The rosetta CLI / library
     # should be run in the current working directory of the user's application's repo.
     # TODO: Allow rosetta CLI / library to run anywhere and pass the working_dir as a parameter / option.
-    working_dir = pathlib.Path(os.getcwd()).parent
-    if not (working_dir / '.git').exists():
-        logger.warning(f'No .git repository found in current working directory {working_dir}. Walking upwards.')
+    working_dir = pathlib.Path(os.getcwd())
     while not (working_dir / '.git').exists():
         if working_dir.parent == working_dir:
             raise ValueError('Could not find .git directory. Please run index within a git repository.')
         working_dir = working_dir.parent
-    logger.info(f'Found the .git repository: {working_dir}.')
+    logger.info(f'Found the .git repository in dir: {working_dir}.')
     repo = git.Repo(working_dir / '.git')
 
     if repo.is_dirty() and not os.getenv("ROSETTA_REPO_DIRTY_OK", False):
