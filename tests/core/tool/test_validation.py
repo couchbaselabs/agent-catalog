@@ -570,15 +570,16 @@ def test_semantic_search():
 
 @pytest.mark.smoke
 def test_http_request():
-    file1 = io.StringIO(inspect.cleandoc("""
+    filename_prefix = pathlib.Path(__file__).parent.absolute()
+    file1 = io.StringIO(inspect.cleandoc(f"""
         tool_kind: http_request
         
         open_api:
-          filename: _good_spec.json
+          filename: {filename_prefix}/_good_spec.json
           operations:
             - path: /create
               method: post
-            - path: /rewards/{member_id}
+            - path: /rewards/{{member_id}}
               method: get
          """))
     file1_yaml = yaml.safe_load(file1)
@@ -590,56 +591,56 @@ def test_http_request():
     assert file1_yaml['open_api']['operations'][1]['path'] == file1_model.open_api.operations[1].path
     assert file1_yaml['open_api']['operations'][1]['method'] == file1_model.open_api.operations[1].method
 
-    file2 = io.StringIO(inspect.cleandoc("""
+    file2 = io.StringIO(inspect.cleandoc(f"""
         tool_kind: python_function
 
         open_api:
-          filename: _good_spec.json
+          filename: {filename_prefix}/_good_spec.json
           operations:
             - path: /create
               method: post
-            - path: /rewards/{member_id}
+            - path: /rewards/{{member_id}}
               method: get
          """))
     file2_yaml = yaml.safe_load(file2)
     with pytest.raises(pydantic.ValidationError):
         HTTPRequestMetadata.model_validate(file2_yaml)
 
-    file3 = io.StringIO(inspect.cleandoc("""
+    file3 = io.StringIO(inspect.cleandoc(f"""
         tool_kind: http_request
 
         open_api:
-          filename: _good_spec.json
+          filename: {filename_prefix}/_good_spec.json
           operations:
             - path: /create
               method: get
-            - path: /rewards/{member_id}
+            - path: /rewards/{{member_id}}
               method: get
          """))
     file3_yaml = yaml.safe_load(file3)
     with pytest.raises(pydantic.ValidationError):
         HTTPRequestMetadata.model_validate(file3_yaml)
 
-    file3 = io.StringIO(inspect.cleandoc("""
+    file3 = io.StringIO(inspect.cleandoc(f"""
         tool_kind: http_request
 
         open_api:
-          filename: _good_spec.json
+          filename: {filename_prefix}/_good_spec.json
           operations:
             - path: /doesnotexist
               method: post
-            - path: /rewards/{member_id}
+            - path: /rewards/{{member_id}}
               method: get
          """))
     file3_yaml = yaml.safe_load(file3)
     with pytest.raises(pydantic.ValidationError):
         HTTPRequestMetadata.model_validate(file3_yaml)
 
-    file4 = io.StringIO(inspect.cleandoc("""
+    file4 = io.StringIO(inspect.cleandoc(f"""
         tool_kind: http_request
 
         open_api:
-          filename: _bad_spec.json
+          filename: {filename_prefix}/_bad_spec.json
           operations:
             - path: /create
               method: post
@@ -648,13 +649,13 @@ def test_http_request():
     with pytest.raises(pydantic.ValidationError):
         HTTPRequestMetadata.model_validate(file4_yaml)
 
-    file5 = io.StringIO(inspect.cleandoc("""
+    file5 = io.StringIO(inspect.cleandoc(f"""
         tool_kind: http_request
 
         open_api:
-          filename: _bad_spec.json
+          filename: {filename_prefix}/_bad_spec.json
           operations:
-            - path: /rewards/{member_id}
+            - path: /rewards/{{member_id}}
               method: get
          """))
     file5_yaml = yaml.safe_load(file5)
