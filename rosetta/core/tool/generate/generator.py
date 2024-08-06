@@ -54,13 +54,13 @@ class SQLPPCodeGenerator(_BaseCodeGenerator):
 
         # Generate a Pydantic model for the input schema...
         input_model = generate_model_from_json_schema(
-            json_schema=json.dumps(metadata.input),
+            json_schema=metadata.input,
             class_name=input_model_class_name_in_templates
         )
 
         # ...and the output schema.
         output_model = generate_model_from_json_schema(
-            json_schema=json.dumps(metadata.output),
+            json_schema=metadata.output,
             class_name=output_model_class_name_in_templates
         )
 
@@ -94,7 +94,7 @@ class SemanticSearchCodeGenerator(_BaseCodeGenerator):
 
         # Generate a Pydantic model for the input schema.
         input_model = generate_model_from_json_schema(
-            json_schema=json.dumps(metadata.input),
+            json_schema=metadata.input,
             class_name=input_model_class_name_in_templates
         )
 

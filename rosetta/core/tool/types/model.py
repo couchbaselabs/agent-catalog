@@ -9,25 +9,25 @@ from .kind import ToolKind
 
 class _Metadata(abc.ABC, pydantic.BaseModel):
     @staticmethod
-    def _check_if_valid_json_schema(input_dict: dict):
+    def _check_if_valid_json_schema(input_dict: str):
         # TODO (GLENN): We should be checking more than just if the value can be directly serialized to JSON.
-        json.dumps(input_dict)
+        json.loads(input_dict)
 
 
 class SQLPPQueryMetadata(_Metadata):
     name: str
     description: str
-    input: dict
+    input: str
 
     # TODO (GLENN): Infer our output in the future by first running the query.
-    output: dict
+    output: str
 
     # We will only parse SQL++ query front-matter in a .sqlpp file, so this field is optional.
     tool_kind: typing.Optional[ToolKind] = ToolKind.SQLPPQuery
 
     @pydantic.field_validator('input', 'output')
     @classmethod
-    def value_should_be_valid_json_schema(cls, v: dict):
+    def value_should_be_valid_json_schema(cls, v: str):
         cls._check_if_valid_json_schema(v)
 
     @pydantic.field_validator('tool_kind')
@@ -51,7 +51,7 @@ class SemanticSearchMetadata(_Metadata):
     tool_kind: ToolKind
     name: str
     description: str
-    input: dict
+    input: str
     vector_search: VectorSearchMetadata
 
     @pydantic.field_validator('tool_kind')
@@ -62,7 +62,7 @@ class SemanticSearchMetadata(_Metadata):
 
     @pydantic.field_validator('input')
     @classmethod
-    def value_should_be_valid_json_schema(cls, v: dict):
+    def value_should_be_valid_json_schema(cls, v: str):
         cls._check_if_valid_json_schema(v)
 
 
