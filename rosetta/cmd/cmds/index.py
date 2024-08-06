@@ -5,11 +5,11 @@ import git
 
 from tqdm import tqdm
 
+from rosetta.cmd.cmds.init import init_local
+
 from rosetta.core.catalog.dir import dir_scan
 
 from rosetta.core.tool.indexer import source_indexers
-
-from rosetta.cmd.cmds.init import init_local
 
 
 source_globs = list(source_indexers.keys())
@@ -48,7 +48,7 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
 
     source_files = []
     for d in source_dirs:
-        source_files = source_files + dir_scan(d, source_globs)
+        source_files += dir_scan(d, source_globs)
 
     all_errs = []
     all_descriptors = []
@@ -57,26 +57,21 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
         if len(all_errs) > MAX_ERRS:
             break
 
-        import time
-        time.sleep(0.1)
+        print(source_file)
 
         p = pathlib.Path(source_file)
 
         def rev_ident_fn(filename: pathlib.Path) -> str:
             print("rev_ident_fn", filename)
-            return "TODO-rev-ident" # TODO: Call repo GitPython API to retrieve commit SHA.
+
+            # TODO: Call repo GitPython API to retrieve commit SHA,
+            # parent SHA, whether the file is dirty, etc.
+
+            return "TODO-rev-ident"
 
         for glob, indexer in source_indexers.items():
             if fnmatch.fnmatch(p.name, glob):
-                errs, descriptors = None, []
-
-                # TODO: This produces a pydantic error, like...
-                #   ERROR: 1 validation error for SemanticSearchMetadata input
-                #   Input should be a valid dictionary [type=dict_type,
-                #     input_value='{\n  "type": "object",\n...ing" }\n    }\n  }\n}\n', input_type=str]
-                #   For further information visit https://errors.pydantic.dev/2.8/v/dict_type
-                #
-                # errs, descriptors = indexer.start_descriptors(p, rev_ident_fn)
+                errs, descriptors = indexer.start_descriptors(p, rev_ident_fn)
 
                 all_errs += errs or []
                 all_descriptors += [(descriptor, indexer) for descriptor in descriptors]
@@ -90,29 +85,43 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
             if len(all_errs) > MAX_ERRS:
                 break
 
-            all_errs += indexer.augment_descriptor(descriptor) or []
+            print(descriptor.name)
+
+            errs = indexer.augment_descriptor(descriptor)
+
+            all_errs += errs or []
 
     if not all_errs:
         print("==================\nvectorizing...")
+
+        import sentence_transformers
+
+        embedding_model_obj = sentence_transformers.SentenceTransformer(meta['embedding_model'])
 
         for descriptor, indexer in tqdm(all_descriptors):
             if len(all_errs) > MAX_ERRS:
                 break
 
-            all_errs += indexer.vectorize_descriptor(descriptor) or []
+            print(descriptor.name)
+
+            errs = indexer.vectorize_descriptor(descriptor, embedding_model_obj)
+
+            all_errs += errs or []
 
     if all_errs:
         print("ERROR:", "\n".join([str(e) for e in all_errs]))
 
         raise all_errs[0]
 
-    print("==================\nsaving local catalog...")
+    print("==================\nlocal catalog...")
 
-    print("\n".join([descriptor for descriptor, indexer in descriptors]))
+    print("\n".join([str(descriptor) for descriptor, indexer in all_descriptors]))
 
     # TODO: Actually save the local catalog.
 
     # ---------------------------------
+
+    print("==================\nOLD / pre-refactor indexing...")
 
     # TODO: Old indexing codepaths that are getting refactored.
 

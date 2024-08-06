@@ -7,8 +7,8 @@ import sys
 import typing
 import uuid
 
-import pydantic
 import langchain_core.tools
+import pydantic
 import sentence_transformers
 import yaml
 
@@ -121,8 +121,10 @@ class DotPyFileIndexer(BaseFileIndexer):
                 identifier=str(filename) + ":" + tool.name + ":" + rev_ident,
                 name=tool.name,
                 description=tool.description,
+                # TODO: The embedding is actually None at this point.
+                embedding=[],
                 # TODO: Capture line numbers as part of source?
-                source=str(filename),
+                source=filename,
                 kind=ToolKind.PythonFunction,
             ))
 
@@ -143,13 +145,15 @@ class DotSqlppFileIndexer(BaseFileIndexer):
 
         rev_ident = rev_ident_fn(filename)
 
-        return (None, ToolDescriptor(
+        return (None, [ToolDescriptor(
             identifier=str(filename) + ":" + metadata.name + ":" + rev_ident,
             name=metadata.name, # TODO: Should default to filename?
             description=metadata.description,
-            source=str(filename),
+            # TODO: The embedding is actually None at this point.
+            embedding=[],
+            source=filename,
             kind=ToolKind.SQLPPQuery,
-        ))
+        )])
 
 
 class DotYamlFileIndexer(BaseFileIndexer):
@@ -171,13 +175,16 @@ class DotYamlFileIndexer(BaseFileIndexer):
         match parsed_desc['tool_kind']:
             case ToolKind.SemanticSearch:
                 metadata = SemanticSearchMetadata.model_validate(parsed_desc)
-                return (None, ToolDescriptor(
+                return (None, [ToolDescriptor(
                     identifier=str(filename) + ":" + metadata.name + ":" + rev_ident_fn(filename),
                     name=metadata.name, # TODO: Should default to filename?
                     description=metadata.description,
-                    source=str(filename),
+                    # TODO: The embedding is actually None at this point.
+                    embedding=[],
+                    source=filename,
                     kind=ToolKind.SemanticSearch
-                ))
+                )])
+
             case ToolKind.HTTPRequest:
                 metadata = HTTPRequestMetadata.model_validate(parsed_desc)
 
@@ -190,13 +197,20 @@ class DotYamlFileIndexer(BaseFileIndexer):
                         identifier=str(filename) + ":" + operation.specification.operation_id + ":" + rev_ident,
                         name=operation.specification.operation_id,
                         description=operation.specification.description,
+                        # TODO: The embedding is actually None at this point.
+                        embedding=[],
                         # TODO: Capture line numbers as part of source?
-                        source=str(filename),
+                        source=filename,
                         kind=ToolKind.HTTPRequest
                     ))
+
+                return (None, descriptors)
+
             case _:
                 logger.warning(f'Encountered .yaml file with unknown tool_kind field. '
                                 f'Not indexing {str(filename.absolute())}.')
+
+        return (None, [])
 
 
 source_indexers = {
