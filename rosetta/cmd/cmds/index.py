@@ -1,27 +1,23 @@
 import fnmatch
 import os
 import pathlib
-
+import logging
 import git
-
 from tqdm import tqdm
 
 from rosetta.cmd.cmds.init import init_local
-
 from rosetta.core.catalog.dir import dir_scan
-
 from rosetta.core.catalog.descriptor import CatalogDescriptor
-
 from rosetta.core.tool.indexer import source_indexers
-
 
 source_globs = list(source_indexers.keys())
 
+logger = logging.getLogger(__name__)
 
 # TODO: During index'ing, should we also record the source_dirs into the catalog?
 
 
-MAX_ERRS = 10 # TODO: Hardcoded limit on too many errors.
+MAX_ERRS = 10  # TODO: Hardcoded limit on too many errors.
 
 
 def commit_str(commit):
@@ -38,17 +34,20 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
     if not meta['embedding_model']:
         raise ValueError("An --embedding-model is required as an embedding model is not yet recorded.")
 
-    # The repo is the user's application's repo and is NOT the
-    # repo of rosetta-core. The rosetta CLI / library should be run
-    # in the current working directory of the user's application's repo.
-    #
-    # TODO: One day, allow for rosetta CLI / library to run anywhere
-    # and the '.' to be optionally passed in as an parameter / option.
-    #
-    repo = git.Repo('.')
+    # The repo is the user's application's repo and is NOT the repo of rosetta-core. The rosetta CLI / library
+    # should be run in the current working directory of the user's application's repo.
+    # TODO: Allow rosetta CLI / library to run anywhere and pass the working_dir as a parameter / option.
+    working_dir = pathlib.Path(os.getcwd()).parent
+    if not (working_dir / '.git').exists():
+        logger.warning(f'No .git repository found in current working directory {working_dir}. Walking upwards.')
+    while not (working_dir / '.git').exists():
+        if working_dir.parent == working_dir:
+            raise ValueError('Could not find .git directory. Please run index within a git repository.')
+        working_dir = working_dir.parent
+    logger.info(f'Found the .git repository: {working_dir}.')
+    repo = git.Repo(working_dir / '.git')
 
-    if repo.is_dirty() and \
-        not os.getenv("ROSETTA_REPO_DIRTY_OK", False):
+    if repo.is_dirty() and not os.getenv("ROSETTA_REPO_DIRTY_OK", False):
         # The ROSETTA_REPO_DIRTY_OK env var is intended
         # to help during rosetta development.
 
