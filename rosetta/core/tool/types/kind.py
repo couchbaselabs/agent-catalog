@@ -1,11 +1,8 @@
 import enum
 
 
-class ToolKind(str, enum.Enum):
+class ToolKind(enum.StrEnum):
     PythonFunction = 'python_function'
     SQLPPQuery = 'sqlpp_query'
     SemanticSearch = 'semantic_search'
     HTTPRequest = 'http_request'
-
-    def __str__(self):
-        return self.value

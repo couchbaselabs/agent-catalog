@@ -16,7 +16,6 @@ from .types import (
     SemanticSearchMetadata,
     HTTPRequestMetadata
 )
-from .common import get_front_matter_from_dot_sqlpp
 
 # TODO: Should core.tool depend upon core.catalog, or the other
 # way? Ideally, it's not a cross-dependency both ways?
@@ -140,7 +139,7 @@ class DotSqlppFileIndexer(BaseFileIndexer):
            if any encountered.
         """
 
-        front_matter = yaml.safe_load(get_front_matter_from_dot_sqlpp(filename))
+        front_matter = yaml.safe_load(SQLPPQueryMetadata.read_front_matter(filename))
 
         metadata = SQLPPQueryMetadata.model_validate(front_matter)
 

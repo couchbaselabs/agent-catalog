@@ -2,7 +2,6 @@ import datetime
 import pathlib
 import typing
 import uuid
-
 import openapi_parser.parser
 import pydantic
 import jinja2
@@ -24,7 +23,6 @@ from ..types import (
     HTTPRequestMetadata
 )
 from ...catalog.descriptor import ToolDescriptor
-from ..common import get_front_matter_from_dot_sqlpp
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +45,7 @@ class SQLPPCodeGenerator(_BaseCodeGenerator):
     def generate(self, output_dir: pathlib.Path) -> list[pathlib.Path]:
         sqlpp_file = self.tool_descriptors[0].source
         metadata = SQLPPQueryMetadata.model_validate(
-            yaml.safe_load(get_front_matter_from_dot_sqlpp(sqlpp_file))
+            SQLPPQueryMetadata.read_front_matter(sqlpp_file)
         )
         with sqlpp_file.open('r') as fp:
             sqlpp_query = fp.read()
