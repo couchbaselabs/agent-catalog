@@ -85,12 +85,11 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
         p = pathlib.Path(source_file)
 
         def get_repo_commit_id(filename: pathlib.Path) -> str:
-            print("get_repo_commit_id", filename)
+            commits = list(repo.iter_commits(paths=str(filename), max_count=1))
+            if not commits or len(commits) <= 0:
+                raise ValueError(f"ERROR: get_repo_commit_id, no commits for filename: {filename}")
 
-            # TODO: Call repo GitPython API to retrieve commit SHA,
-            # parent SHA, whether the file is dirty, etc.
-
-            return "TODO-get_repo_commit_id"
+            return commit_str(commits[0])
 
         for glob, indexer in source_indexers.items():
             if fnmatch.fnmatch(p.name, glob):
