@@ -13,6 +13,8 @@ class CatalogDescriptor(pydantic.BaseModel):
 
     catalog_schema_version: str
 
+    embedding_model: str
+
     # For git, this is a git repo commit SHA / HASH, which
     # records the repo commit when the 'rosetta index' was run.
     # Ex: "g11aa22bb".
