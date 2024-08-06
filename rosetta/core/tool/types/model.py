@@ -1,44 +1,75 @@
+import pathlib
 import pydantic
 import openapi_parser
+import logging
 import typing
 import abc
 import json
+import yaml
+import re
 
 from .kind import ToolKind
 
+logger = logging.getLogger(__name__)
+
 
 class _Metadata(abc.ABC, pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(
+        extra='forbid',
+        use_enum_values=True
+    )
+
     @staticmethod
-    def _check_if_valid_json_schema(input_dict: dict):
+    def _check_if_valid_json_schema(input_dict: str):
         # TODO (GLENN): We should be checking more than just if the value can be directly serialized to JSON.
-        json.dumps(input_dict)
+        json.loads(input_dict)
 
 
 class SQLPPQueryMetadata(_Metadata):
     name: str
     description: str
-    input: dict
+    input: str
 
     # TODO (GLENN): Infer our output in the future by first running the query.
-    output: dict
+    output: str
 
     # We will only parse SQL++ query front-matter in a .sqlpp file, so this field is optional.
-    tool_kind: typing.Optional[ToolKind] = ToolKind.SQLPPQuery
+    tool_kind: ToolKind = ToolKind.SQLPPQuery
+
+    @staticmethod
+    def read_front_matter(sqlpp_file: pathlib.Path) -> dict:
+        with sqlpp_file.open('r') as fp:
+            matches = re.findall(r'/\*(.*)\*/', fp.read(), re.DOTALL)
+            if len(matches) == 0:
+                raise ValueError(f'Malformed input! No multiline comment found for {sqlpp_file}.')
+            elif len(matches) != 1:
+                logger.warning('More than one multi-line comment found. Using first comment.')
+            return yaml.safe_load(matches[0])
 
     @pydantic.field_validator('input', 'output')
     @classmethod
-    def value_should_be_valid_json_schema(cls, v: dict):
+    def value_should_be_valid_json_schema(cls, v: str):
         cls._check_if_valid_json_schema(v)
+        return v
 
     @pydantic.field_validator('tool_kind')
     @classmethod
     def tool_kind_should_be_sqlpp_query(cls, v: ToolKind):
         if v != ToolKind.SQLPPQuery:
             raise ValueError('Cannot create instance of SQLPPQueryMetadata w/ non SQLPPQuery class!')
+        return v
+
+    @pydantic.field_validator('name')
+    @classmethod
+    def name_should_be_valid_identifier(cls, v: str):
+        if not v.isidentifier():
+            raise ValueError(f'name {v} is not a valid identifier!')
+        return v
 
 
 class SemanticSearchMetadata(_Metadata):
     class VectorSearchMetadata(pydantic.BaseModel):
+        # TODO (GLENN): Copy all vector-search-specific validations here.
         bucket: str
         scope: str
         collection: str
@@ -48,22 +79,39 @@ class SemanticSearchMetadata(_Metadata):
         embedding_model: str
         num_candidates: int = 3
 
-    tool_kind: ToolKind
     name: str
     description: str
-    input: dict
+    input: str
     vector_search: VectorSearchMetadata
+    tool_kind: ToolKind
 
     @pydantic.field_validator('tool_kind')
     @classmethod
     def tool_kind_should_be_semantic_search(cls, v: ToolKind):
         if v != ToolKind.SemanticSearch:
             raise ValueError('Cannot create instance of SemanticSearchMetadata w/ non SemanticSearch class!')
+        return v
 
     @pydantic.field_validator('input')
     @classmethod
-    def value_should_be_valid_json_schema(cls, v: dict):
+    def value_should_be_valid_json_schema(cls, v: str):
         cls._check_if_valid_json_schema(v)
+        return v
+
+    @pydantic.field_validator('input')
+    @classmethod
+    def value_should_be_non_empty(cls, v: str):
+        input_dict = json.loads(v)
+        if len(input_dict) == 0:
+            raise ValueError('SemanticSearch cannot have an empty input!')
+        return v
+
+    @pydantic.field_validator('name')
+    @classmethod
+    def name_should_be_valid_identifier(cls, v: str):
+        if not v.isidentifier():
+            raise ValueError(f'name {v} is not a valid identifier!')
+        return v
 
 
 class HTTPRequestMetadata(_Metadata):
@@ -134,7 +182,7 @@ class HTTPRequestMetadata(_Metadata):
                 # ...and then the method.
                 specification_operation = None
                 for m in specification_path.operations:
-                    if operation.method == m.method:
+                    if operation.method.lower() == m.method.value.lower():
                         specification_operation = m
                         break
                 if specification_operation is None:
@@ -151,12 +199,14 @@ class HTTPRequestMetadata(_Metadata):
                 operation._specification = specification_operation
                 if specification_path.parameters is not None:
                     operation._parent_parameters = specification_path.parameters
+            return self
 
-    tool_kind: ToolKind
     open_api: OpenAPIMetadata
+    tool_kind: ToolKind
 
     @pydantic.field_validator('tool_kind')
     @classmethod
     def tool_kind_should_be_http_request(cls, v: ToolKind):
         if v != ToolKind.HTTPRequest:
             raise ValueError('Cannot create instance of HTTPRequestMetadata w/ non HTTPRequest class!')
+        return v

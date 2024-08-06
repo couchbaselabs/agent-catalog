@@ -18,7 +18,6 @@ from .types import (
     SemanticSearchMetadata,
     HTTPRequestMetadata
 )
-from .common import get_front_matter_from_dot_sqlpp
 
 # TODO: Should core.tool depend upon core.catalog, or the other
 # way? Ideally, it's not a cross-dependency both ways?
@@ -77,7 +76,7 @@ class Indexer(pydantic.BaseModel):
             )
 
     def _handle_dot_sqlpp(self, filename: pathlib.Path) -> typing.Iterable[ToolDescriptor]:
-        front_matter = yaml.safe_load(get_front_matter_from_dot_sqlpp(filename))
+        front_matter = SQLPPQueryMetadata.read_front_matter(filename)
         metadata = SQLPPQueryMetadata.model_validate(front_matter)
 
         # Build our tool descriptor.
