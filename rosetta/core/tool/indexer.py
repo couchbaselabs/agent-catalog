@@ -112,14 +112,16 @@ class DotPyFileIndexer(BaseFileIndexer):
             if not is_tool(name, tool):
                 continue
 
+            name = tool.name.strip()
+
             if not repo_commit_id:
                 repo_commit_id = get_repo_commit_id(filename)
 
             descriptors.append(ToolDescriptor(
-                identifier=str(filename) + ":" + tool.name + ":" + repo_commit_id,
+                identifier=str(filename) + ":" + name + ":" + repo_commit_id,
                 kind=ToolKind.PythonFunction,
-                name=tool.name,
-                description=tool.description,
+                name=name,
+                description=tool.description.strip(),
                 # TODO: Capture line numbers as part of source?
                 source=filename,
                 repo_commit_id=repo_commit_id,
@@ -142,13 +144,15 @@ class DotSqlppFileIndexer(BaseFileIndexer):
 
         metadata = SQLPPQueryMetadata.model_validate(front_matter)
 
+        name = metadata.name.strip() # TODO: If missing, name should default to filename?
+
         repo_commit_id = get_repo_commit_id(filename) # Ex: a git hash / SHA.
 
         return (None, [ToolDescriptor(
-            identifier=str(filename) + ":" + metadata.name + ":" + repo_commit_id,
+            identifier=str(filename) + ":" + name + ":" + repo_commit_id,
             kind=ToolKind.SQLPPQuery,
-            name=metadata.name, # TODO: Should default to filename?
-            description=metadata.description,
+            name=name,
+            description=metadata.description.strip(),
             source=filename,
             repo_commit_id=repo_commit_id,
             # TODO: The embedding is filled in at a later phase.
@@ -178,11 +182,13 @@ class DotYamlFileIndexer(BaseFileIndexer):
             case ToolKind.SemanticSearch:
                 metadata = SemanticSearchMetadata.model_validate(parsed_desc)
 
+                name = metadata.name.strip() # TODO: If missing, name should default to filename?
+
                 return (None, [ToolDescriptor(
-                    identifier=str(filename) + ":" + metadata.name + ":" + repo_commit_id,
+                    identifier=str(filename) + ":" + name + ":" + repo_commit_id,
                     kind=ToolKind.SemanticSearch,
-                    name=metadata.name, # TODO: Should default to filename?
-                    description=metadata.description,
+                    name=name,
+                    description=metadata.description.strip(),
                     source=filename,
                     repo_commit_id=repo_commit_id,
                     # TODO: The embedding is filled in at a later phase.
@@ -195,11 +201,13 @@ class DotYamlFileIndexer(BaseFileIndexer):
                 descriptors = []
 
                 for operation in metadata.open_api.operations:
+                    name = operation.specification.operation_id.strip()
+
                     descriptors.append(ToolDescriptor(
-                        identifier=str(filename) + ":" + operation.specification.operation_id + ":" + repo_commit_id,
+                        identifier=str(filename) + ":" + name + ":" + repo_commit_id,
                         kind=ToolKind.HTTPRequest,
-                        name=operation.specification.operation_id,
-                        description=operation.specification.description,
+                        name=name,
+                        description=operation.specification.description.strip(),
                         # TODO: Capture line numbers as part of source?
                         source=filename,
                         repo_commit_id=repo_commit_id,

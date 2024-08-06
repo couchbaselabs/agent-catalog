@@ -22,8 +22,8 @@ class CatalogDescriptor(pydantic.BaseModel):
 class ToolDescriptor(pydantic.BaseModel):
     """ This model represents a tool catalog entry.
 
-        OBSOLETED! / MOVED: TODO: This will be deleted once the indexing
-        related refactoring is done. This has been replaced/moved to
+        !!! OBSOLETED !!! MOVED: TODO: This will be deleted once the indexing
+        related refactoring is completed. This has been replaced/moved to
         rosetta.core.tool.types.descriptor.ToolDescriptor.
     """
 
