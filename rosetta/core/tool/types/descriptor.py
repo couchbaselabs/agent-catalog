@@ -11,12 +11,12 @@ class ToolDescriptor(pydantic.BaseModel):
     # Ex: "src/tools/finance.py:get_current_stock_price:g11223344".
     identifier: str
 
+    kind: ToolKind
+
     # A short name for the tool, where multiple versions
     # of the same tool would have the same name.
     # Ex: "get_current_stock_price".
     name: str
-
-    kind: ToolKind
 
     # For a *.py tool, this is the python function's docstring.
     description: str

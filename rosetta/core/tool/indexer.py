@@ -20,7 +20,7 @@ from .common import get_front_matter_from_dot_sqlpp
 
 # TODO: Should core.tool depend upon core.catalog, or the other
 # way? Ideally, it's not a cross-dependency both ways?
-from ..catalog.descriptor import ToolDescriptor
+from .types.descriptor import ToolDescriptor
 
 
 # TODO: Need unified logging approach across rosetta?
@@ -117,13 +117,14 @@ class DotPyFileIndexer(BaseFileIndexer):
 
             descriptors.append(ToolDescriptor(
                 identifier=str(filename) + ":" + tool.name + ":" + repo_commit_id,
+                kind=ToolKind.PythonFunction,
                 name=tool.name,
                 description=tool.description,
-                # TODO: The embedding is actually None at this point.
-                embedding=[],
                 # TODO: Capture line numbers as part of source?
                 source=filename,
-                kind=ToolKind.PythonFunction,
+                repo_commit_id=repo_commit_id,
+                # TODO: The embedding is filled in at a later phase.
+                embedding=[],
             ))
 
         return (None, descriptors)
@@ -146,12 +147,13 @@ class DotSqlppFileIndexer(BaseFileIndexer):
 
         return (None, [ToolDescriptor(
             identifier=str(filename) + ":" + metadata.name + ":" + repo_commit_id,
+            kind=ToolKind.SQLPPQuery,
             name=metadata.name, # TODO: Should default to filename?
             description=metadata.description,
-            # TODO: The embedding is actually None at this point.
-            embedding=[],
             source=filename,
-            kind=ToolKind.SQLPPQuery,
+            repo_commit_id=repo_commit_id,
+            # TODO: The embedding is filled in at a later phase.
+            embedding=[],
         )])
 
 
@@ -171,17 +173,21 @@ class DotYamlFileIndexer(BaseFileIndexer):
                             f'Not indexing {str(filename.absolute())}.')
             return (None, [])
 
+        repo_commit_id = get_repo_commit_id(filename) # Ex: a git hash / SHA.
+
         match parsed_desc['tool_kind']:
             case ToolKind.SemanticSearch:
                 metadata = SemanticSearchMetadata.model_validate(parsed_desc)
+
                 return (None, [ToolDescriptor(
-                    identifier=str(filename) + ":" + metadata.name + ":" + get_repo_commit_id(filename),
+                    identifier=str(filename) + ":" + metadata.name + ":" + repo_commit_id,
+                    kind=ToolKind.SemanticSearch,
                     name=metadata.name, # TODO: Should default to filename?
                     description=metadata.description,
-                    # TODO: The embedding is actually None at this point.
-                    embedding=[],
                     source=filename,
-                    kind=ToolKind.SemanticSearch
+                    repo_commit_id=repo_commit_id,
+                    # TODO: The embedding is filled in at a later phase.
+                    embedding=[],
                 )])
 
             case ToolKind.HTTPRequest:
@@ -189,18 +195,17 @@ class DotYamlFileIndexer(BaseFileIndexer):
 
                 descriptors = []
 
-                repo_commit_id = get_repo_commit_id(filename) # Ex: a git hash / SHA.
-
                 for operation in metadata.open_api.operations:
                     descriptors.append(ToolDescriptor(
                         identifier=str(filename) + ":" + operation.specification.operation_id + ":" + repo_commit_id,
+                        kind=ToolKind.HTTPRequest,
                         name=operation.specification.operation_id,
                         description=operation.specification.description,
-                        # TODO: The embedding is actually None at this point.
-                        embedding=[],
                         # TODO: Capture line numbers as part of source?
                         source=filename,
-                        kind=ToolKind.HTTPRequest
+                        repo_commit_id=repo_commit_id,
+                        # TODO: The embedding is filled in at a later phase.
+                        embedding=[],
                     ))
 
                 return (None, descriptors)
