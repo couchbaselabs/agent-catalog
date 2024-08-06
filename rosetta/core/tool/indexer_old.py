@@ -76,7 +76,7 @@ class Indexer(pydantic.BaseModel):
             )
 
     def _handle_dot_sqlpp(self, filename: pathlib.Path) -> typing.Iterable[ToolDescriptor]:
-        front_matter = yaml.safe_load(SQLPPQueryMetadata.read_front_matter(filename))
+        front_matter = SQLPPQueryMetadata.read_front_matter(filename)
         metadata = SQLPPQueryMetadata.model_validate(front_matter)
 
         # Build our tool descriptor.

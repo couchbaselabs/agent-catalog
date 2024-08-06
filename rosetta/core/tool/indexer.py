@@ -139,7 +139,7 @@ class DotSqlppFileIndexer(BaseFileIndexer):
            if any encountered.
         """
 
-        front_matter = yaml.safe_load(SQLPPQueryMetadata.read_front_matter(filename))
+        front_matter = SQLPPQueryMetadata.read_front_matter(filename)
 
         metadata = SQLPPQueryMetadata.model_validate(front_matter)
 
