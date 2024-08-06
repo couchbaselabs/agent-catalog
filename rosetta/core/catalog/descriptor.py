@@ -11,6 +11,8 @@ class CatalogDescriptor(pydantic.BaseModel):
         especially for local and/or in-memory representations.
     """
 
+    catalog_schema_version: str
+
     # For git, this is a git repo commit SHA / HASH, which
     # records the repo commit when the 'rosetta index' was run.
     # Ex: "g11aa22bb".

@@ -147,6 +147,7 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
     repo_commit_id = commit_str(repo.head.commit)
 
     c = CatalogDescriptor(
+        catalog_schema_version=meta["catalog_schema_version"],
         repo_commit_id=repo_commit_id,
         items=[descriptor for descriptor, indexer in all_descriptors],
     )
