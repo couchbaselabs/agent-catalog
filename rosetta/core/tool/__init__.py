@@ -3,7 +3,8 @@ from .provider import (
     LocalProvider,
     CouchbaseProvider
 )
-from .indexer import (
+
+from .indexer_old import (
     Indexer,
     LocalIndexer
 )

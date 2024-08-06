@@ -1,4 +1,5 @@
 import fnmatch
+import os
 import pathlib
 
 import git
@@ -27,8 +28,20 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
     if not meta['embedding_model']:
         raise ValueError("An --embedding-model is required as an embedding model is not yet recorded.")
 
+    # The repo is the user's application's repo and is NOT the
+    # repo of rosetta-core. The rosetta CLI / library should be run
+    # in the current working directory of the user's application's repo.
+    #
+    # TODO: One day, allow for rosetta CLI / library to run anywhere
+    # and the '.' to be optionally passed in as an parameter / option.
+    #
     repo = git.Repo('.')
-    if repo.is_dirty():
+
+    if repo.is_dirty() and \
+        not os.getenv("ROSETTA_REPO_DIRTY_OK", False):
+        # The ROSETTA_REPO_DIRTY_OK env var is intended
+        # to help during rosetta development.
+
         # TODO: One day, handle when there are dirty files (either changes
         # not yet committed into git or untracked files w.r.t. git) via
         # a hierarchy of catalogs? A hierarchy of catalogs has advanced
@@ -61,17 +74,17 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
 
         p = pathlib.Path(source_file)
 
-        def rev_ident_fn(filename: pathlib.Path) -> str:
-            print("rev_ident_fn", filename)
+        def get_repo_commit_id(filename: pathlib.Path) -> str:
+            print("get_repo_commit_id", filename)
 
             # TODO: Call repo GitPython API to retrieve commit SHA,
             # parent SHA, whether the file is dirty, etc.
 
-            return "TODO-rev-ident"
+            return "TODO-get_repo_commit_id"
 
         for glob, indexer in source_indexers.items():
             if fnmatch.fnmatch(p.name, glob):
-                errs, descriptors = indexer.start_descriptors(p, rev_ident_fn)
+                errs, descriptors = indexer.start_descriptors(p, get_repo_commit_id)
 
                 all_errs += errs or []
                 all_descriptors += [(descriptor, indexer) for descriptor in descriptors]
@@ -113,11 +126,18 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
 
         raise all_errs[0]
 
-    print("==================\nlocal catalog...")
+    print("==================\nsaving local catalog...")
 
     print("\n".join([str(descriptor) for descriptor, indexer in all_descriptors]))
 
-    # TODO: Actually save the local catalog.
+    # TODO: During refactoring, we currently save a "tool-catalog.json" (with a hyphen)
+    # instead of "tool_catalog.json" to not break other existing code (publish, find, etc).
+    tool_catalog_path = ctx['catalog'] + '/tool-catalog.json'
+
+    if False:
+        with pathlib.Path(tool_catalog_path).open('w') as fp:
+            pass
+
 
     # ---------------------------------
 
