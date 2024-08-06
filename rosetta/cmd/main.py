@@ -122,25 +122,19 @@ def index(ctx, source_dirs, embedding_model):
     "--scope",
     default="rosetta-catalog",
     help="Couchbase Scope where data is inserted.",
-    required=True,
-)
-@click.option(
-    "-col",
-    "--collection",
-    default="rosetta-catalog",
-    help="Couchbase Collection where data is inserted.",
-    required=True,
 )
 @click.pass_context
-def publish(ctx, scope, collection):
-    """
-    Publish the local catalog to a database.\n
-    rosetta publish -sc <scope_name> -col <collection_name>
-    """
-    keyspace_details = Keyspace(bucket="", scope=scope, collection=collection)
+def publish(ctx, scope):
+    """Publish the local catalog to a database."""
+
+    keyspace_details = Keyspace(bucket="", scope=scope, collection="rosetta-tools")
 
     # TODO: maybe take connection details from cmd/config/kms (default for now)
-    connection_details = CouchbaseConnect()
+    connection_details = CouchbaseConnect(
+        connection_url=os.getenv("COUCHBASE_CONNECTION_URL"),
+        username=os.getenv("COUCHBASE_CLIENT_USERNAME"),
+        password=os.getenv("COUCHBASE_CLIENT_PASSWORD"),
+    )
 
     # Establish a connection and get buckets
     cluster = get_connection(ctx, conn=connection_details)
