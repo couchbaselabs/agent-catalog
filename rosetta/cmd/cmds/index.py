@@ -1,27 +1,23 @@
 import fnmatch
 import os
 import pathlib
-
+import logging
 import git
-
 from tqdm import tqdm
 
 from rosetta.cmd.cmds.init import init_local
-
-from rosetta.core.catalog.dir import dir_scan
-
+from rosetta.core.catalog.directory import scan_directory
 from rosetta.core.catalog.descriptor import CatalogDescriptor
-
 from rosetta.core.tool.indexer import source_indexers
-
 
 source_globs = list(source_indexers.keys())
 
+logger = logging.getLogger(__name__)
 
 # TODO: During index'ing, should we also record the source_dirs into the catalog?
 
 
-MAX_ERRS = 10 # TODO: Hardcoded limit on too many errors.
+MAX_ERRS = 10  # TODO: Hardcoded limit on too many errors.
 
 
 def commit_str(commit):
@@ -38,17 +34,20 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
     if not meta['embedding_model']:
         raise ValueError("An --embedding-model is required as an embedding model is not yet recorded.")
 
-    # The repo is the user's application's repo and is NOT the
-    # repo of rosetta-core. The rosetta CLI / library should be run
-    # in the current working directory of the user's application's repo.
-    #
-    # TODO: One day, allow for rosetta CLI / library to run anywhere
-    # and the '.' to be optionally passed in as an parameter / option.
-    #
-    repo = git.Repo('.')
+    # The repo is the user's application's repo and is NOT the repo of rosetta-core. The rosetta CLI / library
+    # should be run in the current working directory of the user's application's repo.
+    # TODO: Allow rosetta CLI / library to run anywhere and pass the working_dir as a parameter / option.
+    working_dir = pathlib.Path(os.getcwd()).parent
+    if not (working_dir / '.git').exists():
+        logger.warning(f'No .git repository found in current working directory {working_dir}. Walking upwards.')
+    while not (working_dir / '.git').exists():
+        if working_dir.parent == working_dir:
+            raise ValueError('Could not find .git directory. Please run index within a git repository.')
+        working_dir = working_dir.parent
+    logger.info(f'Found the .git repository: {working_dir}.')
+    repo = git.Repo(working_dir / '.git')
 
-    if repo.is_dirty() and \
-        not os.getenv("ROSETTA_REPO_DIRTY_OK", False):
+    if repo.is_dirty() and not os.getenv("ROSETTA_REPO_DIRTY_OK", False):
         # The ROSETTA_REPO_DIRTY_OK env var is intended
         # to help during rosetta development.
 
@@ -71,33 +70,26 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
 
     source_files = []
     for d in source_dirs:
-        source_files += dir_scan(d, source_globs)
+        source_files += scan_directory(d, source_globs)
 
     all_errs = []
     all_descriptors = []
-
     for source_file in tqdm(source_files):
         if len(all_errs) > MAX_ERRS:
             break
+        logger.info(f'Found source file: {source_file}.')
 
-        print(source_file)
-
-        p = pathlib.Path(source_file)
-
-        def get_repo_commit_id(filename: pathlib.Path) -> str:
-            commits = list(repo.iter_commits(paths=str(filename), max_count=1))
+        def get_repo_commit_id(path: pathlib.Path) -> str:
+            commits = list(repo.iter_commits(paths=path.absolute(), max_count=1))
             if not commits or len(commits) <= 0:
-                raise ValueError(f"ERROR: get_repo_commit_id, no commits for filename: {filename}")
-
+                raise ValueError(f"ERROR: get_repo_commit_id, no commits for filename: {path.absolute()}")
             return commit_str(commits[0])
 
         for glob, indexer in source_indexers.items():
-            if fnmatch.fnmatch(p.name, glob):
-                errs, descriptors = indexer.start_descriptors(p, get_repo_commit_id)
-
+            if fnmatch.fnmatch(source_file.name, glob):
+                errs, descriptors = indexer.start_descriptors(source_file, get_repo_commit_id)
                 all_errs += errs or []
                 all_descriptors += [(descriptor, indexer) for descriptor in descriptors]
-
                 break
 
     if not all_errs:
