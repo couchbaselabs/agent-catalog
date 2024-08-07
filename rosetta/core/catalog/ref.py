@@ -129,12 +129,12 @@ class MemCatalogRef(CatalogRef):
 
     def diff(self, source: typing.Self, repo) -> typing.Tuple[list[ToolDescriptor], list[ToolDescriptor]]:
         # TODO: This is the worst diff() implementation, which
-        # incorrectly treats all of the source's items as newer
-        # and ignores self. For now, it just happens to work
-        # with the current MemCatalogRef.update() implementation.
+        # incorrectly deletes all of self's items and treats all
+        # source's items as new items. For now, this incorrect implementation
+        # happens to work with the current implementation of MemCatalogRef.update().
 
         items_newer = source.catalog_descriptor.items
-        items_deleted = []
+        items_deleted = self.catalog_descriptor.items
 
         return (items_newer, items_deleted)
 
@@ -152,36 +152,36 @@ class MemCatalogRef(CatalogRef):
         # A lookup dict m of self's items keyed by "source:name".
         m = defaultdict(list)
         for x in self.catalog_descriptor.items:
-            m[x.source + ':' + x.name].append(x)
-
-        # Update m based on items_newer.
-        for x in items_newer or []:
-            latest = x.model_copy()
-            latest.deleted = False
-
-            m[x.source + ':' + x.name].append(latest)
+            m[str(x.source) + ':' + x.name].append(x)
 
         # Update m based on items_deleted.
         for x in items_deleted or []:
-            tombstone = x.model_copy()
-            tombstone.deleted = True
+            x.deleted = True
+            m[str(x.source) + ':' + x.name].append(x)
 
-            m[x.source + ':' + x.name].append(tombstone)
+        # Update m based on items_newer.
+        for x in items_newer or []:
+            x.deleted = False
+            m[str(x.source) + ':' + x.name].append(x)
 
         # TODO: Some callers may want append-only behavior, where we
         # keep all our existing items unchanged and only append new
-        # items (updates are new items) -- turn this into a parameter?
+        # items (both updates & tombstomes become new items) -- turn
+        # this into an optional parameter?
         append_only = False
 
         items = []
-        for a in m.values():
+        for xs in m.values():
             if append_only:
-                items += a
+                items += xs
             else:
-                items.append(a[-1])
+                items.append(xs[-1])
 
         items.sort(key=lambda x: x.identifier)
 
+        self.catalog_descriptor.catalog_schema_version = meta["catalog_schema_version"]
+        self.catalog_descriptor.embedding_model = meta["embedding_model"]
+        self.catalog_descriptor.repo_commit_id = repo_commit_id
         self.catalog_descriptor.items = items
 
 

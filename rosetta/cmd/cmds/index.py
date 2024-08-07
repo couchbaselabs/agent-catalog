@@ -32,6 +32,22 @@ def commit_str(commit):
     return "g" + str(commit)[:7]
 
 
+def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
+    # The repo is the user's application's repo and is NOT the repo
+    # of rosetta-core. The rosetta CLI / library should be run in
+    # a directory (or subdirectory) of the user's application's repo,
+    # where we'll walk up the parent dirs until we find the .git/ subdirectory.
+
+    while not (top_dir / ".git").exists():
+        if top_dir.parent == top_dir:
+            raise ValueError(
+                "Could not find .git directory. Please run index within a git repository."
+            )
+        top_dir = top_dir.parent
+
+    return git.Repo(top_dir / ".git")
+
+
 def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
     meta = init_local(ctx, embedding_model)
 
@@ -40,22 +56,7 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
             "An --embedding-model is required as an embedding model is not yet recorded."
         )
 
-    # The repo is the user's application's repo and is NOT the repo
-    # of rosetta-core. The rosetta CLI / library should be run in
-    # a directory (or subdirectory) of the user's application's repo,
-    # where we'll walk up the parent dirs until we find the .git/
-    # subdirectory that means we've reached the top directory of the repo.
-    working_dir = pathlib.Path(os.getcwd())
-    while not (working_dir / ".git").exists():
-        if working_dir.parent == working_dir:
-            raise ValueError(
-                "Could not find .git directory. Please run index within a git repository."
-            )
-        working_dir = working_dir.parent
-
-    logger.info(f"Found the .git repository in dir: {working_dir}")
-
-    repo = git.Repo(working_dir / ".git")
+    repo = repo_load(pathlib.Path(os.getcwd()))
 
     if repo.is_dirty() and not os.getenv("ROSETTA_REPO_DIRTY_OK", False):
         # The ROSETTA_REPO_DIRTY_OK env var is intended
@@ -97,11 +98,11 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
 
     if catalog_path.exists():
         # Load the old / previous local catalog.
-        prev_catalog = MemCatalogRef().load(catalog_path)
+        curr_catalog = MemCatalogRef().load(catalog_path)
     else:
         # An empty MemCatalogRef with no items represents an initial catalog state.
-        prev_catalog = MemCatalogRef()
-        prev_catalog.catalog_descriptor = CatalogDescriptor(
+        curr_catalog = MemCatalogRef()
+        curr_catalog.catalog_descriptor = CatalogDescriptor(
             catalog_schema_version=meta["catalog_schema_version"],
             embedding_model=meta["embedding_model"],
             repo_commit_id="",
@@ -117,7 +118,7 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
         if len(all_errs) > MAX_ERRS:
             break
 
-        logger.info(f"Examining source file: {source_file}.")
+        logger.info(f"Examining source file: {source_file}")
 
         def get_repo_commit_id(path: pathlib.Path) -> str:
             commits = list(repo.iter_commits(paths=path.absolute(), max_count=1))
@@ -147,15 +148,15 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
         repo_commit_id=repo_commit_id,
         items=all_descriptors)
 
-    # TODO: items_newer, items_deleted = prev_catalog.diff(next_catalog)
+    items_newer, items_deleted = curr_catalog.diff(next_catalog, repo)
 
-    if all_errs:
-        print("ERROR: during diff'ing", "\n".join([str(e) for e in all_errs]))
-        raise all_errs[0]
+    curr_catalog.update(meta, repo_commit_id, items_newer, items_deleted, repo)
+
+    next_catalog = curr_catalog
 
     print("==================\naugmenting...")
 
-    for descriptor in tqdm(all_descriptors):
+    for descriptor in tqdm(items_newer):
         if len(all_errs) > MAX_ERRS:
             break
 
@@ -175,7 +176,7 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
 
     embedding_model_obj = sentence_transformers.SentenceTransformer(meta["embedding_model"])
 
-    for descriptor in tqdm(all_descriptors):
+    for descriptor in tqdm(items_newer):
         if len(all_errs) > MAX_ERRS:
             break
 
