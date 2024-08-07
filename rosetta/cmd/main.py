@@ -7,7 +7,7 @@ import dotenv
 from .cmds import *
 from .cmds.publish import get_connection, get_buckets, cmd_publish
 from .models.publish.model import Keyspace, CouchbaseConnect
-
+from .models.ctx.model import Context
 
 # TODO: Should we load from ".env.rosetta"?
 # TODO: Or, perhaps even stage specific, like from ".env.rosetta.prod"?
@@ -65,7 +65,8 @@ class AliasedGroup(click.Group):
 @click.pass_context
 def click_main(ctx, catalog, activity, verbose):
     """A command line tool for Rosetta."""
-    ctx.obj = ctx.obj or {"catalog": catalog, "activity": activity, "verbose": verbose}
+    ctx.obj = Context(activity=activity, catalog=catalog, verbose=verbose)
+    # ctx.obj = ctx.obj or {"catalog": catalog, "activity": activity, "verbose": verbose}
 
 
 @click_main.command()
