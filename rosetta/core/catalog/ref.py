@@ -1,11 +1,9 @@
 from collections import defaultdict
 
 import abc
-import json
 import pathlib
 import typing
 import pydantic
-import sklearn
 
 from ..tool.types.descriptor import ToolDescriptor
 
@@ -108,6 +106,8 @@ class MemCatalogRef(CatalogRef):
         embedding_model_obj = sentence_transformers.SentenceTransformer(embedding_model)
 
         query_embedding = embedding_model_obj.encode(query)
+
+        import sklearn
 
         deltas = sklearn.metrics.pairwise.cosine_similarity(
             X=[t.embedding for t in available_tools],
