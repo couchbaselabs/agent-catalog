@@ -20,6 +20,11 @@ class CatalogDescriptor(pydantic.BaseModel):
     # Ex: "g11aa22bb".
     repo_commit_id: str
 
+    # TODO: Besides the repo_commit_id for the HEAD, we might also
+    # want to track all the tags and/or branches which point to the
+    # HEAD's repo_commit_id? That way, users might be able to perform
+    # catalog search/find()'s based on a given tag (e.g., "v1.17.0").
+
     items: list[CoreToolDescriptor]
 
 
