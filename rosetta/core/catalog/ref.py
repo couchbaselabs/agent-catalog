@@ -118,17 +118,17 @@ class ChainedCatalogRef(CatalogRef):
     """ Represents a chain of catalogs, where all catalogs are searched
         during find(), but results from earlier catalogs take precendence. """
 
-    children: list[CatalogRef]
+    chain: list[CatalogRef]
 
-    def __init__(self, children):
-        self.children = children
+    def __init__(self, chain):
+        self.chain = chain
 
     def find(self, query) -> list[ToolDescriptor]:
         # TODO: This might roughly look something like...
 
         results = []
 
-        for c in self.children:
+        for c in self.chain:
             results_c = c.find(query)
 
             # TODO: Filter out entries from results_c which
