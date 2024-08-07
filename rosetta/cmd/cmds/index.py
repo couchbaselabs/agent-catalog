@@ -1,24 +1,32 @@
 import fnmatch
+import logging
+import os
 import pathlib
-
 import git
-
 from tqdm import tqdm
 
-from rosetta.core.catalog.dir import dir_scan
-
-from rosetta.core.tool.indexer import source_indexers
-
 from rosetta.cmd.cmds.init import init_local
-
+from rosetta.core.catalog.ref import MemCatalogRef
+from rosetta.core.catalog.directory import scan_directory
+from rosetta.core.catalog.descriptor import CatalogDescriptor
+from rosetta.core.tool.indexer import source_indexers
 
 source_globs = list(source_indexers.keys())
 
+logger = logging.getLogger(__name__)
 
 # TODO: During index'ing, should we also record the source_dirs into the catalog?
 
 
-MAX_ERRS = 10 # TODO: Hardcoded limit on too many errors.
+MAX_ERRS = 10  # TODO: Hardcoded limit on too many errors.
+
+
+def commit_str(commit):
+    """ Ex: 'g1234abcd'. """
+
+    # TODO: Only works for git, where a far, future day, folks might want non-git?
+
+    return 'g' + str(commit)[:8]
 
 
 def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
@@ -27,8 +35,22 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
     if not meta['embedding_model']:
         raise ValueError("An --embedding-model is required as an embedding model is not yet recorded.")
 
-    repo = git.Repo('.')
-    if repo.is_dirty():
+    # The repo is the user's application's repo and is NOT the repo of rosetta-core. The rosetta CLI / library
+    # should be run in the current working directory of the user's application's repo.
+    # TODO: Allow rosetta CLI / library to run anywhere and pass the working_dir as a parameter / option.
+    working_dir = pathlib.Path(os.getcwd())
+    while not (working_dir / '.git').exists():
+        if working_dir.parent == working_dir:
+            raise ValueError('Could not find .git directory. Please run index within a git repository.')
+        working_dir = working_dir.parent
+    logger.info(f'Found the .git repository in dir: {working_dir}')
+
+    repo = git.Repo(working_dir / '.git')
+
+    if repo.is_dirty() and not os.getenv("ROSETTA_REPO_DIRTY_OK", False):
+        # The ROSETTA_REPO_DIRTY_OK env var is intended
+        # to help during rosetta development.
+
         # TODO: One day, handle when there are dirty files (either changes
         # not yet committed into git or untracked files w.r.t. git) via
         # a hierarchy of catalogs? A hierarchy of catalogs has advanced
@@ -48,39 +70,26 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
 
     source_files = []
     for d in source_dirs:
-        source_files = source_files + dir_scan(d, source_globs)
+        source_files += scan_directory(d, source_globs)
 
     all_errs = []
     all_descriptors = []
-
     for source_file in tqdm(source_files):
         if len(all_errs) > MAX_ERRS:
             break
+        logger.info(f'Found source file: {source_file}.')
 
-        import time
-        time.sleep(0.1)
-
-        p = pathlib.Path(source_file)
-
-        def rev_ident_fn(filename: pathlib.Path) -> str:
-            print("rev_ident_fn", filename)
-            return "TODO-rev-ident" # TODO: Call repo GitPython API to retrieve commit SHA.
+        def get_repo_commit_id(path: pathlib.Path) -> str:
+            commits = list(repo.iter_commits(paths=path.absolute(), max_count=1))
+            if not commits or len(commits) <= 0:
+                raise ValueError(f"ERROR: get_repo_commit_id, no commits for filename: {path.absolute()}")
+            return commit_str(commits[0])
 
         for glob, indexer in source_indexers.items():
-            if fnmatch.fnmatch(p.name, glob):
-                errs, descriptors = None, []
-
-                # TODO: This produces a pydantic error, like...
-                #   ERROR: 1 validation error for SemanticSearchMetadata input
-                #   Input should be a valid dictionary [type=dict_type,
-                #     input_value='{\n  "type": "object",\n...ing" }\n    }\n  }\n}\n', input_type=str]
-                #   For further information visit https://errors.pydantic.dev/2.8/v/dict_type
-                #
-                # errs, descriptors = indexer.start_descriptors(p, rev_ident_fn)
-
+            if fnmatch.fnmatch(source_file.name, glob):
+                errs, descriptors = indexer.start_descriptors(source_file, get_repo_commit_id)
                 all_errs += errs or []
                 all_descriptors += [(descriptor, indexer) for descriptor in descriptors]
-
                 break
 
     if not all_errs:
@@ -90,16 +99,28 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
             if len(all_errs) > MAX_ERRS:
                 break
 
-            all_errs += indexer.augment_descriptor(descriptor) or []
+            print(descriptor.name)
+
+            errs = indexer.augment_descriptor(descriptor)
+
+            all_errs += errs or []
 
     if not all_errs:
         print("==================\nvectorizing...")
+
+        import sentence_transformers
+
+        embedding_model_obj = sentence_transformers.SentenceTransformer(meta['embedding_model'])
 
         for descriptor, indexer in tqdm(all_descriptors):
             if len(all_errs) > MAX_ERRS:
                 break
 
-            all_errs += indexer.vectorize_descriptor(descriptor) or []
+            print(descriptor.name)
+
+            errs = indexer.vectorize_descriptor(descriptor, embedding_model_obj)
+
+            all_errs += errs or []
 
     if all_errs:
         print("ERROR:", "\n".join([str(e) for e in all_errs]))
@@ -108,11 +129,32 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
 
     print("==================\nsaving local catalog...")
 
-    print("\n".join([descriptor for descriptor, indexer in descriptors]))
+    # TODO: One day, allow users to choose a different branch instead of assuming
+    # the HEAD branch, as users currently would have to 'git checkout BRANCH_THEY_WANT'
+    # before calling 'rosetta index' -- where if we decide to support an optional
+    # branch name parameter, then the Indexer.start_descriptors() methods would
+    # need to be provided the file blob streams from git instead of our current
+    # approach of opening & reading file contents directly,
+    repo_commit_id = commit_str(repo.head.commit)
 
-    # TODO: Actually save the local catalog.
+    # TODO: Support a --dry-run option that doesn't actually update/save any files.
+
+    mcr = MemCatalogRef()
+    mcr.catalog_descriptor = CatalogDescriptor(
+        catalog_schema_version=meta["catalog_schema_version"],
+        embedding_model=meta["embedding_model"],
+        repo_commit_id=repo_commit_id,
+        items=[descriptor for descriptor, indexer in all_descriptors],
+    )
+
+    # TODO: During refactoring, we currently save a "tool-catalog.json" (with a hyphen)
+    # instead of "tool_catalog.json" to not break other existing code (publish, find, etc).
+
+    mcr.save(pathlib.Path(ctx['catalog'] + '/tool-catalog.json'))
 
     # ---------------------------------
+
+    print("==================\nOLD / pre-refactor indexing...")
 
     # TODO: Old indexing codepaths that are getting refactored.
 

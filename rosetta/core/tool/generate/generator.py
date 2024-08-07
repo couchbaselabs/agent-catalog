@@ -2,7 +2,6 @@ import datetime
 import pathlib
 import typing
 import uuid
-
 import openapi_parser.parser
 import pydantic
 import jinja2
@@ -24,7 +23,6 @@ from ..types import (
     HTTPRequestMetadata
 )
 from ...catalog.descriptor import ToolDescriptor
-from ..common import get_front_matter_from_dot_sqlpp
 
 logger = logging.getLogger(__name__)
 
@@ -47,20 +45,20 @@ class SQLPPCodeGenerator(_BaseCodeGenerator):
     def generate(self, output_dir: pathlib.Path) -> list[pathlib.Path]:
         sqlpp_file = self.tool_descriptors[0].source
         metadata = SQLPPQueryMetadata.model_validate(
-            yaml.safe_load(get_front_matter_from_dot_sqlpp(sqlpp_file))
+            SQLPPQueryMetadata.read_front_matter(sqlpp_file)
         )
         with sqlpp_file.open('r') as fp:
             sqlpp_query = fp.read()
 
         # Generate a Pydantic model for the input schema...
         input_model = generate_model_from_json_schema(
-            json_schema=json.dumps(metadata.input),
+            json_schema=metadata.input,
             class_name=input_model_class_name_in_templates
         )
 
         # ...and the output schema.
         output_model = generate_model_from_json_schema(
-            json_schema=json.dumps(metadata.output),
+            json_schema=metadata.output,
             class_name=output_model_class_name_in_templates
         )
 
@@ -94,7 +92,7 @@ class SemanticSearchCodeGenerator(_BaseCodeGenerator):
 
         # Generate a Pydantic model for the input schema.
         input_model = generate_model_from_json_schema(
-            json_schema=json.dumps(metadata.input),
+            json_schema=metadata.input,
             class_name=input_model_class_name_in_templates
         )
 
