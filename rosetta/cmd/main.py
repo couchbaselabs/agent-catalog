@@ -83,10 +83,17 @@ def env(ctx):
 
 
 @click_main.command()
+@click.argument("query", nargs=1)
+@click.option(
+    "--kind",
+    default="tool",
+    help="The kind of catalog to search.",
+    show_default=True,
+)
 @click.pass_context
-def find(ctx):
+def find(ctx, query, kind):
     """Find tools, prompts, etc. from the catalog."""
-    cmd_find(ctx.obj)
+    cmd_find(ctx.obj, query, kind=kind)
 
 
 @click_main.command()

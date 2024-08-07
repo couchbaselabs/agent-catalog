@@ -1,7 +1,7 @@
 import fnmatch
+import logging
 import os
 import pathlib
-import logging
 import git
 from tqdm import tqdm
 
@@ -42,7 +42,8 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
         if working_dir.parent == working_dir:
             raise ValueError('Could not find .git directory. Please run index within a git repository.')
         working_dir = working_dir.parent
-    logger.info(f'Found the .git repository in dir: {working_dir}.')
+    logger.info(f'Found the .git repository in dir: {working_dir}')
+
     repo = git.Repo(working_dir / '.git')
 
     if repo.is_dirty() and not os.getenv("ROSETTA_REPO_DIRTY_OK", False):
