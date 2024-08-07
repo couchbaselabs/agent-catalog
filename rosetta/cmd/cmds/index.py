@@ -9,7 +9,8 @@ from rosetta.cmd.cmds.init import init_local
 from rosetta.core.catalog.ref import MemCatalogRef
 from rosetta.core.catalog.directory import scan_directory
 from rosetta.core.catalog.descriptor import CatalogDescriptor
-from rosetta.core.tool.indexer import source_indexers
+from rosetta.core.tool.indexer import source_indexers, augment_descriptor, vectorize_descriptor
+
 
 from ..models.ctx.model import Context
 
@@ -28,7 +29,7 @@ def commit_str(commit):
 
     # TODO: Only works for git, where a far, future day, folks might want non-git?
 
-    return "g" + str(commit)[:8]
+    return "g" + str(commit)[:7]
 
 
 def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
@@ -97,19 +98,19 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
             if fnmatch.fnmatch(source_file.name, glob):
                 errs, descriptors = indexer.start_descriptors(source_file, get_repo_commit_id)
                 all_errs += errs or []
-                all_descriptors += [(descriptor, indexer) for descriptor in descriptors]
+                all_descriptors += descriptors or []
                 break
 
     if not all_errs:
         print("==================\naugmenting...")
 
-        for descriptor, indexer in tqdm(all_descriptors):
+        for descriptor in tqdm(all_descriptors):
             if len(all_errs) > MAX_ERRS:
                 break
 
             print(descriptor.name)
 
-            errs = indexer.augment_descriptor(descriptor)
+            errs = augment_descriptor(descriptor)
 
             all_errs += errs or []
 
@@ -120,13 +121,13 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
 
         embedding_model_obj = sentence_transformers.SentenceTransformer(meta["embedding_model"])
 
-        for descriptor, indexer in tqdm(all_descriptors):
+        for descriptor in tqdm(all_descriptors):
             if len(all_errs) > MAX_ERRS:
                 break
 
             print(descriptor.name)
 
-            errs = indexer.vectorize_descriptor(descriptor, embedding_model_obj)
+            errs = vectorize_descriptor(descriptor, embedding_model_obj)
 
             all_errs += errs or []
 
@@ -145,6 +146,11 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
     # approach of opening & reading file contents directly,
     repo_commit_id = commit_str(repo.head.commit)
 
+    # TODO: Besides the repo_commit_id for the HEAD, we might also
+    # want to track all the tags and/or branches which point to
+    # the HEAD's repo_commit_id? That way, users might be able to perform
+    # catalog search/find()'s based on a given tag (e.g., "v1.17.0").
+
     # TODO: Support a --dry-run option that doesn't actually update/save any files.
 
     mcr = MemCatalogRef()
@@ -152,7 +158,7 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
         catalog_schema_version=meta["catalog_schema_version"],
         embedding_model=meta["embedding_model"],
         repo_commit_id=repo_commit_id,
-        items=[descriptor for descriptor, indexer in all_descriptors],
+        items=all_descriptors,
     )
 
     # TODO: During refactoring, we currently save a "tool-catalog.json" (with a hyphen)
