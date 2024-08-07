@@ -30,7 +30,7 @@ class CatalogRef(abc.ABC):
         # optional params, perhaps to query on tags, labels, annotations,
         # user credentials (for ACL's), etc.?
 
-        pass
+        raise NotImplementedError("CatalogRef.find()")
 
     @abc.abstractmethod
     def diff(self, source: 'MemCatalogRef', repo) -> typing.Tuple[list[ToolDescriptor], list[ToolDescriptor]]:
@@ -46,13 +46,15 @@ class CatalogRef(abc.ABC):
             The repo_commit_id of source items vs self items are compared, and
             the repo object (e.g., a git repo) is consulted for deeper comparisons.
         """
-        pass
+
+        raise NotImplementedError("CatalogRef.diff()")
 
     @abc.abstractmethod
     def update(self, newer: list[ToolDescriptor], deleted: list[ToolDescriptor], repo):
         """ Updates self from newer items (will be UPSERT'ed) and deleted items.
         """
-        pass # TODO.
+
+        raise NotImplementedError("CatalogRef.update()")
 
 
 class MemCatalogRef(CatalogRef):
