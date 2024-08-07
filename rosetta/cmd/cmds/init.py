@@ -11,11 +11,13 @@ from rosetta.core.catalog.version import (
     lib_version_compare,
 )
 
+from ..models.ctx.model import Context
 
-def init_local(ctx, embedding_model: str):
+
+def init_local(ctx: Context, embedding_model: str):
     # Init directories.
-    os.makedirs(ctx["catalog"], exist_ok=True)
-    os.makedirs(ctx["activity"], exist_ok=True)
+    os.makedirs(ctx.catalog, exist_ok=True)
+    os.makedirs(ctx.activity, exist_ok=True)
 
     lib_v = lib_version(ctx)
 
@@ -27,7 +29,7 @@ def init_local(ctx, embedding_model: str):
         "embedding_model": None,
     }
 
-    meta_path = ctx["catalog"] + "/meta.json"
+    meta_path = ctx.catalog + "/meta.json"
 
     if os.path.exists(meta_path):
         with open(meta_path, "r") as f:
