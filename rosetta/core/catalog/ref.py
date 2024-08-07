@@ -11,13 +11,14 @@ from .descriptor import CatalogDescriptor
 class CatalogRef(abc.ABC):
     """ An abstract interface for a catalog reference. """
 
+    @abc.abstractmethod
     def find(self, todo):
         """ Returns the ToolDescriptors from the catalog that best match a query. """
         pass
 
 
-class LocalCatalogRef(CatalogRef):
-    """ Represents a local catalog. """
+class MemCatalogRef(CatalogRef):
+    """ Represents an in-memory catalog ref. """
 
     catalog_path: pathlib.Path
 
@@ -43,7 +44,7 @@ class DBCatalogRef(CatalogRef):
         """ Returns the ToolDescriptors that best match a query. """
         pass # TODO: SQL++ and vector index searches likely are involved here.
 
-    def updateFrom(self, source: LocalCatalogRef, repo):
+    def updateFrom(self, source: MemCatalogRef, repo):
         # TODO.
         pass
 
