@@ -29,7 +29,7 @@ def commit_str(commit):
 
     # TODO: Only works for git, where a far, future day, folks might want non-git?
 
-    return "g" + str(commit)[:8]
+    return "g" + str(commit)[:7]
 
 
 def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
