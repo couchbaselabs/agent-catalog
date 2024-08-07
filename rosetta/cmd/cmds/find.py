@@ -3,9 +3,10 @@ import pathlib
 import click
 
 from rosetta.core.catalog.ref import MemCatalogRef
+from ..models.ctx.model import Context
 
 
-def cmd_find(ctx, query, kind="tool"):
+def cmd_find(ctx: Context, query, kind="tool"):
     # TODO: One day, handle DBCatalogRef?
 
     # TODO: If DB is outdated and the local catalog has newer info,
@@ -17,7 +18,7 @@ def cmd_find(ctx, query, kind="tool"):
     # TODO: When refactoring is done, rename back to "tool_catalog.json" (with underscore)?
 
     # TODO: Possible security issue -- need to check kind is an allowed value?
-    catalog_path = ctx["catalog"] + "/" + kind + "-catalog.json"
+    catalog_path = ctx.catalog + "/" + kind + "-catalog.json"
 
     c = MemCatalogRef().load(pathlib.Path(catalog_path))
 

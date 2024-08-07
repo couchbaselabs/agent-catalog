@@ -11,6 +11,8 @@ from rosetta.core.catalog.directory import scan_directory
 from rosetta.core.catalog.descriptor import CatalogDescriptor
 from rosetta.core.tool.indexer import source_indexers
 
+from ..models.ctx.model import Context
+
 source_globs = list(source_indexers.keys())
 
 logger = logging.getLogger(__name__)
@@ -22,30 +24,34 @@ MAX_ERRS = 10  # TODO: Hardcoded limit on too many errors.
 
 
 def commit_str(commit):
-    """ Ex: 'g1234abcd'. """
+    """Ex: 'g1234abcd'."""
 
     # TODO: Only works for git, where a far, future day, folks might want non-git?
 
-    return 'g' + str(commit)[:8]
+    return "g" + str(commit)[:8]
 
 
-def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
+def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
     meta = init_local(ctx, embedding_model)
 
-    if not meta['embedding_model']:
-        raise ValueError("An --embedding-model is required as an embedding model is not yet recorded.")
+    if not meta["embedding_model"]:
+        raise ValueError(
+            "An --embedding-model is required as an embedding model is not yet recorded."
+        )
 
     # The repo is the user's application's repo and is NOT the repo of rosetta-core. The rosetta CLI / library
     # should be run in the current working directory of the user's application's repo.
     # TODO: Allow rosetta CLI / library to run anywhere and pass the working_dir as a parameter / option.
     working_dir = pathlib.Path(os.getcwd())
-    while not (working_dir / '.git').exists():
+    while not (working_dir / ".git").exists():
         if working_dir.parent == working_dir:
-            raise ValueError('Could not find .git directory. Please run index within a git repository.')
+            raise ValueError(
+                "Could not find .git directory. Please run index within a git repository."
+            )
         working_dir = working_dir.parent
-    logger.info(f'Found the .git repository in dir: {working_dir}')
+    logger.info(f"Found the .git repository in dir: {working_dir}")
 
-    repo = git.Repo(working_dir / '.git')
+    repo = git.Repo(working_dir / ".git")
 
     if repo.is_dirty() and not os.getenv("ROSETTA_REPO_DIRTY_OK", False):
         # The ROSETTA_REPO_DIRTY_OK env var is intended
@@ -66,7 +72,7 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
         # instead preemptively generate a .rosetta-activity/.gitiginore
         # file during init_local()?
         #
-        raise ValueError(f"repo is dirty")
+        raise ValueError("repo is dirty")
 
     source_files = []
     for d in source_dirs:
@@ -77,12 +83,14 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
     for source_file in tqdm(source_files):
         if len(all_errs) > MAX_ERRS:
             break
-        logger.info(f'Found source file: {source_file}.')
+        logger.info(f"Found source file: {source_file}.")
 
         def get_repo_commit_id(path: pathlib.Path) -> str:
             commits = list(repo.iter_commits(paths=path.absolute(), max_count=1))
             if not commits or len(commits) <= 0:
-                raise ValueError(f"ERROR: get_repo_commit_id, no commits for filename: {path.absolute()}")
+                raise ValueError(
+                    f"ERROR: get_repo_commit_id, no commits for filename: {path.absolute()}"
+                )
             return commit_str(commits[0])
 
         for glob, indexer in source_indexers.items():
@@ -110,7 +118,7 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
 
         import sentence_transformers
 
-        embedding_model_obj = sentence_transformers.SentenceTransformer(meta['embedding_model'])
+        embedding_model_obj = sentence_transformers.SentenceTransformer(meta["embedding_model"])
 
         for descriptor, indexer in tqdm(all_descriptors):
             if len(all_errs) > MAX_ERRS:
@@ -150,7 +158,7 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
     # TODO: During refactoring, we currently save a "tool-catalog.json" (with a hyphen)
     # instead of "tool_catalog.json" to not break other existing code (publish, find, etc).
 
-    mcr.save(pathlib.Path(ctx['catalog'] + '/tool-catalog.json'))
+    mcr.save(pathlib.Path(ctx.catalog + "/tool-catalog.json"))
 
     # ---------------------------------
 
@@ -158,12 +166,12 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
 
     # TODO: Old indexing codepaths that are getting refactored.
 
-    tool_catalog_file = ctx['catalog'] + '/tool_catalog.json'
+    tool_catalog_file = ctx.catalog + "/tool_catalog.json"
 
     import rosetta.core.tool
     import sentence_transformers
 
     rosetta.core.tool.LocalIndexer(
         catalog_file=pathlib.Path(tool_catalog_file),
-        embedding_model=sentence_transformers.SentenceTransformer(meta['embedding_model'])
+        embedding_model=sentence_transformers.SentenceTransformer(meta["embedding_model"]),
     ).index([pathlib.Path(p) for p in source_dirs])
