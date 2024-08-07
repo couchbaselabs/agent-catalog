@@ -5,6 +5,7 @@ import json
 import pathlib
 import typing
 import pydantic
+import sklearn
 
 from ..tool.types.descriptor import ToolDescriptor
 
@@ -20,12 +21,15 @@ class FoundItem(pydantic.BaseModel):
     # or extra information -- such as to help with any further
     # processing of results (e.g., reranking)?
 
+    delta: typing.Any
+
 
 class CatalogRef(abc.ABC):
     """ An abstract interface for a catalog reference. """
 
     @abc.abstractmethod
-    def find(self, query) -> list[FoundItem]:
+    def find(self, query: str,
+             max: typing.Union[int | None] = 1) -> list[FoundItem]:
         """ Returns the catalog items that best match a query. """
 
         # TODO: The find() method might likely one day need additional,
@@ -71,7 +75,7 @@ class MemCatalogRef(CatalogRef):
         self.catalog_path = catalog_path
 
         with self.catalog_path.open('r') as fp:
-            self.catalog_descriptor = json.load(fp)
+            self.catalog_descriptor = CatalogDescriptor.model_validate_json(fp.read())
 
         return self
 
@@ -89,10 +93,38 @@ class MemCatalogRef(CatalogRef):
             fp.write(j)
             fp.write('\n')
 
-    def find(self, query) -> list[FoundItem]:
+    def find(self, query: str,
+             max: typing.Union[int | None] = 1) -> list[FoundItem]:
         """ Returns the catalog items that best match a query. """
 
-        return [] # TODO.
+        # TODO: Expose max param out to command-line rosetta find --max N QUERY.
+
+        available_tools = self.catalog_descriptor.items
+
+        embedding_model = self.catalog_descriptor.embedding_model
+
+        import sentence_transformers
+
+        embedding_model_obj = sentence_transformers.SentenceTransformer(embedding_model)
+
+        query_embedding = embedding_model_obj.encode(query)
+
+        deltas = sklearn.metrics.pairwise.cosine_similarity(
+            X=[t.embedding for t in available_tools],
+            Y=[query_embedding]
+        )
+
+        # Order results by their distance to the query (larger is "closer").
+        results = [FoundItem(tool_descriptor=available_tools[i],
+                             delta=deltas[i])
+                   for i in range(len(deltas))]
+
+        results = sorted(results, key=lambda t: t.delta, reverse=True)
+
+        if max > 0:
+            results = results[:max]
+
+        return results
 
     def diff(self, source: typing.Self, repo) -> typing.Tuple[list[ToolDescriptor], list[ToolDescriptor]]:
         newer, deleted = [], [] # TODO.
@@ -144,13 +176,16 @@ class MemCatalogRef(CatalogRef):
 
         self.catalog_descriptor.items = items
 
+        self.cache_clear()
+
 
 class DBCatalogRef(CatalogRef):
     """ Represents a catalog stored in a database. """
 
     # TODO: This probably has fields of conn info, etc.
 
-    def find(self, query) -> list[FoundItem]:
+    def find(self, query: str,
+             max: typing.Union[int | None] = 1) -> list[FoundItem]:
         """ Returns the catalog items that best match a query. """
 
         return [] # TODO: SQL++ and vector index searches likely are involved here.
