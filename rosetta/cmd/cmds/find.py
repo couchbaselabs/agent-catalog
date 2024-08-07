@@ -6,7 +6,7 @@ from rosetta.core.catalog.ref import MemCatalogRef
 from ..models.ctx.model import Context
 
 
-def cmd_find(ctx: Context, query, kind="tool"):
+def cmd_find(ctx: Context, query, kind="tool", max=1):
     # TODO: One day, handle DBCatalogRef?
 
     # TODO: If DB is outdated and the local catalog has newer info,
@@ -22,7 +22,7 @@ def cmd_find(ctx: Context, query, kind="tool"):
 
     c = MemCatalogRef().load(pathlib.Path(catalog_path))
 
-    found_items = c.find(query)
+    found_items = c.find(query, max=max)
 
     # TODO: Perhaps users optionally want find() to also return deleted items?
 
@@ -36,10 +36,13 @@ def cmd_find(ctx: Context, query, kind="tool"):
 
     # Strip out the embedding vector as it's not usually useful and it's big.
     for x in results:
-        x["source"] = str(x["source"]) # Convert from pathlib.Path to str for json.dumps().
+        # Convert pathlib.Path to str so json.dumps() works.
+        if 'source' in x:
+            x["source"] = str(x["source"])
 
         # TODO: The embedding vector is too big to show by default, but perhaps
         # provide an option flag in case the user really wants to see it.
-        del x['embedding']
+        if 'embedding' in x:
+            del x['embedding']
 
     click.echo(json.dumps(results, sort_keys=True, indent=4))
