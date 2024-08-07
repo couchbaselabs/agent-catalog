@@ -6,6 +6,7 @@ import git
 from tqdm import tqdm
 
 from rosetta.cmd.cmds.init import init_local
+from rosetta.core.catalog.ref import MemCatalogRef
 from rosetta.core.catalog.directory import scan_directory
 from rosetta.core.catalog.descriptor import CatalogDescriptor
 from rosetta.core.tool.indexer import source_indexers
@@ -133,31 +134,23 @@ def cmd_index(ctx, source_dirs: list[str], embedding_model: str, **_):
     # before calling 'rosetta index' -- where if we decide to support an optional
     # branch name parameter, then the Indexer.start_descriptors() methods would
     # need to be provided the file blob streams from git instead of our current
-    # approach reading the file contents directly,
+    # approach of opening & reading file contents directly,
     repo_commit_id = commit_str(repo.head.commit)
 
-    c = CatalogDescriptor(
+    # TODO: Support a --dry-run option that doesn't actually update/save any files.
+
+    mcr = MemCatalogRef()
+    mcr.catalog_descriptor = CatalogDescriptor(
         catalog_schema_version=meta["catalog_schema_version"],
         embedding_model=meta["embedding_model"],
         repo_commit_id=repo_commit_id,
         items=[descriptor for descriptor, indexer in all_descriptors],
     )
 
-    # TODO: We should have a specialized json format here, where currently
-    # the vector numbers each take up their own line -- and, instead, we want
-    # the array of vector numbers to be all on one line, so that it's more
-    # usable for humans and so that 'git diff' outputs are more useful.
-    j = c.model_dump_json(round_trip=True, indent=2)
-
     # TODO: During refactoring, we currently save a "tool-catalog.json" (with a hyphen)
     # instead of "tool_catalog.json" to not break other existing code (publish, find, etc).
-    tool_catalog_path = ctx['catalog'] + '/tool-catalog.json'
 
-    # TODO: Support a --dry-run option that doesn't actually update/save any files.
-
-    with pathlib.Path(tool_catalog_path).open('w') as fp:
-        fp.write(j)
-        fp.write('\n')
+    mcr.save(pathlib.Path(ctx['catalog'] + '/tool-catalog.json'))
 
     # ---------------------------------
 

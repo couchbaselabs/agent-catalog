@@ -70,6 +70,17 @@ class MemCatalogRef(CatalogRef):
 
         return self
 
+    def save(self, catalog_path: pathlib.Path):
+        # TODO: We should have a specialized json format here, where currently
+        # the vector numbers each take up their own line -- and, instead, we want
+        # the array of vector numbers to be all on one line, so that it's more
+        # usable for humans and so that 'git diff' outputs are more useful.
+        j = self.catalog_descriptor.model_dump_json(round_trip=True, indent=2)
+
+        with catalog_path.open('w') as fp:
+            fp.write(j)
+            fp.write('\n')
+
     def find(self, query) -> list[FoundItem]:
         """ Returns the catalog items that best match a query. """
 
