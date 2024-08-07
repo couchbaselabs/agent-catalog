@@ -9,14 +9,14 @@ import os
 import rosetta.core.tool
 
 {% if input is not none %}
-{{ input.model.code }}
+{{ input.model.generated_code }}
 parameter_locations = {{ input.locations }}
 {% endif %}
 
 @rosetta.core.tool.tool(infer_schema=True)
-def {{ tool_metadata.name }}({% if input is not none %}argument_input: {{ input.model.type_name }}{% endif %}) -> str:
+def {{ openapi.specification.operation_id  }}({% if input is not none %}argument_input: {{ input.model.type_name }}{% endif %}) -> str:
     """
-    {{ tool_metadata.description }}
+    {{ openapi.specification.description }}
     """
 
     {% if input is not none %}
@@ -30,7 +30,8 @@ def {{ tool_metadata.name }}({% if input is not none %}argument_input: {{ input.
     {% endif %}
 
     # TODO (GLENN): We need to formalize how to handle multiple URLs.
-    for url in {{ urls }}:
+    for server_url in {{ urls }}:
+        url = server_url + '{{ path }}'
         request_body = dict()
         parameters = dict()
         headers = dict()
@@ -51,19 +52,17 @@ def {{ tool_metadata.name }}({% if input is not none %}argument_input: {{ input.
                     # We should never reach here...
                     raise ValueError('Unknown location of parameter!')
 
-        request_args = {
-            method='{{ method }}',
-            url=url,
-        }
+        request_args = dict()
         if len(parameters) > 0:
             request_args['params'] = parameters
         if len(headers) > 0:
             request_args['headers'] = headers
         if len(cookies) > 0:
             request_args['cookies'] = cookies
-        if len(body) > 0:
+        if len(request_body) > 0:
             request_args['data'] = json.dumps(request_body)
 
-        response = requests.request(**request_args)
+        response = requests.request("{{ method }}", url, **request_args)
         if response.status_code == 200:
             return response.text
+        raise Exception(f"Non-200 status code returned from server!\n\n{response.text}")

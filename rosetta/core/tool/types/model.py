@@ -1,9 +1,11 @@
+import dataclasses
 import pathlib
 import pydantic
 import openapi_parser
 import logging
 import typing
 import abc
+import enum
 import json
 import yaml
 import re
@@ -115,6 +117,26 @@ class SemanticSearchMetadata(_Metadata):
 
 
 class HTTPRequestMetadata(_Metadata):
+    class JSONEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, openapi_parser.parser.Schema):
+                result_dict = dict()
+                for k, v in dataclasses.asdict(obj).items():
+                    result_dict[k] = self.default(v)
+                return result_dict
+
+            elif isinstance(obj, openapi_parser.parser.Property):
+                return {
+                    'name': obj.name,
+                    'schema': self.default(obj.schema)
+                }
+
+            elif isinstance(obj, enum.Enum):
+                return obj.value
+
+            else:
+                return obj
+
     class OpenAPIMetadata(pydantic.BaseModel):
         filename: typing.Optional[str] = None
         url: typing.Optional[str] = None
@@ -140,7 +162,7 @@ class HTTPRequestMetadata(_Metadata):
                 return self._specification
 
             @property
-            def servers(self) -> list[str]:
+            def servers(self) -> list[openapi_parser.parser.Server]:
                 return self._servers
 
             def __str__(self):
