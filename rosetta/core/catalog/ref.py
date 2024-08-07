@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import abc
 import json
 import pathlib
@@ -50,7 +52,8 @@ class CatalogRef(abc.ABC):
         raise NotImplementedError("CatalogRef.diff()")
 
     @abc.abstractmethod
-    def update(self, newer: list[ToolDescriptor], deleted: list[ToolDescriptor], repo):
+    def update(self, meta, repo_commit_id: str,
+               newer: list[ToolDescriptor], deleted: list[ToolDescriptor], repo):
         """ Updates self from newer items (will be UPSERT'ed) and deleted items.
         """
 
@@ -73,10 +76,13 @@ class MemCatalogRef(CatalogRef):
         return self
 
     def save(self, catalog_path: pathlib.Path):
+        self.catalog_descriptor.items.sort(key=lambda x: x.identifier)
+
         # TODO: We should have a specialized json format here, where currently
         # the vector numbers each take up their own line -- and, instead, we want
         # the array of vector numbers to be all on one line, so that it's more
         # usable for humans and so that 'git diff' outputs are more useful.
+
         j = self.catalog_descriptor.model_dump_json(round_trip=True, indent=2)
 
         with catalog_path.open('w') as fp:
@@ -93,8 +99,50 @@ class MemCatalogRef(CatalogRef):
 
         return (newer, deleted)
 
-    def update(self, newer: list[ToolDescriptor], deleted: list[ToolDescriptor], repo):
-        pass # TODO.
+    def update(self, meta, repo_commit_id: str,
+               newer: list[ToolDescriptor], deleted: list[ToolDescriptor], repo):
+        if self.catalog_descriptor is None:
+            self.catalog_descriptor = CatalogDescriptor(
+                catalog_schema_version=meta["catalog_schema_version"],
+                embedding_model=meta["embedding_model"],
+                repo_commit_id=repo_commit_id,
+                items=[]
+            )
+
+        # A lookup dict m of our existing items keyed by "source:name".
+        m = defaultdict(list)
+        for x in self.catalog_descriptor.items:
+            m[x.source + ':' + x.name].append(x)
+
+        # Update m based on newer.
+        for x in newer or []:
+            latest = x.model_copy()
+            latest.deleted = False
+
+            m[x.source + ':' + x.name].append(latest)
+
+        # Update m based on deleted.
+        for x in deleted or []:
+            tombstone = x.model_copy()
+            tombstone.deleted = True
+
+            m[x.source + ':' + x.name].append(tombstone)
+
+        # TODO: Some callers may want append-only behavior, where we
+        # keep all our existing items unchanged and only append new
+        # items (updates are new items) -- turn this into a parameter?
+        append_only = False
+
+        items = []
+        for a in m.values():
+            if append_only:
+                items += a
+            else:
+                items.append(a[-1])
+
+        items.sort(key=lambda x: x.identifier)
+
+        self.catalog_descriptor.items = items
 
 
 class DBCatalogRef(CatalogRef):
@@ -112,7 +160,8 @@ class DBCatalogRef(CatalogRef):
 
         return (newer, deleted)
 
-    def update(self, newer: list[ToolDescriptor], deleted: list[ToolDescriptor], repo):
+    def update(self, meta, repo_commit_id: str,
+               newer: list[ToolDescriptor], deleted: list[ToolDescriptor], repo):
         pass # TODO.
 
 

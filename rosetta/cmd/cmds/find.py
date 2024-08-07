@@ -24,7 +24,9 @@ def cmd_find(ctx: Context, query, kind="tool"):
 
     found_items = c.find(query)
 
-    results = [x.tool_descriptor.copy() for x in found_items]
+    results = [x.tool_descriptor.model_copy()
+               for x in found_items
+               if not bool(x.deleted)]
 
     # TODO: Rerank the results?
 
