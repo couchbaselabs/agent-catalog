@@ -91,10 +91,17 @@ def env(ctx):
     help="The kind of catalog to search.",
     show_default=True,
 )
+@click.option(
+    "-m",
+    "--max",
+    default=1,
+    help="The max number of results.",
+    show_default=True,
+)
 @click.pass_context
-def find(ctx, query, kind):
+def find(ctx, query, kind, max):
     """Find tools, prompts, etc. from the catalog."""
-    cmd_find(ctx.obj, query, kind=kind)
+    cmd_find(ctx.obj, query, kind=kind, max=max)
 
 
 @click_main.command()

@@ -1,11 +1,9 @@
 from collections import defaultdict
 
 import abc
-import json
 import pathlib
 import typing
 import pydantic
-import sklearn
 
 from ..tool.types.descriptor import ToolDescriptor
 
@@ -57,7 +55,9 @@ class CatalogRef(abc.ABC):
 
     @abc.abstractmethod
     def update(self, meta, repo_commit_id: str,
-               newer: list[ToolDescriptor], deleted: list[ToolDescriptor], repo):
+               items_newer: list[ToolDescriptor],
+               items_deleted: list[ToolDescriptor],
+               repo):
         """ Updates self from newer items (will be UPSERT'ed) and deleted items.
         """
 
@@ -97,9 +97,8 @@ class MemCatalogRef(CatalogRef):
              max: typing.Union[int | None] = 1) -> list[FoundItem]:
         """ Returns the catalog items that best match a query. """
 
-        # TODO: Expose max param out to command-line rosetta find --max N QUERY.
-
-        available_tools = self.catalog_descriptor.items
+        available_tools = [x for x in self.catalog_descriptor.items
+                           if not bool(x.deleted)]
 
         embedding_model = self.catalog_descriptor.embedding_model
 
@@ -108,6 +107,8 @@ class MemCatalogRef(CatalogRef):
         embedding_model_obj = sentence_transformers.SentenceTransformer(embedding_model)
 
         query_embedding = embedding_model_obj.encode(query)
+
+        import sklearn
 
         deltas = sklearn.metrics.pairwise.cosine_similarity(
             X=[t.embedding for t in available_tools],
@@ -127,56 +128,61 @@ class MemCatalogRef(CatalogRef):
         return results
 
     def diff(self, source: typing.Self, repo) -> typing.Tuple[list[ToolDescriptor], list[ToolDescriptor]]:
-        newer, deleted = [], [] # TODO.
+        # TODO: This is the worst diff() implementation, which
+        # incorrectly deletes all of self's items and treats all
+        # source's items as new items. For now, this incorrect implementation
+        # happens to work with the current implementation of MemCatalogRef.update().
 
-        return (newer, deleted)
+        items_newer = source.catalog_descriptor.items
+        items_deleted = self.catalog_descriptor.items
+
+        return (items_newer, items_deleted)
 
     def update(self, meta, repo_commit_id: str,
-               newer: list[ToolDescriptor], deleted: list[ToolDescriptor], repo):
+               items_newer: list[ToolDescriptor],
+               items_deleted: list[ToolDescriptor],
+               repo):
         if self.catalog_descriptor is None:
             self.catalog_descriptor = CatalogDescriptor(
                 catalog_schema_version=meta["catalog_schema_version"],
                 embedding_model=meta["embedding_model"],
                 repo_commit_id=repo_commit_id,
-                items=[]
-            )
+                items=[])
 
-        # A lookup dict m of our existing items keyed by "source:name".
+        # A lookup dict m of self's items keyed by "source:name".
         m = defaultdict(list)
         for x in self.catalog_descriptor.items:
-            m[x.source + ':' + x.name].append(x)
+            m[str(x.source) + ':' + x.name].append(x)
 
-        # Update m based on newer.
-        for x in newer or []:
-            latest = x.model_copy()
-            latest.deleted = False
+        # Update m based on items_deleted.
+        for x in items_deleted or []:
+            x.deleted = True
+            m[str(x.source) + ':' + x.name].append(x)
 
-            m[x.source + ':' + x.name].append(latest)
-
-        # Update m based on deleted.
-        for x in deleted or []:
-            tombstone = x.model_copy()
-            tombstone.deleted = True
-
-            m[x.source + ':' + x.name].append(tombstone)
+        # Update m based on items_newer.
+        for x in items_newer or []:
+            x.deleted = False
+            m[str(x.source) + ':' + x.name].append(x)
 
         # TODO: Some callers may want append-only behavior, where we
         # keep all our existing items unchanged and only append new
-        # items (updates are new items) -- turn this into a parameter?
+        # items (both updates & tombstomes become new items) -- turn
+        # this into an optional parameter?
         append_only = False
 
         items = []
-        for a in m.values():
+        for xs in m.values():
             if append_only:
-                items += a
+                items += xs
             else:
-                items.append(a[-1])
+                items.append(xs[-1])
 
         items.sort(key=lambda x: x.identifier)
 
+        self.catalog_descriptor.catalog_schema_version = meta["catalog_schema_version"]
+        self.catalog_descriptor.embedding_model = meta["embedding_model"]
+        self.catalog_descriptor.repo_commit_id = repo_commit_id
         self.catalog_descriptor.items = items
-
-        self.cache_clear()
 
 
 class DBCatalogRef(CatalogRef):
@@ -196,7 +202,9 @@ class DBCatalogRef(CatalogRef):
         return (newer, deleted)
 
     def update(self, meta, repo_commit_id: str,
-               newer: list[ToolDescriptor], deleted: list[ToolDescriptor], repo):
+               items_newer: list[ToolDescriptor],
+               items_deleted: list[ToolDescriptor],
+               repo):
         pass # TODO.
 
 

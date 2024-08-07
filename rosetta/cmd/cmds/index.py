@@ -32,6 +32,22 @@ def commit_str(commit):
     return "g" + str(commit)[:7]
 
 
+def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
+    # The repo is the user's application's repo and is NOT the repo
+    # of rosetta-core. The rosetta CLI / library should be run in
+    # a directory (or subdirectory) of the user's application's repo,
+    # where we'll walk up the parent dirs until we find the .git/ subdirectory.
+
+    while not (top_dir / ".git").exists():
+        if top_dir.parent == top_dir:
+            raise ValueError(
+                "Could not find .git directory. Please run index within a git repository."
+            )
+        top_dir = top_dir.parent
+
+    return git.Repo(top_dir / ".git")
+
+
 def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
     meta = init_local(ctx, embedding_model)
 
@@ -40,19 +56,7 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
             "An --embedding-model is required as an embedding model is not yet recorded."
         )
 
-    # The repo is the user's application's repo and is NOT the repo of rosetta-core. The rosetta CLI / library
-    # should be run in the current working directory of the user's application's repo.
-    # TODO: Allow rosetta CLI / library to run anywhere and pass the working_dir as a parameter / option.
-    working_dir = pathlib.Path(os.getcwd())
-    while not (working_dir / ".git").exists():
-        if working_dir.parent == working_dir:
-            raise ValueError(
-                "Could not find .git directory. Please run index within a git repository."
-            )
-        working_dir = working_dir.parent
-    logger.info(f"Found the .git repository in dir: {working_dir}")
-
-    repo = git.Repo(working_dir / ".git")
+    repo = repo_load(pathlib.Path(os.getcwd()))
 
     if repo.is_dirty() and not os.getenv("ROSETTA_REPO_DIRTY_OK", False):
         # The ROSETTA_REPO_DIRTY_OK env var is intended
@@ -63,28 +67,58 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
         # a hierarchy of catalogs? A hierarchy of catalogs has advanced
         # cases of file deletions, renames/moves & lineage changes
         # and how those changes can shadow lower-level catalog items.
-        #
+
         # TODO: If the repo is dirty only because .rosetta-catalog/ is
         # dirty, then we might consider going ahead and indexing?
-        #
+
         # TODO: If the repo is dirty because .rosetta-activity/ is
         # dirty, then we might print some helper instructions on
         # adding .rosetta-activity/ to the .gitignore file? Or, should
         # instead preemptively generate a .rosetta-activity/.gitiginore
         # file during init_local()?
-        #
+
         raise ValueError("repo is dirty")
 
+    # TODO: One day, allow users to choose a different branch instead of assuming
+    # the HEAD branch, as users currently would have to 'git checkout BRANCH_THEY_WANT'
+    # before calling 'rosetta index' -- where if we decide to support an optional
+    # branch name parameter, then the Indexer.start_descriptors() methods would
+    # need to be provided the file blob streams from git instead of our current
+    # approach of opening & reading file contents directly,
+
+    # The commit id for the repo's HEAD commit.
+    repo_commit_id = commit_str(repo.head.commit)
+
+    # TODO: During refactoring, we currently load/save to "tool-catalog.json" (with
+    # a hyphen) instead of the old "tool_catalog.json" to not break other existing
+    # code (publish, find, etc) that depends on the old file. Once refactoring is
+    # done, we'll switch back to tool_catalog.json.
+
+    catalog_path = pathlib.Path(ctx.catalog + "/tool-catalog.json")
+
+    if catalog_path.exists():
+        # Load the old / previous local catalog.
+        curr_catalog = MemCatalogRef().load(catalog_path)
+    else:
+        # An empty MemCatalogRef with no items represents an initial catalog state.
+        curr_catalog = MemCatalogRef()
+        curr_catalog.catalog_descriptor = CatalogDescriptor(
+            catalog_schema_version=meta["catalog_schema_version"],
+            embedding_model=meta["embedding_model"],
+            repo_commit_id="",
+            items=[])
+
     source_files = []
-    for d in source_dirs:
-        source_files += scan_directory(d, source_globs)
+    for source_dir in source_dirs:
+        source_files += scan_directory(source_dir, source_globs)
 
     all_errs = []
     all_descriptors = []
     for source_file in tqdm(source_files):
         if len(all_errs) > MAX_ERRS:
             break
-        logger.info(f"Found source file: {source_file}.")
+
+        logger.info(f"Examining source file: {source_file}")
 
         def get_repo_commit_id(path: pathlib.Path) -> str:
             commits = list(repo.iter_commits(paths=path.absolute(), max_count=1))
@@ -101,70 +135,67 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
                 all_descriptors += descriptors or []
                 break
 
-    if not all_errs:
-        print("==================\naugmenting...")
+    if all_errs:
+        print("ERROR: during examining", "\n".join([str(e) for e in all_errs]))
+        raise all_errs[0]
 
-        for descriptor in tqdm(all_descriptors):
-            if len(all_errs) > MAX_ERRS:
-                break
+    print("==================\ndiff'ing...")
 
-            print(descriptor.name)
+    next_catalog = MemCatalogRef()
+    next_catalog.catalog_descriptor = CatalogDescriptor(
+        catalog_schema_version=meta["catalog_schema_version"],
+        embedding_model=meta["embedding_model"],
+        repo_commit_id=repo_commit_id,
+        items=all_descriptors)
 
-            errs = augment_descriptor(descriptor)
+    items_newer, items_deleted = curr_catalog.diff(next_catalog, repo)
 
-            all_errs += errs or []
+    curr_catalog.update(meta, repo_commit_id, items_newer, items_deleted, repo)
 
-    if not all_errs:
-        print("==================\nvectorizing...")
+    next_catalog = curr_catalog
 
-        import sentence_transformers
+    print("==================\naugmenting...")
 
-        embedding_model_obj = sentence_transformers.SentenceTransformer(meta["embedding_model"])
+    for descriptor in tqdm(items_newer):
+        if len(all_errs) > MAX_ERRS:
+            break
 
-        for descriptor in tqdm(all_descriptors):
-            if len(all_errs) > MAX_ERRS:
-                break
+        print(descriptor.name)
 
-            print(descriptor.name)
+        errs = augment_descriptor(descriptor)
 
-            errs = vectorize_descriptor(descriptor, embedding_model_obj)
-
-            all_errs += errs or []
+        all_errs += errs or []
 
     if all_errs:
-        print("ERROR:", "\n".join([str(e) for e in all_errs]))
+        print("ERROR: during augmenting", "\n".join([str(e) for e in all_errs]))
+        raise all_errs[0]
+
+    print("==================\nvectorizing...")
+
+    import sentence_transformers
+
+    embedding_model_obj = sentence_transformers.SentenceTransformer(meta["embedding_model"])
+
+    for descriptor in tqdm(items_newer):
+        if len(all_errs) > MAX_ERRS:
+            break
+
+        print(descriptor.name)
+
+        errs = vectorize_descriptor(descriptor, embedding_model_obj)
+
+        all_errs += errs or []
+
+    if all_errs:
+        print("ERROR: during vectorizing", "\n".join([str(e) for e in all_errs]))
 
         raise all_errs[0]
 
     print("==================\nsaving local catalog...")
 
-    # TODO: One day, allow users to choose a different branch instead of assuming
-    # the HEAD branch, as users currently would have to 'git checkout BRANCH_THEY_WANT'
-    # before calling 'rosetta index' -- where if we decide to support an optional
-    # branch name parameter, then the Indexer.start_descriptors() methods would
-    # need to be provided the file blob streams from git instead of our current
-    # approach of opening & reading file contents directly,
-    repo_commit_id = commit_str(repo.head.commit)
+    # TODO: Support a --dry-run option that doesn't update/save any files.
 
-    # TODO: Besides the repo_commit_id for the HEAD, we might also
-    # want to track all the tags and/or branches which point to
-    # the HEAD's repo_commit_id? That way, users might be able to perform
-    # catalog search/find()'s based on a given tag (e.g., "v1.17.0").
-
-    # TODO: Support a --dry-run option that doesn't actually update/save any files.
-
-    mcr = MemCatalogRef()
-    mcr.catalog_descriptor = CatalogDescriptor(
-        catalog_schema_version=meta["catalog_schema_version"],
-        embedding_model=meta["embedding_model"],
-        repo_commit_id=repo_commit_id,
-        items=all_descriptors,
-    )
-
-    # TODO: During refactoring, we currently save a "tool-catalog.json" (with a hyphen)
-    # instead of "tool_catalog.json" to not break other existing code (publish, find, etc).
-
-    mcr.save(pathlib.Path(ctx.catalog + "/tool-catalog.json"))
+    next_catalog.save(catalog_path)
 
     # ---------------------------------
 
