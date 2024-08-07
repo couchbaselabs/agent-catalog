@@ -24,14 +24,22 @@ def cmd_find(ctx: Context, query, kind="tool"):
 
     found_items = c.find(query)
 
-    results = [x.tool_descriptor.copy() for x in found_items]
+    # TODO: Perhaps users optionally want find() to also return deleted items?
+
+    # TODO: Perhaps users optionally want the deltas or similarity scores, too?
+
+    results = [x.tool_descriptor.model_dump()
+               for x in found_items
+               if not bool(x.tool_descriptor.deleted)]
 
     # TODO: Rerank the results?
 
     # Strip out the embedding vector as it's not usually useful and it's big.
     for x in results:
+        x["source"] = str(x["source"]) # Convert from pathlib.Path to str for json.dumps().
+
         # TODO: The embedding vector is too big to show by default, but perhaps
         # provide an option flag in case the user really wants to see it.
-        x.embedding = None
+        del x['embedding']
 
     click.echo(json.dumps(results, sort_keys=True, indent=4))
