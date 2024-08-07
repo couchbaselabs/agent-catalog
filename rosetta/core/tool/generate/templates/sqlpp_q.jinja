@@ -9,9 +9,9 @@ import os
 
 import rosetta.core.tool
 
-{{ input.code }}
+{{ input.generated_code }}
 
-{{ output.code }}
+{{ output.generated_code }}
 
 # TODO (GLENN): Handle this better.
 def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
