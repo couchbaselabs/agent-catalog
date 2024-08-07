@@ -55,7 +55,9 @@ class CatalogRef(abc.ABC):
 
     @abc.abstractmethod
     def update(self, meta, repo_commit_id: str,
-               newer: list[ToolDescriptor], deleted: list[ToolDescriptor], repo):
+               items_newer: list[ToolDescriptor],
+               items_deleted: list[ToolDescriptor],
+               repo):
         """ Updates self from newer items (will be UPSERT'ed) and deleted items.
         """
 
@@ -95,7 +97,8 @@ class MemCatalogRef(CatalogRef):
              max: typing.Union[int | None] = 1) -> list[FoundItem]:
         """ Returns the catalog items that best match a query. """
 
-        available_tools = self.catalog_descriptor.items
+        available_tools = [x for x in self.catalog_descriptor.items
+                           if not bool(x.deleted)]
 
         embedding_model = self.catalog_descriptor.embedding_model
 
@@ -125,34 +128,41 @@ class MemCatalogRef(CatalogRef):
         return results
 
     def diff(self, source: typing.Self, repo) -> typing.Tuple[list[ToolDescriptor], list[ToolDescriptor]]:
-        newer, deleted = [], [] # TODO.
+        # TODO: This is the worst diff() implementation, which
+        # incorrectly treats all of the source's items as newer
+        # and ignores self. For now, it just happens to work
+        # with the current MemCatalogRef.update() implementation.
 
-        return (newer, deleted)
+        items_newer = source.catalog_descriptor.items
+        items_deleted = []
+
+        return (items_newer, items_deleted)
 
     def update(self, meta, repo_commit_id: str,
-               newer: list[ToolDescriptor], deleted: list[ToolDescriptor], repo):
+               items_newer: list[ToolDescriptor],
+               items_deleted: list[ToolDescriptor],
+               repo):
         if self.catalog_descriptor is None:
             self.catalog_descriptor = CatalogDescriptor(
                 catalog_schema_version=meta["catalog_schema_version"],
                 embedding_model=meta["embedding_model"],
                 repo_commit_id=repo_commit_id,
-                items=[]
-            )
+                items=[])
 
-        # A lookup dict m of our existing items keyed by "source:name".
+        # A lookup dict m of self's items keyed by "source:name".
         m = defaultdict(list)
         for x in self.catalog_descriptor.items:
             m[x.source + ':' + x.name].append(x)
 
-        # Update m based on newer.
-        for x in newer or []:
+        # Update m based on items_newer.
+        for x in items_newer or []:
             latest = x.model_copy()
             latest.deleted = False
 
             m[x.source + ':' + x.name].append(latest)
 
-        # Update m based on deleted.
-        for x in deleted or []:
+        # Update m based on items_deleted.
+        for x in items_deleted or []:
             tombstone = x.model_copy()
             tombstone.deleted = True
 
@@ -174,8 +184,6 @@ class MemCatalogRef(CatalogRef):
 
         self.catalog_descriptor.items = items
 
-        self.cache_clear()
-
 
 class DBCatalogRef(CatalogRef):
     """ Represents a catalog stored in a database. """
@@ -194,7 +202,9 @@ class DBCatalogRef(CatalogRef):
         return (newer, deleted)
 
     def update(self, meta, repo_commit_id: str,
-               newer: list[ToolDescriptor], deleted: list[ToolDescriptor], repo):
+               items_newer: list[ToolDescriptor],
+               items_deleted: list[ToolDescriptor],
+               repo):
         pass # TODO.
 
 
