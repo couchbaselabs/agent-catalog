@@ -15,7 +15,7 @@ class FoundItem(pydantic.BaseModel):
     tool_descriptor: ToolDescriptor
 
     # TODO: A FoundItem might one day also contain a similarity score
-    # or other information -- such as to help with any further
+    # or extra information -- such as to help with any further
     # processing of results (e.g., reranking)?
 
 
@@ -31,6 +31,28 @@ class CatalogRef(abc.ABC):
         # user credentials (for ACL's), etc.?
 
         pass
+
+    @abc.abstractmethod
+    def diff(self, source: 'MemCatalogRef', repo) -> typing.Tuple[list[ToolDescriptor], list[ToolDescriptor]]:
+        """ Returns the (newer, deleted) items in the source MemCatalogRef
+            compared to the items in self.
+
+            From the results of diff(), later steps can UPSERT the newer
+            items into self and DELETE the deleted items from self.
+
+            The items in the source MemCatalogRef can be 'bare', in that
+            they might not yet have augmentations and/or vector embeddings.
+
+            The repo_commit_id of source items vs self items are compared, and
+            the repo object (e.g., a git repo) is consulted for deeper comparisons.
+        """
+        pass
+
+    @abc.abstractmethod
+    def update(self, newer: list[ToolDescriptor], deleted: list[ToolDescriptor], repo):
+        """ Updates self from newer items (will be UPSERT'ed) and deleted items.
+        """
+        pass # TODO.
 
 
 class MemCatalogRef(CatalogRef):
@@ -53,19 +75,31 @@ class MemCatalogRef(CatalogRef):
 
         return [] # TODO.
 
-    def updateFrom(self, source: typing.Self, repo):
+    def diff(self, source: typing.Self, repo) -> typing.Tuple[list[ToolDescriptor], list[ToolDescriptor]]:
+        newer, deleted = [], [] # TODO.
+
+        return (newer, deleted)
+
+    def update(self, newer: list[ToolDescriptor], deleted: list[ToolDescriptor], repo):
         pass # TODO.
 
 
 class DBCatalogRef(CatalogRef):
     """ Represents a catalog stored in a database. """
 
+    # TODO: This probably has fields of conn info, etc.
+
     def find(self, query) -> list[FoundItem]:
         """ Returns the catalog items that best match a query. """
 
         return [] # TODO: SQL++ and vector index searches likely are involved here.
 
-    def updateFrom(self, source: MemCatalogRef, repo):
+    def diff(self, source: MemCatalogRef, repo) -> typing.Tuple[list[ToolDescriptor], list[ToolDescriptor]]:
+        newer, deleted = [], [] # TODO.
+
+        return (newer, deleted)
+
+    def update(self, newer: list[ToolDescriptor], deleted: list[ToolDescriptor], repo):
         pass # TODO.
 
 
