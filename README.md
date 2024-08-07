@@ -62,6 +62,13 @@ To enable debug mode, execute the following command:
 export ROSETTA_DEBUG=1
 ```
 
+To ignore the "repo is dirty" error that is thrown when running `rosetta index` (useful when working on both 
+`rosetta-example` and `rosetta-core`), execute the following command:
+
+```bash
+export ROSETTA_REPO_DIRTY_OK=1
+```
+
 ### Working with Poetry
 
 Below, we list out some notes that developers might find useful w.r.t. Poetry:
