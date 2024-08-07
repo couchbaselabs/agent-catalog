@@ -146,6 +146,11 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
     # approach of opening & reading file contents directly,
     repo_commit_id = commit_str(repo.head.commit)
 
+    # TODO: Besides the repo_commit_id for the HEAD, we might also
+    # want to track all the tags and/or branches which point to
+    # the HEAD's repo_commit_id? That way, users might be able to perform
+    # catalog search/find()'s based on a given tag (e.g., "v1.17.0").
+
     # TODO: Support a --dry-run option that doesn't actually update/save any files.
 
     mcr = MemCatalogRef()
