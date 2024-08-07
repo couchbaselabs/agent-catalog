@@ -95,8 +95,6 @@ class MemCatalogRef(CatalogRef):
              max: typing.Union[int | None] = 1) -> list[FoundItem]:
         """ Returns the catalog items that best match a query. """
 
-        # TODO: Expose max param out to command-line rosetta find --max N QUERY.
-
         available_tools = self.catalog_descriptor.items
 
         embedding_model = self.catalog_descriptor.embedding_model
