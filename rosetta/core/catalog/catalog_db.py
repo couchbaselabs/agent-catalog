@@ -1,7 +1,7 @@
 import typing
 
-from ..tool.types.descriptor import ToolDescriptor
 from .catalog_base import CatalogBase, FoundItem
+from ..record.descriptor import RecordDescriptor
 
 
 class CatalogDB(CatalogBase):

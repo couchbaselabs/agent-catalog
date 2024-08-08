@@ -29,7 +29,7 @@ def cmd_find(ctx: Context, query, kind="tool", max=1):
 
     found_items = c.find(query, max=max)
 
-    results = [x.tool_descriptor.model_dump() for x in found_items]
+    results = [x.record_descriptor.model_dump() for x in found_items]
 
     # TODO: Rerank the results?
 

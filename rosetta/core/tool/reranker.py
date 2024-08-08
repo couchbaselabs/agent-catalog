@@ -5,7 +5,6 @@ import sklearn.neighbors
 import numpy
 import dataclasses
 import logging
-import langchain_core.tools
 
 logger = logging.getLogger(__name__)
 
@@ -15,12 +14,12 @@ logger = logging.getLogger(__name__)
 class ToolWithEmbedding:
     identifier: str
     embedding: numpy.ndarray
-    tool: langchain_core.tools.StructuredTool
+    tool: typing.Any
 
 
 @dataclasses.dataclass
 class ToolWithDelta:
-    tool: langchain_core.tools.StructuredTool
+    tool: typing.Any
     delta: float
 
 

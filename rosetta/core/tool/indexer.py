@@ -5,26 +5,19 @@ import logging
 import pathlib
 import sys
 import typing
-
 import langchain_core.tools
 import pydantic
 import yaml
 
-from .types import (
-    ToolKind,
+from .models import (
     SQLPPQueryMetadata,
     SemanticSearchMetadata,
     HTTPRequestMetadata
 )
 
-# TODO: Should core.tool depend upon core.catalog, or the other
-# way? Ideally, it's not a cross-dependency both ways?
-from .types.descriptor import ToolDescriptor
+from ..record.descriptor import RecordDescriptor
+from ..record.kind import RecordKind
 
-
-# TODO: Need unified logging approach across rosetta?
-# TODO: Since this is a library, can a custom logger
-# implementation be passed in by the app?
 logger = logging.getLogger(__name__)
 
 
@@ -40,7 +33,7 @@ logger = logging.getLogger(__name__)
 class BaseFileIndexer(pydantic.BaseModel):
     @abc.abstractmethod
     def start_descriptors(self, filename: pathlib.Path, get_repo_commit_id) -> \
-        typing.Tuple[list[ValueError], list[ToolDescriptor]]:
+            typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or more 'bare' catalog item descriptors for a filename,
            and/or return non-fatal or 'keep-on-going' errors if any encountered.
 
@@ -60,7 +53,7 @@ class BaseFileIndexer(pydantic.BaseModel):
 
 class DotPyFileIndexer(BaseFileIndexer):
     def start_descriptors(self, filename: pathlib.Path, get_repo_commit_id) -> \
-        typing.Tuple[list[ValueError], list[ToolDescriptor]]:
+            typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or more 'bare' catalog item descriptors
            for a *.py, and/or returns 'keep-on-going' errors
            if any encountered.
@@ -78,7 +71,7 @@ class DotPyFileIndexer(BaseFileIndexer):
 
         descriptors = []
 
-        repo_commit_id = None # Ex: a git hash / SHA.
+        repo_commit_id = None  # Ex: a git hash / SHA.
 
         for name, tool in inspect.getmembers(i):
             if not is_tool(name, tool):
@@ -89,9 +82,9 @@ class DotPyFileIndexer(BaseFileIndexer):
             if not repo_commit_id:
                 repo_commit_id = get_repo_commit_id(filename)
 
-            descriptors.append(ToolDescriptor(
+            descriptors.append(RecordDescriptor(
                 identifier=str(filename) + ":" + name + ":" + repo_commit_id,
-                kind=ToolKind.PythonFunction,
+                kind=RecordKind.PythonFunction,
                 name=name,
                 description=tool.description.strip(),
                 # TODO: Capture line numbers as part of source?
@@ -107,7 +100,7 @@ class DotPyFileIndexer(BaseFileIndexer):
 
 class DotSqlppFileIndexer(BaseFileIndexer):
     def start_descriptors(self, filename: pathlib.Path, get_repo_commit_id) -> \
-        typing.Tuple[list[ValueError], list[ToolDescriptor]]:
+            typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or 1 'bare' catalog item descriptors
            for a *.sqlpp, and/or return 'keep-on-going' errors
            if any encountered.
@@ -117,13 +110,13 @@ class DotSqlppFileIndexer(BaseFileIndexer):
 
         metadata = SQLPPQueryMetadata.model_validate(front_matter)
 
-        name = metadata.name.strip() # TODO: If missing, name should default to filename?
+        name = metadata.name.strip()  # TODO: If missing, name should default to filename?
 
-        repo_commit_id = get_repo_commit_id(filename) # Ex: a git hash / SHA.
+        repo_commit_id = get_repo_commit_id(filename)  # Ex: a git hash / SHA.
 
-        return (None, [ToolDescriptor(
+        return (None, [RecordDescriptor(
             identifier=str(filename) + ":" + name + ":" + repo_commit_id,
-            kind=ToolKind.SQLPPQuery,
+            kind=RecordKind.SQLPPQuery,
             name=name,
             description=metadata.description.strip(),
             source=filename,
@@ -136,7 +129,7 @@ class DotSqlppFileIndexer(BaseFileIndexer):
 
 class DotYamlFileIndexer(BaseFileIndexer):
     def start_descriptors(self, filename: pathlib.Path, get_repo_commit_id) -> \
-        typing.Tuple[list[ValueError], list[ToolDescriptor]]:
+            typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or more 'bare' catalog item descriptors
            for a *.yaml, and/or return 'keep-on-going' errors
            if any encountered.
@@ -147,20 +140,20 @@ class DotYamlFileIndexer(BaseFileIndexer):
 
         if 'tool_kind' not in parsed_desc:
             logger.warning(f'Encountered .yaml file with unknown tool_kind field. '
-                            f'Not indexing {str(filename.absolute())}.')
+                           f'Not indexing {str(filename.absolute())}.')
             return (None, [])
 
-        repo_commit_id = get_repo_commit_id(filename) # Ex: a git hash / SHA.
+        repo_commit_id = get_repo_commit_id(filename)  # Ex: a git hash / SHA.
 
         match parsed_desc['tool_kind']:
-            case ToolKind.SemanticSearch:
+            case RecordKind.SemanticSearch:
                 metadata = SemanticSearchMetadata.model_validate(parsed_desc)
 
-                name = metadata.name.strip() # TODO: If missing, name should default to filename?
+                name = metadata.name.strip()  # TODO: If missing, name should default to filename?
 
-                return (None, [ToolDescriptor(
+                return (None, [RecordDescriptor(
                     identifier=str(filename) + ":" + name + ":" + repo_commit_id,
-                    kind=ToolKind.SemanticSearch,
+                    kind=RecordKind.SemanticSearch,
                     name=name,
                     description=metadata.description.strip(),
                     source=filename,
@@ -170,7 +163,7 @@ class DotYamlFileIndexer(BaseFileIndexer):
                     embedding=[],
                 )])
 
-            case ToolKind.HTTPRequest:
+            case RecordKind.HTTPRequest:
                 metadata = HTTPRequestMetadata.model_validate(parsed_desc)
 
                 descriptors = []
@@ -178,9 +171,9 @@ class DotYamlFileIndexer(BaseFileIndexer):
                 for operation in metadata.open_api.operations:
                     name = operation.specification.operation_id.strip()
 
-                    descriptors.append(ToolDescriptor(
+                    descriptors.append(RecordDescriptor(
                         identifier=str(filename) + ":" + name + ":" + repo_commit_id,
-                        kind=ToolKind.HTTPRequest,
+                        kind=RecordKind.HTTPRequest,
                         name=name,
                         description=operation.specification.description.strip(),
                         # TODO: Capture line numbers as part of source?
@@ -195,7 +188,7 @@ class DotYamlFileIndexer(BaseFileIndexer):
 
             case _:
                 logger.warning(f'Encountered .yaml file with unknown tool_kind field. '
-                                f'Not indexing {str(filename.absolute())}.')
+                               f'Not indexing {str(filename.absolute())}.')
 
         return (None, [])
 
@@ -207,25 +200,25 @@ source_indexers = {
 }
 
 
-def augment_descriptor(descriptor: ToolDescriptor) -> list[ValueError]:
+def augment_descriptor(descriptor: RecordDescriptor) -> list[ValueError]:
     """ Augments a single catalog item descriptor (in-place, destructive),
         with additional information, such as generated by an LLM,
         and/or return 'keep-on-going' errors if any encountered.
     """
 
-    # TODO: Different source file types might have
+    # TODO: Different source file models might have
     # different ways of augmenting a descriptor?
 
     return None
 
 
-def vectorize_descriptor(descriptor: ToolDescriptor, embedding_model_obj) -> \
-    list[ValueError]:
+def vectorize_descriptor(descriptor: RecordDescriptor, embedding_model_obj) -> \
+        list[ValueError]:
     """ Adds vector embeddings to a single catalog item descriptor (in-place,
         destructive), and/or return 'keep-on-going' errors if any encountered.
     """
 
-    # TODO: Different source file types might have different ways
+    # TODO: Different source file models might have different ways
     # to compute & add vector embedding(s), perhaps by using additional
     # fields besides description?
 

@@ -2,17 +2,17 @@ import pydantic
 import pathlib
 import typing
 
-from .kind import ToolKind
+from .kind import RecordKind
 
 
-class ToolDescriptor(pydantic.BaseModel):
+class RecordDescriptor(pydantic.BaseModel):
     """ This model represents a tool's persistable description or metadata. """
 
     # A fully qualified unique identifier for the tool.
     # Ex: "src/tools/finance.py:get_current_stock_price:g11223344".
     identifier: str
 
-    kind: ToolKind
+    kind: RecordKind
 
     # A short name for the tool, where multiple versions
     # of the same tool would have the same name.
