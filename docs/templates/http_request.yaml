@@ -1,7 +1,7 @@
 #
 # The following file is a template for an HTTP request tool.
 #
-tool_kind: http_request
+record_kind: http_request
 
 # HTTP requests must be specified using an OpenAPI spec.
 open_api:

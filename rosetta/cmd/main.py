@@ -44,7 +44,7 @@ class AliasedGroup(click.Group):
     default=".rosetta-catalog",
     type=click.Path(exists=False, file_okay=False, dir_okay=True),
     help="""Directory of local catalog files.
-              The local catalog DIRECTORY should be checked into git.""",
+            The local catalog DIRECTORY should be checked into git.""",
     envvar="ROSETTA_CATALOG",
     show_default=True,
 )
@@ -54,13 +54,14 @@ class AliasedGroup(click.Group):
     default=".rosetta-activity",
     type=click.Path(exists=False, file_okay=False, dir_okay=True),
     help="""Directory of local activity files (runtime data).
-              The local activity DIRECTORY should NOT be checked into git,
-              as it holds runtime activity data like logs, call histories, etc.""",
+            The local activity DIRECTORY should NOT be checked into git,
+            as it holds runtime activity data like logs, etc.""",
     envvar="ROSETTA_ACTIVITY",
     show_default=True,
 )
 @click.option(
-    "-v", "--verbose", count=True, help="Enable verbose output.", envvar="ROSETTA_VERBOSE"
+    "-v", "--verbose", count=True,
+    help="Enable verbose output.", envvar="ROSETTA_VERBOSE"
 )
 @click.pass_context
 def click_main(ctx, catalog, activity, verbose):
@@ -93,16 +94,22 @@ def env(ctx):
 )
 @click.option(
     "-k",
-    "--top_k",
+    "--top-k",
     default=1,
     help="The maximum number of results to show.",
     show_default=True,
 )
+@click.option(
+    "--ignore-dirty",
+    default=True,
+    help="Whether to ignore dirty source files for the find query.",
+    show_default=True,
+)
 @click.pass_context
-def find(ctx, query, kind, top_k):
-    """Find tools, prompts, etc. from the catalog based on a natural language QUERY string.
-    """
-    cmd_find(ctx.obj, query, kind=kind, top_k=top_k)
+def find(ctx, query, kind, top_k, ignore_dirty):
+    """Find tools, prompts, etc.
+       from the catalog based on a natural language QUERY string."""
+    cmd_find(ctx.obj, query, kind=kind, top_k=top_k, ignore_dirty=ignore_dirty)
 
 
 @click_main.command()

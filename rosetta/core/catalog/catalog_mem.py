@@ -20,6 +20,9 @@ class CatalogMem(CatalogBase):
         self.catalog_descriptor = catalog_descriptor
 
     def init_from(self, other: typing.Self) -> list[RecordDescriptor]:
+        """ Initialize the items in self by copying over attributes from
+            items found in other that have the exact same repo_commit_id's. """
+
         items_to_process = []
 
         if other and other.catalog_descriptor:
@@ -38,7 +41,6 @@ class CatalogMem(CatalogBase):
                     items_to_process.append(s)
 
         return items_to_process
-
 
     def load(self, catalog_path: pathlib.Path) -> typing.Self:
         """ Load from a catalog_path JSON file. """
@@ -66,8 +68,7 @@ class CatalogMem(CatalogBase):
             fp.write(j)
             fp.write('\n')
 
-    def find(self, query: str,
-             max: typing.Union[int | None] = 1) -> list[FoundItem]:
+    def find(self, query: str, max: int = 1) -> list[RecordDescriptor]:
         """ Returns the catalog items that best match a query. """
 
         available_tools = [x for x in self.catalog_descriptor.items]

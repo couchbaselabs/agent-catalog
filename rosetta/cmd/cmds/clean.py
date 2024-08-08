@@ -30,7 +30,7 @@ def clean_local(ctx: Context):
             shutil.rmtree(x_path.absolute())
 
 
-# TODO (GLENN): Define a 'clean' action for a Couchbase collection.
+# TODO: Implement clean for the rosetta scope in Couchbase.
 def clean_db(ctx, conn_string: str, authenticator: couchbase.auth.Authenticator, **_):
     pass
 

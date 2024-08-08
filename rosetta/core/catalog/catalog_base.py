@@ -18,11 +18,10 @@ class FoundItem(pydantic.BaseModel):
 
 
 class CatalogBase(abc.ABC):
-    """ An abstract base class for a catalog of ToolDescriptors. """
+    """ An abstract base class for a catalog of RecordDescriptor's. """
 
     @abc.abstractmethod
-    def find(self, query: str,
-             max: typing.Union[int | None] = 1) -> list[FoundItem]:
+    def find(self, query: str, max: int = 1) -> list[RecordDescriptor]:
         """ Returns the catalog items that best match a query. """
 
         # TODO: The find() method might likely one day need additional,

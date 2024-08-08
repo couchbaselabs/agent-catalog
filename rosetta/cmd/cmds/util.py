@@ -4,6 +4,7 @@ import pathlib
 
 import click
 import git
+import gitignore_parser
 import sentence_transformers
 
 from rosetta.core.catalog import CATALOG_SCHEMA_VERSION
@@ -12,19 +13,29 @@ from rosetta.core.catalog.version import (
     lib_version,
     lib_version_compare,
 )
+from rosetta.core.catalog.directory import ScanDirectoryOpts
 
 from ..models.ctx.model import Context
 
 
-def init_local(ctx: Context, embedding_model: str, dry_run: bool = False):
+MAX_ERRS = 10
+
+
+DEFAULT_SCAN_DIRECTORY_OPTS = ScanDirectoryOpts(
+    unwanted_patterns = frozenset([".git"]),
+    ignore_file_name = ".gitignore",
+    ignore_file_parser_factory = gitignore_parser.parse_gitignore)
+
+
+def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
     # Init directories.
-    if not dry_run:
+    if not read_only:
         os.makedirs(ctx.catalog, exist_ok=True)
         os.makedirs(ctx.activity, exist_ok=True)
     else:
-        print("SKIPPING: local directory creation due to --dry-run")
+        print("SKIPPING: local directory creation due to read_only mode")
 
-    lib_v = lib_version(ctx)
+    lib_v = lib_version()
 
     meta = {
         # Version of the local catalog data.
@@ -75,11 +86,11 @@ def init_local(ctx: Context, embedding_model: str, dry_run: bool = False):
 
         meta["embedding_model"] = embedding_model
 
-    if not dry_run:
+    if not read_only:
         with open(meta_path, "w") as f:
             json.dump(meta, f, sort_keys=True, indent=4)
     else:
-        print("SKIPPING: meta.json file write due to --dry-run")
+        print("SKIPPING: meta.json file write due to read_only mode")
 
     return meta
 

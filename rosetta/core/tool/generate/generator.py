@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 
 class _BaseCodeGenerator(pydantic.BaseModel):
-    record_descriptors: list[RecordDescriptor] = pydantic.Field(min_items=1)
+    record_descriptors: list[RecordDescriptor] = pydantic.Field(min_length=1)
     template_directory: pathlib.Path = pydantic.Field(
         default=(pathlib.Path(__file__).parent / 'templates').resolve(),
         description='Location of the the template files.'

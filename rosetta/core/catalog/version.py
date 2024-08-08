@@ -8,7 +8,7 @@ import semantic_version
 # TODO: Consider grabbing version from the package distribution
 # metadata of rosetta instead of from a VERSION.txt file?
 
-def lib_version(ctx):
+def lib_version():
     # Ex: "v0.2.0-0-g6f9305e".
     # Ex: "v0.1.0-alpha-4-g6f9305e".
     # Ex: "v0.1.0-beta2-17-gf63950e".

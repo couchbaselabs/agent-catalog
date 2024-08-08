@@ -137,14 +137,14 @@ class DotYamlFileIndexer(BaseFileIndexer):
         with filename.open('r') as fp:
             parsed_desc = yaml.safe_load(fp)
 
-        if 'tool_kind' not in parsed_desc:
-            logger.warning(f'Encountered .yaml file with unknown tool_kind field. '
+        if 'record_kind' not in parsed_desc:
+            logger.warning(f'Encountered .yaml file with unknown record_kind field. '
                            f'Not indexing {str(filename.absolute())}.')
             return (None, [])
 
         repo_commit_id = get_repo_commit_id(filename)  # Ex: a git hash / SHA.
 
-        match parsed_desc['tool_kind']:
+        match parsed_desc['record_kind']:
             case RecordKind.SemanticSearch:
                 metadata = SemanticSearchMetadata.model_validate(parsed_desc)
 
@@ -185,7 +185,7 @@ class DotYamlFileIndexer(BaseFileIndexer):
                 return (None, descriptors)
 
             case _:
-                logger.warning(f'Encountered .yaml file with unknown tool_kind field. '
+                logger.warning(f'Encountered .yaml file with unknown record_kind field. '
                                f'Not indexing {str(filename.absolute())}.')
 
         return (None, [])
