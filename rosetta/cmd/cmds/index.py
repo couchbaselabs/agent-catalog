@@ -37,18 +37,10 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
         # The ROSETTA_REPO_DIRTY_OK env var is intended
         # to help during rosetta development.
 
-        # TODO: One day, handle when there are dirty files (either changes
-        # not yet committed into git or untracked files w.r.t. git) via
-        # a hierarchy of catalogs? A hierarchy of catalogs has advanced
-        # cases of file deletions, renames/moves & lineage changes
-        # and how those changes can shadow lower-level catalog items.
-
         # TODO: If the repo is dirty only because .rosetta-catalog/ is
-        # dirty, then we might consider going ahead and indexing?
-
-        # TODO: If the repo is dirty because .rosetta-activity/ is
-        # dirty, then we might print some helper instructions for the dev user
-        # on how to add .rosetta-activity/ to the .gitignore file? Or, should
+        # dirty or because .rosetta-activity/ is dirty, then we might print
+        # some helper instructions for the dev user on commiting the .rosetta-catalog/
+        # and on how to add .rosetta-activity/ to the .gitignore file? Or, should
         # we instead preemptively generate a .rosetta-activity/.gitiginore
         # file during init_local()?
 
@@ -114,20 +106,20 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
         print("ERROR: during examining", "\n".join([str(e) for e in all_errs]))
         raise all_errs[0]
 
-    print("==================\ndiff'ing...")
+    print("==================\ninit'ing...")
 
-    next_catalog = CatalogMem()
-    next_catalog.catalog_descriptor = CatalogDescriptor(
+    next_catalog = CatalogMem(catalog_descriptor=CatalogDescriptor(
         catalog_schema_version=meta["catalog_schema_version"],
         embedding_model=meta["embedding_model"],
         repo_commit_id=repo_commit_id,
-        items=all_descriptors)
+        items=all_descriptors
+    ))
 
-    items_to_upsert, items_to_delete = curr_catalog.diff(next_catalog, repo)
+    items_to_process = next_catalog.init_from(curr_catalog)
 
     print("==================\naugmenting...")
 
-    for descriptor in tqdm(items_to_upsert):
+    for descriptor in tqdm(items_to_process):
         if len(all_errs) > MAX_ERRS:
             break
 
@@ -147,7 +139,7 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
 
     embedding_model_obj = sentence_transformers.SentenceTransformer(meta["embedding_model"])
 
-    for descriptor in tqdm(items_to_upsert):
+    for descriptor in tqdm(items_to_process):
         if len(all_errs) > MAX_ERRS:
             break
 
@@ -166,9 +158,7 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
 
     # TODO: Support a --dry-run option that doesn't update/save any files.
 
-    curr_catalog.update(meta, repo_commit_id, items_to_upsert, items_to_delete)
-
-    curr_catalog.save(catalog_path)
+    next_catalog.save(catalog_path)
 
     # ---------------------------------
 
