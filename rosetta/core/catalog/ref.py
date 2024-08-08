@@ -57,8 +57,7 @@ class CatalogRef(abc.ABC):
     @abc.abstractmethod
     def update(self, meta, repo_commit_id: str,
                items_to_upsert: list[ToolDescriptor],
-               items_to_delete: list[ToolDescriptor],
-               repo):
+               items_to_delete: list[ToolDescriptor]):
         """ Updates self from the items to upsert and delete.
         """
 
@@ -226,8 +225,7 @@ class MemCatalogRef(CatalogRef):
 
     def update(self, meta, repo_commit_id: str,
                items_to_upsert: list[ToolDescriptor],
-               items_to_delete: list[ToolDescriptor],
-               repo):
+               items_to_delete: list[ToolDescriptor]):
         if self.catalog_descriptor is None:
             self.catalog_descriptor = CatalogDescriptor(
                 catalog_schema_version=meta["catalog_schema_version"],
@@ -281,8 +279,7 @@ class DBCatalogRef(CatalogRef):
 
     def update(self, meta, repo_commit_id: str,
                items_to_upsert: list[ToolDescriptor],
-               items_to_delete: list[ToolDescriptor],
-               repo):
+               items_to_delete: list[ToolDescriptor]):
         pass # TODO.
 
 
