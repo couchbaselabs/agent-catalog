@@ -60,6 +60,22 @@ def test_sqlpp_front_matter():
         assert '/*' not in front_matter3
         assert '*/' not in front_matter3
 
+        fp = open(pathlib.Path(tmp_dir) / 'f4', 'w')
+        fp.write("""
+            -- some other comments in the front 
+            /* 
+               some front matter: asd
+            */
+            should not be seen: asd
+            """)
+        fp.close()
+        front_matter4 = SQLPPQueryMetadata.read_front_matter(pathlib.Path(fp.name))
+        assert 'should not be seen' not in front_matter4
+        assert 'some other comments in the front' not in front_matter4
+        assert 'some front matter' in front_matter4
+        assert '/*' not in front_matter4
+        assert '*/' not in front_matter4
+
 
 @pytest.mark.smoke
 def test_sqlpp_query():

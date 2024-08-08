@@ -1,0 +1,28 @@
+#
+# The following file is a template for an HTTP request tool.
+#
+tool_kind: http_request
+
+# HTTP requests must be specified using an OpenAPI spec.
+open_api:
+
+  # The path relative to the tool-calling code.
+  # The OpenAPI spec can either be in JSON or YAML.
+  filename: path_to_openapi_spec.json
+
+  # A URL denoting where to retrieve the OpenAPI spec.
+  # The filename or the url must be specified (not both).
+  # url: http://url_to_openapi_spec/openapi.json
+
+  # Which OpenAPI operations should be indexed as tools are specified below.
+  # This field is mandatory, and each operation is validated against the spec on index.
+  operations:
+
+    # All operations must specify a path and a method.
+    # 1. The path corresponds to an OpenAPI path object.
+    # 2. The method corresponds to GET/POST/PUT/PATCH/DELETE/HEAD/OPTIONS/TRACE.
+    # See https://swagger.io/specification/#path-item-object for more information.
+    - path: /users/create
+      method: post
+    - path: /users/delete/{user_id}
+      method: delete
