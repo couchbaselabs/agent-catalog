@@ -37,28 +37,28 @@ class CatalogRef(abc.ABC):
         raise NotImplementedError("CatalogRef.find()")
 
     @abc.abstractmethod
-    def diff(self, source: 'MemCatalogRef', repo) -> typing.Tuple[list[ToolDescriptor], list[ToolDescriptor]]:
-        """ Returns the (newer, deleted) items in the source MemCatalogRef
-            compared to the items in self.
+    def diff(self, other: 'MemCatalogRef', repo) -> typing.Tuple[list[ToolDescriptor], list[ToolDescriptor]]:
+        """ Compare items from self to items from other.
 
-            From the results of diff(), later steps can UPSERT the newer
-            items into self and DELETE the deleted items from self.
+            Returns (items_to_upsert, items_to_delete) lists, where the
+            items_to_upsert list holds items from the other MemCatalogRef,
+            and the items_to_delete list holds items from the self MemCatalogRef.
 
-            The items in the source MemCatalogRef can be 'bare', in that
+            The items in the other MemCatalogRef can be 'bare', in that
             they might not yet have augmentations and/or vector embeddings.
 
-            The repo_commit_id of source items vs self items are compared, and
-            the repo object (e.g., a git repo) is consulted for deeper comparisons.
+            The repo_commit_id of other items vs self items are compared, and the
+            repo object (e.g., a git repo) may be consulted for deeper comparisons.
         """
 
         raise NotImplementedError("CatalogRef.diff()")
 
     @abc.abstractmethod
     def update(self, meta, repo_commit_id: str,
-               items_newer: list[ToolDescriptor],
-               items_deleted: list[ToolDescriptor],
+               items_to_upsert: list[ToolDescriptor],
+               items_to_delete: list[ToolDescriptor],
                repo):
-        """ Updates self from newer items (will be UPSERT'ed) and deleted items.
+        """ Updates self from the items to upsert and delete.
         """
 
         raise NotImplementedError("CatalogRef.update()")
@@ -71,15 +71,40 @@ class MemCatalogRef(CatalogRef):
 
     catalog_descriptor: CatalogDescriptor
 
+    # A cached lookup dict of our catalog_descriptor's items keyed by "source:name".
+    _cache_items: typing.Union[defaultdict | None]
+
+    def __init__(self):
+        self.catalog_path = None
+        self.catalog_descriptor = None
+        self._cache_items = None
+
+    def _cache_items_release(self):
+        self._cache_items = None
+
+    def _cache_items_load(self, fresh=False):
+        if self._cache_items is None or fresh:
+            self._cache_items = defaultdict(list)
+            for x in self.catalog_descriptor.items:
+                self._cache_items[str(x.source) + ':' + x.name].append(x)
+
+        return self._cache_items
+
     def load(self, catalog_path: pathlib.Path) -> typing.Self:
+        """ Load from a catalog_path JSON file. """
+
         self.catalog_path = catalog_path
 
         with self.catalog_path.open('r') as fp:
             self.catalog_descriptor = CatalogDescriptor.model_validate_json(fp.read())
 
+        self._cache_items_release()
+
         return self
 
     def save(self, catalog_path: pathlib.Path):
+        """ Save to a catalog_path JSON file. """
+
         self.catalog_descriptor.items.sort(key=lambda x: x.identifier)
 
         # TODO: We should have a specialized json format here, where currently
@@ -127,20 +152,78 @@ class MemCatalogRef(CatalogRef):
 
         return results
 
-    def diff(self, source: typing.Self, repo) -> typing.Tuple[list[ToolDescriptor], list[ToolDescriptor]]:
-        # TODO: This is the worst diff() implementation, which
-        # incorrectly deletes all of self's items and treats all
-        # source's items as new items. For now, this incorrect implementation
-        # happens to work with the current implementation of MemCatalogRef.update().
+    def diff(self, other: typing.Self, repo) -> typing.Tuple[list[ToolDescriptor], list[ToolDescriptor]]:
+        if not other or not other.catalog_descriptor:
+            return [], []
 
-        items_newer = source.catalog_descriptor.items
-        items_deleted = self.catalog_descriptor.items
+        items_to_upsert, items_to_delete = [], []
 
-        return (items_newer, items_deleted)
+        # A lookup dict of items keyed by "source:name".
+        m = self._cache_items_load(fresh=True)
+
+        # TODO: The following assumes we're on the same branch
+        # or sequential lineage of commits -- so branching
+        # complexities need to be considered another day.
+
+        other_source_names = set()
+
+        for o in other.catalog_descriptor.items or []:
+            source_name = str(o.source) + ':' + o.name
+
+            other_source_names.add(source_name)
+
+            xs: list[ToolDescriptor] = m.get(source_name, [])
+            if len(xs) > 0:
+                s = xs[-1]
+
+                if bool(o.deleted):
+                    if bool(s.deleted):
+                        # It's deleted in self, and it's deleted in other, so NO-OP.
+                        pass
+                    else:
+                        # It's active in self, and it's deleted in other, so DELETE.
+                        items_to_delete.append(o)
+                else:
+                    if bool(s.deleted):
+                        # It's deleted in self, and it's active in other, so UPSERT.
+                        items_to_upsert.append(o)
+                    else:
+                        # It's active in self, and it's active in other, so compare them...
+                        if s.repo_commit_id == o.repo_commit_id:
+                            # They have the same repo_commit_id's, so NO-OP.
+                            pass
+                        else:
+                            # The have different repo_commit_id's, so UPSERT.
+                            items_to_upsert.append(o)
+            else:
+                if bool(o.deleted):
+                    # It's not in self, and it's deleted in other, so NO-OP.
+                    pass
+                else:
+                    # It's not in self, and it's active in other, so UPSERT.
+                    items_to_upsert.append(o)
+
+        # Any active items in self that are not in other should be DELETE'ed.
+        for s in self.catalog_descriptor.items or []:
+            if not bool(s.deleted):
+                source_name = str(s.source) + ':' + s.name
+
+                if source_name not in other_source_names:
+                    # The self has an item that's not in other, so it's a DELETE.
+                    d = s.model_copy()
+                    d.deleted = True
+
+                    # TODO: We should find the actual commit id
+                    # of the deletion from the repo.
+                    # d.repo_commit_id = ???
+
+                    items_to_delete.append(d)
+
+        return (items_to_upsert, items_to_delete)
 
     def update(self, meta, repo_commit_id: str,
-               items_newer: list[ToolDescriptor],
-               items_deleted: list[ToolDescriptor],
+               items_to_upsert: list[ToolDescriptor],
+               items_to_delete: list[ToolDescriptor],
                repo):
         if self.catalog_descriptor is None:
             self.catalog_descriptor = CatalogDescriptor(
@@ -149,33 +232,25 @@ class MemCatalogRef(CatalogRef):
                 repo_commit_id=repo_commit_id,
                 items=[])
 
-        # A lookup dict m of self's items keyed by "source:name".
-        m = defaultdict(list)
-        for x in self.catalog_descriptor.items:
-            m[str(x.source) + ':' + x.name].append(x)
+        # A lookup dict of items keyed by "source:name".
+        m = self._cache_items_load()
 
-        # Update m based on items_deleted.
-        for x in items_deleted or []:
+        # Since we own the lookup dict now and will mutate it.
+        self._cache_items_release()
+
+        # Update m based on items_to_delete.
+        for x in items_to_delete or []:
             x.deleted = True
             m[str(x.source) + ':' + x.name].append(x)
 
-        # Update m based on items_newer.
-        for x in items_newer or []:
+        # Update m based on items_to_upsert.
+        for x in items_to_upsert or []:
             x.deleted = False
             m[str(x.source) + ':' + x.name].append(x)
 
-        # TODO: Some callers may want append-only behavior, where we
-        # keep all our existing items unchanged and only append new
-        # items (both updates & tombstomes become new items) -- turn
-        # this into an optional parameter?
-        append_only = False
-
         items = []
         for xs in m.values():
-            if append_only:
-                items += xs
-            else:
-                items.append(xs[-1])
+            items.append(xs[-1])
 
         items.sort(key=lambda x: x.identifier)
 
@@ -196,14 +271,14 @@ class DBCatalogRef(CatalogRef):
 
         return [] # TODO: SQL++ and vector index searches likely are involved here.
 
-    def diff(self, source: MemCatalogRef, repo) -> typing.Tuple[list[ToolDescriptor], list[ToolDescriptor]]:
-        newer, deleted = [], [] # TODO.
+    def diff(self, other: MemCatalogRef, repo) -> typing.Tuple[list[ToolDescriptor], list[ToolDescriptor]]:
+        items_to_upsert, items_to_delete = [], [] # TODO.
 
-        return (newer, deleted)
+        return (items_to_upsert, items_to_delete)
 
     def update(self, meta, repo_commit_id: str,
-               items_newer: list[ToolDescriptor],
-               items_deleted: list[ToolDescriptor],
+               items_to_upsert: list[ToolDescriptor],
+               items_to_delete: list[ToolDescriptor],
                repo):
         pass # TODO.
 

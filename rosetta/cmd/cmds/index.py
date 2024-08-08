@@ -148,15 +148,15 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
         repo_commit_id=repo_commit_id,
         items=all_descriptors)
 
-    items_newer, items_deleted = curr_catalog.diff(next_catalog, repo)
+    items_to_upsert, items_to_delete = curr_catalog.diff(next_catalog, repo)
 
-    curr_catalog.update(meta, repo_commit_id, items_newer, items_deleted, repo)
+    curr_catalog.update(meta, repo_commit_id, items_to_upsert, items_to_delete, repo)
 
     next_catalog = curr_catalog
 
     print("==================\naugmenting...")
 
-    for descriptor in tqdm(items_newer):
+    for descriptor in tqdm(items_to_upsert):
         if len(all_errs) > MAX_ERRS:
             break
 
@@ -176,7 +176,7 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
 
     embedding_model_obj = sentence_transformers.SentenceTransformer(meta["embedding_model"])
 
-    for descriptor in tqdm(items_newer):
+    for descriptor in tqdm(items_to_upsert):
         if len(all_errs) > MAX_ERRS:
             break
 
