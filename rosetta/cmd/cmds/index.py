@@ -21,8 +21,8 @@ logger = logging.getLogger(__name__)
 MAX_ERRS = 10  # TODO: Hardcoded limit on too many errors.
 
 
-def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
-    meta = init_local(ctx, embedding_model)
+def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, dry_run: bool, **_):
+    meta = init_local(ctx, embedding_model, dry_run=dry_run)
 
     if not meta["embedding_model"]:
         raise ValueError(
@@ -155,9 +155,10 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
 
     print("==================\nsaving local catalog...")
 
-    # TODO: Support a --dry-run option that doesn't update/save any files.
-
-    next_catalog.save(catalog_path)
+    if not dry_run:
+        next_catalog.save(catalog_path)
+    else:
+        print("SKIPPING: local catalog write due to --dry-run")
 
     # ---------------------------------
 
