@@ -16,13 +16,16 @@ from rosetta.core.catalog.version import (
 from ..models.ctx.model import Context
 
 
-def init_local(ctx: Context, embedding_model: str, dry_run: bool = False):
+MAX_ERRS = 10
+
+
+def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
     # Init directories.
-    if not dry_run:
+    if not read_only:
         os.makedirs(ctx.catalog, exist_ok=True)
         os.makedirs(ctx.activity, exist_ok=True)
     else:
-        print("SKIPPING: local directory creation due to --dry-run")
+        print("SKIPPING: local directory creation due to read_only mode")
 
     lib_v = lib_version(ctx)
 
@@ -75,11 +78,11 @@ def init_local(ctx: Context, embedding_model: str, dry_run: bool = False):
 
         meta["embedding_model"] = embedding_model
 
-    if not dry_run:
+    if not read_only:
         with open(meta_path, "w") as f:
             json.dump(meta, f, sort_keys=True, indent=4)
     else:
-        print("SKIPPING: meta.json file write due to --dry-run")
+        print("SKIPPING: meta.json file write due to read_only mode")
 
     return meta
 

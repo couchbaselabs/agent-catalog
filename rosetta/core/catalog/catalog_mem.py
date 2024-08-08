@@ -66,8 +66,7 @@ class CatalogMem(CatalogBase):
             fp.write(j)
             fp.write('\n')
 
-    def find(self, query: str,
-             max: typing.Union[int | None] = 1) -> list[FoundItem]:
+    def find(self, query: str, max: int = 1) -> list[RecordDescriptor]:
         """ Returns the catalog items that best match a query. """
 
         available_tools = [x for x in self.catalog_descriptor.items]

@@ -1,6 +1,10 @@
 import pathlib
-import click
 
+import click
+import tqdm
+
+from rosetta.cmd.cmds.util import *
+from rosetta.core.catalog.index import index_catalog
 from rosetta.core.catalog.catalog_mem import CatalogMem
 from rosetta.core.tool.reranker import ClosestClusterReranker
 from rosetta.core.tool.reranker import ToolWithDelta
@@ -22,8 +26,35 @@ def cmd_find(ctx: Context, query, kind="tool", top_k=3):
 
     # Query our catalog for a list of results.
     catalog = CatalogMem().load(pathlib.Path(catalog_path))
+
+    repo = repo_load(pathlib.Path(os.getcwd()))
+
+    if repo and repo.is_dirty():
+        # Create a CatalogMem that also includes the dirty items.
+
+        meta = init_local(ctx, catalog.catalog_descriptor.embedding_model, read_only=True)
+
+        # A dirty file and/or repo does not have a real commit id, so we use "DIRTY".
+        repo_commit_id = "DIRTY"
+
+        def get_repo_commit_id(path: pathlib.Path) -> str:
+            if repo.is_dirty(path=path.absolute()):
+                return "DIRTY"
+
+            commits = list(repo.iter_commits(paths=path.absolute(), max_count=1))
+            if not commits or len(commits) <= 0:
+                return "DIRTY"
+
+            return commit_str(commits[0])
+
+        source_dirs = catalog.catalog_descriptor.source_dirs
+
+        catalog = index_catalog(meta, repo_commit_id, get_repo_commit_id,
+                                kind, catalog_path, source_dirs,
+                                progress=tqdm.tqdm, max_errs=MAX_ERRS)
+
     search_results = [
-         ToolWithDelta(tool=x.record_descriptor, delta=x.delta) for x in catalog.find(query, max=top_k)
+        ToolWithDelta(tool=x.record_descriptor, delta=x.delta) for x in catalog.find(query, max=top_k)
     ]
 
     # TODO (GLENN): If / when different rerankers are implemented, specify them above.

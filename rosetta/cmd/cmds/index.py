@@ -1,6 +1,7 @@
 import logging
 import os
 import pathlib
+
 from tqdm import tqdm
 
 from rosetta.cmd.cmds.util import *
@@ -15,11 +16,9 @@ from ..models.ctx.model import Context
 logger = logging.getLogger(__name__)
 
 
-MAX_ERRS = 10  # TODO: Hardcoded limit on too many errors.
-
-
-def cmd_index(ctx: Context, source_dirs: list[str], kind: str, embedding_model: str, dry_run: bool, **_):
-    meta = init_local(ctx, embedding_model, dry_run=dry_run)
+def cmd_index(ctx: Context, source_dirs: list[str],
+              kind: str, embedding_model: str, dry_run: bool, **_):
+    meta = init_local(ctx, embedding_model, read_only=dry_run)
 
     if not meta["embedding_model"]:
         raise ValueError(
