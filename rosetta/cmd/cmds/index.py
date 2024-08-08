@@ -6,7 +6,7 @@ import git
 from tqdm import tqdm
 
 from rosetta.cmd.cmds.init import init_local
-from rosetta.core.catalog.ref import MemCatalogRef
+from rosetta.core.catalog.catalog_mem import CatalogMem
 from rosetta.core.catalog.directory import scan_directory
 from rosetta.core.catalog.descriptor import CatalogDescriptor
 from rosetta.core.tool.indexer import source_indexers, augment_descriptor, vectorize_descriptor
@@ -98,10 +98,10 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
 
     if catalog_path.exists():
         # Load the old / previous local catalog.
-        curr_catalog = MemCatalogRef().load(catalog_path)
+        curr_catalog = CatalogMem().load(catalog_path)
     else:
-        # An empty MemCatalogRef with no items represents an initial catalog state.
-        curr_catalog = MemCatalogRef()
+        # An empty CatalogMem with no items represents an initial catalog state.
+        curr_catalog = CatalogMem()
         curr_catalog.catalog_descriptor = CatalogDescriptor(
             catalog_schema_version=meta["catalog_schema_version"],
             embedding_model=meta["embedding_model"],
@@ -141,7 +141,7 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
 
     print("==================\ndiff'ing...")
 
-    next_catalog = MemCatalogRef()
+    next_catalog = CatalogMem()
     next_catalog.catalog_descriptor = CatalogDescriptor(
         catalog_schema_version=meta["catalog_schema_version"],
         embedding_model=meta["embedding_model"],

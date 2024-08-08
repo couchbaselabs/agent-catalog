@@ -1,71 +1,15 @@
 from collections import defaultdict
 
-import abc
 import pathlib
 import typing
-import pydantic
 
 from ..tool.types.descriptor import ToolDescriptor
-
+from .catalog_base import CatalogBase, FoundItem
 from .descriptor import CatalogDescriptor
 
 
-class FoundItem(pydantic.BaseModel):
-    """ A result item in the results from a CatalogRef.find(). """
-
-    tool_descriptor: ToolDescriptor
-
-    # TODO: A FoundItem might one day also contain additional information --
-    # such as to help with any further processing of results (e.g., reranking)
-    # and with debugging.
-
-    delta: typing.Any
-
-
-class CatalogRef(abc.ABC):
-    """ An abstract interface for a catalog reference. """
-
-    @abc.abstractmethod
-    def find(self, query: str,
-             max: typing.Union[int | None] = 1) -> list[FoundItem]:
-        """ Returns the catalog items that best match a query. """
-
-        # TODO: The find() method might likely one day need additional,
-        # optional params, perhaps to query on tags, labels, annotations,
-        # user credentials (for ACL's), etc.?
-
-        raise NotImplementedError("CatalogRef.find()")
-
-    @abc.abstractmethod
-    def diff(self, other: 'MemCatalogRef', repo) -> typing.Tuple[list[ToolDescriptor], list[ToolDescriptor]]:
-        """ Compare items from self to items from other.
-
-            Returns (items_to_upsert, items_to_delete), where the
-            items_to_upsert list holds items originating from the
-            other MemCatalogRef, and the items_to_delete list holds
-            items originating from the self MemCatalogRef.
-
-            The items in the other MemCatalogRef can be 'bare', in that
-            they might not yet have augmentations and/or vector embeddings.
-
-            The repo_commit_id of other items vs self items are compared, and the
-            repo object (e.g., a git repo) may be consulted for deeper comparisons.
-        """
-
-        raise NotImplementedError("CatalogRef.diff()")
-
-    @abc.abstractmethod
-    def update(self, meta, repo_commit_id: str,
-               items_to_upsert: list[ToolDescriptor],
-               items_to_delete: list[ToolDescriptor]):
-        """ Updates self from the items to upsert and delete.
-        """
-
-        raise NotImplementedError("CatalogRef.update()")
-
-
-class MemCatalogRef(CatalogRef):
-    """ Represents an in-memory catalog ref. """
+class CatalogMem(CatalogBase):
+    """ Represents an in-memory catalog. """
 
     catalog_path: pathlib.Path
 
@@ -259,50 +203,3 @@ class MemCatalogRef(CatalogRef):
         self.catalog_descriptor.embedding_model = meta["embedding_model"]
         self.catalog_descriptor.repo_commit_id = repo_commit_id
         self.catalog_descriptor.items = items
-
-
-class DBCatalogRef(CatalogRef):
-    """ Represents a catalog stored in a database. """
-
-    # TODO: This probably has fields of conn info, etc.
-
-    def find(self, query: str,
-             max: typing.Union[int | None] = 1) -> list[FoundItem]:
-        """ Returns the catalog items that best match a query. """
-
-        return [] # TODO: SQL++ and vector index searches likely are involved here.
-
-    def diff(self, other: MemCatalogRef, repo) -> typing.Tuple[list[ToolDescriptor], list[ToolDescriptor]]:
-        items_to_upsert, items_to_delete = [], [] # TODO.
-
-        return (items_to_upsert, items_to_delete)
-
-    def update(self, meta, repo_commit_id: str,
-               items_to_upsert: list[ToolDescriptor],
-               items_to_delete: list[ToolDescriptor]):
-        pass # TODO.
-
-
-class ChainedCatalogRef(CatalogRef):
-    """ Represents a chain of catalogs, where all catalogs are searched
-        during find(), but results from earlier catalogs take precendence. """
-
-    chain: list[CatalogRef]
-
-    def __init__(self, chain):
-        self.chain = chain
-
-    def find(self, query) -> list[ToolDescriptor]:
-        # TODO: This might roughly look something like...
-
-        results = []
-
-        for c in self.chain:
-            results_c = c.find(query)
-
-            # TODO: Filter out entries from results_c which
-            # are shadowed by the entries in the existing results.
-
-            results += results_c
-
-        return results
