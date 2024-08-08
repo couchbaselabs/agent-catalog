@@ -1,7 +1,9 @@
 import json
 import os
+import pathlib
 
 import click
+import git
 import sentence_transformers
 
 from rosetta.core.catalog import CATALOG_SCHEMA_VERSION
@@ -74,3 +76,36 @@ def init_local(ctx: Context, embedding_model: str):
         json.dump(meta, f, sort_keys=True, indent=4)
 
     return meta
+
+
+def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
+    # The repo is the user's application's repo and is NOT the repo
+    # of rosetta-core. The rosetta CLI / library should be run in
+    # a directory (or subdirectory) of the user's application's repo,
+    # where we'll walk up the parent dirs until we find the .git/ subdirectory.
+
+    while not (top_dir / ".git").exists():
+        if top_dir.parent == top_dir:
+            raise ValueError(
+                "Could not find .git directory. Please run index within a git repository."
+            )
+        top_dir = top_dir.parent
+
+    return git.Repo(top_dir / ".git")
+
+
+# TODO: One use case is a user's repo (like rosetta-example) might
+# have multiple, independent subdirectories in it which should each
+# have its own, separate local catalog. We might consider using
+# the pattern similar to repo_load()'s searching for a .git/ directory
+# and scan up the parent directories to find the first .rosetta-catalog/
+# subdirectory?
+
+
+def commit_str(commit):
+    """Ex: 'g1234abcd'."""
+
+    # TODO: Only works for git, where a far, future day, folks might want non-git?
+
+    return "g" + str(commit)[:7]
+

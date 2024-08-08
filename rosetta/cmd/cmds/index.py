@@ -2,10 +2,9 @@ import fnmatch
 import logging
 import os
 import pathlib
-import git
 from tqdm import tqdm
 
-from rosetta.cmd.cmds.init import init_local
+from rosetta.cmd.cmds.util import *
 from rosetta.core.catalog.catalog_mem import CatalogMem
 from rosetta.core.catalog.directory import scan_directory
 from rosetta.core.catalog.descriptor import CatalogDescriptor
@@ -22,30 +21,6 @@ logger = logging.getLogger(__name__)
 
 
 MAX_ERRS = 10  # TODO: Hardcoded limit on too many errors.
-
-
-def commit_str(commit):
-    """Ex: 'g1234abcd'."""
-
-    # TODO: Only works for git, where a far, future day, folks might want non-git?
-
-    return "g" + str(commit)[:7]
-
-
-def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
-    # The repo is the user's application's repo and is NOT the repo
-    # of rosetta-core. The rosetta CLI / library should be run in
-    # a directory (or subdirectory) of the user's application's repo,
-    # where we'll walk up the parent dirs until we find the .git/ subdirectory.
-
-    while not (top_dir / ".git").exists():
-        if top_dir.parent == top_dir:
-            raise ValueError(
-                "Could not find .git directory. Please run index within a git repository."
-            )
-        top_dir = top_dir.parent
-
-    return git.Repo(top_dir / ".git")
 
 
 def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
@@ -72,9 +47,9 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
         # dirty, then we might consider going ahead and indexing?
 
         # TODO: If the repo is dirty because .rosetta-activity/ is
-        # dirty, then we might print some helper instructions on
-        # adding .rosetta-activity/ to the .gitignore file? Or, should
-        # instead preemptively generate a .rosetta-activity/.gitiginore
+        # dirty, then we might print some helper instructions for the dev user
+        # on how to add .rosetta-activity/ to the .gitignore file? Or, should
+        # we instead preemptively generate a .rosetta-activity/.gitiginore
         # file during init_local()?
 
         raise ValueError("repo is dirty")
