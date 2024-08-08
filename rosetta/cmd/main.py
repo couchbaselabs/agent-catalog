@@ -92,17 +92,17 @@ def env(ctx):
     show_default=True,
 )
 @click.option(
-    "-m",
-    "--max",
+    "-k",
+    "--top_k",
     default=1,
-    help="The max number of results.",
+    help="The maximum number of results to show.",
     show_default=True,
 )
 @click.pass_context
-def find(ctx, query, kind, max):
+def find(ctx, query, kind, top_k):
     """Find tools, prompts, etc. from the catalog based on a natural language QUERY string.
     """
-    cmd_find(ctx.obj, query, kind=kind, max=max)
+    cmd_find(ctx.obj, query, kind=kind, top_k=top_k)
 
 
 @click_main.command()

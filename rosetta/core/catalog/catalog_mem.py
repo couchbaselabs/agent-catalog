@@ -1,9 +1,9 @@
 import pathlib
 import typing
 
-from ..tool.types.descriptor import ToolDescriptor
 from .catalog_base import CatalogBase, FoundItem
-from .descriptor import CatalogDescriptor
+from ..catalog.descriptor import CatalogDescriptor
+from ..record.descriptor import RecordDescriptor
 
 
 class CatalogMem(CatalogBase):
@@ -19,7 +19,7 @@ class CatalogMem(CatalogBase):
         self.catalog_path = catalog_path
         self.catalog_descriptor = catalog_descriptor
 
-    def init_from(self, other: typing.Self) -> list[ToolDescriptor]:
+    def init_from(self, other: typing.Self) -> list[RecordDescriptor]:
         items_to_process = []
 
         if other and other.catalog_descriptor:
@@ -88,7 +88,7 @@ class CatalogMem(CatalogBase):
         )
 
         # Order results by their distance to the query (larger is "closer").
-        results = [FoundItem(tool_descriptor=available_tools[i],
+        results = [FoundItem(record_descriptor=available_tools[i],
                              delta=deltas[i])
                    for i in range(len(deltas))]
 

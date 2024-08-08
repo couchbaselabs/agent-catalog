@@ -10,7 +10,7 @@ import json
 import yaml
 import re
 
-from .kind import ToolKind
+from ...record.kind import RecordKind
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ class SQLPPQueryMetadata(_Metadata):
     output: str
 
     # We will only parse SQL++ query front-matter in a .sqlpp file, so this field is optional.
-    tool_kind: ToolKind = ToolKind.SQLPPQuery
+    record_kind: RecordKind = RecordKind.SQLPPQuery
 
     @staticmethod
     def read_front_matter(sqlpp_file: pathlib.Path) -> dict:
@@ -54,10 +54,10 @@ class SQLPPQueryMetadata(_Metadata):
         cls._check_if_valid_json_schema(v)
         return v
 
-    @pydantic.field_validator('tool_kind')
+    @pydantic.field_validator('record_kind')
     @classmethod
-    def tool_kind_should_be_sqlpp_query(cls, v: ToolKind):
-        if v != ToolKind.SQLPPQuery:
+    def record_kind_should_be_sqlpp_query(cls, v: RecordKind):
+        if v != RecordKind.SQLPPQuery:
             raise ValueError('Cannot create instance of SQLPPQueryMetadata w/ non SQLPPQuery class!')
         return v
 
@@ -85,12 +85,12 @@ class SemanticSearchMetadata(_Metadata):
     description: str
     input: str
     vector_search: VectorSearchMetadata
-    tool_kind: ToolKind
+    record_kind: RecordKind
 
-    @pydantic.field_validator('tool_kind')
+    @pydantic.field_validator('record_kind')
     @classmethod
-    def tool_kind_should_be_semantic_search(cls, v: ToolKind):
-        if v != ToolKind.SemanticSearch:
+    def record_kind_should_be_semantic_search(cls, v: RecordKind):
+        if v != RecordKind.SemanticSearch:
             raise ValueError('Cannot create instance of SemanticSearchMetadata w/ non SemanticSearch class!')
         return v
 
@@ -224,11 +224,11 @@ class HTTPRequestMetadata(_Metadata):
             return self
 
     open_api: OpenAPIMetadata
-    tool_kind: ToolKind
+    record_kind: RecordKind
 
-    @pydantic.field_validator('tool_kind')
+    @pydantic.field_validator('record_kind')
     @classmethod
-    def tool_kind_should_be_http_request(cls, v: ToolKind):
-        if v != ToolKind.HTTPRequest:
+    def record_kind_should_be_http_request(cls, v: RecordKind):
+        if v != RecordKind.HTTPRequest:
             raise ValueError('Cannot create instance of HTTPRequestMetadata w/ non HTTPRequest class!')
         return v

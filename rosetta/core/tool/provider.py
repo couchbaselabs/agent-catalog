@@ -22,8 +22,8 @@ from .reranker import (
     ToolWithDelta,
     ClosestClusterReranker
 )
-from ..catalog.descriptor import ToolDescriptor
-from .types.kind import ToolKind
+from ..record.descriptor import RecordDescriptor
+from ..record.kind import RecordKind
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +56,7 @@ class Provider(pydantic.BaseModel, abc.ABC):
     def get(self, _id: str) -> langchain_core.tools.StructuredTool:
         pass
 
-    def _load_from_source(self, filename: pathlib.Path, entry: ToolDescriptor, tool_filter=None):
+    def _load_from_source(self, filename: pathlib.Path, entry: RecordDescriptor, tool_filter=None):
         # TODO (GLENN): We should avoid blindly putting things in our path.
         if not str(filename.parent.absolute()) in sys.path:
             sys.path.append(str(filename.parent.absolute()))
@@ -92,7 +92,7 @@ class LocalProvider(Provider):
         with self.catalog_file.open('r') as fp:
             source_groups = dict()
             for line in fp:
-                entry = ToolDescriptor.model_validate_json(line)
+                entry = RecordDescriptor.model_validate_json(line)
                 if entry.source not in source_groups:
                     # Note: we assume that each source only contains one type (kind) of tool.
                     source_groups[entry.source] = {
@@ -104,24 +104,24 @@ class LocalProvider(Provider):
         # Now, iterate through each group.
         for source, group in source_groups.items():
             entries = group['entries']
-            if group['kind'] == ToolKind.PythonFunction:
+            if group['kind'] == RecordKind.PythonFunction:
                 for entry in entries:
                     # TODO (GLENN): We need a better identifier than just the name and description.
                     tool_filter = lambda t: entry.name == t.name and entry.description == t.description
                     self._load_from_source(entry.source, entry, tool_filter)
             else:
                 match group['kind']:
-                    case ToolKind.SQLPPQuery:
+                    case RecordKind.SQLPPQuery:
                         generator = SQLPPCodeGenerator
-                    case ToolKind.SemanticSearch:
+                    case RecordKind.SemanticSearch:
                         generator = SemanticSearchCodeGenerator
-                    case ToolKind.HTTPRequest:
+                    case RecordKind.HTTPRequest:
                         generator = HTTPRequestCodeGenerator
                     case _:
                         raise ValueError('Unexpected tool-kind encountered!')
 
                 # For non-Python (native) tools, we expect one Python file per entry.
-                output = generator(tool_descriptors=entries).generate(self.output_directory)
+                output = generator(record_descriptors=entries).generate(self.output_directory)
                 for i in range(len(entries)):
                     self._load_from_source(output[i], entries[i])
 

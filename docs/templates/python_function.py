@@ -5,8 +5,8 @@ from rosetta.core.tool import tool
 from pydantic import BaseModel
 
 
-# Although Python uses duck-typing, the specification of types greatly improves the response quality of LLMs.
-# It is highly recommended that all tools specify the types of their bound functions using Pydantic or dataclasses.
+# Although Python uses duck-typing, the specification of models greatly improves the response quality of LLMs.
+# It is highly recommended that all tools specify the models of their bound functions using Pydantic or dataclasses.
 class SalesModel(BaseModel):
     input_sources: list[str]
     sales_formula: str

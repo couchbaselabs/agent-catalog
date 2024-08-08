@@ -7,8 +7,8 @@ import tempfile
 import pydantic
 import io
 
-from rosetta.core.tool.types.kind import ToolKind
-from rosetta.core.tool.types.model import (
+from rosetta.core.record.kind import RecordKind
+from rosetta.core.tool.models.model import (
     SQLPPQueryMetadata,
     SemanticSearchMetadata,
     HTTPRequestMetadata
@@ -169,7 +169,7 @@ def test_sqlpp_query():
     file2_model = SQLPPQueryMetadata.model_validate(file2_yaml)
     assert file2_yaml['name'] == file2_model.name
     assert file2_yaml['description'] == file2_model.description
-    assert file2_model.tool_kind == ToolKind.SQLPPQuery
+    assert file2_model.record_kind == RecordKind.SQLPPQuery
 
     file3 = io.StringIO(inspect.cleandoc("""
         name: tool_1

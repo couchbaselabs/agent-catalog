@@ -1,4 +1,4 @@
-from ..tool.types.descriptor import ToolDescriptor
+from ..record.descriptor import RecordDescriptor
 from .catalog_base import CatalogBase
 
 
@@ -11,7 +11,7 @@ class CatalogChain(CatalogBase):
     def __init__(self, chain):
         self.chain = chain
 
-    def find(self, query) -> list[ToolDescriptor]:
+    def find(self, query) -> list[RecordDescriptor]:
         # TODO: This might roughly look something like...
 
         results = []

@@ -2,13 +2,13 @@ import abc
 import typing
 import pydantic
 
-from ..tool.types.descriptor import ToolDescriptor
+from ..record.descriptor import RecordDescriptor
 
 
 class FoundItem(pydantic.BaseModel):
     """ A result item in the results from a CatalogBase.find(). """
 
-    tool_descriptor: ToolDescriptor
+    record_descriptor: RecordDescriptor
 
     # TODO: A FoundItem might one day also contain additional information --
     # such as to help with any further processing of results (e.g., reranking)
