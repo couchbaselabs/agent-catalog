@@ -2,11 +2,10 @@ import fnmatch
 import logging
 import os
 import pathlib
-import git
 from tqdm import tqdm
 
-from rosetta.cmd.cmds.init import init_local
-from rosetta.core.catalog.ref import MemCatalogRef
+from rosetta.cmd.cmds.util import *
+from rosetta.core.catalog.catalog_mem import CatalogMem
 from rosetta.core.catalog.directory import scan_directory
 from rosetta.core.catalog.descriptor import CatalogDescriptor
 from rosetta.core.tool.indexer import source_indexers, augment_descriptor, vectorize_descriptor
@@ -22,30 +21,6 @@ logger = logging.getLogger(__name__)
 
 
 MAX_ERRS = 10  # TODO: Hardcoded limit on too many errors.
-
-
-def commit_str(commit):
-    """Ex: 'g1234abcd'."""
-
-    # TODO: Only works for git, where a far, future day, folks might want non-git?
-
-    return "g" + str(commit)[:7]
-
-
-def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
-    # The repo is the user's application's repo and is NOT the repo
-    # of rosetta-core. The rosetta CLI / library should be run in
-    # a directory (or subdirectory) of the user's application's repo,
-    # where we'll walk up the parent dirs until we find the .git/ subdirectory.
-
-    while not (top_dir / ".git").exists():
-        if top_dir.parent == top_dir:
-            raise ValueError(
-                "Could not find .git directory. Please run index within a git repository."
-            )
-        top_dir = top_dir.parent
-
-    return git.Repo(top_dir / ".git")
 
 
 def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
@@ -72,9 +47,9 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
         # dirty, then we might consider going ahead and indexing?
 
         # TODO: If the repo is dirty because .rosetta-activity/ is
-        # dirty, then we might print some helper instructions on
-        # adding .rosetta-activity/ to the .gitignore file? Or, should
-        # instead preemptively generate a .rosetta-activity/.gitiginore
+        # dirty, then we might print some helper instructions for the dev user
+        # on how to add .rosetta-activity/ to the .gitignore file? Or, should
+        # we instead preemptively generate a .rosetta-activity/.gitiginore
         # file during init_local()?
 
         raise ValueError("repo is dirty")
@@ -98,10 +73,10 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
 
     if catalog_path.exists():
         # Load the old / previous local catalog.
-        curr_catalog = MemCatalogRef().load(catalog_path)
+        curr_catalog = CatalogMem().load(catalog_path)
     else:
-        # An empty MemCatalogRef with no items represents an initial catalog state.
-        curr_catalog = MemCatalogRef()
+        # An empty CatalogMem with no items represents an initial catalog state.
+        curr_catalog = CatalogMem()
         curr_catalog.catalog_descriptor = CatalogDescriptor(
             catalog_schema_version=meta["catalog_schema_version"],
             embedding_model=meta["embedding_model"],
@@ -141,22 +116,18 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
 
     print("==================\ndiff'ing...")
 
-    next_catalog = MemCatalogRef()
+    next_catalog = CatalogMem()
     next_catalog.catalog_descriptor = CatalogDescriptor(
         catalog_schema_version=meta["catalog_schema_version"],
         embedding_model=meta["embedding_model"],
         repo_commit_id=repo_commit_id,
         items=all_descriptors)
 
-    items_newer, items_deleted = curr_catalog.diff(next_catalog, repo)
-
-    curr_catalog.update(meta, repo_commit_id, items_newer, items_deleted, repo)
-
-    next_catalog = curr_catalog
+    items_to_upsert, items_to_delete = curr_catalog.diff(next_catalog, repo)
 
     print("==================\naugmenting...")
 
-    for descriptor in tqdm(items_newer):
+    for descriptor in tqdm(items_to_upsert):
         if len(all_errs) > MAX_ERRS:
             break
 
@@ -176,7 +147,7 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
 
     embedding_model_obj = sentence_transformers.SentenceTransformer(meta["embedding_model"])
 
-    for descriptor in tqdm(items_newer):
+    for descriptor in tqdm(items_to_upsert):
         if len(all_errs) > MAX_ERRS:
             break
 
@@ -195,7 +166,9 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
 
     # TODO: Support a --dry-run option that doesn't update/save any files.
 
-    next_catalog.save(catalog_path)
+    curr_catalog.update(meta, repo_commit_id, items_to_upsert, items_to_delete)
+
+    curr_catalog.save(catalog_path)
 
     # ---------------------------------
 

@@ -2,7 +2,7 @@ import json
 import pathlib
 import click
 
-from rosetta.core.catalog.ref import MemCatalogRef
+from rosetta.core.catalog.catalog_mem import CatalogMem
 from ..models.ctx.model import Context
 
 
@@ -20,7 +20,7 @@ def cmd_find(ctx: Context, query, kind="tool", max=1):
     # TODO: Possible security issue -- need to check kind is an allowed value?
     catalog_path = ctx.catalog + "/" + kind + "-catalog.json"
 
-    c = MemCatalogRef().load(pathlib.Path(catalog_path))
+    c = CatalogMem().load(pathlib.Path(catalog_path))
 
     found_items = c.find(query, max=max)
 
