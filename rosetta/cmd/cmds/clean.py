@@ -12,6 +12,7 @@ def clean_local(ctx: Context):
     xs = [
         ctx.activity,
         # TODO: We should instead glob for all *_catalog.json files?
+        ctx.catalog + "/tool-catalog.json", # TODO: emporary during refactoring.
         ctx.catalog + "/tool_catalog.json",
         ctx.catalog + "/prompt_catalog.json",
         ctx.catalog + "/meta.json",
