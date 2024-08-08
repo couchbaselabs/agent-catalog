@@ -40,13 +40,13 @@ class RecordDescriptor(pydantic.BaseModel):
 
     # For git, this is a git commit SHA / HASH.
     # Ex: "g11223344".
-    repo_commit_id: str
+    repo_commit_id: str = None
 
     # Embedding used to search this record.
     embedding: list[float]
 
     # TODO (GLENN): Do we need this?
-    content: typing.Optional[str]
+    content: typing.Optional[str] = None
 
     @property
     def pretty_json(self) -> str:
