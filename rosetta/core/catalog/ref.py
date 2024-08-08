@@ -15,9 +15,9 @@ class FoundItem(pydantic.BaseModel):
 
     tool_descriptor: ToolDescriptor
 
-    # TODO: A FoundItem might one day also contain a similarity score
-    # or extra information -- such as to help with any further
-    # processing of results (e.g., reranking)?
+    # TODO: A FoundItem might one day also contain additional information --
+    # such as to help with any further processing of results (e.g., reranking)
+    # and with debugging.
 
     delta: typing.Any
 
@@ -40,9 +40,10 @@ class CatalogRef(abc.ABC):
     def diff(self, other: 'MemCatalogRef', repo) -> typing.Tuple[list[ToolDescriptor], list[ToolDescriptor]]:
         """ Compare items from self to items from other.
 
-            Returns (items_to_upsert, items_to_delete) lists, where the
-            items_to_upsert list holds items from the other MemCatalogRef,
-            and the items_to_delete list holds items from the self MemCatalogRef.
+            Returns (items_to_upsert, items_to_delete), where the
+            items_to_upsert list holds items originating from the
+            other MemCatalogRef, and the items_to_delete list holds
+            items originating from the self MemCatalogRef.
 
             The items in the other MemCatalogRef can be 'bare', in that
             they might not yet have augmentations and/or vector embeddings.
@@ -193,7 +194,7 @@ class MemCatalogRef(CatalogRef):
                             # They have the same repo_commit_id's, so NO-OP.
                             pass
                         else:
-                            # The have different repo_commit_id's, so UPSERT.
+                            # They have different repo_commit_id's, so UPSERT.
                             items_to_upsert.append(o)
             else:
                 if bool(o.deleted):
@@ -214,7 +215,9 @@ class MemCatalogRef(CatalogRef):
                     d.deleted = True
 
                     # TODO: We should find the actual commit id
-                    # of the deletion from the repo.
+                    # of the deletion from the repo, where right
+                    # now we're incorrectly reusing the item's last
+                    # repo_commit_id in order to have some value.
                     # d.repo_commit_id = ???
 
                     items_to_delete.append(d)
