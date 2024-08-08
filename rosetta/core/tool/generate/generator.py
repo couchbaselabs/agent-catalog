@@ -43,7 +43,7 @@ class SQLPPCodeGenerator(_BaseCodeGenerator):
     record_descriptors: list[RecordDescriptor] = pydantic.Field(min_length=1, max_length=1)
 
     def generate(self, output_dir: pathlib.Path) -> list[pathlib.Path]:
-        sqlpp_file = self.tool_descriptors[0].source
+        sqlpp_file = self.record_descriptors[0].source
         metadata = SQLPPQueryMetadata.model_validate(
             SQLPPQueryMetadata.read_front_matter(sqlpp_file)
         )
@@ -87,7 +87,7 @@ class SemanticSearchCodeGenerator(_BaseCodeGenerator):
     record_descriptors: list[RecordDescriptor] = pydantic.Field(min_length=1, max_length=1)
 
     def generate(self, output_dir: pathlib.Path) -> list[pathlib.Path]:
-        yaml_file = self.tool_descriptors[0].source
+        yaml_file = self.record_descriptors[0].source
         metadata = SemanticSearchMetadata.model_validate(yaml.safe_load(yaml_file.open()))
 
         # Generate a Pydantic model for the input schema.
@@ -130,9 +130,9 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
         def locations(self):
             return f'{json.dumps(self.locations_dict)}'
 
-    @pydantic.field_validator('tool_descriptors')
+    @pydantic.field_validator('record_descriptors')
     @classmethod
-    def tool_descriptors_must_share_the_same_source(cls, v: list[RecordDescriptor]):
+    def record_descriptors_must_share_the_same_source(cls, v: list[RecordDescriptor]):
         if any(td.source != v[0].source for td in v):
             raise ValueError('Grouped HTTP-Request descriptors must share the same source!')
         return v

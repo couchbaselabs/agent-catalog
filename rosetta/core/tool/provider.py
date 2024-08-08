@@ -121,7 +121,7 @@ class LocalProvider(Provider):
                         raise ValueError('Unexpected tool-kind encountered!')
 
                 # For non-Python (native) tools, we expect one Python file per entry.
-                output = generator(tool_descriptors=entries).generate(self.output_directory)
+                output = generator(record_descriptors=entries).generate(self.output_directory)
                 for i in range(len(entries)):
                     self._load_from_source(output[i], entries[i])
 

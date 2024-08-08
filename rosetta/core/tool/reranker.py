@@ -54,7 +54,7 @@ class ClosestClusterReranker(pydantic.BaseModel):
                 logger.debug(f'Bandwidth of {working_bandwidth} was not satisfiable. Deepening.')
 
         if len(first_minimum) < 1:
-            logger.warning('Satisfiable bandwidth was not found. Returning original list.')
+            logger.debug('Satisfiable bandwidth was not found. Returning original list.')
             return ordered_tools
         else:
             closest_cluster = [t for t in ordered_tools if t.delta > s[first_maximum[-1]]]

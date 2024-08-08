@@ -88,7 +88,7 @@ class CatalogMem(CatalogBase):
         )
 
         # Order results by their distance to the query (larger is "closer").
-        results = [FoundItem(tool_descriptor=available_tools[i],
+        results = [FoundItem(record_descriptor=available_tools[i],
                              delta=deltas[i])
                    for i in range(len(deltas))]
 

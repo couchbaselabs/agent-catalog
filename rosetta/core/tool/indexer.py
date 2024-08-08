@@ -90,7 +90,6 @@ class DotPyFileIndexer(BaseFileIndexer):
                 # TODO: Capture line numbers as part of source?
                 source=filename,
                 repo_commit_id=repo_commit_id,
-                content=None,
                 # TODO: The embedding is filled in at a later phase.
                 embedding=[],
             ))
@@ -179,7 +178,6 @@ class DotYamlFileIndexer(BaseFileIndexer):
                         # TODO: Capture line numbers as part of source?
                         source=filename,
                         repo_commit_id=repo_commit_id,
-                        content=None,
                         # TODO: The embedding is filled in at a later phase.
                         embedding=[],
                     ))
