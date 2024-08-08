@@ -62,7 +62,16 @@ def cmd_index(ctx: Context, source_dirs: list[str], kind: str, embedding_model: 
     # TODO: The kind needs a security check as it's part of the path?
     catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")
 
-    next_catalog = cmd_index_catalog(meta, repo, repo_commit_id, kind, catalog_path, source_dirs)
+    def get_repo_commit_id(path: pathlib.Path) -> str:
+        commits = list(repo.iter_commits(paths=path.absolute(), max_count=1))
+        if not commits or len(commits) <= 0:
+            raise ValueError(
+                f"ERROR: get_repo_commit_id, no commits for filename: {path.absolute()}"
+            )
+        return commit_str(commits[0])
+
+    next_catalog = cmd_index_catalog(meta, repo_commit_id, get_repo_commit_id,
+                                     kind, catalog_path, source_dirs)
 
     print("==================\nsaving local catalog...")
 
@@ -88,7 +97,8 @@ def cmd_index(ctx: Context, source_dirs: list[str], kind: str, embedding_model: 
     ).index([pathlib.Path(p) for p in source_dirs])
 
 
-def cmd_index_catalog(meta, repo, repo_commit_id, kind, catalog_path, source_dirs):
+def cmd_index_catalog(meta, repo_commit_id, get_repo_commit_id,
+                      kind, catalog_path, source_dirs):
     # TODO: We should use different source_indexers & source_globs based on the kind?
 
     if catalog_path.exists():
@@ -115,14 +125,6 @@ def cmd_index_catalog(meta, repo, repo_commit_id, kind, catalog_path, source_dir
             break
 
         logger.info(f"Examining source file: {source_file}")
-
-        def get_repo_commit_id(path: pathlib.Path) -> str:
-            commits = list(repo.iter_commits(paths=path.absolute(), max_count=1))
-            if not commits or len(commits) <= 0:
-                raise ValueError(
-                    f"ERROR: get_repo_commit_id, no commits for filename: {path.absolute()}"
-                )
-            return commit_str(commits[0])
 
         for glob, indexer in source_indexers.items():
             if fnmatch.fnmatch(source_file.name, glob):
