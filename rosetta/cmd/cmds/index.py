@@ -1,4 +1,3 @@
-import fnmatch
 import logging
 import os
 import pathlib
@@ -8,12 +7,10 @@ from rosetta.cmd.cmds.util import *
 from rosetta.core.catalog.catalog_mem import CatalogMem
 from rosetta.core.catalog.directory import scan_directory
 from rosetta.core.catalog.descriptor import CatalogDescriptor
-from rosetta.core.tool.indexer import source_indexers, augment_descriptor, vectorize_descriptor
-
+from rosetta.core.catalog.index import index_catalog
 
 from ..models.ctx.model import Context
 
-source_globs = list(source_indexers.keys())
 
 logger = logging.getLogger(__name__)
 
@@ -70,8 +67,9 @@ def cmd_index(ctx: Context, source_dirs: list[str], kind: str, embedding_model: 
             )
         return commit_str(commits[0])
 
-    next_catalog = cmd_index_catalog(meta, repo_commit_id, get_repo_commit_id,
-                                     kind, catalog_path, source_dirs)
+    next_catalog = index_catalog(meta, repo_commit_id, get_repo_commit_id,
+                                 kind, catalog_path, source_dirs,
+                                 progress=tqdm, max_errs=MAX_ERRS)
 
     print("==================\nsaving local catalog...")
 
@@ -95,96 +93,3 @@ def cmd_index(ctx: Context, source_dirs: list[str], kind: str, embedding_model: 
         catalog_file=pathlib.Path(tool_catalog_file),
         embedding_model=sentence_transformers.SentenceTransformer(meta["embedding_model"]),
     ).index([pathlib.Path(p) for p in source_dirs])
-
-
-def cmd_index_catalog(meta, repo_commit_id, get_repo_commit_id,
-                      kind, catalog_path, source_dirs):
-    # TODO: We should use different source_indexers & source_globs based on the kind?
-
-    if catalog_path.exists():
-        # Load the old / previous local catalog.
-        curr_catalog = CatalogMem().load(catalog_path)
-    else:
-        # An empty CatalogMem with no items represents an initial catalog state.
-        curr_catalog = CatalogMem()
-        curr_catalog.catalog_descriptor = CatalogDescriptor(
-            catalog_schema_version=meta["catalog_schema_version"],
-            kind=kind,
-            embedding_model=meta["embedding_model"],
-            repo_commit_id="",
-            items=[])
-
-    source_files = []
-    for source_dir in source_dirs:
-        source_files += scan_directory(source_dir, source_globs)
-
-    all_errs = []
-    all_descriptors = []
-    for source_file in tqdm(source_files):
-        if len(all_errs) > MAX_ERRS:
-            break
-
-        logger.info(f"Examining source file: {source_file}")
-
-        for glob, indexer in source_indexers.items():
-            if fnmatch.fnmatch(source_file.name, glob):
-                errs, descriptors = indexer.start_descriptors(source_file, get_repo_commit_id)
-                all_errs += errs or []
-                all_descriptors += descriptors or []
-                break
-
-    if all_errs:
-        print("ERROR: during examining", "\n".join([str(e) for e in all_errs]))
-        raise all_errs[0]
-
-    print("==================\ninit'ing...")
-
-    next_catalog = CatalogMem(catalog_descriptor=CatalogDescriptor(
-        catalog_schema_version=meta["catalog_schema_version"],
-        embedding_model=meta["embedding_model"],
-        kind=kind,
-        repo_commit_id=repo_commit_id,
-        source_dirs=source_dirs,
-        items=all_descriptors
-    ))
-
-    items_to_process = next_catalog.init_from(curr_catalog)
-
-    print("==================\naugmenting...")
-
-    for descriptor in tqdm(items_to_process):
-        if len(all_errs) > MAX_ERRS:
-            break
-
-        print(descriptor.name)
-
-        errs = augment_descriptor(descriptor)
-
-        all_errs += errs or []
-
-    if all_errs:
-        print("ERROR: during augmenting", "\n".join([str(e) for e in all_errs]))
-        raise all_errs[0]
-
-    print("==================\nvectorizing...")
-
-    import sentence_transformers
-
-    embedding_model_obj = sentence_transformers.SentenceTransformer(meta["embedding_model"])
-
-    for descriptor in tqdm(items_to_process):
-        if len(all_errs) > MAX_ERRS:
-            break
-
-        print(descriptor.name)
-
-        errs = vectorize_descriptor(descriptor, embedding_model_obj)
-
-        all_errs += errs or []
-
-    if all_errs:
-        print("ERROR: during vectorizing", "\n".join([str(e) for e in all_errs]))
-
-        raise all_errs[0]
-
-    return next_catalog
