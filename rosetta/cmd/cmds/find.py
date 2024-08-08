@@ -22,10 +22,10 @@ def cmd_find(ctx: Context, query, kind="tool", top_k=3):
     # TODO: When refactoring is done, rename back to "tool_catalog.json" (with underscore)?
     # TODO: Perhaps users optionally want the deltas or similarity scores, too?
     # TODO: Possible security issue -- need to check kind is an allowed value?
-    catalog_path = ctx.catalog + "/" + kind + "-catalog.json"
+    catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")
 
     # Query our catalog for a list of results.
-    catalog = CatalogMem().load(pathlib.Path(catalog_path))
+    catalog = CatalogMem().load(catalog_path)
 
     repo = repo_load(pathlib.Path(os.getcwd()))
 
