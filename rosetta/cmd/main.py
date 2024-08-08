@@ -108,6 +108,12 @@ def find(ctx, query, kind, max):
 @click_main.command()
 @click.argument("source_dirs", nargs=-1)
 @click.option(
+    "--kind",
+    default="tool",
+    help="The kind of items to index into the local catalog.",
+    show_default=True,
+)
+@click.option(
     "-em",
     "--embedding-model",
     default=DEFAULT_EMBEDDING_MODEL,
@@ -121,7 +127,7 @@ def find(ctx, query, kind, max):
     show_default=True,
 )
 @click.pass_context
-def index(ctx, source_dirs, embedding_model, dry_run):
+def index(ctx, source_dirs, kind, embedding_model, dry_run):
     """Walk source directory trees for indexing source files into the local catalog.
 
     SOURCE_DIRS defaults to "."
@@ -135,7 +141,7 @@ def index(ctx, source_dirs, embedding_model, dry_run):
     # TODO: The index command should ignore the '.git' subdirectory.
     # TODO: The index command should ignore whatever's in the '.gitignore' file.
 
-    cmd_index(ctx.obj, source_dirs=source_dirs, embedding_model=embedding_model, dry_run=dry_run)
+    cmd_index(ctx.obj, source_dirs=source_dirs, kind=kind, embedding_model=embedding_model, dry_run=dry_run)
 
 
 @click_main.command()

@@ -14,6 +14,8 @@ class CatalogDescriptor(pydantic.BaseModel):
 
     catalog_schema_version: str
 
+    kind: str = None
+
     embedding_model: str
 
     # For git, this is a git repo commit SHA / HASH, which

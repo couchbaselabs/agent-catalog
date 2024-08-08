@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 MAX_ERRS = 10  # TODO: Hardcoded limit on too many errors.
 
 
-def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, dry_run: bool, **_):
+def cmd_index(ctx: Context, source_dirs: list[str], kind: str, embedding_model: str, dry_run: bool, **_):
     meta = init_local(ctx, embedding_model, dry_run=dry_run)
 
     if not meta["embedding_model"]:
@@ -44,11 +44,11 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, dry_ru
 
         raise ValueError("repo is dirty")
 
-    # TODO: One day, allow users to choose a different branch instead of assuming
+    # TODO: One day, maybe allow users to choose a different branch instead of assuming
     # the HEAD branch, as users currently would have to 'git checkout BRANCH_THEY_WANT'
     # before calling 'rosetta index' -- where if we decide to support an optional
     # branch name parameter, then the Indexer.start_descriptors() methods would
-    # need to be provided the file blob streams from git instead of our current
+    # need to be provided the file blob streams from the repo instead of our current
     # approach of opening & reading file contents directly,
 
     # The commit id for the repo's HEAD commit.
@@ -59,7 +59,37 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, dry_ru
     # code (publish, find, etc) that depends on the old file. Once refactoring is
     # done, we'll switch back to tool_catalog.json.
 
-    catalog_path = pathlib.Path(ctx.catalog + "/tool-catalog.json")
+    # TODO: The kind needs a security check as it's part of the path?
+    catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")
+
+    next_catalog = cmd_index_catalog(meta, repo, repo_commit_id, kind, catalog_path, source_dirs)
+
+    print("==================\nsaving local catalog...")
+
+    if not dry_run:
+        next_catalog.save(catalog_path)
+    else:
+        print("SKIPPING: local catalog saving due to --dry-run")
+
+    # ---------------------------------
+
+    # TODO: Old indexing codepaths that are getting refactored.
+
+    print("==================\nOLD / pre-refactor indexing...")
+
+    tool_catalog_file = ctx.catalog + "/tool_catalog.json"
+
+    import rosetta.core.tool
+    import sentence_transformers
+
+    rosetta.core.tool.LocalIndexer(
+        catalog_file=pathlib.Path(tool_catalog_file),
+        embedding_model=sentence_transformers.SentenceTransformer(meta["embedding_model"]),
+    ).index([pathlib.Path(p) for p in source_dirs])
+
+
+def cmd_index_catalog(meta, repo, repo_commit_id, kind, catalog_path, source_dirs):
+    # TODO: We should use different source_indexers & source_globs based on the kind?
 
     if catalog_path.exists():
         # Load the old / previous local catalog.
@@ -69,6 +99,7 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, dry_ru
         curr_catalog = CatalogMem()
         curr_catalog.catalog_descriptor = CatalogDescriptor(
             catalog_schema_version=meta["catalog_schema_version"],
+            kind=kind,
             embedding_model=meta["embedding_model"],
             repo_commit_id="",
             items=[])
@@ -109,6 +140,7 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, dry_ru
     next_catalog = CatalogMem(catalog_descriptor=CatalogDescriptor(
         catalog_schema_version=meta["catalog_schema_version"],
         embedding_model=meta["embedding_model"],
+        kind=kind,
         repo_commit_id=repo_commit_id,
         source_dirs=source_dirs,
         items=all_descriptors
@@ -153,25 +185,4 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, dry_ru
 
         raise all_errs[0]
 
-    print("==================\nsaving local catalog...")
-
-    if not dry_run:
-        next_catalog.save(catalog_path)
-    else:
-        print("SKIPPING: local catalog write due to --dry-run")
-
-    # ---------------------------------
-
-    print("==================\nOLD / pre-refactor indexing...")
-
-    # TODO: Old indexing codepaths that are getting refactored.
-
-    tool_catalog_file = ctx.catalog + "/tool_catalog.json"
-
-    import rosetta.core.tool
-    import sentence_transformers
-
-    rosetta.core.tool.LocalIndexer(
-        catalog_file=pathlib.Path(tool_catalog_file),
-        embedding_model=sentence_transformers.SentenceTransformer(meta["embedding_model"]),
-    ).index([pathlib.Path(p) for p in source_dirs])
+    return next_catalog
