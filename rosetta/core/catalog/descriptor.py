@@ -1,5 +1,6 @@
 import pydantic
 import pathlib
+import typing
 
 from ..tool import types
 
@@ -13,12 +14,16 @@ class CatalogDescriptor(pydantic.BaseModel):
 
     catalog_schema_version: str
 
+    kind: str = None
+
     embedding_model: str
 
     # For git, this is a git repo commit SHA / HASH, which
     # records the repo commit when the 'rosetta index' was run.
     # Ex: "g11aa22bb".
     repo_commit_id: str
+
+    source_dirs: typing.Union[list[str] | None] = None
 
     # TODO: Besides the repo_commit_id for the HEAD, we might also
     # want to track all the tags and/or branches which point to the

@@ -97,7 +97,7 @@ class DotPyFileIndexer(BaseFileIndexer):
                 # TODO: Capture line numbers as part of source?
                 source=filename,
                 repo_commit_id=repo_commit_id,
-                deleted=False,
+                content=None,
                 # TODO: The embedding is filled in at a later phase.
                 embedding=[],
             ))
@@ -128,7 +128,7 @@ class DotSqlppFileIndexer(BaseFileIndexer):
             description=metadata.description.strip(),
             source=filename,
             repo_commit_id=repo_commit_id,
-            deleted=False,
+            content=filename.read_text(),
             # TODO: The embedding is filled in at a later phase.
             embedding=[],
         )])
@@ -165,7 +165,7 @@ class DotYamlFileIndexer(BaseFileIndexer):
                     description=metadata.description.strip(),
                     source=filename,
                     repo_commit_id=repo_commit_id,
-                    deleted=False,
+                    content=filename.read_text(),
                     # TODO: The embedding is filled in at a later phase.
                     embedding=[],
                 )])
@@ -186,7 +186,7 @@ class DotYamlFileIndexer(BaseFileIndexer):
                         # TODO: Capture line numbers as part of source?
                         source=filename,
                         repo_commit_id=repo_commit_id,
-                        deleted=False,
+                        content=None,
                         # TODO: The embedding is filled in at a later phase.
                         embedding=[],
                     ))

@@ -9,6 +9,9 @@ from ..models.ctx.model import Context
 def cmd_find(ctx: Context, query, kind="tool", max=1):
     # TODO: One day, handle DBCatalogRef?
 
+    # TODO: If the repo is dirty, load the dirty items into a
+    # CatalogMem and setup a chain of catalogs to perform the find().
+
     # TODO: If DB is outdated and the local catalog has newer info,
     # then we need to consult the latest, local catalog / MemCatalogRef?
 
@@ -17,6 +20,8 @@ def cmd_find(ctx: Context, query, kind="tool", max=1):
 
     # TODO: When refactoring is done, rename back to "tool_catalog.json" (with underscore)?
 
+    # TODO: Perhaps users optionally want the deltas or similarity scores, too?
+
     # TODO: Possible security issue -- need to check kind is an allowed value?
     catalog_path = ctx.catalog + "/" + kind + "-catalog.json"
 
@@ -24,13 +29,7 @@ def cmd_find(ctx: Context, query, kind="tool", max=1):
 
     found_items = c.find(query, max=max)
 
-    # TODO: Perhaps users optionally want find() to also return deleted items?
-
-    # TODO: Perhaps users optionally want the deltas or similarity scores, too?
-
-    results = [x.tool_descriptor.model_dump()
-               for x in found_items
-               if not bool(x.tool_descriptor.deleted)]
+    results = [x.tool_descriptor.model_dump() for x in found_items]
 
     # TODO: Rerank the results?
 

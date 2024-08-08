@@ -17,14 +17,12 @@ source_globs = list(source_indexers.keys())
 
 logger = logging.getLogger(__name__)
 
-# TODO: During index'ing, should we also record the source_dirs into the catalog?
-
 
 MAX_ERRS = 10  # TODO: Hardcoded limit on too many errors.
 
 
-def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
-    meta = init_local(ctx, embedding_model)
+def cmd_index(ctx: Context, source_dirs: list[str], kind: str, embedding_model: str, dry_run: bool, **_):
+    meta = init_local(ctx, embedding_model, dry_run=dry_run)
 
     if not meta["embedding_model"]:
         raise ValueError(
@@ -37,28 +35,20 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
         # The ROSETTA_REPO_DIRTY_OK env var is intended
         # to help during rosetta development.
 
-        # TODO: One day, handle when there are dirty files (either changes
-        # not yet committed into git or untracked files w.r.t. git) via
-        # a hierarchy of catalogs? A hierarchy of catalogs has advanced
-        # cases of file deletions, renames/moves & lineage changes
-        # and how those changes can shadow lower-level catalog items.
-
         # TODO: If the repo is dirty only because .rosetta-catalog/ is
-        # dirty, then we might consider going ahead and indexing?
-
-        # TODO: If the repo is dirty because .rosetta-activity/ is
-        # dirty, then we might print some helper instructions for the dev user
-        # on how to add .rosetta-activity/ to the .gitignore file? Or, should
+        # dirty or because .rosetta-activity/ is dirty, then we might print
+        # some helper instructions for the dev user on commiting the .rosetta-catalog/
+        # and on how to add .rosetta-activity/ to the .gitignore file? Or, should
         # we instead preemptively generate a .rosetta-activity/.gitiginore
         # file during init_local()?
 
         raise ValueError("repo is dirty")
 
-    # TODO: One day, allow users to choose a different branch instead of assuming
+    # TODO: One day, maybe allow users to choose a different branch instead of assuming
     # the HEAD branch, as users currently would have to 'git checkout BRANCH_THEY_WANT'
     # before calling 'rosetta index' -- where if we decide to support an optional
     # branch name parameter, then the Indexer.start_descriptors() methods would
-    # need to be provided the file blob streams from git instead of our current
+    # need to be provided the file blob streams from the repo instead of our current
     # approach of opening & reading file contents directly,
 
     # The commit id for the repo's HEAD commit.
@@ -69,7 +59,37 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
     # code (publish, find, etc) that depends on the old file. Once refactoring is
     # done, we'll switch back to tool_catalog.json.
 
-    catalog_path = pathlib.Path(ctx.catalog + "/tool-catalog.json")
+    # TODO: The kind needs a security check as it's part of the path?
+    catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")
+
+    next_catalog = cmd_index_catalog(meta, repo, repo_commit_id, kind, catalog_path, source_dirs)
+
+    print("==================\nsaving local catalog...")
+
+    if not dry_run:
+        next_catalog.save(catalog_path)
+    else:
+        print("SKIPPING: local catalog saving due to --dry-run")
+
+    # ---------------------------------
+
+    # TODO: Old indexing codepaths that are getting refactored.
+
+    print("==================\nOLD / pre-refactor indexing...")
+
+    tool_catalog_file = ctx.catalog + "/tool_catalog.json"
+
+    import rosetta.core.tool
+    import sentence_transformers
+
+    rosetta.core.tool.LocalIndexer(
+        catalog_file=pathlib.Path(tool_catalog_file),
+        embedding_model=sentence_transformers.SentenceTransformer(meta["embedding_model"]),
+    ).index([pathlib.Path(p) for p in source_dirs])
+
+
+def cmd_index_catalog(meta, repo, repo_commit_id, kind, catalog_path, source_dirs):
+    # TODO: We should use different source_indexers & source_globs based on the kind?
 
     if catalog_path.exists():
         # Load the old / previous local catalog.
@@ -79,6 +99,7 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
         curr_catalog = CatalogMem()
         curr_catalog.catalog_descriptor = CatalogDescriptor(
             catalog_schema_version=meta["catalog_schema_version"],
+            kind=kind,
             embedding_model=meta["embedding_model"],
             repo_commit_id="",
             items=[])
@@ -114,20 +135,22 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
         print("ERROR: during examining", "\n".join([str(e) for e in all_errs]))
         raise all_errs[0]
 
-    print("==================\ndiff'ing...")
+    print("==================\ninit'ing...")
 
-    next_catalog = CatalogMem()
-    next_catalog.catalog_descriptor = CatalogDescriptor(
+    next_catalog = CatalogMem(catalog_descriptor=CatalogDescriptor(
         catalog_schema_version=meta["catalog_schema_version"],
         embedding_model=meta["embedding_model"],
+        kind=kind,
         repo_commit_id=repo_commit_id,
-        items=all_descriptors)
+        source_dirs=source_dirs,
+        items=all_descriptors
+    ))
 
-    items_to_upsert, items_to_delete = curr_catalog.diff(next_catalog, repo)
+    items_to_process = next_catalog.init_from(curr_catalog)
 
     print("==================\naugmenting...")
 
-    for descriptor in tqdm(items_to_upsert):
+    for descriptor in tqdm(items_to_process):
         if len(all_errs) > MAX_ERRS:
             break
 
@@ -147,7 +170,7 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
 
     embedding_model_obj = sentence_transformers.SentenceTransformer(meta["embedding_model"])
 
-    for descriptor in tqdm(items_to_upsert):
+    for descriptor in tqdm(items_to_process):
         if len(all_errs) > MAX_ERRS:
             break
 
@@ -162,26 +185,4 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
 
         raise all_errs[0]
 
-    print("==================\nsaving local catalog...")
-
-    # TODO: Support a --dry-run option that doesn't update/save any files.
-
-    curr_catalog.update(meta, repo_commit_id, items_to_upsert, items_to_delete)
-
-    curr_catalog.save(catalog_path)
-
-    # ---------------------------------
-
-    print("==================\nOLD / pre-refactor indexing...")
-
-    # TODO: Old indexing codepaths that are getting refactored.
-
-    tool_catalog_file = ctx.catalog + "/tool_catalog.json"
-
-    import rosetta.core.tool
-    import sentence_transformers
-
-    rosetta.core.tool.LocalIndexer(
-        catalog_file=pathlib.Path(tool_catalog_file),
-        embedding_model=sentence_transformers.SentenceTransformer(meta["embedding_model"]),
-    ).index([pathlib.Path(p) for p in source_dirs])
+    return next_catalog

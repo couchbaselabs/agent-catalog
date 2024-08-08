@@ -14,13 +14,3 @@ class CatalogDB(CatalogBase):
         """ Returns the catalog items that best match a query. """
 
         return [] # TODO: SQL++ and vector index searches likely are involved here.
-
-    def diff(self, other, repo) -> typing.Tuple[list[ToolDescriptor], list[ToolDescriptor]]:
-        items_to_upsert, items_to_delete = [], [] # TODO.
-
-        return (items_to_upsert, items_to_delete)
-
-    def update(self, meta, repo_commit_id: str,
-               items_to_upsert: list[ToolDescriptor],
-               items_to_delete: list[ToolDescriptor]):
-        pass # TODO.

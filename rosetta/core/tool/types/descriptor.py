@@ -1,5 +1,6 @@
 import pydantic
 import pathlib
+import typing
 
 from .kind import ToolKind
 
@@ -29,8 +30,6 @@ class ToolDescriptor(pydantic.BaseModel):
     # Ex: "g11223344".
     repo_commit_id: str
 
-    # For a non-deleted ToolDescriptor, the deleted will not True or false'y.
-    # For a deleted ToolDescriptor, the deleted will be True -- a tombstone.
-    deleted: bool
+    content: typing.Union[str | None]
 
     embedding: list[float]

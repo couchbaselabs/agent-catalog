@@ -100,12 +100,19 @@ def env(ctx):
 )
 @click.pass_context
 def find(ctx, query, kind, max):
-    """Find tools, prompts, etc. from the catalog."""
+    """Find tools, prompts, etc. from the catalog based on a natural language QUERY string.
+    """
     cmd_find(ctx.obj, query, kind=kind, max=max)
 
 
 @click_main.command()
 @click.argument("source_dirs", nargs=-1)
+@click.option(
+    "--kind",
+    default="tool",
+    help="The kind of items to index into the local catalog.",
+    show_default=True,
+)
 @click.option(
     "-em",
     "--embedding-model",
@@ -113,8 +120,14 @@ def find(ctx, query, kind, max):
     help="Embedding model when indexing source files into the local catalog.",
     show_default=True,
 )
+@click.option(
+    "--dry-run",
+    default=False,
+    help="When true, do not update the local catalog files.",
+    show_default=True,
+)
 @click.pass_context
-def index(ctx, source_dirs, embedding_model):
+def index(ctx, source_dirs, kind, embedding_model, dry_run):
     """Walk source directory trees for indexing source files into the local catalog.
 
     SOURCE_DIRS defaults to "."
@@ -128,7 +141,7 @@ def index(ctx, source_dirs, embedding_model):
     # TODO: The index command should ignore the '.git' subdirectory.
     # TODO: The index command should ignore whatever's in the '.gitignore' file.
 
-    cmd_index(ctx.obj, source_dirs=source_dirs, embedding_model=embedding_model)
+    cmd_index(ctx.obj, source_dirs=source_dirs, kind=kind, embedding_model=embedding_model, dry_run=dry_run)
 
 
 @click_main.command()

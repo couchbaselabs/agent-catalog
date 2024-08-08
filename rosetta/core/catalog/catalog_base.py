@@ -30,30 +30,3 @@ class CatalogBase(abc.ABC):
         # user credentials (for ACL's), etc.?
 
         raise NotImplementedError("CatalogBase.find()")
-
-    @abc.abstractmethod
-    def diff(self, other, repo) -> typing.Tuple[list[ToolDescriptor], list[ToolDescriptor]]:
-        """ Compare items from self to items from other (a CatalogMem).
-
-            Returns (items_to_upsert, items_to_delete), where the
-            items_to_upsert list holds items originating from the
-            other CatalogMem, and the items_to_delete list holds
-            items originating from the self CatalogBase.
-
-            The items in the other CatalogMem can be 'bare', in that
-            they might not yet have augmentations and/or vector embeddings.
-
-            The repo_commit_id of other items vs self items are compared, and the
-            repo object (e.g., a git repo) may be consulted for deeper comparisons.
-        """
-
-        raise NotImplementedError("CatalogBase.diff()")
-
-    @abc.abstractmethod
-    def update(self, meta, repo_commit_id: str,
-               items_to_upsert: list[ToolDescriptor],
-               items_to_delete: list[ToolDescriptor]):
-        """ Updates self from the items to upsert and delete.
-        """
-
-        raise NotImplementedError("CatalogBase.update()")
