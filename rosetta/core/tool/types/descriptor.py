@@ -30,6 +30,6 @@ class ToolDescriptor(pydantic.BaseModel):
     # Ex: "g11223344".
     repo_commit_id: str
 
-    content: typing.Union[str, None]
+    content: typing.Union[str | None]
 
     embedding: list[float]

@@ -17,8 +17,6 @@ source_globs = list(source_indexers.keys())
 
 logger = logging.getLogger(__name__)
 
-# TODO: During index'ing, should we also record the source_dirs into the catalog?
-
 
 MAX_ERRS = 10  # TODO: Hardcoded limit on too many errors.
 
@@ -112,6 +110,7 @@ def cmd_index(ctx: Context, source_dirs: list[str], embedding_model: str, **_):
         catalog_schema_version=meta["catalog_schema_version"],
         embedding_model=meta["embedding_model"],
         repo_commit_id=repo_commit_id,
+        source_dirs=source_dirs,
         items=all_descriptors
     ))
 
