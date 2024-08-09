@@ -101,8 +101,6 @@ def index_catalog_start(meta, repo_commit_id, repo_commit_id_for_path,
         print("ERROR: during start_descriptors", "\n".join([str(e) for e in all_errs]))
         raise all_errs[0]
 
-    print("==================\ninit'ing...")
-
     next_catalog = CatalogMem(catalog_descriptor=CatalogDescriptor(
         catalog_schema_version=meta["catalog_schema_version"],
         embedding_model=meta["embedding_model"],

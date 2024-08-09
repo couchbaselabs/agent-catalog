@@ -198,10 +198,16 @@ def publish(ctx, scope):
 
 
 @click_main.command()
+@click.option(
+    "--kind",
+    default="tool",
+    help="The kind of catalog to show status.",
+    show_default=True,
+)
 @click.pass_context
-def status(ctx):
+def status(ctx, kind):
     """Show the status of the local catalog."""
-    cmd_status(ctx.obj)
+    cmd_status(ctx.obj, kind=kind)
 
 
 @click_main.command()

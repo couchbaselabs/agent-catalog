@@ -33,8 +33,6 @@ def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
     if not read_only:
         os.makedirs(ctx.catalog, exist_ok=True)
         os.makedirs(ctx.activity, exist_ok=True)
-    else:
-        print("SKIPPING: local directory creation due to read_only mode")
 
     lib_v = lib_version()
 
@@ -90,8 +88,6 @@ def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
     if not read_only:
         with open(meta_path, "w") as f:
             json.dump(meta, f, sort_keys=True, indent=4)
-    else:
-        print("SKIPPING: meta.json file write due to read_only mode")
 
     return meta
 
