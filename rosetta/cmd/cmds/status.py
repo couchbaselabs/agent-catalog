@@ -5,67 +5,110 @@ from rosetta.core.catalog.catalog_mem import CatalogMem
 from rosetta.core.catalog.index import index_catalog_start
 
 
-def cmd_status(ctx, kind="tool"):
+level_colors = {"good": "green", "warn": "yellow", "error": "red"}
+
+
+def cmd_status(ctx, kind="tool", include_dirty=True):
+    # TODO: Allow the kind to be '*' or None to show the
+    # status on all the available kinds of catalogs.
+
+    sections = catalog_status(ctx, kind, include_dirty=include_dirty)
+
+    for section in sections:
+        name, parts = section
+        if name:
+            click.echo("-------------")
+            click.echo(name + ":")
+            indent = "  "
+        else:
+            indent = ""
+
+        for part in parts:
+            level, msg = part
+            if level in level_colors:
+                click.secho(indent + msg, fg=level_colors[level])
+            else:
+                click.echo(indent + msg)
+
+
+def catalog_status(ctx, kind, include_dirty=True):
     # TODO: Implement status checks also against a CatalogDB backend --
     # such as by validating DDL and schema versions,
     # looking for outdated items versus the local catalog, etc?
 
     # TODO: Validate schema versions -- if they're ahead, far behind, etc?
 
-    # TODO: Allow the kind to be '*' or None to show status
-    # on all the available kinds of catalogs.
-
-    repo, repo_commit_id_for_path = repo_load(pathlib.Path(os.getcwd()))
-    if repo.is_dirty():
-        repo_commit_id = REPO_DIRTY
-        click.secho("repo is DIRTY -- use 'rosetta index' to update the local catalog.", fg='red')
-    else:
-        repo_commit_id = repo_commit_id_str(repo.head.commit)
-        click.echo(f"repo commit id: {repo_commit_id}")
-
     catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")
+
     if not catalog_path.exists():
-        click.secho("local catalog does not exist yet -- use the index command.", fg='red')
-        return
+        return [(None, [("error", "ERROR: local catalog does not exist yet: please use the index command.")])]
+
+    sections = []
 
     catalog = CatalogMem().load(catalog_path)
 
-    uninitialized_items = []
+    if include_dirty:
+        repo, repo_commit_id_for_path = repo_load(pathlib.Path(os.getcwd()))
+        if repo.is_dirty():
+            repo_commit_id = REPO_DIRTY
+            sections.append((
+                "repo commit",
+                [("warn", "repo is DIRTY: please use 'rosetta index' to update the local catalog.")]
+            ))
+        else:
+            repo_commit_id = repo_commit_id_str(repo.head.commit)
+            sections.append((
+                "repo commit",
+                [(None, f"repo is clean"),
+                 (None, f"repo commit id: {repo_commit_id}")]
+            ))
 
-    if repo.is_dirty():
-        click.echo("-------------")
-        click.echo("scanning dirty items...")
+        uninitialized_items = []
 
-        meta = init_local(ctx, catalog.catalog_descriptor.embedding_model, read_only=True)
+        if repo.is_dirty():
+            section_parts = []
 
-        repo_commit_id = REPO_DIRTY
+            meta = init_local(ctx, catalog.catalog_descriptor.embedding_model, read_only=True)
 
-        # Scan the same source_dirs that were used in the last "rosetta index".
-        source_dirs = catalog.catalog_descriptor.source_dirs
+            repo_commit_id = REPO_DIRTY
 
-        # Start a CatalogMem on-the-fly that incorporates the dirty
-        # source file items which we'll use instead of the local catalog file.
-        all_errs, catalog, uninitialized_items = index_catalog_start(
-            meta, repo_commit_id, repo_commit_id_for_path,
-            kind, catalog_path, source_dirs,
-            scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
-            max_errs=999999)
+            # Scan the same source_dirs that were used in the last "rosetta index".
+            source_dirs = catalog.catalog_descriptor.source_dirs
 
-        for err in all_errs:
-            click.secho(f"ERROR: {err}", fg="red")
+            # Start a CatalogMem on-the-fly that incorporates the dirty
+            # source file items which we'll use instead of the local catalog file.
+            errs, catalog, uninitialized_items = index_catalog_start(
+                meta, repo_commit_id, repo_commit_id_for_path,
+                kind, catalog_path, source_dirs,
+                scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
+                max_errs=999999)
 
-    if uninitialized_items:
-        click.echo("-------------")
-        click.echo(f"dirty items count: {len(uninitialized_items)}")
-        click.echo("dirty items:")
-        for x in uninitialized_items:
-            click.echo(f"  - {x.source}: {x.name}")
+            for err in errs:
+                section_parts.append(("error", f"ERROR: {err}"))
+            else:
+                section_parts.append((None, "ok"))
 
-    click.echo("-------------")
-    click.echo("catalog info:")
-    click.echo(f"  path            : {catalog_path}")
-    click.echo(f"  schema version  : {catalog.catalog_descriptor.catalog_schema_version}")
-    click.echo(f"  kind of catalog : {catalog.catalog_descriptor.kind}")
-    click.echo(f"  number of items : {len(catalog.catalog_descriptor.items or [])}")
-    click.echo(f"  embedding model : {catalog.catalog_descriptor.embedding_model}")
-    click.echo(f"  source dirs     : {catalog.catalog_descriptor.source_dirs}")
+            sections.append(("local scanning", section_parts))
+
+        if uninitialized_items:
+            section_parts = [
+                (None, f"dirty items count: {len(uninitialized_items)}")
+            ]
+
+            for x in uninitialized_items:
+                section_parts.append(("None", f"- {x.source}: {x.name}"))
+
+            sections.append(("local dirty items", section_parts))
+
+    sections.append((
+        "local catalog info",
+         [(None, f"path            : {catalog_path}"),
+          (None, f"schema version  : {catalog.catalog_descriptor.catalog_schema_version}"),
+          (None, f"kind of catalog : {catalog.catalog_descriptor.kind}"),
+          (None, f"repo commit id  : {catalog.catalog_descriptor.repo_commit_id}"),
+          (None, f"embedding model : {catalog.catalog_descriptor.embedding_model}"),
+          (None, f"source dirs     : {catalog.catalog_descriptor.source_dirs}"),
+          (None, f"number of items : {len(catalog.catalog_descriptor.items or [])}")]
+    ))
+
+    return sections

@@ -20,7 +20,7 @@ class RecordDescriptor(pydantic.BaseModel):
     """ This model represents a tool's persistable description or metadata. """
 
     # A fully qualified unique identifier for the tool.
-    # Ex: "src/tools/finance.py:get_current_stock_price:g11223344".
+    # Ex: "src/tools/finance.py:get_current_stock_price:g11aa345".
     identifier: str
 
     # The type of catalog entry (python tool, prompt, etc...).
@@ -39,7 +39,7 @@ class RecordDescriptor(pydantic.BaseModel):
     source: pathlib.Path
 
     # For git, this is a git commit SHA / HASH.
-    # Ex: "g11223344".
+    # Ex: "g11aa345" or REPO_DIRTY.
     repo_commit_id: str = None
 
     # Embedding used to search this record.

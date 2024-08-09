@@ -20,11 +20,11 @@ class CatalogDescriptor(pydantic.BaseModel):
 
     embedding_model: str
 
-    # For git, this is a git repo commit SHA / HASH, which
-    # records the repo commit when the 'rosetta index' was run.
-    # Ex: "g11aa234".
-    repo_commit_id: str
-
     source_dirs: typing.Union[list[str] | None] = None
+
+    # For git, this is a git repo commit SHA / HASH, which
+    # records the repo's commit id when 'rosetta index' was run.
+    # Ex: "g11aa234" or REPO_DIRTY.
+    repo_commit_id: str
 
     items: list[RecordDescriptor]

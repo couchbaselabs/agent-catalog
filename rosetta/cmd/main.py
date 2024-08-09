@@ -204,10 +204,16 @@ def publish(ctx, scope):
     help="The kind of catalog to show status.",
     show_default=True,
 )
+@click.option(
+    "--include-dirty",
+    default=True,
+    help="Whether to consider dirty source files for status.",
+    show_default=True,
+)
 @click.pass_context
-def status(ctx, kind):
+def status(ctx, kind, include_dirty):
     """Show the status of the local catalog."""
-    cmd_status(ctx.obj, kind=kind)
+    cmd_status(ctx.obj, kind=kind, include_dirty=include_dirty)
 
 
 @click_main.command()
