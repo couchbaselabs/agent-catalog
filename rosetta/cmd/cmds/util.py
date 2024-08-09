@@ -95,7 +95,10 @@ def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
     return meta
 
 
+ # Special value when there's no commit id,
+ # such as when there are dirty / untracked files.
 REPO_DIRTY = "_DIRTY_"
+
 
 def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
     # The repo is the user's application's repo and is NOT the repo
