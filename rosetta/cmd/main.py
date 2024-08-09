@@ -100,16 +100,16 @@ def env(ctx):
     show_default=True,
 )
 @click.option(
-    "--ignore-dirty",
+    "--include-dirty",
     default=True,
-    help="Whether to ignore dirty source files for the find query.",
+    help="Whether to consider and process dirty source files for the find query.",
     show_default=True,
 )
 @click.pass_context
-def find(ctx, query, kind, top_k, ignore_dirty):
+def find(ctx, query, kind, top_k, include_dirty):
     """Find tools, prompts, etc.
-    from the catalog based on a natural language QUERY string."""
-    cmd_find(ctx.obj, query, kind=kind, top_k=top_k, ignore_dirty=ignore_dirty)
+       from the catalog based on a natural language QUERY string."""
+    cmd_find(ctx.obj, query, kind=kind, top_k=top_k, include_dirty=include_dirty)
 
 
 @click_main.command()
@@ -128,13 +128,19 @@ def find(ctx, query, kind, top_k, ignore_dirty):
     show_default=True,
 )
 @click.option(
+    "--include-dirty",
+    default=False,
+    help="Whether to index dirty source files into the local catalog.",
+    show_default=True,
+)
+@click.option(
     "--dry-run",
     default=False,
     help="When true, do not update the local catalog files.",
     show_default=True,
 )
 @click.pass_context
-def index(ctx, source_dirs, kind, embedding_model, dry_run):
+def index(ctx, source_dirs, kind, embedding_model, include_dirty, dry_run):
     """Walk source directory trees for indexing source files into the local catalog.
 
     SOURCE_DIRS defaults to "."
@@ -148,13 +154,8 @@ def index(ctx, source_dirs, kind, embedding_model, dry_run):
     # TODO: The index command should ignore the '.git' subdirectory.
     # TODO: The index command should ignore whatever's in the '.gitignore' file.
 
-    cmd_index(
-        ctx.obj,
-        source_dirs=source_dirs,
-        kind=kind,
-        embedding_model=embedding_model,
-        dry_run=dry_run,
-    )
+    cmd_index(ctx.obj, source_dirs=source_dirs, kind=kind, embedding_model=embedding_model,
+              include_dirty=include_dirty, dry_run=dry_run)
 
 
 @click_main.command()
@@ -200,10 +201,22 @@ def publish(ctx, scope):
 
 
 @click_main.command()
+@click.option(
+    "--kind",
+    default="tool",
+    help="The kind of catalog to show status.",
+    show_default=True,
+)
+@click.option(
+    "--include-dirty",
+    default=True,
+    help="Whether to consider dirty source files for status.",
+    show_default=True,
+)
 @click.pass_context
-def status(ctx):
+def status(ctx, kind, include_dirty):
     """Show the status of the local catalog."""
-    cmd_status(ctx.obj)
+    cmd_status(ctx.obj, kind=kind, include_dirty=include_dirty)
 
 
 @click_main.command()
