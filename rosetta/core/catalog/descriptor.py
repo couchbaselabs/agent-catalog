@@ -1,9 +1,7 @@
 import pydantic
-import pathlib
+import typing
 
-from ..tool import types
-
-from ..tool.types.descriptor import ToolDescriptor as CoreToolDescriptor
+from ..record.descriptor import RecordDescriptor
 
 
 class CatalogDescriptor(pydantic.BaseModel):
@@ -13,6 +11,8 @@ class CatalogDescriptor(pydantic.BaseModel):
 
     catalog_schema_version: str
 
+    kind: str = None
+
     embedding_model: str
 
     # For git, this is a git repo commit SHA / HASH, which
@@ -20,22 +20,11 @@ class CatalogDescriptor(pydantic.BaseModel):
     # Ex: "g11aa22bb".
     repo_commit_id: str
 
-    items: list[CoreToolDescriptor]
+    source_dirs: typing.Union[list[str] | None] = None
 
+    # TODO: Besides the repo_commit_id for the HEAD, we might also
+    # want to track all the tags and/or branches which point to the
+    # HEAD's repo_commit_id? That way, users might be able to perform
+    # catalog search/find()'s based on a given tag (e.g., "v1.17.0").
 
-class ToolDescriptor(pydantic.BaseModel):
-    """ This model represents a tool catalog entry.
-
-        !!! OBSOLETED !!! MOVED: TODO: This will be deleted once the indexing
-        related refactoring is completed. This has been replaced/moved to
-        rosetta.core.tool.types.descriptor.ToolDescriptor.
-    """
-
-    identifier: str
-
-    name: str
-    description: str
-    embedding: list[float]
-
-    source: pathlib.Path
-    kind: types.ToolKind
+    items: list[RecordDescriptor]

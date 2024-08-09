@@ -1,7 +1,10 @@
 import json
 import os
+import pathlib
 
 import click
+import git
+import gitignore_parser
 import sentence_transformers
 
 from rosetta.core.catalog import CATALOG_SCHEMA_VERSION
@@ -10,16 +13,29 @@ from rosetta.core.catalog.version import (
     lib_version,
     lib_version_compare,
 )
+from rosetta.core.catalog.directory import ScanDirectoryOpts
 
 from ..models.ctx.model import Context
 
 
-def init_local(ctx: Context, embedding_model: str):
-    # Init directories.
-    os.makedirs(ctx.catalog, exist_ok=True)
-    os.makedirs(ctx.activity, exist_ok=True)
+MAX_ERRS = 10
 
-    lib_v = lib_version(ctx)
+
+DEFAULT_SCAN_DIRECTORY_OPTS = ScanDirectoryOpts(
+    unwanted_patterns = frozenset([".git"]),
+    ignore_file_name = ".gitignore",
+    ignore_file_parser_factory = gitignore_parser.parse_gitignore)
+
+
+def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
+    # Init directories.
+    if not read_only:
+        os.makedirs(ctx.catalog, exist_ok=True)
+        os.makedirs(ctx.activity, exist_ok=True)
+    else:
+        print("SKIPPING: local directory creation due to read_only mode")
+
+    lib_v = lib_version()
 
     meta = {
         # Version of the local catalog data.
@@ -70,7 +86,43 @@ def init_local(ctx: Context, embedding_model: str):
 
         meta["embedding_model"] = embedding_model
 
-    with open(meta_path, "w") as f:
-        json.dump(meta, f, sort_keys=True, indent=4)
+    if not read_only:
+        with open(meta_path, "w") as f:
+            json.dump(meta, f, sort_keys=True, indent=4)
+    else:
+        print("SKIPPING: meta.json file write due to read_only mode")
 
     return meta
+
+
+def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
+    # The repo is the user's application's repo and is NOT the repo
+    # of rosetta-core. The rosetta CLI / library should be run in
+    # a directory (or subdirectory) of the user's application's repo,
+    # where we'll walk up the parent dirs until we find the .git/ subdirectory.
+
+    while not (top_dir / ".git").exists():
+        if top_dir.parent == top_dir:
+            raise ValueError(
+                "Could not find .git directory. Please run index within a git repository."
+            )
+        top_dir = top_dir.parent
+
+    return git.Repo(top_dir / ".git")
+
+
+# TODO: One use case is a user's repo (like rosetta-example) might
+# have multiple, independent subdirectories in it which should each
+# have its own, separate local catalog. We might consider using
+# the pattern similar to repo_load()'s searching for a .git/ directory
+# and scan up the parent directories to find the first .rosetta-catalog/
+# subdirectory?
+
+
+def commit_str(commit):
+    """Ex: 'g1234abcd'."""
+
+    # TODO: Only works for git, where a far, future day, folks might want non-git?
+
+    return "g" + str(commit)[:7]
+

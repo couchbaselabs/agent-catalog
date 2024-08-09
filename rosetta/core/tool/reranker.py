@@ -5,7 +5,6 @@ import sklearn.neighbors
 import numpy
 import dataclasses
 import logging
-import langchain_core.tools
 
 logger = logging.getLogger(__name__)
 
@@ -15,12 +14,12 @@ logger = logging.getLogger(__name__)
 class ToolWithEmbedding:
     identifier: str
     embedding: numpy.ndarray
-    tool: langchain_core.tools.StructuredTool
+    tool: typing.Any
 
 
 @dataclasses.dataclass
 class ToolWithDelta:
-    tool: langchain_core.tools.StructuredTool
+    tool: typing.Any
     delta: float
 
 
@@ -55,7 +54,7 @@ class ClosestClusterReranker(pydantic.BaseModel):
                 logger.debug(f'Bandwidth of {working_bandwidth} was not satisfiable. Deepening.')
 
         if len(first_minimum) < 1:
-            logger.warning('Satisfiable bandwidth was not found. Returning original list.')
+            logger.debug('Satisfiable bandwidth was not found. Returning original list.')
             return ordered_tools
         else:
             closest_cluster = [t for t in ordered_tools if t.delta > s[first_maximum[-1]]]

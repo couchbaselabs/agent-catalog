@@ -2,6 +2,7 @@ import datamodel_code_generator.model
 import datamodel_code_generator.parser.jsonschema
 import datamodel_code_generator.parser.openapi
 import json
+import re
 import pydantic
 
 input_model_class_name_in_templates = '_ArgumentInput'
@@ -14,8 +15,8 @@ class GeneratedPydanticCode(pydantic.BaseModel):
     type_name: str
 
 
-def _post_process_model_code(generated_code: str) -> str:
-    return (
+def _post_process_model_code(generated_code: str, class_name: str) -> str:
+    replace_results = (
         generated_code
         # This should not appear in the output (this is most likely a bug in datamodel_code_generator).
         .replace('from __future__ import annotations', '')
@@ -23,8 +24,14 @@ def _post_process_model_code(generated_code: str) -> str:
         .replace('from pydantic import BaseModel', 'from pydantic.v1 import BaseModel')
     )
 
+    last_class_regex = re.compile(r'class \w+\((.*)\):(?!(\n|.)*class)')
+    regex_results = (
+        last_class_regex.sub(rf'class {class_name}(\1):', replace_results)
+    )
+    return regex_results
 
-def generate_model_from_json_schema(json_schema: dict, class_name: str) -> GeneratedPydanticCode:
+
+def generate_model_from_json_schema(json_schema: str, class_name: str) -> GeneratedPydanticCode:
     model_types = datamodel_code_generator.model.get_data_model_types(
         # TODO (GLENN): LangChain requires v1 Pydantic... hopefully they change this soon.
         datamodel_code_generator.DataModelType.PydanticBaseModel,
@@ -32,18 +39,19 @@ def generate_model_from_json_schema(json_schema: dict, class_name: str) -> Gener
     )
 
     # If we have a list-valued field, first extract the fields involved.
-    if json_schema['type'] == 'array':
-        codegen_schema = json_schema['items']
+    parsed_json_schema = json.loads(json_schema)
+    if parsed_json_schema['type'] == 'array':
+        codegen_schema = parsed_json_schema['items']
         is_list_valued = True
         type_name = class_name
     else:
-        codegen_schema = json_schema
+        codegen_schema = parsed_json_schema
         is_list_valued = False
         type_name = class_name
 
     # Generate a Pydantic model for the given JSON schema.
     argument_parser = datamodel_code_generator.parser.jsonschema.JsonSchemaParser(
-        json.loads(codegen_schema),
+        json.dumps(codegen_schema),
         data_model_type=model_types.data_model,
         data_model_root_type=model_types.root_model,
         data_model_field_type=model_types.field_model,
@@ -51,8 +59,9 @@ def generate_model_from_json_schema(json_schema: dict, class_name: str) -> Gener
         dump_resolve_reference_action=model_types.dump_resolve_reference_action,
         class_name=class_name,
     )
+    generated_code = _post_process_model_code(str(argument_parser.parse()), class_name)
     return GeneratedPydanticCode(
-        generated_code=_post_process_model_code(str(argument_parser.parse())),
+        generated_code=generated_code,
         is_list_valued=is_list_valued,
         type_name=type_name
     )

@@ -6,27 +6,21 @@ import pathlib
 import sys
 import typing
 import uuid
-
 import langchain_core.tools
 import pydantic
 import sentence_transformers
 import yaml
 
-from .types import (
-    ToolKind,
+from .models import (
     SQLPPQueryMetadata,
     SemanticSearchMetadata,
     HTTPRequestMetadata
 )
 
-# TODO: Should core.tool depend upon core.catalog, or the other
-# way? Ideally, it's not a cross-dependency both ways?
-from ..catalog.descriptor import ToolDescriptor
+from ..record.descriptor import RecordDescriptor
+from ..record.kind import RecordKind
 
 
-# TODO: Need unified logging approach across rosetta?
-# TODO: Since this is a library, can a custom logger
-# implementation be passed in by the app?
 logger = logging.getLogger(__name__)
 
 
@@ -53,7 +47,7 @@ class Indexer(pydantic.BaseModel):
         # TODO (GLENN): Handle large descriptions in embedding model.
         return self.embedding_model.encode(description).tolist()
 
-    def _handle_dot_py(self, filename: pathlib.Path) -> typing.Iterable[ToolDescriptor]:
+    def _handle_dot_py(self, filename: pathlib.Path) -> typing.Iterable[RecordDescriptor]:
         is_tool = lambda n, t: isinstance(t, langchain_core.tools.BaseTool)
 
         # TODO (GLENN): We should avoid blindly putting things in our path.
@@ -66,61 +60,61 @@ class Indexer(pydantic.BaseModel):
                 continue
 
             # Yield our descriptor.
-            yield ToolDescriptor(
+            yield RecordDescriptor(
                 identifier=self._generate_tool_id(),
                 name=tool.name,
                 description=tool.description,
                 embedding=self._encode_description(tool.description),
                 source=str(filename.absolute()),
-                kind=ToolKind.PythonFunction,
+                kind=RecordKind.PythonFunction,
             )
 
-    def _handle_dot_sqlpp(self, filename: pathlib.Path) -> typing.Iterable[ToolDescriptor]:
+    def _handle_dot_sqlpp(self, filename: pathlib.Path) -> typing.Iterable[RecordDescriptor]:
         front_matter = SQLPPQueryMetadata.read_front_matter(filename)
         metadata = SQLPPQueryMetadata.model_validate(front_matter)
 
         # Build our tool descriptor.
-        yield ToolDescriptor(
+        yield RecordDescriptor(
             identifier=self._generate_tool_id(),
             name=metadata.name,
             description=metadata.description,
             embedding=self._encode_description(metadata.description),
             source=str(filename.absolute()),
-            kind=ToolKind.SQLPPQuery,
+            kind=RecordKind.SQLPPQuery,
         )
 
-    def _handle_dot_yaml(self, filename: pathlib.Path) -> typing.Iterable[ToolDescriptor]:
+    def _handle_dot_yaml(self, filename: pathlib.Path) -> typing.Iterable[RecordDescriptor]:
         with filename.open('r') as fp:
             parsed_desc = yaml.safe_load(fp)
-        if 'tool_kind' not in parsed_desc:
-            logger.warning(f'Encountered .yaml file with unknown tool_kind field. '
+        if 'record_kind' not in parsed_desc:
+            logger.warning(f'Encountered .yaml file with unknown record_kind field. '
                            f'Not indexing {str(filename.absolute())}.')
             return
 
-        match parsed_desc['tool_kind']:
-            case ToolKind.SemanticSearch:
+        match parsed_desc['record_kind']:
+            case RecordKind.SemanticSearch:
                 metadata = SemanticSearchMetadata.model_validate(parsed_desc)
-                yield ToolDescriptor(
+                yield RecordDescriptor(
                     identifier=self._generate_tool_id(),
                     name=metadata.name,
                     description=metadata.description,
                     embedding=self._encode_description(metadata.description),
                     source=str(filename.absolute()),
-                    kind=ToolKind.SemanticSearch
+                    kind=RecordKind.SemanticSearch
                 )
-            case ToolKind.HTTPRequest:
+            case RecordKind.HTTPRequest:
                 metadata = HTTPRequestMetadata.model_validate(parsed_desc)
                 for operation in metadata.open_api.operations:
-                    yield ToolDescriptor(
+                    yield RecordDescriptor(
                         identifier=self._generate_tool_id(),
                         name=operation.specification.operation_id,
                         description=operation.specification.description,
                         embedding=self._encode_description(operation.specification.description),
                         source=str(filename.absolute()),
-                        kind=ToolKind.HTTPRequest
+                        kind=RecordKind.HTTPRequest
                     )
             case _:
-                logger.warning(f'Encountered .yaml file with unknown tool_kind field. '
+                logger.warning(f'Encountered .yaml file with unknown record_kind field. '
                                f'Not indexing {str(filename.absolute())}.')
 
 

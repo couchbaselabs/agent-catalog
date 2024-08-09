@@ -17,18 +17,18 @@ from .common import (
     output_model_class_name_in_templates,
     generate_model_from_json_schema,
 )
-from ..types import (
+from ..models import (
     SQLPPQueryMetadata,
     SemanticSearchMetadata,
     HTTPRequestMetadata
 )
-from ...catalog.descriptor import ToolDescriptor
+from ...record.descriptor import RecordDescriptor
 
 logger = logging.getLogger(__name__)
 
 
 class _BaseCodeGenerator(pydantic.BaseModel):
-    tool_descriptors: list[ToolDescriptor]
+    record_descriptors: list[RecordDescriptor] = pydantic.Field(min_length=1)
     template_directory: pathlib.Path = pydantic.Field(
         default=(pathlib.Path(__file__).parent / 'templates').resolve(),
         description='Location of the the template files.'
@@ -40,10 +40,10 @@ class _BaseCodeGenerator(pydantic.BaseModel):
 
 
 class SQLPPCodeGenerator(_BaseCodeGenerator):
-    tool_descriptors: list[ToolDescriptor] = pydantic.Field(min_length=1, max_length=1)
+    record_descriptors: list[RecordDescriptor] = pydantic.Field(min_length=1, max_length=1)
 
     def generate(self, output_dir: pathlib.Path) -> list[pathlib.Path]:
-        sqlpp_file = self.tool_descriptors[0].source
+        sqlpp_file = self.record_descriptors[0].source
         metadata = SQLPPQueryMetadata.model_validate(
             SQLPPQueryMetadata.read_front_matter(sqlpp_file)
         )
@@ -84,11 +84,11 @@ class SQLPPCodeGenerator(_BaseCodeGenerator):
 
 
 class SemanticSearchCodeGenerator(_BaseCodeGenerator):
-    tool_descriptors: list[ToolDescriptor] = pydantic.Field(min_length=1, max_length=1)
+    record_descriptors: list[RecordDescriptor] = pydantic.Field(min_length=1, max_length=1)
 
     def generate(self, output_dir: pathlib.Path) -> list[pathlib.Path]:
-        yaml_file = self.tool_descriptors[0].source
-        metadata = SemanticSearchMetadata.model_validate(yaml.safe_load(yaml_file))
+        yaml_file = self.record_descriptors[0].source
+        metadata = SemanticSearchMetadata.model_validate(yaml.safe_load(yaml_file.open()))
 
         # Generate a Pydantic model for the input schema.
         input_model = generate_model_from_json_schema(
@@ -130,11 +130,12 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
         def locations(self):
             return f'{json.dumps(self.locations_dict)}'
 
-    @pydantic.field_validator('tool_descriptors')
+    @pydantic.field_validator('record_descriptors')
     @classmethod
-    def tool_descriptors_must_share_the_same_source(cls, v: list[ToolDescriptor]):
+    def record_descriptors_must_share_the_same_source(cls, v: list[RecordDescriptor]):
         if any(td.source != v[0].source for td in v):
             raise ValueError('Grouped HTTP-Request descriptors must share the same source!')
+        return v
 
     def _create_json_schema_from_specification(self, operation: HTTPRequestMetadata.OpenAPIMetadata.OperationMetadata):
         # Our goal here is to create an easy "interface" for our LLM to call, so we will consolidate parameters
@@ -148,7 +149,7 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
         # Note: parent parameters are handled in the OperationMetadata class.
         for parameter in operation.parameters:
             base_object['properties'][parameter.name] = openapi_schema_to_json_schema.to_json_schema(
-                schema=dataclasses.asdict(parameter.schema)
+                schema=json.loads(json.dumps(parameter.schema, cls=HTTPRequestMetadata.JSONEncoder))
             )
             locations[parameter.name] = parameter.location.value.lower()
 
@@ -160,7 +161,7 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
                         json_type_request_content = content
                         break
 
-                    # TODO (GLENN): Implement other types of request bodies.
+                    # TODO (GLENN): Implement other models of request bodies.
                     case _:
                         continue
 
@@ -189,8 +190,8 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
             )
 
     def generate(self, output_dir: pathlib.Path) -> list[pathlib.Path]:
-        yaml_file = self.tool_descriptors[0].source
-        metadata = HTTPRequestMetadata.model_validate(yaml.safe_load(yaml_file))
+        yaml_file = self.record_descriptors[0].source
+        metadata = HTTPRequestMetadata.model_validate(yaml.safe_load(yaml_file.open()))
 
         # Iterate over our operations.
         output_modules = list()
@@ -210,11 +211,11 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
                 generation_time = datetime.datetime.now().strftime('%I:%M%p on %B %d, %Y')
                 rendered_code = template.render({
                     'time': generation_time,
-                    'tool_metadata': metadata,
+                    'openapi': operation,
                     'input': input_context,
                     'method': operation.method.upper(),
                     'path': operation.path,
-                    'urls': operation.servers
+                    'urls': [s.url for s in operation.servers]
                 })
                 logger.debug('The following code has been generated:\n' + rendered_code)
 

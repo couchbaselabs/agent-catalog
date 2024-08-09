@@ -44,7 +44,7 @@ class AliasedGroup(click.Group):
     default=".rosetta-catalog",
     type=click.Path(exists=False, file_okay=False, dir_okay=True),
     help="""Directory of local catalog files.
-              The local catalog DIRECTORY should be checked into git.""",
+            The local catalog DIRECTORY should be checked into git.""",
     envvar="ROSETTA_CATALOG",
     show_default=True,
 )
@@ -54,13 +54,14 @@ class AliasedGroup(click.Group):
     default=".rosetta-activity",
     type=click.Path(exists=False, file_okay=False, dir_okay=True),
     help="""Directory of local activity files (runtime data).
-              The local activity DIRECTORY should NOT be checked into git,
-              as it holds runtime activity data like logs, call histories, etc.""",
+            The local activity DIRECTORY should NOT be checked into git,
+            as it holds runtime activity data like logs, etc.""",
     envvar="ROSETTA_ACTIVITY",
     show_default=True,
 )
 @click.option(
-    "-v", "--verbose", count=True, help="Enable verbose output.", envvar="ROSETTA_VERBOSE"
+    "-v", "--verbose", count=True,
+    help="Enable verbose output.", envvar="ROSETTA_VERBOSE"
 )
 @click.pass_context
 def click_main(ctx, catalog, activity, verbose):
@@ -91,14 +92,34 @@ def env(ctx):
     help="The kind of catalog to search.",
     show_default=True,
 )
+@click.option(
+    "-k",
+    "--top-k",
+    default=1,
+    help="The maximum number of results to show.",
+    show_default=True,
+)
+@click.option(
+    "--ignore-dirty",
+    default=True,
+    help="Whether to ignore dirty source files for the find query.",
+    show_default=True,
+)
 @click.pass_context
-def find(ctx, query, kind):
-    """Find tools, prompts, etc. from the catalog."""
-    cmd_find(ctx.obj, query, kind=kind)
+def find(ctx, query, kind, top_k, ignore_dirty):
+    """Find tools, prompts, etc.
+       from the catalog based on a natural language QUERY string."""
+    cmd_find(ctx.obj, query, kind=kind, top_k=top_k, ignore_dirty=ignore_dirty)
 
 
 @click_main.command()
 @click.argument("source_dirs", nargs=-1)
+@click.option(
+    "--kind",
+    default="tool",
+    help="The kind of items to index into the local catalog.",
+    show_default=True,
+)
 @click.option(
     "-em",
     "--embedding-model",
@@ -106,8 +127,14 @@ def find(ctx, query, kind):
     help="Embedding model when indexing source files into the local catalog.",
     show_default=True,
 )
+@click.option(
+    "--dry-run",
+    default=False,
+    help="When true, do not update the local catalog files.",
+    show_default=True,
+)
 @click.pass_context
-def index(ctx, source_dirs, embedding_model):
+def index(ctx, source_dirs, kind, embedding_model, dry_run):
     """Walk source directory trees for indexing source files into the local catalog.
 
     SOURCE_DIRS defaults to "."
@@ -121,7 +148,7 @@ def index(ctx, source_dirs, embedding_model):
     # TODO: The index command should ignore the '.git' subdirectory.
     # TODO: The index command should ignore whatever's in the '.gitignore' file.
 
-    cmd_index(ctx.obj, source_dirs=source_dirs, embedding_model=embedding_model)
+    cmd_index(ctx.obj, source_dirs=source_dirs, kind=kind, embedding_model=embedding_model, dry_run=dry_run)
 
 
 @click_main.command()

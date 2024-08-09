@@ -12,6 +12,7 @@ def clean_local(ctx: Context):
     xs = [
         ctx.activity,
         # TODO: We should instead glob for all *_catalog.json files?
+        ctx.catalog + "/tool-catalog.json", # TODO: Temporary during refactoring.
         ctx.catalog + "/tool_catalog.json",
         ctx.catalog + "/prompt_catalog.json",
         ctx.catalog + "/meta.json",
@@ -29,7 +30,7 @@ def clean_local(ctx: Context):
             shutil.rmtree(x_path.absolute())
 
 
-# TODO (GLENN): Define a 'clean' action for a Couchbase collection.
+# TODO: Implement clean for the rosetta scope in Couchbase.
 def clean_db(ctx, conn_string: str, authenticator: couchbase.auth.Authenticator, **_):
     pass
 

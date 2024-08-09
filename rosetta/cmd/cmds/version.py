@@ -7,11 +7,11 @@ blueprint = flask.Blueprint('version', __name__)
 
 @blueprint.route('/version')
 def route_version():
-    return flask.jsonify(lib_version(flask.current_app.config['ctx']))
+    return flask.jsonify(lib_version())
 
 
 def cmd_version(ctx):
-    print(lib_version(ctx))
+    print(lib_version())
 
 
 if __name__ == "__main__":
