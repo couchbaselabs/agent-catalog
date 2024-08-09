@@ -27,7 +27,7 @@ def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
     else:
         print("SKIPPING: local directory creation due to read_only mode")
 
-    lib_v = lib_version(ctx)
+    lib_v = lib_version()
 
     meta = {
         # Version of the local catalog data.

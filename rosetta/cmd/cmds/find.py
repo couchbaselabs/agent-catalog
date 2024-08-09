@@ -11,47 +11,46 @@ from rosetta.core.tool.reranker import ToolWithDelta
 from ..models.ctx.model import Context
 
 
-def cmd_find(ctx: Context, query, kind="tool", top_k=3):
-    # TODO: One day, handle DBCatalogRef?
-    # TODO: If the repo is dirty, load the dirty items into a
-    #       CatalogMem and setup a chain of catalogs to perform the find().
+def cmd_find(ctx: Context, query, kind="tool", top_k=3, ignore_dirty=True):
+    # TODO: One day, also handle DBCatalogRef?
     # TODO: If DB is outdated and the local catalog has newer info,
     #       then we need to consult the latest, local catalog / MemCatalogRef?
     # TODO: Optional, future flags might specify variations like --local-catalog-only
     #       and/or --db-catalog-only, and/or both, via chaining multiple CatalogRef's?
     # TODO: When refactoring is done, rename back to "tool_catalog.json" (with underscore)?
-    # TODO: Perhaps users optionally want the deltas or similarity scores, too?
     # TODO: Possible security issue -- need to check kind is an allowed value?
+
     catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")
 
-    # Query our catalog for a list of results.
+    # Query our local catalog for a list of results.
     catalog = CatalogMem().load(catalog_path)
 
-    repo = repo_load(pathlib.Path(os.getcwd()))
+    if not ignore_dirty:
+        repo = repo_load(pathlib.Path(os.getcwd()))
+        if repo and repo.is_dirty():
+            meta = init_local(ctx, catalog.catalog_descriptor.embedding_model, read_only=True)
 
-    if repo and repo.is_dirty():
-        # Create a CatalogMem that also includes the dirty items.
+            # The repo and any dirty files do not have real commit id's, so use "DIRTY".
+            repo_commit_id = "DIRTY"
 
-        meta = init_local(ctx, catalog.catalog_descriptor.embedding_model, read_only=True)
+            def get_repo_commit_id(path: pathlib.Path) -> str:
+                if repo.is_dirty(path=path.absolute()):
+                    return "DIRTY"
 
-        # A dirty file and/or repo does not have a real commit id, so we use "DIRTY".
-        repo_commit_id = "DIRTY"
+                commits = list(repo.iter_commits(paths=path.absolute(), max_count=1))
+                if not commits or len(commits) <= 0:
+                    return "DIRTY"
 
-        def get_repo_commit_id(path: pathlib.Path) -> str:
-            if repo.is_dirty(path=path.absolute()):
-                return "DIRTY"
+                return commit_str(commits[0])
 
-            commits = list(repo.iter_commits(paths=path.absolute(), max_count=1))
-            if not commits or len(commits) <= 0:
-                return "DIRTY"
+            # Scan the same source_dirs that were used in the last "rosetta index".
+            source_dirs = catalog.catalog_descriptor.source_dirs
 
-            return commit_str(commits[0])
-
-        source_dirs = catalog.catalog_descriptor.source_dirs
-
-        catalog = index_catalog(meta, repo_commit_id, get_repo_commit_id,
-                                kind, catalog_path, source_dirs,
-                                progress=tqdm.tqdm, max_errs=MAX_ERRS)
+            # Create a CatalogMem on-the-fly that incorporates the dirty
+            # source file items which we'll use instead of the local catalog file.
+            catalog = index_catalog(meta, repo_commit_id, get_repo_commit_id,
+                                    kind, catalog_path, source_dirs,
+                                    progress=tqdm.tqdm, max_errs=MAX_ERRS)
 
     search_results = [
         ToolWithDelta(tool=x.record_descriptor, delta=x.delta) for x in catalog.find(query, max=top_k)
