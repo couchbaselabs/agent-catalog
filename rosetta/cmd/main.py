@@ -100,16 +100,16 @@ def env(ctx):
     show_default=True,
 )
 @click.option(
-    "--ignore-dirty",
+    "--include-dirty",
     default=True,
-    help="Whether to ignore dirty source files for the find query.",
+    help="Whether to consider and process dirty source files for the find query.",
     show_default=True,
 )
 @click.pass_context
-def find(ctx, query, kind, top_k, ignore_dirty):
+def find(ctx, query, kind, top_k, include_dirty):
     """Find tools, prompts, etc.
        from the catalog based on a natural language QUERY string."""
-    cmd_find(ctx.obj, query, kind=kind, top_k=top_k, ignore_dirty=ignore_dirty)
+    cmd_find(ctx.obj, query, kind=kind, top_k=top_k, include_dirty=include_dirty)
 
 
 @click_main.command()

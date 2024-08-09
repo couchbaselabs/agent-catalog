@@ -11,7 +11,7 @@ from rosetta.core.tool.reranker import ToolWithDelta
 from ..models.ctx.model import Context
 
 
-def cmd_find(ctx: Context, query, kind="tool", top_k=3, ignore_dirty=True):
+def cmd_find(ctx: Context, query, kind="tool", top_k=3, include_dirty=True):
     # TODO: One day, also handle DBCatalogRef?
     # TODO: If DB is outdated and the local catalog has newer info,
     #       then we need to consult the latest, local catalog / MemCatalogRef?
@@ -24,7 +24,7 @@ def cmd_find(ctx: Context, query, kind="tool", top_k=3, ignore_dirty=True):
 
     catalog = CatalogMem().load(catalog_path)
 
-    if not ignore_dirty:
+    if include_dirty:
         repo, repo_commit_id_for_path = repo_load(pathlib.Path(os.getcwd()))
         if repo and repo.is_dirty():
             meta = init_local(ctx, catalog.catalog_descriptor.embedding_model, read_only=True)
