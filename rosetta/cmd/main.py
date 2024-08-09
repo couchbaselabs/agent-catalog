@@ -141,12 +141,12 @@ def publish(ctx, scope):
         username=os.getenv("CB_USERNAME"),
         password=os.getenv("CB_PASSWORD"),
     )
-    
+
     # Establish a connection and get buckets
     err, cluster = get_connection(conn=connection_details)
     if err:
         click.echo(str(err))
-        return 
+        return
     buckets = get_buckets(cluster=cluster)
 
     # Prompt user to select a bucket
