@@ -25,29 +25,19 @@ def cmd_find(ctx: Context, query, kind="tool", top_k=3, ignore_dirty=True):
     catalog = CatalogMem().load(catalog_path)
 
     if not ignore_dirty:
-        repo = repo_load(pathlib.Path(os.getcwd()))
+        repo, repo_commit_id_for_path = repo_load(pathlib.Path(os.getcwd()))
         if repo and repo.is_dirty():
             meta = init_local(ctx, catalog.catalog_descriptor.embedding_model, read_only=True)
 
             # The repo and any dirty files do not have real commit id's, so use "DIRTY".
-            repo_commit_id = "DIRTY"
-
-            def get_repo_commit_id(path: pathlib.Path) -> str:
-                if repo.is_dirty(path=path.absolute()):
-                    return "DIRTY"
-
-                commits = list(repo.iter_commits(paths=path.absolute(), max_count=1))
-                if not commits or len(commits) <= 0:
-                    return "DIRTY"
-
-                return commit_str(commits[0])
+            repo_commit_id = REPO_DIRTY
 
             # Scan the same source_dirs that were used in the last "rosetta index".
             source_dirs = catalog.catalog_descriptor.source_dirs
 
             # Create a CatalogMem on-the-fly that incorporates the dirty
             # source file items which we'll use instead of the local catalog file.
-            catalog = index_catalog(meta, repo_commit_id, get_repo_commit_id,
+            catalog = index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
                                     kind, catalog_path, source_dirs,
                                     scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
                                     progress=tqdm.tqdm, max_errs=MAX_ERRS)

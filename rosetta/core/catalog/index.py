@@ -10,7 +10,7 @@ from .catalog_mem import CatalogMem
 source_globs = list(source_indexers.keys())
 
 
-def index_catalog(meta, repo_commit_id, get_repo_commit_id,
+def index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
                   kind, catalog_path, source_dirs,
                   scan_directory_opts: ScanDirectoryOpts = None,
                   progress=lambda x: x,
@@ -42,7 +42,7 @@ def index_catalog(meta, repo_commit_id, get_repo_commit_id,
 
         for glob, indexer in source_indexers.items():
             if fnmatch.fnmatch(source_file.name, glob):
-                errs, descriptors = indexer.start_descriptors(source_file, get_repo_commit_id)
+                errs, descriptors = indexer.start_descriptors(source_file, repo_commit_id_for_path)
                 all_errs += errs or []
                 all_descriptors += descriptors or []
                 break

@@ -95,11 +95,13 @@ def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
     return meta
 
 
+REPO_DIRTY = "_DIRTY_"
+
 def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
     # The repo is the user's application's repo and is NOT the repo
     # of rosetta-core. The rosetta CLI / library should be run in
     # a directory (or subdirectory) of the user's application's repo,
-    # where we'll walk up the parent dirs until we find the .git/ subdirectory.
+    # where repo_load() walks up the parent dirs until it finds a .git/ subdirectory.
 
     while not (top_dir / ".git").exists():
         if top_dir.parent == top_dir:
@@ -108,7 +110,21 @@ def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
             )
         top_dir = top_dir.parent
 
-    return git.Repo(top_dir / ".git")
+    repo = git.Repo(top_dir / ".git")
+
+    def repo_commit_id_for_path(path: pathlib.Path) -> str:
+        path_absolute = path.absolute()
+
+        if repo.is_dirty(path=path_absolute):
+            return REPO_DIRTY
+
+        commits = list(repo.iter_commits(paths=path_absolute, max_count=1))
+        if not commits or len(commits) <= 0:
+            return REPO_DIRTY # Untracked, so treat it as dirty.
+
+        return repo_commit_id_str(commits[0])
+
+    return repo, repo_commit_id_for_path
 
 
 # TODO: One use case is a user's repo (like rosetta-example) might
@@ -119,10 +135,13 @@ def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
 # subdirectory?
 
 
-def commit_str(commit):
-    """Ex: 'g1234abcd'."""
+def repo_commit_id_str(repo_commit_id):
+    """Formats a long repo_commit_id into a shorter format. Ex: 'g1234abcd'."""
 
     # TODO: Only works for git, where a far, future day, folks might want non-git?
 
-    return "g" + str(commit)[:7]
+    if repo_commit_id == REPO_DIRTY:
+        return REPO_DIRTY
+
+    return "g" + str(repo_commit_id)[:7]
 

@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 class BaseFileIndexer(pydantic.BaseModel):
     @abc.abstractmethod
-    def start_descriptors(self, filename: pathlib.Path, get_repo_commit_id) -> \
+    def start_descriptors(self, filename: pathlib.Path, repo_commit_id_for_path) -> \
             typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or more 'bare' catalog item descriptors for a filename,
            and/or return non-fatal or 'keep-on-going' errors if any encountered.
@@ -52,7 +52,7 @@ class BaseFileIndexer(pydantic.BaseModel):
 
 
 class DotPyFileIndexer(BaseFileIndexer):
-    def start_descriptors(self, filename: pathlib.Path, get_repo_commit_id) -> \
+    def start_descriptors(self, filename: pathlib.Path, repo_commit_id_for_path) -> \
             typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or more 'bare' catalog item descriptors
            for a *.py, and/or returns 'keep-on-going' errors
@@ -80,7 +80,7 @@ class DotPyFileIndexer(BaseFileIndexer):
             name = tool.name.strip()
 
             if not repo_commit_id:
-                repo_commit_id = get_repo_commit_id(filename)
+                repo_commit_id = repo_commit_id_for_path(filename)
 
             descriptors.append(RecordDescriptor(
                 identifier=str(filename) + ":" + name + ":" + repo_commit_id,
@@ -98,7 +98,7 @@ class DotPyFileIndexer(BaseFileIndexer):
 
 
 class DotSqlppFileIndexer(BaseFileIndexer):
-    def start_descriptors(self, filename: pathlib.Path, get_repo_commit_id) -> \
+    def start_descriptors(self, filename: pathlib.Path, repo_commit_id_for_path) -> \
             typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or 1 'bare' catalog item descriptors
            for a *.sqlpp, and/or return 'keep-on-going' errors
@@ -111,7 +111,7 @@ class DotSqlppFileIndexer(BaseFileIndexer):
 
         name = metadata.name.strip()  # TODO: If missing, name should default to filename?
 
-        repo_commit_id = get_repo_commit_id(filename)  # Ex: a git hash / SHA.
+        repo_commit_id = repo_commit_id_for_path(filename)  # Ex: a git hash / SHA.
 
         return (None, [RecordDescriptor(
             identifier=str(filename) + ":" + name + ":" + repo_commit_id,
@@ -127,7 +127,7 @@ class DotSqlppFileIndexer(BaseFileIndexer):
 
 
 class DotYamlFileIndexer(BaseFileIndexer):
-    def start_descriptors(self, filename: pathlib.Path, get_repo_commit_id) -> \
+    def start_descriptors(self, filename: pathlib.Path, repo_commit_id_for_path) -> \
             typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or more 'bare' catalog item descriptors
            for a *.yaml, and/or return 'keep-on-going' errors
@@ -142,7 +142,7 @@ class DotYamlFileIndexer(BaseFileIndexer):
                            f'Not indexing {str(filename.absolute())}.')
             return (None, [])
 
-        repo_commit_id = get_repo_commit_id(filename)  # Ex: a git hash / SHA.
+        repo_commit_id = repo_commit_id_for_path(filename)  # Ex: a git hash / SHA.
 
         match parsed_desc['record_kind']:
             case RecordKind.SemanticSearch:

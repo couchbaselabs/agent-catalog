@@ -25,7 +25,7 @@ def cmd_index(ctx: Context, source_dirs: list[str],
             "An --embedding-model is required as an embedding model is not yet recorded."
         )
 
-    repo = repo_load(pathlib.Path(os.getcwd()))
+    repo, repo_commit_id_for_path = repo_load(pathlib.Path(os.getcwd()))
 
     if repo.is_dirty() and not os.getenv("ROSETTA_REPO_DIRTY_OK", False):
         # The ROSETTA_REPO_DIRTY_OK env var is intended
@@ -48,7 +48,7 @@ def cmd_index(ctx: Context, source_dirs: list[str],
     # approach of opening & reading file contents directly,
 
     # The commit id for the repo's HEAD commit.
-    repo_commit_id = commit_str(repo.head.commit)
+    repo_commit_id = repo_commit_id_str(repo.head.commit)
 
     # TODO: During refactoring, we currently load/save to "tool-catalog.json" (with
     # a hyphen) instead of the old "tool_catalog.json" to not break other existing
@@ -58,15 +58,7 @@ def cmd_index(ctx: Context, source_dirs: list[str],
     # TODO: The kind needs a security check as it's part of the path?
     catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")
 
-    def get_repo_commit_id(path: pathlib.Path) -> str:
-        commits = list(repo.iter_commits(paths=path.absolute(), max_count=1))
-        if not commits or len(commits) <= 0:
-            raise ValueError(
-                f"ERROR: get_repo_commit_id, no commits for filename: {path.absolute()}"
-            )
-        return commit_str(commits[0])
-
-    next_catalog = index_catalog(meta, repo_commit_id, get_repo_commit_id,
+    next_catalog = index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
                                  kind, catalog_path, source_dirs,
                                  scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
                                  progress=tqdm, max_errs=MAX_ERRS)
