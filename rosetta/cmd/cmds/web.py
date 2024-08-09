@@ -5,7 +5,6 @@ def register_blueprints(app):
     # TODO: app.register_blueprint(find.blueprint)
     # TODO: app.register_blueprint(index.blueprint)
     # TODO: app.register_blueprint(publish.blueprint)
-    # TODO: app.register_blueprint(status.blueprint)
 
     from .clean import blueprint as clean_blueprint
     app.register_blueprint(clean_blueprint)
@@ -13,9 +12,11 @@ def register_blueprints(app):
     from .env import blueprint as env_blueprint
     app.register_blueprint(env_blueprint)
 
+    from .status import blueprint as status_blueprint
+    app.register_blueprint(status_blueprint)
+
     from .version import blueprint as version_blueprint
     app.register_blueprint(version_blueprint)
-
 
 def cmd_web(ctx, host_port, debug=True):
     app = flask.Flask(__name__)

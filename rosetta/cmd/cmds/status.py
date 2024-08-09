@@ -1,8 +1,21 @@
 import pathlib
 
+import flask
+
 from rosetta.cmd.cmds.util import *
 from rosetta.core.catalog.catalog_mem import CatalogMem
 from rosetta.core.catalog.index import index_catalog_start
+
+
+blueprint = flask.Blueprint('status', __name__)
+
+
+@blueprint.route('/status')
+def route_status():
+    kind = flask.request.args.get('kind', default="tool", type=str)
+    include_dirty = flask.request.args.get('include_dirty', default='true', type=str).lower() == 'true'
+
+    return flask.jsonify(catalog_status(flask.current_app.config["ctx"], kind, include_dirty))
 
 
 level_colors = {"good": "green", "warn": "yellow", "error": "red"}
