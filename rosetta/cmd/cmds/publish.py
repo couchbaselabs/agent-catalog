@@ -10,7 +10,7 @@ from ..models.publish.model import CouchbaseConnect, Keyspace
 import uuid
 
 
-def get_connection(ctx, conn: CouchbaseConnect):
+def get_connection(conn: CouchbaseConnect):
     cluster_url = conn.connection_url
     username = conn.username
     password = conn.password
@@ -30,12 +30,12 @@ def get_connection(ctx, conn: CouchbaseConnect):
         cluster = Cluster(cluster_url, options)
         cluster.wait_until_ready(timedelta(seconds=15))
     except CouchbaseException as e:
-        return f"Error connecting to couchbase : {e}"
+        return f"Error connecting to couchbase : {e}", None
 
-    return cluster
+    return None, cluster
 
 
-def get_buckets(ctx, cluster):
+def get_buckets(cluster):
     if cluster:
         buckets = cluster.buckets().get_all_buckets()
         list_buckets = []
