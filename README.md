@@ -37,7 +37,7 @@ The core for a Couchbase-backed agentic workflow SDK.
                                activity]
      -v, --verbose             Enable verbose output.
      --help                    Show this message and exit.
-   
+
    Commands:
      clean    Clean up catalog, activity, generated files, etc.
      env      Show this program's env or configuration parameters as JSON.
@@ -62,7 +62,7 @@ To enable debug mode, execute the following command:
 export ROSETTA_DEBUG=1
 ```
 
-To ignore the "repo is dirty" error that is thrown when running `rosetta index` (useful when working on both 
+To ignore the "repo is dirty" error that is thrown when running `rosetta index` (useful when working on both
 `rosetta-example` and `rosetta-core`), execute the following command:
 
 ```bash
@@ -89,18 +89,18 @@ README.md
 pyproject.toml
 
 rosetta/
-cmd/
-  main.py       -- Main entry point for rosetta command-line tool (CLI).
-  cmds/         -- Each "rosetta SUBCMD" has its own cmds/SUBCMD.py file.
-    ...
-    find.py
-    index.py
-    publish.py
-    version.py
-    web.py      -- Provides an HTML/REST interface for the SUBCMD's.
+  cmd/
+    main.py       -- Main entry point for rosetta command-line tool (CLI).
+    cmds/         -- Each "rosetta SUBCMD" has its own cmds/SUBCMD.py file.
+      ...
+      find.py
+      index.py
+      publish.py
+      version.py
+      web.py      -- Provides an HTML/REST interface for the SUBCMD's.
 
-core/           -- The core rosetta library used by applications
-                   and by the rosetta CLI.
+  core/           -- The core rosetta library used by applications
+                     and by the rosetta CLI.
 
 tests/ -- Test cases.
 
