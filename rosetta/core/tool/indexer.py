@@ -21,11 +21,6 @@ from ..record.kind import RecordKind
 logger = logging.getLogger(__name__)
 
 
-# TODO: Need to support index scanning, but not doing any
-# real work, such as to support "rosetta status", such as
-# to detect when local catalog is out of date -- or such
-# as when running with a "rosetta index --dry-run" option?
-
 # TODO: We should use something other than ValueError,
 # such as by capturing line numbers, etc?
 
@@ -90,7 +85,7 @@ class DotPyFileIndexer(BaseFileIndexer):
                 # TODO: Capture line numbers as part of source?
                 source=filename,
                 repo_commit_id=repo_commit_id,
-                # TODO: The embedding is filled in at a later phase.
+                # The embedding is filled in at a later phase.
                 embedding=[],
             ))
 
@@ -109,7 +104,7 @@ class DotSqlppFileIndexer(BaseFileIndexer):
 
         metadata = SQLPPQueryMetadata.model_validate(front_matter)
 
-        name = metadata.name.strip()  # TODO: If missing, name should default to filename?
+        name = metadata.name.strip() # TODO: If missing, name should default to filename?
 
         repo_commit_id = repo_commit_id_for_path(filename)  # Ex: a git hash / SHA.
 
@@ -121,7 +116,7 @@ class DotSqlppFileIndexer(BaseFileIndexer):
             source=filename,
             repo_commit_id=repo_commit_id,
             content=filename.read_text(),
-            # TODO: The embedding is filled in at a later phase.
+            # The embedding is filled in at a later phase.
             embedding=[],
         )])
 
@@ -158,7 +153,7 @@ class DotYamlFileIndexer(BaseFileIndexer):
                     source=filename,
                     repo_commit_id=repo_commit_id,
                     content=filename.read_text(),
-                    # TODO: The embedding is filled in at a later phase.
+                    # The embedding is filled in at a later phase.
                     embedding=[],
                 )])
 
@@ -178,7 +173,7 @@ class DotYamlFileIndexer(BaseFileIndexer):
                         # TODO: Capture line numbers as part of source?
                         source=filename,
                         repo_commit_id=repo_commit_id,
-                        # TODO: The embedding is filled in at a later phase.
+                        # The embedding is filled in at a later phase.
                         embedding=[],
                     ))
 
@@ -211,7 +206,7 @@ def augment_descriptor(descriptor: RecordDescriptor) -> list[ValueError]:
 
 
 def vectorize_descriptor(descriptor: RecordDescriptor, embedding_model_obj) -> \
-        list[ValueError]:
+    list[ValueError]:
     """ Adds vector embeddings to a single catalog item descriptor (in-place,
         destructive), and/or return 'keep-on-going' errors if any encountered.
     """
