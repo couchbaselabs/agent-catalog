@@ -14,13 +14,18 @@ class CatalogChain(CatalogBase):
     def find(self, query: str, max: int = 1) -> list[RecordDescriptor]:
         results = []
 
+        seen = set() # Keyed by 'source:name'.
+
         for c in self.chain:
             results_c = c.find(query, max=max)
 
-            # TODO: Filter out entries from results_c which
-            # are shadowed by the entries in the existing results.
+            for x in results_c:
+                source_name = str(x.source) + ':' + x.name
 
-            results += results_c
+                if source_name not in seen:
+                    seen.add(source_name)
+
+                    results.append(x)
 
         if max > 0:
             results = results[:max]
