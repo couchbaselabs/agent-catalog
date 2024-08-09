@@ -22,7 +22,6 @@ def cmd_find(ctx: Context, query, kind="tool", top_k=3, ignore_dirty=True):
 
     catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")
 
-    # Query our local catalog for a list of results.
     catalog = CatalogMem().load(catalog_path)
 
     if not ignore_dirty:
@@ -52,6 +51,7 @@ def cmd_find(ctx: Context, query, kind="tool", top_k=3, ignore_dirty=True):
                                     kind, catalog_path, source_dirs,
                                     progress=tqdm.tqdm, max_errs=MAX_ERRS)
 
+    # Query the catalog for a list of results.
     search_results = [
         ToolWithDelta(tool=x.record_descriptor, delta=x.delta) for x in catalog.find(query, max=top_k)
     ]
