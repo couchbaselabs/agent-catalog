@@ -17,7 +17,8 @@ logger = logging.getLogger(__name__)
 
 
 def cmd_index(ctx: Context, source_dirs: list[str],
-              kind: str, embedding_model: str, dry_run: bool, **_):
+              kind: str, embedding_model: str,
+              include_dirty: bool = True, dry_run: bool = False, **_):
     meta = init_local(ctx, embedding_model, read_only=dry_run)
 
     if not meta["embedding_model"]:
@@ -27,17 +28,14 @@ def cmd_index(ctx: Context, source_dirs: list[str],
 
     repo, repo_commit_id_for_path = repo_load(pathlib.Path(os.getcwd()))
 
-    if repo.is_dirty() and not os.getenv("ROSETTA_REPO_DIRTY_OK", False):
-        # The ROSETTA_REPO_DIRTY_OK env var is intended
-        # to help during rosetta development.
+    # TODO: If the repo is dirty only because .rosetta-catalog/ is
+    # dirty or because .rosetta-activity/ is dirty, then we might print
+    # some helper instructions for the dev user on commiting the .rosetta-catalog/
+    # and on how to add .rosetta-activity/ to the .gitignore file? Or, should
+    # we instead preemptively generate a .rosetta-activity/.gitiginore
+    # file during init_local()?
 
-        # TODO: If the repo is dirty only because .rosetta-catalog/ is
-        # dirty or because .rosetta-activity/ is dirty, then we might print
-        # some helper instructions for the dev user on commiting the .rosetta-catalog/
-        # and on how to add .rosetta-activity/ to the .gitignore file? Or, should
-        # we instead preemptively generate a .rosetta-activity/.gitiginore
-        # file during init_local()?
-
+    if repo.is_dirty() and not include_dirty:
         raise ValueError("repo is dirty")
 
     # TODO: One day, maybe allow users to choose a different branch instead of assuming

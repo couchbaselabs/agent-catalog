@@ -128,13 +128,19 @@ def find(ctx, query, kind, top_k, include_dirty):
     show_default=True,
 )
 @click.option(
+    "--include-dirty",
+    default=False,
+    help="Whether to index dirty source files into the local catalog.",
+    show_default=True,
+)
+@click.option(
     "--dry-run",
     default=False,
     help="When true, do not update the local catalog files.",
     show_default=True,
 )
 @click.pass_context
-def index(ctx, source_dirs, kind, embedding_model, dry_run):
+def index(ctx, source_dirs, kind, embedding_model, include_dirty, dry_run):
     """Walk source directory trees for indexing source files into the local catalog.
 
     SOURCE_DIRS defaults to "."
@@ -148,7 +154,8 @@ def index(ctx, source_dirs, kind, embedding_model, dry_run):
     # TODO: The index command should ignore the '.git' subdirectory.
     # TODO: The index command should ignore whatever's in the '.gitignore' file.
 
-    cmd_index(ctx.obj, source_dirs=source_dirs, kind=kind, embedding_model=embedding_model, dry_run=dry_run)
+    cmd_index(ctx.obj, source_dirs=source_dirs, kind=kind, embedding_model=embedding_model,
+              include_dirty=include_dirty, dry_run=dry_run)
 
 
 @click_main.command()
