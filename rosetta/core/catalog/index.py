@@ -2,7 +2,7 @@ import fnmatch
 
 from rosetta.core.tool.indexer import source_indexers, augment_descriptor, vectorize_descriptor
 
-from .directory import scan_directory
+from .directory import scan_directory, ScanDirectoryOpts
 from .descriptor import CatalogDescriptor
 from .catalog_mem import CatalogMem
 
@@ -12,6 +12,7 @@ source_globs = list(source_indexers.keys())
 
 def index_catalog(meta, repo_commit_id, get_repo_commit_id,
                   kind, catalog_path, source_dirs,
+                  scan_directory_opts: ScanDirectoryOpts = None,
                   progress=lambda x: x,
                   max_errs=1):
     # TODO: We should use different source_indexers & source_globs based on the kind?
@@ -31,7 +32,7 @@ def index_catalog(meta, repo_commit_id, get_repo_commit_id,
 
     source_files = []
     for source_dir in source_dirs:
-        source_files += scan_directory(source_dir, source_globs)
+        source_files += scan_directory(source_dir, source_globs, opts=scan_directory_opts)
 
     all_errs = []
     all_descriptors = []

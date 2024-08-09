@@ -4,6 +4,7 @@ import pathlib
 
 import click
 import git
+import gitignore_parser
 import sentence_transformers
 
 from rosetta.core.catalog import CATALOG_SCHEMA_VERSION
@@ -12,11 +13,18 @@ from rosetta.core.catalog.version import (
     lib_version,
     lib_version_compare,
 )
+from rosetta.core.catalog.directory import ScanDirectoryOpts
 
 from ..models.ctx.model import Context
 
 
 MAX_ERRS = 10
+
+
+DEFAULT_SCAN_DIRECTORY_OPTS = ScanDirectoryOpts(
+    unwanted_patterns = frozenset([".git"]),
+    ignore_file_name = ".gitignore",
+    ignore_file_parser_factory = gitignore_parser.parse_gitignore)
 
 
 def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
