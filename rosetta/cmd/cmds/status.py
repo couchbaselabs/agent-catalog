@@ -94,7 +94,7 @@ def catalog_status(ctx, kind, include_dirty=True):
                 meta, repo_commit_id, repo_commit_id_for_path,
                 kind, catalog_path, source_dirs,
                 scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
-                max_errs=999999)
+                max_errs=0)
 
             for err in errs:
                 section_parts.append(("error", f"ERROR: {err}"))

@@ -24,7 +24,7 @@ def index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
     print("==================\naugmenting...")
 
     for descriptor in progress(uninitialized_items):
-        if len(all_errs) > max_errs:
+        if max_errs > 0 and len(all_errs) >= max_errs:
             break
 
         print(descriptor.name)
@@ -44,7 +44,7 @@ def index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
     embedding_model_obj = sentence_transformers.SentenceTransformer(meta["embedding_model"])
 
     for descriptor in progress(uninitialized_items):
-        if len(all_errs) > max_errs:
+        if max_errs > 0 and len(all_errs) >= max_errs:
             break
 
         print(descriptor.name)
@@ -87,7 +87,7 @@ def index_catalog_start(meta, repo_commit_id, repo_commit_id_for_path,
     all_errs = []
     all_descriptors = []
     for source_file in progress(source_files):
-        if len(all_errs) > max_errs:
+        if max_errs > 0 and len(all_errs) >= max_errs:
             break
 
         for glob, indexer in source_indexers.items():

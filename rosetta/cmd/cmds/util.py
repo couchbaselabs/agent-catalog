@@ -19,7 +19,7 @@ from rosetta.core.catalog.descriptor import REPO_DIRTY as CATALOG_REPO_DIRTY
 from ..models.ctx.model import Context
 
 
-MAX_ERRS = 10
+DEFAULT_MAX_ERRS = 10
 
 
 DEFAULT_SCAN_DIRECTORY_OPTS = ScanDirectoryOpts(

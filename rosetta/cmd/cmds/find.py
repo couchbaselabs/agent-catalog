@@ -40,7 +40,7 @@ def cmd_find(ctx: Context, query, kind="tool", top_k=3, include_dirty=True):
             catalog = index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
                                     kind, catalog_path, source_dirs,
                                     scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
-                                    progress=tqdm.tqdm, max_errs=MAX_ERRS)
+                                    progress=tqdm.tqdm, max_errs=DEFAULT_MAX_ERRS)
 
     # Query the catalog for a list of results.
     search_results = [

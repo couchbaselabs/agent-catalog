@@ -59,7 +59,7 @@ def cmd_index(ctx: Context, source_dirs: list[str],
     next_catalog = index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
                                  kind, catalog_path, source_dirs,
                                  scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
-                                 progress=tqdm, max_errs=MAX_ERRS)
+                                 progress=tqdm, max_errs=DEFAULT_MAX_ERRS)
 
     print("==================\nsaving local catalog...")
 
