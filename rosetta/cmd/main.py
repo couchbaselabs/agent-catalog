@@ -2,7 +2,7 @@ import os
 import sys
 
 import click
-import dotenv
+from dotenv import load_dotenv, find_dotenv
 
 from .cmds import *
 from .cmds.publish import get_connection, get_buckets, cmd_publish
@@ -11,7 +11,7 @@ from .models.ctx.model import Context
 
 # TODO: Should we load from ".env.rosetta"?
 # TODO: Or, perhaps even stage specific, like from ".env.rosetta.prod"?
-dotenv.load_dotenv()
+load_dotenv(find_dotenv(usecwd=True))
 
 
 # Support abbreviated command aliases, ex: "rosetta st" ==> "rosetta status".
@@ -136,19 +136,20 @@ def publish(ctx, scope):
     """Publish the local catalog to a database."""
 
     keyspace_details = Keyspace(bucket="", scope=scope, collection="rosetta-tools")
-
-    # TODO: maybe take connection details from cmd/config/kms (default for now)
     connection_details = CouchbaseConnect(
-        connection_url=os.getenv("COUCHBASE_CONNECTION_URL"),
-        username=os.getenv("COUCHBASE_CLIENT_USERNAME"),
-        password=os.getenv("COUCHBASE_CLIENT_PASSWORD"),
+        connection_url=os.getenv("CB_CONN_STRING"),
+        username=os.getenv("CB_USERNAME"),
+        password=os.getenv("CB_PASSWORD"),
     )
-
+    
     # Establish a connection and get buckets
-    cluster = get_connection(ctx, conn=connection_details)
-    buckets = get_buckets(ctx, cluster=cluster)
+    err, cluster = get_connection(conn=connection_details)
+    if err:
+        click.echo(str(err))
+        return 
+    buckets = get_buckets(cluster=cluster)
 
-    # Prompt user to select a bucket - TODO: can take these details from config/kms later
+    # Prompt user to select a bucket
     selected_bucket = click.prompt(
         "Please select a bucket", type=click.Choice(buckets), show_choices=True
     )
