@@ -14,6 +14,7 @@ from rosetta.core.catalog.version import (
     lib_version_compare,
 )
 from rosetta.core.catalog.directory import ScanDirectoryOpts
+from rosetta.core.catalog.descriptor import REPO_DIRTY as CATALOG_REPO_DIRTY
 
 from ..models.ctx.model import Context
 
@@ -97,7 +98,7 @@ def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
 
  # Special value when there's no commit id,
  # such as when there are dirty / untracked files.
-REPO_DIRTY = "_DIRTY_"
+REPO_DIRTY = CATALOG_REPO_DIRTY
 
 
 def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):

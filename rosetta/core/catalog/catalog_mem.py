@@ -2,7 +2,7 @@ import pathlib
 import typing
 
 from .catalog_base import CatalogBase, FoundItem
-from ..catalog.descriptor import CatalogDescriptor
+from ..catalog.descriptor import CatalogDescriptor, REPO_DIRTY
 from ..record.descriptor import RecordDescriptor
 
 
@@ -21,9 +21,11 @@ class CatalogMem(CatalogBase):
 
     def init_from(self, other: typing.Self) -> list[RecordDescriptor]:
         """ Initialize the items in self by copying over attributes from
-            items found in other that have the exact same repo_commit_id's. """
+            items found in other that have the exact same repo_commit_id's.
 
-        items_to_process = []
+            Returns a list of uninitialized items. """
+
+        uninitialized_items = []
 
         if other and other.catalog_descriptor:
             # A lookup dict of items keyed by "source:name".
@@ -32,15 +34,16 @@ class CatalogMem(CatalogBase):
 
             for s in self.catalog_descriptor.items:
                 o = other_items.get(str(s.source) + ':' + s.name)
-                if o and o.repo_commit_id == s.repo_commit_id:
+                if o and s.repo_commit_id != REPO_DIRTY and \
+                    o.repo_commit_id == s.repo_commit_id:
                     # The prev item and self item have the same repo_commit_id's,
                     # so copy the prev item contents into the self item.
                     for k, v in o.model_dump().items():
                         setattr(s, k, v)
                 else:
-                    items_to_process.append(s)
+                    uninitialized_items.append(s)
 
-        return items_to_process
+        return uninitialized_items
 
     def load(self, catalog_path: pathlib.Path) -> typing.Self:
         """ Load from a catalog_path JSON file. """

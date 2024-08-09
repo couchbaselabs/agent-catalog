@@ -62,11 +62,11 @@ def index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
         items=all_descriptors
     ))
 
-    items_to_process = next_catalog.init_from(curr_catalog)
+    uninitialized_items = next_catalog.init_from(curr_catalog)
 
     print("==================\naugmenting...")
 
-    for descriptor in progress(items_to_process):
+    for descriptor in progress(uninitialized_items):
         if len(all_errs) > max_errs:
             break
 
@@ -86,7 +86,7 @@ def index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
 
     embedding_model_obj = sentence_transformers.SentenceTransformer(meta["embedding_model"])
 
-    for descriptor in progress(items_to_process):
+    for descriptor in progress(uninitialized_items):
         if len(all_errs) > max_errs:
             break
 
@@ -98,7 +98,6 @@ def index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
 
     if all_errs:
         print("ERROR: during vectorizing", "\n".join([str(e) for e in all_errs]))
-
         raise all_errs[0]
 
     return next_catalog
