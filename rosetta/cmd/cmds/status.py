@@ -45,8 +45,8 @@ def cmd_status(ctx, kind="tool", include_dirty=True):
 
 
 def catalog_status(ctx, kind, include_dirty=True):
-    # TODO: Implement status checks also against a CatalogDB backend --
-    # such as by validating DDL and schema versions,
+    # TODO: One day implement status checks also against a CatalogDB
+    # backend -- such as by validating DDL and schema versions,
     # looking for outdated items versus the local catalog, etc?
 
     # TODO: Validate schema versions -- if they're ahead, far behind, etc?
@@ -66,7 +66,7 @@ def catalog_status(ctx, kind, include_dirty=True):
             repo_commit_id = REPO_DIRTY
             sections.append((
                 "repo commit",
-                [("warn", "repo is DIRTY: please use 'rosetta index' to update the local catalog.")]
+                [("warn", "repo is DIRTY: please use the index command to update the local catalog.")]
             ))
         else:
             repo_commit_id = repo_commit_id_str(repo.head.commit)

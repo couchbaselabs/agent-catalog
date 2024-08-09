@@ -18,6 +18,7 @@ def register_blueprints(app):
     from .version import blueprint as version_blueprint
     app.register_blueprint(version_blueprint)
 
+
 def cmd_web(ctx, host_port, debug=True):
     app = flask.Flask(__name__)
 
