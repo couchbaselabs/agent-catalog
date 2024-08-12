@@ -1,17 +1,9 @@
 import logging
-import os
-import pathlib
-
-from tqdm import tqdm
+import tqdm
 
 from rosetta.cmd.cmds.util import *
-from rosetta.core.catalog.catalog_mem import CatalogMem
-from rosetta.core.catalog.directory import scan_directory
-from rosetta.core.catalog.descriptor import CatalogDescriptor
 from rosetta.core.catalog.index import index_catalog
-
 from ..models.ctx.model import Context
-
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +51,7 @@ def cmd_index(ctx: Context, source_dirs: list[str],
     next_catalog = index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
                                  kind, catalog_path, source_dirs,
                                  scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
-                                 progress=tqdm, max_errs=DEFAULT_MAX_ERRS)
+                                 progress=tqdm.tqdm, max_errs=DEFAULT_MAX_ERRS)
 
     print("==================\nsaving local catalog...")
 
@@ -67,19 +59,3 @@ def cmd_index(ctx: Context, source_dirs: list[str],
         next_catalog.dump(catalog_path)
     else:
         print("SKIPPING: local catalog saving due to --dry-run")
-
-    # ---------------------------------
-
-    # TODO: Old indexing codepaths that are getting refactored.
-
-    print("==================\nOLD / pre-refactor indexing...")
-
-    tool_catalog_file = ctx.catalog + "/tool_catalog.json"
-
-    import rosetta.core.tool
-    import sentence_transformers
-
-    rosetta.core.tool.LocalIndexer(
-        catalog_file=pathlib.Path(tool_catalog_file),
-        embedding_model=sentence_transformers.SentenceTransformer(meta["embedding_model"]),
-    ).index([pathlib.Path(p) for p in source_dirs])

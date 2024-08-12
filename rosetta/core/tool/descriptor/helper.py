@@ -1,9 +1,5 @@
 import jsonschema
-import pydantic
-import abc
 import json
-
-from ...record.descriptor import RecordDescriptor
 
 # This schema was copied from: https://json-schema.org/draft/2020-12/schema
 JSON_META_SCHEMA = {
@@ -74,18 +70,3 @@ class JSONSchemaValidatingMixin:
     def check_if_valid_json_schema(input_dict_as_str: str):
         input_dict = json.loads(input_dict_as_str)
         jsonschema.validate(input_dict, JSON_META_SCHEMA)
-
-
-class CouchbaseToolDescriptor(abc.ABC, RecordDescriptor):
-    class CouchbaseMetadata(pydantic.BaseModel):
-        class Secrets(pydantic.BaseModel):
-            conn_string: str
-            username: str
-            password: str
-
-        secrets: Secrets
-
-    couchbase: CouchbaseMetadata
-
-
-

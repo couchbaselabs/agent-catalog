@@ -18,7 +18,7 @@ from .generate import (
     SemanticSearchCodeGenerator,
     HTTPRequestCodeGenerator
 )
-from .generate.secrets import put_secret
+from .secrets import put_secret
 from ..catalog.catalog_base import CatalogBase
 from ..record.descriptor import (
     RecordDescriptor,
@@ -41,7 +41,7 @@ class Provider(abc.ABC):
         >>> import rosetta.core.tool.provider as rp
         >>> import rosetta.core.catalog.catalog_mem as rcm
         >>> import os
-        >>> my_catalog = rcm.CatalogMem.init_from('.rosetta-catalog')
+        >>> my_catalog = rcm.CatalogMem.load('.rosetta-catalog')
         >>> my_provider = rp.Provider(
         >>>     catalog=my_catalog,
         >>>     secrets={'CB_PASSWORD': lambda: os.getenv('MY_CB_PASSWORD')}

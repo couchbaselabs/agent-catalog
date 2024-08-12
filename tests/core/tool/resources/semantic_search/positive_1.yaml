@@ -25,8 +25,8 @@ vector_search:
   text_field: text
   embedding_model: sentence-transformers/all-MiniLM-L12-v2
 
-couchbase:
-  secrets:
-    conn_string: CB_CONN_STRING
-    username: CB_USERNAME
-    password: CB_PASSWORD
+secrets:
+  - couchbase:
+      conn_string: CB_CONN_STRING
+      username: CB_USERNAME
+      password: CB_PASSWORD

@@ -67,7 +67,7 @@ class SQLPPCodeGenerator(_BaseCodeGenerator):
                 'tool': self.record_descriptor,
                 'input': input_model,
                 'output': output_model,
-                'secrets': self.record_descriptor.couchbase.secrets
+                'secrets': self.record_descriptor.secrets[0].couchbase
             })
             logger.debug('The following code has been generated:\n' + rendered_code)
 
@@ -102,7 +102,7 @@ class SemanticSearchCodeGenerator(_BaseCodeGenerator):
                 'tool': self.record_descriptor,
                 'input': input_model,
                 'vector_search': self.record_descriptor.vector_search,
-                'secrets': self.record_descriptor.couchbase.secrets
+                'secrets': self.record_descriptor.secrets[0].couchbase
             })
             logger.debug('The following code has been generated:\n' + rendered_code)
 
