@@ -2,25 +2,28 @@
 from __future__ import annotations
 
 import requests
+import logging
 import typing
 import json
 import os
 
-import rosetta.core.tool
+from rosetta.core.tool import tool
 
 {% if input is not none %}
 {{ input.model.generated_code }}
 parameter_locations = {{ input.locations }}
 {% endif %}
 
-@rosetta.core.tool.tool(infer_schema=True)
-def {{ openapi.specification.operation_id  }}({% if input is not none %}argument_input: {{ input.model.type_name }}{% endif %}) -> str:
+@tool(infer_schema=True)
+def {{ tool.name }}({% if input is not none %}argument_input: {{ input.model.type_name }}{% endif %}) -> str:
     """
-    {{ openapi.specification.description }}
+    {{ tool.description }}
     """
+    logger.debug("{{ tool.name }} has been called.")
 
     {% if input is not none %}
     # We need to safeguard against weird LLM function calls.
+    logger.debug("{{ tool.name }} has been given the input: " + str(argument_input) + ".")
     if isinstance(argument_input, dict):
         named_parameters = argument_input
     elif isinstance(argument_input, {{ input.model.type_name }}):
@@ -62,7 +65,10 @@ def {{ openapi.specification.operation_id  }}({% if input is not none %}argument
         if len(request_body) > 0:
             request_args['data'] = json.dumps(request_body)
 
+        logger.debug("{{ tool.name }} is issuing the request {{ method }} " + url +
+                     "with request parameters: " + str(request_args))
         response = requests.request("{{ method }}", url, **request_args)
         if response.status_code == 200:
+            logger.debug("{{ tool.name }} has returned " + response.text)
             return response.text
         raise Exception(f"Non-200 status code returned from server!\n\n{response.text}")

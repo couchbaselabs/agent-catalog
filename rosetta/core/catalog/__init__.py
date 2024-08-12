@@ -1,3 +1,6 @@
+from .catalog_mem import CatalogMem
+from .catalog_db import CatalogDB
+
 # Newer versions of the rosetta core library / tools might be
 # able to read and/or write older catalog schema versions of data
 # which were persisted into the local catalog and/or into the database.

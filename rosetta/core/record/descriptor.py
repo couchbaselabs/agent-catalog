@@ -1,9 +1,8 @@
 import pydantic
 import pathlib
+import enum
 import typing
 import json
-
-from .kind import RecordKind
 
 
 class JsonEncoder(json.JSONEncoder):
@@ -16,15 +15,36 @@ class JsonEncoder(json.JSONEncoder):
             return super(JsonEncoder, self).default(o)
 
 
+class RecordKind(enum.StrEnum):
+    PythonFunction = 'python_function'
+    SQLPPQuery = 'sqlpp_query'
+    SemanticSearch = 'semantic_search'
+    HTTPRequest = 'http_request'
+
+    # TODO (GLENN): Include other classes for prompts.
+    RawPrompt = 'raw_prompt'
+    JinjaPrompt = 'jinja_prompt'
+
+
 class RecordDescriptor(pydantic.BaseModel):
     """ This model represents a tool's persistable description or metadata. """
+    model_config = pydantic.ConfigDict(
+        frozen=True,
+        use_enum_values=True
+    )
 
+    # TODO (GLENN): Maybe this should be a computed property?
     # A fully qualified unique identifier for the tool.
-    # Ex: "src/tools/finance.py:get_current_stock_price:g11aa345".
+    # Ex: "src/tools/finance.py:get_current_stock_price:g11223344".
     identifier: str
 
     # The type of catalog entry (python tool, prompt, etc...).
-    kind: RecordKind
+    record_kind: typing.Literal[
+        RecordKind.PythonFunction,
+        RecordKind.SQLPPQuery,
+        RecordKind.SemanticSearch,
+        RecordKind.HTTPRequest
+    ]
 
     # A short name for the tool, where multiple versions
     # of the same tool would have the same name.
@@ -39,18 +59,14 @@ class RecordDescriptor(pydantic.BaseModel):
     source: pathlib.Path
 
     # For git, this is a git commit SHA / HASH.
-    # Ex: "g11aa345" or REPO_DIRTY.
-    repo_commit_id: str = None
+    # Ex: "g11223344" or REPO_DIRTY.
+    repo_commit_id: str
 
     # Embedding used to search this record.
-    embedding: list[float]
+    embedding: typing.Optional[list[float]] = list()
 
-    # TODO (GLENN): Do we need this?
-    content: typing.Optional[str] = None
-
-    @property
-    def pretty_json(self) -> str:
-        # TODO (GLENN): Leverage the built in Pydantic JSON serialization?
+    def __str__(self) -> str:
+        # TODO (GLENN): Leverage the built-in Pydantic JSON serialization?
         descriptor_as_dict = self.dict()
         descriptor_as_dict['embedding'] = \
             descriptor_as_dict['embedding'][0:3] \

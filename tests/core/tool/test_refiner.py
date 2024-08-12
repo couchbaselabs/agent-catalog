@@ -1,8 +1,8 @@
 import pytest
 import langchain_core.tools
 
-from rosetta.core.tool.reranker import (
-    ClosestClusterReranker,
+from rosetta.core.tool.refiner import (
+    ClosestClusterRefiner,
     ToolWithDelta
 )
 
@@ -26,8 +26,8 @@ def _generate_test_tools(deltas: list[int]) -> list[ToolWithDelta]:
 
 
 @pytest.mark.smoke
-def test_closest_cluster_reranker():
-    reranker = ClosestClusterReranker()
+def test_closest_cluster_refiner():
+    reranker = ClosestClusterRefiner()
 
     same_tools = _generate_test_tools([0.1 for _ in range(0, 10)])
     assert same_tools == reranker(same_tools)

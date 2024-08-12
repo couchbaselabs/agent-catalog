@@ -1,157 +1,135 @@
 import shutil
 import tempfile
 import typing
-import pydantic
 import pathlib
 import importlib
-import sentence_transformers
 import langchain_core.tools
 import logging
-import sklearn
 import inspect
 import abc
 import sys
 
+from .refiner import (
+    ToolWithDelta,
+    ClosestClusterRefiner
+)
 from .generate import (
     SQLPPCodeGenerator,
     SemanticSearchCodeGenerator,
     HTTPRequestCodeGenerator
 )
-from .reranker import (
-    ToolWithEmbedding,
-    ToolWithDelta,
-    ClosestClusterReranker
+from .generate.secrets import put_secret
+from ..catalog.catalog_base import CatalogBase
+from ..record.descriptor import (
+    RecordDescriptor,
+    RecordKind
 )
-from ..record.descriptor import RecordDescriptor
-from ..record.kind import RecordKind
 
 logger = logging.getLogger(__name__)
 
 
-class Provider(pydantic.BaseModel, abc.ABC):
-    model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
+class Provider(abc.ABC):
+    def __init__(self, catalog: CatalogBase, output_directory: pathlib.Path = None,
+                 refiner: typing.Callable[[list[ToolWithDelta]], list[ToolWithDelta]] = None,
+                 secrets: typing.Optional[dict[str, typing.Callable[[], str]]] = None):
+        """
+        :param catalog: A handle to the catalog. Entries can either be in memory or in Couchbase.
+        :param output_directory: Location to place the generated Python stubs.
+        :param refiner: Refiner (reranker / post processor) to use when retrieving tools.
+        :param secrets: Map of identifiers to functions (callbacks) that retrieve secrets.
 
-    # TODO (GLENN): This should be in inferred from the catalog.
-    embedding_model: sentence_transformers.SentenceTransformer = pydantic.Field(
-        description="Embedding model used to encode the tool descriptions."
-    )
-    output_directory: pathlib.Path = pydantic.Field(
-        default_factory=lambda: pathlib.Path(tempfile.mkdtemp()),
-        description="Location to place the generated Python stubs."
-    )
-    reranker: typing.Callable[[list[ToolWithDelta]], list[ToolWithDelta]] = pydantic.Field(
-        default_factory=ClosestClusterReranker,
-        description="Reranker to use when retrieving tools."
-    )
+        >>> import rosetta.core.tool.provider as rp
+        >>> import rosetta.core.catalog.catalog_mem as rcm
+        >>> import os
+        >>> my_catalog = rcm.CatalogMem.init_from('.rosetta-catalog')
+        >>> my_provider = rp.Provider(
+        >>>     catalog=my_catalog,
+        >>>     secrets={'CB_PASSWORD': lambda: os.getenv('MY_CB_PASSWORD')}
+        >>> )
+        """
+        self.catalog = catalog
+        self._tool_cache = dict()
+        self._modules = list()
 
-    _tools: list[ToolWithEmbedding] = list()
-    _modules: dict = dict()
+        # Handle our defaults.
+        if output_directory is not None:
+            self.output_directory = output_directory
+        else:
+            self.output_directory = pathlib.Path(tempfile.mkdtemp())
+        if refiner is not None:
+            self.refiner = refiner
+        else:
+            self.refiner = ClosestClusterRefiner()
+        if secrets is not None:
+            # Note: we only register our secrets at instantiation-time.
+            for k, v in secrets.items():
+                put_secret(k, v)
 
-    @abc.abstractmethod
-    def get_tools_for(self, objective: str, k: typing.Union[int | None] = 1) \
+    def get_tools_for(self, query: str, limit: typing.Union[int | None] = 1) \
             -> list[langchain_core.tools.StructuredTool]:
-        pass
+        results = self.refiner(self.catalog.find(query=query, limit=limit))
 
-    @abc.abstractmethod
-    def get(self, _id: str) -> langchain_core.tools.StructuredTool:
-        pass
+        # Load all tools that we have not already cached.
+        non_cached_results = [f for f in results if f.tool not in self._tool_cache]
+        for record_descriptor, tool in self._load_from_descriptors(non_cached_results):
+            self._tool_cache[record_descriptor] = tool
 
-    def _load_from_source(self, filename: pathlib.Path, entry: RecordDescriptor, tool_filter=None):
+        # Return the tools from the cache.
+        return [self._tool_cache[x.tool] for x in results]
+
+    def _load_from_descriptors(self, descriptors: list[RecordDescriptor]) \
+            -> list[tuple[RecordDescriptor, langchain_core.tools.StructuredTool]]:
+        # Group all entries by their 'source'.
+        source_groups = dict()
+        for result in descriptors:
+            if result.source not in source_groups:
+                # Note: we assume that each source only contains one type (kind) of tool.
+                source_groups[result.source] = {
+                    'entries': list(),
+                    'kind': result.record_kind
+                }
+            source_groups[result.source]['entries'].append(result)
+
+        # Now, iterate through each group.
+        resultant_tools = list()
+        for source, group in source_groups.items():
+            entries = group['entries']
+            if group['kind'] == RecordKind.PythonFunction:
+                for entry in entries:
+                    resultant_tools.append((entry, self._load_from_module(entry.source, entry),))
+            else:
+                match group['kind']:
+                    case RecordKind.SQLPPQuery:
+                        generator = SQLPPCodeGenerator(record_descriptors=entries).generate
+                    case RecordKind.SemanticSearch:
+                        generator = SemanticSearchCodeGenerator(record_descriptors=entries).generate
+                    case RecordKind.HTTPRequest:
+                        generator = HTTPRequestCodeGenerator(record_descriptor=entries).generate
+                    case _:
+                        raise ValueError('Unexpected tool-kind encountered!')
+                output = generator(self.output_directory)
+                for i in range(len(entries)):
+                    resultant_tools.append((entries[i], self._load_from_module(output[i], entries[i]),))
+
+        return resultant_tools
+
+    def _load_from_module(self, filename: pathlib.Path, entry: RecordDescriptor) \
+            -> langchain_core.tools.StructuredTool:
         # TODO (GLENN): We should avoid blindly putting things in our path.
         if not str(filename.parent.absolute()) in sys.path:
             sys.path.append(str(filename.parent.absolute()))
-
         if filename.stem not in self._modules:
             self._modules[filename.stem] = importlib.import_module(filename.stem)
 
+        # Grab the tool that corresponds to the given entry name.
         for name, tool in inspect.getmembers(self._modules[filename.stem]):
             if not isinstance(tool, langchain_core.tools.StructuredTool):
                 continue
-            if tool_filter is None or tool_filter(tool):
-                self._tools.append(ToolWithEmbedding(
-                    identifier=entry.identifier,
-                    embedding=entry.embedding,
-                    tool=tool
-                ))
-                break
+            if entry.name == tool.name:
+                return tool
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         shutil.rmtree(str(self.output_directory.absolute()))
-
-
-class LocalProvider(Provider):
-    catalog_file: pathlib.Path
-
-    def __init__(self, /, **data: typing.Any):
-        super(LocalProvider, self).__init__(**data)
-
-        # Group all entries by their 'source'.
-        with self.catalog_file.open('r') as fp:
-            source_groups = dict()
-            for line in fp:
-                entry = RecordDescriptor.model_validate_json(line)
-                if entry.source not in source_groups:
-                    # Note: we assume that each source only contains one type (kind) of tool.
-                    source_groups[entry.source] = {
-                        'entries': list(),
-                        'kind': entry.kind
-                    }
-                source_groups[entry.source]['entries'].append(entry)
-
-        # Now, iterate through each group.
-        for source, group in source_groups.items():
-            entries = group['entries']
-            if group['kind'] == RecordKind.PythonFunction:
-                for entry in entries:
-                    # TODO (GLENN): We need a better identifier than just the name and description.
-                    tool_filter = lambda t: entry.name == t.name and entry.description == t.description
-                    self._load_from_source(entry.source, entry, tool_filter)
-            else:
-                match group['kind']:
-                    case RecordKind.SQLPPQuery:
-                        generator = SQLPPCodeGenerator
-                    case RecordKind.SemanticSearch:
-                        generator = SemanticSearchCodeGenerator
-                    case RecordKind.HTTPRequest:
-                        generator = HTTPRequestCodeGenerator
-                    case _:
-                        raise ValueError('Unexpected tool-kind encountered!')
-
-                # For non-Python (native) tools, we expect one Python file per entry.
-                output = generator(record_descriptors=entries).generate(self.output_directory)
-                for i in range(len(entries)):
-                    self._load_from_source(output[i], entries[i])
-
-    def get_tools_for(self, objective: str, k: typing.Union[int | None] = 1) \
-            -> list[langchain_core.tools.StructuredTool]:
-        # Compute the distance between our tool embeddings and our objective embeddings.
-        objective_embedding = self.embedding_model.encode(objective)
-        available_tools = [t for t in self._tools]
-        tool_deltas = sklearn.metrics.pairwise.cosine_similarity(
-            X=[t.embedding for t in available_tools],
-            Y=[objective_embedding]
-        )
-
-        # Order our tools by their distance to the objective (larger is "closer").
-        tools_with_deltas = [
-            ToolWithDelta(
-                tool=available_tools[i].tool,
-                delta=tool_deltas[i]
-            ) for i in range(len(tool_deltas))
-        ]
-        ordered_tools = sorted(tools_with_deltas, key=lambda t: t.delta, reverse=True)
-        if k > 0:
-            # Note: the inclusion of k here overrides our reranker, if specified.
-            return [t.tool for t in ordered_tools][:k]
-        else:
-            return self.reranker(ordered_tools)
-
-    def get(self, _id: str) -> langchain_core.tools.StructuredTool:
-        pass
-
-
-class CouchbaseProvider(Provider):
-    pass
