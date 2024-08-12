@@ -11,7 +11,21 @@ from rosetta.core.tool.reranker import ToolWithDelta
 from ..models.ctx.model import Context
 
 
-def cmd_find(ctx: Context, query, kind="tool", top_k=3, include_dirty=True):
+def NoneReranker():
+    return lambda results: results
+
+
+rerankers = {
+    "none": NoneReranker,
+
+    "ClosestCluster": ClosestClusterReranker,
+
+    # TODO: One day allow for custom rerankers at runtime where
+    # we dynamically import a user's module/function?
+}
+
+
+def cmd_find(ctx: Context, query, kind="tool", top_k=3, include_dirty=True, reranker="default"):
     # TODO: One day, also handle DBCatalogRef?
     # TODO: If DB is outdated and the local catalog has newer info,
     #       then we need to consult the latest, local catalog / MemCatalogRef?
@@ -19,6 +33,11 @@ def cmd_find(ctx: Context, query, kind="tool", top_k=3, include_dirty=True):
     #       and/or --db-catalog-only, and/or both, via chaining multiple CatalogRef's?
     # TODO: When refactoring is done, rename back to "tool_catalog.json" (with underscore)?
     # TODO: Possible security issue -- need to check kind is an allowed value?
+
+    if reranker not in rerankers:
+        valid_rerankers = list(rerankers.keys())
+        valid_rerankers.sort()
+        raise ValueError(f"ERROR: unknown reranker, valid rerankers: {valid_rerankers}")
 
     catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")
 
@@ -47,8 +66,8 @@ def cmd_find(ctx: Context, query, kind="tool", top_k=3, include_dirty=True):
         ToolWithDelta(tool=x.record_descriptor, delta=x.delta) for x in catalog.find(query, max=top_k)
     ]
 
-    # TODO (GLENN): If / when different rerankers are implemented, specify them above.
-    reranker = ClosestClusterReranker()
-    for i, result in enumerate(reranker(search_results)):
+    r = rerankers[reranker]()
+
+    for i, result in enumerate(r(search_results)):
         click.echo(f'#{i + 1} (delta = {result.delta}, higher is better): ', nl=False)
         click.echo(result.tool.pretty_json)
