@@ -14,11 +14,12 @@ from rosetta.core.catalog.version import (
     lib_version_compare,
 )
 from rosetta.core.catalog.directory import ScanDirectoryOpts
+from rosetta.core.catalog.descriptor import REPO_DIRTY as CATALOG_REPO_DIRTY
 
 from ..models.ctx.model import Context
 
 
-MAX_ERRS = 10
+DEFAULT_MAX_ERRS = 10
 
 
 DEFAULT_SCAN_DIRECTORY_OPTS = ScanDirectoryOpts(
@@ -32,8 +33,6 @@ def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
     if not read_only:
         os.makedirs(ctx.catalog, exist_ok=True)
         os.makedirs(ctx.activity, exist_ok=True)
-    else:
-        print("SKIPPING: local directory creation due to read_only mode")
 
     lib_v = lib_version()
 
@@ -89,17 +88,20 @@ def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
     if not read_only:
         with open(meta_path, "w") as f:
             json.dump(meta, f, sort_keys=True, indent=4)
-    else:
-        print("SKIPPING: meta.json file write due to read_only mode")
 
     return meta
+
+
+ # Special value when there's no commit id,
+ # such as when there are dirty / untracked files.
+REPO_DIRTY = CATALOG_REPO_DIRTY
 
 
 def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
     # The repo is the user's application's repo and is NOT the repo
     # of rosetta-core. The rosetta CLI / library should be run in
     # a directory (or subdirectory) of the user's application's repo,
-    # where we'll walk up the parent dirs until we find the .git/ subdirectory.
+    # where repo_load() walks up the parent dirs until it finds a .git/ subdirectory.
 
     while not (top_dir / ".git").exists():
         if top_dir.parent == top_dir:
@@ -108,7 +110,21 @@ def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
             )
         top_dir = top_dir.parent
 
-    return git.Repo(top_dir / ".git")
+    repo = git.Repo(top_dir / ".git")
+
+    def repo_commit_id_for_path(path: pathlib.Path) -> str:
+        path_absolute = path.absolute()
+
+        if repo.is_dirty(path=path_absolute):
+            return REPO_DIRTY
+
+        commits = list(repo.iter_commits(paths=path_absolute, max_count=1))
+        if not commits or len(commits) <= 0:
+            return REPO_DIRTY # Untracked, so treat it as dirty.
+
+        return repo_commit_id_str(commits[0])
+
+    return repo, repo_commit_id_for_path
 
 
 # TODO: One use case is a user's repo (like rosetta-example) might
@@ -119,10 +135,13 @@ def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
 # subdirectory?
 
 
-def commit_str(commit):
-    """Ex: 'g1234abcd'."""
+def repo_commit_id_str(repo_commit_id):
+    """Formats a long repo_commit_id into a shorter format. Ex: 'g1234abcd'."""
 
     # TODO: Only works for git, where a far, future day, folks might want non-git?
 
-    return "g" + str(commit)[:7]
+    if repo_commit_id == REPO_DIRTY:
+        return REPO_DIRTY
+
+    return "g" + str(repo_commit_id)[:7]
 

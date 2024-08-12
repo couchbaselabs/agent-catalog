@@ -10,5 +10,4 @@ def route_env():
 
 
 def cmd_env(ctx: Context):
-    print("activity: {},\ncatalog: {},\nverbose: {}".format(ctx.activity, ctx.catalog, ctx.verbose))
-    # print(json.dumps(ctx, sort_keys=True, indent=4))
+    print("activity: {}\ncatalog: {}\nverbose: {}".format(ctx.activity, ctx.catalog, ctx.verbose))

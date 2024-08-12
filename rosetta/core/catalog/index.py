@@ -10,11 +10,61 @@ from .catalog_mem import CatalogMem
 source_globs = list(source_indexers.keys())
 
 
-def index_catalog(meta, repo_commit_id, get_repo_commit_id,
+def index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
                   kind, catalog_path, source_dirs,
                   scan_directory_opts: ScanDirectoryOpts = None,
                   progress=lambda x: x,
                   max_errs=1):
+    all_errs, next_catalog, uninitialized_items = index_catalog_start(
+        meta, repo_commit_id, repo_commit_id_for_path,
+        kind, catalog_path, source_dirs,
+        scan_directory_opts=scan_directory_opts,
+        progress=progress, max_errs=max_errs)
+
+    print("==================\naugmenting...")
+
+    for descriptor in progress(uninitialized_items):
+        if max_errs > 0 and len(all_errs) >= max_errs:
+            break
+
+        print(descriptor.name)
+
+        errs = augment_descriptor(descriptor)
+
+        all_errs += errs or []
+
+    if all_errs:
+        print("ERROR: during augmenting", "\n".join([str(e) for e in all_errs]))
+        raise all_errs[0]
+
+    print("==================\nvectorizing...")
+
+    import sentence_transformers
+
+    embedding_model_obj = sentence_transformers.SentenceTransformer(meta["embedding_model"])
+
+    for descriptor in progress(uninitialized_items):
+        if max_errs > 0 and len(all_errs) >= max_errs:
+            break
+
+        print(descriptor.name)
+
+        errs = vectorize_descriptor(descriptor, embedding_model_obj)
+
+        all_errs += errs or []
+
+    if all_errs:
+        print("ERROR: during vectorizing", "\n".join([str(e) for e in all_errs]))
+        raise all_errs[0]
+
+    return next_catalog
+
+
+def index_catalog_start(meta, repo_commit_id, repo_commit_id_for_path,
+                        kind, catalog_path, source_dirs,
+                        scan_directory_opts: ScanDirectoryOpts = None,
+                        progress=lambda x: x,
+                        max_errs=1):
     # TODO: We should use different source_indexers & source_globs based on the kind?
 
     if catalog_path.exists():
@@ -37,21 +87,19 @@ def index_catalog(meta, repo_commit_id, get_repo_commit_id,
     all_errs = []
     all_descriptors = []
     for source_file in progress(source_files):
-        if len(all_errs) > max_errs:
+        if max_errs > 0 and len(all_errs) >= max_errs:
             break
 
         for glob, indexer in source_indexers.items():
             if fnmatch.fnmatch(source_file.name, glob):
-                errs, descriptors = indexer.start_descriptors(source_file, get_repo_commit_id)
+                errs, descriptors = indexer.start_descriptors(source_file, repo_commit_id_for_path)
                 all_errs += errs or []
                 all_descriptors += descriptors or []
                 break
 
     if all_errs:
-        print("ERROR: during examining", "\n".join([str(e) for e in all_errs]))
+        print("ERROR: during start_descriptors", "\n".join([str(e) for e in all_errs]))
         raise all_errs[0]
-
-    print("==================\ninit'ing...")
 
     next_catalog = CatalogMem(catalog_descriptor=CatalogDescriptor(
         catalog_schema_version=meta["catalog_schema_version"],
@@ -62,43 +110,6 @@ def index_catalog(meta, repo_commit_id, get_repo_commit_id,
         items=all_descriptors
     ))
 
-    items_to_process = next_catalog.init_from(curr_catalog)
+    uninitialized_items = next_catalog.init_from(curr_catalog)
 
-    print("==================\naugmenting...")
-
-    for descriptor in progress(items_to_process):
-        if len(all_errs) > max_errs:
-            break
-
-        print(descriptor.name)
-
-        errs = augment_descriptor(descriptor)
-
-        all_errs += errs or []
-
-    if all_errs:
-        print("ERROR: during augmenting", "\n".join([str(e) for e in all_errs]))
-        raise all_errs[0]
-
-    print("==================\nvectorizing...")
-
-    import sentence_transformers
-
-    embedding_model_obj = sentence_transformers.SentenceTransformer(meta["embedding_model"])
-
-    for descriptor in progress(items_to_process):
-        if len(all_errs) > max_errs:
-            break
-
-        print(descriptor.name)
-
-        errs = vectorize_descriptor(descriptor, embedding_model_obj)
-
-        all_errs += errs or []
-
-    if all_errs:
-        print("ERROR: during vectorizing", "\n".join([str(e) for e in all_errs]))
-
-        raise all_errs[0]
-
-    return next_catalog
+    return all_errs, next_catalog, uninitialized_items

@@ -21,18 +21,13 @@ from ..record.kind import RecordKind
 logger = logging.getLogger(__name__)
 
 
-# TODO: Need to support index scanning, but not doing any
-# real work, such as to support "rosetta status", such as
-# to detect when local catalog is out of date -- or such
-# as when running with a "rosetta index --dry-run" option?
-
 # TODO: We should use something other than ValueError,
 # such as by capturing line numbers, etc?
 
 
 class BaseFileIndexer(pydantic.BaseModel):
     @abc.abstractmethod
-    def start_descriptors(self, filename: pathlib.Path, get_repo_commit_id) -> \
+    def start_descriptors(self, filename: pathlib.Path, repo_commit_id_for_path) -> \
             typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or more 'bare' catalog item descriptors for a filename,
            and/or return non-fatal or 'keep-on-going' errors if any encountered.
@@ -52,7 +47,7 @@ class BaseFileIndexer(pydantic.BaseModel):
 
 
 class DotPyFileIndexer(BaseFileIndexer):
-    def start_descriptors(self, filename: pathlib.Path, get_repo_commit_id) -> \
+    def start_descriptors(self, filename: pathlib.Path, repo_commit_id_for_path) -> \
             typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or more 'bare' catalog item descriptors
            for a *.py, and/or returns 'keep-on-going' errors
@@ -80,7 +75,7 @@ class DotPyFileIndexer(BaseFileIndexer):
             name = tool.name.strip()
 
             if not repo_commit_id:
-                repo_commit_id = get_repo_commit_id(filename)
+                repo_commit_id = repo_commit_id_for_path(filename)
 
             descriptors.append(RecordDescriptor(
                 identifier=str(filename) + ":" + name + ":" + repo_commit_id,
@@ -90,7 +85,7 @@ class DotPyFileIndexer(BaseFileIndexer):
                 # TODO: Capture line numbers as part of source?
                 source=filename,
                 repo_commit_id=repo_commit_id,
-                # TODO: The embedding is filled in at a later phase.
+                # The embedding is filled in at a later phase.
                 embedding=[],
             ))
 
@@ -98,7 +93,7 @@ class DotPyFileIndexer(BaseFileIndexer):
 
 
 class DotSqlppFileIndexer(BaseFileIndexer):
-    def start_descriptors(self, filename: pathlib.Path, get_repo_commit_id) -> \
+    def start_descriptors(self, filename: pathlib.Path, repo_commit_id_for_path) -> \
             typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or 1 'bare' catalog item descriptors
            for a *.sqlpp, and/or return 'keep-on-going' errors
@@ -109,9 +104,9 @@ class DotSqlppFileIndexer(BaseFileIndexer):
 
         metadata = SQLPPQueryMetadata.model_validate(front_matter)
 
-        name = metadata.name.strip()  # TODO: If missing, name should default to filename?
+        name = metadata.name.strip() # TODO: If missing, name should default to filename?
 
-        repo_commit_id = get_repo_commit_id(filename)  # Ex: a git hash / SHA.
+        repo_commit_id = repo_commit_id_for_path(filename)  # Ex: a git hash / SHA.
 
         return (None, [RecordDescriptor(
             identifier=str(filename) + ":" + name + ":" + repo_commit_id,
@@ -121,13 +116,13 @@ class DotSqlppFileIndexer(BaseFileIndexer):
             source=filename,
             repo_commit_id=repo_commit_id,
             content=filename.read_text(),
-            # TODO: The embedding is filled in at a later phase.
+            # The embedding is filled in at a later phase.
             embedding=[],
         )])
 
 
 class DotYamlFileIndexer(BaseFileIndexer):
-    def start_descriptors(self, filename: pathlib.Path, get_repo_commit_id) -> \
+    def start_descriptors(self, filename: pathlib.Path, repo_commit_id_for_path) -> \
             typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or more 'bare' catalog item descriptors
            for a *.yaml, and/or return 'keep-on-going' errors
@@ -142,7 +137,7 @@ class DotYamlFileIndexer(BaseFileIndexer):
                            f'Not indexing {str(filename.absolute())}.')
             return (None, [])
 
-        repo_commit_id = get_repo_commit_id(filename)  # Ex: a git hash / SHA.
+        repo_commit_id = repo_commit_id_for_path(filename)  # Ex: a git hash / SHA.
 
         match parsed_desc['record_kind']:
             case RecordKind.SemanticSearch:
@@ -158,7 +153,7 @@ class DotYamlFileIndexer(BaseFileIndexer):
                     source=filename,
                     repo_commit_id=repo_commit_id,
                     content=filename.read_text(),
-                    # TODO: The embedding is filled in at a later phase.
+                    # The embedding is filled in at a later phase.
                     embedding=[],
                 )])
 
@@ -178,7 +173,7 @@ class DotYamlFileIndexer(BaseFileIndexer):
                         # TODO: Capture line numbers as part of source?
                         source=filename,
                         repo_commit_id=repo_commit_id,
-                        # TODO: The embedding is filled in at a later phase.
+                        # The embedding is filled in at a later phase.
                         embedding=[],
                     ))
 
@@ -211,7 +206,7 @@ def augment_descriptor(descriptor: RecordDescriptor) -> list[ValueError]:
 
 
 def vectorize_descriptor(descriptor: RecordDescriptor, embedding_model_obj) -> \
-        list[ValueError]:
+    list[ValueError]:
     """ Adds vector embeddings to a single catalog item descriptor (in-place,
         destructive), and/or return 'keep-on-going' errors if any encountered.
     """

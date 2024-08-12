@@ -17,7 +17,8 @@ logger = logging.getLogger(__name__)
 
 
 def cmd_index(ctx: Context, source_dirs: list[str],
-              kind: str, embedding_model: str, dry_run: bool, **_):
+              kind: str, embedding_model: str,
+              include_dirty: bool = True, dry_run: bool = False, **_):
     meta = init_local(ctx, embedding_model, read_only=dry_run)
 
     if not meta["embedding_model"]:
@@ -25,19 +26,16 @@ def cmd_index(ctx: Context, source_dirs: list[str],
             "An --embedding-model is required as an embedding model is not yet recorded."
         )
 
-    repo = repo_load(pathlib.Path(os.getcwd()))
+    repo, repo_commit_id_for_path = repo_load(pathlib.Path(os.getcwd()))
 
-    if repo.is_dirty() and not os.getenv("ROSETTA_REPO_DIRTY_OK", False):
-        # The ROSETTA_REPO_DIRTY_OK env var is intended
-        # to help during rosetta development.
+    # TODO: If the repo is dirty only because .rosetta-catalog/ is
+    # dirty or because .rosetta-activity/ is dirty, then we might print
+    # some helper instructions for the dev user on commiting the .rosetta-catalog/
+    # and on how to add .rosetta-activity/ to the .gitignore file? Or, should
+    # we instead preemptively generate a .rosetta-activity/.gitiginore
+    # file during init_local()?
 
-        # TODO: If the repo is dirty only because .rosetta-catalog/ is
-        # dirty or because .rosetta-activity/ is dirty, then we might print
-        # some helper instructions for the dev user on commiting the .rosetta-catalog/
-        # and on how to add .rosetta-activity/ to the .gitignore file? Or, should
-        # we instead preemptively generate a .rosetta-activity/.gitiginore
-        # file during init_local()?
-
+    if repo.is_dirty() and not include_dirty:
         raise ValueError("repo is dirty")
 
     # TODO: One day, maybe allow users to choose a different branch instead of assuming
@@ -48,7 +46,7 @@ def cmd_index(ctx: Context, source_dirs: list[str],
     # approach of opening & reading file contents directly,
 
     # The commit id for the repo's HEAD commit.
-    repo_commit_id = commit_str(repo.head.commit)
+    repo_commit_id = repo_commit_id_str(repo.head.commit)
 
     # TODO: During refactoring, we currently load/save to "tool-catalog.json" (with
     # a hyphen) instead of the old "tool_catalog.json" to not break other existing
@@ -58,18 +56,10 @@ def cmd_index(ctx: Context, source_dirs: list[str],
     # TODO: The kind needs a security check as it's part of the path?
     catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")
 
-    def get_repo_commit_id(path: pathlib.Path) -> str:
-        commits = list(repo.iter_commits(paths=path.absolute(), max_count=1))
-        if not commits or len(commits) <= 0:
-            raise ValueError(
-                f"ERROR: get_repo_commit_id, no commits for filename: {path.absolute()}"
-            )
-        return commit_str(commits[0])
-
-    next_catalog = index_catalog(meta, repo_commit_id, get_repo_commit_id,
+    next_catalog = index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
                                  kind, catalog_path, source_dirs,
                                  scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
-                                 progress=tqdm, max_errs=MAX_ERRS)
+                                 progress=tqdm, max_errs=DEFAULT_MAX_ERRS)
 
     print("==================\nsaving local catalog...")
 
