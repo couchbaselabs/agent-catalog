@@ -4,34 +4,36 @@ from __future__ import annotations
 import couchbase.auth
 import couchbase.options
 import couchbase.cluster
+import logging
 import typing
-import os
 
-import rosetta.core.tool
+from rosetta.core.tool import tool
+from rosetta.core.tool.generate.secrets import get_secret
+
+logger = logging.getLogger(__name__)
 
 {{ input.generated_code }}
-
 {{ output.generated_code }}
 
-# TODO (GLENN): Handle this better.
 def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
     authenticator = couchbase.auth.PasswordAuthenticator(
-        username=os.getenv('CB_USERNAME'),
-        password=os.getenv('CB_PASSWORD')
+        username=get_secret("{{ secrets.username }}"),
+        password=get_secret("{{ secrets.password }}")
     )
-    conn_string = os.getenv('CB_CONN_STRING')
+    conn_string = get_secret("{{ secrets.conn_string }}")
     return couchbase.cluster.Cluster(conn_string, couchbase.options.ClusterOptions(authenticator))
 
-
-@rosetta.core.tool.tool(infer_schema=True)
-def {{ tool_metadata.name }}(argument_input: {{ input.type_name }}) \
+@tool(infer_schema=True)
+def {{ tool.name }}(argument_input: {{ input.type_name }}) \
         -> {% if output.is_list_valued %}list[{{ output.type_name }}]{% else %}{{ output.type_name }}{% endif %}:
     """
-    {{ tool_metadata.description }}
+    {{ tool.description }}
     """
+    logger.debug("{{ tool.name }} has been called.")
     cluster = _get_couchbase_cluster()
 
     # We need to safeguard against weird LLM function calls.
+    logger.debug("{{ tool.name }} has been given the input: " + str(argument_input) + ".")
     if isinstance(argument_input, dict):
         named_parameters = argument_input
     elif isinstance(argument_input, {{ input.type_name }}):
@@ -40,7 +42,7 @@ def {{ tool_metadata.name }}(argument_input: {{ input.type_name }}) \
         raise ValueError("Bad input given to SQL++ tool!")
 
     query_results = cluster.query(
-        """ {{ sqlpp_query }} """,
+        """ {{ query }} """,
         couchbase.options.QueryOptions(named_parameters=named_parameters)
     )
 
@@ -48,9 +50,11 @@ def {{ tool_metadata.name }}(argument_input: {{ input.type_name }}) \
     {% if output.is_list_valued %}
     for result in query_results:
         tool_results.append({{ output.type_name }}(**result))
+    logger.debug("{{ tool.name }} has returned the following: " + str(tool_results))
     return tool_results
     {% else %}
-    # TODO (GLENN): Clean this up.
     for result in query_results:
-        return {{ output.type_name }}(**result)
+        final_result = {{ output.type_name }}(**result)
+        logger.debug("{{ tool.name }} has returned the following: " + str(final_result))
+        return final_result
     {% endif %}

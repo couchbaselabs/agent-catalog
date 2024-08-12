@@ -6,7 +6,6 @@ from .directory import scan_directory, ScanDirectoryOpts
 from .descriptor import CatalogDescriptor
 from .catalog_mem import CatalogMem
 
-
 source_globs = list(source_indexers.keys())
 
 
@@ -69,16 +68,17 @@ def index_catalog_start(meta, repo_commit_id, repo_commit_id_for_path,
 
     if catalog_path.exists():
         # Load the old / previous local catalog.
-        curr_catalog = CatalogMem().load(catalog_path)
+        curr_catalog = CatalogMem.load(catalog_path)
     else:
         # An empty CatalogMem with no items represents an initial catalog state.
-        curr_catalog = CatalogMem()
-        curr_catalog.catalog_descriptor = CatalogDescriptor(
-            catalog_schema_version=meta["catalog_schema_version"],
-            kind=kind,
-            embedding_model=meta["embedding_model"],
-            repo_commit_id="",
-            items=[])
+        curr_catalog = CatalogMem(
+            catalog_descriptor=CatalogDescriptor(
+                catalog_schema_version=meta["catalog_schema_version"],
+                kind=kind,
+                embedding_model=meta["embedding_model"],
+                repo_commit_id="",
+                items=[])
+        )
 
     source_files = []
     for source_dir in source_dirs:
@@ -101,14 +101,16 @@ def index_catalog_start(meta, repo_commit_id, repo_commit_id_for_path,
         print("ERROR: during start_descriptors", "\n".join([str(e) for e in all_errs]))
         raise all_errs[0]
 
-    next_catalog = CatalogMem(catalog_descriptor=CatalogDescriptor(
-        catalog_schema_version=meta["catalog_schema_version"],
-        embedding_model=meta["embedding_model"],
-        kind=kind,
-        repo_commit_id=repo_commit_id,
-        source_dirs=source_dirs,
-        items=all_descriptors
-    ))
+    next_catalog = CatalogMem(
+        catalog_descriptor=CatalogDescriptor(
+            catalog_schema_version=meta["catalog_schema_version"],
+            embedding_model=meta["embedding_model"],
+            kind=kind,
+            repo_commit_id=repo_commit_id,
+            source_dirs=source_dirs,
+            items=all_descriptors
+        )
+    )
 
     uninitialized_items = next_catalog.init_from(curr_catalog)
 

@@ -64,7 +64,7 @@ def cmd_index(ctx: Context, source_dirs: list[str],
     print("==================\nsaving local catalog...")
 
     if not dry_run:
-        next_catalog.save(catalog_path)
+        next_catalog.dump(catalog_path)
     else:
         print("SKIPPING: local catalog saving due to --dry-run")
 

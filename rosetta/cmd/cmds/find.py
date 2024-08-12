@@ -6,8 +6,8 @@ import tqdm
 from rosetta.cmd.cmds.util import *
 from rosetta.core.catalog.index import index_catalog
 from rosetta.core.catalog.catalog_mem import CatalogMem
-from rosetta.core.tool.reranker import ClosestClusterReranker
-from rosetta.core.tool.reranker import ToolWithDelta
+from rosetta.core.tool.refiner import ClosestClusterRefiner
+from rosetta.core.tool.refiner import ToolWithDelta
 from ..models.ctx.model import Context
 
 
@@ -16,9 +16,8 @@ def NoneReranker():
 
 
 rerankers = {
-    "none": NoneReranker,
-
-    "ClosestCluster": ClosestClusterReranker,
+    "None": NoneReranker,
+    "ClosestCluster": ClosestClusterRefiner,
 
     # TODO: One day allow for custom rerankers at runtime where
     # we dynamically import a user's module/function?
@@ -34,12 +33,12 @@ def cmd_find(ctx: Context, query, kind="tool", top_k=3, include_dirty=True, rera
     # TODO: When refactoring is done, rename back to "tool_catalog.json" (with underscore)?
     # TODO: Possible security issue -- need to check kind is an allowed value?
 
-    if reranker not in rerankers:
+    if not any(r.lower() == reranker.lower() for r in rerankers):
         valid_rerankers = list(rerankers.keys())
         valid_rerankers.sort()
         raise ValueError(f"ERROR: unknown reranker, valid rerankers: {valid_rerankers}")
 
-    catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")
+    catalog_path = pathlib.Path(ctx.catalog) / (kind + "-catalog.json")
 
     catalog = CatalogMem().load(catalog_path)
 
@@ -63,11 +62,11 @@ def cmd_find(ctx: Context, query, kind="tool", top_k=3, include_dirty=True, rera
 
     # Query the catalog for a list of results.
     search_results = [
-        ToolWithDelta(tool=x.record_descriptor, delta=x.delta) for x in catalog.find(query, max=top_k)
+        ToolWithDelta(tool=x.record_descriptor, delta=x.delta) for x in catalog.find(query, limit=top_k)
     ]
 
-    r = rerankers[reranker]()
-
-    for i, result in enumerate(r(search_results)):
+    # TODO (GLENN): If / when different rerankers are implemented, specify them above.
+    reranker = rerankers[reranker]()
+    for i, result in enumerate(reranker(search_results)):
         click.echo(f'#{i + 1} (delta = {result.delta}, higher is better): ', nl=False)
-        click.echo(result.tool.pretty_json)
+        click.echo(str(result.tool))

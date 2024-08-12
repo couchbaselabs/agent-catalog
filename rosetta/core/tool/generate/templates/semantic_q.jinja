@@ -9,31 +9,33 @@ import couchbase.vector_search
 import typing
 import json
 import sentence_transformers
-import os
 
-import rosetta.core.tool
+from rosetta.core.tool import tool
+from rosetta.core.tool.generate.secrets import get_secret
 
 {{ input.generated_code }}
 
-# TODO (GLENN): Handle this better.
+
 def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
     authenticator = couchbase.auth.PasswordAuthenticator(
-        username=os.getenv('CB_USERNAME'),
-        password=os.getenv('CB_PASSWORD')
+        username=get_secret("{{ secrets.username }}"),
+        password=get_secret("{{ secrets.password }}")
     )
-    conn_string = os.getenv('CB_CONN_STRING')
+    conn_string = get_secret("{{ secrets.conn_string }}")
     return couchbase.cluster.Cluster(conn_string, couchbase.options.ClusterOptions(authenticator))
 
 
-@rosetta.core.tool.tool(infer_schema=True)
-def {{ tool_metadata.name }}(question: {{ input.type_name }}) -> list[str]:
-    """ {{ tool_metadata.description }} """
+@tool(infer_schema=True)
+def {{ tool.name }}(question: {{ input.type_name }}) -> list[str]:
+    """ {{ tool.description }} """
     cluster = _get_couchbase_cluster()
-    bucket = cluster.bucket('{{ tool_metadata.vector_search.bucket }}')
-    scope = bucket.scope('{{ tool_metadata.vector_search.scope }}')
-    collection = scope.collection('{{ tool_metadata.vector_search.collection }}')
+    bucket = cluster.bucket('{{ vector_search.bucket }}')
+    scope = bucket.scope('{{ vector_search.scope }}')
+    collection = scope.collection('{{ vector_search.collection }}')
+    logger.debug("{{ tool.name }} has been called.")
 
     # We need to safeguard against weird LLM function calls.
+    logger.debug("{{ tool.name }} has been given the input: " + str(question) + ".")
     if isinstance(question, dict):
         formatted_question = json.dumps(question)
     elif isinstance(question, str):
@@ -43,18 +45,20 @@ def {{ tool_metadata.name }}(question: {{ input.type_name }}) -> list[str]:
     else:
         raise ValueError("Bad input given to tool!")
 
-    embedding_model = sentence_transformers.SentenceTransformer('{{ tool_metadata.vector_search.embedding_model }}')
+    logger.debug("{{ tool.name }} is generating an embedding for: " + formatted_question + ".")
+    embedding_model = sentence_transformers.SentenceTransformer('{{ vector_search.embedding_model }}')
     _embedding = embedding_model.encode(formatted_question)
     for_q = list(_embedding.astype('float64'))
     vector_req = couchbase.vector_search.VectorSearch.from_vector_query(
-        couchbase.vector_search.VectorQuery('{{ tool_metadata.vector_search.vector_field }}', for_q, num_candidates={{ tool_metadata.vector_search.num_candidates }})
+        couchbase.vector_search.VectorQuery('{{ vector_search.vector_field }}', for_q, num_candidates={{ vector_search.num_candidates }})
     )
     search_req = couchbase.search.SearchRequest.create(couchbase.search.MatchNoneQuery())
     search_req = search_req.with_vector_search(vector_req)
     search_opt = couchbase.options.SearchOptions(fields=["*"])
-    search_result = scope.search('{{ tool_metadata.vector_search.index }}', search_req, search_opt)
+    search_result = scope.search('{{ vector_search.index }}', search_req, search_opt)
 
     tool_results = []
     for r in search_result.rows():
-        tool_results.append(collection.get(r.id).content_as[dict]['{{ tool_metadata.vector_search.text_field }}'])
+        tool_results.append(collection.get(r.id).content_as[dict]['{{ vector_search.text_field }}'])
+    logger.debug("{{ tool.name }} has returned the following: " + str(tool_results))
     return tool_results

@@ -9,14 +9,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-# Note: Numpy and Pydantic don't really play well together...
-@dataclasses.dataclass
-class ToolWithEmbedding:
-    identifier: str
-    embedding: numpy.ndarray
-    tool: typing.Any
-
-
 @dataclasses.dataclass
 class ToolWithDelta:
     tool: typing.Any
@@ -24,7 +16,7 @@ class ToolWithDelta:
 
 
 # TODO (GLENN): Fine tune the deepening factor...
-class ClosestClusterReranker(pydantic.BaseModel):
+class ClosestClusterRefiner(pydantic.BaseModel):
     kde_distribution_n: int = pydantic.Field(default=10000, gt=0)
     deepening_factor: float = pydantic.Field(default=0.1, gt=0)
     max_deepen_steps: int = pydantic.Field(default=10, gt=0)

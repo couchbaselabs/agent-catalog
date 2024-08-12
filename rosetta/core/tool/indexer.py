@@ -1,22 +1,21 @@
 import abc
-import importlib
-import inspect
 import logging
 import pathlib
-import sys
 import typing
-import langchain_core.tools
 import pydantic
 import yaml
 
-from .models import (
-    SQLPPQueryMetadata,
-    SemanticSearchMetadata,
-    HTTPRequestMetadata
+from .descriptor import (
+    SQLPPQueryToolDescriptor,
+    SemanticSearchToolDescriptor,
+    PythonToolDescriptor,
+    HTTPRequestToolDescriptor
 )
 
-from ..record.descriptor import RecordDescriptor
-from ..record.kind import RecordKind
+from ..record.descriptor import (
+    RecordDescriptor,
+    RecordKind
+)
 
 logger = logging.getLogger(__name__)
 
@@ -53,43 +52,13 @@ class DotPyFileIndexer(BaseFileIndexer):
            for a *.py, and/or returns 'keep-on-going' errors
            if any encountered.
         """
-
-        # TODO (GLENN): We should avoid blindly putting things in our path.
-        if str(filename.parent.absolute()) not in sys.path:
-            sys.path.append(str(filename.parent.absolute()))
-
-        # TODO: See if we can avoid relying on langchain_core or othern
-        # agent framework? Potentially with a duck-typing approach instead?
-        is_tool = lambda n, t: isinstance(t, langchain_core.tools.BaseTool)
-
-        i = importlib.import_module(filename.stem)
-
-        descriptors = []
-
-        repo_commit_id = None  # Ex: a git hash / SHA.
-
-        for name, tool in inspect.getmembers(i):
-            if not is_tool(name, tool):
-                continue
-
-            name = tool.name.strip()
-
-            if not repo_commit_id:
-                repo_commit_id = repo_commit_id_for_path(filename)
-
-            descriptors.append(RecordDescriptor(
-                identifier=str(filename) + ":" + name + ":" + repo_commit_id,
-                kind=RecordKind.PythonFunction,
-                name=name,
-                description=tool.description.strip(),
-                # TODO: Capture line numbers as part of source?
-                source=filename,
-                repo_commit_id=repo_commit_id,
-                # The embedding is filled in at a later phase.
-                embedding=[],
-            ))
-
-        return (None, descriptors)
+        repo_commit_id = repo_commit_id_for_path(filename)
+        factory = PythonToolDescriptor.Factory(
+            filename=filename,
+            repo_commit_id=repo_commit_id,
+            id_generator=lambda n: f'{str(filename)}:{n}:{repo_commit_id}'
+        )
+        return None, list(factory)
 
 
 class DotSqlppFileIndexer(BaseFileIndexer):
@@ -99,26 +68,13 @@ class DotSqlppFileIndexer(BaseFileIndexer):
            for a *.sqlpp, and/or return 'keep-on-going' errors
            if any encountered.
         """
-
-        front_matter = SQLPPQueryMetadata.read_front_matter(filename)
-
-        metadata = SQLPPQueryMetadata.model_validate(front_matter)
-
-        name = metadata.name.strip() # TODO: If missing, name should default to filename?
-
-        repo_commit_id = repo_commit_id_for_path(filename)  # Ex: a git hash / SHA.
-
-        return (None, [RecordDescriptor(
-            identifier=str(filename) + ":" + name + ":" + repo_commit_id,
-            kind=RecordKind.SQLPPQuery,
-            name=name,
-            description=metadata.description.strip(),
-            source=filename,
+        repo_commit_id = repo_commit_id_for_path(filename)
+        factory = SQLPPQueryToolDescriptor.Factory(
+            filename=filename,
             repo_commit_id=repo_commit_id,
-            content=filename.read_text(),
-            # The embedding is filled in at a later phase.
-            embedding=[],
-        )])
+            id_generator=lambda n: f'{str(filename)}:{n}:{repo_commit_id}'
+        )
+        return None, list(factory)
 
 
 class DotYamlFileIndexer(BaseFileIndexer):
@@ -128,62 +84,32 @@ class DotYamlFileIndexer(BaseFileIndexer):
            for a *.yaml, and/or return 'keep-on-going' errors
            if any encountered.
         """
-
+        # All we need here is the record_kind.
         with filename.open('r') as fp:
             parsed_desc = yaml.safe_load(fp)
-
-        if 'record_kind' not in parsed_desc:
-            logger.warning(f'Encountered .yaml file with unknown record_kind field. '
-                           f'Not indexing {str(filename.absolute())}.')
-            return (None, [])
+            if 'record_kind' not in parsed_desc:
+                logger.warning(f'Encountered .yaml file with unknown record_kind field. '
+                               f'Not indexing {str(filename.absolute())}.')
+                return None, []
+            record_kind = parsed_desc['record_kind']
 
         repo_commit_id = repo_commit_id_for_path(filename)  # Ex: a git hash / SHA.
-
-        match parsed_desc['record_kind']:
+        factory_args = {
+            'filename': filename,
+            'repo_commit_id': repo_commit_id,
+            'id_generator': lambda n: f'{str(filename)}:{n}:{repo_commit_id}'
+        }
+        match record_kind:
             case RecordKind.SemanticSearch:
-                metadata = SemanticSearchMetadata.model_validate(parsed_desc)
-
-                name = metadata.name.strip()  # TODO: If missing, name should default to filename?
-
-                return (None, [RecordDescriptor(
-                    identifier=str(filename) + ":" + name + ":" + repo_commit_id,
-                    kind=RecordKind.SemanticSearch,
-                    name=name,
-                    description=metadata.description.strip(),
-                    source=filename,
-                    repo_commit_id=repo_commit_id,
-                    content=filename.read_text(),
-                    # The embedding is filled in at a later phase.
-                    embedding=[],
-                )])
+                return None, list(SemanticSearchToolDescriptor.Factory(**factory_args))
 
             case RecordKind.HTTPRequest:
-                metadata = HTTPRequestMetadata.model_validate(parsed_desc)
-
-                descriptors = []
-
-                for operation in metadata.open_api.operations:
-                    name = operation.specification.operation_id.strip()
-
-                    descriptors.append(RecordDescriptor(
-                        identifier=str(filename) + ":" + name + ":" + repo_commit_id,
-                        kind=RecordKind.HTTPRequest,
-                        name=name,
-                        description=operation.specification.description.strip(),
-                        # TODO: Capture line numbers as part of source?
-                        source=filename,
-                        repo_commit_id=repo_commit_id,
-                        # The embedding is filled in at a later phase.
-                        embedding=[],
-                    ))
-
-                return (None, descriptors)
+                return None, list(HTTPRequestToolDescriptor.Factory(**factory_args))
 
             case _:
                 logger.warning(f'Encountered .yaml file with unknown record_kind field. '
                                f'Not indexing {str(filename.absolute())}.')
-
-        return (None, [])
+                return None, list()
 
 
 source_indexers = {
@@ -199,14 +125,14 @@ def augment_descriptor(descriptor: RecordDescriptor) -> list[ValueError]:
         and/or return 'keep-on-going' errors if any encountered.
     """
 
-    # TODO: Different source file models might have
+    # TODO: Different source file descriptor might have
     # different ways of augmenting a descriptor?
 
     return None
 
 
 def vectorize_descriptor(descriptor: RecordDescriptor, embedding_model_obj) -> \
-    list[ValueError]:
+        list[ValueError]:
     """ Adds vector embeddings to a single catalog item descriptor (in-place,
         destructive), and/or return 'keep-on-going' errors if any encountered.
     """

@@ -1,4 +1,4 @@
-from .catalog_base import CatalogBase, FoundItem
+from .catalog_base import CatalogBase, SearchResult
 
 
 class CatalogChain(CatalogBase):
@@ -10,13 +10,13 @@ class CatalogChain(CatalogBase):
     def __init__(self, chain=[]):
         self.chain = chain
 
-    def find(self, query: str, max: int = 1) -> list[FoundItem]:
+    def find(self, query: str, limit: int = 1) -> list[SearchResult]:
         results = []
 
         seen = set() # Keyed by 'source:name'.
 
         for c in self.chain:
-            results_c = c.find(query, max=max)
+            results_c = c.find(query, limit=limit)
 
             for x in results_c:
                 source_name = str(x.record_descriptor.source) + ':' + x.record_descriptor.name
@@ -26,7 +26,7 @@ class CatalogChain(CatalogBase):
 
                     results.append(x)
 
-        if max > 0:
-            results = results[:max]
+        if limit > 0:
+            results = results[:limit]
 
         return results

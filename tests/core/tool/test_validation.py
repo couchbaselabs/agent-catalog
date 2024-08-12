@@ -1,679 +1,225 @@
 import json
 import pathlib
+import uuid
 import pytest
-import inspect
-import yaml
-import tempfile
 import pydantic
-import io
 
-from rosetta.core.record.kind import RecordKind
-from rosetta.core.tool.models.model import (
-    SQLPPQueryMetadata,
-    SemanticSearchMetadata,
-    HTTPRequestMetadata
+from rosetta.core.record.descriptor import RecordKind
+from rosetta.core.tool.descriptor.models import (
+    SQLPPQueryToolDescriptor,
+    SemanticSearchToolDescriptor,
+    HTTPRequestToolDescriptor,
+    PythonToolDescriptor,
 )
 
 
+def _get_tool_descriptor_factory(cls, filename: pathlib.Path):
+    filename_prefix = pathlib.Path(__file__).parent / 'resources'
+    factory_args = {
+        'filename': filename_prefix / filename,
+        'id_generator': lambda s: uuid.uuid4().hex,
+        'repo_commit_id': uuid.uuid4().hex
+    }
+    return cls(**factory_args)
+
+
 @pytest.mark.smoke
-def test_sqlpp_front_matter():
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        fp = open(pathlib.Path(tmp_dir) / 'f1', 'w')
-        fp.write("""
-            /*
-               some front matter: asd
-            */
-            should not be seen: asd
-            """)
-        fp.close()
-        front_matter1 = SQLPPQueryMetadata.read_front_matter(pathlib.Path(fp.name))
-        assert 'should not be seen' not in front_matter1
-        assert 'some front matter' in front_matter1
-        assert '/*' not in front_matter1
-        assert '*/' not in front_matter1
-
-        fp = open(pathlib.Path(tmp_dir) / 'f2', 'w')
-        fp.write("""
-            /*
-            some front matter: asd */
-            should not be seen: asd
-            """)
-        fp.close()
-        front_matter2 = SQLPPQueryMetadata.read_front_matter(pathlib.Path(fp.name))
-        assert 'should not be seen' not in front_matter2
-        assert 'some front matter' in front_matter2
-        assert '/*' not in front_matter2
-        assert '*/' not in front_matter2
-
-        fp = open(pathlib.Path(tmp_dir) / 'f3', 'w')
-        fp.write("""
-
-            /*
-               some front matter: asd
-            */
-            should not be seen: asd
-            """)
-        fp.close()
-        front_matter3 = SQLPPQueryMetadata.read_front_matter(pathlib.Path(fp.name))
-        assert 'should not be seen' not in front_matter3
-        assert 'some front matter' in front_matter3
-        assert '/*' not in front_matter3
-        assert '*/' not in front_matter3
-
-        fp = open(pathlib.Path(tmp_dir) / 'f4', 'w')
-        fp.write("""
-            -- some other comments in the front
-            /*
-               some front matter: asd
-            */
-            should not be seen: asd
-            """)
-        fp.close()
-        front_matter4 = SQLPPQueryMetadata.read_front_matter(pathlib.Path(fp.name))
-        assert 'should not be seen' not in front_matter4
-        assert 'some other comments in the front' not in front_matter4
-        assert 'some front matter' in front_matter4
-        assert '/*' not in front_matter4
-        assert '*/' not in front_matter4
+def test_python_function():
+    positive_1_factory = _get_tool_descriptor_factory(
+        cls=PythonToolDescriptor.Factory,
+        filename=pathlib.Path('python_function/positive_1.py')
+    )
+    positive_1_tools = list(positive_1_factory)
+    assert len(positive_1_tools) == 1
+    assert positive_1_tools[0].name == 'calculate_travel_costs'
+    assert ('Calculate the travel costs based on distance, fuel efficiency, and fuel price.' in
+            positive_1_tools[0].description)
 
 
 @pytest.mark.smoke
 def test_sqlpp_query():
-    file1 = io.StringIO(inspect.cleandoc("""
-        name: tool_1
-        description: >
-            i am a dummy tool
-            hello i am a dummy tool
+    positive_1_factory = _get_tool_descriptor_factory(
+        cls=SQLPPQueryToolDescriptor.Factory,
+        filename=pathlib.Path('sqlpp_query/positive_1.sqlpp')
+    )
+    positive_1_tools = list(positive_1_factory)
+    assert len(positive_1_tools) == 1
+    assert positive_1_tools[0].name == 'tool_1'
+    assert positive_1_tools[0].record_kind == RecordKind.SQLPPQuery
+    assert 'SELECT 1;' in positive_1_tools[0].query
+    assert 'i am a dummy tool' in positive_1_tools[0].description
+    assert 'hello i am a dummy tool' in positive_1_tools[0].description
+    assert 'CB_CONN_STRING' == positive_1_tools[0].couchbase.secrets.conn_string
+    assert 'CB_USERNAME' == positive_1_tools[0].couchbase.secrets.username
+    assert 'CB_PASSWORD' == positive_1_tools[0].couchbase.secrets.password
+    positive_1_input_json = json.loads(positive_1_tools[0].input)
+    assert positive_1_input_json['type'] == 'object'
+    assert positive_1_input_json['properties']['source_airport']['type'] == 'string'
+    assert positive_1_input_json['properties']['destination_airport']['type'] == 'string'
+    positive_1_output_json = json.loads(positive_1_tools[0].output)
+    assert positive_1_output_json['type'] == 'array'
+    assert positive_1_output_json['items']['type'] == 'object'
+    assert positive_1_output_json['items']['properties']['airlines']['type'] == 'array'
 
-        input: >
-            {
-              "type": "object",
-              "properties": {
-                "source_airport": { "type": "string" },
-                "destination_airport": { "type": "string" }
-              }
-            }
+    # Test the optional inclusion of record_kind.
+    positive_2_factory = _get_tool_descriptor_factory(
+        cls=SQLPPQueryToolDescriptor.Factory,
+        filename=pathlib.Path('sqlpp_query/positive_2.sqlpp')
+    )
+    positive_2_tools = list(positive_2_factory)
+    assert len(positive_2_tools) == 1
+    assert positive_2_tools[0].name == 'tool_1'
+    assert positive_2_tools[0].record_kind == RecordKind.SQLPPQuery
+    assert 'SELECT 1;' in positive_2_tools[0].query
+    assert 'i am a dummy tool' in positive_2_tools[0].description
+    assert 'hello i am a dummy tool' in positive_2_tools[0].description
+    assert 'CB_CONN_STRING' == positive_2_tools[0].couchbase.secrets.conn_string
+    assert 'CB_USERNAME' == positive_2_tools[0].couchbase.secrets.username
+    assert 'CB_PASSWORD' == positive_2_tools[0].couchbase.secrets.password
+    positive_2_input_json = json.loads(positive_2_tools[0].input)
+    assert positive_2_input_json['type'] == 'object'
+    assert positive_2_input_json['properties']['source_airport']['type'] == 'string'
+    assert positive_2_input_json['properties']['destination_airport']['type'] == 'string'
+    positive_2_output_json = json.loads(positive_2_tools[0].output)
+    assert positive_2_output_json['type'] == 'array'
+    assert positive_2_output_json['items']['type'] == 'object'
+    assert positive_2_output_json['items']['properties']['airlines']['type'] == 'array'
 
-        output: >
-            {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "airlines": {
-                    "type": "array",
-                    "items": { "type": "string" }
-                  },
-                  "layovers": {
-                    "type": "array",
-                    "items": { "type": "string" }
-                  },
-                  "from_airport": { "type": "string" },
-                  "to_airport": { "type": "string" }
-                }
-              }
-            }
-    """))
-    file1_yaml = yaml.safe_load(file1)
-    file1_model = SQLPPQueryMetadata.model_validate(file1_yaml)
-    assert file1_yaml['name'] == file1_model.name
-    assert file1_yaml['description'] == file1_model.description
-    input_json = json.loads(file1_model.input)
-    assert input_json['type'] == 'object'
-    assert input_json['properties']['source_airport']['type'] == 'string'
-    assert input_json['properties']['destination_airport']['type'] == 'string'
-    output_json = json.loads(file1_model.output)
-    assert output_json['type'] == 'array'
-    assert output_json['items']['type'] == 'object'
-    assert output_json['items']['properties']['airlines']['type'] == 'array'
-
-    file2 = io.StringIO(inspect.cleandoc("""
-        name: tool_1
-
-        record_kind: sqlpp_query
-
-        description: >
-            i am a dummy tool
-            hello i am a dummy tool
-
-        input: >
-            {
-              "type": "object",
-              "properties": {
-                "source_airport": { "type": "string" },
-                "destination_airport": { "type": "string" }
-              }
-            }
-
-        output: >
-            {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "airlines": {
-                    "type": "array",
-                    "items": { "type": "string" }
-                  },
-                  "layovers": {
-                    "type": "array",
-                    "items": { "type": "string" }
-                  },
-                  "from_airport": { "type": "string" },
-                  "to_airport": { "type": "string" }
-                }
-              }
-            }
-    """))
-    file2_yaml = yaml.safe_load(file2)
-    file2_model = SQLPPQueryMetadata.model_validate(file2_yaml)
-    assert file2_yaml['name'] == file2_model.name
-    assert file2_yaml['description'] == file2_model.description
-    assert file2_model.record_kind == RecordKind.SQLPPQuery
-
-    file3 = io.StringIO(inspect.cleandoc("""
-        name: tool_1
-    """))
-    file3_yaml = yaml.safe_load(file3)
+    # Test an incomplete tool descriptor.
+    negative_1_factory = _get_tool_descriptor_factory(
+        cls=SQLPPQueryToolDescriptor.Factory,
+        filename=pathlib.Path('sqlpp_query/negative_1.sqlpp')
+    )
     with pytest.raises(pydantic.ValidationError):
-        SQLPPQueryMetadata.model_validate(file3_yaml)
+        list(negative_1_factory)
 
-    file4 = io.StringIO(inspect.cleandoc("""
-        name: tool_1
-
-        record_kind: python_function
-
-        description: >
-            i am a dummy tool
-            hello i am a dummy tool
-
-        input: >
-            {
-              "type": "object",
-              "properties": {
-                "source_airport": { "type": "string" },
-                "destination_airport": { "type": "string" }
-              }
-            }
-
-        output: >
-            {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "airlines": {
-                    "type": "array",
-                    "items": { "type": "string" }
-                  },
-                  "layovers": {
-                    "type": "array",
-                    "items": { "type": "string" }
-                  },
-                  "from_airport": { "type": "string" },
-                  "to_airport": { "type": "string" }
-                }
-              }
-            }
-    """))
-    file4_yaml = yaml.safe_load(file4)
+    # Test an incorrect record_kind.
+    negative_2_factory = _get_tool_descriptor_factory(
+        cls=SQLPPQueryToolDescriptor.Factory,
+        filename=pathlib.Path('sqlpp_query/negative_2.sqlpp')
+    )
     with pytest.raises(pydantic.ValidationError):
-        SQLPPQueryMetadata.model_validate(file4_yaml)
+        list(negative_2_factory)
 
-    file5 = io.StringIO(inspect.cleandoc("""
-        name: tool 1
-        description: >
-            i am a dummy tool
-            hello i am a dummy tool
-
-        input: >
-            {
-              "type": "object",
-              "properties": {
-                "source_airport": { "type": "string" },
-                "destination_airport": { "type": "string" }
-              }
-            }
-
-        output: >
-            {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "airlines": {
-                    "type": "array",
-                    "items": { "type": "string" }
-                  },
-                  "layovers": {
-                    "type": "array",
-                    "items": { "type": "string" }
-                  },
-                  "from_airport": { "type": "string" },
-                  "to_airport": { "type": "string" }
-                }
-              }
-            }
-    """))
-    file6_yaml = yaml.safe_load(file5)
+    # Test a bad JSON schema.
+    negative_3_factory = _get_tool_descriptor_factory(
+        cls=SQLPPQueryToolDescriptor.Factory,
+        filename=pathlib.Path('sqlpp_query/negative_3.sqlpp')
+    )
     with pytest.raises(pydantic.ValidationError):
-        SQLPPQueryMetadata.model_validate(file6_yaml)
+        list(negative_3_factory)
 
 
 @pytest.mark.smoke
 def test_semantic_search():
-    file1 = io.StringIO(inspect.cleandoc("""
-        record_kind: semantic_search
+    positive_1_factory = _get_tool_descriptor_factory(
+        cls=SemanticSearchToolDescriptor.Factory,
+        filename=pathlib.Path('semantic_search/positive_1.yaml')
+    )
+    positive_1_tools = list(positive_1_factory)
+    assert len(positive_1_tools) == 1
+    assert positive_1_tools[0].name == 'get_travel_blog_snippets_from_user_interests'
+    assert "Fetch snippets of travel blogs using a user's interests." in positive_1_tools[0].description
+    assert 'CB_CONN_STRING' == positive_1_tools[0].couchbase.secrets.conn_string
+    assert 'CB_USERNAME' == positive_1_tools[0].couchbase.secrets.username
+    assert 'CB_PASSWORD' == positive_1_tools[0].couchbase.secrets.password
+    assert positive_1_tools[0].record_kind == RecordKind.SemanticSearch
+    positive_1_input_json = json.loads(positive_1_tools[0].input)
+    assert positive_1_input_json['type'] == 'object'
+    assert positive_1_input_json['properties']['user_interests']['type'] == 'array'
+    assert positive_1_input_json['properties']['user_interests']['items']['type'] == 'string'
+    assert positive_1_tools[0].vector_search.bucket == 'travel-sample'
+    assert positive_1_tools[0].vector_search.scope == 'inventory'
+    assert positive_1_tools[0].vector_search.collection == 'article'
 
-        name: get_travel_blog_snippets_from_user_interests
-
-        description: >
-          Fetch snippets of travel blogs using a user's interests.
-
-        input: >
-          {
-            "type": "object",
-            "properties": {
-              "user_interests": {
-                "type": "array",
-                "items": { "type": "string" }
-              }
-            }
-          }
-
-        vector_search:
-          bucket: travel-sample
-          scope: inventory
-          collection: article
-          index: articles-index
-          vector_field: vec
-          text_field: text
-          embedding_model: sentence-transformers/all-MiniLM-L12-v2
-       """))
-    file1_yaml = yaml.safe_load(file1)
-    file1_model = SemanticSearchMetadata.model_validate(file1_yaml)
-    assert file1_yaml['record_kind'] == file1_model.record_kind
-    assert file1_yaml['description'] == file1_model.description
-    input_json = json.loads(file1_model.input)
-    assert input_json['type'] == 'object'
-    assert input_json['properties']['user_interests']['type'] == 'array'
-    assert input_json['properties']['user_interests']['items']['type'] == 'string'
-    assert file1_yaml['vector_search']['bucket'] == file1_model.vector_search.bucket
-    assert file1_yaml['vector_search']['embedding_model'] == file1_model.vector_search.embedding_model
-
-    file2 = io.StringIO(inspect.cleandoc("""
-        record_kind: semantic_search
-
-        name: get travel_blog_snippets_from_user_interests
-
-        description: >
-          Fetch snippets of travel blogs using a user's interests.
-
-        input: >
-          {
-            "type": "object",
-            "properties": {
-              "user_interests": {
-                "type": "array",
-                "items": { "type": "string" }
-              }
-            }
-          }
-
-        vector_search:
-          bucket: travel-sample
-          scope: inventory
-          collection: article
-          index: articles-index
-          vector_field: vec
-          text_field: text
-          embedding_model: sentence-transformers/all-MiniLM-L12-v2
-           """))
-    file2_yaml = yaml.safe_load(file2)
+    # Test a bad (non-Python-identifier) tool name.
+    negative_1_factory = _get_tool_descriptor_factory(
+        cls=SemanticSearchToolDescriptor.Factory,
+        filename=pathlib.Path('semantic_search/negative_1.yaml')
+    )
     with pytest.raises(pydantic.ValidationError):
-        SemanticSearchMetadata.model_validate(file2_yaml)
+        list(negative_1_factory)
 
-    file3 = io.StringIO(inspect.cleandoc("""
-        record_kind: python_function
-
-        name: get_travel_blog_snippets_from_user_interests
-
-        description: >
-          Fetch snippets of travel blogs using a user's interests.
-
-        input: >
-          {
-            "type": "object",
-            "properties": {
-              "user_interests": {
-                "type": "array",
-                "items": { "type": "string" }
-              }
-            }
-          }
-
-        vector_search:
-          bucket: travel-sample
-          scope: inventory
-          collection: article
-          index: articles-index
-          vector_field: vec
-          text_field: text
-          embedding_model: sentence-transformers/all-MiniLM-L12-v2
-           """))
-    file3_yaml = yaml.safe_load(file3)
+    # Test an incorrect record_kind.
+    negative_2_factory = _get_tool_descriptor_factory(
+        cls=SemanticSearchToolDescriptor.Factory,
+        filename=pathlib.Path('semantic_search/negative_2.yaml')
+    )
     with pytest.raises(pydantic.ValidationError):
-        SemanticSearchMetadata.model_validate(file3_yaml)
+        list(negative_2_factory)
 
-    file4 = io.StringIO(inspect.cleandoc("""
-        record_kind: python_function
-
-        name: get_travel_blog_snippets_from_user_interests
-
-        description: >
-          Fetch snippets of travel blogs using a user's interests.
-
-        input: >
-          {
-          }
-
-        vector_search:
-          bucket: travel-sample
-          scope: inventory
-          collection: article
-          index: articles-index
-          vector_field: vec
-          text_field: text
-          embedding_model: sentence-transformers/all-MiniLM-L12-v2
-           """))
-    file4_yaml = yaml.safe_load(file4)
+    # Test an invalid input schema (one that is empty).
+    negative_3_factory = _get_tool_descriptor_factory(
+        cls=SemanticSearchToolDescriptor.Factory,
+        filename=pathlib.Path('semantic_search/negative_3.yaml')
+    )
     with pytest.raises(pydantic.ValidationError):
-        SemanticSearchMetadata.model_validate(file4_yaml)
+        list(negative_3_factory)
 
-    file5 = io.StringIO(inspect.cleandoc("""
-        record_kind: python_function
-
-        name: get_travel_blog_snippets_from_user_interests
-
-        description: >
-          Fetch snippets of travel blogs using a user's interests.
-
-        input: >
-          {
-            "type": "object",
-            "properties": {
-              "user_interests": {
-                "type": "array",
-                "items": { "type": "string" }
-              }
-            }
-          }
-
-        vector_search:
-          scope: inventory
-          collection: article
-          index: articles-index
-          vector_field: vec
-          text_field: text
-          embedding_model: sentence-transformers/all-MiniLM-L12-v2
-           """))
-    file5_yaml = yaml.safe_load(file5)
+    # Test a malformed vector_search object.
+    negative_4_factory = _get_tool_descriptor_factory(
+        cls=SemanticSearchToolDescriptor.Factory,
+        filename=pathlib.Path('semantic_search/negative_4.yaml')
+    )
     with pytest.raises(pydantic.ValidationError):
-        SemanticSearchMetadata.model_validate(file5_yaml)
-
-
-@pytest.mark.smoke
-def test_semantic_search():
-    file1 = io.StringIO(inspect.cleandoc("""
-        record_kind: semantic_search
-
-        name: get_travel_blog_snippets_from_user_interests
-
-        description: >
-          Fetch snippets of travel blogs using a user's interests.
-
-        input: >
-          {
-            "type": "object",
-            "properties": {
-              "user_interests": {
-                "type": "array",
-                "items": { "type": "string" }
-              }
-            }
-          }
-
-        vector_search:
-          bucket: travel-sample
-          scope: inventory
-          collection: article
-          index: articles-index
-          vector_field: vec
-          text_field: text
-          embedding_model: sentence-transformers/all-MiniLM-L12-v2
-       """))
-    file1_yaml = yaml.safe_load(file1)
-    file1_model = SemanticSearchMetadata.model_validate(file1_yaml)
-    assert file1_yaml['record_kind'] == file1_model.record_kind
-    assert file1_yaml['description'] == file1_model.description
-    input_json = json.loads(file1_model.input)
-    assert input_json['type'] == 'object'
-    assert input_json['properties']['user_interests']['type'] == 'array'
-    assert input_json['properties']['user_interests']['items']['type'] == 'string'
-    assert file1_yaml['vector_search']['bucket'] == file1_model.vector_search.bucket
-    assert file1_yaml['vector_search']['embedding_model'] == file1_model.vector_search.embedding_model
-
-    file2 = io.StringIO(inspect.cleandoc("""
-        record_kind: semantic_search
-
-        name: get travel_blog_snippets_from_user_interests
-
-        description: >
-          Fetch snippets of travel blogs using a user's interests.
-
-        input: >
-          {
-            "type": "object",
-            "properties": {
-              "user_interests": {
-                "type": "array",
-                "items": { "type": "string" }
-              }
-            }
-          }
-
-        vector_search:
-          bucket: travel-sample
-          scope: inventory
-          collection: article
-          index: articles-index
-          vector_field: vec
-          text_field: text
-          embedding_model: sentence-transformers/all-MiniLM-L12-v2
-           """))
-    file2_yaml = yaml.safe_load(file2)
-    with pytest.raises(pydantic.ValidationError):
-        SemanticSearchMetadata.model_validate(file2_yaml)
-
-    file3 = io.StringIO(inspect.cleandoc("""
-        record_kind: python_function
-
-        name: get_travel_blog_snippets_from_user_interests
-
-        description: >
-          Fetch snippets of travel blogs using a user's interests.
-
-        input: >
-          {
-            "type": "object",
-            "properties": {
-              "user_interests": {
-                "type": "array",
-                "items": { "type": "string" }
-              }
-            }
-          }
-
-        vector_search:
-          bucket: travel-sample
-          scope: inventory
-          collection: article
-          index: articles-index
-          vector_field: vec
-          text_field: text
-          embedding_model: sentence-transformers/all-MiniLM-L12-v2
-           """))
-    file3_yaml = yaml.safe_load(file3)
-    with pytest.raises(pydantic.ValidationError):
-        SemanticSearchMetadata.model_validate(file3_yaml)
-
-    file4 = io.StringIO(inspect.cleandoc("""
-        record_kind: python_function
-
-        name: get_travel_blog_snippets_from_user_interests
-
-        description: >
-          Fetch snippets of travel blogs using a user's interests.
-
-        input: >
-          {
-          }
-
-        vector_search:
-          bucket: travel-sample
-          scope: inventory
-          collection: article
-          index: articles-index
-          vector_field: vec
-          text_field: text
-          embedding_model: sentence-transformers/all-MiniLM-L12-v2
-           """))
-    file4_yaml = yaml.safe_load(file4)
-    with pytest.raises(pydantic.ValidationError):
-        SemanticSearchMetadata.model_validate(file4_yaml)
-
-    file5 = io.StringIO(inspect.cleandoc("""
-        record_kind: python_function
-
-        name: get_travel_blog_snippets_from_user_interests
-
-        description: >
-          Fetch snippets of travel blogs using a user's interests.
-
-        input: >
-          {
-            "type": "object",
-            "properties": {
-              "user_interests": {
-                "type": "array",
-                "items": { "type": "string" }
-              }
-            }
-          }
-
-        vector_search:
-          scope: inventory
-          collection: article
-          index: articles-index
-          vector_field: vec
-          text_field: text
-          embedding_model: sentence-transformers/all-MiniLM-L12-v2
-           """))
-    file5_yaml = yaml.safe_load(file5)
-    with pytest.raises(pydantic.ValidationError):
-        SemanticSearchMetadata.model_validate(file5_yaml)
+        list(negative_4_factory)
 
 
 @pytest.mark.smoke
 def test_http_request():
-    filename_prefix = pathlib.Path(__file__).parent.absolute()
-    file1 = io.StringIO(inspect.cleandoc(f"""
-        record_kind: http_request
+    positive_1_factory = _get_tool_descriptor_factory(
+        cls=HTTPRequestToolDescriptor.Factory,
+        filename=pathlib.Path('http_request/positive_1.yaml')
+    )
+    positive_1_tools = list(positive_1_factory)
+    assert len(positive_1_tools) == 2
+    assert positive_1_tools[0].name == 'create_new_member_create_post'
+    assert positive_1_tools[0].description == 'Create a new travel-rewards member.'
+    assert positive_1_tools[0].operation.path == '/create'
+    assert positive_1_tools[0].operation.method.lower() == 'post'
+    assert positive_1_tools[0].record_kind == RecordKind.HTTPRequest
+    assert positive_1_tools[1].name == 'get_member_rewards_rewards__member_id__get'
+    assert positive_1_tools[1].description == 'Get the rewards associated with a member.'
+    assert positive_1_tools[1].operation.path == '/rewards/{member_id}'
+    assert positive_1_tools[1].operation.method.lower() == 'get'
+    assert positive_1_tools[1].record_kind == RecordKind.HTTPRequest
 
-        open_api:
-          filename: {filename_prefix}/_good_spec.json
-          operations:
-            - path: /create
-              method: post
-            - path: /rewards/{{member_id}}
-              method: get
-         """))
-    file1_yaml = yaml.safe_load(file1)
-    file1_model = HTTPRequestMetadata.model_validate(file1_yaml)
-    assert file1_yaml['record_kind'] == file1_model.record_kind
-    assert file1_yaml['open_api']['filename'] == file1_model.open_api.filename
-    assert file1_yaml['open_api']['operations'][0]['path'] == file1_model.open_api.operations[0].path
-    assert file1_yaml['open_api']['operations'][0]['method'] == file1_model.open_api.operations[0].method
-    assert file1_yaml['open_api']['operations'][1]['path'] == file1_model.open_api.operations[1].path
-    assert file1_yaml['open_api']['operations'][1]['method'] == file1_model.open_api.operations[1].method
-
-    file2 = io.StringIO(inspect.cleandoc(f"""
-        record_kind: python_function
-
-        open_api:
-          filename: {filename_prefix}/_good_spec.json
-          operations:
-            - path: /create
-              method: post
-            - path: /rewards/{{member_id}}
-              method: get
-         """))
-    file2_yaml = yaml.safe_load(file2)
+    # Test an incorrect record kind.
+    negative_1_factory = _get_tool_descriptor_factory(
+        cls=HTTPRequestToolDescriptor.Factory,
+        filename=pathlib.Path('http_request/negative_1.yaml')
+    )
     with pytest.raises(pydantic.ValidationError):
-        HTTPRequestMetadata.model_validate(file2_yaml)
+        list(negative_1_factory)
 
-    file3 = io.StringIO(inspect.cleandoc(f"""
-        record_kind: http_request
-
-        open_api:
-          filename: {filename_prefix}/_good_spec.json
-          operations:
-            - path: /create
-              method: get
-            - path: /rewards/{{member_id}}
-              method: get
-         """))
-    file3_yaml = yaml.safe_load(file3)
+    # Test a non-existent method for an operation.
+    negative_2_factory = _get_tool_descriptor_factory(
+        cls=HTTPRequestToolDescriptor.Factory,
+        filename=pathlib.Path('http_request/negative_2.yaml')
+    )
     with pytest.raises(pydantic.ValidationError):
-        HTTPRequestMetadata.model_validate(file3_yaml)
+        list(negative_2_factory)
 
-    file3 = io.StringIO(inspect.cleandoc(f"""
-        record_kind: http_request
-
-        open_api:
-          filename: {filename_prefix}/_good_spec.json
-          operations:
-            - path: /doesnotexist
-              method: post
-            - path: /rewards/{{member_id}}
-              method: get
-         """))
-    file3_yaml = yaml.safe_load(file3)
+    # Test a non-existent path for an operation.
+    negative_3_factory = _get_tool_descriptor_factory(
+        cls=HTTPRequestToolDescriptor.Factory,
+        filename=pathlib.Path('http_request/negative_3.yaml')
+    )
     with pytest.raises(pydantic.ValidationError):
-        HTTPRequestMetadata.model_validate(file3_yaml)
+        list(negative_3_factory)
 
-    file4 = io.StringIO(inspect.cleandoc(f"""
-        record_kind: http_request
-
-        open_api:
-          filename: {filename_prefix}/_bad_spec.json
-          operations:
-            - path: /create
-              method: post
-         """))
-    file4_yaml = yaml.safe_load(file4)
+    # Test an operation that doesn't specify an operationId.
+    negative_4_factory = _get_tool_descriptor_factory(
+        cls=HTTPRequestToolDescriptor.Factory,
+        filename=pathlib.Path('http_request/negative_4.yaml')
+    )
     with pytest.raises(pydantic.ValidationError):
-        HTTPRequestMetadata.model_validate(file4_yaml)
+        list(negative_4_factory)
 
-    file5 = io.StringIO(inspect.cleandoc(f"""
-        record_kind: http_request
-
-        open_api:
-          filename: {filename_prefix}/_bad_spec.json
-          operations:
-            - path: /rewards/{{member_id}}
-              method: get
-         """))
-    file5_yaml = yaml.safe_load(file5)
+    # Test an operation that doesn't specify a description.
+    negative_5_factory = _get_tool_descriptor_factory(
+        cls=HTTPRequestToolDescriptor.Factory,
+        filename=pathlib.Path('http_request/negative_5.yaml')
+    )
     with pytest.raises(pydantic.ValidationError):
-        HTTPRequestMetadata.model_validate(file5_yaml)
+        list(negative_5_factory)
