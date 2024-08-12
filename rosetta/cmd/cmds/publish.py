@@ -1,59 +1,19 @@
-from datetime import timedelta
-
-from couchbase.auth import PasswordAuthenticator
-from couchbase.cluster import Cluster
-from couchbase.exceptions import CouchbaseException
-from couchbase.options import ClusterOptions
-
-from ..models.publish.model import CouchbaseConnect, Keyspace
-
-import uuid
+from ..models.publish.model import Keyspace
+from ...core.utils.publish_utils import create_scope_and_collection
+from ..models.ctx.model import Context
+from pathlib import Path
+import os
+import json
 
 
-def get_connection(conn: CouchbaseConnect):
-    cluster_url = conn.connection_url
-    username = conn.username
-    password = conn.password
-
-    # Connect to Couchbase
-    if cluster_url == "couchbase://127.0.0.1" or cluster_url == "couchbase://localhost":
-        auth = PasswordAuthenticator(username, password)
-        options = ClusterOptions(auth)
-        options.apply_profile("wan_development")
-    else:
-        # Connect to Capella
-        auth = PasswordAuthenticator(username, password, cert_path="certificates/cert.pem")
-        options = ClusterOptions(auth)
-        options.apply_profile("wan_development")
-
-    try:
-        cluster = Cluster(cluster_url, options)
-        cluster.wait_until_ready(timedelta(seconds=15))
-    except CouchbaseException as e:
-        return f"Error connecting to couchbase : {e}", None
-
-    return None, cluster
-
-
-def get_buckets(cluster):
-    if cluster:
-        buckets = cluster.buckets().get_all_buckets()
-        list_buckets = []
-
-        # Get bucket names
-        for bucket_item in buckets:
-            bucket_name = bucket_item.name
-            list_buckets.append(bucket_name)
-        return list_buckets
-
-
-# TODO: define data's schema
-def cmd_publish(ctx, cluster, data, keyspace: Keyspace):
-    # TODO: Implement publish of the local catalog to a database.
+def cmd_publish(ctx: Context, cluster, keyspace: Keyspace):
 
     bucket = keyspace.bucket
     scope = keyspace.scope
-    collection = keyspace.collection
+    catalog_file_name = ctx.catalog
+
+    folder_path = Path("./" + catalog_file_name)
+    files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
 
     # Get bucket ref
     cb = cluster.bucket(bucket)
@@ -61,44 +21,63 @@ def cmd_publish(ctx, cluster, data, keyspace: Keyspace):
     # Get the bucket manager
     bucket_manager = cb.collections()
 
-    # Create a new scope if does not exist
-    try:
-        scopes = bucket_manager.get_all_scopes()
-        scope_exists = any(s.name == scope for s in scopes)
-        if not scope_exists:
-            bucket_manager.create_scope(scope)
-            print(f"Scope '{scope}' created successfully.")
-    except Exception as e:
-        print(f"Error creating scope '{scope}\n': {e}")
+    # Iterate over all catalog files
+    for col_type in files:
 
-    # Create a new collection within the scope if collection does not exist
-    try:
-        if scope_exists:
-            collections = [c.name for s in scopes if s.name == scope for c in s.collections]
-            collection_exists = collection in collections
-            if not collection_exists:
-                bucket_manager.create_collection(scope, collection)
-                print(f"Collection '{collection}' in scope '{scope}' created successfully.")
-        else:
-            bucket_manager.create_collection(scope, collection)
-            print(f"Collection '{collection}' in scope '{scope}' created successfully.")
+        # Get catalog file
+        f = open("./" + catalog_file_name + "/" + col_type)
+        data = json.load(f)
 
-    except Exception as e:
-        print(f"Error creating collection '{collection}': {e}")
+        # ----------Metadata collection----------
+        meta_col = col_type.split("-")[0] + "_metadata"
+        (msg, err) = create_scope_and_collection(bucket_manager, scope=scope, collection=meta_col)
+        if err is not None:
+            print(msg, err)
+            return
 
-    # Get collection ref
-    cb_coll = cb.scope(scope).collection(collection)
+        # get collection ref
+        cb_coll = cb.scope(scope).collection(meta_col)
 
-    # TODO: iterate over input and upsert each tool
-    # TODO: Pre-checks to allow/deny publishing to couchbase collection (git sha? doc sha?)
+        # dict to store all the metadata - snapshot related data
+        metadata = {}
+        for key in data:
+            if not isinstance(data[key], list):
+                # print(f"{key}: {data[key]}")
+                metadata.update({key: data[key]})
 
-    print("\nUpserting data: ")
-    try:
-        key = uuid.uuid4().hex  # TODO: decide key to upsert each doc
-        result = cb_coll.upsert(key, data)
-        print(result.key, " added to keyspace")
-    except Exception as e:
-        print("could not insert: ", e)
-        return e
+        print("Upserting metadata..")
+        try:
+            key = metadata["snapshot_commit_id"]
+            cb_coll.upsert(key, metadata)
+            # print("Snapshot ",result.key," added to keyspace")
+        except Exception as e:
+            print("could not insert: ", e)
+            return e
 
-    print("Successfully inserted catalog!")
+        # ----------Catalog items collection----------
+        catalog_col = col_type.split("-")[0] + "_catalog"
+        (msg, err) = create_scope_and_collection(
+            bucket_manager, scope=scope, collection=catalog_col
+        )
+        if err is not None:
+            print(msg, err)
+            return
+
+        # get collection ref
+        cb_coll = cb.scope(scope).collection(catalog_col)
+
+        print("Upserting catalog items..")
+
+        for item in data["items"]:
+            try:
+                key = item["identifier"]
+                cb_coll.upsert(key, item)
+                # print("Snapshot ",result.key," added to keyspace")
+            except Exception as e:
+                print("could not insert: ", e)
+                return e
+
+        f.close()
+        print("Inserted", col_type.split("-")[0], "catalog successfully!\n")
+
+    return "Successfully inserted all catalogs!"
