@@ -72,11 +72,13 @@ def index_catalog_start(meta, repo_commit_id, repo_commit_id_for_path,
     else:
         # An empty CatalogMem with no items represents an initial catalog state.
         curr_catalog = CatalogMem(
+            catalog_path=catalog_path,
             catalog_descriptor=CatalogDescriptor(
                 catalog_schema_version=meta["catalog_schema_version"],
                 kind=kind,
                 embedding_model=meta["embedding_model"],
                 repo_commit_id="",
+                source_dirs=source_dirs,
                 items=[])
         )
 
@@ -102,6 +104,7 @@ def index_catalog_start(meta, repo_commit_id, repo_commit_id_for_path,
         raise all_errs[0]
 
     next_catalog = CatalogMem(
+        catalog_path=catalog_path,
         catalog_descriptor=CatalogDescriptor(
             catalog_schema_version=meta["catalog_schema_version"],
             embedding_model=meta["embedding_model"],
