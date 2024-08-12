@@ -1,6 +1,4 @@
 import pathlib
-import typing
-
 import pydantic
 
 from .catalog_base import CatalogBase, SearchResult
@@ -10,17 +8,15 @@ from ..record.descriptor import RecordDescriptor
 
 class CatalogMem(pydantic.BaseModel, CatalogBase):
     """ Represents an in-memory catalog. """
-    catalog_path: typing.Optional[pathlib.Path]
     catalog_descriptor: CatalogDescriptor
 
-    def init_from(self, other: typing.Self) -> list[RecordDescriptor]:
+    def init_from(self, other: 'CatalogMem') -> list[RecordDescriptor]:
         """ Initialize the items in self by copying over attributes from
             items found in other that have the exact same repo_commit_id's.
 
             Returns a list of uninitialized items. """
 
         uninitialized_items = []
-
         if other and other.catalog_descriptor:
             # A lookup dict of items keyed by "source:name".
             other_items = {str(o.source) + ':' + o.name: o
@@ -36,6 +32,8 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
                         setattr(s, k, v)
                 else:
                     uninitialized_items.append(s)
+        else:
+            uninitialized_items += self.catalog_descriptor.items
 
         return uninitialized_items
 
@@ -44,7 +42,7 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
         """ Load from a catalog_path JSON file. """
         with catalog_path.open('r') as fp:
             catalog_descriptor = CatalogDescriptor.model_validate_json(fp.read())
-        return CatalogMem(catalog_path=catalog_path, catalog_descriptor=catalog_descriptor)
+        return CatalogMem(catalog_descriptor=catalog_descriptor)
 
     def dump(self, catalog_path: pathlib.Path):
         """ Save to a catalog_path JSON file. """
@@ -67,7 +65,10 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
         # Compute the distance of each tool in the catalog to the query.
         available_tools = [x for x in self.catalog_descriptor.items]
         embedding_model = self.catalog_descriptor.embedding_model
-        embedding_model_obj = sentence_transformers.SentenceTransformer(embedding_model)
+        embedding_model_obj = sentence_transformers.SentenceTransformer(
+            embedding_model,
+            tokenizer_kwargs={'clean_up_tokenization_spaces': True}
+        )
         query_embedding = embedding_model_obj.encode(query)
         deltas = sklearn.metrics.pairwise.cosine_similarity(
             X=[t.embedding for t in available_tools],

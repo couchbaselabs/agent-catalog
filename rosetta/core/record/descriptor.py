@@ -29,7 +29,7 @@ class RecordKind(enum.StrEnum):
 class RecordDescriptor(pydantic.BaseModel):
     """ This model represents a tool's persistable description or metadata. """
     model_config = pydantic.ConfigDict(
-        frozen=True,
+        validate_assignment=True,
         use_enum_values=True
     )
 
@@ -77,3 +77,6 @@ class RecordDescriptor(pydantic.BaseModel):
             indent=4,
             cls=JsonEncoder
         )
+
+    def __hash__(self):
+        return hash(self.identifier)

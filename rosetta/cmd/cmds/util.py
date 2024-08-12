@@ -79,7 +79,10 @@ def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
             click.echo(f"Downloading and caching embedding model: {embedding_model} ...")
 
             # Download embedding model to be cached for later runtime usage.
-            sentence_transformers.SentenceTransformer(embedding_model)
+            sentence_transformers.SentenceTransformer(
+                embedding_model,
+                tokenizer_kwargs={'clean_up_tokenization_spaces': True}
+            )
 
             click.echo(f"Downloading and caching embedding model: {embedding_model} ... DONE.")
 

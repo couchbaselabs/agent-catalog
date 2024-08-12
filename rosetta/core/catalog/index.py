@@ -40,7 +40,10 @@ def index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
 
     import sentence_transformers
 
-    embedding_model_obj = sentence_transformers.SentenceTransformer(meta["embedding_model"])
+    embedding_model_obj = sentence_transformers.SentenceTransformer(
+        meta["embedding_model"],
+        tokenizer_kwargs={'clean_up_tokenization_spaces': True}
+    )
 
     for descriptor in progress(uninitialized_items):
         if max_errs > 0 and len(all_errs) >= max_errs:
@@ -70,17 +73,7 @@ def index_catalog_start(meta, repo_commit_id, repo_commit_id_for_path,
         # Load the old / previous local catalog.
         curr_catalog = CatalogMem.load(catalog_path)
     else:
-        # An empty CatalogMem with no items represents an initial catalog state.
-        curr_catalog = CatalogMem(
-            catalog_path=catalog_path,
-            catalog_descriptor=CatalogDescriptor(
-                catalog_schema_version=meta["catalog_schema_version"],
-                kind=kind,
-                embedding_model=meta["embedding_model"],
-                repo_commit_id="",
-                source_dirs=source_dirs,
-                items=[])
-        )
+        curr_catalog = None
 
     source_files = []
     for source_dir in source_dirs:
@@ -104,7 +97,6 @@ def index_catalog_start(meta, repo_commit_id, repo_commit_id_for_path,
         raise all_errs[0]
 
     next_catalog = CatalogMem(
-        catalog_path=catalog_path,
         catalog_descriptor=CatalogDescriptor(
             catalog_schema_version=meta["catalog_schema_version"],
             embedding_model=meta["embedding_model"],

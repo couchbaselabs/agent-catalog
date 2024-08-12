@@ -46,7 +46,10 @@ def {{ tool.name }}(question: {{ input.type_name }}) -> list[str]:
         raise ValueError("Bad input given to tool!")
 
     logger.debug("{{ tool.name }} is generating an embedding for: " + formatted_question + ".")
-    embedding_model = sentence_transformers.SentenceTransformer('{{ vector_search.embedding_model }}')
+    embedding_model = sentence_transformers.SentenceTransformer(
+        '{{ vector_search.embedding_model }}',
+        tokenizer_kwargs={'clean_up_tokenization_spaces': True}
+    )
     _embedding = embedding_model.encode(formatted_question)
     for_q = list(_embedding.astype('float64'))
     vector_req = couchbase.vector_search.VectorSearch.from_vector_query(
