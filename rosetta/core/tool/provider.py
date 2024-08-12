@@ -18,7 +18,7 @@ from .generate import (
     SemanticSearchCodeGenerator,
     HTTPRequestCodeGenerator
 )
-from .generate.secrets import put_secret
+from .secrets import put_secret
 from ..catalog.catalog_base import CatalogBase
 from ..record.descriptor import (
     RecordDescriptor,

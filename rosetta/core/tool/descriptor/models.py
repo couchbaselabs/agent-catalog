@@ -14,10 +14,8 @@ import re
 import importlib
 import inspect
 
-from .helper import (
-    CouchbaseToolDescriptor,
-    JSONSchemaValidatingMixin
-)
+from .helper import JSONSchemaValidatingMixin
+from .secrets import CouchbaseSecrets
 from ...record.descriptor import (
     RecordKind,
     RecordDescriptor
@@ -62,10 +60,11 @@ class PythonToolDescriptor(RecordDescriptor):
                 )
 
 
-class SQLPPQueryToolDescriptor(CouchbaseToolDescriptor):
+class SQLPPQueryToolDescriptor(RecordDescriptor):
     input: str
     output: str
     query: str
+    secrets: list[CouchbaseSecrets] = pydantic.Field(min_items=1, max_items=1)
     record_kind: typing.Literal[RecordKind.SQLPPQuery]
 
     class Factory(_BaseFactory):
@@ -80,7 +79,7 @@ class SQLPPQueryToolDescriptor(CouchbaseToolDescriptor):
             description: str
             input: str
             output: str
-            couchbase: CouchbaseToolDescriptor.CouchbaseMetadata
+            secrets: list[CouchbaseSecrets] = pydantic.Field(min_items=1, max_items=1)
             record_kind: typing.Optional[typing.Literal[RecordKind.SQLPPQuery] | None] = None
 
             @pydantic.field_validator('input', 'output')
@@ -114,14 +113,14 @@ class SQLPPQueryToolDescriptor(CouchbaseToolDescriptor):
                 description=metadata.description,
                 source=self.filename,
                 repo_commit_id=self.repo_commit_id,
-                couchbase=metadata.couchbase,
+                secrets=metadata.secrets,
                 input=metadata.input,
                 output=metadata.output,
                 query=self.filename.open('r').read(),
             )
 
 
-class SemanticSearchToolDescriptor(CouchbaseToolDescriptor):
+class SemanticSearchToolDescriptor(RecordDescriptor):
     class VectorSearchMetadata(pydantic.BaseModel):
         # TODO (GLENN): Copy all vector-search-specific validations here.
         bucket: str
@@ -135,6 +134,7 @@ class SemanticSearchToolDescriptor(CouchbaseToolDescriptor):
 
     input: str
     vector_search: VectorSearchMetadata
+    secrets: list[CouchbaseSecrets] = pydantic.Field(min_items=1, max_items=1)
     record_kind: typing.Literal[RecordKind.SemanticSearch]
 
     class Factory(_BaseFactory):
@@ -149,7 +149,7 @@ class SemanticSearchToolDescriptor(CouchbaseToolDescriptor):
             name: str
             description: str
             input: str
-            couchbase: CouchbaseToolDescriptor.CouchbaseMetadata
+            secrets: list[CouchbaseSecrets] = pydantic.Field(min_items=1, max_items=1)
             vector_search: 'SemanticSearchToolDescriptor.VectorSearchMetadata'
 
             @pydantic.field_validator('input')
@@ -183,7 +183,7 @@ class SemanticSearchToolDescriptor(CouchbaseToolDescriptor):
                     description=metadata.description,
                     source=self.filename,
                     repo_commit_id=self.repo_commit_id,
-                    couchbase=metadata.couchbase,
+                    secrets=metadata.secrets,
                     input=metadata.input,
                     vector_search=metadata.vector_search
                 )

@@ -47,17 +47,15 @@ output: >
       }
     }
 
-# All Couchbase tools (e.g., semantic search, SQL++) must specify a set of secrets.
-# The fields below are mandatory.
-couchbase:
+# The "secrets" field defines search keys that will be used to query a "secrets" manager.
+# Note that these values are NOT the secrets themselves, rather they are used to lookup secrets.
+secrets:
 
-  # The "secrets" field defines search keys that will be used to query a "secrets" manager.
-  # The following fields must be specified: conn_string, username, and password.
-  # Note that these values are NOT the secrets themselves, rather they are used to lookup secrets.
-  secrets:
-    conn_string: CB_CONN_STRING
-    username: CB_USERNAME
-    password: CB_PASSWORD
+    # All Couchbase tools (e.g., semantic search, SQL++) must specify conn_string, username, and password.
+    - couchbase:
+        conn_string: CB_CONN_STRING
+        username: CB_USERNAME
+        password: CB_PASSWORD
 */
 
 SELECT

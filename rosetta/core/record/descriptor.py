@@ -34,36 +34,46 @@ class RecordDescriptor(pydantic.BaseModel):
     )
 
     # TODO (GLENN): Maybe this should be a computed property?
-    # A fully qualified unique identifier for the tool.
-    # Ex: "src/tools/finance.py:get_current_stock_price:g11223344".
-    identifier: str
+    identifier: str = pydantic.Field(
+        description="A fully qualified unique identifier for the tool.",
+        examples=["src/tools/finance.py:get_current_stock_price:g11223344"]
+    )
 
-    # The type of catalog entry (python tool, prompt, etc...).
     record_kind: typing.Literal[
         RecordKind.PythonFunction,
         RecordKind.SQLPPQuery,
         RecordKind.SemanticSearch,
         RecordKind.HTTPRequest
-    ]
+    ] = pydantic.Field(description="The type of catalog entry (python tool, prompt, etc...).")
 
-    # A short name for the tool, where multiple versions
-    # of the same tool would have the same name.
-    # Ex: "get_current_stock_price".
-    name: str
+    name: str = pydantic.Field(
+        description="A short (Python-identifier-valid) name for the tool, where multiple versions of the "
+                    "same tool would have the same name.",
+        examples=['get_current_stock_price']
+    )
 
-    # For a *.py tool, this is the python function's docstring.
-    description: str
+    description: str = pydantic.Field(
+        description="Text used to describe an entry's purpose. "
+                    "For a *.py tool, this is the python function's docstring. "
+    )
 
-    # Ex: "src/tools/finance.py".
     # TODO: One day also track source line numbers?
-    source: pathlib.Path
+    source: pathlib.Path = pydantic.Field(
+        # TODO (GLENN): Is this description accurate?
+        description="Source location of the file, relative to where index was called.",
+        examples=['src/tools/finance.py']
+    )
 
-    # For git, this is a git commit SHA / HASH.
-    # Ex: "g11223344" or REPO_DIRTY.
-    repo_commit_id: str
+    repo_commit_id: str = pydantic.Field(
+        description="A unique identifier that attaches a record to a catalog snapshot. "
+                    "For git, this is the git repo commit SHA / HASH.",
+        examples=['g11223344', '_DIRTY_']
+    )
 
-    # Embedding used to search this record.
-    embedding: typing.Optional[list[float]] = list()
+    embedding: typing.Optional[list[float]] = pydantic.Field(
+        default_factory=list,
+        description="Embedding used to search for the record."
+    )
 
     def __str__(self) -> str:
         # TODO (GLENN): Leverage the built-in Pydantic JSON serialization?

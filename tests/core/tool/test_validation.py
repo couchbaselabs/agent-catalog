@@ -49,9 +49,9 @@ def test_sqlpp_query():
     assert 'SELECT 1;' in positive_1_tools[0].query
     assert 'i am a dummy tool' in positive_1_tools[0].description
     assert 'hello i am a dummy tool' in positive_1_tools[0].description
-    assert 'CB_CONN_STRING' == positive_1_tools[0].couchbase.secrets.conn_string
-    assert 'CB_USERNAME' == positive_1_tools[0].couchbase.secrets.username
-    assert 'CB_PASSWORD' == positive_1_tools[0].couchbase.secrets.password
+    assert 'CB_CONN_STRING' == positive_1_tools[0].secrets[0].couchbase.conn_string
+    assert 'CB_USERNAME' == positive_1_tools[0].secrets[0].couchbase.username
+    assert 'CB_PASSWORD' == positive_1_tools[0].secrets[0].couchbase.password
     positive_1_input_json = json.loads(positive_1_tools[0].input)
     assert positive_1_input_json['type'] == 'object'
     assert positive_1_input_json['properties']['source_airport']['type'] == 'string'
@@ -73,9 +73,9 @@ def test_sqlpp_query():
     assert 'SELECT 1;' in positive_2_tools[0].query
     assert 'i am a dummy tool' in positive_2_tools[0].description
     assert 'hello i am a dummy tool' in positive_2_tools[0].description
-    assert 'CB_CONN_STRING' == positive_2_tools[0].couchbase.secrets.conn_string
-    assert 'CB_USERNAME' == positive_2_tools[0].couchbase.secrets.username
-    assert 'CB_PASSWORD' == positive_2_tools[0].couchbase.secrets.password
+    assert 'CB_CONN_STRING' == positive_2_tools[0].secrets[0].couchbase.conn_string
+    assert 'CB_USERNAME' == positive_2_tools[0].secrets[0].couchbase.username
+    assert 'CB_PASSWORD' == positive_2_tools[0].secrets[0].couchbase.password
     positive_2_input_json = json.loads(positive_2_tools[0].input)
     assert positive_2_input_json['type'] == 'object'
     assert positive_2_input_json['properties']['source_airport']['type'] == 'string'
@@ -120,9 +120,9 @@ def test_semantic_search():
     assert len(positive_1_tools) == 1
     assert positive_1_tools[0].name == 'get_travel_blog_snippets_from_user_interests'
     assert "Fetch snippets of travel blogs using a user's interests." in positive_1_tools[0].description
-    assert 'CB_CONN_STRING' == positive_1_tools[0].couchbase.secrets.conn_string
-    assert 'CB_USERNAME' == positive_1_tools[0].couchbase.secrets.username
-    assert 'CB_PASSWORD' == positive_1_tools[0].couchbase.secrets.password
+    assert 'CB_CONN_STRING' == positive_1_tools[0].secrets[0].couchbase.conn_string
+    assert 'CB_USERNAME' == positive_1_tools[0].secrets[0].couchbase.username
+    assert 'CB_PASSWORD' == positive_1_tools[0].secrets[0].couchbase.password
     assert positive_1_tools[0].record_kind == RecordKind.SemanticSearch
     positive_1_input_json = json.loads(positive_1_tools[0].input)
     assert positive_1_input_json['type'] == 'object'
