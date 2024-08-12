@@ -5,7 +5,8 @@ import click
 from dotenv import load_dotenv, find_dotenv
 
 from .cmds import *
-from .cmds.publish import get_connection, get_buckets, cmd_publish
+from .cmds.publish import cmd_publish
+from ..core.utils.publish_utils import get_buckets, get_connection
 from .models.publish.model import Keyspace, CouchbaseConnect
 from .models.ctx.model import Context
 
@@ -60,8 +61,7 @@ class AliasedGroup(click.Group):
     show_default=True,
 )
 @click.option(
-    "-v", "--verbose", count=True,
-    help="Enable verbose output.", envvar="ROSETTA_VERBOSE"
+    "-v", "--verbose", count=True, help="Enable verbose output.", envvar="ROSETTA_VERBOSE"
 )
 @click.pass_context
 def click_main(ctx, catalog, activity, verbose):
@@ -108,7 +108,7 @@ def env(ctx):
 @click.pass_context
 def find(ctx, query, kind, top_k, ignore_dirty):
     """Find tools, prompts, etc.
-       from the catalog based on a natural language QUERY string."""
+    from the catalog based on a natural language QUERY string."""
     cmd_find(ctx.obj, query, kind=kind, top_k=top_k, ignore_dirty=ignore_dirty)
 
 
@@ -148,7 +148,13 @@ def index(ctx, source_dirs, kind, embedding_model, dry_run):
     # TODO: The index command should ignore the '.git' subdirectory.
     # TODO: The index command should ignore whatever's in the '.gitignore' file.
 
-    cmd_index(ctx.obj, source_dirs=source_dirs, kind=kind, embedding_model=embedding_model, dry_run=dry_run)
+    cmd_index(
+        ctx.obj,
+        source_dirs=source_dirs,
+        kind=kind,
+        embedding_model=embedding_model,
+        dry_run=dry_run,
+    )
 
 
 @click_main.command()
@@ -162,32 +168,34 @@ def index(ctx, source_dirs, kind, embedding_model, dry_run):
 def publish(ctx, scope):
     """Publish the local catalog to a database."""
 
-    keyspace_details = Keyspace(bucket="", scope=scope, collection="rosetta-tools")
+    keyspace_details = Keyspace(bucket="", scope=scope)
     connection_details = CouchbaseConnect(
         connection_url=os.getenv("CB_CONN_STRING"),
         username=os.getenv("CB_USERNAME"),
         password=os.getenv("CB_PASSWORD"),
     )
 
-    # Establish a connection and get buckets
+    # Establish a connection
     err, cluster = get_connection(conn=connection_details)
     if err:
         click.echo(str(err))
         return
+
+    # Get buckets from CB Cluster
     buckets = get_buckets(cluster=cluster)
 
     # Prompt user to select a bucket
     selected_bucket = click.prompt(
         "Please select a bucket", type=click.Choice(buckets), show_choices=True
     )
-    click.echo(
-        f"\nInserting documents in : {selected_bucket}.{keyspace_details.scope}.{keyspace_details.collection}"
-    )
+    click.echo(f"Inserting documents in : {selected_bucket}/{keyspace_details.scope}\n")
     keyspace_details.bucket = selected_bucket
 
-    # TODO: define where data comes from, passing sample data for now
-    cmd_publish(ctx.obj, cluster=cluster, data="doc sample", keyspace=keyspace_details)
+    # Publish catalog into keyspace
+    msg = cmd_publish(ctx.obj, cluster=cluster, keyspace=keyspace_details)
+    print(msg)
 
+    # Close cluster connection
     cluster.close()
 
 

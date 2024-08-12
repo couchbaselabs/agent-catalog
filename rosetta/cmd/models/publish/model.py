@@ -6,7 +6,6 @@ class Keyspace(BaseModel):
 
     bucket: str
     scope: str
-    collection: str
 
 
 class CouchbaseConnect(BaseModel):
