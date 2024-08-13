@@ -27,15 +27,15 @@ def _generate_test_tools(deltas: list[int]) -> list[ToolWithDelta]:
 
 @pytest.mark.smoke
 def test_closest_cluster_refiner():
-    reranker = ClosestClusterRefiner()
+    refiner = ClosestClusterRefiner()
 
     same_tools = _generate_test_tools([0.1 for _ in range(0, 10)])
-    assert same_tools == reranker(same_tools)
+    assert same_tools == refiner(same_tools)
 
     one_tool_cluster = _generate_test_tools([0.999, 0.6, 0.6, 0.5, 0.3, -0.3])
-    assert [one_tool_cluster[0]] == reranker(one_tool_cluster)
+    assert [one_tool_cluster[0]] == refiner(one_tool_cluster)
 
     two_tool_cluster = _generate_test_tools([0.9990, 0.9989, 0.6, 0.6, 0.5, 0.3, -0.3])
-    assert two_tool_cluster[0:2] == reranker(two_tool_cluster)
+    assert two_tool_cluster[0:2] == refiner(two_tool_cluster)
 
 
