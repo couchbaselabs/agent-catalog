@@ -14,10 +14,6 @@ from rosetta.core.provider.refiner import (
 def _generate_test_tools(deltas: list[int]) -> list[SearchResult]:
     tools_with_delta = list()
     for i, delta in enumerate(deltas):
-        def dummy_tool(j: int) -> int:
-            """ dummy tool """
-            return i
-
         tools_with_delta.append(SearchResult(
             entry=RecordDescriptor(
                 identifier=str(i),

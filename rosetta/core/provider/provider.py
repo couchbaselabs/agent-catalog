@@ -41,8 +41,8 @@ class Provider(abc.ABC):
 
         >>> import rosetta.core.provider as rp
         >>> import rosetta.core.catalog.catalog_mem as rcm
-        >>> import langchain_core.tools, os
-        >>> my_catalog = rcm.CatalogMem.load('.rosetta-catalog')
+        >>> import langchain_core.tools, os, pathlib
+        >>> my_catalog = rcm.CatalogMem.load(pathlib.Path('.rosetta-catalog') / 'tool-catalog.json')
         >>> my_provider = rp.Provider(
         >>>     catalog=my_catalog,
         >>>     func_transform=langchain_core.tools.StructuredTool.from_function,
