@@ -21,6 +21,7 @@ from ...record.descriptor import (
     RecordDescriptor
 )
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -350,3 +351,11 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
                         ),
                         tags=metadata.tags
                     )
+
+
+typing_union_tools = typing.Union[
+    SemanticSearchToolDescriptor,
+    SQLPPQueryToolDescriptor,
+    HTTPRequestToolDescriptor,
+    PythonToolDescriptor,
+]
