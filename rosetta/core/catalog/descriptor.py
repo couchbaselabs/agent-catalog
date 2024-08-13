@@ -21,6 +21,10 @@ class CatalogKind(enum.StrEnum):
     # TODO (GLENN): Include other classes.
 
 
+class CatalogKindModel(pydantic.BaseModel):
+    kind: CatalogKind
+
+
 class CatalogDescriptor(pydantic.BaseModel):
     """This model represents a persistable tool catalog,  especially for local and/or in-memory representations."""
 
