@@ -60,6 +60,9 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
 
     def find(self, query: str, limit: typing.Union[int | None] = 1, tags: list[str] = None) -> list[SearchResult]:
         """ Returns the catalog items that best match a query. """
+        if tags is not None and len(tags) < 1:
+            tags = None
+
         import sentence_transformers
         import sklearn
 

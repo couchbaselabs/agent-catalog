@@ -108,7 +108,7 @@ def env(ctx):
 )
 @click.option(
     "--refiner",
-    type=click.Choice(['ClosestCluster'], case_sensitive=False),
+    type=click.Choice(['ClosestCluster', 'None'], case_sensitive=False),
     default=None,
     help="Specify how to post-process find results.",
     show_default=True,
