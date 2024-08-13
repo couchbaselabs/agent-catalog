@@ -75,6 +75,12 @@ class RecordDescriptor(pydantic.BaseModel):
         description="Embedding used to search for the record."
     )
 
+    tags: typing.Optional[list[str] | None] = pydantic.Field(
+        default=None,
+        description="List of user-defined tags attached to this record.",
+        examples=['gdpr_2016_compliant']
+    )
+
     def __str__(self) -> str:
         # TODO (GLENN): Leverage the built-in Pydantic JSON serialization?
         descriptor_as_dict = self.dict()

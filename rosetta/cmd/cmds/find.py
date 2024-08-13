@@ -1,13 +1,10 @@
-import pathlib
-
-import click
 import tqdm
 
 from rosetta.cmd.cmds.util import *
 from rosetta.core.catalog.index import index_catalog
 from rosetta.core.catalog.catalog_mem import CatalogMem
-from rosetta.core.tool.refiner import ClosestClusterRefiner
-from rosetta.core.tool.refiner import ToolWithDelta
+from rosetta.core.provider.refiner import ClosestClusterRefiner
+from rosetta.core.provider.refiner import EntryWithDelta
 from ..models.ctx.model import Context
 
 
@@ -62,10 +59,10 @@ def cmd_find(ctx: Context, query, kind="tool", top_k=3, include_dirty=True, refi
 
     # Query the catalog for a list of results.
     search_results = [
-        ToolWithDelta(tool=x.record_descriptor, delta=x.delta) for x in catalog.find(query, limit=top_k)
+        EntryWithDelta(entry=x.record_descriptor, delta=x.delta) for x in catalog.find(query, limit=top_k)
     ]
 
     refiner_fn = refiners[refiner]()
     for i, result in enumerate(refiner_fn(search_results)):
         click.echo(f'#{i + 1} (delta = {result.delta}, higher is better): ', nl=False)
-        click.echo(str(result.tool))
+        click.echo(str(result.entry))

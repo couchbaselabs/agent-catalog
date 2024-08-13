@@ -1,5 +1,6 @@
 import pathlib
 import pydantic
+import typing
 
 from .catalog_base import CatalogBase, SearchResult
 from ..catalog.descriptor import CatalogDescriptor, REPO_DIRTY
@@ -57,13 +58,17 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
             fp.write(j)
             fp.write('\n')
 
-    def find(self, query: str, limit: int = 1) -> list[SearchResult]:
+    def find(self, query: str, limit: typing.Union[int | None] = 1, tags: list[str] = None) -> list[SearchResult]:
         """ Returns the catalog items that best match a query. """
         import sentence_transformers
         import sklearn
 
+        # If a list of tags has been specified, prune all tools that do not possess this tag.
+        candidate_tools = [x for x in self.catalog_descriptor.items]
+        if tags is not None:
+            candidate_tools = [x for x in candidate_tools if x]
+
         # Compute the distance of each tool in the catalog to the query.
-        available_tools = [x for x in self.catalog_descriptor.items]
         embedding_model = self.catalog_descriptor.embedding_model
         embedding_model_obj = sentence_transformers.SentenceTransformer(
             embedding_model,
@@ -71,14 +76,14 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
         )
         query_embedding = embedding_model_obj.encode(query)
         deltas = sklearn.metrics.pairwise.cosine_similarity(
-            X=[t.embedding for t in available_tools],
+            X=[t.embedding for t in candidate_tools],
             Y=[query_embedding]
         )
 
         # Order results by their distance to the query (larger is "closer").
         results = [
             SearchResult(
-                record_descriptor=available_tools[i],
+                record_descriptor=candidate_tools[i],
                 delta=deltas[i]
             ) for i in range(len(deltas))
         ]

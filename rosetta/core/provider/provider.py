@@ -10,15 +10,15 @@ import abc
 import sys
 
 from .refiner import (
-    ToolWithDelta,
+    EntryWithDelta,
     ClosestClusterRefiner
 )
-from .generate import (
+from ..tool.generate import (
     SQLPPCodeGenerator,
     SemanticSearchCodeGenerator,
     HTTPRequestCodeGenerator
 )
-from .secrets import put_secret
+from ..secrets import put_secret
 from ..catalog.catalog_base import CatalogBase
 from ..record.descriptor import (
     RecordDescriptor,
@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 class Provider(abc.ABC):
     def __init__(self, catalog: CatalogBase, output_directory: pathlib.Path = None,
-                 refiner: typing.Callable[[list[ToolWithDelta]], list[ToolWithDelta]] = None,
+                 refiner: typing.Callable[[list[EntryWithDelta]], list[EntryWithDelta]] = None,
                  secrets: typing.Optional[dict[str, typing.Callable[[], str]]] = None):
         """
         :param catalog: A handle to the catalog. Entries can either be in memory or in Couchbase.
@@ -38,7 +38,7 @@ class Provider(abc.ABC):
         :param refiner: Refiner (reranker / post processor) to use when retrieving tools.
         :param secrets: Map of identifiers to functions (callbacks) that retrieve secrets.
 
-        >>> import rosetta.core.tool.provider as rp
+        >>> import rosetta.core.provider as rp
         >>> import rosetta.core.catalog.catalog_mem as rcm
         >>> import os
         >>> my_catalog = rcm.CatalogMem.load('.rosetta-catalog')
@@ -65,17 +65,24 @@ class Provider(abc.ABC):
             for k, v in secrets.items():
                 put_secret(k, v)
 
-    def get_tools_for(self, query: str, limit: typing.Union[int | None] = 1) \
+    def get_tools_for(self, query: str, tags: list[str] = None,
+                      limit: typing.Union[int | None] = 1) \
             -> list[langchain_core.tools.StructuredTool]:
-        results = self.refiner(self.catalog.find(query=query, limit=limit))
+        """
+        :param query: A string to search the catalog with.
+        :param tags: A list of tags that must exist with each associated entry.
+        :param limit: The maximum number of results to return.
+        :return: A list of tools (Python functions).
+        """
+        results = self.refiner(self.catalog.find(query=query, tags=tags, limit=limit))
 
         # Load all tools that we have not already cached.
-        non_cached_results = [f for f in results if f.tool not in self._tool_cache]
+        non_cached_results = [f for f in results if f.entry not in self._tool_cache]
         for record_descriptor, tool in self._load_from_descriptors(non_cached_results):
             self._tool_cache[record_descriptor] = tool
 
         # Return the tools from the cache.
-        return [self._tool_cache[x.tool] for x in results]
+        return [self._tool_cache[x.entry] for x in results]
 
     def _load_from_descriptors(self, descriptors: list[RecordDescriptor]) \
             -> list[tuple[RecordDescriptor, langchain_core.tools.StructuredTool]]:

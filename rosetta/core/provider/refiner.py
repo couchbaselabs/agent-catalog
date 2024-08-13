@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
-class ToolWithDelta:
-    tool: typing.Any
+class EntryWithDelta:
+    entry: typing.Any
     delta: float
 
 
@@ -22,9 +22,9 @@ class ClosestClusterRefiner(pydantic.BaseModel):
     max_deepen_steps: int = pydantic.Field(default=10, gt=0)
     no_more_than_k: typing.Optional[int] = pydantic.Field(None, gt=0)
 
-    def __call__(self, ordered_tools: list[ToolWithDelta]):
+    def __call__(self, ordered_entries: list[EntryWithDelta]):
         # We are given tools in the order of most relevant to least relevant -- we need to reverse this list.
-        a = numpy.array(sorted([t.delta for t in ordered_tools])).reshape(-1, 1)
+        a = numpy.array(sorted([t.delta for t in ordered_entries])).reshape(-1, 1)
         s = numpy.linspace(min(a) - 0.01, max(a) + 0.01, num=self.kde_distribution_n).reshape(-1, 1)
 
         # Use KDE to estimate our PDF. We are going to iteratively deepen until we get some local extrema.
@@ -47,8 +47,8 @@ class ClosestClusterRefiner(pydantic.BaseModel):
 
         if len(first_minimum) < 1:
             logger.debug('Satisfiable bandwidth was not found. Returning original list.')
-            return ordered_tools
+            return ordered_entries
         else:
-            closest_cluster = [t for t in ordered_tools if t.delta > s[first_maximum[-1]]]
+            closest_cluster = [t for t in ordered_entries if t.delta > s[first_maximum[-1]]]
             sorted_cluster = sorted(closest_cluster, key=lambda t: t.delta, reverse=True)
             return sorted_cluster[0:self.no_more_than_k] if self.no_more_than_k is not None else sorted_cluster

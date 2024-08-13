@@ -1,7 +1,13 @@
 #
-# The following file is a template for an HTTP request tool.
+# The following file is a template for a set of HTTP request tools.
 #
 record_kind: http_request
+
+# As a supplement to the tool similarity search, users can optionally specify search tags.
+# This field is optional, and does not have to be present.
+tags:
+  - gdpr_2016_compliant
+  - ccpa_2019_compliant
 
 # HTTP requests must be specified using an OpenAPI spec.
 open_api:

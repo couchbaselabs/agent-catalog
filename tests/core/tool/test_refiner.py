@@ -1,13 +1,13 @@
 import pytest
 import langchain_core.tools
 
-from rosetta.core.tool.refiner import (
+from rosetta.core.provider.refiner import (
     ClosestClusterRefiner,
-    ToolWithDelta
+    EntryWithDelta
 )
 
 
-def _generate_test_tools(deltas: list[int]) -> list[ToolWithDelta]:
+def _generate_test_tools(deltas: list[int]) -> list[EntryWithDelta]:
     tools_with_delta = list()
     for i, delta in enumerate(deltas):
         def dummy_tool(j: int) -> int:
@@ -18,8 +18,8 @@ def _generate_test_tools(deltas: list[int]) -> list[ToolWithDelta]:
             func=dummy_tool,
             name=f'Tool {i}'
         )
-        tools_with_delta.append(ToolWithDelta(
-            tool=new_tool,
+        tools_with_delta.append(EntryWithDelta(
+            entry=new_tool,
             delta=delta
         ))
     return tools_with_delta

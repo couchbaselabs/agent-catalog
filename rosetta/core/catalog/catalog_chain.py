@@ -1,3 +1,5 @@
+import typing
+
 from .catalog_base import CatalogBase, SearchResult
 
 
@@ -10,7 +12,7 @@ class CatalogChain(CatalogBase):
     def __init__(self, chain=[]):
         self.chain = chain
 
-    def find(self, query: str, limit: int = 1) -> list[SearchResult]:
+    def find(self, query: str, limit: typing.Union[int | None] = 1, tags: list[str] = None) -> list[SearchResult]:
         results = []
 
         seen = set() # Keyed by 'source:name'.
