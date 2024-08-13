@@ -1,6 +1,6 @@
 # rosetta-lc
 
-A collection of LangChain-specific tools to be used with [rosetta-core](https://github.com/couchbaselabs/rosetta-core). 
+A collection of LangChain-specific classes and functions to be used with [rosetta-core](https://github.com/couchbaselabs/rosetta-core). 
 This package currently includes a LangChain agent that interfaces with Capella for its LLM calls.
 
 ## Building From Source
