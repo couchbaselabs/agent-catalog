@@ -17,6 +17,7 @@ REPO_DIRTY = "_DIRTY_"
 class CatalogKind(enum.StrEnum):
     Tool = "tool"
     Prompt = "prompt"
+    All = "all"
 
     # TODO (GLENN): Include other classes.
 
