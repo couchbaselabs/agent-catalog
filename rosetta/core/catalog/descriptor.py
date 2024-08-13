@@ -1,8 +1,7 @@
 import pydantic
-import typing
 import enum
 
-from ..tool.descriptor.models import typing_union_tools
+from ..tool.descriptor import ToolDescriptorUnionType
 
 
 # Special value for repo_commit_id that means
@@ -48,9 +47,4 @@ class CatalogDescriptor(pydantic.BaseModel):
         description="A list of source directories that were crawled to generate this catalog."
     )
 
-    items: list[
-        typing.Annotated[
-            typing_union_tools,
-            pydantic.Field(discriminator="record_kind"),
-        ]
-    ] = pydantic.Field(description="The entries in the catalog.")
+    items: list[ToolDescriptorUnionType] = pydantic.Field(description="The entries in the catalog.")

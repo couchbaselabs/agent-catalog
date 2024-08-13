@@ -21,7 +21,6 @@ from ...record.descriptor import (
     RecordDescriptor
 )
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -353,9 +352,10 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
                     )
 
 
-typing_union_tools = typing.Union[
-    SemanticSearchToolDescriptor,
-    SQLPPQueryToolDescriptor,
-    HTTPRequestToolDescriptor,
-    PythonToolDescriptor,
+ToolDescriptorUnionType = typing.Annotated[
+    PythonToolDescriptor
+    | SQLPPQueryToolDescriptor
+    | SemanticSearchToolDescriptor
+    | HTTPRequestToolDescriptor,
+    pydantic.Field(discriminator='record_kind')
 ]
