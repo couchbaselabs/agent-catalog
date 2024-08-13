@@ -5,8 +5,9 @@ import click
 from dotenv import load_dotenv, find_dotenv
 
 from .cmds import *
-from .cmds.publish import cmd_publish
+from .cmds.publish import cmd_publish, cmd_publish_obj
 from ..core.utils.publish_utils import get_buckets, get_connection
+from ..core.catalog.descriptor import CatalogKindModel
 from .models.publish.model import Keyspace, CouchbaseConnect
 from .models.ctx.model import Context
 
@@ -115,9 +116,8 @@ def env(ctx):
 @click.pass_context
 def find(ctx, query, kind, top_k, include_dirty, refiner):
     """Find tools, prompts, etc.
-       from the catalog based on a natural language QUERY string."""
-    cmd_find(ctx.obj, query, kind=kind, top_k=top_k,
-             include_dirty=include_dirty, refiner=refiner)
+    from the catalog based on a natural language QUERY string."""
+    cmd_find(ctx.obj, query, kind=kind, top_k=top_k, include_dirty=include_dirty, refiner=refiner)
 
 
 @click_main.command()
@@ -162,8 +162,14 @@ def index(ctx, source_dirs, kind, embedding_model, include_dirty, dry_run):
     # TODO: The index command should ignore the '.git' subdirectory.
     # TODO: The index command should ignore whatever's in the '.gitignore' file.
 
-    cmd_index(ctx.obj, source_dirs=source_dirs, kind=kind, embedding_model=embedding_model,
-              include_dirty=include_dirty, dry_run=dry_run)
+    cmd_index(
+        ctx.obj,
+        source_dirs=source_dirs,
+        kind=kind,
+        embedding_model=embedding_model,
+        include_dirty=include_dirty,
+        dry_run=dry_run,
+    )
 
 
 @click_main.command()
@@ -205,6 +211,50 @@ def publish(ctx, scope):
     print(msg)
 
     # Close cluster connection
+    cluster.close()
+
+
+@click_main.command()
+@click.option(
+    "--kind",
+    default="tool",
+    help="The kind of catalog to show status.",
+    show_default=True,
+)
+@click.option(
+    "-sc",
+    "--scope",
+    default="rosetta-catalog-publish-serialise",
+    help="Couchbase Scope where data is inserted.",
+)
+@click.pass_context
+def publishobj(ctx, kind, scope):
+    """Publish command that inserts after reading CatalogMem object"""
+    kind_obj = CatalogKindModel(kind=kind)
+    keyspace_details = Keyspace(bucket="", scope=scope)
+    connection_details = CouchbaseConnect(
+        connection_url=os.getenv("CB_CONN_STRING"),
+        username=os.getenv("CB_USERNAME"),
+        password=os.getenv("CB_PASSWORD"),
+    )
+
+    # Establish a connection
+    err, cluster = get_connection(conn=connection_details)
+    if err:
+        click.echo(str(err))
+        return
+
+    # Get buckets from CB Cluster
+    buckets = get_buckets(cluster=cluster)
+
+    # Prompt user to select a bucket
+    selected_bucket = click.prompt(
+        "Please select a bucket", type=click.Choice(buckets), show_choices=True
+    )
+    click.echo(f"Inserting documents in : {selected_bucket}/{keyspace_details.scope}\n")
+    keyspace_details.bucket = selected_bucket
+    cmd_publish_obj(ctx.obj, kind_obj.kind, cluster, keyspace_details)
+
     cluster.close()
 
 
