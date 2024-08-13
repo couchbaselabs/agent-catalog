@@ -23,6 +23,8 @@ def cmd_publish(ctx: Context, cluster, keyspace: Keyspace):
 
     # Iterate over all catalog files
     for col_type in files:
+        if str(col_type) == "meta.json":
+            continue
 
         # Get catalog file
         f = open("./" + catalog_file_name + "/" + col_type)
@@ -71,6 +73,7 @@ def cmd_publish(ctx: Context, cluster, keyspace: Keyspace):
         for item in data["items"]:
             try:
                 key = item["identifier"]
+                item.update({"snapshot_commit_id": metadata["snapshot_commit_id"]})
                 cb_coll.upsert(key, item)
                 # print("Snapshot ",result.key," added to keyspace")
             except Exception as e:
