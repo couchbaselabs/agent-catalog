@@ -1,11 +1,12 @@
 from datetime import timedelta
+import json
 
 from couchbase.auth import PasswordAuthenticator
 from couchbase.cluster import Cluster
 from couchbase.exceptions import CouchbaseException
 from couchbase.options import ClusterOptions
-
 from ...cmd.models.publish.model import CouchbaseConnect
+from pathlib import Path
 
 
 def get_connection(conn: CouchbaseConnect):
@@ -73,3 +74,10 @@ def create_scope_and_collection(bucket_manager, scope, collection):
         return (f"Error creating collection '{collection}'\n", e)
 
     return ("Successfully created scope and collection", None)
+
+
+class CustomPublishEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, Path):
+            return str(o)
+        return super().default(o)
