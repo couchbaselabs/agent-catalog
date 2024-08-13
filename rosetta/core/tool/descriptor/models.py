@@ -3,7 +3,6 @@ import dataclasses
 import pathlib
 import pydantic
 import openapi_parser
-import langchain_core.tools
 import logging
 import typing
 import enum
@@ -16,6 +15,7 @@ import inspect
 
 from .helper import JSONSchemaValidatingMixin
 from .secrets import CouchbaseSecrets
+from ..decorator import ToolMarker
 from ...record.descriptor import (
     RecordKind,
     RecordDescriptor
@@ -48,13 +48,13 @@ class PythonToolDescriptor(RecordDescriptor):
                 sys.path.append(str(self.filename.parent.absolute()))
             imported_module = importlib.import_module(self.filename.stem)
             for name, tool in inspect.getmembers(imported_module):
-                if not isinstance(tool, langchain_core.tools.StructuredTool):
+                if not isinstance(tool, ToolMarker):
                     continue
                 yield PythonToolDescriptor(
                     identifier=self.id_generator(name),
                     record_kind=RecordKind.PythonFunction,
                     name=name,
-                    description=tool.description,
+                    description=tool.__doc__,
                     source=self.filename,
                     repo_commit_id=self.repo_commit_id,
                     # TODO (GLENN): Add support for user-defined tags here.

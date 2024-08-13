@@ -23,7 +23,7 @@ def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
     conn_string = get_secret("{{ secrets.conn_string }}")
     return couchbase.cluster.Cluster(conn_string, couchbase.options.ClusterOptions(authenticator))
 
-@tool(infer_schema=True)
+@tool
 def {{ tool.name }}(argument_input: {{ input.type_name }}) \
         -> {% if output.is_list_valued %}list[{{ output.type_name }}]{% else %}{{ output.type_name }}{% endif %}:
     """

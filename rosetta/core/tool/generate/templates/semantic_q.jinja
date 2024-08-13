@@ -25,7 +25,7 @@ def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
     return couchbase.cluster.Cluster(conn_string, couchbase.options.ClusterOptions(authenticator))
 
 
-@tool(infer_schema=True)
+@tool
 def {{ tool.name }}(question: {{ input.type_name }}) -> list[str]:
     """ {{ tool.description }} """
     cluster = _get_couchbase_cluster()

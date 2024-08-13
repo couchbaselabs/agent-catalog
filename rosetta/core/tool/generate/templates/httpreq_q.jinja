@@ -14,7 +14,7 @@ from rosetta.core.tool import tool
 parameter_locations = {{ input.locations }}
 {% endif %}
 
-@tool(infer_schema=True)
+@tool
 def {{ tool.name }}({% if input is not none %}argument_input: {{ input.model.type_name }}{% endif %}) -> str:
     """
     {{ tool.description }}

@@ -1,25 +1,32 @@
+import pathlib
+import uuid
 import pytest
-import langchain_core.tools
 
+from rosetta.core.catalog.catalog_base import SearchResult
+from rosetta.core.record.descriptor import (
+    RecordDescriptor, RecordKind
+)
 from rosetta.core.provider.refiner import (
-    ClosestClusterRefiner,
-    EntryWithDelta
+    ClosestClusterRefiner
 )
 
 
-def _generate_test_tools(deltas: list[int]) -> list[EntryWithDelta]:
+def _generate_test_tools(deltas: list[int]) -> list[SearchResult]:
     tools_with_delta = list()
     for i, delta in enumerate(deltas):
         def dummy_tool(j: int) -> int:
             """ dummy tool """
             return i
 
-        new_tool = langchain_core.tools.StructuredTool.from_function(
-            func=dummy_tool,
-            name=f'Tool {i}'
-        )
-        tools_with_delta.append(EntryWithDelta(
-            entry=new_tool,
+        tools_with_delta.append(SearchResult(
+            entry=RecordDescriptor(
+                identifier=str(i),
+                record_kind=RecordKind.PythonFunction,
+                name='dummy tool #' + str(i),
+                description='a dummy tool #' + str(i),
+                source=pathlib.Path('.'),
+                repo_commit_id=uuid.uuid4().hex,
+            ),
             delta=delta
         ))
     return tools_with_delta
@@ -37,5 +44,3 @@ def test_closest_cluster_refiner():
 
     two_tool_cluster = _generate_test_tools([0.9990, 0.9989, 0.6, 0.6, 0.5, 0.3, -0.3])
     assert two_tool_cluster[0:2] == refiner(two_tool_cluster)
-
-

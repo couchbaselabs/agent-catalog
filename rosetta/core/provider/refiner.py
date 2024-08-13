@@ -3,16 +3,11 @@ import pydantic
 import scipy.signal
 import sklearn.neighbors
 import numpy
-import dataclasses
 import logging
 
+from ..catalog.catalog_base import SearchResult
+
 logger = logging.getLogger(__name__)
-
-
-@dataclasses.dataclass
-class EntryWithDelta:
-    entry: typing.Any
-    delta: float
 
 
 # TODO (GLENN): Fine tune the deepening factor...
@@ -22,7 +17,7 @@ class ClosestClusterRefiner(pydantic.BaseModel):
     max_deepen_steps: int = pydantic.Field(default=10, gt=0)
     no_more_than_k: typing.Optional[int] = pydantic.Field(None, gt=0)
 
-    def __call__(self, ordered_entries: list[EntryWithDelta]):
+    def __call__(self, ordered_entries: list[SearchResult]):
         # We are given tools in the order of most relevant to least relevant -- we need to reverse this list.
         a = numpy.array(sorted([t.delta for t in ordered_entries])).reshape(-1, 1)
         s = numpy.linspace(min(a) - 0.01, max(a) + 0.01, num=self.kde_distribution_n).reshape(-1, 1)

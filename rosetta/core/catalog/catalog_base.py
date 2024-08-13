@@ -7,7 +7,7 @@ from ..record.descriptor import RecordDescriptor
 
 class SearchResult(pydantic.BaseModel):
     """ A result item in the results from a CatalogBase.find(). """
-    record_descriptor: RecordDescriptor
+    entry: RecordDescriptor
     delta: float
 
     # TODO: A FoundItem might one day also contain additional information --

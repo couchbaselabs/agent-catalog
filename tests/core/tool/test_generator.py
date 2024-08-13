@@ -4,13 +4,13 @@ import tempfile
 import inspect
 import importlib
 import uuid
-import langchain_core.tools
 
 from rosetta.core.tool.generate.generator import (
     SQLPPCodeGenerator,
     SemanticSearchCodeGenerator,
     HTTPRequestCodeGenerator
 )
+from rosetta.core.tool.decorator import ToolMarker
 from rosetta.core.tool.descriptor.models import (
     SQLPPQueryToolDescriptor,
     SemanticSearchToolDescriptor,
@@ -48,7 +48,7 @@ def test_sqlpp_generator():
         assert any(x[0] == '_ToolOutput' for x in members)
         assert any(x[0] == 'tool_1' for x in members)
         tool = [x[1] for x in members if x[0] == 'tool_1'][0]
-        assert isinstance(tool, langchain_core.tools.StructuredTool)
+        assert isinstance(tool, ToolMarker)
         sys.path.remove(tmp_dir)
 
 
@@ -71,7 +71,7 @@ def test_semantic_search_generator():
         assert any(x[0] == '_ArgumentInput' for x in members)
         assert any(x[0] == 'get_travel_blog_snippets_from_user_interests' for x in members)
         tool = [x[1] for x in members if x[0] == 'get_travel_blog_snippets_from_user_interests'][0]
-        assert isinstance(tool, langchain_core.tools.StructuredTool)
+        assert isinstance(tool, ToolMarker)
         sys.path.remove(tmp_dir)
 
 
@@ -96,5 +96,5 @@ def test_http_request_generator():
             names = {'create_new_member_create_post', 'get_member_rewards_rewards__member_id__get'}
             assert any(x[0] in names for x in members)
             tool = [x[1] for x in members if x[0] in names][0]
-            assert isinstance(tool, langchain_core.tools.StructuredTool)
+            assert isinstance(tool, ToolMarker)
         sys.path.remove(tmp_dir)

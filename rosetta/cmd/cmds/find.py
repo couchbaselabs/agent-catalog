@@ -3,8 +3,8 @@ import tqdm
 from rosetta.cmd.cmds.util import *
 from rosetta.core.catalog.index import index_catalog
 from rosetta.core.catalog.catalog_mem import CatalogMem
+from rosetta.core.catalog.catalog_base import SearchResult
 from rosetta.core.provider.refiner import ClosestClusterRefiner
-from rosetta.core.provider.refiner import EntryWithDelta
 from ..models.ctx.model import Context
 
 
@@ -54,7 +54,7 @@ def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refi
 
     # Query the catalog for a list of results.
     search_results = [
-        EntryWithDelta(entry=x.record_descriptor, delta=x.delta) for x in catalog.find(query, limit=limit, tags=tags)
+        SearchResult(entry=x.entry, delta=x.delta) for x in catalog.find(query, limit=limit, tags=tags)
     ]
     if refiner is not None:
         search_results = refiners[refiner]()(search_results)

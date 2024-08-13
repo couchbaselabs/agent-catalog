@@ -41,7 +41,7 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
     @staticmethod
     def load(catalog_path: pathlib.Path):
         """ Load from a catalog_path JSON file. """
-        with catalog_path.open('r') as fp:
+        with (catalog_path / 'tool-catalog.json').open('r') as fp:
             catalog_descriptor = CatalogDescriptor.model_validate_json(fp.read())
         return CatalogMem(catalog_descriptor=catalog_descriptor)
 
@@ -89,7 +89,7 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
         # Order results by their distance to the query (larger is "closer").
         results = [
             SearchResult(
-                record_descriptor=candidate_tools[i],
+                entry=candidate_tools[i],
                 delta=deltas[i]
             ) for i in range(len(deltas))
         ]
