@@ -255,6 +255,8 @@ def publishobj(ctx, kind, scope):
     keyspace_details.bucket = selected_bucket
     cmd_publish_obj(ctx.obj, kind_obj.kind, cluster, keyspace_details)
 
+    cluster.close()
+
 
 @click_main.command()
 @click.option(
