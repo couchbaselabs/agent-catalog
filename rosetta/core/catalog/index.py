@@ -9,16 +9,28 @@ from .catalog_mem import CatalogMem
 source_globs = list(source_indexers.keys())
 
 
-def index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
-                  kind, catalog_path, source_dirs,
-                  scan_directory_opts: ScanDirectoryOpts = None,
-                  progress=lambda x: x,
-                  max_errs=1):
+def index_catalog(
+    meta,
+    snapshot_commit_id,
+    snapshot_commit_id_for_path,
+    kind,
+    catalog_path,
+    source_dirs,
+    scan_directory_opts: ScanDirectoryOpts = None,
+    progress=lambda x: x,
+    max_errs=1,
+):
     all_errs, next_catalog, uninitialized_items = index_catalog_start(
-        meta, repo_commit_id, repo_commit_id_for_path,
-        kind, catalog_path, source_dirs,
+        meta,
+        snapshot_commit_id,
+        snapshot_commit_id_for_path,
+        kind,
+        catalog_path,
+        source_dirs,
         scan_directory_opts=scan_directory_opts,
-        progress=progress, max_errs=max_errs)
+        progress=progress,
+        max_errs=max_errs,
+    )
 
     print("==================\naugmenting...")
 
@@ -41,8 +53,7 @@ def index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
     import sentence_transformers
 
     embedding_model_obj = sentence_transformers.SentenceTransformer(
-        meta["embedding_model"],
-        tokenizer_kwargs={'clean_up_tokenization_spaces': True}
+        meta["embedding_model"], tokenizer_kwargs={"clean_up_tokenization_spaces": True}
     )
 
     for descriptor in progress(uninitialized_items):
@@ -62,11 +73,17 @@ def index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
     return next_catalog
 
 
-def index_catalog_start(meta, repo_commit_id, repo_commit_id_for_path,
-                        kind, catalog_path, source_dirs,
-                        scan_directory_opts: ScanDirectoryOpts = None,
-                        progress=lambda x: x,
-                        max_errs=1):
+def index_catalog_start(
+    meta,
+    snapshot_commit_id,
+    snapshot_commit_id_for_path,
+    kind,
+    catalog_path,
+    source_dirs,
+    scan_directory_opts: ScanDirectoryOpts = None,
+    progress=lambda x: x,
+    max_errs=1,
+):
     # TODO: We should use different source_indexers & source_globs based on the kind?
 
     if catalog_path.exists():
@@ -87,7 +104,9 @@ def index_catalog_start(meta, repo_commit_id, repo_commit_id_for_path,
 
         for glob, indexer in source_indexers.items():
             if fnmatch.fnmatch(source_file.name, glob):
-                errs, descriptors = indexer.start_descriptors(source_file, repo_commit_id_for_path)
+                errs, descriptors = indexer.start_descriptors(
+                    source_file, snapshot_commit_id_for_path
+                )
                 all_errs += errs or []
                 all_descriptors += descriptors or []
                 break
@@ -101,9 +120,9 @@ def index_catalog_start(meta, repo_commit_id, repo_commit_id_for_path,
             catalog_schema_version=meta["catalog_schema_version"],
             embedding_model=meta["embedding_model"],
             kind=kind,
-            repo_commit_id=repo_commit_id,
+            snapshot_commit_id=snapshot_commit_id,
             source_dirs=source_dirs,
-            items=all_descriptors
+            items=all_descriptors,
         )
     )
 
