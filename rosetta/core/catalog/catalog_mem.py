@@ -41,7 +41,7 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
     @staticmethod
     def load(catalog_path: pathlib.Path):
         """ Load from a catalog_path JSON file. """
-        with (catalog_path / 'tool-catalog.json').open('r') as fp:
+        with catalog_path.open('r') as fp:
             catalog_descriptor = CatalogDescriptor.model_validate_json(fp.read())
         return CatalogMem(catalog_descriptor=catalog_descriptor)
 
