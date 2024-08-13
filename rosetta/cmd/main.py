@@ -66,7 +66,7 @@ class AliasedGroup(click.Group):
 )
 @click.pass_context
 def click_main(ctx, catalog, activity, verbose):
-    """A command line tool for Rosetta."""
+    """ A command line tool for Rosetta. """
     ctx.obj = Context(activity=activity, catalog=catalog, verbose=verbose)
     # ctx.obj = ctx.obj or {"catalog": catalog, "activity": activity, "verbose": verbose}
 
@@ -74,14 +74,14 @@ def click_main(ctx, catalog, activity, verbose):
 @click_main.command()
 @click.pass_context
 def clean(ctx):
-    """Clean up catalog, activity, generated files, etc."""
+    """ Clean up the catalog folder, the activity folder, any generated files, etc... """
     cmd_clean(ctx.obj)
 
 
 @click_main.command()
 @click.pass_context
 def env(ctx):
-    """Show this program's env or configuration parameters as JSON."""
+    """ Show this program's environment or configuration parameters as a JSON object. """
     cmd_env(ctx.obj)
 
 
@@ -94,8 +94,7 @@ def env(ctx):
     show_default=True,
 )
 @click.option(
-    "-k",
-    "--top-k",
+    "--limit",
     default=1,
     help="The maximum number of results to show.",
     show_default=True,
@@ -103,21 +102,27 @@ def env(ctx):
 @click.option(
     "--include-dirty",
     default=True,
+    is_flag=True,
     help="Whether to consider and process dirty source files for the find query.",
     show_default=True,
 )
 @click.option(
     "--refiner",
-    default="ClosestCluster",
-    help="""Refining of candidate results.
-            Valid values: ClosestCluster, None.""",
+    type=click.Choice(['ClosestCluster'], case_sensitive=False),
+    default=None,
+    help="Specify how to post-process find results.",
     show_default=True,
 )
+@click.argument(
+    'tags',
+    default=None,
+    nargs=-1
+)
 @click.pass_context
-def find(ctx, query, kind, top_k, include_dirty, refiner):
-    """Find tools, prompts, etc.
-    from the catalog based on a natural language QUERY string."""
-    cmd_find(ctx.obj, query, kind=kind, top_k=top_k, include_dirty=include_dirty, refiner=refiner)
+def find(ctx, query, kind, limit, include_dirty, refiner, tags):
+    """ Find tools, prompts, etc. from the catalog based on a natural language QUERY string.
+        Optionally specify a list of search tags (TAGS) at the end of this command. """
+    cmd_find(ctx.obj, query, kind=kind, limit=limit, include_dirty=include_dirty, refiner=refiner, tags=tags)
 
 
 @click_main.command()
@@ -138,6 +143,7 @@ def find(ctx, query, kind, top_k, include_dirty, refiner):
 @click.option(
     "--include-dirty",
     default=False,
+    is_flag=True,
     help="Whether to index dirty source files into the local catalog.",
     show_default=True,
 )
@@ -149,11 +155,9 @@ def find(ctx, query, kind, top_k, include_dirty, refiner):
 )
 @click.pass_context
 def index(ctx, source_dirs, kind, embedding_model, include_dirty, dry_run):
-    """Walk source directory trees for indexing source files into the local catalog.
-
-    SOURCE_DIRS defaults to "."
-
-    Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc."""
+    """ Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
+        SOURCE_DIRS defaults to ".", the current working directory.
+        Source files that will be scanned include *.py, *.sqlpp, *.yaml," etc. """
 
     if not source_dirs:
         source_dirs = ["."]
@@ -181,7 +185,7 @@ def index(ctx, source_dirs, kind, embedding_model, include_dirty, dry_run):
 )
 @click.pass_context
 def publish(ctx, scope):
-    """Publish the local catalog to a database."""
+    """ Publish the local catalog to a Couchbase instance. """
 
     keyspace_details = Keyspace(bucket="", scope=scope)
     connection_details = CouchbaseConnect(
@@ -268,19 +272,20 @@ def publishobj(ctx, kind, scope):
 @click.option(
     "--include-dirty",
     default=True,
+    is_flag=True,
     help="Whether to consider dirty source files for status.",
     show_default=True,
 )
 @click.pass_context
 def status(ctx, kind, include_dirty):
-    """Show the status of the local catalog."""
+    """ Show the status of the local catalog. """
     cmd_status(ctx.obj, kind=kind, include_dirty=include_dirty)
 
 
 @click_main.command()
 @click.pass_context
 def version(ctx):
-    """Show the version of this tool."""
+    """ Show the version of this tool. """
     cmd_version(ctx.obj)
 
 
@@ -301,7 +306,7 @@ def version(ctx):
 )
 @click.pass_context
 def web(ctx, host_port, debug):
-    """Start local web server."""
+    """ Start a local web server to view our tools. """
     cmd_web(ctx.obj, host_port, debug)
 
 
@@ -313,7 +318,7 @@ def main():
 
         if os.getenv("ROSETTA_DEBUG") is not None:
             # Set ROSETTA_DEBUG so standard python stack trace is emitted.
-            raise (e)
+            raise e
 
         sys.exit(1)
 

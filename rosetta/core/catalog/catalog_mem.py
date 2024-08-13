@@ -66,7 +66,13 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
         # If a list of tags has been specified, prune all tools that do not possess this tag.
         candidate_tools = [x for x in self.catalog_descriptor.items]
         if tags is not None:
-            candidate_tools = [x for x in candidate_tools if x]
+            candidate_tools = [
+                x for x in candidate_tools
+                if x.tags is not None and len(set(x.tags) & set(tags)) > 0
+            ]
+        if len(candidate_tools) == 0:
+            # Exit early if there are no candidates.
+            return list()
 
         # Compute the distance of each tool in the catalog to the query.
         embedding_model = self.catalog_descriptor.embedding_model
