@@ -1,22 +1,14 @@
-import pathlib
-
-import click
 import tqdm
 
 from rosetta.cmd.cmds.util import *
 from rosetta.core.catalog.index import index_catalog
 from rosetta.core.catalog.catalog_mem import CatalogMem
-from rosetta.core.tool.refiner import ClosestClusterRefiner
-from rosetta.core.tool.refiner import ToolWithDelta
+from rosetta.core.catalog.catalog_base import SearchResult
+from rosetta.core.provider.refiner import ClosestClusterRefiner
 from ..models.ctx.model import Context
 
 
-def NoneRefiner():
-    return lambda results: results
-
-
 refiners = {
-    "None": NoneRefiner,
     "ClosestCluster": ClosestClusterRefiner,
 
     # TODO: One day allow for custom refiners at runtime where
@@ -24,7 +16,7 @@ refiners = {
 }
 
 
-def cmd_find(ctx: Context, query, kind="tool", top_k=3, include_dirty=True, refiner="ClosestCluster"):
+def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refiner=None, tags=None):
     # TODO: One day, also handle DBCatalogRef?
     # TODO: If DB is outdated and the local catalog has newer info,
     #       then we need to consult the latest, local catalog / MemCatalogRef?
@@ -33,7 +25,7 @@ def cmd_find(ctx: Context, query, kind="tool", top_k=3, include_dirty=True, refi
     # TODO: When refactoring is done, rename back to "tool_catalog.json" (with underscore)?
     # TODO: Possible security issue -- need to check kind is an allowed value?
 
-    if not any(r.lower() == refiner.lower() for r in refiners):
+    if refiner is not None and not any(r.lower() == refiner.lower() for r in refiners):
         valid_refiners = list(refiners.keys())
         valid_refiners.sort()
         raise ValueError(f"ERROR: unknown refiner, valid refiners: {valid_refiners}")
@@ -62,10 +54,10 @@ def cmd_find(ctx: Context, query, kind="tool", top_k=3, include_dirty=True, refi
 
     # Query the catalog for a list of results.
     search_results = [
-        ToolWithDelta(tool=x.record_descriptor, delta=x.delta) for x in catalog.find(query, limit=top_k)
+        SearchResult(entry=x.entry, delta=x.delta) for x in catalog.find(query, limit=limit, tags=tags)
     ]
-
-    refiner_fn = refiners[refiner]()
-    for i, result in enumerate(refiner_fn(search_results)):
+    if refiner is not None:
+        search_results = refiners[refiner]()(search_results)
+    for i, result in enumerate(search_results):
         click.echo(f'#{i + 1} (delta = {result.delta}, higher is better): ', nl=False)
-        click.echo(str(result.tool))
+        click.echo(str(result.entry))

@@ -47,6 +47,12 @@ output: >
       }
     }
 
+# As a supplement to the tool similarity search, users can optionally specify search tags.
+# This field is optional, and does not have to be present.
+tags:
+  - gdpr_2016_compliant
+  - ccpa_2019_compliant
+
 # The "secrets" field defines search keys that will be used to query a "secrets" manager.
 # Note that these values are NOT the secrets themselves, rather they are used to lookup secrets.
 secrets:

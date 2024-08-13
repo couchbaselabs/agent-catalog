@@ -43,11 +43,6 @@ openapi3-parser = "^1.1.17"
 py-openapi-schema-to-json-schema = "^0.0.3"
 tqdm = "^4.66.5"
 
-# Note:
-#   This dependency is purely for the StructuredTool (BaseTool) type.
-#   All agent-frameworks we've seen to-date rely on BaseTool, so this feels like a sane dependency.
-langchain-core = ">0.1.47"
-
 [tool.pytest.ini_options]
 markers = [
     "smoke: marks tests for running on each git-push"

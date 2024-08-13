@@ -12,9 +12,9 @@ class SalesModel(BaseModel):
     sales_formula: str
 
 
-# Only functions decorated with rosetta.core.tool.tool will be indexed.
+# Only functions decorated with "tool" will be indexed.
 # All other functions / module members will be ignored by the indexer.
-@tool(infer_schema=True)
+@tool
 def compute_sales_for_this_week(sales_model: SalesModel) -> float:
     """ A description for the function bound to the tool. This is mandatory for tools. """
 
