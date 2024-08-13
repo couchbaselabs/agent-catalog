@@ -2,12 +2,8 @@ import pydantic
 import typing
 import enum
 
-from ..tool.descriptor.models import (
-    SemanticSearchToolDescriptor,
-    SQLPPQueryToolDescriptor,
-    HTTPRequestToolDescriptor,
-    PythonToolDescriptor,
-)
+from ..tool.descriptor.models import typing_union_tools
+
 
 # Special value for repo_commit_id that means
 # the repo or a file is dirty / untracked.
@@ -54,12 +50,7 @@ class CatalogDescriptor(pydantic.BaseModel):
 
     items: list[
         typing.Annotated[
-            typing.Union[
-                SemanticSearchToolDescriptor,
-                SQLPPQueryToolDescriptor,
-                HTTPRequestToolDescriptor,
-                PythonToolDescriptor,
-            ],
+            typing_union_tools,
             pydantic.Field(discriminator="record_kind"),
         ]
     ] = pydantic.Field(description="The entries in the catalog.")

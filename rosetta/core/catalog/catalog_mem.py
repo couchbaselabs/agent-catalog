@@ -41,7 +41,7 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
     @staticmethod
     def load(catalog_path: pathlib.Path):
         """ Load from a catalog_path JSON file. """
-        with (catalog_path / 'tool-catalog.json').open('r') as fp:
+        with catalog_path.open('r') as fp:
             catalog_descriptor = CatalogDescriptor.model_validate_json(fp.read())
         return CatalogMem(catalog_descriptor=catalog_descriptor)
 
@@ -60,6 +60,9 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
 
     def find(self, query: str, limit: typing.Union[int | None] = 1, tags: list[str] = None) -> list[SearchResult]:
         """ Returns the catalog items that best match a query. """
+        if tags is not None and len(tags) < 1:
+            tags = None
+
         import sentence_transformers
         import sklearn
 

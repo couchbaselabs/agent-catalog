@@ -25,7 +25,9 @@ def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refi
     # TODO: When refactoring is done, rename back to "tool_catalog.json" (with underscore)?
     # TODO: Possible security issue -- need to check kind is an allowed value?
 
-    if refiner is not None and not any(r.lower() == refiner.lower() for r in refiners):
+    if refiner == "None":
+        refiner = None
+    if refiner is not None and refiner not in refiners:
         valid_refiners = list(refiners.keys())
         valid_refiners.sort()
         raise ValueError(f"ERROR: unknown refiner, valid refiners: {valid_refiners}")
