@@ -7,13 +7,15 @@ from rosetta.core.catalog.catalog_mem import CatalogMem
 from rosetta.core.catalog.index import index_catalog_start
 
 
-blueprint = flask.Blueprint('status', __name__)
+blueprint = flask.Blueprint("status", __name__)
 
 
-@blueprint.route('/status')
+@blueprint.route("/status")
 def route_status():
-    kind = flask.request.args.get('kind', default="tool", type=str)
-    include_dirty = flask.request.args.get('include_dirty', default='true', type=str).lower() == 'true'
+    kind = flask.request.args.get("kind", default="tool", type=str)
+    include_dirty = (
+        flask.request.args.get("include_dirty", default="true", type=str).lower() == "true"
+    )
 
     return flask.jsonify(catalog_status(flask.current_app.config["ctx"], kind, include_dirty))
 
@@ -54,7 +56,17 @@ def catalog_status(ctx, kind, include_dirty=True):
     catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")
 
     if not catalog_path.exists():
-        return [(None, [("error", "ERROR: local catalog does not exist yet: please use the index command.")])]
+        return [
+            (
+                None,
+                [
+                    (
+                        "error",
+                        "ERROR: local catalog does not exist yet: please use the index command.",
+                    )
+                ],
+            )
+        ]
 
     sections = []
 
@@ -64,17 +76,25 @@ def catalog_status(ctx, kind, include_dirty=True):
         repo, repo_commit_id_for_path = repo_load(pathlib.Path(os.getcwd()))
         if repo.is_dirty():
             repo_commit_id = REPO_DIRTY
-            sections.append((
-                "repo commit",
-                [("warn", "repo is DIRTY: please use the index command to update the local catalog.")]
-            ))
+            sections.append(
+                (
+                    "repo commit",
+                    [
+                        (
+                            "warn",
+                            "repo is DIRTY: please use the index command to update the local catalog.",
+                        )
+                    ],
+                )
+            )
         else:
             repo_commit_id = repo_commit_id_str(repo.head.commit)
-            sections.append((
-                "repo commit",
-                [(None, f"repo is clean"),
-                 (None, f"repo commit id: {repo_commit_id}")]
-            ))
+            sections.append(
+                (
+                    "repo commit",
+                    [(None, "repo is clean"), (None, f"repo commit id: {repo_commit_id}")],
+                )
+            )
 
         uninitialized_items = []
 
@@ -91,10 +111,15 @@ def catalog_status(ctx, kind, include_dirty=True):
             # Start a CatalogMem on-the-fly that incorporates the dirty
             # source file items which we'll use instead of the local catalog file.
             errs, catalog, uninitialized_items = index_catalog_start(
-                meta, repo_commit_id, repo_commit_id_for_path,
-                kind, catalog_path, source_dirs,
+                meta,
+                repo_commit_id,
+                repo_commit_id_for_path,
+                kind,
+                catalog_path,
+                source_dirs,
                 scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
-                max_errs=0)
+                max_errs=0,
+            )
 
             for err in errs:
                 section_parts.append(("error", f"ERROR: {err}"))
@@ -104,24 +129,26 @@ def catalog_status(ctx, kind, include_dirty=True):
             sections.append(("local scanning", section_parts))
 
         if uninitialized_items:
-            section_parts = [
-                (None, f"dirty items count: {len(uninitialized_items)}")
-            ]
+            section_parts = [(None, f"dirty items count: {len(uninitialized_items)}")]
 
             for x in uninitialized_items:
                 section_parts.append(("None", f"- {x.source}: {x.name}"))
 
             sections.append(("local dirty items", section_parts))
 
-    sections.append((
-        "local catalog info",
-         [(None, f"path            : {catalog_path}"),
-          (None, f"schema version  : {catalog.catalog_descriptor.catalog_schema_version}"),
-          (None, f"kind of catalog : {catalog.catalog_descriptor.kind}"),
-          (None, f"repo commit id  : {catalog.catalog_descriptor.repo_commit_id}"),
-          (None, f"embedding model : {catalog.catalog_descriptor.embedding_model}"),
-          (None, f"source dirs     : {catalog.catalog_descriptor.source_dirs}"),
-          (None, f"number of items : {len(catalog.catalog_descriptor.items or [])}")]
-    ))
+    sections.append(
+        (
+            "local catalog info",
+            [
+                (None, f"path            : {catalog_path}"),
+                (None, f"schema version  : {catalog.catalog_descriptor.catalog_schema_version}"),
+                (None, f"kind of catalog : {catalog.catalog_descriptor.kind}"),
+                (None, f"repo commit id  : {catalog.catalog_descriptor.snapshot_commit_id}"),
+                (None, f"embedding model : {catalog.catalog_descriptor.embedding_model}"),
+                (None, f"source dirs     : {catalog.catalog_descriptor.source_dirs}"),
+                (None, f"number of items : {len(catalog.catalog_descriptor.items or [])}"),
+            ],
+        )
+    )
 
     return sections
