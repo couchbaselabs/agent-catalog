@@ -106,18 +106,18 @@ def env(ctx):
     show_default=True,
 )
 @click.option(
-    "--reranker",
+    "--refiner",
     default="ClosestCluster",
-    help="""Reranking of candidate results.
-            Valid values: ClosestCluster, none.""",
+    help="""Refining of candidate results.
+            Valid values: ClosestCluster, None.""",
     show_default=True,
 )
 @click.pass_context
-def find(ctx, query, kind, top_k, include_dirty, reranker):
+def find(ctx, query, kind, top_k, include_dirty, refiner):
     """Find tools, prompts, etc.
        from the catalog based on a natural language QUERY string."""
     cmd_find(ctx.obj, query, kind=kind, top_k=top_k,
-             include_dirty=include_dirty, reranker=reranker)
+             include_dirty=include_dirty, refiner=refiner)
 
 
 @click_main.command()

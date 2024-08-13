@@ -8,7 +8,7 @@ from ..record.descriptor import RecordDescriptor
 
 class CatalogMem(pydantic.BaseModel, CatalogBase):
     """ Represents an in-memory catalog. """
-    catalog_descriptor: CatalogDescriptor
+    catalog_descriptor: CatalogDescriptor = None
 
     def init_from(self, other: 'CatalogMem') -> list[RecordDescriptor]:
         """ Initialize the items in self by copying over attributes from
