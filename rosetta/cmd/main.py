@@ -157,7 +157,7 @@ def find(ctx, query, kind, limit, include_dirty, refiner, tags):
 def index(ctx, source_dirs, kind, embedding_model, include_dirty, dry_run):
     """ Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
         SOURCE_DIRS defaults to ".", the current working directory.
-        Source files that will be scanned include *.py, *.sqlpp, *.yaml," etc. """
+        Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc. """
 
     if not source_dirs:
         source_dirs = ["."]
