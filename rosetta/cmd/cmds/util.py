@@ -143,8 +143,10 @@ def repo_commit_id_str(repo_commit_id):
 
     # TODO: Only works for git, where a far, future day, folks might want non-git?
 
-    if repo_commit_id == REPO_DIRTY:
-        return REPO_DIRTY
+    s = str(repo_commit_id)
 
-    return "g" + str(repo_commit_id)[:7]
+    if s.startswith(REPO_DIRTY):
+        return s
+
+    return "g" + s[:7]
 

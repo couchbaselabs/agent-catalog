@@ -25,10 +25,13 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
 
             for s in self.catalog_descriptor.items:
                 o = other_items.get(str(s.source) + ':' + s.name)
-                if o and s.repo_commit_id != REPO_DIRTY and \
-                        o.repo_commit_id == s.repo_commit_id:
-                    # The prev item and self item have the same repo_commit_id's,
-                    # so copy the prev item contents into the self item.
+                if o and \
+                    not o.repo_commit_id.startswith(REPO_DIRTY) and \
+                    not s.repo_commit_id.startswith(REPO_DIRTY) and \
+                    o.repo_commit_id == s.repo_commit_id:
+                    # The other item and self item have the same, non-DIRTY
+                    # repo_commit_id's, so copy the other item contents
+                    # into the self item.
                     for k, v in o.model_dump().items():
                         setattr(s, k, v)
                 else:
