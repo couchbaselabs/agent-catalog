@@ -66,7 +66,7 @@ class RecordDescriptor(pydantic.BaseModel):
 
     repo_commit_id: str = pydantic.Field(
         description="A unique identifier that attaches a record to a catalog snapshot. "
-                    "For git, this is the git repo commit SHA / HASH.",
+                    "For git, this is the git repo commit SHA / HASH, or a string that starts with the REPO_DIRTY marker.",
         examples=['g11223344', '_DIRTY_']
     )
 

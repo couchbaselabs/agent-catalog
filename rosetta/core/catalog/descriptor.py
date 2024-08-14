@@ -4,7 +4,7 @@ import enum
 from ..tool.descriptor import ToolDescriptorUnionType
 
 
-# Special value for repo_commit_id that means
+# Special prefix value for snapshot / repo_commit_id that means
 # the repo or a file is dirty / untracked.
 REPO_DIRTY = "_DIRTY_"
 
