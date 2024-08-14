@@ -1,19 +1,33 @@
+import logging
 import os
 import sys
-
 import click
-from dotenv import load_dotenv, find_dotenv
+import dotenv
+
+# Configure all logging here before we continue with our imports.
+# By default, we won't print any log messages below WARNING.
+logging.basicConfig(
+    level=logging.WARNING,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
+
+# Keeping this here, sentence_transformers logging can be pretty verbose.
+logging.getLogger('sentence_transformers').setLevel(logging.WARNING)
+
+from ..utils.publish import get_buckets, get_connection
+from ..cmd.models.publish import Keyspace, CouchbaseConnect
+from ..cmd.models.context import Context
 
 from .cmds import *
 from .cmds.publish import cmd_publish, cmd_publish_obj
-from ..core.utils.publish_utils import get_buckets, get_connection
-from ..core.catalog.descriptor import CatalogKindModel
-from .models.publish.model import Keyspace, CouchbaseConnect
-from .models.ctx.model import Context
+from .defaults import *
 
 # TODO: Should we load from ".env.rosetta"?
 # TODO: Or, perhaps even stage specific, like from ".env.rosetta.prod"?
-load_dotenv(find_dotenv(usecwd=True))
+dotenv.load_dotenv(dotenv.find_dotenv(usecwd=True))
 
 
 # Support abbreviated command aliases, ex: "rosetta st" ==> "rosetta status".
@@ -43,7 +57,7 @@ class AliasedGroup(click.Group):
 @click.option(
     "-c",
     "--catalog",
-    default=".rosetta-catalog",
+    default=DEFAULT_CATALOG_FOLDER,
     type=click.Path(exists=False, file_okay=False, dir_okay=True),
     help="""Directory of local catalog files.
             The local catalog DIRECTORY should be checked into git.""",
@@ -53,7 +67,7 @@ class AliasedGroup(click.Group):
 @click.option(
     "-a",
     "--activity",
-    default=".rosetta-activity",
+    default=DEFAULT_ACTIVITY_FOLDER,
     type=click.Path(exists=False, file_okay=False, dir_okay=True),
     help="""Directory of local activity files (runtime data).
             The local activity DIRECTORY should NOT be checked into git,
@@ -114,15 +128,16 @@ def env(ctx):
     show_default=True,
 )
 @click.argument(
-    'tags',
+    'annotations',
     default=None,
     nargs=-1
 )
 @click.pass_context
-def find(ctx, query, kind, limit, include_dirty, refiner, tags):
+def find(ctx, query, kind, limit, include_dirty, refiner, annotations):
     """ Find tools, prompts, etc. from the catalog based on a natural language QUERY string.
-        Optionally specify a list of search tags (TAGS) at the end of this command. """
-    cmd_find(ctx.obj, query, kind=kind, limit=limit, include_dirty=include_dirty, refiner=refiner, tags=tags)
+        Optionally specify a list of key-value (ANNOTATIONS) at the end of this command. """
+    cmd_find(ctx.obj, query, kind=kind, limit=limit, include_dirty=include_dirty, refiner=refiner,
+             annotations=annotations)
 
 
 @click_main.command()
@@ -234,7 +249,6 @@ def publish(ctx, scope):
 @click.pass_context
 def publishobj(ctx, kind, scope):
     """Publish command that inserts after reading CatalogMem object"""
-    kind_obj = CatalogKindModel(kind=kind)
     keyspace_details = Keyspace(bucket="", scope=scope)
     connection_details = CouchbaseConnect(
         connection_url=os.getenv("CB_CONN_STRING"),
@@ -257,7 +271,7 @@ def publishobj(ctx, kind, scope):
     )
     click.echo(f"Inserting documents in : {selected_bucket}/{keyspace_details.scope}\n")
     keyspace_details.bucket = selected_bucket
-    cmd_publish_obj(ctx.obj, kind_obj.kind, cluster, keyspace_details)
+    cmd_publish_obj(ctx.obj, kind, cluster, keyspace_details)
 
     cluster.close()
 

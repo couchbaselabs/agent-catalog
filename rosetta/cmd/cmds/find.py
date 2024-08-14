@@ -1,12 +1,22 @@
 import tqdm
+import jsbeautifier
+import pathlib
+import click
+import os
 
-from rosetta.cmd.cmds.util import *
 from rosetta.core.catalog.index import index_catalog
 from rosetta.core.catalog.catalog_mem import CatalogMem
 from rosetta.core.catalog.catalog_base import SearchResult
 from rosetta.core.provider.refiner import ClosestClusterRefiner
-from ..models.ctx.model import Context
+from rosetta.core.version import VersionDescriptor
 
+from ...cmd.models.context import Context
+from ...cmd.cmds.util import init_local, load_repository
+from ..defaults import (
+    DEFAULT_SCAN_DIRECTORY_OPTS,
+    DEFAULT_MAX_ERRS,
+    DEFAULT_BEAUTIFY_OPTS
+)
 
 refiners = {
     "ClosestCluster": ClosestClusterRefiner,
@@ -16,7 +26,7 @@ refiners = {
 }
 
 
-def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refiner=None, tags=None):
+def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refiner=None, annotations=None):
     # TODO: One day, also handle DBCatalogRef?
     # TODO: If DB is outdated and the local catalog has newer info,
     #       then we need to consult the latest, local catalog / MemCatalogRef?
@@ -37,21 +47,22 @@ def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refi
     catalog = CatalogMem().load(catalog_path)
 
     if include_dirty:
-        repo, repo_commit_id_for_path = repo_load(pathlib.Path(os.getcwd()))
+        repo, get_path_version = load_repository(pathlib.Path(os.getcwd()))
         if repo and repo.is_dirty():
             meta = init_local(ctx, catalog.catalog_descriptor.embedding_model, read_only=True)
 
             # The repo and any dirty files do not have real commit id's, so use "DIRTY".
-            repo_commit_id = REPO_DIRTY
+            version = VersionDescriptor(is_dirty=True)
 
             # Scan the same source_dirs that were used in the last "rosetta index".
             source_dirs = catalog.catalog_descriptor.source_dirs
 
             # Create a CatalogMem on-the-fly that incorporates the dirty
             # source file items which we'll use instead of the local catalog file.
-            catalog = index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
+            catalog = index_catalog(meta, version, get_path_version,
                                     kind, catalog_path, source_dirs,
                                     scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
+                                    printer=click.echo,
                                     progress=tqdm.tqdm, max_errs=DEFAULT_MAX_ERRS)
 
     # Transform our list of annotations into a single dictionary.
@@ -67,10 +78,15 @@ def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refi
 
     # Query the catalog for a list of results.
     search_results = [
-        SearchResult(entry=x.entry, delta=x.delta) for x in catalog.find(query, limit=limit, tags=tags)
+        SearchResult(entry=x.entry, delta=x.delta) for x in
+        catalog.find(query, limit=limit, annotations=annotations_dict)
     ]
     if refiner is not None:
         search_results = refiners[refiner]()(search_results)
     for i, result in enumerate(search_results):
+        pretty_json = jsbeautifier.beautify(
+            result.entry.model_dump_json(exclude={'embedding'}),
+            opts=DEFAULT_BEAUTIFY_OPTS
+        )
         click.echo(f'#{i + 1} (delta = {result.delta}, higher is better): ', nl=False)
-        click.echo(str(result.entry))
+        click.echo(pretty_json)

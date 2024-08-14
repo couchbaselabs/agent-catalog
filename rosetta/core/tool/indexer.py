@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 class BaseFileIndexer(pydantic.BaseModel):
     @abc.abstractmethod
-    def start_descriptors(self, filename: pathlib.Path, repo_commit_id_for_path) -> \
+    def start_descriptors(self, filename: pathlib.Path, get_path_version) -> \
             typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or more 'bare' catalog item descriptors for a filename,
            and/or return non-fatal or 'keep-on-going' errors if any encountered.
@@ -46,39 +46,29 @@ class BaseFileIndexer(pydantic.BaseModel):
 
 
 class DotPyFileIndexer(BaseFileIndexer):
-    def start_descriptors(self, filename: pathlib.Path, repo_commit_id_for_path) -> \
+    def start_descriptors(self, filename: pathlib.Path, get_path_version) -> \
             typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or more 'bare' catalog item descriptors
            for a *.py, and/or returns 'keep-on-going' errors
            if any encountered.
         """
-        repo_commit_id = repo_commit_id_for_path(filename)
-        factory = PythonToolDescriptor.Factory(
-            filename=filename,
-            repo_commit_id=repo_commit_id,
-            id_generator=lambda n: f'{str(filename)}:{n}:{repo_commit_id}'
-        )
+        factory = PythonToolDescriptor.Factory(filename=filename, version=get_path_version(filename))
         return None, list(factory)
 
 
 class DotSqlppFileIndexer(BaseFileIndexer):
-    def start_descriptors(self, filename: pathlib.Path, repo_commit_id_for_path) -> \
+    def start_descriptors(self, filename: pathlib.Path, get_path_version) -> \
             typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or 1 'bare' catalog item descriptors
            for a *.sqlpp, and/or return 'keep-on-going' errors
            if any encountered.
         """
-        repo_commit_id = repo_commit_id_for_path(filename)
-        factory = SQLPPQueryToolDescriptor.Factory(
-            filename=filename,
-            repo_commit_id=repo_commit_id,
-            id_generator=lambda n: f'{str(filename)}:{n}:{repo_commit_id}'
-        )
+        factory = SQLPPQueryToolDescriptor.Factory(filename=filename, version=get_path_version(filename))
         return None, list(factory)
 
 
 class DotYamlFileIndexer(BaseFileIndexer):
-    def start_descriptors(self, filename: pathlib.Path, repo_commit_id_for_path) -> \
+    def start_descriptors(self, filename: pathlib.Path, get_version) -> \
             typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or more 'bare' catalog item descriptors
            for a *.yaml, and/or return 'keep-on-going' errors
@@ -93,12 +83,7 @@ class DotYamlFileIndexer(BaseFileIndexer):
                 return None, []
             record_kind = parsed_desc['record_kind']
 
-        repo_commit_id = repo_commit_id_for_path(filename)  # Ex: a git hash / SHA.
-        factory_args = {
-            'filename': filename,
-            'repo_commit_id': repo_commit_id,
-            'id_generator': lambda n: f'{str(filename)}:{n}:{repo_commit_id}'
-        }
+        factory_args = {'filename': filename, 'version': get_version(filename)}
         match record_kind:
             case RecordKind.SemanticSearch:
                 return None, list(SemanticSearchToolDescriptor.Factory(**factory_args))

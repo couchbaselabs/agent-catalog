@@ -1,54 +1,56 @@
 import fnmatch
-
-from rosetta.core.tool.indexer import source_indexers, augment_descriptor, vectorize_descriptor
+import logging
 
 from .directory import scan_directory, ScanDirectoryOpts
 from .descriptor import CatalogDescriptor
 from .catalog_mem import CatalogMem
+from rosetta.core.tool.indexer import (
+    source_indexers, augment_descriptor, vectorize_descriptor
+)
+
+logger = logging.getLogger(__name__)
 
 source_globs = list(source_indexers.keys())
 
 
 def index_catalog(
-    meta,
-    snapshot_commit_id,
-    snapshot_commit_id_for_path,
-    kind,
-    catalog_path,
-    source_dirs,
-    scan_directory_opts: ScanDirectoryOpts = None,
-    progress=lambda x: x,
-    max_errs=1,
+        meta,
+        version,
+        get_path_version,
+        kind,
+        catalog_path,
+        source_dirs,
+        scan_directory_opts: ScanDirectoryOpts = None,
+        printer=lambda x: None,
+        progress=lambda x: x,
+        max_errs=1,
 ):
     all_errs, next_catalog, uninitialized_items = index_catalog_start(
         meta,
-        snapshot_commit_id,
-        snapshot_commit_id_for_path,
+        version,
+        get_path_version,
         kind,
         catalog_path,
         source_dirs,
         scan_directory_opts=scan_directory_opts,
+        printer=printer,
         progress=progress,
         max_errs=max_errs,
     )
 
-    print("==================\naugmenting...")
-
+    printer('Augmenting descriptor metadata.')
+    logger.debug('Now augmenting descriptor metadata.')
     for descriptor in progress(uninitialized_items):
         if max_errs > 0 and len(all_errs) >= max_errs:
             break
-
-        print(descriptor.name)
-
+        printer(f'- {descriptor.name}')
+        logger.debug(f'Augmenting {descriptor.name}.')
         errs = augment_descriptor(descriptor)
-
         all_errs += errs or []
 
     if all_errs:
-        print("ERROR: during augmenting", "\n".join([str(e) for e in all_errs]))
+        logger.error('Encountered error(s) during augmenting: ' + "\n".join([str(e) for e in all_errs]))
         raise all_errs[0]
-
-    print("==================\nvectorizing...")
 
     import sentence_transformers
 
@@ -56,33 +58,34 @@ def index_catalog(
         meta["embedding_model"], tokenizer_kwargs={"clean_up_tokenization_spaces": True}
     )
 
+    printer('Generating embeddings for descriptors.')
+    logger.debug('Now generating embeddings for descriptors.')
     for descriptor in progress(uninitialized_items):
         if max_errs > 0 and len(all_errs) >= max_errs:
             break
-
-        print(descriptor.name)
-
+        printer(f'- {descriptor.name}')
+        logger.debug(f'Generating embedding for {descriptor.name}.')
         errs = vectorize_descriptor(descriptor, embedding_model_obj)
-
         all_errs += errs or []
 
     if all_errs:
-        print("ERROR: during vectorizing", "\n".join([str(e) for e in all_errs]))
+        logger.error('Encountered error(s) during embedding generation: ' + "\n".join([str(e) for e in all_errs]))
         raise all_errs[0]
 
     return next_catalog
 
 
 def index_catalog_start(
-    meta,
-    snapshot_commit_id,
-    snapshot_commit_id_for_path,
-    kind,
-    catalog_path,
-    source_dirs,
-    scan_directory_opts: ScanDirectoryOpts = None,
-    progress=lambda x: x,
-    max_errs=1,
+        meta,
+        version,
+        get_path_version,
+        kind,
+        catalog_path,
+        source_dirs,
+        scan_directory_opts: ScanDirectoryOpts = None,
+        printer=lambda x: None,
+        progress=lambda x: x,
+        max_errs=1,
 ):
     # TODO: We should use different source_indexers & source_globs based on the kind?
 
@@ -98,21 +101,26 @@ def index_catalog_start(
 
     all_errs = []
     all_descriptors = []
+
+    printer('Crawling source directories.')
+    logger.debug('Now crawling source directories.')
     for source_file in progress(source_files):
         if max_errs > 0 and len(all_errs) >= max_errs:
             break
 
         for glob, indexer in source_indexers.items():
             if fnmatch.fnmatch(source_file.name, glob):
+                printer(f'- {source_file.name}')
+                logger.debug(f'Indexing file {source_file.name}.')
                 errs, descriptors = indexer.start_descriptors(
-                    source_file, snapshot_commit_id_for_path
+                    source_file, get_path_version
                 )
                 all_errs += errs or []
                 all_descriptors += descriptors or []
                 break
 
     if all_errs:
-        print("ERROR: during start_descriptors", "\n".join([str(e) for e in all_errs]))
+        logger.error('Encountered error(s) while crawling source directories: ' + "\n".join([str(e) for e in all_errs]))
         raise all_errs[0]
 
     next_catalog = CatalogMem(
@@ -120,7 +128,7 @@ def index_catalog_start(
             catalog_schema_version=meta["catalog_schema_version"],
             embedding_model=meta["embedding_model"],
             kind=kind,
-            snapshot_commit_id=snapshot_commit_id,
+            version=version,
             source_dirs=source_dirs,
             items=all_descriptors,
         )

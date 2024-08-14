@@ -12,13 +12,14 @@ class CatalogChain(CatalogBase):
     def __init__(self, chain=[]):
         self.chain = chain
 
-    def find(self, query: str, limit: typing.Union[int | None] = 1, tags: list[str] = None) -> list[SearchResult]:
+    def find(self, query: str, limit: typing.Union[int | None] = 1, annotations: dict[str, str] = None) \
+            -> list[SearchResult]:
         results = []
 
         seen = set() # Keyed by 'source:name'.
 
         for c in self.chain:
-            results_c = c.find(query, limit=limit)
+            results_c = c.find(query, limit=limit, annotations=annotations)
 
             for x in results_c:
                 source_name = str(x.entry.source) + ':' + x.entry.name

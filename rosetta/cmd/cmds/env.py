@@ -1,5 +1,5 @@
 import flask
-from ..models.ctx.model import Context
+from ..models.context import Context
 
 blueprint = flask.Blueprint("env", __name__)
 

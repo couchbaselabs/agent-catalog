@@ -1,21 +1,24 @@
 import os
 import pathlib
 import shutil
-
 import couchbase.auth
 import flask
 
-from ..models.ctx.model import Context
+from ..models.context import Context
+from ..defaults import (
+    DEFAULT_TOOL_CATALOG_NAME,
+    DEFAULT_PROMPT_CATALOG_NAME,
+    DEFAULT_META_CATALOG_NAME
+)
 
 
 def clean_local(ctx: Context):
     xs = [
         ctx.activity,
         # TODO: We should instead glob for all *_catalog.json files?
-        ctx.catalog + "/tool-catalog.json", # TODO: Temporary during refactoring.
-        ctx.catalog + "/tool_catalog.json",
-        ctx.catalog + "/prompt_catalog.json",
-        ctx.catalog + "/meta.json",
+        ctx.catalog + "/" + DEFAULT_TOOL_CATALOG_NAME,
+        ctx.catalog + "/" + DEFAULT_PROMPT_CATALOG_NAME,
+        ctx.catalog + "/" + DEFAULT_META_CATALOG_NAME,
     ]
 
     for x in xs:

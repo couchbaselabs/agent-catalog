@@ -1,12 +1,15 @@
 from datetime import timedelta
-import json
-
 from couchbase.auth import PasswordAuthenticator
 from couchbase.cluster import Cluster
 from couchbase.exceptions import CouchbaseException
 from couchbase.options import ClusterOptions
-from ...cmd.models.publish.model import CouchbaseConnect
 from pathlib import Path
+import json
+import logging
+
+from rosetta.cmd.models.publish import CouchbaseConnect
+
+logger = logging.getLogger(__name__)
 
 
 def get_connection(conn: CouchbaseConnect):
@@ -26,8 +29,11 @@ def get_connection(conn: CouchbaseConnect):
         options.apply_profile("wan_development")
 
     try:
+        logger.debug(f'Connecting to Couchbase cluster at {cluster_url}...')
         cluster = Cluster(cluster_url, options)
         cluster.wait_until_ready(timedelta(seconds=10))
+        logger.debug(f'Connection successfully established.')
+
     except CouchbaseException as e:
         return f"Error connecting to couchbase : {e}", None
 
@@ -47,16 +53,18 @@ def get_buckets(cluster):
 
 
 def create_scope_and_collection(bucket_manager, scope, collection):
-
     # Create a new scope if does not exist
     try:
         scopes = bucket_manager.get_all_scopes()
         scope_exists = any(s.name == scope for s in scopes)
         if not scope_exists:
+            logger.debug(f'Scope {scope} not found. Attempting to create scope now.')
             bucket_manager.create_scope(scope)
-            print(f"Scope '{scope}' created successfully.")
-    except Exception as e:
-        return (f"Error creating scope '{scope}\n'", e)
+            logger.debug(f'Scope {scope} was created successfully.')
+    except CouchbaseException as e:
+        error_message = f'Encountered error while creating scope {scope}:\n{str(e)}'
+        logger.error(error_message)
+        return error_message, e
 
     # Create a new collection within the scope if collection does not exist
     try:
@@ -64,14 +72,18 @@ def create_scope_and_collection(bucket_manager, scope, collection):
             collections = [c.name for s in scopes if s.name == scope for c in s.collections]
             collection_exists = collection in collections
             if not collection_exists:
+                logger.debug(f'Collection {scope}.{collection} not found. Attempting to create collection now.')
                 bucket_manager.create_collection(scope, collection)
-                print(f"Collection '{collection}' in scope '{scope}' created successfully.")
+                logger.debug(f'Collection {scope}.{collection} was created successfully.')
         else:
+            logger.debug(f'Collection {scope}.{collection} not found. Attempting to create collection now.')
             bucket_manager.create_collection(scope, collection)
-            print(f"Collection '{collection}' in scope '{scope}' created successfully.")
+            logger.debug(f'Collection {scope}.{collection} was created successfully.')
 
-    except Exception as e:
-        return (f"Error creating collection '{collection}'\n", e)
+    except CouchbaseException as e:
+        error_message = f'Encountered error while creating collection {scope}.{collection}:\n{str(e)}'
+        logger.error(error_message)
+        return error_message, e
 
     return ("Successfully created scope and collection", None)
 

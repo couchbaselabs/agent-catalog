@@ -16,6 +16,7 @@ import inspect
 from .helper import JSONSchemaValidatingMixin
 from .secrets import CouchbaseSecrets
 from ..decorator import ToolMarker
+from ...version import VersionDescriptor
 from ...record.descriptor import (
     RecordKind,
     RecordDescriptor
@@ -25,15 +26,13 @@ logger = logging.getLogger(__name__)
 
 
 class _BaseFactory(abc.ABC):
-    def __init__(self, filename: pathlib.Path, id_generator: typing.Callable[[str], str], repo_commit_id: str):
+    def __init__(self, filename: pathlib.Path, version: VersionDescriptor):
         """
         :param filename: Name of the file to load the record descriptor from.
-        :param id_generator: A function that generates a unique identifier given the name of a tool.
-        :param repo_commit_id: The unique identifier associated with file describing a set of tools.
+        :param version: The version descriptor associated with file describing a set of tools.
         """
         self.filename = filename
-        self.id_generator = id_generator
-        self.repo_commit_id = repo_commit_id
+        self.version = version
 
 
 # Note: a Python Tool does not add any additional fields.
@@ -51,14 +50,13 @@ class PythonToolDescriptor(RecordDescriptor):
                 if not isinstance(tool, ToolMarker):
                     continue
                 yield PythonToolDescriptor(
-                    identifier=self.id_generator(name),
                     record_kind=RecordKind.PythonFunction,
                     name=name,
                     description=tool.__doc__,
                     source=self.filename,
-                    repo_commit_id=self.repo_commit_id,
-                    # TODO (GLENN): Add support for user-defined tags here.
-                    tags=[]
+                    version=self.version,
+                    # TODO (GLENN): Add support for user-defined annotations here.
+                    annotations=dict()
                 )
 
 
@@ -83,7 +81,7 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
             output: str
             secrets: list[CouchbaseSecrets] = pydantic.Field(min_items=1, max_items=1)
             record_kind: typing.Optional[typing.Literal[RecordKind.SQLPPQuery] | None] = None
-            tags: typing.Optional[list[str] | None] = None
+            annotations: typing.Optional[dict[str, str] | None] = None
 
             @pydantic.field_validator('input', 'output')
             @classmethod
@@ -110,17 +108,16 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
 
             # Now, generate a single SQL++ tool descriptor.
             yield SQLPPQueryToolDescriptor(
-                identifier=self.id_generator(metadata.name),
                 record_kind=RecordKind.SQLPPQuery,
                 name=metadata.name,
                 description=metadata.description,
                 source=self.filename,
-                repo_commit_id=self.repo_commit_id,
+                version=self.version,
                 secrets=metadata.secrets,
                 input=metadata.input,
                 output=metadata.output,
                 query=self.filename.open('r').read(),
-                tags=metadata.tags
+                annotations=metadata.annotations
             )
 
 
@@ -139,7 +136,6 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
     input: str
     vector_search: VectorSearchMetadata
     secrets: list[CouchbaseSecrets] = pydantic.Field(min_items=1, max_items=1)
-    tags: typing.Optional[list[str] | None] = None
     record_kind: typing.Literal[RecordKind.SemanticSearch]
 
     class Factory(_BaseFactory):
@@ -155,7 +151,7 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
             description: str
             input: str
             secrets: list[CouchbaseSecrets] = pydantic.Field(min_items=1, max_items=1)
-            tags: typing.Optional[list[str] | None] = None
+            annotations: typing.Optional[dict[str, str] | None] = None
             vector_search: 'SemanticSearchToolDescriptor.VectorSearchMetadata'
 
             @pydantic.field_validator('input')
@@ -183,16 +179,15 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
             with self.filename.open('r') as fp:
                 metadata = SemanticSearchToolDescriptor.Factory.Metadata.model_validate(yaml.safe_load(fp))
                 yield SemanticSearchToolDescriptor(
-                    identifier=self.id_generator(metadata.name),
                     record_kind=RecordKind.SemanticSearch,
                     name=metadata.name,
                     description=metadata.description,
                     source=self.filename,
-                    repo_commit_id=self.repo_commit_id,
+                    version=self.version,
                     secrets=metadata.secrets,
                     input=metadata.input,
                     vector_search=metadata.vector_search,
-                    tags=metadata.tags
+                    annotations=metadata.annotations
                 )
 
 
@@ -239,7 +234,6 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
     operation: OperationMetadata
     specification: SpecificationMetadata
     record_kind: typing.Literal[RecordKind.HTTPRequest]
-    tags: typing.Optional[list[str] | None] = None
 
     class JSONEncoder(json.JSONEncoder):
         def default(self, obj):
@@ -330,25 +324,24 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
             # Below, we enumerate all fields that appear in a .yaml file for http requests.
             record_kind: typing.Literal[RecordKind.HTTPRequest]
             open_api: OpenAPIMetadata
-            tags: typing.Optional[list[str] | None] = None
+            annotations: typing.Optional[dict[str, str] | None] = None
 
         def __iter__(self) -> typing.Iterable['HTTPRequestToolDescriptor']:
             with self.filename.open('r') as fp:
                 metadata = HTTPRequestToolDescriptor.Factory.Metadata.model_validate(yaml.safe_load(fp))
                 for operation in metadata.open_api.operations:
                     yield HTTPRequestToolDescriptor(
-                        identifier=self.id_generator(operation.operation_id),
                         record_kind=RecordKind.HTTPRequest,
                         name=operation.operation_id,
                         description=operation.description,
                         source=self.filename,
-                        repo_commit_id=self.repo_commit_id,
+                        version=self.version,
                         operation=operation,
                         specification=HTTPRequestToolDescriptor.SpecificationMetadata(
                             filename=metadata.open_api.filename,
                             url=metadata.open_api.url
                         ),
-                        tags=metadata.tags
+                        annotations=metadata.annotations
                     )
 
 

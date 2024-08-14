@@ -1,9 +1,18 @@
 import logging
 import tqdm
+import pathlib
+import os
+import click
 
-from rosetta.cmd.cmds.util import *
 from rosetta.core.catalog.index import index_catalog
-from ..models.ctx.model import Context
+from rosetta.core.version import VersionDescriptor
+
+from ..cmds.util import init_local, load_repository
+from ..models.context import Context
+from ..defaults import (
+    DEFAULT_SCAN_DIRECTORY_OPTS,
+    DEFAULT_MAX_ERRS
+)
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +27,7 @@ def cmd_index(ctx: Context, source_dirs: list[str],
             "An --embedding-model is required as an embedding model is not yet recorded."
         )
 
-    repo, repo_commit_id_for_path = repo_load(pathlib.Path(os.getcwd()))
+    repo, get_path_version = load_repository(pathlib.Path(os.getcwd()))
 
     # TODO: If the repo is dirty only because .rosetta-catalog/ is
     # dirty or because .rosetta-activity/ is dirty, then we might print
@@ -37,21 +46,16 @@ def cmd_index(ctx: Context, source_dirs: list[str],
     # need to be provided the file blob streams from the repo instead of our current
     # approach of opening & reading file contents directly,
 
-    # The commit id for the repo's HEAD commit.
-    repo_commit_id = repo_commit_id_str(repo.head.commit)
-
-    # TODO: During refactoring, we currently load/save to "tool-catalog.json" (with
-    # a hyphen) instead of the old "tool_catalog.json" to not break other existing
-    # code (publish, find, etc) that depends on the old file. Once refactoring is
-    # done, we'll switch back to tool_catalog.json.
+    # The version for the repo's HEAD commit.
+    version = VersionDescriptor(identifier=str(repo.head.commit), is_dirty=repo.is_dirty())
 
     # TODO: The kind needs a security check as it's part of the path?
     catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")
 
-    next_catalog = index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
+    next_catalog = index_catalog(meta, version, get_path_version,
                                  kind, catalog_path, source_dirs,
                                  scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
-                                 progress=tqdm.tqdm, max_errs=DEFAULT_MAX_ERRS)
+                                 printer=click.echo, progress=tqdm.tqdm, max_errs=DEFAULT_MAX_ERRS)
 
     print("==================\nsaving local catalog...")
 

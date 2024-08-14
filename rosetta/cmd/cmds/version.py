@@ -1,9 +1,9 @@
-from rosetta.core.catalog.version import lib_version
-
 import flask
 
+from rosetta.core.catalog.version import lib_version
 
 blueprint = flask.Blueprint('version', __name__)
+
 
 @blueprint.route('/version')
 def route_version():
@@ -16,4 +16,3 @@ def cmd_version(ctx):
 
 if __name__ == "__main__":
     cmd_version({})
-

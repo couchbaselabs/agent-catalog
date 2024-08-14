@@ -5,6 +5,9 @@ import inspect
 import importlib
 import uuid
 
+from rosetta.core.version.identifier import (
+    VersionDescriptor, VersionSystem
+)
 from rosetta.core.tool.generate.generator import (
     SQLPPCodeGenerator,
     SemanticSearchCodeGenerator,
@@ -22,8 +25,10 @@ def _get_tool_descriptor_factory(cls, filename: pathlib.Path):
     filename_prefix = pathlib.Path(__file__).parent / 'resources'
     factory_args = {
         'filename': filename_prefix / filename,
-        'id_generator': lambda s: uuid.uuid4().hex,
-        'repo_commit_id': uuid.uuid4().hex
+        'version': VersionDescriptor(
+            identifier=uuid.uuid4().hex,
+            version_system=VersionSystem.Raw
+        )
     }
     return cls(**factory_args)
 
@@ -37,8 +42,13 @@ def test_sqlpp_generator():
     positive_1_generator = SQLPPCodeGenerator(record_descriptors=list(positive_1_factory))
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_dir_path = pathlib.Path(tmp_dir)
-        positive_1_generator.generate(output_dir=tmp_dir_path)
-        generated_files = list(tmp_dir_path.iterdir())
+        generated_files = []
+        for code in positive_1_generator.generate():
+            new_file = tmp_dir_path / (uuid.uuid4().hex + '.py')
+            with new_file.open('w') as fp:
+                fp.write(code)
+                fp.flush()
+            generated_files.append(new_file)
         assert len(generated_files) == 1
 
         sys.path.append(tmp_dir)
@@ -61,8 +71,13 @@ def test_semantic_search_generator():
     positive_1_generator = SemanticSearchCodeGenerator(record_descriptors=list(positive_1_factory))
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_dir_path = pathlib.Path(tmp_dir)
-        positive_1_generator.generate(output_dir=tmp_dir_path)
-        generated_files = list(tmp_dir_path.iterdir())
+        generated_files = []
+        for code in positive_1_generator.generate():
+            new_file = tmp_dir_path / (uuid.uuid4().hex + '.py')
+            with new_file.open('w') as fp:
+                fp.write(code)
+                fp.flush()
+            generated_files.append(new_file)
         assert len(generated_files) == 1
 
         sys.path.append(tmp_dir)
@@ -84,8 +99,13 @@ def test_http_request_generator():
     positive_1_generator = HTTPRequestCodeGenerator(record_descriptors=list(positive_1_factory))
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_dir_path = pathlib.Path(tmp_dir)
-        positive_1_generator.generate(output_dir=tmp_dir_path)
-        generated_files = list(tmp_dir_path.iterdir())
+        generated_files = []
+        for code in positive_1_generator.generate():
+            new_file = tmp_dir_path / (uuid.uuid4().hex + '.py')
+            with new_file.open('w') as fp:
+                fp.write(code)
+                fp.flush()
+            generated_files.append(new_file)
         assert len(generated_files) == 2
 
         sys.path.append(tmp_dir)
