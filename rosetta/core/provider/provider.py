@@ -41,11 +41,10 @@ class Provider(abc.ABC):
 
         >>> import rosetta.core.provider as rp
         >>> import rosetta.core.catalog.catalog_mem as rcm
-        >>> import langchain_core.tools, os, pathlib
+        >>> import os, pathlib
         >>> my_catalog = rcm.CatalogMem.load(pathlib.Path('.rosetta-catalog') / 'tool-catalog.json')
         >>> my_provider = rp.Provider(
         >>>     catalog=my_catalog,
-        >>>     func_transform=langchain_core.tools.StructuredTool.from_function,
         >>>     secrets={'CB_PASSWORD': lambda: os.getenv('MY_CB_PASSWORD')}
         >>> )
         """
@@ -54,18 +53,9 @@ class Provider(abc.ABC):
         self._modules = dict()
 
         # Handle our defaults.
-        if output_directory is not None:
-            self.output_directory = output_directory
-        else:
-            self.output_directory = pathlib.Path(tempfile.mkdtemp())
-        if func_transform is not None:
-            self.func_transform = func_transform
-        else:
-            self.func_transform = lambda s: s
-        if refiner is not None:
-            self.refiner = refiner
-        else:
-            self.refiner = lambda s: s
+        self.output_directory = output_directory if output_directory is not None else pathlib.Path(tempfile.mkdtemp())
+        self.func_transform = func_transform if func_transform is not None else lambda s: s
+        self.refiner = refiner if refiner is not None else lambda s: s
         if secrets is not None:
             # Note: we only register our secrets at instantiation-time.
             for k, v in secrets.items():
@@ -106,23 +96,21 @@ class Provider(abc.ABC):
         resultant_tools = list()
         for source, group in source_groups.items():
             entries = group['entries']
-            if group['kind'] == RecordKind.PythonFunction:
-                # TODO (GLENN): Add a generator for Python functions that uses git to fetch the source and save this to a tmp dir.
-                for entry in entries:
-                    resultant_tools.append((entry, self._load_from_module(entry.source, entry),))
-            else:
-                match group['kind']:
-                    case RecordKind.SQLPPQuery:
-                        generator = SQLPPCodeGenerator(record_descriptors=entries).generate
-                    case RecordKind.SemanticSearch:
-                        generator = SemanticSearchCodeGenerator(record_descriptors=entries).generate
-                    case RecordKind.HTTPRequest:
-                        generator = HTTPRequestCodeGenerator(record_descriptor=entries).generate
-                    case _:
-                        raise ValueError('Unexpected tool-kind encountered!')
-                output = generator(self.output_directory)
-                for i in range(len(entries)):
-                    resultant_tools.append((entries[i], self._load_from_module(output[i], entries[i]),))
+            match group['kind']:
+                case RecordKind.PythonFunction:
+                    generator = lambda s: [e.source for e in entries]
+                case RecordKind.SQLPPQuery:
+                    generator = SQLPPCodeGenerator(record_descriptors=entries).generate
+                case RecordKind.SemanticSearch:
+                    generator = SemanticSearchCodeGenerator(record_descriptors=entries).generate
+                case RecordKind.HTTPRequest:
+                    generator = HTTPRequestCodeGenerator(record_descriptor=entries).generate
+                case _:
+                    raise ValueError('Unexpected tool-kind encountered!')
+
+            output = generator(self.output_directory)
+            for i in range(len(entries)):
+                resultant_tools.append((entries[i], self._load_from_module(output[i], entries[i]),))
 
         return resultant_tools
 

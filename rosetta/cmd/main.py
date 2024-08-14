@@ -1,13 +1,11 @@
 import os
 import sys
-
 import click
 from dotenv import load_dotenv, find_dotenv
 
 from .cmds import *
 from .cmds.publish import cmd_publish, cmd_publish_obj
-from ..core.utils.publish_utils import get_buckets, get_connection
-from ..core.catalog.descriptor import CatalogKindModel
+from ..utils.publish import get_buckets, get_connection
 from .models.publish.model import Keyspace, CouchbaseConnect
 from .models.ctx.model import Context
 
@@ -234,7 +232,6 @@ def publish(ctx, scope):
 @click.pass_context
 def publishobj(ctx, kind, scope):
     """Publish command that inserts after reading CatalogMem object"""
-    kind_obj = CatalogKindModel(kind=kind)
     keyspace_details = Keyspace(bucket="", scope=scope)
     connection_details = CouchbaseConnect(
         connection_url=os.getenv("CB_CONN_STRING"),
@@ -257,7 +254,7 @@ def publishobj(ctx, kind, scope):
     )
     click.echo(f"Inserting documents in : {selected_bucket}/{keyspace_details.scope}\n")
     keyspace_details.bucket = selected_bucket
-    cmd_publish_obj(ctx.obj, kind_obj.kind, cluster, keyspace_details)
+    cmd_publish_obj(ctx.obj, kind, cluster, keyspace_details)
 
     cluster.close()
 

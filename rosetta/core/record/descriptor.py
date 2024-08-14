@@ -2,17 +2,9 @@ import pydantic
 import pathlib
 import enum
 import typing
-import json
 
-
-class JsonEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, RecordKind):
-            return o.value
-        elif isinstance(o, pathlib.Path):
-            return str(o.absolute())
-        else:
-            return super(JsonEncoder, self).default(o)
+from ..version import SnapshotDescriptor
+from ..version.identifier import VersionSystem
 
 
 class RecordKind(enum.StrEnum):
@@ -31,12 +23,6 @@ class RecordDescriptor(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(
         validate_assignment=True,
         use_enum_values=True
-    )
-
-    # TODO (GLENN): Maybe this should be a computed property?
-    identifier: str = pydantic.Field(
-        description="A fully qualified unique identifier for the tool.",
-        examples=["src/tools/finance.py:get_current_stock_price:g11223344"]
     )
 
     record_kind: typing.Literal[
@@ -59,15 +45,12 @@ class RecordDescriptor(pydantic.BaseModel):
 
     # TODO: One day also track source line numbers?
     source: pathlib.Path = pydantic.Field(
-        # TODO (GLENN): Is this description accurate?
         description="Source location of the file, relative to where index was called.",
-        examples=['src/tools/finance.py']
+        examples=[pathlib.Path('src/tools/finance.py')]
     )
 
-    repo_commit_id: str = pydantic.Field(
-        description="A unique identifier that attaches a record to a catalog snapshot. "
-                    "For git, this is the git repo commit SHA / HASH, or a string that starts with the REPO_DIRTY marker.",
-        examples=['g11223344', '_DIRTY_']
+    snapshot: SnapshotDescriptor = pydantic.Field(
+        description="A low water-mark that defines the earliest snapshot this record belongs to.",
     )
 
     embedding: typing.Optional[list[float]] = pydantic.Field(
@@ -81,18 +64,22 @@ class RecordDescriptor(pydantic.BaseModel):
         examples=['gdpr_2016_compliant']
     )
 
-    def __str__(self) -> str:
-        # TODO (GLENN): Leverage the built-in Pydantic JSON serialization?
-        descriptor_as_dict = self.dict()
-        descriptor_as_dict['embedding'] = \
-            descriptor_as_dict['embedding'][0:3] \
-            + ['...']
-        return json.dumps(
-            descriptor_as_dict,
-            sort_keys=True,
-            indent=4,
-            cls=JsonEncoder
-        )
+    @pydantic.computed_field
+    @property
+    def identifier(self) -> str:
+        suffix = self.snapshot.identifier or ''
+        if self.snapshot.is_dirty:
+            suffix += '_dirty'
+        match self.snapshot.version_system:
+            case VersionSystem.Git:
+                suffix = 'git_' + suffix
+
+        return f'{self.source}:{self.name}:{suffix}'
+
+    @identifier.setter
+    def identifier(self, identifier: str) -> str:
+        # This is purely a computed field, we do not need to set anything else.
+        pass
 
     def __hash__(self):
         return hash(self.identifier)

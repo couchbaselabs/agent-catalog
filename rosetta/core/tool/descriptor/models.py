@@ -16,6 +16,7 @@ import inspect
 from .helper import JSONSchemaValidatingMixin
 from .secrets import CouchbaseSecrets
 from ..decorator import ToolMarker
+from ...version import SnapshotDescriptor
 from ...record.descriptor import (
     RecordKind,
     RecordDescriptor
@@ -25,15 +26,13 @@ logger = logging.getLogger(__name__)
 
 
 class _BaseFactory(abc.ABC):
-    def __init__(self, filename: pathlib.Path, id_generator: typing.Callable[[str], str], repo_commit_id: str):
+    def __init__(self, filename: pathlib.Path, snapshot: SnapshotDescriptor):
         """
         :param filename: Name of the file to load the record descriptor from.
-        :param id_generator: A function that generates a unique identifier given the name of a tool.
-        :param repo_commit_id: The unique identifier associated with file describing a set of tools.
+        :param snapshot: The snapshot descriptor associated with file describing a set of tools.
         """
         self.filename = filename
-        self.id_generator = id_generator
-        self.repo_commit_id = repo_commit_id
+        self.snapshot = snapshot
 
 
 # Note: a Python Tool does not add any additional fields.
@@ -51,12 +50,11 @@ class PythonToolDescriptor(RecordDescriptor):
                 if not isinstance(tool, ToolMarker):
                     continue
                 yield PythonToolDescriptor(
-                    identifier=self.id_generator(name),
                     record_kind=RecordKind.PythonFunction,
                     name=name,
                     description=tool.__doc__,
                     source=self.filename,
-                    repo_commit_id=self.repo_commit_id,
+                    snapshot=self.snapshot,
                     # TODO (GLENN): Add support for user-defined tags here.
                     tags=[]
                 )
@@ -110,12 +108,11 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
 
             # Now, generate a single SQL++ tool descriptor.
             yield SQLPPQueryToolDescriptor(
-                identifier=self.id_generator(metadata.name),
                 record_kind=RecordKind.SQLPPQuery,
                 name=metadata.name,
                 description=metadata.description,
                 source=self.filename,
-                repo_commit_id=self.repo_commit_id,
+                snapshot=self.snapshot,
                 secrets=metadata.secrets,
                 input=metadata.input,
                 output=metadata.output,
@@ -183,12 +180,11 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
             with self.filename.open('r') as fp:
                 metadata = SemanticSearchToolDescriptor.Factory.Metadata.model_validate(yaml.safe_load(fp))
                 yield SemanticSearchToolDescriptor(
-                    identifier=self.id_generator(metadata.name),
                     record_kind=RecordKind.SemanticSearch,
                     name=metadata.name,
                     description=metadata.description,
                     source=self.filename,
-                    repo_commit_id=self.repo_commit_id,
+                    snapshot=self.snapshot,
                     secrets=metadata.secrets,
                     input=metadata.input,
                     vector_search=metadata.vector_search,
@@ -337,12 +333,11 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
                 metadata = HTTPRequestToolDescriptor.Factory.Metadata.model_validate(yaml.safe_load(fp))
                 for operation in metadata.open_api.operations:
                     yield HTTPRequestToolDescriptor(
-                        identifier=self.id_generator(operation.operation_id),
                         record_kind=RecordKind.HTTPRequest,
                         name=operation.operation_id,
                         description=operation.description,
                         source=self.filename,
-                        repo_commit_id=self.repo_commit_id,
+                        snapshot=self.snapshot,
                         operation=operation,
                         specification=HTTPRequestToolDescriptor.SpecificationMetadata(
                             filename=metadata.open_api.filename,

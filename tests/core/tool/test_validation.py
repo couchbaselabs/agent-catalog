@@ -4,6 +4,9 @@ import uuid
 import pytest
 import pydantic
 
+from rosetta.core.version.identifier import (
+    SnapshotDescriptor, VersionSystem
+)
 from rosetta.core.record.descriptor import RecordKind
 from rosetta.core.tool.descriptor.models import (
     SQLPPQueryToolDescriptor,
@@ -17,8 +20,10 @@ def _get_tool_descriptor_factory(cls, filename: pathlib.Path):
     filename_prefix = pathlib.Path(__file__).parent / 'resources'
     factory_args = {
         'filename': filename_prefix / filename,
-        'id_generator': lambda s: uuid.uuid4().hex,
-        'repo_commit_id': uuid.uuid4().hex
+        'snapshot': SnapshotDescriptor(
+            identifier=uuid.uuid4().hex,
+            version_system=VersionSystem.Raw
+        )
     }
     return cls(**factory_args)
 

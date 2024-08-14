@@ -1,14 +1,14 @@
+import json
+import os
+from pathlib import Path
+
 from ..models.publish.model import Keyspace
-from ...core.utils.publish_utils import create_scope_and_collection, CustomPublishEncoder
+from ...utils.publish import create_scope_and_collection, CustomPublishEncoder
 from ..models.ctx.model import Context
 from ...core.catalog.catalog_mem import CatalogMem
-import json
-from pathlib import Path
-import os
 
 
 def cmd_publish(ctx: Context, cluster, keyspace: Keyspace):
-
     bucket = keyspace.bucket
     scope = keyspace.scope
     catalog_file_name = ctx.catalog

@@ -3,6 +3,9 @@ import uuid
 import pytest
 
 from rosetta.core.catalog.catalog_base import SearchResult
+from rosetta.core.version.identifier import (
+    SnapshotDescriptor, VersionSystem
+)
 from rosetta.core.record.descriptor import (
     RecordDescriptor, RecordKind
 )
@@ -16,12 +19,14 @@ def _generate_test_tools(deltas: list[int]) -> list[SearchResult]:
     for i, delta in enumerate(deltas):
         tools_with_delta.append(SearchResult(
             entry=RecordDescriptor(
-                identifier=str(i),
                 record_kind=RecordKind.PythonFunction,
                 name='dummy tool #' + str(i),
                 description='a dummy tool #' + str(i),
                 source=pathlib.Path('.'),
-                repo_commit_id=uuid.uuid4().hex,
+                snapshot=SnapshotDescriptor(
+                    identifier=uuid.uuid4().hex,
+                    version_system=VersionSystem.Raw
+                )
             ),
             delta=delta
         ))

@@ -120,7 +120,7 @@ def index_catalog_start(
             catalog_schema_version=meta["catalog_schema_version"],
             embedding_model=meta["embedding_model"],
             kind=kind,
-            snapshot_commit_id=snapshot_commit_id,
+            snapshot=snapshot_commit_id,
             source_dirs=source_dirs,
             items=all_descriptors,
         )

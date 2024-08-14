@@ -1,12 +1,12 @@
 from datetime import timedelta
-import json
-
 from couchbase.auth import PasswordAuthenticator
 from couchbase.cluster import Cluster
 from couchbase.exceptions import CouchbaseException
 from couchbase.options import ClusterOptions
-from ...cmd.models.publish.model import CouchbaseConnect
 from pathlib import Path
+import json
+
+from ..cmd.models.publish.model import CouchbaseConnect
 
 
 def get_connection(conn: CouchbaseConnect):
@@ -47,7 +47,6 @@ def get_buckets(cluster):
 
 
 def create_scope_and_collection(bucket_manager, scope, collection):
-
     # Create a new scope if does not exist
     try:
         scopes = bucket_manager.get_all_scopes()

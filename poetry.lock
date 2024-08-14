@@ -384,6 +384,16 @@ trio = ["trio (>=0.23)"]
 wmi = ["wmi (>=1.5.1)"]
 
 [[package]]
+name = "editorconfig"
+version = "0.12.4"
+description = "EditorConfig File Locator and Interpreter for Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "EditorConfig-0.12.4.tar.gz", hash = "sha256:24857fa1793917dd9ccf0c7810a07e05404ce9b823521c7dce22a4fb5d125f80"},
+]
+
+[[package]]
 name = "email-validator"
 version = "2.2.0"
 description = "A robust email address syntax and deliverability validation library."
@@ -812,6 +822,20 @@ files = [
     {file = "joblib-1.4.2-py3-none-any.whl", hash = "sha256:06d478d5674cbc267e7496a410ee875abd68e4340feff4490bcb7afb88060ae6"},
     {file = "joblib-1.4.2.tar.gz", hash = "sha256:2382c5816b2636fbd20a09e0f4e9dad4736765fdfb7dca582943b9c1366b3f0e"},
 ]
+
+[[package]]
+name = "jsbeautifier"
+version = "1.15.1"
+description = "JavaScript unobfuscator and beautifier."
+optional = false
+python-versions = "*"
+files = [
+    {file = "jsbeautifier-1.15.1.tar.gz", hash = "sha256:ebd733b560704c602d744eafc839db60a1ee9326e30a2a80c4adb8718adc1b24"},
+]
+
+[package.dependencies]
+editorconfig = ">=0.12.2"
+six = ">=1.13.0"
 
 [[package]]
 name = "jsonschema"
@@ -3093,4 +3117,4 @@ watchdog = ["watchdog (>=2.3)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "7492a1a31fbb49b9e1e73d4ab324d5d4ccd5e8698d810b22dff037ad2b87a807"
+content-hash = "274e02ee53de411b76a058577627e7ce8cc03bf34db1fbf61aa9881b092626e8"

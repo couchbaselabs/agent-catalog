@@ -1,7 +1,6 @@
 import json
 import os
 import pathlib
-
 import click
 import git
 import gitignore_parser
@@ -14,8 +13,7 @@ from rosetta.core.catalog.version import (
     lib_version_compare,
 )
 from rosetta.core.catalog.directory import ScanDirectoryOpts
-from rosetta.core.catalog.descriptor import REPO_DIRTY as CATALOG_REPO_DIRTY
-
+from rosetta.core.version import SnapshotDescriptor
 from ..models.ctx.model import Context
 
 
@@ -95,10 +93,6 @@ def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
     return meta
 
 
- # Special value when there's no commit id,
- # such as when there are dirty / untracked files.
-REPO_DIRTY = CATALOG_REPO_DIRTY
-
 
 def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
     # The repo is the user's application's repo and is NOT the repo
@@ -115,17 +109,17 @@ def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
 
     repo = git.Repo(top_dir / ".git")
 
-    def repo_commit_id_for_path(path: pathlib.Path) -> str:
+    def repo_commit_id_for_path(path: pathlib.Path) -> SnapshotDescriptor:
         path_absolute = path.absolute()
 
         if repo.is_dirty(path=path_absolute):
-            return REPO_DIRTY
+            return SnapshotDescriptor(is_dirty=True)
 
         commits = list(repo.iter_commits(paths=path_absolute, max_count=1))
         if not commits or len(commits) <= 0:
-            return REPO_DIRTY # Untracked, so treat it as dirty.
+            return SnapshotDescriptor(is_dirty=True)
 
-        return repo_commit_id_str(commits[0])
+        return SnapshotDescriptor(identifier=str(commits[0]))
 
     return repo, repo_commit_id_for_path
 
@@ -136,17 +130,4 @@ def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
 # the pattern similar to repo_load()'s searching for a .git/ directory
 # and scan up the parent directories to find the first .rosetta-catalog/
 # subdirectory?
-
-
-def repo_commit_id_str(repo_commit_id):
-    """Formats a long repo_commit_id into a shorter format. Ex: 'g1234abcd'."""
-
-    # TODO: Only works for git, where a far, future day, folks might want non-git?
-
-    s = str(repo_commit_id)
-
-    if s.startswith(REPO_DIRTY):
-        return s
-
-    return "g" + s[:7]
 

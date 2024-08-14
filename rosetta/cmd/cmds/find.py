@@ -1,12 +1,13 @@
 import tqdm
+import jsbeautifier
 
-from rosetta.cmd.cmds.util import *
-from rosetta.core.catalog.index import index_catalog
-from rosetta.core.catalog.catalog_mem import CatalogMem
-from rosetta.core.catalog.catalog_base import SearchResult
-from rosetta.core.provider.refiner import ClosestClusterRefiner
+from ...cmd.cmds.util import *
+from ...core.catalog.index import index_catalog
+from ...core.catalog.catalog_mem import CatalogMem
+from ...core.catalog.catalog_base import SearchResult
+from ...core.provider.refiner import ClosestClusterRefiner
+from ...core.version import SnapshotDescriptor
 from ..models.ctx.model import Context
-
 
 refiners = {
     "ClosestCluster": ClosestClusterRefiner,
@@ -14,6 +15,20 @@ refiners = {
     # TODO: One day allow for custom refiners at runtime where
     # we dynamically import a user's custom module/function?
 }
+
+beautify_opts = jsbeautifier.BeautifierOptions(options={
+    "indent_size": 2,
+    "indent_char": " ",
+    "max_preserve_newlines": -1,
+    "preserve_newlines": False,
+    "keep_array_indentation": False,
+    "brace_style": "expand",
+    "unescape_strings": False,
+    "end_with_newline": False,
+    "wrap_line_length": 0,
+    "comma_first": False,
+    "indent_empty_lines": False
+})
 
 
 def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refiner=None, tags=None):
@@ -42,7 +57,7 @@ def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refi
             meta = init_local(ctx, catalog.catalog_descriptor.embedding_model, read_only=True)
 
             # The repo and any dirty files do not have real commit id's, so use "DIRTY".
-            repo_commit_id = REPO_DIRTY
+            repo_commit_id = SnapshotDescriptor(is_dirty=True)
 
             # Scan the same source_dirs that were used in the last "rosetta index".
             source_dirs = catalog.catalog_descriptor.source_dirs
@@ -61,5 +76,9 @@ def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refi
     if refiner is not None:
         search_results = refiners[refiner]()(search_results)
     for i, result in enumerate(search_results):
+        pretty_json = jsbeautifier.beautify(
+            result.entry.model_dump_json(exclude={'embedding'}),
+            opts=beautify_opts
+        )
         click.echo(f'#{i + 1} (delta = {result.delta}, higher is better): ', nl=False)
-        click.echo(str(result.entry))
+        click.echo(pretty_json)

@@ -5,6 +5,9 @@ import inspect
 import importlib
 import uuid
 
+from rosetta.core.version.identifier import (
+    SnapshotDescriptor, VersionSystem
+)
 from rosetta.core.tool.generate.generator import (
     SQLPPCodeGenerator,
     SemanticSearchCodeGenerator,
@@ -22,8 +25,10 @@ def _get_tool_descriptor_factory(cls, filename: pathlib.Path):
     filename_prefix = pathlib.Path(__file__).parent / 'resources'
     factory_args = {
         'filename': filename_prefix / filename,
-        'id_generator': lambda s: uuid.uuid4().hex,
-        'repo_commit_id': uuid.uuid4().hex
+        'snapshot': SnapshotDescriptor(
+            identifier=uuid.uuid4().hex,
+            version_system=VersionSystem.Raw
+        )
     }
     return cls(**factory_args)
 

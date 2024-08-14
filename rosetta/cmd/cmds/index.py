@@ -1,8 +1,9 @@
 import logging
 import tqdm
 
-from rosetta.cmd.cmds.util import *
-from rosetta.core.catalog.index import index_catalog
+from ...cmd.cmds.util import *
+from ...core.catalog.index import index_catalog
+from ...core.version import SnapshotDescriptor
 from ..models.ctx.model import Context
 
 logger = logging.getLogger(__name__)
@@ -38,12 +39,10 @@ def cmd_index(ctx: Context, source_dirs: list[str],
     # approach of opening & reading file contents directly,
 
     # The commit id for the repo's HEAD commit.
-    repo_commit_id = repo_commit_id_str(repo.head.commit)
-
-    # TODO: During refactoring, we currently load/save to "tool-catalog.json" (with
-    # a hyphen) instead of the old "tool_catalog.json" to not break other existing
-    # code (publish, find, etc) that depends on the old file. Once refactoring is
-    # done, we'll switch back to tool_catalog.json.
+    repo_commit_id = SnapshotDescriptor(
+        identifier=str(repo.head.commit),
+        is_dirty=repo.is_dirty(),
+    )
 
     # TODO: The kind needs a security check as it's part of the path?
     catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")

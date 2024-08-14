@@ -1,9 +1,10 @@
 import pathlib
 import pydantic
 import typing
+import jsbeautifier
 
 from .catalog_base import CatalogBase, SearchResult
-from ..catalog.descriptor import CatalogDescriptor, REPO_DIRTY
+from ..catalog.descriptor import CatalogDescriptor
 from ..record.descriptor import RecordDescriptor
 
 
@@ -25,13 +26,9 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
 
             for s in self.catalog_descriptor.items:
                 o = other_items.get(str(s.source) + ':' + s.name)
-                if o and \
-                    not o.repo_commit_id.startswith(REPO_DIRTY) and \
-                    not s.repo_commit_id.startswith(REPO_DIRTY) and \
-                    o.repo_commit_id == s.repo_commit_id:
-                    # The other item and self item have the same, non-DIRTY
-                    # repo_commit_id's, so copy the other item contents
-                    # into the self item.
+                if o and not s.snapshot.is_dirty and o.snapshot == s.snapshot:
+                    # The prev item and self item have the same snapshot IDs,
+                    # so copy the prev item contents into the self item.
                     for k, v in o.model_dump().items():
                         setattr(s, k, v)
                 else:
@@ -56,9 +53,25 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
         # the vector numbers each take up their own line -- and, instead, we want
         # the array of vector numbers to be all on one line, so that it's more
         # usable for humans and so that 'git diff' outputs are more useful.
-        j = self.catalog_descriptor.model_dump_json(round_trip=True, indent=2)
+        beautify_opts = jsbeautifier.BeautifierOptions(options={
+            "indent_size": 2,
+            "indent_char": " ",
+            "max_preserve_newlines": -1,
+            "preserve_newlines": False,
+            "keep_array_indentation": False,
+            "brace_style": "expand",
+            "unescape_strings": False,
+            "end_with_newline": False,
+            "wrap_line_length": 0,
+            "comma_first": False,
+            "indent_empty_lines": False
+        })
+        pretty_json = jsbeautifier.beautify(
+            self.catalog_descriptor.model_dump_json(),
+            opts=beautify_opts
+        )
         with catalog_path.open('w') as fp:
-            fp.write(j)
+            fp.write(pretty_json)
             fp.write('\n')
 
     def find(self, query: str, limit: typing.Union[int | None] = 1, tags: list[str] = None) -> list[SearchResult]:
