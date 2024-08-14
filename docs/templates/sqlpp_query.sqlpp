@@ -1,0 +1,86 @@
+--
+-- The following file is a template for a (Couchbase) SQL++ query tool.
+--
+
+-- All SQL++ query tools are specified using a valid SQL++ (.sqlpp) file.
+-- The tool metadata must be specified with YAML inside a multi-line C-style comment.
+/*
+# The name of the tool must be a valid Python identifier (e.g., no spaces).
+# This field is mandatory, and will be used as the name of a Python function.
+name: find_high_order_item_customers_between_date
+
+# A description for the function bound to this tool.
+# This field is mandatory, and will be used in the docstring of a Python function.
+description: >
+    Given a date range, find the customers that have placed orders where the total number of items is more than 1000.
+
+# The inputs used to resolve the named parameters in the SQL++ query below.
+# Inputs are described using a JSON object that follows the JSON schema standard.
+# This field is mandatory, and will be used to build a Pydantic model.
+# See https://json-schema.org/learn/getting-started-step-by-step for more info.
+input: >
+    {
+      "type": "object",
+      "properties": {
+        "orderdate_start": { "type": "string" },
+        "orderdate_end": { "type": "string" }
+      }
+    }
+
+# The outputs used describe the structure of the SQL++ query result.
+# Outputs are described using a JSON object that follows the JSON schema standard.
+# This field is mandatory, and will be used to build a Pydantic model.
+# We recommend using the 'INFER' command to build a JSON schema from your query results.
+# See https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/infer.html.
+# In the future, this field will be optional (we will INFER the query automatically for you).
+output: >
+    {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "cust_id": { "type": "string" },
+          "first_name": { "type": "string" },
+          "last_name": { "type": "string" },
+          "item_cnt": { "type": "integer" }
+        }
+      }
+    }
+
+# As a supplement to the tool similarity search, users can optionally specify search annotations.
+# The values of these annotations MUST be strings (e.g., not 'true', but '"true"').
+# This field is optional, and does not have to be present.
+annotations:
+  gdpr_2016_compliant: "false"
+  ccpa_2019_compliant: "true"
+
+# The "secrets" field defines search keys that will be used to query a "secrets" manager.
+# Note that these values are NOT the secrets themselves, rather they are used to lookup secrets.
+secrets:
+
+    # All Couchbase tools (e.g., semantic search, SQL++) must specify conn_string, username, and password.
+    - couchbase:
+        conn_string: CB_CONN_STRING
+        username: CB_USERNAME
+        password: CB_PASSWORD
+*/
+
+SELECT
+  c.cust_id,
+  c.name.first AS first_name,
+  c.name.last  AS last_name,
+  COUNT(*)     AS item_cnt
+FROM
+  customers AS c,
+  orders    AS o,
+  o.items   AS i
+WHERE
+  -- Parameters specified in the input field of the tool metadata above correspond to named parameters here.
+  -- The '$' syntax is used to denote a named parameter.
+  -- See https://docs.couchbase.com/server/current/n1ql/n1ql-rest-api/exnamed.html for more details.
+  ( o.orderdate BETWEEN $orderdate_start AND $orderdate_end ) AND
+  c.cust_id = o.cust_id
+GROUP BY
+  c.cust_id
+HAVING
+  COUNT(*) > 1000;
