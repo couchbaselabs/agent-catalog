@@ -1,7 +1,21 @@
+import logging
 import os
 import sys
 import click
-from dotenv import load_dotenv, find_dotenv
+import dotenv
+
+# Configure all logging here before we continue with our imports.
+# By default, we won't print any log messages below WARNING.
+logging.basicConfig(
+    level=logging.WARNING,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
+
+# Keeping this here, sentence_transformers logging can be pretty verbose.
+logging.getLogger('sentence_transformers').setLevel(logging.WARNING)
 
 from .cmds import *
 from .cmds.publish import cmd_publish, cmd_publish_obj
@@ -11,7 +25,7 @@ from .models.ctx.model import Context
 
 # TODO: Should we load from ".env.rosetta"?
 # TODO: Or, perhaps even stage specific, like from ".env.rosetta.prod"?
-load_dotenv(find_dotenv(usecwd=True))
+dotenv.load_dotenv(dotenv.find_dotenv(usecwd=True))
 
 
 # Support abbreviated command aliases, ex: "rosetta st" ==> "rosetta status".

@@ -1,4 +1,6 @@
 import logging
+
+import click
 import tqdm
 
 from ...cmd.cmds.util import *
@@ -47,7 +49,7 @@ def cmd_index(ctx: Context, source_dirs: list[str],
     next_catalog = index_catalog(meta, version, get_path_version,
                                  kind, catalog_path, source_dirs,
                                  scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
-                                 progress=tqdm.tqdm, max_errs=DEFAULT_MAX_ERRS)
+                                 printer=click.echo, progress=tqdm.tqdm, max_errs=DEFAULT_MAX_ERRS)
 
     print("==================\nsaving local catalog...")
 

@@ -67,6 +67,7 @@ def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refi
             catalog = index_catalog(meta, version, get_path_version,
                                     kind, catalog_path, source_dirs,
                                     scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
+                                    printer=click.echo,
                                     progress=tqdm.tqdm, max_errs=DEFAULT_MAX_ERRS)
 
     # Transform our list of annotations into a single dictionary.
