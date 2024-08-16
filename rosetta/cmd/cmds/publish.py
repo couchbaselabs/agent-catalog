@@ -8,6 +8,7 @@ from ..models.ctx.model import Context
 from ...core.catalog.catalog_mem import CatalogMem
 
 
+# TODO (GLENN): I haven't tested these changes, but this signals a move towards a "version" object instead of a string.
 def cmd_publish(ctx: Context, cluster, keyspace: Keyspace):
     bucket = keyspace.bucket
     scope = keyspace.scope
@@ -24,12 +25,13 @@ def cmd_publish(ctx: Context, cluster, keyspace: Keyspace):
 
     # Iterate over all catalog files
     for col_type in files:
+        # TODO (GLENN): We should consolidate all of these constants somewhere (e.g., meta.json).
         if str(col_type) == "meta.json":
             continue
 
         # Get catalog file
         f = open("./" + catalog_file_name + "/" + col_type)
-        data = json.load(f)
+        data: dict = json.load(f)
 
         # ----------Metadata collection----------
         meta_col = col_type.split("-")[0] + "_metadata"
@@ -42,15 +44,11 @@ def cmd_publish(ctx: Context, cluster, keyspace: Keyspace):
         cb_coll = cb.scope(scope).collection(meta_col)
 
         # dict to store all the metadata - snapshot related data
-        metadata = {}
-        for key in data:
-            if not isinstance(data[key], list):
-                # print(f"{key}: {data[key]}")
-                metadata.update({key: data[key]})
+        metadata = {k: v for k, v in data.items() if k != 'items'}
 
         print("Upserting metadata..")
         try:
-            key = metadata["snapshot_commit_id"]
+            key = metadata['version']['identifier']
             cb_coll.upsert(key, metadata)
             # print("Snapshot ",result.key," added to keyspace")
         except Exception as e:
@@ -74,9 +72,10 @@ def cmd_publish(ctx: Context, cluster, keyspace: Keyspace):
         for item in data["items"]:
             try:
                 key = item["identifier"]
-                item.update({"snapshot_commit_id": metadata["snapshot_commit_id"]})
+                item.update({"catalog_identifier": metadata['version']['identifier']})
                 cb_coll.upsert(key, item)
                 # print("Snapshot ",result.key," added to keyspace")
+            # TODO (GLENN): Should use the specific exception here instead of 'Exception'.
             except Exception as e:
                 print("could not insert: ", e)
                 return e
@@ -116,18 +115,14 @@ def cmd_publish_obj(ctx: Context, kind, cluster, keyspace: Keyspace):
     cb_coll = cb.scope(scope).collection(meta_col)
 
     # dict to store all the metadata - snapshot related data
-    metadata = {}
-    for element in catalog:
-        # print(element[0], type(element[1]))
-        if element[0] != "items":
-            # print(element[0], element[1])
-            metadata.update({element[0]: str(element[1])})
+    metadata = {k: v for k, v in catalog.model_dump() if k != 'items'}
 
     print("Upserting metadata..")
     try:
-        key = metadata["snapshot_commit_id"]
+        key = metadata['version']['identifier']
         cb_coll.upsert(key, metadata)
         # print("Snapshot ",result.key," added to keyspace")
+    # TODO (GLENN): Should use the specific exception here instead of 'Exception'.
     except Exception as e:
         print("could not insert: ", e)
         return e
@@ -155,7 +150,7 @@ def cmd_publish_obj(ctx: Context, kind, cluster, keyspace: Keyspace):
 
             # convert to dict object and insert snapshot id
             item_json: dict = json.loads(item)
-            item_json.update({"snapshot_commit_id": metadata["snapshot_commit_id"]})
+            item_json.update({"catalog_identifier": metadata["version"]["identifier"]})
 
             # upsert docs to CB collection
             cb_coll.upsert(key, item_json)

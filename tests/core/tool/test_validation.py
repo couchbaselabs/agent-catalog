@@ -5,7 +5,7 @@ import pytest
 import pydantic
 
 from rosetta.core.version.identifier import (
-    SnapshotDescriptor, VersionSystem
+    VersionDescriptor, VersionSystem
 )
 from rosetta.core.record.descriptor import RecordKind
 from rosetta.core.tool.descriptor.models import (
@@ -20,7 +20,7 @@ def _get_tool_descriptor_factory(cls, filename: pathlib.Path):
     filename_prefix = pathlib.Path(__file__).parent / 'resources'
     factory_args = {
         'filename': filename_prefix / filename,
-        'snapshot': SnapshotDescriptor(
+        'version': VersionDescriptor(
             identifier=uuid.uuid4().hex,
             version_system=VersionSystem.Raw
         )
@@ -136,6 +136,16 @@ def test_semantic_search():
     assert positive_1_tools[0].vector_search.bucket == 'travel-sample'
     assert positive_1_tools[0].vector_search.scope == 'inventory'
     assert positive_1_tools[0].vector_search.collection == 'article'
+
+    # Test the serialization of annotations.
+    positive_2_factory = _get_tool_descriptor_factory(
+        cls=SemanticSearchToolDescriptor.Factory,
+        filename=pathlib.Path('semantic_search/positive_2.yaml')
+    )
+    positive_2_tools = list(positive_2_factory)
+    assert len(positive_1_tools) == 1
+    assert positive_2_tools[0].annotations['just_for_testing'] == 'false'
+    assert positive_2_tools[0].annotations['gdpr_compliant'] == 'true'
 
     # Test a bad (non-Python-identifier) tool name.
     negative_1_factory = _get_tool_descriptor_factory(

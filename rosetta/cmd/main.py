@@ -112,15 +112,16 @@ def env(ctx):
     show_default=True,
 )
 @click.argument(
-    'tags',
+    'annotations',
     default=None,
     nargs=-1
 )
 @click.pass_context
-def find(ctx, query, kind, limit, include_dirty, refiner, tags):
+def find(ctx, query, kind, limit, include_dirty, refiner, annotations):
     """ Find tools, prompts, etc. from the catalog based on a natural language QUERY string.
-        Optionally specify a list of search tags (TAGS) at the end of this command. """
-    cmd_find(ctx.obj, query, kind=kind, limit=limit, include_dirty=include_dirty, refiner=refiner, tags=tags)
+        Optionally specify a list of key-value (ANNOTATIONS) at the end of this command. """
+    cmd_find(ctx.obj, query, kind=kind, limit=limit, include_dirty=include_dirty, refiner=refiner,
+             annotations=annotations)
 
 
 @click_main.command()

@@ -3,7 +3,7 @@ import pathlib
 import enum
 import typing
 
-from ..version import SnapshotDescriptor
+from ..version import VersionDescriptor
 from ..version.identifier import VersionSystem
 
 
@@ -49,8 +49,8 @@ class RecordDescriptor(pydantic.BaseModel):
         examples=[pathlib.Path('src/tools/finance.py')]
     )
 
-    snapshot: SnapshotDescriptor = pydantic.Field(
-        description="A low water-mark that defines the earliest snapshot this record belongs to.",
+    version: VersionDescriptor = pydantic.Field(
+        description="A low water-mark that defines the earliest version this record is valid under.",
     )
 
     embedding: typing.Optional[list[float]] = pydantic.Field(
@@ -58,19 +58,19 @@ class RecordDescriptor(pydantic.BaseModel):
         description="Embedding used to search for the record."
     )
 
-    tags: typing.Optional[list[str] | None] = pydantic.Field(
+    annotations: typing.Optional[dict[str, str] | None] = pydantic.Field(
         default=None,
-        description="List of user-defined tags attached to this record.",
-        examples=['gdpr_2016_compliant']
+        description="Dictionary of user-defined annotations attached to this record.",
+        examples=[{'gdpr_2016_compliant': '"false"', 'ccpa_2019_compliant': '"true"'}]
     )
 
     @pydantic.computed_field
     @property
     def identifier(self) -> str:
-        suffix = self.snapshot.identifier or ''
-        if self.snapshot.is_dirty:
+        suffix = self.version.identifier or ''
+        if self.version.is_dirty:
             suffix += '_dirty'
-        match self.snapshot.version_system:
+        match self.version.version_system:
             case VersionSystem.Git:
                 suffix = 'git_' + suffix
 

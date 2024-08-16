@@ -2,7 +2,7 @@ import pydantic
 import enum
 
 from ..tool.descriptor import ToolDescriptorUnionType
-from ..version import SnapshotDescriptor
+from ..version import VersionDescriptor
 
 
 class CatalogKind(enum.StrEnum):
@@ -29,8 +29,8 @@ class CatalogDescriptor(pydantic.BaseModel):
         examples=["sentence-transformers/all-MiniLM-L12-v2"],
     )
 
-    snapshot: SnapshotDescriptor = pydantic.Field(
-        description="A unique identifier that defines a catalog snapshot.",
+    version: VersionDescriptor = pydantic.Field(
+        description="A unique identifier that defines a catalog version / snapshot / commit.",
     )
 
     source_dirs: list[str] = pydantic.Field(

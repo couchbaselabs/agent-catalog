@@ -4,7 +4,7 @@ import pytest
 
 from rosetta.core.catalog.catalog_base import SearchResult
 from rosetta.core.version.identifier import (
-    SnapshotDescriptor, VersionSystem
+    VersionDescriptor, VersionSystem
 )
 from rosetta.core.record.descriptor import (
     RecordDescriptor, RecordKind
@@ -23,7 +23,7 @@ def _generate_test_tools(deltas: list[int]) -> list[SearchResult]:
                 name='dummy tool #' + str(i),
                 description='a dummy tool #' + str(i),
                 source=pathlib.Path('.'),
-                snapshot=SnapshotDescriptor(
+                version=VersionDescriptor(
                     identifier=uuid.uuid4().hex,
                     version_system=VersionSystem.Raw
                 )

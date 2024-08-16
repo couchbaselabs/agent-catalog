@@ -11,8 +11,8 @@ source_globs = list(source_indexers.keys())
 
 def index_catalog(
     meta,
-    snapshot_commit_id,
-    snapshot_commit_id_for_path,
+    version,
+    get_path_version,
     kind,
     catalog_path,
     source_dirs,
@@ -22,8 +22,8 @@ def index_catalog(
 ):
     all_errs, next_catalog, uninitialized_items = index_catalog_start(
         meta,
-        snapshot_commit_id,
-        snapshot_commit_id_for_path,
+        version,
+        get_path_version,
         kind,
         catalog_path,
         source_dirs,
@@ -75,8 +75,8 @@ def index_catalog(
 
 def index_catalog_start(
     meta,
-    snapshot_commit_id,
-    snapshot_commit_id_for_path,
+    version,
+    get_path_version,
     kind,
     catalog_path,
     source_dirs,
@@ -105,7 +105,7 @@ def index_catalog_start(
         for glob, indexer in source_indexers.items():
             if fnmatch.fnmatch(source_file.name, glob):
                 errs, descriptors = indexer.start_descriptors(
-                    source_file, snapshot_commit_id_for_path
+                    source_file, get_path_version
                 )
                 all_errs += errs or []
                 all_descriptors += descriptors or []
@@ -120,7 +120,7 @@ def index_catalog_start(
             catalog_schema_version=meta["catalog_schema_version"],
             embedding_model=meta["embedding_model"],
             kind=kind,
-            snapshot=snapshot_commit_id,
+            version=version,
             source_dirs=source_dirs,
             items=all_descriptors,
         )

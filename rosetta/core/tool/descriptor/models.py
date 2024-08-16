@@ -16,7 +16,7 @@ import inspect
 from .helper import JSONSchemaValidatingMixin
 from .secrets import CouchbaseSecrets
 from ..decorator import ToolMarker
-from ...version import SnapshotDescriptor
+from ...version import VersionDescriptor
 from ...record.descriptor import (
     RecordKind,
     RecordDescriptor
@@ -26,13 +26,13 @@ logger = logging.getLogger(__name__)
 
 
 class _BaseFactory(abc.ABC):
-    def __init__(self, filename: pathlib.Path, snapshot: SnapshotDescriptor):
+    def __init__(self, filename: pathlib.Path, version: VersionDescriptor):
         """
         :param filename: Name of the file to load the record descriptor from.
-        :param snapshot: The snapshot descriptor associated with file describing a set of tools.
+        :param version: The version descriptor associated with file describing a set of tools.
         """
         self.filename = filename
-        self.snapshot = snapshot
+        self.version = version
 
 
 # Note: a Python Tool does not add any additional fields.
@@ -54,9 +54,9 @@ class PythonToolDescriptor(RecordDescriptor):
                     name=name,
                     description=tool.__doc__,
                     source=self.filename,
-                    snapshot=self.snapshot,
-                    # TODO (GLENN): Add support for user-defined tags here.
-                    tags=[]
+                    version=self.version,
+                    # TODO (GLENN): Add support for user-defined annotations here.
+                    annotations=dict()
                 )
 
 
@@ -81,7 +81,7 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
             output: str
             secrets: list[CouchbaseSecrets] = pydantic.Field(min_items=1, max_items=1)
             record_kind: typing.Optional[typing.Literal[RecordKind.SQLPPQuery] | None] = None
-            tags: typing.Optional[list[str] | None] = None
+            annotations: typing.Optional[dict[str, str] | None] = None
 
             @pydantic.field_validator('input', 'output')
             @classmethod
@@ -112,12 +112,12 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
                 name=metadata.name,
                 description=metadata.description,
                 source=self.filename,
-                snapshot=self.snapshot,
+                version=self.version,
                 secrets=metadata.secrets,
                 input=metadata.input,
                 output=metadata.output,
                 query=self.filename.open('r').read(),
-                tags=metadata.tags
+                annotations=metadata.annotations
             )
 
 
@@ -136,7 +136,6 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
     input: str
     vector_search: VectorSearchMetadata
     secrets: list[CouchbaseSecrets] = pydantic.Field(min_items=1, max_items=1)
-    tags: typing.Optional[list[str] | None] = None
     record_kind: typing.Literal[RecordKind.SemanticSearch]
 
     class Factory(_BaseFactory):
@@ -152,7 +151,7 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
             description: str
             input: str
             secrets: list[CouchbaseSecrets] = pydantic.Field(min_items=1, max_items=1)
-            tags: typing.Optional[list[str] | None] = None
+            annotations: typing.Optional[dict[str, str] | None] = None
             vector_search: 'SemanticSearchToolDescriptor.VectorSearchMetadata'
 
             @pydantic.field_validator('input')
@@ -184,11 +183,11 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
                     name=metadata.name,
                     description=metadata.description,
                     source=self.filename,
-                    snapshot=self.snapshot,
+                    version=self.version,
                     secrets=metadata.secrets,
                     input=metadata.input,
                     vector_search=metadata.vector_search,
-                    tags=metadata.tags
+                    annotations=metadata.annotations
                 )
 
 
@@ -235,7 +234,6 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
     operation: OperationMetadata
     specification: SpecificationMetadata
     record_kind: typing.Literal[RecordKind.HTTPRequest]
-    tags: typing.Optional[list[str] | None] = None
 
     class JSONEncoder(json.JSONEncoder):
         def default(self, obj):
@@ -326,7 +324,7 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
             # Below, we enumerate all fields that appear in a .yaml file for http requests.
             record_kind: typing.Literal[RecordKind.HTTPRequest]
             open_api: OpenAPIMetadata
-            tags: typing.Optional[list[str] | None] = None
+            annotations: typing.Optional[dict[str, str] | None] = None
 
         def __iter__(self) -> typing.Iterable['HTTPRequestToolDescriptor']:
             with self.filename.open('r') as fp:
@@ -337,13 +335,13 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
                         name=operation.operation_id,
                         description=operation.description,
                         source=self.filename,
-                        snapshot=self.snapshot,
+                        version=self.version,
                         operation=operation,
                         specification=HTTPRequestToolDescriptor.SpecificationMetadata(
                             filename=metadata.open_api.filename,
                             url=metadata.open_api.url
                         ),
-                        tags=metadata.tags
+                        annotations=metadata.annotations
                     )
 
 

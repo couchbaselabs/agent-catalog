@@ -1,11 +1,14 @@
 import pathlib
 import pydantic
 import typing
+import logging
 import jsbeautifier
 
 from .catalog_base import CatalogBase, SearchResult
 from ..catalog.descriptor import CatalogDescriptor
 from ..record.descriptor import RecordDescriptor
+
+logger = logging.getLogger(__name__)
 
 
 class CatalogMem(pydantic.BaseModel, CatalogBase):
@@ -14,7 +17,7 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
 
     def init_from(self, other: 'CatalogMem') -> list[RecordDescriptor]:
         """ Initialize the items in self by copying over attributes from
-            items found in other that have the exact same repo_commit_id's.
+            items found in other that have the exact same versions.
 
             Returns a list of uninitialized items. """
 
@@ -26,8 +29,8 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
 
             for s in self.catalog_descriptor.items:
                 o = other_items.get(str(s.source) + ':' + s.name)
-                if o and not s.snapshot.is_dirty and o.snapshot == s.snapshot:
-                    # The prev item and self item have the same snapshot IDs,
+                if o and not s.version.is_dirty and o.version.identifier == s.version.identifier:
+                    # The prev item and self item have the same version IDs,
                     # so copy the prev item contents into the self item.
                     for k, v in o.model_dump().items():
                         setattr(s, k, v)
@@ -74,21 +77,37 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
             fp.write(pretty_json)
             fp.write('\n')
 
-    def find(self, query: str, limit: typing.Union[int | None] = 1, tags: list[str] = None) -> list[SearchResult]:
+    def find(self, query: str, limit: typing.Union[int | None] = 1, annotations: dict[str, str] = None) \
+            -> list[SearchResult]:
         """ Returns the catalog items that best match a query. """
-        if tags is not None and len(tags) < 1:
-            tags = None
+        if annotations is not None and len(annotations) == 0:
+            logger.warning('An empty set of annotations was explicitly specified. This will yield no results. '
+                           'To search without annotations, use "annotations=None" instead.')
+            return list()
 
         import sentence_transformers
         import sklearn
 
-        # If a list of tags has been specified, prune all tools that do not possess this tag.
+        # If annotations have been specified, prune all tools that do not possess these annotations.
         candidate_tools = [x for x in self.catalog_descriptor.items]
-        if tags is not None:
-            candidate_tools = [
-                x for x in candidate_tools
-                if x.tags is not None and len(set(x.tags) & set(tags)) > 0
-            ]
+        if annotations is not None:
+            candidates_for_annotation_search = candidate_tools.copy()
+            candidate_tools = list()
+            for tool in candidates_for_annotation_search:
+                if tool.annotations is None:
+                    # Tools without annotations will always be excluded.
+                    continue
+
+                is_valid_tool = True
+                for k, v in annotations.items():
+                    if k not in tool.annotations:
+                        is_valid_tool = False
+                        break
+                    elif tool.annotations[k] != v:
+                        is_valid_tool = False
+                        break
+                if is_valid_tool:
+                    candidate_tools += [tool]
         if len(candidate_tools) == 0:
             # Exit early if there are no candidates.
             return list()

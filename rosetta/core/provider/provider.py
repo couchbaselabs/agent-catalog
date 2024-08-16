@@ -61,15 +61,15 @@ class Provider(abc.ABC):
             for k, v in secrets.items():
                 put_secret(k, v)
 
-    def get_tools_for(self, query: str, tags: list[str] = None, limit: typing.Union[int | None] = 1) \
+    def get_tools_for(self, query: str, annotations: dict[str, str] = None, limit: typing.Union[int | None] = 1) \
             -> list[typing.Any]:
         """
         :param query: A string to search the catalog with.
-        :param tags: A list of tags that must exist with each associated entry.
+        :param annotations: A set of annotations (as a dictionary) that must exist with each associated entry.
         :param limit: The maximum number of results to return.
         :return: A list of tools (Python functions).
         """
-        results = self.refiner(self.catalog.find(query=query, tags=tags, limit=limit))
+        results = self.refiner(self.catalog.find(query=query, annotations=annotations, limit=limit))
 
         # Load all tools that we have not already cached.
         non_cached_results = [f.entry for f in results if f.entry not in self._tool_cache]

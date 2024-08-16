@@ -6,7 +6,7 @@ import importlib
 import uuid
 
 from rosetta.core.version.identifier import (
-    SnapshotDescriptor, VersionSystem
+    VersionDescriptor, VersionSystem
 )
 from rosetta.core.tool.generate.generator import (
     SQLPPCodeGenerator,
@@ -25,7 +25,7 @@ def _get_tool_descriptor_factory(cls, filename: pathlib.Path):
     filename_prefix = pathlib.Path(__file__).parent / 'resources'
     factory_args = {
         'filename': filename_prefix / filename,
-        'snapshot': SnapshotDescriptor(
+        'version': VersionDescriptor(
             identifier=uuid.uuid4().hex,
             version_system=VersionSystem.Raw
         )

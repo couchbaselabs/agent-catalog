@@ -13,17 +13,15 @@ from rosetta.core.catalog.version import (
     lib_version_compare,
 )
 from rosetta.core.catalog.directory import ScanDirectoryOpts
-from rosetta.core.version import SnapshotDescriptor
+from rosetta.core.version import VersionDescriptor
 from ..models.ctx.model import Context
-
 
 DEFAULT_MAX_ERRS = 10
 
-
 DEFAULT_SCAN_DIRECTORY_OPTS = ScanDirectoryOpts(
-    unwanted_patterns = frozenset([".git"]),
-    ignore_file_name = ".gitignore",
-    ignore_file_parser_factory = gitignore_parser.parse_gitignore)
+    unwanted_patterns=frozenset([".git"]),
+    ignore_file_name=".gitignore",
+    ignore_file_parser_factory=gitignore_parser.parse_gitignore)
 
 
 def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
@@ -93,8 +91,7 @@ def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
     return meta
 
 
-
-def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
+def load_repository(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
     # The repo is the user's application's repo and is NOT the repo
     # of rosetta-core. The rosetta CLI / library should be run in
     # a directory (or subdirectory) of the user's application's repo,
@@ -109,20 +106,19 @@ def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
 
     repo = git.Repo(top_dir / ".git")
 
-    def repo_commit_id_for_path(path: pathlib.Path) -> SnapshotDescriptor:
+    def get_path_version(path: pathlib.Path) -> VersionDescriptor:
         path_absolute = path.absolute()
 
         if repo.is_dirty(path=path_absolute):
-            return SnapshotDescriptor(is_dirty=True)
+            return VersionDescriptor(is_dirty=True)
 
         commits = list(repo.iter_commits(paths=path_absolute, max_count=1))
         if not commits or len(commits) <= 0:
-            return SnapshotDescriptor(is_dirty=True)
+            return VersionDescriptor(is_dirty=True)
 
-        return SnapshotDescriptor(identifier=str(commits[0]))
+        return VersionDescriptor(identifier=str(commits[0]))
 
-    return repo, repo_commit_id_for_path
-
+    return repo, get_path_version
 
 # TODO: One use case is a user's repo (like rosetta-example) might
 # have multiple, independent subdirectories in it which should each
@@ -130,4 +126,3 @@ def repo_load(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
 # the pattern similar to repo_load()'s searching for a .git/ directory
 # and scan up the parent directories to find the first .rosetta-catalog/
 # subdirectory?
-

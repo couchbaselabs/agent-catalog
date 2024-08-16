@@ -1,1 +1,1 @@
-from .identifier import SnapshotDescriptor
+from .identifier import VersionDescriptor

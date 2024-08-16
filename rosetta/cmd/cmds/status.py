@@ -3,8 +3,7 @@ import flask
 from rosetta.cmd.cmds.util import *
 from rosetta.core.catalog.catalog_mem import CatalogMem
 from rosetta.core.catalog.index import index_catalog_start
-from rosetta.core.version import SnapshotDescriptor
-
+from rosetta.core.version import VersionDescriptor
 
 blueprint = flask.Blueprint("status", __name__)
 
@@ -13,7 +12,7 @@ blueprint = flask.Blueprint("status", __name__)
 def route_status():
     kind = flask.request.args.get("kind", default="tool", type=str)
     include_dirty = (
-        flask.request.args.get("include_dirty", default="true", type=str).lower() == "true"
+            flask.request.args.get("include_dirty", default="true", type=str).lower() == "true"
     )
 
     return flask.jsonify(catalog_status(flask.current_app.config["ctx"], kind, include_dirty))
@@ -72,9 +71,8 @@ def catalog_status(ctx, kind, include_dirty=True):
     catalog = CatalogMem().load(catalog_path)
 
     if include_dirty:
-        repo, repo_commit_id_for_path = repo_load(pathlib.Path(os.getcwd()))
+        repo, get_path_version = load_repository(pathlib.Path(os.getcwd()))
         if repo.is_dirty():
-            repo_commit_id = SnapshotDescriptor(is_dirty=True)
             sections.append(
                 (
                     "repo commit",
@@ -87,11 +85,11 @@ def catalog_status(ctx, kind, include_dirty=True):
                 )
             )
         else:
-            repo_commit_id = SnapshotDescriptor(identifier=str(repo.head.commit))
+            version = VersionDescriptor(identifier=str(repo.head.commit))
             sections.append(
                 (
                     "repo commit",
-                    [(None, "repo is clean"), (None, f"repo commit id: {repo_commit_id}")],
+                    [(None, "repo is clean"), (None, f"repo version: {version}")],
                 )
             )
 
@@ -102,7 +100,7 @@ def catalog_status(ctx, kind, include_dirty=True):
 
             meta = init_local(ctx, catalog.catalog_descriptor.embedding_model, read_only=True)
 
-            repo_commit_id = SnapshotDescriptor(is_dirty=True)
+            version = VersionDescriptor(is_dirty=True)
 
             # Scan the same source_dirs that were used in the last "rosetta index".
             source_dirs = catalog.catalog_descriptor.source_dirs
@@ -111,8 +109,8 @@ def catalog_status(ctx, kind, include_dirty=True):
             # source file items which we'll use instead of the local catalog file.
             errs, catalog, uninitialized_items = index_catalog_start(
                 meta,
-                repo_commit_id,
-                repo_commit_id_for_path,
+                version,
+                get_path_version,
                 kind,
                 catalog_path,
                 source_dirs,
@@ -142,7 +140,7 @@ def catalog_status(ctx, kind, include_dirty=True):
                 (None, f"path            : {catalog_path}"),
                 (None, f"schema version  : {catalog.catalog_descriptor.catalog_schema_version}"),
                 (None, f"kind of catalog : {catalog.catalog_descriptor.kind}"),
-                (None, f"repo commit id  : {catalog.catalog_descriptor.snapshot.identifier}"),
+                (None, f"repo version    : {catalog.catalog_descriptor.version.identifier}"),
                 (None, f"embedding model : {catalog.catalog_descriptor.embedding_model}"),
                 (None, f"source dirs     : {catalog.catalog_descriptor.source_dirs}"),
                 (None, f"number of items : {len(catalog.catalog_descriptor.items or [])}"),

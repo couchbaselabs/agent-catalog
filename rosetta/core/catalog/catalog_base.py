@@ -19,7 +19,8 @@ class CatalogBase(abc.ABC):
     """ An abstract base class for a catalog of RecordDescriptor's. """
 
     @abc.abstractmethod
-    def find(self, query: str, limit: typing.Union[int | None] = 1, tags: list[str] = None) -> list[SearchResult]:
+    def find(self, query: str, limit: typing.Union[int | None] = 1, annotations: dict[str, str] = None) \
+            -> list[SearchResult]:
         """ Returns the catalog items that best match a query. """
 
         # TODO: The find() method might likely one day need additional,

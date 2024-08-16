@@ -3,7 +3,7 @@ import tqdm
 
 from ...cmd.cmds.util import *
 from ...core.catalog.index import index_catalog
-from ...core.version import SnapshotDescriptor
+from ...core.version import VersionDescriptor
 from ..models.ctx.model import Context
 
 logger = logging.getLogger(__name__)
@@ -19,7 +19,7 @@ def cmd_index(ctx: Context, source_dirs: list[str],
             "An --embedding-model is required as an embedding model is not yet recorded."
         )
 
-    repo, repo_commit_id_for_path = repo_load(pathlib.Path(os.getcwd()))
+    repo, get_path_version = load_repository(pathlib.Path(os.getcwd()))
 
     # TODO: If the repo is dirty only because .rosetta-catalog/ is
     # dirty or because .rosetta-activity/ is dirty, then we might print
@@ -38,16 +38,13 @@ def cmd_index(ctx: Context, source_dirs: list[str],
     # need to be provided the file blob streams from the repo instead of our current
     # approach of opening & reading file contents directly,
 
-    # The commit id for the repo's HEAD commit.
-    repo_commit_id = SnapshotDescriptor(
-        identifier=str(repo.head.commit),
-        is_dirty=repo.is_dirty(),
-    )
+    # The version for the repo's HEAD commit.
+    version = VersionDescriptor(identifier=str(repo.head.commit), is_dirty=repo.is_dirty())
 
     # TODO: The kind needs a security check as it's part of the path?
     catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")
 
-    next_catalog = index_catalog(meta, repo_commit_id, repo_commit_id_for_path,
+    next_catalog = index_catalog(meta, version, get_path_version,
                                  kind, catalog_path, source_dirs,
                                  scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
                                  progress=tqdm.tqdm, max_errs=DEFAULT_MAX_ERRS)
