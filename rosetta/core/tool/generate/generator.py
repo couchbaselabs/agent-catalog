@@ -1,7 +1,6 @@
 import datetime
 import pathlib
 import typing
-import uuid
 import openapi_parser.parser
 import pydantic
 import jinja2
@@ -33,7 +32,7 @@ class _BaseCodeGenerator(pydantic.BaseModel):
     )
 
     @abc.abstractmethod
-    def generate(self, output_dir: pathlib.Path) -> list[pathlib.Path]:
+    def generate(self) -> typing.Iterable[str]:
         pass
 
 
@@ -44,7 +43,7 @@ class SQLPPCodeGenerator(_BaseCodeGenerator):
     def record_descriptor(self) -> SQLPPQueryToolDescriptor:
         return self.record_descriptors[0]
 
-    def generate(self, output_dir: pathlib.Path) -> list[pathlib.Path]:
+    def generate(self) -> typing.Iterable[str]:
         # Generate a Pydantic model for the input schema...
         input_model = generate_model_from_json_schema(
             json_schema=self.record_descriptor.input,
@@ -57,7 +56,7 @@ class SQLPPCodeGenerator(_BaseCodeGenerator):
             class_name=output_model_class_name_in_templates
         )
 
-        # Instantiate our template...
+        # Instantiate our template.
         with (self.template_directory / 'sqlpp_q.jinja').open('r') as tmpl_fp:
             template = jinja2.Template(source=tmpl_fp.read())
             generation_time = datetime.datetime.now().strftime('%I:%M%p on %B %d, %Y')
@@ -70,13 +69,7 @@ class SQLPPCodeGenerator(_BaseCodeGenerator):
                 'secrets': self.record_descriptor.secrets[0].couchbase
             })
             logger.debug('The following code has been generated:\n' + rendered_code)
-
-        # ...and write this as a single file to our output directory.
-        output_file = output_dir / (uuid.uuid4().hex + '.py')
-        with output_file.open('w') as fp:
-            fp.write(rendered_code)
-            fp.flush()
-        return [output_file]
+            yield rendered_code
 
 
 class SemanticSearchCodeGenerator(_BaseCodeGenerator):
@@ -86,14 +79,14 @@ class SemanticSearchCodeGenerator(_BaseCodeGenerator):
     def record_descriptor(self) -> SemanticSearchToolDescriptor:
         return self.record_descriptors[0]
 
-    def generate(self, output_dir: pathlib.Path) -> list[pathlib.Path]:
+    def generate(self) -> typing.Iterable[str]:
         # Generate a Pydantic model for the input schema.
         input_model = generate_model_from_json_schema(
             json_schema=self.record_descriptor.input,
             class_name=input_model_class_name_in_templates
         )
 
-        # Instantiate our template...
+        # Instantiate our template.
         with (self.template_directory / 'semantic_q.jinja').open('r') as tmpl_fp:
             template = jinja2.Template(source=tmpl_fp.read())
             generation_time = datetime.datetime.now().strftime('%I:%M%p on %B %d, %Y')
@@ -105,13 +98,7 @@ class SemanticSearchCodeGenerator(_BaseCodeGenerator):
                 'secrets': self.record_descriptor.secrets[0].couchbase
             })
             logger.debug('The following code has been generated:\n' + rendered_code)
-
-        # ...and write this as a single file to our output directory.
-        output_file = output_dir / (uuid.uuid4().hex + '.py')
-        with output_file.open('w') as fp:
-            fp.write(rendered_code)
-            fp.flush()
-        return [output_file]
+            yield rendered_code
 
 
 class HTTPRequestCodeGenerator(_BaseCodeGenerator):
@@ -189,9 +176,8 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
                 model=None
             )
 
-    def generate(self, output_dir: pathlib.Path) -> list[pathlib.Path]:
+    def generate(self) -> typing.Iterable[str]:
         # Iterate over our operations.
-        output_modules = list()
         for record_descriptor in self.record_descriptors:
             operation = record_descriptor.operation
 
@@ -204,7 +190,7 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
                     class_name=input_model_class_name_in_templates
                 )
 
-            # Instantiate our template...
+            # Instantiate our template.
             with (self.template_directory / 'httpreq_q.jinja').open('r') as tmpl_fp:
                 template = jinja2.Template(source=tmpl_fp.read())
                 generation_time = datetime.datetime.now().strftime('%I:%M%p on %B %d, %Y')
@@ -217,11 +203,4 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
                     'urls': [s.url for s in operation.servers]
                 })
                 logger.debug('The following code has been generated:\n' + rendered_code)
-
-            # ...and write this as a single file to our output directory.
-            output_file = output_dir / (uuid.uuid4().hex + '.py')
-            with output_file.open('w') as fp:
-                fp.write(rendered_code)
-                fp.flush()
-            output_modules.append(output_file)
-        return output_modules
+                yield rendered_code
