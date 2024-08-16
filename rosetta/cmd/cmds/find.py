@@ -54,6 +54,17 @@ def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refi
                                     scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
                                     progress=tqdm.tqdm, max_errs=DEFAULT_MAX_ERRS)
 
+    # Transform our list of annotations into a single dictionary.
+    annotations_dict = None
+    if annotations is not None and len(annotations) > 0:
+        annotations_dict = dict()
+        for annotation in annotations:
+            if '=' not in annotation:
+                raise ValueError('Invalid format for annotation. Use "[key]=[value]".')
+            else:
+                k, v = annotation.split('=', maxsplit=1)
+                annotations_dict[k] = v
+
     # Query the catalog for a list of results.
     search_results = [
         SearchResult(entry=x.entry, delta=x.delta) for x in catalog.find(query, limit=limit, tags=tags)
