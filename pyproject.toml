@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "rosetta"
+version = "0.1.0"
+description = "User facing repository for all things rosetta (tooling around agent workflows)."
+repository = "https://github.com/couchbaselabs/rosetta"
+authors = [
+    "Glenn Galvizo <glenn.galvizo@couchbase.com>"
+]
+readme = "README.md"
+packages = [{ include = "src" }]
+
+[tool.poetry.urls]
+Homepage = "https://couchbase.com"
+Documentation = "https://docs.couchbase.com"
+Repository = "https://github.com/couchbaselabs/rosetta"
+
+[tool.poetry.scripts]
+rosetta = "src.__main__:main"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pydantic-settings = "^2.4.0"
+
+rosetta-core = { git = "git@github.com:couchbaselabs/rosetta-core.git" }
+rosetta-lc = { git = "git@github.com:couchbaselabs/rosetta-lc.git", optional = true }
+
+# For developers that want to use a local version of rosetta.
+# rosetta-core = { path = "PATH TO ROSETTA-CORE REPO", develop = true }
+# rosetta-lc = { path = "PATH TO ROSETTA-LC REPO", develop = true, optional = true }
+
+[tool.poetry.extras]
+langchain = ["rosetta-lc"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
