@@ -1,9 +1,14 @@
 import flask
+import click
+import pathlib
+import os
 
-from rosetta.cmd.cmds.util import *
 from rosetta.core.catalog.catalog_mem import CatalogMem
 from rosetta.core.catalog.index import index_catalog_start
 from rosetta.core.version import VersionDescriptor
+
+from ..cmds.util import load_repository, init_local
+from ..defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 
 blueprint = flask.Blueprint("status", __name__)
 

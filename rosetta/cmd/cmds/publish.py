@@ -1,14 +1,26 @@
 import json
 import os
+import logging
 from pathlib import Path
 
-from ..models.publish.model import Keyspace
-from ...utils.publish import create_scope_and_collection, CustomPublishEncoder
-from ..models.ctx.model import Context
-from ...core.catalog.catalog_mem import CatalogMem
+from rosetta.core.catalog.catalog_mem import CatalogMem
+from rosetta.utils.publish import (
+    create_scope_and_collection,
+    CustomPublishEncoder
+)
+
+from ..models import (
+    Keyspace, Context
+)
+from ..defaults import (
+    DEFAULT_META_CATALOG_NAME
+)
+
+logger = logging.getLogger(__name__)
 
 
 # TODO (GLENN): I haven't tested these changes, but this signals a move towards a "version" object instead of a string.
+# TODO (GLENN): Use click.echo instead of print, and make use of the logger.
 def cmd_publish(ctx: Context, cluster, keyspace: Keyspace):
     bucket = keyspace.bucket
     scope = keyspace.scope
@@ -25,8 +37,7 @@ def cmd_publish(ctx: Context, cluster, keyspace: Keyspace):
 
     # Iterate over all catalog files
     for col_type in files:
-        # TODO (GLENN): We should consolidate all of these constants somewhere (e.g., meta.json).
-        if str(col_type) == "meta.json":
+        if str(col_type) == DEFAULT_META_CATALOG_NAME:
             continue
 
         # Get catalog file

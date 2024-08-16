@@ -1,12 +1,18 @@
 import logging
-
-import click
 import tqdm
+import pathlib
+import os
+import click
 
-from ...cmd.cmds.util import *
-from ...core.catalog.index import index_catalog
-from ...core.version import VersionDescriptor
-from ..models.ctx.model import Context
+from rosetta.core.catalog.index import index_catalog
+from rosetta.core.version import VersionDescriptor
+
+from ..cmds.util import init_local, load_repository
+from ..models.context import Context
+from ..defaults import (
+    DEFAULT_SCAN_DIRECTORY_OPTS,
+    DEFAULT_MAX_ERRS
+)
 
 logger = logging.getLogger(__name__)
 

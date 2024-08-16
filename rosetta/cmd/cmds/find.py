@@ -1,13 +1,22 @@
 import tqdm
 import jsbeautifier
+import pathlib
+import click
+import os
 
-from ...cmd.cmds.util import *
-from ...core.catalog.index import index_catalog
-from ...core.catalog.catalog_mem import CatalogMem
-from ...core.catalog.catalog_base import SearchResult
-from ...core.provider.refiner import ClosestClusterRefiner
-from ...core.version import VersionDescriptor
-from ..models.ctx.model import Context
+from rosetta.core.catalog.index import index_catalog
+from rosetta.core.catalog.catalog_mem import CatalogMem
+from rosetta.core.catalog.catalog_base import SearchResult
+from rosetta.core.provider.refiner import ClosestClusterRefiner
+from rosetta.core.version import VersionDescriptor
+
+from ...cmd.models.context import Context
+from ...cmd.cmds.util import init_local, load_repository
+from ..defaults import (
+    DEFAULT_SCAN_DIRECTORY_OPTS,
+    DEFAULT_MAX_ERRS,
+    DEFAULT_BEAUTIFY_OPTS
+)
 
 refiners = {
     "ClosestCluster": ClosestClusterRefiner,
@@ -15,20 +24,6 @@ refiners = {
     # TODO: One day allow for custom refiners at runtime where
     # we dynamically import a user's custom module/function?
 }
-
-beautify_opts = jsbeautifier.BeautifierOptions(options={
-    "indent_size": 2,
-    "indent_char": " ",
-    "max_preserve_newlines": -1,
-    "preserve_newlines": False,
-    "keep_array_indentation": False,
-    "brace_style": "expand",
-    "unescape_strings": False,
-    "end_with_newline": False,
-    "wrap_line_length": 0,
-    "comma_first": False,
-    "indent_empty_lines": False
-})
 
 
 def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refiner=None, annotations=None):
@@ -91,7 +86,7 @@ def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refi
     for i, result in enumerate(search_results):
         pretty_json = jsbeautifier.beautify(
             result.entry.model_dump_json(exclude={'embedding'}),
-            opts=beautify_opts
+            opts=DEFAULT_BEAUTIFY_OPTS
         )
         click.echo(f'#{i + 1} (delta = {result.delta}, higher is better): ', nl=False)
         click.echo(pretty_json)

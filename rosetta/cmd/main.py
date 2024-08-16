@@ -17,11 +17,13 @@ logging.basicConfig(
 # Keeping this here, sentence_transformers logging can be pretty verbose.
 logging.getLogger('sentence_transformers').setLevel(logging.WARNING)
 
+from ..utils.publish import get_buckets, get_connection
+from ..cmd.models.publish import Keyspace, CouchbaseConnect
+from ..cmd.models.context import Context
+
 from .cmds import *
 from .cmds.publish import cmd_publish, cmd_publish_obj
-from ..utils.publish import get_buckets, get_connection
-from .models.publish.model import Keyspace, CouchbaseConnect
-from .models.ctx.model import Context
+from .defaults import *
 
 # TODO: Should we load from ".env.rosetta"?
 # TODO: Or, perhaps even stage specific, like from ".env.rosetta.prod"?
@@ -55,7 +57,7 @@ class AliasedGroup(click.Group):
 @click.option(
     "-c",
     "--catalog",
-    default=".rosetta-catalog",
+    default=DEFAULT_CATALOG_FOLDER,
     type=click.Path(exists=False, file_okay=False, dir_okay=True),
     help="""Directory of local catalog files.
             The local catalog DIRECTORY should be checked into git.""",
@@ -65,7 +67,7 @@ class AliasedGroup(click.Group):
 @click.option(
     "-a",
     "--activity",
-    default=".rosetta-activity",
+    default=DEFAULT_ACTIVITY_FOLDER,
     type=click.Path(exists=False, file_okay=False, dir_okay=True),
     help="""Directory of local activity files (runtime data).
             The local activity DIRECTORY should NOT be checked into git,

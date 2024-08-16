@@ -7,7 +7,7 @@ from pathlib import Path
 import json
 import logging
 
-from ..cmd.models.publish.model import CouchbaseConnect
+from rosetta.cmd.models.publish import CouchbaseConnect
 
 logger = logging.getLogger(__name__)
 
