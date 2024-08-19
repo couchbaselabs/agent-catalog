@@ -22,7 +22,7 @@ from ..cmd.models.publish import Keyspace, CouchbaseConnect
 from ..cmd.models.context import Context
 
 from .cmds import *
-from .cmds.publish import cmd_publish, cmd_publish_obj
+from .cmds.publish import cmd_publish
 from .defaults import *
 
 # TODO: Should we load from ".env.rosetta"?
@@ -229,7 +229,7 @@ def publish(ctx, kind, scope):
     )
     click.echo(f"Inserting documents in : {selected_bucket}/{keyspace_details.scope}\n")
     keyspace_details.bucket = selected_bucket
-    cmd_publish_obj(ctx.obj, kind, cluster, keyspace_details)
+    cmd_publish(ctx.obj, kind, cluster, keyspace_details)
 
     cluster.close()
 
