@@ -195,7 +195,7 @@ def index(ctx, source_dirs, kind, embedding_model, include_dirty, dry_run):
 @click.option(
     "-sc",
     "--scope",
-    default="rosetta-catalog",
+    default="rosetta-catalog-old",
     help="Couchbase Scope where data is inserted.",
 )
 @click.pass_context
@@ -236,14 +236,14 @@ def publish(ctx, scope):
 @click_main.command()
 @click.option(
     "--kind",
-    default="tool",
-    help="The kind of catalog to show status.",
+    default="all",
+    help="The kind of catalog to insert into DB.",
     show_default=True,
 )
 @click.option(
     "-sc",
     "--scope",
-    default="rosetta-catalog-publish-serialise",
+    default="rosetta-catalog",
     help="Couchbase Scope where data is inserted.",
 )
 @click.pass_context

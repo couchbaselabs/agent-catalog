@@ -99,76 +99,80 @@ def cmd_publish(ctx: Context, cluster, keyspace: Keyspace):
 
 def cmd_publish_obj(ctx: Context, kind, cluster, keyspace: Keyspace):
     if kind == "all":  # TODO: handle case later
-        print("all catalogs")
-        return
+        kind_list = ["tool", "prompt"]
+        print("Inserting all catalogs...")
+    else:
+        kind_list = [kind]
 
-    catalog_path = Path(ctx.catalog) / (kind + "-catalog.json")
-    catalog = CatalogMem.load(catalog_path).catalog_descriptor
+    for kind in kind_list:
 
-    bucket = keyspace.bucket
-    scope = keyspace.scope
-    # catalog_file_name = ctx.catalog
+        catalog_path = Path(ctx.catalog) / (kind + "-catalog.json")
+        catalog = CatalogMem.load(catalog_path).catalog_descriptor
 
-    # Get bucket ref
-    cb = cluster.bucket(bucket)
+        bucket = keyspace.bucket
+        scope = keyspace.scope
+        # catalog_file_name = ctx.catalog
 
-    # Get the bucket manager
-    bucket_manager = cb.collections()
+        # Get bucket ref
+        cb = cluster.bucket(bucket)
 
-    # ----------Metadata collection----------
-    meta_col = kind + "_metadata"
-    (msg, err) = create_scope_and_collection(bucket_manager, scope=scope, collection=meta_col)
-    if err is not None:
-        print(msg, err)
-        return
+        # Get the bucket manager
+        bucket_manager = cb.collections()
 
-    # get collection ref
-    cb_coll = cb.scope(scope).collection(meta_col)
+        # ----------Metadata collection----------
+        meta_col = kind + "_metadata"
+        (msg, err) = create_scope_and_collection(bucket_manager, scope=scope, collection=meta_col)
+        if err is not None:
+            print(msg, err)
+            return
 
-    # dict to store all the metadata - snapshot related data
-    metadata = {k: v for k, v in catalog.model_dump() if k != 'items'}
+        # get collection ref
+        cb_coll = cb.scope(scope).collection(meta_col)
 
-    print("Upserting metadata..")
-    try:
-        key = metadata['version']['identifier']
-        cb_coll.upsert(key, metadata)
-        # print("Snapshot ",result.key," added to keyspace")
-    # TODO (GLENN): Should use the specific exception here instead of 'Exception'.
-    except Exception as e:
-        print("could not insert: ", e)
-        return e
-    print("Metadata added!\n")
+        # dict to store all the metadata - snapshot related data
+        metadata = {el: catalog.model_dump()[el] for el in catalog.model_dump() if el != 'items'}
 
-    # ----------Catalog items collection----------
-    catalog_col = kind + "_catalog"
-    (msg, err) = create_scope_and_collection(bucket_manager, scope=scope, collection=catalog_col)
-    if err is not None:
-        print(msg, err)
-        return
-
-    # get collection ref
-    cb_coll = cb.scope(scope).collection(catalog_col)
-
-    print("Upserting catalog items..")
-
-    # iterate over individual catalog items
-    for item in catalog.items:
+        print("Upserting metadata..")
         try:
-            key = item.identifier
-
-            # serialise object to str
-            item = json.dumps(item.model_dump(), cls=CustomPublishEncoder)
-
-            # convert to dict object and insert snapshot id
-            item_json: dict = json.loads(item)
-            item_json.update({"catalog_identifier": metadata["version"]["identifier"]})
-
-            # upsert docs to CB collection
-            cb_coll.upsert(key, item_json)
+            key = metadata['version']['identifier']
+            cb_coll.upsert(key, metadata)
+            # print("Snapshot ",result.key," added to keyspace")
+        # TODO (GLENN): Should use the specific exception here instead of 'Exception'.
         except Exception as e:
             print("could not insert: ", e)
             return e
+        print("Metadata added!\n")
 
-    print("Inserted", kind, "catalog successfully!\n")
+        # ----------Catalog items collection----------
+        catalog_col = kind + "_catalog"
+        (msg, err) = create_scope_and_collection(bucket_manager, scope=scope, collection=catalog_col)
+        if err is not None:
+            print(msg, err)
+            return
+
+        # get collection ref
+        cb_coll = cb.scope(scope).collection(catalog_col)
+
+        print("Upserting catalog items..")
+
+        # iterate over individual catalog items
+        for item in catalog.items:
+            try:
+                key = item.identifier
+
+                # serialise object to str
+                item = json.dumps(item.model_dump(), cls=CustomPublishEncoder)
+
+                # convert to dict object and insert snapshot id
+                item_json: dict = json.loads(item)
+                item_json.update({"catalog_identifier": metadata["version"]["identifier"]})
+
+                # upsert docs to CB collection
+                cb_coll.upsert(key, item_json)
+            except Exception as e:
+                print("could not insert: ", e)
+                return e
+
+        print("Inserted", kind, "catalog successfully!\n")
 
     return "Successfully inserted all catalogs!"
