@@ -22,7 +22,7 @@ from ..cmd.models.publish import Keyspace, CouchbaseConnect
 from ..cmd.models.context import Context
 
 from .cmds import *
-from .cmds.publish import cmd_publish, cmd_publish_obj
+from .cmds.publish import cmd_publish
 from .defaults import *
 
 # TODO: Should we load from ".env.rosetta"?
@@ -193,61 +193,19 @@ def index(ctx, source_dirs, kind, embedding_model, include_dirty, dry_run):
 
 @click_main.command()
 @click.option(
+    "--kind",
+    default="all",
+    help="The kind of catalog to insert into DB.",
+    show_default=True,
+)
+@click.option(
     "-sc",
     "--scope",
     default="rosetta-catalog",
     help="Couchbase Scope where data is inserted.",
 )
 @click.pass_context
-def publish(ctx, scope):
-    """ Publish the local catalog to a Couchbase instance. """
-
-    keyspace_details = Keyspace(bucket="", scope=scope)
-    connection_details = CouchbaseConnect(
-        connection_url=os.getenv("CB_CONN_STRING"),
-        username=os.getenv("CB_USERNAME"),
-        password=os.getenv("CB_PASSWORD"),
-    )
-
-    # Establish a connection
-    err, cluster = get_connection(conn=connection_details)
-    if err:
-        click.echo(str(err))
-        return
-
-    # Get buckets from CB Cluster
-    buckets = get_buckets(cluster=cluster)
-
-    # Prompt user to select a bucket
-    selected_bucket = click.prompt(
-        "Please select a bucket", type=click.Choice(buckets), show_choices=True
-    )
-    click.echo(f"Inserting documents in : {selected_bucket}/{keyspace_details.scope}\n")
-    keyspace_details.bucket = selected_bucket
-
-    # Publish catalog into keyspace
-    msg = cmd_publish(ctx.obj, cluster=cluster, keyspace=keyspace_details)
-    print(msg)
-
-    # Close cluster connection
-    cluster.close()
-
-
-@click_main.command()
-@click.option(
-    "--kind",
-    default="tool",
-    help="The kind of catalog to show status.",
-    show_default=True,
-)
-@click.option(
-    "-sc",
-    "--scope",
-    default="rosetta-catalog-publish-serialise",
-    help="Couchbase Scope where data is inserted.",
-)
-@click.pass_context
-def publishobj(ctx, kind, scope):
+def publish(ctx, kind, scope):
     """Publish command that inserts after reading CatalogMem object"""
     keyspace_details = Keyspace(bucket="", scope=scope)
     connection_details = CouchbaseConnect(
@@ -271,7 +229,7 @@ def publishobj(ctx, kind, scope):
     )
     click.echo(f"Inserting documents in : {selected_bucket}/{keyspace_details.scope}\n")
     keyspace_details.bucket = selected_bucket
-    cmd_publish_obj(ctx.obj, kind, cluster, keyspace_details)
+    cmd_publish(ctx.obj, kind, cluster, keyspace_details)
 
     cluster.close()
 
