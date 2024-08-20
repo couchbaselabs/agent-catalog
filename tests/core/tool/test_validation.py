@@ -4,11 +4,11 @@ import uuid
 import pytest
 import pydantic
 
-from rosetta.core.version.identifier import (
+from rosetta_core.version.identifier import (
     VersionDescriptor, VersionSystem
 )
-from rosetta.core.record.descriptor import RecordKind
-from rosetta.core.tool.descriptor.models import (
+from rosetta_core.record.descriptor import RecordKind
+from rosetta_core.tool.descriptor.models import (
     SQLPPQueryToolDescriptor,
     SemanticSearchToolDescriptor,
     HTTPRequestToolDescriptor,

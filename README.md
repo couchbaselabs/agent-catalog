@@ -81,21 +81,27 @@ Below, we lay out some important directories & files.
 README.md
 pyproject.toml
 
-rosetta/
-  cmd/
-    main.py       -- Main entry point for rosetta command-line tool (CLI).
-    cmds/         -- Each "rosetta SUBCMD" has its own cmds/SUBCMD.py file.
+rosetta_cmd/
+   main.py       -- Main entry point for rosetta command-line tool (CLI).
+   defaults.py   -- All command-line-tool defaults belong in here.
+   cmds/         -- Each "rosetta SUBCMD" has its own cmds/SUBCMD.py file.
       ...
       find.py
       index.py
       publish.py
       version.py
       web.py      -- Provides an HTML/REST interface for the SUBCMD's.
+   models/
 
-  core/           -- The core rosetta library used by applications
-                     and by the rosetta CLI.
+rosetta_core/     -- The core rosetta library used by applications and by the rosetta CLI.
+   catalog/
+   provider/
+   record/
+   secrets/
+   tool/
+   version/
+   
+tests/            -- Test cases.
 
-tests/ -- Test cases.
-
-VERSION.txt -- To be generated or updated at build or packaging time.
+VERSION.txt       -- To be generated or updated at build or packaging time.
 ```

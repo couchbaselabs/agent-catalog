@@ -5,16 +5,16 @@ import inspect
 import importlib
 import uuid
 
-from rosetta.core.version.identifier import (
+from rosetta_core.version.identifier import (
     VersionDescriptor, VersionSystem
 )
-from rosetta.core.tool.generate.generator import (
+from rosetta_core.tool.generate.generator import (
     SQLPPCodeGenerator,
     SemanticSearchCodeGenerator,
     HTTPRequestCodeGenerator
 )
-from rosetta.core.tool.decorator import ToolMarker
-from rosetta.core.tool.descriptor.models import (
+from rosetta_core.tool.decorator import ToolMarker
+from rosetta_core.tool.descriptor.models import (
     SQLPPQueryToolDescriptor,
     SemanticSearchToolDescriptor,
     HTTPRequestToolDescriptor
