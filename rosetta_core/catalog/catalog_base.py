@@ -3,6 +3,7 @@ import pydantic
 import typing
 
 from ..record.descriptor import RecordDescriptor
+from ..annotation import AnnotationPredicate
 
 
 class SearchResult(pydantic.BaseModel):
@@ -19,7 +20,7 @@ class CatalogBase(abc.ABC):
     """ An abstract base class for a catalog of RecordDescriptor's. """
 
     @abc.abstractmethod
-    def find(self, query: str, limit: typing.Union[int | None] = 1, annotations: dict[str, str] = None) \
+    def find(self, query: str, limit: typing.Union[int | None] = 1, annotations: AnnotationPredicate = None) \
             -> list[SearchResult]:
         """ Returns the catalog items that best match a query. """
 

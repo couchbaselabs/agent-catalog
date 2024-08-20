@@ -7,6 +7,7 @@ import jsbeautifier
 from .catalog_base import CatalogBase, SearchResult
 from ..catalog.descriptor import CatalogDescriptor
 from ..record.descriptor import RecordDescriptor
+from ..annotation import AnnotationPredicate
 
 logger = logging.getLogger(__name__)
 
@@ -77,14 +78,9 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
             fp.write(pretty_json)
             fp.write('\n')
 
-    def find(self, query: str, limit: typing.Union[int | None] = 1, annotations: dict[str, str] = None) \
+    def find(self, query: str, limit: typing.Union[int | None] = 1, annotations: AnnotationPredicate = None) \
             -> list[SearchResult]:
         """ Returns the catalog items that best match a query. """
-        if annotations is not None and len(annotations) == 0:
-            logger.warning('An empty set of annotations was explicitly specified. This will yield no results. '
-                           'To search without annotations, use "annotations=None" instead.')
-            return list()
-
         import sentence_transformers
         import sklearn
 
@@ -98,16 +94,20 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
                     # Tools without annotations will always be excluded.
                     continue
 
-                is_valid_tool = True
-                for k, v in annotations.items():
-                    if k not in tool.annotations:
-                        is_valid_tool = False
+                # Iterate through our disjuncts.
+                for disjunct in annotations.disjuncts:
+                    is_valid_tool = True
+                    for k, v in disjunct.items():
+                        if k not in tool.annotations:
+                            is_valid_tool = False
+                            break
+                        elif tool.annotations[k] != v:
+                            is_valid_tool = False
+                            break
+                    if is_valid_tool:
+                        candidate_tools += [tool]
                         break
-                    elif tool.annotations[k] != v:
-                        is_valid_tool = False
-                        break
-                if is_valid_tool:
-                    candidate_tools += [tool]
+
         if len(candidate_tools) == 0:
             # Exit early if there are no candidates.
             return list()

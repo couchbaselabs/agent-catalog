@@ -10,6 +10,7 @@ from rosetta_core.catalog.catalog_mem import CatalogMem
 from rosetta_core.catalog.catalog_base import SearchResult
 from rosetta_core.provider.refiner import ClosestClusterRefiner
 from rosetta_core.version import VersionDescriptor
+from rosetta_core.annotation import AnnotationPredicate
 
 from .util import init_local, load_repository
 from ..models.context import Context
@@ -68,19 +69,10 @@ def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refi
                                     printer=click.echo,
                                     progress=tqdm.tqdm, max_errs=DEFAULT_MAX_ERRS)
 
-    # Transform our list of annotations into a single dictionary.
-    annotations_dict = None
-    if annotations is not None and len(annotations) > 0:
-        annotations_dict = dict()
-        for k, v in annotations:
-            if k in annotations_dict:
-                logger.warning(f'Annotation for key {k} has already been specified! Overwriting.')
-            annotations_dict[k] = v
-
     # Query the catalog for a list of results.
     search_results = [
         SearchResult(entry=x.entry, delta=x.delta) for x in
-        catalog.find(query, limit=limit, annotations=annotations_dict)
+        catalog.find(query, limit=limit, annotations=AnnotationPredicate(annotations))
     ]
     if refiner is not None:
         search_results = refiners[refiner]()(search_results)

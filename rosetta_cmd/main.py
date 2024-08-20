@@ -125,10 +125,9 @@ def env(ctx):
 @click.option(
     "-an",
     "--annotations",
-    multiple=True,
-    type=click.Tuple([str, str]),
+    type=str,
     default=None,
-    help="Tool-specific annotations to filter by.",
+    help="Tool-specific annotations to filter by, specified using KEY=\"VALUE\" (AND|OR KEY=\"VALUE\")*.",
     show_default=True,
 )
 @click.pass_context

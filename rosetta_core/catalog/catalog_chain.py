@@ -1,6 +1,7 @@
 import typing
 
 from .catalog_base import CatalogBase, SearchResult
+from ..annotation import AnnotationPredicate
 
 
 class CatalogChain(CatalogBase):
@@ -12,11 +13,11 @@ class CatalogChain(CatalogBase):
     def __init__(self, chain=[]):
         self.chain = chain
 
-    def find(self, query: str, limit: typing.Union[int | None] = 1, annotations: dict[str, str] = None) \
+    def find(self, query: str, limit: typing.Union[int | None] = 1, annotations: AnnotationPredicate = None) \
             -> list[SearchResult]:
         results = []
 
-        seen = set() # Keyed by 'source:name'.
+        seen = set()  # Keyed by 'source:name'.
 
         for c in self.chain:
             results_c = c.find(query, limit=limit, annotations=annotations)

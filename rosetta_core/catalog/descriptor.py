@@ -1,3 +1,5 @@
+import typing
+
 import pydantic
 import enum
 
@@ -17,8 +19,7 @@ class CatalogDescriptor(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(use_enum_values=True)
 
     catalog_schema_version: str = pydantic.Field(
-        description="The version of the catalog schema. "
-                    "This field is used across rosetta SDK versions."
+        description="The version of the catalog schema. This field is used across rosetta SDK versions."
     )
 
     kind: CatalogKind = pydantic.Field(description="The type of items within the catalog.")
@@ -35,6 +36,11 @@ class CatalogDescriptor(pydantic.BaseModel):
 
     source_dirs: list[str] = pydantic.Field(
         description="A list of source directories that were crawled to generate this catalog."
+    )
+
+    project: typing.Optional[str] = pydantic.Field(
+        description="An optional user-defined field to group snapshots by.",
+        default='main'  # TODO (GLENN): Should we use a different name here?
     )
 
     items: list[ToolDescriptorUnionType] = pydantic.Field(description="The entries in the catalog.")
