@@ -122,11 +122,18 @@ def env(ctx):
     help="Specify how to post-process find results.",
     show_default=True,
 )
-@click.argument("annotations", default=None, nargs=-1)
+@click.option(
+    "-an",
+    "--annotations",
+    multiple=True,
+    type=click.Tuple([str, str]),
+    default=None,
+    help="Tool-specific annotations to filter by.",
+    show_default=True,
+)
 @click.pass_context
 def find(ctx, query, kind, limit, include_dirty, refiner, annotations):
-    """Find tools, prompts, etc. from the catalog based on a natural language QUERY string.
-    Optionally specify a list of key-value (ANNOTATIONS) at the end of this command."""
+    """Find tools, prompts, etc. from the catalog based on a natural language QUERY string."""
     cmd_find(
         ctx.obj,
         query,
@@ -233,6 +240,7 @@ def publish(ctx, kind, scope, annotations):
     # Get buckets from CB Cluster
     buckets = get_buckets(cluster=cluster)
 
+    # TODO (GLENN): Have an option to bypass the prompt by allowing a user to directly specify a bucket
     # Prompt user to select a bucket
     selected_bucket = click.prompt(
         "Please select a bucket", type=click.Choice(buckets), show_choices=True

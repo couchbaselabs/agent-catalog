@@ -2,6 +2,7 @@ import tqdm
 import jsbeautifier
 import pathlib
 import click
+import logging
 import os
 
 from rosetta_core.catalog.index import index_catalog
@@ -24,6 +25,8 @@ refiners = {
     # TODO: One day allow for custom refiners at runtime where
     # we dynamically import a user's custom module/function?
 }
+
+logger = logging.getLogger(__name__)
 
 
 def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refiner=None, annotations=None):
@@ -69,12 +72,10 @@ def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refi
     annotations_dict = None
     if annotations is not None and len(annotations) > 0:
         annotations_dict = dict()
-        for annotation in annotations:
-            if '=' not in annotation:
-                raise ValueError('Invalid format for annotation. Use "[key]=[value]".')
-            else:
-                k, v = annotation.split('=', maxsplit=1)
-                annotations_dict[k] = v
+        for k, v in annotations:
+            if k in annotations_dict:
+                logger.warning(f'Annotation for key {k} has already been specified! Overwriting.')
+            annotations_dict[k] = v
 
     # Query the catalog for a list of results.
     search_results = [

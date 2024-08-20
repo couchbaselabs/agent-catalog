@@ -10,10 +10,6 @@ from ..models import Keyspace, Context
 logger = logging.getLogger(__name__)
 
 
-# TODO (GLENN): I haven't tested these changes, but this signals a move towards a "version" object instead of a string.
-# TODO (GLENN): Use click.echo instead of print, and make use of the logger.
-
-
 def cmd_publish(ctx: Context, kind, annotations: list[dict], cluster, keyspace: Keyspace, printer):
     if kind == "all":
         kind_list = ["tool", "prompt"]
@@ -28,7 +24,7 @@ def cmd_publish(ctx: Context, kind, annotations: list[dict], cluster, keyspace: 
     cb = cluster.bucket(bucket)
 
     for kind in kind_list:
-
+        # TODO (GLENN): Can we also move these constants ('-catalog.json', '_metadata') to the defaults.py file?
         catalog_path = Path(ctx.catalog) / (kind + "-catalog.json")
         catalog = CatalogMem.load(catalog_path).catalog_descriptor
 

@@ -26,8 +26,8 @@ class Provider(abc.ABC):
         :param secrets: Map of identifiers to secret values.
 
         Below, we give an example of how this class is used.
-        >>> import rosetta.core.provider as rp
-        >>> import rosetta.core.catalog.catalog_mem as rcm
+        >>> import rosetta_core.provider as rp
+        >>> import rosetta_core.catalog.catalog_mem as rcm
         >>> import os, pathlib
         >>> my_catalog = rcm.CatalogMem.load(pathlib.Path('.rosetta-catalog') / 'tool-catalog.json')
         >>> my_provider = rp.Provider(
