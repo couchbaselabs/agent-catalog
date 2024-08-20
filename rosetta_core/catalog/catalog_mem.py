@@ -2,7 +2,6 @@ import pathlib
 import pydantic
 import typing
 import logging
-import jsbeautifier
 
 from .catalog_base import CatalogBase, SearchResult
 from ..catalog.descriptor import CatalogDescriptor
@@ -52,30 +51,8 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
     def dump(self, catalog_path: pathlib.Path):
         """ Save to a catalog_path JSON file. """
         self.catalog_descriptor.items.sort(key=lambda x: x.identifier)
-
-        # TODO: We should have a specialized json format here, where currently
-        # the vector numbers each take up their own line -- and, instead, we want
-        # the array of vector numbers to be all on one line, so that it's more
-        # usable for humans and so that 'git diff' outputs are more useful.
-        beautify_opts = jsbeautifier.BeautifierOptions(options={
-            "indent_size": 2,
-            "indent_char": " ",
-            "max_preserve_newlines": -1,
-            "preserve_newlines": False,
-            "keep_array_indentation": False,
-            "brace_style": "expand",
-            "unescape_strings": False,
-            "end_with_newline": False,
-            "wrap_line_length": 0,
-            "comma_first": False,
-            "indent_empty_lines": False
-        })
-        pretty_json = jsbeautifier.beautify(
-            self.catalog_descriptor.model_dump_json(),
-            opts=beautify_opts
-        )
         with catalog_path.open('w') as fp:
-            fp.write(pretty_json)
+            fp.write(str(self.catalog_descriptor))
             fp.write('\n')
 
     def find(self, query: str, limit: typing.Union[int | None] = 1, annotations: AnnotationPredicate = None) \

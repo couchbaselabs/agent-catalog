@@ -1,9 +1,9 @@
-import tqdm
-import jsbeautifier
 import pathlib
 import click
 import logging
 import os
+import textwrap
+import tqdm
 
 from rosetta_core.catalog.index import index_catalog
 from rosetta_core.catalog.catalog_mem import CatalogMem
@@ -17,7 +17,6 @@ from ..models.context import Context
 from ..defaults import (
     DEFAULT_SCAN_DIRECTORY_OPTS,
     DEFAULT_MAX_ERRS,
-    DEFAULT_BEAUTIFY_OPTS
 )
 
 refiners = {
@@ -36,7 +35,6 @@ def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refi
     #       then we need to consult the latest, local catalog / MemCatalogRef?
     # TODO: Optional, future flags might specify variations like --local-catalog-only
     #       and/or --db-catalog-only, and/or both, via chaining multiple CatalogRef's?
-    # TODO: When refactoring is done, rename back to "tool_catalog.json" (with underscore)?
     # TODO: Possible security issue -- need to check kind is an allowed value?
 
     if refiner == "None":
@@ -66,8 +64,9 @@ def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refi
             catalog = index_catalog(meta, version, get_path_version,
                                     kind, catalog_path, source_dirs,
                                     scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
-                                    printer=click.echo,
-                                    progress=tqdm.tqdm, max_errs=DEFAULT_MAX_ERRS)
+                                    printer=logger.debug if not ctx.verbose else click.echo,
+                                    progress=(lambda a: a) if not ctx.verbose else tqdm.tqdm,
+                                    max_errs=DEFAULT_MAX_ERRS)
 
     # Query the catalog for a list of results.
     search_results = [
@@ -76,10 +75,12 @@ def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refi
     ]
     if refiner is not None:
         search_results = refiners[refiner]()(search_results)
-    for i, result in enumerate(search_results):
-        pretty_json = jsbeautifier.beautify(
-            result.entry.model_dump_json(exclude={'embedding'}),
-            opts=DEFAULT_BEAUTIFY_OPTS
-        )
-        click.echo(f'#{i + 1} (delta = {result.delta}, higher is better): ', nl=False)
-        click.echo(pretty_json)
+    click.secho(f'{len(search_results)} result(s) returned from the catalog.', bold=True, bg='green')
+    if ctx.verbose:
+        for i, result in enumerate(search_results):
+            click.secho(f'  {i + 1}. (delta = {result.delta}, higher is better): ', bold=True)
+            click.echo(textwrap.indent(str(result.entry), '  '))
+    else:
+        for i, result in enumerate(search_results):
+            click.secho(f'  {i + 1}. (delta = {result.delta}, higher is better): ', nl=False, bold=True)
+            click.echo(str(result.entry.identifier))

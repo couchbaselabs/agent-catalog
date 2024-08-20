@@ -1,9 +1,11 @@
 import typing
-
+import jsbeautifier
 import pydantic
 import enum
+import json
 
 from ..tool.descriptor import ToolDescriptorUnionType
+from ..record.descriptor import BEAUTIFY_OPTS
 from ..version import VersionDescriptor
 
 
@@ -44,3 +46,14 @@ class CatalogDescriptor(pydantic.BaseModel):
     )
 
     items: list[ToolDescriptorUnionType] = pydantic.Field(description="The entries in the catalog.")
+
+    def __str__(self):
+        return jsbeautifier.beautify(
+            json.dumps(self.model_dump(
+                # TODO (GLENN): Should we be excluding null-valued fields here?
+                exclude_none=True,
+                exclude_unset=True,
+                mode='json'
+            ), sort_keys=True),
+            opts=BEAUTIFY_OPTS
+        )

@@ -2,9 +2,25 @@ import pydantic
 import pathlib
 import enum
 import typing
+import jsbeautifier
+import json
 
 from ..version import VersionDescriptor
 from ..version.identifier import VersionSystem
+
+BEAUTIFY_OPTS = jsbeautifier.BeautifierOptions(options={
+    "indent_size": 2,
+    "indent_char": " ",
+    "max_preserve_newlines": -1,
+    "preserve_newlines": False,
+    "keep_array_indentation": False,
+    "brace_style": "expand",
+    "unescape_strings": False,
+    "end_with_newline": False,
+    "wrap_line_length": 0,
+    "comma_first": False,
+    "indent_empty_lines": False
+})
 
 
 class RecordKind(enum.StrEnum):
@@ -80,6 +96,18 @@ class RecordDescriptor(pydantic.BaseModel):
     def identifier(self, identifier: str) -> str:
         # This is purely a computed field, we do not need to set anything else.
         pass
+
+    def __str__(self):
+        # Note: this method should only be used to display info (use model_dump to persist this record).
+        return jsbeautifier.beautify(
+            json.dumps(self.model_dump(
+                exclude={'embedding'},
+                exclude_none=True,
+                exclude_unset=True,
+                mode='json'
+            ), sort_keys=True),
+            opts=BEAUTIFY_OPTS
+        )
 
     def __hash__(self):
         return hash(self.identifier)
