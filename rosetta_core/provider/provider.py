@@ -56,7 +56,7 @@ class Provider(abc.ABC):
         :param limit: The maximum number of results to return.
         :return: A list of tools (Python functions).
         """
-        annotation_predicate = AnnotationPredicate(query=annotations)
+        annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
         results = self.refiner(self.catalog.find(query=query, annotations=annotation_predicate, limit=limit))
 
         # Load all tools that we have not already cached.
