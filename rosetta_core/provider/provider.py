@@ -8,6 +8,7 @@ from ..catalog.catalog_base import (
     CatalogBase,
     SearchResult
 )
+from ..annotation import AnnotationPredicate
 from .loader import EntryLoader
 
 logger = logging.getLogger(__name__)
@@ -47,15 +48,16 @@ class Provider(abc.ABC):
             for k, v in secrets.items():
                 put_secret(k, v)
 
-    def get_tools_for(self, query: str, annotations: dict[str, str] = None, limit: typing.Union[int | None] = 1) \
+    def get_tools_for(self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1) \
             -> list[typing.Any]:
         """
         :param query: A string to search the catalog with.
-        :param annotations: A set of annotations (as a dictionary) that must exist with each associated entry.
+        :param annotations: An annotation query string in the form of KEY=VALUE (AND|OR KEY=VALUE)*.
         :param limit: The maximum number of results to return.
         :return: A list of tools (Python functions).
         """
-        results = self.refiner(self.catalog.find(query=query, annotations=annotations, limit=limit))
+        annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
+        results = self.refiner(self.catalog.find(query=query, annotations=annotation_predicate, limit=limit))
 
         # Load all tools that we have not already cached.
         non_cached_results = [f.entry for f in results if f.entry not in self._tool_cache]

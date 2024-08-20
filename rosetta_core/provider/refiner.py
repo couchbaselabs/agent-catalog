@@ -1,3 +1,4 @@
+import abc
 import typing
 import pydantic
 import scipy.signal
@@ -10,8 +11,14 @@ from ..catalog.catalog_base import SearchResult
 logger = logging.getLogger(__name__)
 
 
+class BaseRefiner(abc.ABC):
+    @abc.abstractmethod
+    def __call__(self, ordered_entries: list[SearchResult]):
+        pass
+
+
 # TODO (GLENN): Fine tune the deepening factor...
-class ClosestClusterRefiner(pydantic.BaseModel):
+class ClosestClusterRefiner(pydantic.BaseModel, BaseRefiner):
     kde_distribution_n: int = pydantic.Field(default=10000, gt=0)
     deepening_factor: float = pydantic.Field(default=0.1, gt=0)
     max_deepen_steps: int = pydantic.Field(default=10, gt=0)

@@ -9,9 +9,12 @@ import couchbase.vector_search
 import typing
 import json
 import sentence_transformers
+import logging
 
 from rosetta_core.tool import tool
 from rosetta_core.secrets import get_secret
+
+logger = logging.getLogger(__name__)
 
 {{ input.generated_code }}
 

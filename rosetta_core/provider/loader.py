@@ -115,7 +115,7 @@ class EntryLoader:
                 case RecordKind.SemanticSearch:
                     generator = SemanticSearchCodeGenerator(record_descriptors=entries).generate
                 case RecordKind.HTTPRequest:
-                    generator = HTTPRequestCodeGenerator(record_descriptor=entries).generate
+                    generator = HTTPRequestCodeGenerator(record_descriptors=entries).generate
                 case _:
                     raise ValueError('Unexpected tool-kind encountered!')
 
