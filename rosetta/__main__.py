@@ -1,8 +1,8 @@
 def main():
-    import rosetta.cmd
+    import rosetta_cmd
 
     # Note: all the CLI code currently resides in rosetta-core.
-    rosetta.cmd.main()
+    rosetta_cmd.main()
 
 
 if __name__ == '__main__':

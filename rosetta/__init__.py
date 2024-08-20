@@ -1,4 +1,4 @@
-from rosetta.core.tool.decorator import tool
+from rosetta_core.tool.decorator import tool
 
 from .provider import Provider
 
