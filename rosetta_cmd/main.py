@@ -4,6 +4,11 @@ import sys
 import click
 import dotenv
 
+from rosetta_util.publish import get_buckets, get_connection
+from .models import Keyspace, CouchbaseConnect, Context
+from .cmds import *
+from .defaults import *
+
 # Configure all logging here before we continue with our imports.
 # By default, we won't print any log messages below WARNING.
 logging.basicConfig(
@@ -14,11 +19,6 @@ logging.basicConfig(
 
 # Keeping this here, sentence_transformers logging can be pretty verbose.
 logging.getLogger("sentence_transformers").setLevel(logging.WARNING)
-
-from rosetta_util.publish import get_buckets, get_connection
-from .models import Keyspace, CouchbaseConnect, Context
-from .cmds import *
-from .defaults import *
 
 # TODO: Should we load from ".env.rosetta"?
 # TODO: Or, perhaps even stage specific, like from ".env.rosetta.prod"?
