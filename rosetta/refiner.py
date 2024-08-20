@@ -1,5 +1,4 @@
 from rosetta_core.provider.refiner import (
-    SearchResult,
-    ClosestClusterRefiner
+    SearchResult, BaseRefiner,
 )
 from rosetta_core.record.descriptor import RecordDescriptor

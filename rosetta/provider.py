@@ -87,7 +87,7 @@ class Provider(pydantic_settings.BaseSettings):
     SearchResult instances (a model with the fields "entry" and "delta") and return a list of SearchResult instances.
     
     We offer an experimental post-processor to cluster closely related results (using delta as the loss function) and
-    subsequently yield the closest cluster (see rosetta.refiner.ClosestClusterRefiner).
+    subsequently yield the closest cluster (see rosetta_core.provider.refiner.ClosestClusterRefiner).
     """
 
     secrets: typing.Optional[dict[str, pydantic.SecretStr]] = pydantic.Field(default_factory=dict, frozen=True)
@@ -183,11 +183,11 @@ class Provider(pydantic_settings.BaseSettings):
         )
         return self
 
-    def get_tools_for(self, query: str, annotations: dict[str, str] = None, limit: typing.Union[int | None] = 1) \
+    def get_tools_for(self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1) \
             -> list[typing.Any]:
         """
         :param query: A string to search the catalog with.
-        :param annotations: A set of annotations (as a dictionary) that must exist with each associated entry.
+        :param annotations: An annotation query string in the form of KEY=VALUE (AND|OR KEY=VALUE)*.
         :param limit: The maximum number of results to return.
         :return: A list of tools (Python functions).
         """
