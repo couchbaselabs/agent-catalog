@@ -226,7 +226,9 @@ def publish(ctx, kind, scope):
     )
     click.echo(f"Inserting documents in : {selected_bucket}/{keyspace_details.scope}\n")
     keyspace_details.bucket = selected_bucket
-    cmd_publish(ctx.obj, kind, cluster, keyspace_details)
+
+    printer = click.echo
+    cmd_publish(ctx.obj, kind, cluster, keyspace_details, printer)
 
     cluster.close()
 

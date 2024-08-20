@@ -18,10 +18,10 @@ logger = logging.getLogger(__name__)
 # TODO (GLENN): I haven't tested these changes, but this signals a move towards a "version" object instead of a string.
 # TODO (GLENN): Use click.echo instead of print, and make use of the logger.
 
-def cmd_publish(ctx: Context, kind, cluster, keyspace: Keyspace):
+def cmd_publish(ctx: Context, kind, cluster, keyspace: Keyspace, printer):
     if kind == "all":
         kind_list = ["tool", "prompt"]
-        print("Inserting all catalogs...")
+        logger.info("Inserting all catalogs...")
     else:
         kind_list = [kind]
 
@@ -43,7 +43,7 @@ def cmd_publish(ctx: Context, kind, cluster, keyspace: Keyspace):
         meta_col = kind + "_metadata"
         (msg, err) = create_scope_and_collection(bucket_manager, scope=scope, collection=meta_col)
         if err is not None:
-            print(msg, err)
+            printer(msg, err)
             return
 
         # get collection ref
@@ -52,28 +52,28 @@ def cmd_publish(ctx: Context, kind, cluster, keyspace: Keyspace):
         # dict to store all the metadata - snapshot related data
         metadata = {el: catalog.model_dump()[el] for el in catalog.model_dump() if el != 'items'}
 
-        print("Upserting metadata..")
+        printer("Upserting metadata..")
         try:
             key = metadata['version']['identifier']
             cb_coll.upsert(key, metadata)
-            # print("Snapshot ",result.key," added to keyspace")
+            # printer("Snapshot ",result.key," added to keyspace")
         # TODO (GLENN): Should use the specific exception here instead of 'Exception'.
         except Exception as e:
-            print("could not insert: ", e)
+            logger.error("could not insert: ", e)
             return e
-        print("Metadata added!\n")
+        printer("Metadata added!")
 
         # ----------Catalog items collection----------
         catalog_col = kind + "_catalog"
         (msg, err) = create_scope_and_collection(bucket_manager, scope=scope, collection=catalog_col)
         if err is not None:
-            print(msg, err)
+            printer(msg, err)
             return
 
         # get collection ref
         cb_coll = cb.scope(scope).collection(catalog_col)
 
-        print("Upserting catalog items..")
+        printer("Upserting catalog items..")
 
         # iterate over individual catalog items
         for item in catalog.items:
@@ -90,9 +90,9 @@ def cmd_publish(ctx: Context, kind, cluster, keyspace: Keyspace):
                 # upsert docs to CB collection
                 cb_coll.upsert(key, item_json)
             except Exception as e:
-                print("could not insert: ", e)
+                logger.error("could not insert: ", e)
                 return e
 
-        print("Inserted", kind, "catalog successfully!\n")
+        printer(f"Inserted {kind} catalog successfully!\n")
 
-    return "Successfully inserted all catalogs!"
+    logger.info("Successfully inserted all catalogs!")
