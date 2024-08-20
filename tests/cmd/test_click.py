@@ -4,8 +4,8 @@ import pytest
 import shutil
 import pathlib
 
-from rosetta.cmd.main import click_main
-from rosetta.cmd.defaults import (
+from rosetta_cmd.main import click_main
+from rosetta_cmd.defaults import (
     DEFAULT_CATALOG_FOLDER,
     DEFAULT_ACTIVITY_FOLDER,
     DEFAULT_TOOL_CATALOG_NAME,

@@ -2,14 +2,14 @@ import pathlib
 import uuid
 import pytest
 
-from rosetta.core.catalog.catalog_base import SearchResult
-from rosetta.core.version.identifier import (
+from rosetta_core.catalog.catalog_base import SearchResult
+from rosetta_core.version.identifier import (
     VersionDescriptor, VersionSystem
 )
-from rosetta.core.record.descriptor import (
+from rosetta_core.record.descriptor import (
     RecordDescriptor, RecordKind
 )
-from rosetta.core.provider.refiner import (
+from rosetta_core.provider.refiner import (
     ClosestClusterRefiner
 )
 

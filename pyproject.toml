@@ -9,7 +9,15 @@ authors = [
     "Tanvi Johari <tanvi.johari@couchbase.com>"
 ]
 readme = "README.md"
-packages = [{ include = "rosetta" }]
+packages = [
+    { include = "rosetta_core" },
+    { include = "rosetta_cmd"},
+    { include = "rosetta_util"}
+]
+
+include = [
+    "rosetta_core/tool/generate/templates/*"
+]
 
 [tool.poetry.urls]
 Homepage = "https://couchbase.com"

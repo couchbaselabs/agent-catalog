@@ -1,5 +1,5 @@
 import pydantic
-from rosetta.core.tool import tool
+from rosetta_core.tool import tool
 
 
 class TravelCost(pydantic.BaseModel):
