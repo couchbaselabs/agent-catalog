@@ -4,23 +4,21 @@ import sys
 import click
 import dotenv
 
+from rosetta_util.publish import get_buckets, get_connection
+from .models import Keyspace, CouchbaseConnect, Context
+from .cmds import *
+from .defaults import *
+
 # Configure all logging here before we continue with our imports.
 # By default, we won't print any log messages below WARNING.
 logging.basicConfig(
     level=logging.WARNING,
     format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.StreamHandler()
-    ]
+    handlers=[logging.StreamHandler()],
 )
 
 # Keeping this here, sentence_transformers logging can be pretty verbose.
-logging.getLogger('sentence_transformers').setLevel(logging.WARNING)
-
-from rosetta_util.publish import get_buckets, get_connection
-from .models import Keyspace, CouchbaseConnect, Context
-from .cmds import *
-from .defaults import *
+logging.getLogger("sentence_transformers").setLevel(logging.WARNING)
 
 # TODO: Should we load from ".env.rosetta"?
 # TODO: Or, perhaps even stage specific, like from ".env.rosetta.prod"?
@@ -77,7 +75,7 @@ class AliasedGroup(click.Group):
 )
 @click.pass_context
 def click_main(ctx, catalog, activity, verbose):
-    """ A command line tool for Rosetta. """
+    """A command line tool for Rosetta."""
     ctx.obj = Context(activity=activity, catalog=catalog, verbose=verbose)
     # ctx.obj = ctx.obj or {"catalog": catalog, "activity": activity, "verbose": verbose}
 
@@ -85,14 +83,14 @@ def click_main(ctx, catalog, activity, verbose):
 @click_main.command()
 @click.pass_context
 def clean(ctx):
-    """ Clean up the catalog folder, the activity folder, any generated files, etc... """
+    """Clean up the catalog folder, the activity folder, any generated files, etc..."""
     cmd_clean(ctx.obj)
 
 
 @click_main.command()
 @click.pass_context
 def env(ctx):
-    """ Show this program's environment or configuration parameters as a JSON object. """
+    """Show this program's environment or configuration parameters as a JSON object."""
     cmd_env(ctx.obj)
 
 
@@ -119,22 +117,25 @@ def env(ctx):
 )
 @click.option(
     "--refiner",
-    type=click.Choice(['ClosestCluster', 'None'], case_sensitive=False),
+    type=click.Choice(["ClosestCluster", "None"], case_sensitive=False),
     default=None,
     help="Specify how to post-process find results.",
     show_default=True,
 )
-@click.argument(
-    'annotations',
-    default=None,
-    nargs=-1
-)
+@click.argument("annotations", default=None, nargs=-1)
 @click.pass_context
 def find(ctx, query, kind, limit, include_dirty, refiner, annotations):
-    """ Find tools, prompts, etc. from the catalog based on a natural language QUERY string.
-        Optionally specify a list of key-value (ANNOTATIONS) at the end of this command. """
-    cmd_find(ctx.obj, query, kind=kind, limit=limit, include_dirty=include_dirty, refiner=refiner,
-             annotations=annotations)
+    """Find tools, prompts, etc. from the catalog based on a natural language QUERY string.
+    Optionally specify a list of key-value (ANNOTATIONS) at the end of this command."""
+    cmd_find(
+        ctx.obj,
+        query,
+        kind=kind,
+        limit=limit,
+        include_dirty=include_dirty,
+        refiner=refiner,
+        annotations=annotations,
+    )
 
 
 @click_main.command()
@@ -167,9 +168,9 @@ def find(ctx, query, kind, limit, include_dirty, refiner, annotations):
 )
 @click.pass_context
 def index(ctx, source_dirs, kind, embedding_model, include_dirty, dry_run):
-    """ Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
-        SOURCE_DIRS defaults to ".", the current working directory.
-        Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc. """
+    """Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
+    SOURCE_DIRS defaults to ".", the current working directory.
+    Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc."""
 
     if not source_dirs:
         source_dirs = ["."]
@@ -200,10 +201,22 @@ def index(ctx, source_dirs, kind, embedding_model, include_dirty, dry_run):
     "--scope",
     default="rosetta-catalog",
     help="Couchbase Scope where data is inserted.",
+    show_default=True,
+)
+@click.option(
+    "-an",
+    "--annotations",
+    multiple=True,
+    type=click.Tuple([str, str]),
+    default=[],
+    help="Snapshot level annotations to be added while publishing.",
+    show_default=True,
 )
 @click.pass_context
-def publish(ctx, kind, scope):
+def publish(ctx, kind, scope, annotations):
     """Publish command that inserts after reading CatalogMem object"""
+
+    # Get keyspace and connection details
     keyspace_details = Keyspace(bucket="", scope=scope)
     connection_details = CouchbaseConnect(
         connection_url=os.getenv("CB_CONN_STRING"),
@@ -226,7 +239,9 @@ def publish(ctx, kind, scope):
     )
     click.echo(f"Inserting documents in : {selected_bucket}/{keyspace_details.scope}\n")
     keyspace_details.bucket = selected_bucket
-    cmd_publish(ctx.obj, kind, cluster, keyspace_details)
+
+    printer = click.echo
+    cmd_publish(ctx.obj, kind, annotations, cluster, keyspace_details, printer)
 
     cluster.close()
 
@@ -247,14 +262,14 @@ def publish(ctx, kind, scope):
 )
 @click.pass_context
 def status(ctx, kind, include_dirty):
-    """ Show the status of the local catalog. """
+    """Show the status of the local catalog."""
     cmd_status(ctx.obj, kind=kind, include_dirty=include_dirty)
 
 
 @click_main.command()
 @click.pass_context
 def version(ctx):
-    """ Show the version of this tool. """
+    """Show the version of this tool."""
     cmd_version(ctx.obj)
 
 
@@ -275,7 +290,7 @@ def version(ctx):
 )
 @click.pass_context
 def web(ctx, host_port, debug):
-    """ Start a local web server to view our tools. """
+    """Start a local web server to view our tools."""
     cmd_web(ctx.obj, host_port, debug)
 
 
