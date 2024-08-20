@@ -25,7 +25,7 @@ Documentation = "https://docs.couchbase.com"
 Repository = "https://github.com/couchbaselabs/rosetta-core"
 
 [tool.poetry.scripts]
-rosetta = "rosetta.cmd.main:main"
+rosetta = "rosetta_cmd.main:main"
 
 [tool.poetry.dependencies]
 python = "^3.11"
