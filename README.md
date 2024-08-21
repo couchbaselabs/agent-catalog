@@ -15,9 +15,9 @@ User facing repository for all things rosetta (tooling around agent workflows).
    Run the `rosetta` command to test your installation.
    ```bash
     Usage: rosetta [OPTIONS] COMMAND [ARGS]...
-    
+
       A command line tool for Rosetta.
-    
+
     Options:
       -c, --catalog DIRECTORY   Directory of local catalog files. The local
                                 catalog DIRECTORY should be checked into git.
@@ -28,7 +28,7 @@ User facing repository for all things rosetta (tooling around agent workflows).
                                 logs, etc.  [default: .rosetta-activity]
       -v, --verbose             Enable verbose output.
       --help                    Show this message and exit.
-    
+
     Commands:
       clean       Clean up the catalog folder, the activity folder, any...
       env         Show this program's environment or configuration parameters...
@@ -73,6 +73,16 @@ This repository (`rosetta`) is meant to serve as a "front-desk", where we focus 
 (i.e., being opinionated) for the sake of a simpler / more-user-friendly out-of-the-box experience.
 Keep this in mind when contributing to these repositories: the core should be minimal and extensible, and this
 repository should leverage the core's extensibility.
+
+### Setting up Pre-Commit
+
+To set up `pre-commit` and reap all the benefits of code formatting, linting, automatic `poetry` lock generation, etc...
+execute the following command:
+
+```bash
+pip install pre-commit
+pre-commit install
+```
 
 ### Enabling Debug Mode
 
