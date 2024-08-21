@@ -1,3 +1,7 @@
+"""
+Need to add user parameters in .env file
+"""
+
 import rosetta.lc
 import json
 import os
@@ -36,7 +40,7 @@ auth = PasswordAuthenticator(
 
 # Get a reference to our cluster
 # NOTE: For TLS/SSL connection use 'couchbases://<your-ip-address>' instead
-cluster = Cluster('couchbase://10.100.172.95', ClusterOptions(auth))
+cluster = Cluster(os.getenv("CONN_STRING"), ClusterOptions(auth))
 
 # Wait until the cluster is ready for use.
 cluster.wait_until_ready(timedelta(seconds=5))
@@ -95,32 +99,31 @@ def gen_doc(id: str, name: str, callsign: str):
 content = {}
 
 def processResponse():
-    if"tool_calls" in content["choices"][0]["message"]:
-                print(content["choices"][0]["message"]["tool_calls"][0]["function"])
-                
-                func = globals()[content["choices"][0]["message"]["tool_calls"][0]["function"]["name"]]
+    if "tool_calls" in content["choices"][0]["message"]:
+        print(content["choices"][0]["message"]["tool_calls"][0]["function"])
+        
+        func = globals()[content["choices"][0]["message"]["tool_calls"][0]["function"]["name"]]
 
-                print(func)
+        print(func)
 
-                if content["choices"][0]["message"]["tool_calls"][0]["function"]["name"] == "gen_doc":
+        if content["choices"][0]["message"]["tool_calls"][0]["function"]["name"] == "gen_doc":
 
-                    argsDict = json.loads(content["choices"][0]["message"]["tool_calls"][0]["function"]["arguments"])
-                    print(content["choices"][0]["message"]["tool_calls"][0]["function"]["name"])
-                    s2 = func(argsDict["id"], argsDict["name"], argsDict["callsign"])
-                    storedAirlines.append(s2)
-                
-                elif content["choices"][0]["message"]["tool_calls"][0]["function"]["name"] == "upsert_document":
-                    if storedAirlines:
-                        func(storedAirlines[0])
-                        storedAirlines.pop(0)
+            argsDict = json.loads(content["choices"][0]["message"]["tool_calls"][0]["function"]["arguments"])
+            print(content["choices"][0]["message"]["tool_calls"][0]["function"]["name"])
+            s2 = func(argsDict["id"], argsDict["name"], argsDict["callsign"])
+            storedAirlines.append(s2)
+        
+        elif content["choices"][0]["message"]["tool_calls"][0]["function"]["name"] == "upsert_document":
+            if storedAirlines:
+                func(storedAirlines[0])
+                storedAirlines.pop(0)
 
-                elif content["choices"][0]["message"]["tool_calls"][0]["function"]["name"] == "get_airline_by_key":
-                    argsDict = json.loads(content["choices"][0]["message"]["tool_calls"][0]["function"]["arguments"])
-                    func(argsDict["key"])
+        elif content["choices"][0]["message"]["tool_calls"][0]["function"]["name"] == "get_airline_by_key":
+            argsDict = json.loads(content["choices"][0]["message"]["tool_calls"][0]["function"]["arguments"])
+            func(argsDict["key"])
+
 
 test = rosetta.lc.IQAgent(model_name="custam",capAddy=os.getenv("CAPELLA-ADDRESS"), orgID=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
-test.setFields()
-
 s1 = test.invoke([
     SystemMessage(content="You are a helpful assistant who knows everything, especially about the Couchbase Server Cluster. "),
     HumanMessage(content="Can you gen a doc with ID=8091, callsign=CBA, and name=Couchbase Airways"),
@@ -134,9 +137,9 @@ s2 = test.invoke([
     HumanMessage(content="Can you gen a doc with ID=8091, callsign=CBA, and name=Couchbase Airways"),
 ])
 
-print("Without Binding: ", s1)
+print(f"Without Binding: {s1}")
 print()
-print("With Binding: ", s2)
+print(f"With Binding: {s2}")
 
 content = json.loads(s2.content)
 

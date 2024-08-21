@@ -1,10 +1,13 @@
 import pytest
-import rosetta.lc
+import rosetta_lc
 import random
 import pydantic
 import json
 import os
 from datetime import timedelta 
+
+#TODO consolidate duplicate code in beginning b/w example & test
+
 # needed for any cluster connection
 from couchbase.auth import PasswordAuthenticator
 from couchbase.cluster import Cluster
@@ -168,7 +171,8 @@ def test_set5():
     with pytest.raises(ValueError) as excinfo:
         test.select_model("Couchbase")
 
-#Tests with generation/streaming
+
+#TODO Tests with generation/streaming
 def test_gen1():
     test = rosetta.lc.IQAgent(model_name="custam",capAddy=os.getenv("CAPELLA-ADDRESS"), orgID=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
 

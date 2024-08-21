@@ -14,6 +14,7 @@ from langchain_core.messages import (
     ToolMessage,
 )
 from langchain.agents import tool
+from pathlib import Path
 from joblib import Memory
 import requests
 import subprocess
@@ -21,25 +22,23 @@ import json
 import logging
 import time
 import os
-from dotenv import load_dotenv, dotenv_values 
-load_dotenv()
-logging.root.setLevel(logging.DEBUG)
-logger = logging.getLogger(__name__)
-class CustomChatModel(BaseChatModel):
+
+class IQChatModel(BaseChatModel):
     """
     Custom Chat Model that calls IQ proxy
     """
 
+    #TODO: validate model_name & other string variables on instantation
     model_name: str
     """The name of the model"""
 
-    capAddy: str
+    capella_address: str
     """Base URL for capella IQ """
 
-    orgID: str
+    org_id: str
     """Org ID for capella IQ"""
 
-    hJWT: str
+    jwt: str
     """JWT token"""
 
     _supportedModels = [
@@ -60,65 +59,6 @@ class CustomChatModel(BaseChatModel):
     }
     """Payload for iq-proxy request"""
 
-    _payloadOld = {
-        "messages": [], 
-        "completionSettings": {
-            "model":"gpt-4", 
-            "stream": False,
-            "type": "json_object",
-            "tools": [
-                {
-                    "type": "function",
-                    "function": {
-                        "name": "gen_doc",
-                        "description": "Generates a document for an airline and returns it.", 
-                        "parameters": {
-                            "type": "object",
-                            "properties": {
-                                "id" : {"type": "string", "description": "the id of the airline"},
-                                "name": {"type": "string", "description": "the name of the airline"},
-                                "callsign": {"type": "string", "description": "the callsign of the airline"}
-                            },
-                            "required": ["id", "name", "callsign"]
-                        }
-                    }
-                },
-                {
-                    "type": "function",
-                    "function":{
-                        "name": "get_airline_by_key",
-                        "descrition": "Retrieves an airline with a given key",
-                        "parameters": {
-                            "type": "object",
-                            "properties": {
-                                "key": {"type": "string", "description": "the key of the airline to retrieve, in the form of airline_xxxx"}
-                            },
-                            "required": ["key"]
-                        }
-                    }
-                },
-                {
-                    "type": "function",
-                    "function": {
-                        "name": "upsert_document",
-                        "description": "Updates/Inserts a document into a collection",
-                        "parameters": {
-                            "type": "object",
-                            "properties": {
-                                "doc": {"type": "object", "description": "the document to be inserted into the collection"},
-                            },
-                            "required": ["doc"]
-                        }
-
-                    }
-                }
-            ]
-        },
-
-    }
-
-    """def getTools(self):
-        return [upsert_document, gen_doc, get_airline_by_key]"""
 
     def _generate(
         self,
@@ -127,20 +67,12 @@ class CustomChatModel(BaseChatModel):
         run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     )    -> ChatResult: 
-        """Override the _generate method to implement the chat model logic.
-
-        This can be a call to an API, a call to a local model, or any other
-        implementation that generates a response to the input prompt.
+        """Overriding the _generate with a call to the iq-backend-proxy.
 
         Args:
-            messages: the prompt composed of a list of messages.
-            stop: a list of strings on which the model should stop generating.
-                  If generation stops due to a stop token, the stop token itself
-                  SHOULD BE INCLUDED as part of the output. This is not enforced
-                  across models right now, but it's a good practice to follow since
-                  it makes it much easier to parse the output of the model
-                  downstream and understand why generation stopped.
-            run_manager: A run manager with callbacks for the LLM. 
+            messages: prompt as a list of messages
+            stop & run_manager: Not Implemented currently
+    
         """
 
         # Seperate inputs into system or human messages, could add more for other types
@@ -159,8 +91,8 @@ class CustomChatModel(BaseChatModel):
         # _generate is one-time invoke, so no stream
         self._payload["completionSettings"]["stream"] = False
 
-        urlCompletion = self.capAddy + "/v2/organizations/" + self.orgID + "/integrations/iq/openai/chat/completions"
-        h = {
+        url_completion = path(self.capAddy + "/v2/organizations/" + self.orgID + "/integrations/iq/openai/chat/completions")
+        header = {
                 'Content-Type': 'application/json',
                 "Authorization": self.hJWT
         }
@@ -168,15 +100,15 @@ class CustomChatModel(BaseChatModel):
         #Send request to IQ-Proxy
         try:
 
-            r = requests.post(urlCompletion, json=self._payload, headers=h)
+            response = requests.post(urlCompletion, json=self._payload, headers=h)
 
-            r2 = AIMessage(
+            responseMessage = AIMessage(
                 content=r.text,
                 additional_kwargs={},  # Used to add additional payload (e.g., function calling request)
                 response_metadata={},  # Use for response metadata 
             )
 
-            generation = ChatGeneration(message=r2)
+            generation = ChatGeneration(message=responseMessage)
             return ChatResult(generations=[generation])       
         except:
             logger.error("Error in requesting to IQ-proxy")
@@ -189,28 +121,18 @@ class CustomChatModel(BaseChatModel):
         **kwargs: Any,
     ) -> Iterator[ChatGenerationChunk]:
         """
-        Stream the output of the model.
-
-        This method should be implemented if the model can generate output
-        in a streaming fashion. If the model does not support streaming,
-        do not implement it. In that case streaming requests will be automatically
-        handled by the _generate method.
+        Constantly streams the output of the model.
 
         Args:
-            messages: the prompt composed of a list of messages.
-            stop: a list of strings on which the model should stop generating.
-                    If generation stops due to a stop token, the stop token itself
-                    SHOULD BE INCLUDED as part of the output. This is not enforced
-                    across models right now, but it's a good practice to follow since
-                    it makes it much easier to parse the output of the model
-                    downstream and understand why generation stopped.
-            run_manager: A run manager with callbacks for the LLM.
+            messages: prompt as a list of messages
+            stop & run_manager: Not Implemented currently
+    
         """
 
         self._payload["completionSettings"]["stream"] = True
 
-        urlCompletion = self.capAddy + "/v2/organizations/" + self.orgID + "/integrations/iq/openai/chat/completions"
-        h = {
+        url_completion = path(self.capAddy + "/v2/organizations/" + self.orgID + "/integrations/iq/openai/chat/completions")
+        header = {
                 'Content-Type': 'application/json',
                 "Authorization": self.hJWT
         }
@@ -333,24 +255,18 @@ class CustomChatModel(BaseChatModel):
         is used for tracing purposes make it possible to monitor LLMs.
         """
         return {
-            # The model name allows users to specify custom token counting
-            # rules in LLM monitoring applications (e.g., in LangSmith users
-            # can provide per token pricing for their model and monitor
-            # costs for the given LLM.)
             "model_name": self.model_name,
         }
  
-memory = Memory("cachedir")
-
 if __name__ == "__main__":
 
+    #TODO add python req to replace subprocess
     JWT = subprocess.run("./../genJWT.sh", capture_output=True, text=True).stdout.strip()
     toInserthJWT = "Bearer " + JWT
 
     model = CustomChatModel(model_name="my_custom_model", capAddy=os.getenv("CAPELLA-ADDRESS"), orgID=os.getenv("ORG-ID"), hJWT=toInserthJWT)
 
 
-    #@memory.cache dont want cacheing when 
     def invoker(s):
         returnS = model.invoke(
             [
@@ -370,32 +286,9 @@ if __name__ == "__main__":
         sT = time.time()
         s = invoker(inp)
         eT = time.time()
-        logger.info(f"Time: {eT-sT}")      
+        print(f"Time: {eT-sT}")      
         content = json.loads(s.content)
 
-        """if skip and "tool_calls" in content["choices"][0]["message"]:
-            print(content["choices"][0]["message"]["tool_calls"][0]["function"])
-            
-            func = globals()[content["choices"][0]["message"]["tool_calls"][0]["function"]["name"]]
-
-            print(func)
-
-            if cont ent["choices"][0]["message"]["tool_calls"][0]["function"]["name"] == "gen_doc":
-
-                argsDict = json.loads(content["choices"][0]["message"]["tool_calls"][0]["function"]["arguments"])
-                print(content["choices"][0]["message"]["tool_calls"][0]["function"]["name"])
-                s2 = func(argsDict["id"], argsDict["name"], argsDict["callsign"])
-                storedAirlines.append(s2)
-            
-            elif content["choices"][0]["message"]["tool_calls"][0]["function"]["name"] == "upsert_document":
-                if storedAirlines:
-                    func(storedAirlines[0])
-                    storedAirlines.pop(0)
-
-            elif content["choices"][0]["message"]["tool_calls"][0]["function"]["name"] == "get_airline_by_key":
-                argsDict = json.loads(content["choices"][0]["message"]["tool_calls"][0]["function"]["arguments"])
-                func(argsDict["key"])
-
-        else:"""
+       
         for x in content:
-            logging.warning(f"\t{x}: {content[x]}") 
+            print(f"\t{x}: {content[x]}") 
