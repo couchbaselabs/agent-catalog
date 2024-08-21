@@ -54,6 +54,16 @@ the [rosetta-example](https://github.com/couchbaselabs/rosetta-example) reposito
 
 ## For Contributors / Developers
 
+### Setting up Pre-Commit
+
+To set up `pre-commit` and reap all the benefits of code formatting, linting, automatic `poetry` lock generation, etc...
+execute the following command:
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
 ### Enabling Debug Mode
 
 To enable debug mode, execute the following command:
