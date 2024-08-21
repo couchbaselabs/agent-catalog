@@ -198,12 +198,12 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
 
     class OperationHandle:
         def __init__(
-                self,
-                path: str,
-                method: str,
-                operation: openapi_parser.parser.Operation,
-                servers: list[openapi_parser.parser.Server],
-                parent_parameters: list[openapi_parser.parser.Parameter] = None,
+            self,
+            path: str,
+            method: str,
+            operation: openapi_parser.parser.Operation,
+            servers: list[openapi_parser.parser.Server],
+            parent_parameters: list[openapi_parser.parser.Parameter] = None,
         ):
             self.path = path
             self.method = method
