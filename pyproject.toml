@@ -30,6 +30,21 @@ rosetta-lc = { git = "git@github.com:couchbaselabs/rosetta-lc.git", optional = t
 [tool.poetry.extras]
 langchain = ["rosetta-lc"]
 
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.0.0"
+
+[tool.ruff]
+line-length = 120
+lint.select = ["F", "B", "I", "SIM"]
+show-fixes = true
+
+[tool.ruff.lint.isort]
+no-sections = true
+force-single-line = true
+lines-between-types = 1
+force-wrap-aliases = true
+split-on-trailing-comma = false
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

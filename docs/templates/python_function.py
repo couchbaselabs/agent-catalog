@@ -1,7 +1,7 @@
 #
 # The following file is a template for a Python tool.
 #
-from rosetta.core.tool import tool
+from rosetta import tool
 from pydantic import BaseModel
 
 
@@ -16,7 +16,7 @@ class SalesModel(BaseModel):
 # All other functions / module members will be ignored by the indexer.
 @tool
 def compute_sales_for_this_week(sales_model: SalesModel) -> float:
-    """ A description for the function bound to the tool. This is mandatory for tools. """
+    """A description for the function bound to the tool. This is mandatory for tools."""
 
     # The implementation of the tool (given below) is *not* indexed.
     # The indexer only cares about the name, function signature, and description.

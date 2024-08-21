@@ -3,8 +3,7 @@ from .provider import Provider
 
 __all__ = [
     # Specify our classes.
-    'Provider',
-
+    "Provider",
     # Specify our decorators (there should just be one?).
-    'tool'
+    "tool",
 ]

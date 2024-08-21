@@ -5,5 +5,5 @@ def main():
     rosetta_cmd.main()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
