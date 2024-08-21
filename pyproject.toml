@@ -13,6 +13,11 @@ Homepage = "https://couchbase.com"
 Documentation = "https://docs.couchbase.com"
 Repository = "https://github.com/couchbaselabs/rosetta-lc"
 
+[tool.poetry.urls]
+Homepage = "https://couchbase.com"
+Documentation = "https://docs.couchbase.com"
+Repository = "https://github.com/couchbaselabs/rosetta-lc"
+
 [tool.poetry.dependencies]
 python = "^3.11"
 couchbase = "^4.3.0"
@@ -22,6 +27,7 @@ langchain-core = "^0.2.28"
 langchain-openai = "^0.1.20"
 pydantic = "2.8.2"
 requests = "^2.32.3"
+python-dotenv = "^1.0.1"
 
 [build-system]
 requires = ["poetry-core"]
