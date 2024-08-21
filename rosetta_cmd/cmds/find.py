@@ -69,9 +69,10 @@ def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refi
                                     max_errs=DEFAULT_MAX_ERRS)
 
     # Query the catalog for a list of results.
+    annotations_predicate = AnnotationPredicate(annotations) if annotations is not None else None
     search_results = [
         SearchResult(entry=x.entry, delta=x.delta) for x in
-        catalog.find(query, limit=limit, annotations=AnnotationPredicate(annotations))
+        catalog.find(query, limit=limit, annotations=annotations_predicate)
     ]
     if refiner is not None:
         search_results = refiners[refiner]()(search_results)
