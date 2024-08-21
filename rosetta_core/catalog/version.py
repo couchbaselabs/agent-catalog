@@ -1,6 +1,6 @@
 import re
-import subprocess
 import semantic_version
+import subprocess
 
 from .. import __version__ as LIB_VERSION
 
@@ -11,14 +11,17 @@ def lib_version():
     # Ex: "v0.1.0-beta2-17-gf63950e".
     # Ex: "v0.1.0-cbse1234-5-g269f05e".
     v = LIB_VERSION
-    if v == 'vMajor.Minor.Micro-N-GITSHA':
-        return 'v0.0.0-0-g0'
+    if v == "vMajor.Minor.Micro-N-GITSHA":
+        return "v0.0.0-0-g0"
 
         # TODO: BUG: This does not work unless we're in the rosetta-core.
 
         # Default to output of `git describe --long --always`.
-        v = subprocess.check_output(['git', 'describe', '--long', '--always'],
-                                    stderr=subprocess.STDOUT).decode('utf-8').strip()
+        v = (
+            subprocess.check_output(["git", "describe", "--long", "--always"], stderr=subprocess.STDOUT)
+            .decode("utf-8")
+            .strip()
+        )
 
     return v
 
@@ -46,10 +49,10 @@ def lib_version_compare(s1, s2):
 
         return 0
 
-    if branch1.startswith('v'):  # Slice off initial "v", from "v0.0.0" to "0.0.0".
+    if branch1.startswith("v"):  # Slice off initial "v", from "v0.0.0" to "0.0.0".
         branch1 = branch1[1:]
 
-    if branch2.startswith('v'):
+    if branch2.startswith("v"):
         branch2 = branch2[1:]
 
     return semantic_version_compare(branch1, branch2)

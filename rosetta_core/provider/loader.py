@@ -1,28 +1,25 @@
-import importlib.machinery
 import importlib
-import pathlib
-import types
-import typing
-import sys
+import importlib.machinery
 import inspect
 import logging
+import pathlib
+import sys
+import types
+import typing
 import uuid
 
-from ..record.descriptor import (
-    RecordDescriptor, RecordKind
-)
+from ..record.descriptor import RecordDescriptor
+from ..record.descriptor import RecordKind
 from ..tool.decorator import ToolMarker
-from ..tool.generate import (
-    SQLPPCodeGenerator,
-    SemanticSearchCodeGenerator,
-    HTTPRequestCodeGenerator
-)
+from ..tool.generate import HTTPRequestCodeGenerator
+from ..tool.generate import SemanticSearchCodeGenerator
+from ..tool.generate import SQLPPCodeGenerator
 
 logger = logging.getLogger(__name__)
 
 
 class _ModuleLoader(importlib.abc.Loader):
-    """ Courtesy of https://stackoverflow.com/a/65034099 with some minor tweaks. """
+    """Courtesy of https://stackoverflow.com/a/65034099 with some minor tweaks."""
 
     def __init__(self):
         self._modules = dict()
@@ -44,7 +41,7 @@ class _ModuleLoader(importlib.abc.Loader):
 
 
 class _ModuleFinder(importlib.abc.MetaPathFinder):
-    """ Courtesy of https://stackoverflow.com/a/65034099 with some minor tweaks. """
+    """Courtesy of https://stackoverflow.com/a/65034099 with some minor tweaks."""
 
     def __init__(self, loader: _ModuleLoader):
         self._loader = loader
@@ -63,15 +60,15 @@ class EntryLoader:
 
     def _load_module_from_filename(self, filename: pathlib.Path):
         # TODO (GLENN): We should avoid blindly putting things in our path.
-        if not str(filename.parent.absolute()) in sys.path:
+        if str(filename.parent.absolute()) not in sys.path:
             sys.path.append(str(filename.parent.absolute()))
         if filename.stem not in self._modules:
-            logger.debug(f'Loading module {filename.stem}.')
+            logger.debug(f"Loading module {filename.stem}.")
             self._modules[filename.stem] = importlib.import_module(filename.stem)
 
     def _load_module_from_string(self, module_name: str, module_content: str) -> typing.Callable:
         if module_name not in self._modules:
-            logger.debug(f'Loading module {module_name} (dynamically generated).')
+            logger.debug(f"Loading module {module_name} (dynamically generated).")
             self._loader.add_module(module_name, module_content)
             self._modules[module_name] = importlib.import_module(module_name)
 
@@ -82,31 +79,32 @@ class EntryLoader:
             if entry.name == name:
                 return tool
 
-    def load(self, record_descriptors: list[RecordDescriptor]) \
-            -> typing.Iterable[tuple[RecordDescriptor, typing.Callable]]:
+    def load(
+        self, record_descriptors: list[RecordDescriptor]
+    ) -> typing.Iterable[tuple[RecordDescriptor, typing.Callable]]:
         # Group all entries by their 'source'.
         source_groups = dict()
         for result in record_descriptors:
             if result.source not in source_groups:
                 # Note: we assume that each source only contains one type (kind) of tool.
-                source_groups[result.source] = {
-                    'entries': list(),
-                    'kind': result.record_kind
-                }
-            source_groups[result.source]['entries'].append(result)
+                source_groups[result.source] = {"entries": list(), "kind": result.record_kind}
+            source_groups[result.source]["entries"].append(result)
 
         # Now, iterate through each group.
         for source, group in source_groups.items():
-            logger.debug(f'Handling entries with source {source}.')
-            entries = group['entries']
-            match group['kind']:
+            logger.debug(f"Handling entries with source {source}.")
+            entries = group["entries"]
+            match group["kind"]:
                 # For PythonFunction records, we load the source directly (using importlib).
                 case RecordKind.PythonFunction:
                     source_file = entries[0].source
                     self._load_module_from_filename(source_file)
                     for entry in entries:
                         loaded_entry = self._get_tool_from_module(source_file.stem, entry)
-                        yield entry, loaded_entry,
+                        yield (
+                            entry,
+                            loaded_entry,
+                        )
                     continue
 
                 # For all other records, we generate the source and load this with a custom importlib loader.
@@ -117,10 +115,13 @@ class EntryLoader:
                 case RecordKind.HTTPRequest:
                     generator = HTTPRequestCodeGenerator(record_descriptors=entries).generate
                 case _:
-                    raise ValueError('Unexpected tool-kind encountered!')
+                    raise ValueError("Unexpected tool-kind encountered!")
 
             for entry, code in zip(entries, generator()):
                 module_id = uuid.uuid4().hex
                 self._load_module_from_string(module_id, code)
                 loaded_entry = self._get_tool_from_module(module_id, entry)
-                yield entry, loaded_entry,
+                yield (
+                    entry,
+                    loaded_entry,
+                )

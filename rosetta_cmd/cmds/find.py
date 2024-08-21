@@ -1,27 +1,24 @@
-import pathlib
 import click
 import logging
 import os
+import pathlib
 import textwrap
 import tqdm
 
-from rosetta_core.catalog.index import index_catalog
-from rosetta_core.catalog.catalog_mem import CatalogMem
+from ..defaults import DEFAULT_MAX_ERRS
+from ..defaults import DEFAULT_SCAN_DIRECTORY_OPTS
+from ..models.context import Context
+from .util import init_local
+from .util import load_repository
+from rosetta_core.annotation import AnnotationPredicate
 from rosetta_core.catalog.catalog_base import SearchResult
+from rosetta_core.catalog.catalog_mem import CatalogMem
+from rosetta_core.catalog.index import index_catalog
 from rosetta_core.provider.refiner import ClosestClusterRefiner
 from rosetta_core.version import VersionDescriptor
-from rosetta_core.annotation import AnnotationPredicate
-
-from .util import init_local, load_repository
-from ..models.context import Context
-from ..defaults import (
-    DEFAULT_SCAN_DIRECTORY_OPTS,
-    DEFAULT_MAX_ERRS,
-)
 
 refiners = {
     "ClosestCluster": ClosestClusterRefiner,
-
     # TODO: One day allow for custom refiners at runtime where
     # we dynamically import a user's custom module/function?
 }
@@ -61,27 +58,33 @@ def cmd_find(ctx: Context, query, kind="tool", limit=1, include_dirty=True, refi
 
             # Create a CatalogMem on-the-fly that incorporates the dirty
             # source file items which we'll use instead of the local catalog file.
-            catalog = index_catalog(meta, version, get_path_version,
-                                    kind, catalog_path, source_dirs,
-                                    scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
-                                    printer=logger.debug if not ctx.verbose else click.echo,
-                                    progress=(lambda a: a) if not ctx.verbose else tqdm.tqdm,
-                                    max_errs=DEFAULT_MAX_ERRS)
+            catalog = index_catalog(
+                meta,
+                version,
+                get_path_version,
+                kind,
+                catalog_path,
+                source_dirs,
+                scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
+                printer=logger.debug if not ctx.verbose else click.echo,
+                progress=(lambda a: a) if not ctx.verbose else tqdm.tqdm,
+                max_errs=DEFAULT_MAX_ERRS,
+            )
 
     # Query the catalog for a list of results.
     annotations_predicate = AnnotationPredicate(annotations) if annotations is not None else None
     search_results = [
-        SearchResult(entry=x.entry, delta=x.delta) for x in
-        catalog.find(query, limit=limit, annotations=annotations_predicate)
+        SearchResult(entry=x.entry, delta=x.delta)
+        for x in catalog.find(query, limit=limit, annotations=annotations_predicate)
     ]
     if refiner is not None:
         search_results = refiners[refiner]()(search_results)
-    click.secho(f'{len(search_results)} result(s) returned from the catalog.', bold=True, bg='green')
+    click.secho(f"{len(search_results)} result(s) returned from the catalog.", bold=True, bg="green")
     if ctx.verbose:
         for i, result in enumerate(search_results):
-            click.secho(f'  {i + 1}. (delta = {result.delta}, higher is better): ', bold=True)
-            click.echo(textwrap.indent(str(result.entry), '  '))
+            click.secho(f"  {i + 1}. (delta = {result.delta}, higher is better): ", bold=True)
+            click.echo(textwrap.indent(str(result.entry), "  "))
     else:
         for i, result in enumerate(search_results):
-            click.secho(f'  {i + 1}. (delta = {result.delta}, higher is better): ', nl=False, bold=True)
+            click.secho(f"  {i + 1}. (delta = {result.delta}, higher is better): ", nl=False, bold=True)
             click.echo(str(result.entry.identifier))

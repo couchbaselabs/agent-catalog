@@ -2,10 +2,10 @@ import flask
 
 from rosetta_core.catalog.version import lib_version
 
-blueprint = flask.Blueprint('version', __name__)
+blueprint = flask.Blueprint("version", __name__)
 
 
-@blueprint.route('/version')
+@blueprint.route("/version")
 def route_version():
     return flask.jsonify(lib_version())
 

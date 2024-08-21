@@ -1,19 +1,16 @@
+import click
+import git
 import json
 import os
 import pathlib
-import click
-import git
 import sentence_transformers
 
-from rosetta_core.catalog import (
-    __version__ as CATALOG_SCHEMA_VERSION
-)
-from rosetta_core.catalog.version import (
-    catalog_schema_version_compare,
-    lib_version, lib_version_compare
-)
-from rosetta_core.version import VersionDescriptor
 from ..models.context import Context
+from rosetta_core.catalog import __version__ as CATALOG_SCHEMA_VERSION
+from rosetta_core.catalog.version import catalog_schema_version_compare
+from rosetta_core.catalog.version import lib_version
+from rosetta_core.catalog.version import lib_version_compare
+from rosetta_core.version import VersionDescriptor
 
 
 def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
@@ -68,8 +65,7 @@ def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
 
             # Download embedding model to be cached for later runtime usage.
             sentence_transformers.SentenceTransformer(
-                embedding_model,
-                tokenizer_kwargs={'clean_up_tokenization_spaces': True}
+                embedding_model, tokenizer_kwargs={"clean_up_tokenization_spaces": True}
             )
 
             click.echo(f"Downloading and caching embedding model: {embedding_model} ... DONE.")
@@ -83,17 +79,16 @@ def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
     return meta
 
 
-def load_repository(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
+def load_repository(top_dir: pathlib.Path = None):
     # The repo is the user's application's repo and is NOT the repo
     # of rosetta-core. The rosetta CLI / library should be run in
     # a directory (or subdirectory) of the user's application's repo,
     # where repo_load() walks up the parent dirs until it finds a .git/ subdirectory.
-
+    if top_dir is None:
+        top_dir = pathlib.Path(os.getcwd())
     while not (top_dir / ".git").exists():
         if top_dir.parent == top_dir:
-            raise ValueError(
-                "Could not find .git directory. Please run index within a git repository."
-            )
+            raise ValueError("Could not find .git directory. Please run index within a git repository.")
         top_dir = top_dir.parent
 
     repo = git.Repo(top_dir / ".git")
@@ -111,6 +106,7 @@ def load_repository(top_dir: pathlib.Path = pathlib.Path(os.getcwd())):
         return VersionDescriptor(identifier=str(commits[0]))
 
     return repo, get_path_version
+
 
 # TODO: One use case is a user's repo (like rosetta-example) might
 # have multiple, independent subdirectories in it which should each

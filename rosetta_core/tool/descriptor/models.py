@@ -1,26 +1,24 @@
 import abc
 import dataclasses
-import pathlib
-import pydantic
-import openapi_parser
-import logging
-import typing
 import enum
-import json
-import sys
-import yaml
-import re
 import importlib
 import inspect
+import json
+import logging
+import openapi_parser
+import pathlib
+import pydantic
+import re
+import sys
+import typing
+import yaml
 
+from ...record.descriptor import RecordDescriptor
+from ...record.descriptor import RecordKind
+from ...version import VersionDescriptor
+from ..decorator import ToolMarker
 from .helper import JSONSchemaValidatingMixin
 from .secrets import CouchbaseSecrets
-from ..decorator import ToolMarker
-from ...version import VersionDescriptor
-from ...record.descriptor import (
-    RecordKind,
-    RecordDescriptor
-)
 
 logger = logging.getLogger(__name__)
 
@@ -34,16 +32,20 @@ class _BaseFactory(abc.ABC):
         self.filename = filename
         self.version = version
 
+    @abc.abstractmethod
+    def __iter__(self):
+        pass
+
 
 # Note: a Python Tool does not add any additional fields.
 class PythonToolDescriptor(RecordDescriptor):
     record_kind: typing.Literal[RecordKind.PythonFunction]
 
     class Factory(_BaseFactory):
-        def __iter__(self) -> typing.Iterable['PythonToolDescriptor']:
+        def __iter__(self) -> typing.Iterable["PythonToolDescriptor"]:
             # Note: this **does not** load the tools themselves into memory.
             # TODO (GLENN): We should avoid blindly putting things in our path.
-            if not str(self.filename.parent.absolute()) in sys.path:
+            if str(self.filename.parent.absolute()) not in sys.path:
                 sys.path.append(str(self.filename.parent.absolute()))
             imported_module = importlib.import_module(self.filename.stem)
             for name, tool in inspect.getmembers(imported_module):
@@ -56,7 +58,7 @@ class PythonToolDescriptor(RecordDescriptor):
                     source=self.filename,
                     version=self.version,
                     # TODO (GLENN): Add support for user-defined annotations here.
-                    annotations=dict()
+                    annotations=dict(),
                 )
 
 
@@ -69,10 +71,7 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
 
     class Factory(_BaseFactory):
         class Metadata(pydantic.BaseModel, JSONSchemaValidatingMixin):
-            model_config = pydantic.ConfigDict(
-                frozen=True,
-                use_enum_values=True
-            )
+            model_config = pydantic.ConfigDict(frozen=True, use_enum_values=True)
 
             # Below, we enumerate all fields that appear in a .sqlpp file.
             name: str
@@ -83,27 +82,27 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
             record_kind: typing.Optional[typing.Literal[RecordKind.SQLPPQuery] | None] = None
             annotations: typing.Optional[dict[str, str] | None] = None
 
-            @pydantic.field_validator('input', 'output')
+            @pydantic.field_validator("input", "output")
             @classmethod
             def value_should_be_valid_json_schema(cls, v: str):
                 cls.check_if_valid_json_schema(v)
                 return v
 
-            @pydantic.field_validator('name')
+            @pydantic.field_validator("name")
             @classmethod
             def name_should_be_valid_identifier(cls, v: str):
                 if not v.isidentifier():
-                    raise ValueError(f'name {v} is not a valid identifier!')
+                    raise ValueError(f"name {v} is not a valid identifier!")
                 return v
 
-        def __iter__(self) -> typing.Iterable['SQLPPQueryToolDescriptor']:
+        def __iter__(self) -> typing.Iterable["SQLPPQueryToolDescriptor"]:
             # First, get the front matter from our .sqlpp file.
-            with self.filename.open('r') as fp:
-                matches = re.findall(r'/\*(.*)\*/', fp.read(), re.DOTALL)
+            with self.filename.open("r") as fp:
+                matches = re.findall(r"/\*(.*)\*/", fp.read(), re.DOTALL)
                 if len(matches) == 0:
-                    raise ValueError(f'Malformed input! No multiline comment found for {self.filename.name}.')
+                    raise ValueError(f"Malformed input! No multiline comment found for {self.filename.name}.")
                 elif len(matches) != 1:
-                    logger.warning('More than one multi-line comment found. Using first comment.')
+                    logger.warning("More than one multi-line comment found. Using first comment.")
                 metadata = SQLPPQueryToolDescriptor.Factory.Metadata.model_validate(yaml.safe_load(matches[0]))
 
             # Now, generate a single SQL++ tool descriptor.
@@ -116,8 +115,8 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
                 secrets=metadata.secrets,
                 input=metadata.input,
                 output=metadata.output,
-                query=self.filename.open('r').read(),
-                annotations=metadata.annotations
+                query=self.filename.open("r").read(),
+                annotations=metadata.annotations,
             )
 
 
@@ -140,10 +139,7 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
 
     class Factory(_BaseFactory):
         class Metadata(pydantic.BaseModel, JSONSchemaValidatingMixin):
-            model_config = pydantic.ConfigDict(
-                frozen=True,
-                use_enum_values=True
-            )
+            model_config = pydantic.ConfigDict(frozen=True, use_enum_values=True)
 
             # Below, we enumerate all fields that appear in a .yaml file for semantic search.
             record_kind: typing.Literal[RecordKind.SemanticSearch]
@@ -152,31 +148,31 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
             input: str
             secrets: list[CouchbaseSecrets] = pydantic.Field(min_items=1, max_items=1)
             annotations: typing.Optional[dict[str, str] | None] = None
-            vector_search: 'SemanticSearchToolDescriptor.VectorSearchMetadata'
+            vector_search: "SemanticSearchToolDescriptor.VectorSearchMetadata"
 
-            @pydantic.field_validator('input')
+            @pydantic.field_validator("input")
             @classmethod
             def value_should_be_valid_json_schema(cls, v: str):
                 cls.check_if_valid_json_schema(v)
                 return v
 
-            @pydantic.field_validator('input')
+            @pydantic.field_validator("input")
             @classmethod
             def value_should_be_non_empty(cls, v: str):
                 input_dict = json.loads(v)
                 if len(input_dict) == 0:
-                    raise ValueError('SemanticSearch cannot have an empty input!')
+                    raise ValueError("SemanticSearch cannot have an empty input!")
                 return v
 
-            @pydantic.field_validator('name')
+            @pydantic.field_validator("name")
             @classmethod
             def name_should_be_valid_identifier(cls, v: str):
                 if not v.isidentifier():
-                    raise ValueError(f'name {v} is not a valid identifier!')
+                    raise ValueError(f"name {v} is not a valid identifier!")
                 return v
 
-        def __iter__(self) -> typing.Iterable['SemanticSearchToolDescriptor']:
-            with self.filename.open('r') as fp:
+        def __iter__(self) -> typing.Iterable["SemanticSearchToolDescriptor"]:
+            with self.filename.open("r") as fp:
                 metadata = SemanticSearchToolDescriptor.Factory.Metadata.model_validate(yaml.safe_load(fp))
                 yield SemanticSearchToolDescriptor(
                     record_kind=RecordKind.SemanticSearch,
@@ -187,7 +183,7 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
                     secrets=metadata.secrets,
                     input=metadata.input,
                     vector_search=metadata.vector_search,
-                    annotations=metadata.annotations
+                    annotations=metadata.annotations,
                 )
 
 
@@ -201,9 +197,14 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
         url: typing.Optional[pathlib.Path | None] = None
 
     class OperationHandle:
-        def __init__(self, path: str, method: str, operation: openapi_parser.parser.Operation,
-                     servers: list[openapi_parser.parser.Server],
-                     parent_parameters: list[openapi_parser.parser.Parameter] = None):
+        def __init__(
+            self,
+            path: str,
+            method: str,
+            operation: openapi_parser.parser.Operation,
+            servers: list[openapi_parser.parser.Server],
+            parent_parameters: list[openapi_parser.parser.Parameter] = None,
+        ):
             self.path = path
             self.method = method
             self.servers = servers
@@ -230,7 +231,7 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
             return self._operation.request_body
 
         def __str__(self):
-            return f'{self.method} {self.path}'
+            return f"{self.method} {self.path}"
 
     operation: OperationMetadata
     specification: SpecificationMetadata
@@ -240,9 +241,9 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
     def validate_operation(filename: pathlib.Path | None, url: str | None, operation: OperationMetadata):
         # We need the filename or the URL. Also, both cannot exist at the same time.
         if filename is None and url is None:
-            raise ValueError('Either filename or url must be specified.')
+            raise ValueError("Either filename or url must be specified.")
         if filename is not None and url is not None:
-            raise ValueError('Both filename and url cannot be specified at the same time.')
+            raise ValueError("Both filename and url cannot be specified at the same time.")
 
         # We should be able to access the specification file here (validation is done internally here).
         if filename is not None:
@@ -255,8 +256,8 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
             servers = open_api_spec.servers
         elif filename is not None:
             servers = [
-                openapi_parser.parser.Server(url='https://localhost/'),
-                openapi_parser.parser.Server(url='http://localhost/')
+                openapi_parser.parser.Server(url="https://localhost/"),
+                openapi_parser.parser.Server(url="http://localhost/"),
             ]
         else:  # url is not None
             servers = [openapi_parser.parser.Server(url)]
@@ -268,7 +269,7 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
                 specification_path = p
                 break
         if specification_path is None:
-            raise ValueError(f'Operation {operation} does not exist in the spec.')
+            raise ValueError(f"Operation {operation} does not exist in the spec.")
 
         # ...and then the method.
         specification_operation = None
@@ -277,13 +278,13 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
                 specification_operation = m
                 break
         if specification_operation is None:
-            raise ValueError(f'Operation {operation} does not exist in the spec.')
+            raise ValueError(f"Operation {operation} does not exist in the spec.")
 
         # We additionally impose that a description and an operationId must exist.
         if specification_operation.description is None:
-            raise ValueError(f'Description must be specified for operation {operation}.')
+            raise ValueError(f"Description must be specified for operation {operation}.")
         if specification_operation.operation_id is None:
-            raise ValueError(f'OperationId must be specified for operation {operation}.')
+            raise ValueError(f"OperationId must be specified for operation {operation}.")
 
         # TODO (GLENN): openapi_parser doesn't support operation servers (OpenAPI 3.1.0).
         return HTTPRequestToolDescriptor.OperationHandle(
@@ -291,15 +292,13 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
             path=operation.path,
             servers=servers,
             operation=specification_operation,
-            parent_parameters=specification_path.parameters
+            parent_parameters=specification_path.parameters,
         )
 
     @property
     def handle(self) -> OperationHandle:
         return HTTPRequestToolDescriptor.validate_operation(
-            filename=pathlib.Path(self.specification.filename),
-            url=self.specification.url,
-            operation=self.operation
+            filename=pathlib.Path(self.specification.filename), url=self.specification.url, operation=self.operation
         )
 
     class JSONEncoder(json.JSONEncoder):
@@ -311,10 +310,7 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
                 return result_dict
 
             elif isinstance(obj, openapi_parser.parser.Property):
-                return {
-                    'name': obj.name,
-                    'schema': self.default(obj.schema)
-                }
+                return {"name": obj.name, "schema": self.default(obj.schema)}
 
             elif isinstance(obj, enum.Enum):
                 return obj.value
@@ -324,23 +320,18 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
 
     class Factory(_BaseFactory):
         class Metadata(pydantic.BaseModel):
-            model_config = pydantic.ConfigDict(
-                frozen=True,
-                use_enum_values=True
-            )
+            model_config = pydantic.ConfigDict(frozen=True, use_enum_values=True)
 
             class OpenAPIMetadata(pydantic.BaseModel):
                 filename: typing.Optional[str | None] = None
                 url: typing.Optional[str | None] = None
-                operations: list['HTTPRequestToolDescriptor.OperationMetadata']
+                operations: list["HTTPRequestToolDescriptor.OperationMetadata"]
 
-                @pydantic.model_validator(mode='after')
+                @pydantic.model_validator(mode="after")
                 def operations_must_be_valid(self) -> typing.Self:
                     for operation in self.operations:
                         HTTPRequestToolDescriptor.validate_operation(
-                            filename=pathlib.Path(self.filename),
-                            url=self.url,
-                            operation=operation
+                            filename=pathlib.Path(self.filename), url=self.url, operation=operation
                         )
                     return self
 
@@ -349,14 +340,14 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
             open_api: OpenAPIMetadata
             annotations: typing.Optional[dict[str, str] | None] = None
 
-        def __iter__(self) -> typing.Iterable['HTTPRequestToolDescriptor']:
-            with self.filename.open('r') as fp:
+        def __iter__(self) -> typing.Iterable["HTTPRequestToolDescriptor"]:
+            with self.filename.open("r") as fp:
                 metadata = HTTPRequestToolDescriptor.Factory.Metadata.model_validate(yaml.safe_load(fp))
                 for operation in metadata.open_api.operations:
                     operation_handle = HTTPRequestToolDescriptor.validate_operation(
                         filename=pathlib.Path(metadata.open_api.filename),
                         url=metadata.open_api.url,
-                        operation=operation
+                        operation=operation,
                     )
                     yield HTTPRequestToolDescriptor(
                         record_kind=RecordKind.HTTPRequest,
@@ -366,17 +357,13 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
                         version=self.version,
                         operation=operation,
                         specification=HTTPRequestToolDescriptor.SpecificationMetadata(
-                            filename=metadata.open_api.filename,
-                            url=metadata.open_api.url
+                            filename=metadata.open_api.filename, url=metadata.open_api.url
                         ),
-                        annotations=metadata.annotations
+                        annotations=metadata.annotations,
                     )
 
 
 ToolDescriptorUnionType = typing.Annotated[
-    PythonToolDescriptor
-    | SQLPPQueryToolDescriptor
-    | SemanticSearchToolDescriptor
-    | HTTPRequestToolDescriptor,
-    pydantic.Field(discriminator='record_kind')
+    PythonToolDescriptor | SQLPPQueryToolDescriptor | SemanticSearchToolDescriptor | HTTPRequestToolDescriptor,
+    pydantic.Field(discriminator="record_kind"),
 ]

@@ -1,11 +1,12 @@
-from datetime import timedelta
+import json
+import logging
+
 from couchbase.auth import PasswordAuthenticator
 from couchbase.cluster import Cluster
 from couchbase.exceptions import CouchbaseException
 from couchbase.options import ClusterOptions
+from datetime import timedelta
 from pathlib import Path
-import json
-import logging
 
 # TODO (GLENN): Should this model be pushed into this module?
 from rosetta_cmd.models.publish import CouchbaseConnect
@@ -30,10 +31,10 @@ def get_connection(conn: CouchbaseConnect):
         options.apply_profile("wan_development")
 
     try:
-        logger.debug(f'Connecting to Couchbase cluster at {cluster_url}...')
+        logger.debug(f"Connecting to Couchbase cluster at {cluster_url}...")
         cluster = Cluster(cluster_url, options)
         cluster.wait_until_ready(timedelta(seconds=10))
-        logger.debug(f'Connection successfully established.')
+        logger.debug("Connection successfully established.")
 
     except CouchbaseException as e:
         return f"Error connecting to couchbase : {e}", None
@@ -59,11 +60,11 @@ def create_scope_and_collection(bucket_manager, scope, collection):
         scopes = bucket_manager.get_all_scopes()
         scope_exists = any(s.name == scope for s in scopes)
         if not scope_exists:
-            logger.debug(f'Scope {scope} not found. Attempting to create scope now.')
+            logger.debug(f"Scope {scope} not found. Attempting to create scope now.")
             bucket_manager.create_scope(scope)
-            logger.debug(f'Scope {scope} was created successfully.')
+            logger.debug(f"Scope {scope} was created successfully.")
     except CouchbaseException as e:
-        error_message = f'Encountered error while creating scope {scope}:\n{str(e)}'
+        error_message = f"Encountered error while creating scope {scope}:\n{str(e)}"
         logger.error(error_message)
         return error_message, e
 
@@ -73,16 +74,16 @@ def create_scope_and_collection(bucket_manager, scope, collection):
             collections = [c.name for s in scopes if s.name == scope for c in s.collections]
             collection_exists = collection in collections
             if not collection_exists:
-                logger.debug(f'Collection {scope}.{collection} not found. Attempting to create collection now.')
+                logger.debug(f"Collection {scope}.{collection} not found. Attempting to create collection now.")
                 bucket_manager.create_collection(scope, collection)
-                logger.debug(f'Collection {scope}.{collection} was created successfully.')
+                logger.debug(f"Collection {scope}.{collection} was created successfully.")
         else:
-            logger.debug(f'Collection {scope}.{collection} not found. Attempting to create collection now.')
+            logger.debug(f"Collection {scope}.{collection} not found. Attempting to create collection now.")
             bucket_manager.create_collection(scope, collection)
-            logger.debug(f'Collection {scope}.{collection} was created successfully.')
+            logger.debug(f"Collection {scope}.{collection} was created successfully.")
 
     except CouchbaseException as e:
-        error_message = f'Encountered error while creating collection {scope}.{collection}:\n{str(e)}'
+        error_message = f"Encountered error while creating collection {scope}.{collection}:\n{str(e)}"
         logger.error(error_message)
         return error_message, e
 

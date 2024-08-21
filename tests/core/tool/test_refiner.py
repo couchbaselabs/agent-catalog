@@ -1,35 +1,30 @@
 import pathlib
-import uuid
 import pytest
+import uuid
 
 from rosetta_core.catalog.catalog_base import SearchResult
-from rosetta_core.version.identifier import (
-    VersionDescriptor, VersionSystem
-)
-from rosetta_core.record.descriptor import (
-    RecordDescriptor, RecordKind
-)
-from rosetta_core.provider.refiner import (
-    ClosestClusterRefiner
-)
+from rosetta_core.provider.refiner import ClosestClusterRefiner
+from rosetta_core.record.descriptor import RecordDescriptor
+from rosetta_core.record.descriptor import RecordKind
+from rosetta_core.version.identifier import VersionDescriptor
+from rosetta_core.version.identifier import VersionSystem
 
 
 def _generate_test_tools(deltas: list[int]) -> list[SearchResult]:
     tools_with_delta = list()
     for i, delta in enumerate(deltas):
-        tools_with_delta.append(SearchResult(
-            entry=RecordDescriptor(
-                record_kind=RecordKind.PythonFunction,
-                name='dummy tool #' + str(i),
-                description='a dummy tool #' + str(i),
-                source=pathlib.Path('.'),
-                version=VersionDescriptor(
-                    identifier=uuid.uuid4().hex,
-                    version_system=VersionSystem.Raw
-                )
-            ),
-            delta=delta
-        ))
+        tools_with_delta.append(
+            SearchResult(
+                entry=RecordDescriptor(
+                    record_kind=RecordKind.PythonFunction,
+                    name="dummy tool #" + str(i),
+                    description="a dummy tool #" + str(i),
+                    source=pathlib.Path("."),
+                    version=VersionDescriptor(identifier=uuid.uuid4().hex, version_system=VersionSystem.Raw),
+                ),
+                delta=delta,
+            )
+        )
     return tools_with_delta
 
 

@@ -1,31 +1,33 @@
-import logging
-import tqdm
-import pathlib
-import os
 import click
+import logging
+import os
+import pathlib
+import tqdm
 
+from ..cmds.util import init_local
+from ..cmds.util import load_repository
+from ..defaults import DEFAULT_MAX_ERRS
+from ..defaults import DEFAULT_SCAN_DIRECTORY_OPTS
+from ..models.context import Context
 from rosetta_core.catalog.index import index_catalog
 from rosetta_core.version import VersionDescriptor
-
-from ..cmds.util import init_local, load_repository
-from ..models.context import Context
-from ..defaults import (
-    DEFAULT_SCAN_DIRECTORY_OPTS,
-    DEFAULT_MAX_ERRS
-)
 
 logger = logging.getLogger(__name__)
 
 
-def cmd_index(ctx: Context, source_dirs: list[str],
-              kind: str, embedding_model: str,
-              include_dirty: bool = True, dry_run: bool = False, **_):
+def cmd_index(
+    ctx: Context,
+    source_dirs: list[str],
+    kind: str,
+    embedding_model: str,
+    include_dirty: bool = True,
+    dry_run: bool = False,
+    **_,
+):
     meta = init_local(ctx, embedding_model, read_only=dry_run)
 
     if not meta["embedding_model"]:
-        raise ValueError(
-            "An --embedding-model is required as an embedding model is not yet recorded."
-        )
+        raise ValueError("An --embedding-model is required as an embedding model is not yet recorded.")
 
     repo, get_path_version = load_repository(pathlib.Path(os.getcwd()))
 
@@ -52,10 +54,18 @@ def cmd_index(ctx: Context, source_dirs: list[str],
     # TODO: The kind needs a security check as it's part of the path?
     catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")
 
-    next_catalog = index_catalog(meta, version, get_path_version,
-                                 kind, catalog_path, source_dirs,
-                                 scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
-                                 printer=click.echo, progress=tqdm.tqdm, max_errs=DEFAULT_MAX_ERRS)
+    next_catalog = index_catalog(
+        meta,
+        version,
+        get_path_version,
+        kind,
+        catalog_path,
+        source_dirs,
+        scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
+        printer=click.echo,
+        progress=tqdm.tqdm,
+        max_errs=DEFAULT_MAX_ERRS,
+    )
 
     print("==================\nsaving local catalog...")
 

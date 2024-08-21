@@ -1,34 +1,35 @@
+import logging
 import pathlib
 import pydantic
 import typing
-import logging
 
-from .catalog_base import CatalogBase, SearchResult
+from ..annotation import AnnotationPredicate
 from ..catalog.descriptor import CatalogDescriptor
 from ..record.descriptor import RecordDescriptor
-from ..annotation import AnnotationPredicate
+from .catalog_base import CatalogBase
+from .catalog_base import SearchResult
 
 logger = logging.getLogger(__name__)
 
 
 class CatalogMem(pydantic.BaseModel, CatalogBase):
-    """ Represents an in-memory catalog. """
+    """Represents an in-memory catalog."""
+
     catalog_descriptor: CatalogDescriptor = None
 
-    def init_from(self, other: 'CatalogMem') -> list[RecordDescriptor]:
-        """ Initialize the items in self by copying over attributes from
-            items found in other that have the exact same versions.
+    def init_from(self, other: "CatalogMem") -> list[RecordDescriptor]:
+        """Initialize the items in self by copying over attributes from
+        items found in other that have the exact same versions.
 
-            Returns a list of uninitialized items. """
+        Returns a list of uninitialized items."""
 
         uninitialized_items = []
         if other and other.catalog_descriptor:
             # A lookup dict of items keyed by "source:name".
-            other_items = {str(o.source) + ':' + o.name: o
-                           for o in other.catalog_descriptor.items or []}
+            other_items = {str(o.source) + ":" + o.name: o for o in other.catalog_descriptor.items or []}
 
             for s in self.catalog_descriptor.items:
-                o = other_items.get(str(s.source) + ':' + s.name)
+                o = other_items.get(str(s.source) + ":" + s.name)
                 if o and not s.version.is_dirty and o.version.identifier == s.version.identifier:
                     # The prev item and self item have the same version IDs,
                     # so copy the prev item contents into the self item.
@@ -43,21 +44,22 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
 
     @staticmethod
     def load(catalog_path: pathlib.Path):
-        """ Load from a catalog_path JSON file. """
-        with catalog_path.open('r') as fp:
+        """Load from a catalog_path JSON file."""
+        with catalog_path.open("r") as fp:
             catalog_descriptor = CatalogDescriptor.model_validate_json(fp.read())
         return CatalogMem(catalog_descriptor=catalog_descriptor)
 
     def dump(self, catalog_path: pathlib.Path):
-        """ Save to a catalog_path JSON file. """
+        """Save to a catalog_path JSON file."""
         self.catalog_descriptor.items.sort(key=lambda x: x.identifier)
-        with catalog_path.open('w') as fp:
+        with catalog_path.open("w") as fp:
             fp.write(str(self.catalog_descriptor))
-            fp.write('\n')
+            fp.write("\n")
 
-    def find(self, query: str, limit: typing.Union[int | None] = 1, annotations: AnnotationPredicate = None) \
-            -> list[SearchResult]:
-        """ Returns the catalog items that best match a query. """
+    def find(
+        self, query: str, limit: typing.Union[int | None] = 1, annotations: AnnotationPredicate = None
+    ) -> list[SearchResult]:
+        """Returns the catalog items that best match a query."""
         import sentence_transformers
         import sklearn
 
@@ -75,10 +77,7 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
                 for disjunct in annotations.disjuncts:
                     is_valid_tool = True
                     for k, v in disjunct.items():
-                        if k not in tool.annotations:
-                            is_valid_tool = False
-                            break
-                        elif tool.annotations[k] != v:
+                        if k not in tool.annotations or tool.annotations[k] != v:
                             is_valid_tool = False
                             break
                     if is_valid_tool:
@@ -92,22 +91,15 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
         # Compute the distance of each tool in the catalog to the query.
         embedding_model = self.catalog_descriptor.embedding_model
         embedding_model_obj = sentence_transformers.SentenceTransformer(
-            embedding_model,
-            tokenizer_kwargs={'clean_up_tokenization_spaces': True}
+            embedding_model, tokenizer_kwargs={"clean_up_tokenization_spaces": True}
         )
         query_embedding = embedding_model_obj.encode(query)
         deltas = sklearn.metrics.pairwise.cosine_similarity(
-            X=[t.embedding for t in candidate_tools],
-            Y=[query_embedding]
+            X=[t.embedding for t in candidate_tools], Y=[query_embedding]
         )
 
         # Order results by their distance to the query (larger is "closer").
-        results = [
-            SearchResult(
-                entry=candidate_tools[i],
-                delta=deltas[i]
-            ) for i in range(len(deltas))
-        ]
+        results = [SearchResult(entry=candidate_tools[i], delta=deltas[i]) for i in range(len(deltas))]
         results = sorted(results, key=lambda t: t.delta, reverse=True)
 
         # Apply our limit clause.

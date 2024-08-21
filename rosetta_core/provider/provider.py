@@ -1,24 +1,25 @@
-import typing
-import pathlib
 import logging
-import abc
+import pathlib
+import typing
 
-from ..secrets import put_secret
-from ..catalog.catalog_base import (
-    CatalogBase,
-    SearchResult
-)
 from ..annotation import AnnotationPredicate
+from ..catalog.catalog_base import CatalogBase
+from ..catalog.catalog_base import SearchResult
+from ..secrets import put_secret
 from .loader import EntryLoader
 
 logger = logging.getLogger(__name__)
 
 
-class Provider(abc.ABC):
-    def __init__(self, catalog: CatalogBase, output: pathlib.Path = None,
-                 decorator: typing.Callable[[typing.Callable], typing.Any] = None,
-                 refiner: typing.Callable[[list[SearchResult]], list[SearchResult]] = None,
-                 secrets: typing.Optional[dict[str, str]] = None):
+class Provider:
+    def __init__(
+        self,
+        catalog: CatalogBase,
+        output: pathlib.Path = None,
+        decorator: typing.Callable[[typing.Callable], typing.Any] = None,
+        refiner: typing.Callable[[list[SearchResult]], list[SearchResult]] = None,
+        secrets: typing.Optional[dict[str, str]] = None,
+    ):
         """
         :param catalog: A handle to the catalog. Entries can either be in memory or in Couchbase.
         :param output: Location to place the generated Python stubs (if desired).
@@ -48,8 +49,9 @@ class Provider(abc.ABC):
             for k, v in secrets.items():
                 put_secret(k, v)
 
-    def get_tools_for(self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1) \
-            -> list[typing.Any]:
+    def get_tools_for(
+        self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1
+    ) -> list[typing.Any]:
         """
         :param query: A string to search the catalog with.
         :param annotations: An annotation query string in the form of KEY=VALUE (AND|OR KEY=VALUE)*.
@@ -66,5 +68,3 @@ class Provider(abc.ABC):
 
         # Return the tools from the cache.
         return [self.decorator(self._tool_cache[x.entry]) for x in results]
-
-

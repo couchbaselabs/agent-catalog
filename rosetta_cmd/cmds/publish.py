@@ -1,11 +1,12 @@
 import json
 import logging
-from pathlib import Path
+import pathlib
 
+from ..models import Context
+from ..models import Keyspace
 from rosetta_core.catalog.catalog_mem import CatalogMem
-from rosetta_util.publish import create_scope_and_collection, CustomPublishEncoder
-
-from ..models import Keyspace, Context
+from rosetta_util.publish import CustomPublishEncoder
+from rosetta_util.publish import create_scope_and_collection
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +26,7 @@ def cmd_publish(ctx: Context, kind, annotations: list[dict], cluster, keyspace: 
 
     for kind in kind_list:
         # TODO (GLENN): Can we also move these constants ('-catalog.json', '_metadata') to the defaults.py file?
-        catalog_path = Path(ctx.catalog) / (kind + "-catalog.json")
+        catalog_path = pathlib.Path(ctx.catalog) / (kind + "-catalog.json")
         catalog = CatalogMem.load(catalog_path).catalog_descriptor
 
         # Get the bucket manager
@@ -45,9 +46,7 @@ def cmd_publish(ctx: Context, kind, annotations: list[dict], cluster, keyspace: 
         metadata = {el: catalog.model_dump()[el] for el in catalog.model_dump() if el != "items"}
 
         # add annotations to metadata
-        annotations_list = {
-            an[0]: an[1].split("+") if "+" in an[1] else an[1] for an in annotations
-        }
+        annotations_list = {an[0]: an[1].split("+") if "+" in an[1] else an[1] for an in annotations}
         metadata.update({"snapshot_annotations": annotations_list})
 
         printer("Upserting metadata..")
@@ -63,9 +62,7 @@ def cmd_publish(ctx: Context, kind, annotations: list[dict], cluster, keyspace: 
 
         # ----------Catalog items collection----------
         catalog_col = kind + "_catalog"
-        (msg, err) = create_scope_and_collection(
-            bucket_manager, scope=scope, collection=catalog_col
-        )
+        (msg, err) = create_scope_and_collection(bucket_manager, scope=scope, collection=catalog_col)
         if err is not None:
             printer(msg, err)
             return
