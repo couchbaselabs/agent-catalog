@@ -1,15 +1,13 @@
+import couchbase.auth
+import flask
 import os
 import pathlib
 import shutil
-import couchbase.auth
-import flask
 
+from ..defaults import DEFAULT_META_CATALOG_NAME
+from ..defaults import DEFAULT_PROMPT_CATALOG_NAME
+from ..defaults import DEFAULT_TOOL_CATALOG_NAME
 from ..models.context import Context
-from ..defaults import (
-    DEFAULT_TOOL_CATALOG_NAME,
-    DEFAULT_PROMPT_CATALOG_NAME,
-    DEFAULT_META_CATALOG_NAME
-)
 
 
 def clean_local(ctx: Context):

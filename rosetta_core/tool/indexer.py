@@ -1,21 +1,16 @@
 import abc
 import logging
 import pathlib
-import typing
 import pydantic
+import typing
 import yaml
 
-from .descriptor import (
-    SQLPPQueryToolDescriptor,
-    SemanticSearchToolDescriptor,
-    PythonToolDescriptor,
-    HTTPRequestToolDescriptor
-)
-
-from ..record.descriptor import (
-    RecordDescriptor,
-    RecordKind
-)
+from ..record.descriptor import RecordDescriptor
+from ..record.descriptor import RecordKind
+from .descriptor import HTTPRequestToolDescriptor
+from .descriptor import PythonToolDescriptor
+from .descriptor import SemanticSearchToolDescriptor
+from .descriptor import SQLPPQueryToolDescriptor
 
 logger = logging.getLogger(__name__)
 
@@ -26,64 +21,70 @@ logger = logging.getLogger(__name__)
 
 class BaseFileIndexer(pydantic.BaseModel):
     @abc.abstractmethod
-    def start_descriptors(self, filename: pathlib.Path, get_path_version) -> \
-            typing.Tuple[list[ValueError], list[RecordDescriptor]]:
+    def start_descriptors(
+        self, filename: pathlib.Path, get_path_version
+    ) -> typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or more 'bare' catalog item descriptors for a filename,
-           and/or return non-fatal or 'keep-on-going' errors if any encountered.
+        and/or return non-fatal or 'keep-on-going' errors if any encountered.
 
-           The returned descriptors are 'bare' in that they only capture
-           immediately available information and properties. Any slow
-           operators such as LLM augmentation, vector embeddings, etc. are
-           handled by other methods & processing phases that are called later.
+        The returned descriptors are 'bare' in that they only capture
+        immediately available information and properties. Any slow
+        operators such as LLM augmentation, vector embeddings, etc. are
+        handled by other methods & processing phases that are called later.
 
-           A 'keep-on-going' error means the top level command should
-           ultimately error, but more processing on other files might
-           still be attempted to increase the user's productivity --
-           e.g., show the user multiple error messages instead of
-           giving up on the very first encountered error.
+        A 'keep-on-going' error means the top level command should
+        ultimately error, but more processing on other files might
+        still be attempted to increase the user's productivity --
+        e.g., show the user multiple error messages instead of
+        giving up on the very first encountered error.
         """
         pass
 
 
 class DotPyFileIndexer(BaseFileIndexer):
-    def start_descriptors(self, filename: pathlib.Path, get_path_version) -> \
-            typing.Tuple[list[ValueError], list[RecordDescriptor]]:
+    def start_descriptors(
+        self, filename: pathlib.Path, get_path_version
+    ) -> typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or more 'bare' catalog item descriptors
-           for a *.py, and/or returns 'keep-on-going' errors
-           if any encountered.
+        for a *.py, and/or returns 'keep-on-going' errors
+        if any encountered.
         """
         factory = PythonToolDescriptor.Factory(filename=filename, version=get_path_version(filename))
         return None, list(factory)
 
 
 class DotSqlppFileIndexer(BaseFileIndexer):
-    def start_descriptors(self, filename: pathlib.Path, get_path_version) -> \
-            typing.Tuple[list[ValueError], list[RecordDescriptor]]:
+    def start_descriptors(
+        self, filename: pathlib.Path, get_path_version
+    ) -> typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or 1 'bare' catalog item descriptors
-           for a *.sqlpp, and/or return 'keep-on-going' errors
-           if any encountered.
+        for a *.sqlpp, and/or return 'keep-on-going' errors
+        if any encountered.
         """
         factory = SQLPPQueryToolDescriptor.Factory(filename=filename, version=get_path_version(filename))
         return None, list(factory)
 
 
 class DotYamlFileIndexer(BaseFileIndexer):
-    def start_descriptors(self, filename: pathlib.Path, get_version) -> \
-            typing.Tuple[list[ValueError], list[RecordDescriptor]]:
+    def start_descriptors(
+        self, filename: pathlib.Path, get_version
+    ) -> typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         """Returns zero or more 'bare' catalog item descriptors
-           for a *.yaml, and/or return 'keep-on-going' errors
-           if any encountered.
+        for a *.yaml, and/or return 'keep-on-going' errors
+        if any encountered.
         """
         # All we need here is the record_kind.
-        with filename.open('r') as fp:
+        with filename.open("r") as fp:
             parsed_desc = yaml.safe_load(fp)
-            if 'record_kind' not in parsed_desc:
-                logger.warning(f'Encountered .yaml file with unknown record_kind field. '
-                               f'Not indexing {str(filename.absolute())}.')
+            if "record_kind" not in parsed_desc:
+                logger.warning(
+                    f"Encountered .yaml file with unknown record_kind field. "
+                    f"Not indexing {str(filename.absolute())}."
+                )
                 return None, []
-            record_kind = parsed_desc['record_kind']
+            record_kind = parsed_desc["record_kind"]
 
-        factory_args = {'filename': filename, 'version': get_version(filename)}
+        factory_args = {"filename": filename, "version": get_version(filename)}
         match record_kind:
             case RecordKind.SemanticSearch:
                 return None, list(SemanticSearchToolDescriptor.Factory(**factory_args))
@@ -92,22 +93,20 @@ class DotYamlFileIndexer(BaseFileIndexer):
                 return None, list(HTTPRequestToolDescriptor.Factory(**factory_args))
 
             case _:
-                logger.warning(f'Encountered .yaml file with unknown record_kind field. '
-                               f'Not indexing {str(filename.absolute())}.')
+                logger.warning(
+                    f"Encountered .yaml file with unknown record_kind field. "
+                    f"Not indexing {str(filename.absolute())}."
+                )
                 return None, list()
 
 
-source_indexers = {
-    '*.py': DotPyFileIndexer(),
-    '*.sqlpp': DotSqlppFileIndexer(),
-    '*.yaml': DotYamlFileIndexer()
-}
+source_indexers = {"*.py": DotPyFileIndexer(), "*.sqlpp": DotSqlppFileIndexer(), "*.yaml": DotYamlFileIndexer()}
 
 
 def augment_descriptor(descriptor: RecordDescriptor) -> list[ValueError]:
-    """ Augments a single catalog item descriptor (in-place, destructive),
-        with additional information, such as generated by an LLM,
-        and/or return 'keep-on-going' errors if any encountered.
+    """Augments a single catalog item descriptor (in-place, destructive),
+    with additional information, such as generated by an LLM,
+    and/or return 'keep-on-going' errors if any encountered.
     """
 
     # TODO: Different source file descriptor might have
@@ -116,10 +115,9 @@ def augment_descriptor(descriptor: RecordDescriptor) -> list[ValueError]:
     return None
 
 
-def vectorize_descriptor(descriptor: RecordDescriptor, embedding_model_obj) -> \
-        list[ValueError]:
-    """ Adds vector embeddings to a single catalog item descriptor (in-place,
-        destructive), and/or return 'keep-on-going' errors if any encountered.
+def vectorize_descriptor(descriptor: RecordDescriptor, embedding_model_obj) -> list[ValueError]:
+    """Adds vector embeddings to a single catalog item descriptor (in-place,
+    destructive), and/or return 'keep-on-going' errors if any encountered.
     """
 
     # TODO: Different source file models might have different ways

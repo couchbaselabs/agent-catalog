@@ -1,12 +1,13 @@
 import fnmatch
 import logging
 
-from .directory import scan_directory, ScanDirectoryOpts
-from .descriptor import CatalogDescriptor
+from ..tool.indexer import augment_descriptor
+from ..tool.indexer import source_indexers
+from ..tool.indexer import vectorize_descriptor
 from .catalog_mem import CatalogMem
-from ..tool.indexer import (
-    source_indexers, augment_descriptor, vectorize_descriptor
-)
+from .descriptor import CatalogDescriptor
+from .directory import ScanDirectoryOpts
+from .directory import scan_directory
 
 logger = logging.getLogger(__name__)
 
@@ -14,16 +15,16 @@ source_globs = list(source_indexers.keys())
 
 
 def index_catalog(
-        meta,
-        version,
-        get_path_version,
-        kind,
-        catalog_path,
-        source_dirs,
-        scan_directory_opts: ScanDirectoryOpts = None,
-        printer=lambda x: None,
-        progress=lambda x: x,
-        max_errs=1,
+    meta,
+    version,
+    get_path_version,
+    kind,
+    catalog_path,
+    source_dirs,
+    scan_directory_opts: ScanDirectoryOpts = None,
+    printer=lambda x: None,
+    progress=lambda x: x,
+    max_errs=1,
 ):
     all_errs, next_catalog, uninitialized_items = index_catalog_start(
         meta,
@@ -38,18 +39,18 @@ def index_catalog(
         max_errs=max_errs,
     )
 
-    printer('Augmenting descriptor metadata.')
-    logger.debug('Now augmenting descriptor metadata.')
+    printer("Augmenting descriptor metadata.")
+    logger.debug("Now augmenting descriptor metadata.")
     for descriptor in progress(uninitialized_items):
         if max_errs > 0 and len(all_errs) >= max_errs:
             break
-        printer(f'- {descriptor.name}')
-        logger.debug(f'Augmenting {descriptor.name}.')
+        printer(f"- {descriptor.name}")
+        logger.debug(f"Augmenting {descriptor.name}.")
         errs = augment_descriptor(descriptor)
         all_errs += errs or []
 
     if all_errs:
-        logger.error('Encountered error(s) during augmenting: ' + "\n".join([str(e) for e in all_errs]))
+        logger.error("Encountered error(s) during augmenting: " + "\n".join([str(e) for e in all_errs]))
         raise all_errs[0]
 
     import sentence_transformers
@@ -58,42 +59,39 @@ def index_catalog(
         meta["embedding_model"], tokenizer_kwargs={"clean_up_tokenization_spaces": True}
     )
 
-    printer('Generating embeddings for descriptors.')
-    logger.debug('Now generating embeddings for descriptors.')
+    printer("Generating embeddings for descriptors.")
+    logger.debug("Now generating embeddings for descriptors.")
     for descriptor in progress(uninitialized_items):
         if max_errs > 0 and len(all_errs) >= max_errs:
             break
-        printer(f'- {descriptor.name}')
-        logger.debug(f'Generating embedding for {descriptor.name}.')
+        printer(f"- {descriptor.name}")
+        logger.debug(f"Generating embedding for {descriptor.name}.")
         errs = vectorize_descriptor(descriptor, embedding_model_obj)
         all_errs += errs or []
 
     if all_errs:
-        logger.error('Encountered error(s) during embedding generation: ' + "\n".join([str(e) for e in all_errs]))
+        logger.error("Encountered error(s) during embedding generation: " + "\n".join([str(e) for e in all_errs]))
         raise all_errs[0]
 
     return next_catalog
 
 
 def index_catalog_start(
-        meta,
-        version,
-        get_path_version,
-        kind,
-        catalog_path,
-        source_dirs,
-        scan_directory_opts: ScanDirectoryOpts = None,
-        printer=lambda x: None,
-        progress=lambda x: x,
-        max_errs=1,
+    meta,
+    version,
+    get_path_version,
+    kind,
+    catalog_path,
+    source_dirs,
+    scan_directory_opts: ScanDirectoryOpts = None,
+    printer=lambda x: None,
+    progress=lambda x: x,
+    max_errs=1,
 ):
     # TODO: We should use different source_indexers & source_globs based on the kind?
 
-    if catalog_path.exists():
-        # Load the old / previous local catalog.
-        curr_catalog = CatalogMem.load(catalog_path)
-    else:
-        curr_catalog = None
+    # Load the old / previous local catalog if our catalog path exists.
+    curr_catalog = CatalogMem.load(catalog_path) if catalog_path.exists() else None
 
     source_files = []
     for source_dir in source_dirs:
@@ -102,25 +100,23 @@ def index_catalog_start(
     all_errs = []
     all_descriptors = []
 
-    printer('Crawling source directories.')
-    logger.debug('Now crawling source directories.')
+    printer("Crawling source directories.")
+    logger.debug("Now crawling source directories.")
     for source_file in progress(source_files):
-        if max_errs > 0 and len(all_errs) >= max_errs:
+        if 0 < max_errs <= len(all_errs):
             break
 
         for glob, indexer in source_indexers.items():
             if fnmatch.fnmatch(source_file.name, glob):
-                printer(f'- {source_file.name}')
-                logger.debug(f'Indexing file {source_file.name}.')
-                errs, descriptors = indexer.start_descriptors(
-                    source_file, get_path_version
-                )
+                printer(f"- {source_file.name}")
+                logger.debug(f"Indexing file {source_file.name}.")
+                errs, descriptors = indexer.start_descriptors(source_file, get_path_version)
                 all_errs += errs or []
                 all_descriptors += descriptors or []
                 break
 
     if all_errs:
-        logger.error('Encountered error(s) while crawling source directories: ' + "\n".join([str(e) for e in all_errs]))
+        logger.error("Encountered error(s) while crawling source directories: " + "\n".join([str(e) for e in all_errs]))
         raise all_errs[0]
 
     next_catalog = CatalogMem(

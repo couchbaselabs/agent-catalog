@@ -1,10 +1,10 @@
 import abc
-import typing
+import logging
+import numpy
 import pydantic
 import scipy.signal
 import sklearn.neighbors
-import numpy
-import logging
+import typing
 
 from ..catalog.catalog_base import SearchResult
 
@@ -32,25 +32,22 @@ class ClosestClusterRefiner(pydantic.BaseModel, BaseRefiner):
         # Use KDE to estimate our PDF. We are going to iteratively deepen until we get some local extrema.
         for i in range(-1, self.max_deepen_steps):
             working_bandwidth = numpy.float_power(self.deepening_factor, i)
-            kde = sklearn.neighbors.KernelDensity(
-                kernel='gaussian',
-                bandwidth=working_bandwidth
-            ).fit(X=a)
+            kde = sklearn.neighbors.KernelDensity(kernel="gaussian", bandwidth=working_bandwidth).fit(X=a)
 
             # Determine our local minima and maxima in between the cosine similarity range.
             kde_score = kde.score_samples(s)
             first_minimum = scipy.signal.argrelextrema(kde_score, numpy.less)[0]
             first_maximum = scipy.signal.argrelextrema(kde_score, numpy.greater)[0]
             if len(first_minimum) > 0:
-                logger.debug(f'Using a bandwidth of {working_bandwidth}.')
+                logger.debug(f"Using a bandwidth of {working_bandwidth}.")
                 break
             else:
-                logger.debug(f'Bandwidth of {working_bandwidth} was not satisfiable. Deepening.')
+                logger.debug(f"Bandwidth of {working_bandwidth} was not satisfiable. Deepening.")
 
         if len(first_minimum) < 1:
-            logger.debug('Satisfiable bandwidth was not found. Returning original list.')
+            logger.debug("Satisfiable bandwidth was not found. Returning original list.")
             return ordered_entries
         else:
             closest_cluster = [t for t in ordered_entries if t.delta > s[first_maximum[-1]]]
             sorted_cluster = sorted(closest_cluster, key=lambda t: t.delta, reverse=True)
-            return sorted_cluster[0:self.no_more_than_k] if self.no_more_than_k is not None else sorted_cluster
+            return sorted_cluster[0 : self.no_more_than_k] if self.no_more_than_k is not None else sorted_cluster

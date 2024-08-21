@@ -57,6 +57,18 @@ markers = [
     "smoke: marks tests for running on each git-push"
 ]
 
+[tool.ruff]
+line-length = 120
+lint.select = ["F", "B", "I", "SIM"]
+show-fixes = true
+
+[tool.ruff.lint.isort]
+no-sections = true
+force-single-line = true
+lines-between-types = 1
+force-wrap-aliases = true
+split-on-trailing-comma = false
+
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
 pytest = "^8.3.2"

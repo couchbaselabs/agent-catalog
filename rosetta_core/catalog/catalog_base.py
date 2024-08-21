@@ -2,12 +2,13 @@ import abc
 import pydantic
 import typing
 
-from ..record.descriptor import RecordDescriptor
 from ..annotation import AnnotationPredicate
+from ..record.descriptor import RecordDescriptor
 
 
 class SearchResult(pydantic.BaseModel):
-    """ A result item in the results from a CatalogBase.find(). """
+    """A result item in the results from a CatalogBase.find()."""
+
     entry: RecordDescriptor
     delta: float
 
@@ -17,12 +18,13 @@ class SearchResult(pydantic.BaseModel):
 
 
 class CatalogBase(abc.ABC):
-    """ An abstract base class for a catalog of RecordDescriptor's. """
+    """An abstract base class for a catalog of RecordDescriptor's."""
 
     @abc.abstractmethod
-    def find(self, query: str, limit: typing.Union[int | None] = 1, annotations: AnnotationPredicate = None) \
-            -> list[SearchResult]:
-        """ Returns the catalog items that best match a query. """
+    def find(
+        self, query: str, limit: typing.Union[int | None] = 1, annotations: AnnotationPredicate = None
+    ) -> list[SearchResult]:
+        """Returns the catalog items that best match a query."""
 
         # TODO: The find() method might likely one day need additional,
         # optional params, perhaps to query on tags, labels, annotations,

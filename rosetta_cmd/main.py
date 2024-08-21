@@ -1,13 +1,26 @@
+import click
+import dotenv
 import logging
 import os
 import sys
-import click
-import dotenv
 
-from rosetta_util.publish import get_buckets, get_connection
-from .models import Keyspace, CouchbaseConnect, Context
-from .cmds import *
-from .defaults import *
+from .cmds import cmd_clean
+from .cmds import cmd_env
+from .cmds import cmd_find
+from .cmds import cmd_index
+from .cmds import cmd_publish
+from .cmds import cmd_status
+from .cmds import cmd_version
+from .cmds import cmd_web
+from .defaults import DEFAULT_ACTIVITY_FOLDER
+from .defaults import DEFAULT_CATALOG_FOLDER
+from .defaults import DEFAULT_EMBEDDING_MODEL
+from .defaults import DEFAULT_WEB_HOST_PORT
+from .models import Context
+from .models import CouchbaseConnect
+from .models import Keyspace
+from rosetta_util.publish import get_buckets
+from rosetta_util.publish import get_connection
 
 # Configure all logging here before we continue with our imports.
 # By default, we won't print any log messages below WARNING.
@@ -70,9 +83,7 @@ class AliasedGroup(click.Group):
     envvar="ROSETTA_ACTIVITY",
     show_default=True,
 )
-@click.option(
-    "-v", "--verbose", count=True, help="Enable verbose output.", envvar="ROSETTA_VERBOSE"
-)
+@click.option("-v", "--verbose", count=True, help="Enable verbose output.", envvar="ROSETTA_VERBOSE")
 @click.pass_context
 def click_main(ctx, catalog, activity, verbose):
     """A command line tool for Rosetta."""
@@ -241,9 +252,7 @@ def publish(ctx, kind, scope, annotations):
 
     # TODO (GLENN): Have an option to bypass the prompt by allowing a user to directly specify a bucket
     # Prompt user to select a bucket
-    selected_bucket = click.prompt(
-        "Please select a bucket", type=click.Choice(buckets), show_choices=True
-    )
+    selected_bucket = click.prompt("Please select a bucket", type=click.Choice(buckets), show_choices=True)
     click.echo(f"Inserting documents in : {selected_bucket}/{keyspace_details.scope}\n")
     keyspace_details.bucket = selected_bucket
 

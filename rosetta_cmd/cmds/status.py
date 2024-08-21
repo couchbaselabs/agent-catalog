@@ -1,14 +1,14 @@
-import flask
 import click
-import pathlib
+import flask
 import os
+import pathlib
 
+from ..cmds.util import init_local
+from ..cmds.util import load_repository
+from ..defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from rosetta_core.catalog.catalog_mem import CatalogMem
 from rosetta_core.catalog.index import index_catalog_start
 from rosetta_core.version import VersionDescriptor
-
-from ..cmds.util import load_repository, init_local
-from ..defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 
 blueprint = flask.Blueprint("status", __name__)
 
@@ -16,9 +16,7 @@ blueprint = flask.Blueprint("status", __name__)
 @blueprint.route("/status")
 def route_status():
     kind = flask.request.args.get("kind", default="tool", type=str)
-    include_dirty = (
-            flask.request.args.get("include_dirty", default="true", type=str).lower() == "true"
-    )
+    include_dirty = flask.request.args.get("include_dirty", default="true", type=str).lower() == "true"
 
     return flask.jsonify(catalog_status(flask.current_app.config["ctx"], kind, include_dirty))
 

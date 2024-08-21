@@ -100,7 +100,7 @@ rosetta_core/     -- The core rosetta library used by applications and by the ro
    secrets/
    tool/
    version/
-   
+
 tests/            -- Test cases.
 
 VERSION.txt       -- To be generated or updated at build or packaging time.

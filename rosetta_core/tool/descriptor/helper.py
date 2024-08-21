@@ -1,5 +1,5 @@
-import jsonschema
 import json
+import jsonschema
 
 # This schema was copied from: https://json-schema.org/draft/2020-12/schema
 JSON_META_SCHEMA = {
@@ -12,7 +12,7 @@ JSON_META_SCHEMA = {
         "https://json-schema.org/draft/2020-12/vocab/validation": True,
         "https://json-schema.org/draft/2020-12/vocab/meta-data": True,
         "https://json-schema.org/draft/2020-12/vocab/format-annotation": True,
-        "https://json-schema.org/draft/2020-12/vocab/content": True
+        "https://json-schema.org/draft/2020-12/vocab/content": True,
     },
     "$dynamicAnchor": "meta",
     "title": "Core and Validation specifications meta-schema",
@@ -23,45 +23,40 @@ JSON_META_SCHEMA = {
         {"$ref": "meta/validation"},
         {"$ref": "meta/meta-data"},
         {"$ref": "meta/format-annotation"},
-        {"$ref": "meta/content"}
+        {"$ref": "meta/content"},
     ],
     "type": ["object", "boolean"],
     "$comment": "This meta-schema also defines keywords that have appeared in previous drafts in order to prevent "
-                "incompatible extensions as they remain in common use.",
+    "incompatible extensions as they remain in common use.",
     "properties": {
         "definitions": {
-            "$comment": "\"definitions\" has been replaced by \"$defs\".",
+            "$comment": '"definitions" has been replaced by "$defs".',
             "type": "object",
-            "additionalProperties": {
-                "$dynamicRef": "#meta"
-            },
+            "additionalProperties": {"$dynamicRef": "#meta"},
             "deprecated": True,
-            "default": {}
+            "default": {},
         },
         "dependencies": {
-            "$comment": "\"dependencies\" has been split and replaced by \"dependentSchemas\" and "
-                        "\"dependentRequired\" in order to serve their differing semantics.",
+            "$comment": '"dependencies" has been split and replaced by "dependentSchemas" and '
+            '"dependentRequired" in order to serve their differing semantics.',
             "type": "object",
             "additionalProperties": {
-                "anyOf": [
-                    {"$dynamicRef": "#meta"},
-                    {"$ref": "meta/validation#/$defs/stringArray"}
-                ]
+                "anyOf": [{"$dynamicRef": "#meta"}, {"$ref": "meta/validation#/$defs/stringArray"}]
             },
             "deprecated": True,
-            "default": {}
+            "default": {},
         },
         "$recursiveAnchor": {
-            "$comment": "\"$recursiveAnchor\" has been replaced by \"$dynamicAnchor\".",
+            "$comment": '"$recursiveAnchor" has been replaced by "$dynamicAnchor".',
             "$ref": "meta/core#/$defs/anchorString",
-            "deprecated": True
+            "deprecated": True,
         },
         "$recursiveRef": {
-            "$comment": "\"$recursiveRef\" has been replaced by \"$dynamicRef\".",
+            "$comment": '"$recursiveRef" has been replaced by "$dynamicRef".',
             "$ref": "meta/core#/$defs/uriReferenceString",
-            "deprecated": True
-        }
-    }
+            "deprecated": True,
+        },
+    },
 }
 
 
