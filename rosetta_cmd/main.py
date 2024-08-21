@@ -127,7 +127,7 @@ def env(ctx):
     "--annotations",
     type=str,
     default=None,
-    help="Tool-specific annotations to filter by, specified using KEY=\"VALUE\" (AND|OR KEY=\"VALUE\")*.",
+    help='Tool-specific annotations to filter by, specified using KEY="VALUE" (AND|OR KEY="VALUE")*.',
     show_default=True,
 )
 @click.pass_context
@@ -220,7 +220,7 @@ def index(ctx, source_dirs, kind, embedding_model, include_dirty, dry_run):
 )
 @click.pass_context
 def publish(ctx, kind, scope, annotations):
-    """Publish command that inserts after reading CatalogMem object"""
+    """Publish the local catalog to Couchbase DB"""
 
     # Get keyspace and connection details
     keyspace_details = Keyspace(bucket="", scope=scope)
