@@ -1,10 +1,13 @@
 import pytest
-import rosetta.lc
+import rosetta_lc
 import random
 import pydantic
 import json
 import os
 from datetime import timedelta 
+
+#TODO consolidate duplicate code in beginning b/w example & test
+
 # needed for any cluster connection
 from couchbase.auth import PasswordAuthenticator
 from couchbase.cluster import Cluster
@@ -95,25 +98,29 @@ def gen_doc(id: str, name: str, callsign: str):
         print("Generate failed.")
         print("Exception: ", e)
 
+from dotenv import load_dotenv, dotenv_values 
+load_dotenv()
+
+
 #Tests with invalid parameters for IQAgent
 def test_par1():
     with pytest.raises(pydantic.v1.error_wrappers.ValidationError) as excinfo:
-        test = rosetta.lc.IQAgent() 
+        test = rosetta_lc.IQBackedChatModel() 
 
 def test_par2():
-    with pytest.raises(pydantic.v1.error_wrappers.ValidationError) as excinfo:
-        test = rosetta.lc.IQAgent(model_name="custam",capAddy=os.getenv("CAPELLA-ADDRESS"), orgID=os.getenv("ORG-ID"), username="Daniel")
+    with pytest.raises(TypeError) as excinfo:
+        test = rosetta_lc.IQBackedChatModel(model_name="custam",capella_address=os.getenv("CAPELLA-ADDRESS"), org_id=os.getenv("ORG-ID"), username="Daniel")
 
 def test_par3():
-    with pytest.raises(pydantic.v1.error_wrappers.ValidationError) as excinfo:
-        test = rosetta.lc.IQAgent(model_name="custam",capAddy=os.getenv("CAPELLA-ADDRESS"), orgID=os.getenv("ORG-ID"), password="12345")
+    with pytest.raises(TypeError) as excinfo:
+        test = rosetta_lc.IQBackedChatModel(model_name="custam",capella_address=os.getenv("CAPELLA-ADDRESS"), org_id=os.getenv("ORG-ID"), password="12345")
 
 def test_par4():
-    test = rosetta.lc.IQAgent(model_name="custam",capAddy=os.getenv("CAPELLA-ADDRESS"), orgID=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
+    test = rosetta_lc.IQBackedChatModel(model_name="custam",capella_address=os.getenv("CAPELLA-ADDRESS"), org_id=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
 
 #Tests with tools for IQAgent
 def test_tools1():
-    test = rosetta.lc.IQAgent(model_name="custam",capAddy=os.getenv("CAPELLA-ADDRESS"), orgID=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
+    test = rosetta_lc.IQBackedChatModel(model_name="custam",capella_address=os.getenv("CAPELLA-ADDRESS"), org_id=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
     test.bind_tools([upsert_document, gen_doc, get_airline_by_key])
     s = test.invoke([
     SystemMessage(content="You are a helpful assistant who knows everything, especially about the Couchbase Server Cluster. "),
@@ -122,13 +129,13 @@ def test_tools1():
     print(s)
 
 def test_tools2():
-    test = rosetta.lc.IQAgent(model_name="custam",capAddy=os.getenv("CAPELLA-ADDRESS"), orgID=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
+    test = rosetta_lc.IQBackedChatModel(model_name="custam",capella_address=os.getenv("CAPELLA-ADDRESS"), org_id=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
     
     test.bind_tools([1, 2, 3]) #Wow works w/ convert_to_openai_tool
 
 #Tests with setting functions
 def test_set1():
-    test = rosetta.lc.IQAgent(model_name="custam",capAddy=os.getenv("CAPELLA-ADDRESS"), orgID=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
+    test = rosetta_lc.IQBackedChatModel(model_name="custam",capella_address=os.getenv("CAPELLA-ADDRESS"), org_id=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
 
     test.select_settings(temperature=1.5, seed=random.randint(1,10000), freq_penalty=1, presence_penalty=-1)
     print(test.invoke([
@@ -137,40 +144,58 @@ def test_set1():
     ]))
 
 def test_set2():
-    test = rosetta.lc.IQAgent(model_name="custam",capAddy=os.getenv("CAPELLA-ADDRESS"), orgID=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
+    test = rosetta_lc.IQBackedChatModel(model_name="custam",capella_address=os.getenv("CAPELLA-ADDRESS"), org_id=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
 
     with pytest.raises(ValueError) as excinfo:
         test.select_settings(freq_penalty=3)
 
 def test_set3():
-    test = rosetta.lc.IQAgent(model_name="custam",capAddy=os.getenv("CAPELLA-ADDRESS"), orgID=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
+    test = rosetta_lc.IQBackedChatModel(model_name="custam",capella_address=os.getenv("CAPELLA-ADDRESS"), org_id=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
     
-    test.select_model(4)
+    test.select_model(modelNum=4)
     print(test.invoke([
         SystemMessage(content="You are a helpful assistant who knows everything, especially about the Couchbase Server Cluster. "),
         HumanMessage(content="Can you tell me about the solor system?")        
     ]))
 
-    test.select_model("gpt-4o-mini")
+    test.select_model(modelName="gpt-4o-mini")
     print(test.invoke([
         HumanMessage(content="Can you tell me about the solor system?")        
     ]))
 
 def test_set4():
-    test = rosetta.lc.IQAgent(model_name="custam",capAddy=os.getenv("CAPELLA-ADDRESS"), orgID=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
+    test = rosetta_lc.IQBackedChatModel(model_name="custam",capella_address=os.getenv("CAPELLA-ADDRESS"), org_id=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
     
     with pytest.raises(ValueError) as excinfo:
         test.select_model(5)
 
 def test_set5():
-    test = rosetta.lc.IQAgent(model_name="custam",capAddy=os.getenv("CAPELLA-ADDRESS"), orgID=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
+    test = rosetta_lc.IQBackedChatModel(model_name="custam",capella_address=os.getenv("CAPELLA-ADDRESS"), org_id=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
 
     with pytest.raises(ValueError) as excinfo:
         test.select_model("Couchbase")
 
+
 #Tests with generation/streaming
 def test_gen1():
-    test = rosetta.lc.IQAgent(model_name="custam",capAddy=os.getenv("CAPELLA-ADDRESS"), orgID=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
+    test = rosetta_lc.IQBackedChatModel(model_name="custam",capella_address=os.getenv("CAPELLA-ADDRESS"), org_id=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
+
+    print(test.invoke([
+        SystemMessage(content="You are a helpful assistant who knows everything, especially about the Couchbase Server Cluster. "),
+        HumanMessage(content="Can you tell me about the solor system?")        
+    ]))
+
 
 def test_stream1():
-    pass
+    test = rosetta_lc.IQBackedChatModel(model_name="custam",capella_address=os.getenv("CAPELLA-ADDRESS"), org_id=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
+
+    counter = 0
+
+    for x in test.stream([
+        SystemMessage(content="You are a helpful assistant who knows everything, especially about the Couchbase Server Cluster. "),
+        HumanMessage(content="Can you tell me about the solor system?")        
+    ]): 
+        counter += 1    
+        print(x)
+
+    assert counter > 1

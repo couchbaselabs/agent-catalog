@@ -683,7 +683,10 @@ aiohttp = ">=3.8.3,<4.0.0"
 langchain-core = ">=0.2.30,<0.3.0"
 langchain-text-splitters = ">=0.2.0,<0.3.0"
 langsmith = ">=0.1.17,<0.2.0"
-numpy = {version = ">=1.26.0,<2.0.0", markers = "python_version >= \"3.12\""}
+numpy = [
+    {version = ">=1.26.0,<2.0.0", markers = "python_version >= \"3.12\""},
+    {version = ">=1,<2", markers = "python_version < \"3.12\""},
+]
 pydantic = ">=1,<3"
 PyYAML = ">=5.3"
 requests = ">=2,<3"
@@ -1610,5 +1613,5 @@ multidict = ">=4.0"
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.12"
-content-hash = "d6e9a6ac7c8840881b5ef8b75c4bbf14682e576bca112ab81b33db8a6eca6a9a"
+python-versions = "^3.11"
+content-hash = "160681ead7d915d3ebafdb351c6ea306df2bdab5c553340a5514911d4e41f4d6"

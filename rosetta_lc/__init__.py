@@ -1,1 +1,1 @@
-from .lcIQAgent import IQAgent
+from .lcIQAgent import IQBackedChatModel
