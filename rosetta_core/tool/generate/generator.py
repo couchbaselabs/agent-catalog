@@ -124,7 +124,7 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
             raise ValueError('Grouped HTTP-Request descriptors must share the same source!')
         return v
 
-    def _create_json_schema_from_specification(self, operation: HTTPRequestToolDescriptor.OperationMetadata):
+    def _create_json_schema_from_specification(self, operation: HTTPRequestToolDescriptor.OperationHandle):
         # Our goal here is to create an easy "interface" for our LLM to call, so we will consolidate parameters
         # and the request body into one model.
         base_object = {
@@ -179,7 +179,7 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
     def generate(self) -> typing.Iterable[str]:
         # Iterate over our operations.
         for record_descriptor in self.record_descriptors:
-            operation = record_descriptor.operation
+            operation = record_descriptor.handle
 
             # TODO (GLENN): We should try to build a model for the response (output) in the future.
             # Generate a Pydantic model for the input schema.

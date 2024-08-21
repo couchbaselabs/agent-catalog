@@ -196,10 +196,19 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
         path: str
         method: str
 
-        # These properties are set after validating HTTPRequestToolDescriptor (outer).
-        _operation: openapi_parser.parser.Operation
-        _servers: list[openapi_parser.parser.Server]
-        _parent_parameters: list[openapi_parser.parser.Parameter] = list()
+    class SpecificationMetadata(pydantic.BaseModel):
+        filename: typing.Optional[pathlib.Path | None] = None
+        url: typing.Optional[pathlib.Path | None] = None
+
+    class OperationHandle:
+        def __init__(self, path: str, method: str, operation: openapi_parser.parser.Operation,
+                     servers: list[openapi_parser.parser.Server],
+                     parent_parameters: list[openapi_parser.parser.Parameter] = None):
+            self.path = path
+            self.method = method
+            self.servers = servers
+            self._operation = operation
+            self._parent_parameters = parent_parameters
 
         @property
         def parameters(self) -> list[openapi_parser.parser.Parameter]:
@@ -207,10 +216,6 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
                 return self._parent_parameters
             else:
                 return self._operation.parameters
-
-        @property
-        def servers(self) -> list[openapi_parser.parser.Server]:
-            return self._servers
 
         @property
         def operation_id(self):
@@ -227,13 +232,75 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
         def __str__(self):
             return f'{self.method} {self.path}'
 
-    class SpecificationMetadata(pydantic.BaseModel):
-        filename: typing.Optional[pathlib.Path | None] = None
-        url: typing.Optional[pathlib.Path | None] = None
-
     operation: OperationMetadata
     specification: SpecificationMetadata
     record_kind: typing.Literal[RecordKind.HTTPRequest]
+
+    @staticmethod
+    def validate_operation(filename: pathlib.Path | None, url: str | None, operation: OperationMetadata):
+        # We need the filename or the URL. Also, both cannot exist at the same time.
+        if filename is None and url is None:
+            raise ValueError('Either filename or url must be specified.')
+        if filename is not None and url is not None:
+            raise ValueError('Both filename and url cannot be specified at the same time.')
+
+        # We should be able to access the specification file here (validation is done internally here).
+        if filename is not None:
+            open_api_spec = openapi_parser.parse(filename.absolute().as_uri())
+        else:
+            open_api_spec = openapi_parser.parse(url)
+
+        # Determine our servers.
+        if len(open_api_spec.servers) > 0:
+            servers = open_api_spec.servers
+        elif filename is not None:
+            servers = [
+                openapi_parser.parser.Server(url='https://localhost/'),
+                openapi_parser.parser.Server(url='http://localhost/')
+            ]
+        else:  # url is not None
+            servers = [openapi_parser.parser.Server(url)]
+
+        # Check the operation path...
+        specification_path = None
+        for p in open_api_spec.paths:
+            if operation.path == p.url:
+                specification_path = p
+                break
+        if specification_path is None:
+            raise ValueError(f'Operation {operation} does not exist in the spec.')
+
+        # ...and then the method.
+        specification_operation = None
+        for m in specification_path.operations:
+            if operation.method.lower() == m.method.value.lower():
+                specification_operation = m
+                break
+        if specification_operation is None:
+            raise ValueError(f'Operation {operation} does not exist in the spec.')
+
+        # We additionally impose that a description and an operationId must exist.
+        if specification_operation.description is None:
+            raise ValueError(f'Description must be specified for operation {operation}.')
+        if specification_operation.operation_id is None:
+            raise ValueError(f'OperationId must be specified for operation {operation}.')
+
+        # TODO (GLENN): openapi_parser doesn't support operation servers (OpenAPI 3.1.0).
+        return HTTPRequestToolDescriptor.OperationHandle(
+            method=operation.method,
+            path=operation.path,
+            servers=servers,
+            operation=specification_operation,
+            parent_parameters=specification_path.parameters
+        )
+
+    @property
+    def handle(self) -> OperationHandle:
+        return HTTPRequestToolDescriptor.validate_operation(
+            filename=pathlib.Path(self.specification.filename),
+            url=self.specification.url,
+            operation=self.operation
+        )
 
     class JSONEncoder(json.JSONEncoder):
         def default(self, obj):
@@ -267,58 +334,14 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
                 url: typing.Optional[str | None] = None
                 operations: list['HTTPRequestToolDescriptor.OperationMetadata']
 
-                _open_api_spec: openapi_parser.parser.Specification
-
                 @pydantic.model_validator(mode='after')
                 def operations_must_be_valid(self) -> typing.Self:
-                    # We need the filename or the URL. Also, both cannot exist at the same time.
-                    if self.filename is None and self.url is None:
-                        raise ValueError('Either filename or url must be specified.')
-                    if self.filename is not None and self.url is not None:
-                        raise ValueError('Both filename and url cannot be specified at the same time.')
-
-                    # We should be able to access the specification file here (validation is done internally here).
-                    self._open_api_spec = openapi_parser.parse(self.filename or self.url)
-                    if len(self._open_api_spec.servers) > 0:
-                        servers = self._open_api_spec.servers
-                    elif self.filename is not None:
-                        servers = [
-                            openapi_parser.parser.Server(url='https://localhost/'),
-                            openapi_parser.parser.Server(url='http://localhost/')
-                        ]
-                    else:  # self.url is not None
-                        servers = [openapi_parser.parser.Server(self.url)]
-
-                    # Check the operation path...
                     for operation in self.operations:
-                        specification_path = None
-                        for p in self._open_api_spec.paths:
-                            if operation.path == p.url:
-                                specification_path = p
-                                break
-                        if specification_path is None:
-                            raise ValueError(f'Operation {operation} does not exist in the spec.')
-
-                        # ...and then the method.
-                        specification_operation = None
-                        for m in specification_path.operations:
-                            if operation.method.lower() == m.method.value.lower():
-                                specification_operation = m
-                                break
-                        if specification_operation is None:
-                            raise ValueError(f'Operation {operation} does not exist in the spec.')
-
-                        # We additionally impose that a description and an operationId must exist.
-                        if specification_operation.description is None:
-                            raise ValueError(f'Description must be specified for operation {operation}.')
-                        if specification_operation.operation_id is None:
-                            raise ValueError(f'OperationId must be specified for operation {operation}.')
-
-                        # TODO (GLENN): openapi_parser doesn't support operation servers (OpenAPI 3.1.0).
-                        operation._servers = servers
-                        operation._operation = specification_operation
-                        if specification_path.parameters is not None:
-                            operation._parent_parameters = specification_path.parameters
+                        HTTPRequestToolDescriptor.validate_operation(
+                            filename=pathlib.Path(self.filename),
+                            url=self.url,
+                            operation=operation
+                        )
                     return self
 
             # Below, we enumerate all fields that appear in a .yaml file for http requests.
@@ -330,10 +353,15 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
             with self.filename.open('r') as fp:
                 metadata = HTTPRequestToolDescriptor.Factory.Metadata.model_validate(yaml.safe_load(fp))
                 for operation in metadata.open_api.operations:
+                    operation_handle = HTTPRequestToolDescriptor.validate_operation(
+                        filename=pathlib.Path(metadata.open_api.filename),
+                        url=metadata.open_api.url,
+                        operation=operation
+                    )
                     yield HTTPRequestToolDescriptor(
                         record_kind=RecordKind.HTTPRequest,
-                        name=operation.operation_id,
-                        description=operation.description,
+                        name=operation_handle.operation_id,
+                        description=operation_handle.description,
                         source=self.filename,
                         version=self.version,
                         operation=operation,
