@@ -1,8 +1,8 @@
 import typing
 
-from ..annotation import AnnotationPredicate
-from .catalog_base import CatalogBase
-from .catalog_base import SearchResult
+from .base import CatalogBase
+from .base import SearchResult
+from rosetta_core.annotation import AnnotationPredicate
 
 
 class CatalogDB(CatalogBase):

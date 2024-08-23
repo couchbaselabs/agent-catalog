@@ -2,8 +2,8 @@ import abc
 import pydantic
 import typing
 
-from ..annotation import AnnotationPredicate
-from ..record.descriptor import RecordDescriptor
+from rosetta_core.annotation import AnnotationPredicate
+from rosetta_core.record.descriptor import RecordDescriptor
 
 
 class SearchResult(pydantic.BaseModel):

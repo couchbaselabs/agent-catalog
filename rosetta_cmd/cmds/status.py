@@ -6,7 +6,7 @@ import pathlib
 from ..cmds.util import init_local
 from ..cmds.util import load_repository
 from ..defaults import DEFAULT_SCAN_DIRECTORY_OPTS
-from rosetta_core.catalog.catalog_mem import CatalogMem
+from rosetta_core.catalog import CatalogMem
 from rosetta_core.catalog.index import index_catalog_start
 from rosetta_core.version import VersionDescriptor
 
