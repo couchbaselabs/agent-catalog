@@ -1,8 +1,8 @@
 """
-Need to add user parameters in .env file
+User needs to add user parameters in .env file
 """
 
-import rosetta.lc
+import rosetta_lc
 import json
 import os
 from datetime import timedelta 
@@ -15,6 +15,9 @@ from couchbase.options import (ClusterOptions, ClusterTimeoutOptions,
 #Get all docs in a range
 from couchbase.kv_range_scan import RangeScan
 
+from dotenv import load_dotenv, dotenv_values 
+load_dotenv()
+
 from langchain_core.messages import (
     AIMessage,
     AIMessageChunk,
@@ -23,6 +26,14 @@ from langchain_core.messages import (
     SystemMessage,
     ToolMessage,
 )
+
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain.agents import AgentExecutor, create_tool_calling_agent
+from langchain.agents.output_parsers.openai_tools import OpenAIToolsAgentOutputParser
+from langchain.agents.format_scratchpad.openai_tools import (
+    format_to_openai_tool_messages,
+)
+from langchain_core.utils.function_calling import convert_to_openai_tool
 
 #Imports Fine in Virtual Environment
 
@@ -56,12 +67,12 @@ def upsert_document(doc):
     """
     Upsert a document into the cluster
     """
+    print(f"upserting: {doc}")
     print("\nUpsert CAS: ")
     try:
-        # key will equal: "airline_8091"
         key = doc["type"] + "_" + str(doc["id"])
         result = cb_coll.upsert(key, doc)
-        print(result)
+        print(result.cas)
     except Exception as e:
         print(e)
 
@@ -77,7 +88,7 @@ def get_airline_by_key(key):
     except Exception as e:
         print(e)
 
-def gen_doc(id: str, name: str, callsign: str):
+def gen_doc(id: int, name: str, callsign: str):
     """
     Generates a doc with the given id, name and callsign, and returns it.
     """
@@ -104,8 +115,6 @@ def processResponse():
         
         func = globals()[content["choices"][0]["message"]["tool_calls"][0]["function"]["name"]]
 
-        print(func)
-
         if content["choices"][0]["message"]["tool_calls"][0]["function"]["name"] == "gen_doc":
 
             argsDict = json.loads(content["choices"][0]["message"]["tool_calls"][0]["function"]["arguments"])
@@ -115,6 +124,7 @@ def processResponse():
         
         elif content["choices"][0]["message"]["tool_calls"][0]["function"]["name"] == "upsert_document":
             if storedAirlines:
+                print(storedAirlines[0])
                 func(storedAirlines[0])
                 storedAirlines.pop(0)
 
@@ -122,38 +132,99 @@ def processResponse():
             argsDict = json.loads(content["choices"][0]["message"]["tool_calls"][0]["function"]["arguments"])
             func(argsDict["key"])
 
+    else: 
+        for x in content:
+            print(f"{x}: {content[x]}")
 
-test = rosetta.lc.IQAgent(model_name="custam",capAddy=os.getenv("CAPELLA-ADDRESS"), orgID=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
-s1 = test.invoke([
-    SystemMessage(content="You are a helpful assistant who knows everything, especially about the Couchbase Server Cluster. "),
-    HumanMessage(content="Can you gen a doc with ID=8091, callsign=CBA, and name=Couchbase Airways"),
-])
-tools = [upsert_document, gen_doc, get_airline_by_key]
 
-testWithTools = test.bind_tools(tools)
+test = rosetta_lc.IQBackedChatModel(model_name="custam",capella_address=os.getenv("CAPELLA-ADDRESS"), org_id=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
 
-s2 = test.invoke([
-    SystemMessage(content="You are a helpful assistant who knows everything, especially about the Couchbase Server Cluster. "),
-    HumanMessage(content="Can you gen a doc with ID=8091, callsign=CBA, and name=Couchbase Airways"),
-])
 
-print(f"Without Binding: {s1}")
-print()
-print(f"With Binding: {s2}")
+def example1():
 
-content = json.loads(s2.content)
+    s1 = test.invoke([
+        SystemMessage(content="You are a helpful assistant who knows everything, especially about the Couchbase Server Cluster."),
+        HumanMessage(content="Can you gen a doc with ID=8091, callsign=CBA, and name=Couchbase Airways"),
+    ])
 
-for x in content:
-    print(f"{x}: {content[x]}")
+    tools = [upsert_document, gen_doc, get_airline_by_key]
+    test.bind_tools(tools)
 
-print()
+    s2 = test.invoke([
+        SystemMessage(content="You are a helpful assistant who knows everything, especially about the Couchbase Server Cluster. "),
+        HumanMessage(content="Can you gen a doc with ID=8091, callsign=CBA, and name=Couchbase Airways"),
+    ])
 
-processResponse()
+    print(f"To Invoke:\nSystemMessage = You are a helpful assistant who knows everything, especially about the Couchbase Server Cluster. \nHumanMessage = Can you gen a doc with ID=8091, callsign=CBA, and name=Couchbase Airways")
 
-print(storedAirlines)
+    print(f"Without Binding:\n")
+    content1 = json.loads(s1.content)
 
-content = json.loads(test.invoke([HumanMessage(content="Can you upsert the doc you just generated")]).content)
+    for x in content1:
+        print(f"{x}: {content1[x]}")
 
-print()
+    print()
+    print(f"With Binding:\n")
 
-processResponse()
+    content2 = json.loads(s2.content)
+
+    for x in content2:
+        print(f"{x}: {content2[x]}")
+
+
+    print()
+
+    processResponse()
+
+    print(storedAirlines)
+
+    content = json.loads(test.invoke([HumanMessage(content="Can you upsert the doc you just generated")]).content)
+
+    print()
+
+    processResponse()
+
+def example2():
+
+    inp = input("Input (q to exit): ")
+
+    while inp.lower() != "q":
+        resp = test.invoke([
+            SystemMessage(content="You are a helpful assistant who knows everything, especially about the Couchbase Server Cluster. Make sure you clarify on accepted arguments."),
+            HumanMessage(content=inp),
+        ])
+
+        content = json.loads(resp.content)
+        processResponse()
+        print
+        inp = input("Input (q to exit): ")
+
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "You are a very powerful assistant, with knowledge about Couchbase Server and Clusters."
+            ),
+            (
+                "user",
+                "{input}"
+            ),
+            MessagesPlaceholder(variable_name="agent_scratchpad")
+        ]
+    )
+
+    agent = (
+        {
+            "input": lambda x: x["input"],
+            "agent_scratchpad": lambda x: format_to_openai_tool_messages(
+                x["intermediate_steps"]
+            ),
+        }
+        | prompt
+        | test
+        | OpenAIToolsAgentOutputParser()
+        )
+    agent_executor = AgentExecutor(agent=agent, tools=[], verbose=True)
+
+
+    agent_executor.invoke({"input": "Can you genetate and upsert a document with the details of id=312, callsign=CBA, and name=Couchbase Airways"})"""
