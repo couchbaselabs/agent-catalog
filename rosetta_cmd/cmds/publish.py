@@ -4,7 +4,7 @@ import pathlib
 
 from ..models import Context
 from ..models import Keyspace
-from rosetta_core.catalog.catalog_mem import CatalogMem
+from rosetta_core.catalog import CatalogMem
 from rosetta_util.publish import CustomPublishEncoder
 from rosetta_util.publish import create_scope_and_collection
 

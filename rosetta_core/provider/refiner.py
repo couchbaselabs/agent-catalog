@@ -6,7 +6,7 @@ import scipy.signal
 import sklearn.neighbors
 import typing
 
-from ..catalog.catalog_base import SearchResult
+from ..catalog import SearchResult
 
 logger = logging.getLogger(__name__)
 
