@@ -3,7 +3,8 @@ name = "rosetta-lc"
 version = "0.1.0"
 description = "Collection of LangChain-specific classes and functions used with rosetta-core."
 authors = [
-  "Kush Khanna <kush.khanna@couchbase.com>"
+  "Kush Khanna <kush.khanna@couchbase.com>",
+  "Glenn Galvizo <glenn.galvizo@couchbase.com>"
 ]
 readme = "README.md"
 packages = [{include = "rosetta_lc"}]
@@ -23,6 +24,25 @@ langchain-openai = "^0.1.20"
 pydantic = "2.8.2"
 requests = "^2.32.3"
 python-dotenv = "^1.0.1"
+
+rosetta = { git = "git@github.com:couchbaselabs/rosetta.git" }
+# rosetta = { path = PATH_TO_LOCAL_ROSETTA, develop = true }
+
+[tool.ruff]
+line-length = 120
+lint.select = ["F", "B", "I", "SIM"]
+show-fixes = true
+
+[tool.ruff.lint.isort]
+no-sections = true
+force-single-line = true
+lines-between-types = 1
+force-wrap-aliases = true
+split-on-trailing-comma = false
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.2.2"
+# pytest = "^8.3.2"
 
 [build-system]
 requires = ["poetry-core"]

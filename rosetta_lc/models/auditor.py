@@ -1,0 +1,2 @@
+class AuditingProxiedModel:
+    pass
