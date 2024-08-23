@@ -1,4 +1,4 @@
-from langcIQ import IQChatModel
+from .langcIQ import IQChatModel, Optional, requests, logging, time, HumanMessage, SystemMessage, os
 from pydantic import model_validator, ValidationError
 import base64
 import logging
@@ -12,17 +12,17 @@ class IQBackedChatModel(IQChatModel): #Should inherit CustomChatModel,
     password: Optional[str] = None
     """Password for capella"""
 
-    hJWT: Optional[str] = None
+    jwt: Optional[str] = None
     """JWT token"""
 
     def __init__(self, **data):
         super().__init__(**data)
         usr = self.username
         pas = self.password
-        tok = self.hJWT
+        tok = self.jwt
 
         if not (usr and pas) and not tok:
-            raise ValidationError("Either username and password must be set or hJWT must be set.")   
+            raise TypeError("Either username and password must be set or hJWT must be set.")   
         
         if not tok:
             to64 = usr+":"+pas
@@ -33,19 +33,22 @@ class IQBackedChatModel(IQChatModel): #Should inherit CustomChatModel,
 
             #logger.warning("%s", encodedString)
             
-            h = {"Authorization": f"Basic {encodedString}"}
+            header = {"Authorization": f"Basic {encodedString}"}
             try:
-                resp = requests.post(self.capAddy+"/sessions", headers=h)
-                self.hJWT = "Bearer " + resp.json().get("jwt")
+                resp = requests.post(self.capella_address+"/sessions", headers=header)
+                self.jwt = "Bearer " + resp.json().get("jwt")
                 
                 #logger.warning("%s", self.hJWT)
             except:
-                logger.error("Error in request for JWT token.")
+                logging.error("Error in request for JWT token.")
 
 
 
-if __name__ == "__main__":
-    test = IQAgent(model_name="custam",capAddy=os.getenv("CAPELLA-ADDRESS"), orgID=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
+if __name__ == "__main__":    
+    from dotenv import load_dotenv, dotenv_values 
+    load_dotenv()
+
+    test = IQBackedChatModel(model_name="custam",capella_address=os.getenv("CAPELLA-ADDRESS"), org_id=os.getenv("ORG-ID"), username=os.getenv("USERNAME"), password=os.getenv("PASSWORD"))
 
     def invoker(s):
         returnS = test.invoke(
