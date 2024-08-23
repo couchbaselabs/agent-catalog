@@ -30,9 +30,9 @@ jobs:
           python-version: "3.12"
           poetry-version: "latest"
           shell: "bash"
-      - name: Install repository with Poetry
-        run: |
-          poetry install
+            # - name: Install repository with Poetry
+            #   run: |
+            #     poetry install
 
       - run: echo "🔥 Starting the smoke tests (🤞 please don't break!)."
       - name: Run smoke tests
