@@ -1,8 +1,9 @@
 from .catalog_base import CatalogBase
+from .catalog_chain import CatalogChain
 from .catalog_db import CatalogDB
 from .catalog_mem import CatalogMem
 
-__all__ = ["CatalogMem", "CatalogDB", "CatalogBase"]
+__all__ = ["CatalogMem", "CatalogDB", "CatalogBase", "CatalogChain"]
 
 # Newer versions of the rosetta core library / tools might be able to read and/or write older catalog schema versions
 # of data which were persisted into the local catalog and/or into the database.
