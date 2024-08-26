@@ -1305,13 +1305,13 @@ tenacity = ">=8.1.0,<8.4.0 || >8.4.0,<9.0.0"
 
 [[package]]
 name = "langchain-core"
-version = "0.2.34"
+version = "0.2.35"
 description = "Building applications with LLMs through composability"
 optional = false
 python-versions = "<4.0,>=3.8.1"
 files = [
-    {file = "langchain_core-0.2.34-py3-none-any.whl", hash = "sha256:c4fd158273e28cef758b4eccc956b424b76d4bb9117ce6014ae6eb2fb985801d"},
-    {file = "langchain_core-0.2.34.tar.gz", hash = "sha256:50048d90b175c0d5a7e28164628b3c7f8c82b0dc2cd766a663d346a18d5c9eb2"},
+    {file = "langchain_core-0.2.35-py3-none-any.whl", hash = "sha256:e994fb8598e919842205824836a584243c1fb7f44268f6f14921c529667c4e6e"},
+    {file = "langchain_core-0.2.35.tar.gz", hash = "sha256:da8f51355a4a285345c41a3232fd0f1cc3a33726eb7b3557b753ffabfeb68b3f"},
 ]
 
 [package.dependencies]
@@ -2597,13 +2597,13 @@ six = "*"
 
 [[package]]
 name = "rich"
-version = "13.7.1"
+version = "13.8.0"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 optional = false
 python-versions = ">=3.7.0"
 files = [
-    {file = "rich-13.7.1-py3-none-any.whl", hash = "sha256:4edbae314f59eb482f54e9e30bf00d33350aaa94f4bfcd4e9e3110e64d0d7222"},
-    {file = "rich-13.7.1.tar.gz", hash = "sha256:9be308cb1fe2f1f57d67ce99e95af38a1e2bc71ad9813b0e247cf7ffbcc3a432"},
+    {file = "rich-13.8.0-py3-none-any.whl", hash = "sha256:2e85306a063b9492dffc86278197a60cbece75bcb766022f3436f567cae11bdc"},
+    {file = "rich-13.8.0.tar.gz", hash = "sha256:a5ac1f1cd448ade0d59cc3356f7db7a7ccda2c8cbae9c7a90c28ff463d3e91f4"},
 ]
 
 [package.dependencies]
@@ -2633,7 +2633,7 @@ langchain = ["rosetta-lc @ git+ssh://git@github.com/couchbaselabs/rosetta-lc.git
 type = "git"
 url = "git@github.com:couchbaselabs/rosetta.git"
 reference = "HEAD"
-resolved_reference = "e87eb4e8e51d4f153853cfafbf5f014d1a9e44eb"
+resolved_reference = "a9db1867528065a7db46d22a1aaf241554a36d2a"
 
 [[package]]
 name = "rosetta-core"
@@ -2672,7 +2672,7 @@ tqdm = "^4.66.5"
 type = "git"
 url = "git@github.com:couchbaselabs/rosetta-core.git"
 reference = "HEAD"
-resolved_reference = "4933f08e1d5740b052db27945296eac952bb4258"
+resolved_reference = "d11cf52a26942c40ef7b526d739ef88279bdf6a3"
 
 [[package]]
 name = "rpds-py"
@@ -3619,13 +3619,13 @@ tutorials = ["matplotlib", "pandas", "tabulate"]
 
 [[package]]
 name = "typer"
-version = "0.12.4"
+version = "0.12.5"
 description = "Typer, build great CLIs. Easy to code. Based on Python type hints."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "typer-0.12.4-py3-none-any.whl", hash = "sha256:819aa03699f438397e876aa12b0d63766864ecba1b579092cc9fe35d886e34b6"},
-    {file = "typer-0.12.4.tar.gz", hash = "sha256:c9c1613ed6a166162705b3347b8d10b661ccc5d95692654d0fb628118f2c34e6"},
+    {file = "typer-0.12.5-py3-none-any.whl", hash = "sha256:62fe4e471711b147e3365034133904df3e235698399bc4de2b36c8579298d52b"},
+    {file = "typer-0.12.5.tar.gz", hash = "sha256:f592f089bedcc8ec1b974125d64851029c3b1af145f04aca64d69410f0c9b722"},
 ]
 
 [package.dependencies]

@@ -1,3 +1,4 @@
-from . import models
+from .models import IQBackedChatModel
+from .models import audit
 
-__all__ = ["models"]
+__all__ = ["audit", "IQBackedChatModel"]

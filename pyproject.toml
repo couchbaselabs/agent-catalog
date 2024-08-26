@@ -26,6 +26,8 @@ requests = "^2.32.3"
 python-dotenv = "^1.0.1"
 
 rosetta = { git = "git@github.com:couchbaselabs/rosetta.git" }
+
+# For developers that want to use a local version of Rosetta.
 # rosetta = { path = PATH_TO_LOCAL_ROSETTA, develop = true }
 
 [tool.ruff]
