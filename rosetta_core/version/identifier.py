@@ -25,7 +25,7 @@ class VersionDescriptor(pydantic.BaseModel):
     )
     metadata: typing.Optional[dict[str, str]] = pydantic.Field(
         description="A set of system-defined annotations that are used to identify records. "
-        "This field should NOT be saved on published, and will only exist in the catalog. ",
+        "This field should NOT be saved on publish, and should only exist in the local catalog. ",
         default=None,
     )
 

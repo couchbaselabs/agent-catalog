@@ -7,6 +7,7 @@ from ..version import VersionDescriptor
 
 class Role(enum.StrEnum):
     Human = "human"
+    System = "system"
     Tool = "tool"
     Assistant = "assistant"
     Feedback = "feedback"
@@ -14,6 +15,11 @@ class Role(enum.StrEnum):
 
 class Message(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(use_enum_values=True, frozen=True)
+
+    timestamp: pydantic.AwareDatetime = pydantic.Field(
+        description="Timestamp of the generated message. This field must have a timezone attached as well.",
+        examples=["2024-08-26T12:02:59.500Z", "2024-08-26T12:02:59.500+00:00"],
+    )
 
     role: Role = pydantic.Field(
         description="The type of producer of this message.",

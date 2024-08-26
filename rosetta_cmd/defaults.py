@@ -4,6 +4,7 @@ import rosetta_core.catalog.directory
 DEFAULT_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L12-v2"
 DEFAULT_CATALOG_FOLDER = ".rosetta-catalog"
 DEFAULT_ACTIVITY_FOLDER = ".rosetta-activity"
+DEFAULT_LLM_ACTIVITY_NAME = "llm-activity.log"
 DEFAULT_TOOL_CATALOG_NAME = "tool-catalog.json"
 DEFAULT_PROMPT_CATALOG_NAME = "prompt-catalog.json"
 DEFAULT_META_CATALOG_NAME = "meta.json"
@@ -19,6 +20,7 @@ __all__ = [
     "DEFAULT_EMBEDDING_MODEL",
     "DEFAULT_CATALOG_FOLDER",
     "DEFAULT_ACTIVITY_FOLDER",
+    "DEFAULT_LLM_ACTIVITY_NAME",
     "DEFAULT_TOOL_CATALOG_NAME",
     "DEFAULT_PROMPT_CATALOG_NAME",
     "DEFAULT_META_CATALOG_NAME",
