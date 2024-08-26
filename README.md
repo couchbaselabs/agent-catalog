@@ -11,6 +11,10 @@ User facing repository for all things rosetta (tooling around agent workflows).
    ```bash
    pip install rosetta
    ```
+   For users that want to install the LangChain extra package, add `[langchain]` after `rosetta`.
+   ```bash
+   pip install rosetta[langchain]
+   ```
 3. You should now have the `rosetta` command line tool installed.
    Run the `rosetta` command to test your installation.
    ```bash
@@ -53,6 +57,10 @@ User facing repository for all things rosetta (tooling around agent workflows).
 3. Install the dependencies from `pyproject.toml`.
    ```bash
    poetry install
+   ```
+4. To install the LangChain extra package, add `-E langchain` after `install`.
+   ```bash
+   poetry install -E langchain
    ```
 
 For examples on what an agentic workflow with Rosetta looks like, see

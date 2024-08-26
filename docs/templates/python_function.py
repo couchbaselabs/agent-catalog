@@ -1,8 +1,8 @@
 #
 # The following file is a template for a Python tool.
 #
-from rosetta import tool
 from pydantic import BaseModel
+from rosetta import tool
 
 
 # Although Python uses duck-typing, the specification of models greatly improves the response quality of LLMs.

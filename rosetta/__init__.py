@@ -1,9 +1,9 @@
-from rosetta_core.tool.decorator import tool
+from .auditor import Auditor
 from .provider import Provider
+from rosetta_core.tool.decorator import tool
 
 __all__ = [
-    # Specify our classes.
     "Provider",
-    # Specify our decorators (there should just be one?).
+    "Auditor",
     "tool",
 ]

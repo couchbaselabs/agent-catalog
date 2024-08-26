@@ -1,25 +1,23 @@
-import pathlib
-import textwrap
-import typing
 import logging
+import pathlib
 import pydantic
 import pydantic_settings
-import rosetta_core.provider
 import rosetta_cmd.defaults
-import rosetta_core.provider.refiner
+import rosetta_core.provider
+import rosetta_core.version
+import textwrap
+import typing
 
 logger = logging.getLogger(__name__)
 
 # To support custom refiners, we must export this model.
-SearchResult = rosetta_core.provider.refiner.SearchResult
+SearchResult = rosetta_core.catalog.SearchResult
 
 
 class Provider(pydantic_settings.BaseSettings):
     """A provider of Rosetta indexed "agent building blocks" (e.g., tools)."""
 
-    model_config = pydantic_settings.SettingsConfigDict(
-        env_prefix="ROSETTA_", use_attribute_docstrings=True
-    )
+    model_config = pydantic_settings.SettingsConfigDict(env_prefix="ROSETTA_", use_attribute_docstrings=True)
 
     conn_string: typing.Annotated[
         typing.Optional[pydantic.AnyUrl],
@@ -33,8 +31,9 @@ class Provider(pydantic_settings.BaseSettings):
     """ Couchbase connection string that points to the Rosetta catalog.
 
     This Couchbase instance refers to the CB instance used with the publish command. If there exists no local catalog
-    (e.g., this is deployed in a standalone environment) OR if $ROSETTA_CATALOG is not explicitly set, we will perform
-    all "find" commands directly on the remote catalog.
+    (e.g., this is deployed in a standalone environment), we will perform all "find" commands directly on the remote
+    catalog. If this field AND $ROSETTA_CATALOG are specified, we will issue "find" on both the remote and local
+    catalog.
 
     This field must be specified with username, password, and bucket.
     """
@@ -72,9 +71,7 @@ class Provider(pydantic_settings.BaseSettings):
     directory.
     """
 
-    decorator: typing.Optional[typing.Callable[[typing.Callable], typing.Any]] = (
-        lambda record: record
-    )
+    decorator: typing.Optional[typing.Callable[[typing.Callable], typing.Any]] = lambda record: record
     """ A Python decorator (function) to apply to each result yielded by 'get_tools_for'.
 
     By default, yielded results are callable and possess type annotations + documentation strings, but some agent
@@ -83,9 +80,7 @@ class Provider(pydantic_settings.BaseSettings):
     yourself, we accept a callback to perform this boxing on your behalf.
     """
 
-    refiner: typing.Optional[
-        typing.Callable[[list[SearchResult]], list[SearchResult]]
-    ] = lambda results: results
+    refiner: typing.Optional[typing.Callable[[list[SearchResult]], list[SearchResult]]] = lambda results: results
     """ A Python function to post-process results (reranking, pruning, etc...) yielded by the catalog.
 
     By default, we perform a strict top-K nearest neighbor search for relevant results. This function serves to perform
@@ -96,9 +91,7 @@ class Provider(pydantic_settings.BaseSettings):
     subsequently yield the closest cluster (see rosetta_core.provider.refiner.ClosestClusterRefiner).
     """
 
-    secrets: typing.Optional[dict[str, pydantic.SecretStr]] = pydantic.Field(
-        default_factory=dict, frozen=True
-    )
+    secrets: typing.Optional[dict[str, pydantic.SecretStr]] = pydantic.Field(default_factory=dict, frozen=True)
     """ A map of identifiers to secret values (e.g., Couchbase usernames, passwords, etc...).
 
     Some tools require access to values that cannot be hard-coded into the tool themselves (for security reasons). As
@@ -122,88 +115,73 @@ class Provider(pydantic_settings.BaseSettings):
     ```
     """
 
+    _local_tool_catalog: rosetta_core.catalog.CatalogMem = None
+    _remote_tool_catalog: rosetta_core.catalog.CatalogDB = None
     _tool_catalog: rosetta_core.catalog.CatalogBase = None
     _tool_provider: rosetta_core.provider.Provider = None
 
-    @staticmethod
-    def _find_local_catalog(starting_path: pathlib.Path) -> pathlib.Path:
-        working_path = starting_path
-
-        # Iteratively ascend our starting path until we find the catalog folder.
-        while not (working_path / rosetta_cmd.defaults.DEFAULT_CATALOG_FOLDER).exists():
-            if working_path.parent == working_path:
-                error_message = textwrap.dedent("""
-                    Could not find $ROSETTA_CATALOG nor $ROSETTA_CONN_STRING! If this is a new project, please run the
-                    command `rosetta index --include-dirty` before instantiating a provider.
-                """)
-                logger.error(error_message)
-                raise ValueError(error_message)
-            working_path = working_path.parent
-
-        return working_path / rosetta_cmd.defaults.DEFAULT_CATALOG_FOLDER
-
     @pydantic.model_validator(mode="after")
-    def _find_and_initialize_catalog_and_provider(self) -> "Provider":
-        if self.catalog is not None:
-            # Case #1: the user has explicitly specified $ROSETTA_CATALOG.
-            tool_catalog_path = (
-                self.catalog / rosetta_cmd.defaults.DEFAULT_TOOL_CATALOG_NAME
-            )
-            logger.info(
-                "Loading local tool catalog at %s.", str(tool_catalog_path.absolute())
-            )
-            self._tool_catalog = rosetta_core.catalog.CatalogMem.load(tool_catalog_path)
-
-        elif self.conn_string is not None:
-            # Case #2: $ROSETTA_CATALOG is unspecified but $ROSETTA_CONN_STRING is specified.
-            use_published_catalog = True
-            if self.username is None:
-                logger.warning(
-                    "$ROSETTA_CONN_STRING is specified but $ROSETTA_USERNAME is missing."
-                )
-                use_published_catalog = False
-            if self.password is None:
-                logger.warning(
-                    "$ROSETTA_CONN_STRING is specified but $ROSETTA_PASSWORD is missing."
-                )
-                use_published_catalog = False
-            if self.bucket is None:
-                logger.warning(
-                    "$ROSETTA_CONN_STRING is specified but $ROSETTA_BUCKET is missing."
-                )
-                use_published_catalog = False
-
-            if not use_published_catalog:
-                logger.debug(
-                    'Starting best effort search for the catalog folder. Searching for "%s".',
-                    rosetta_cmd.defaults.DEFAULT_CATALOG_FOLDER,
-                )
-                catalog_path = Provider._find_local_catalog(pathlib.Path.cwd())
-                tool_catalog_path = (
-                    catalog_path / rosetta_cmd.defaults.DEFAULT_TOOL_CATALOG_NAME
-                )
-                self._tool_catalog = rosetta_core.catalog.CatalogMem.load(
-                    tool_catalog_path
-                )
-            else:
-                # TODO (GLENN): Load from CatalogDB here.
-                raise NotImplementedError(
-                    "Provider with a remote catalog currently not supported."
-                )
-
-        else:
-            # Case #3: Neither $ROSETTA_CATALOG nor $ROSETTA_CONN_STRING is specified.
+    def _find_local_catalog(self) -> typing.Self:
+        if self.catalog is None:
+            working_path = pathlib.Path.cwd()
             logger.debug(
                 'Starting best effort search for the catalog folder. Searching for "%s".',
                 rosetta_cmd.defaults.DEFAULT_CATALOG_FOLDER,
             )
-            catalog_path = Provider._find_local_catalog(pathlib.Path.cwd())
-            tool_catalog_path = (
-                catalog_path / rosetta_cmd.defaults.DEFAULT_TOOL_CATALOG_NAME
-            )
-            self._tool_catalog = rosetta_core.catalog.CatalogMem.load(tool_catalog_path)
 
-        logger.debug("Building provider with the loaded catalog.")
+            # Iteratively ascend our starting path until we find the catalog folder.
+            while not (working_path / rosetta_cmd.defaults.DEFAULT_CATALOG_FOLDER).exists():
+                if working_path.parent == working_path:
+                    return self
+                working_path = working_path.parent
+            self.catalog = working_path / rosetta_cmd.defaults.DEFAULT_CATALOG_FOLDER
+
+        # Set our local catalog if it exists.
+        tool_catalog_path = self.catalog / rosetta_cmd.defaults.DEFAULT_TOOL_CATALOG_NAME
+        logger.info("Loading local tool catalog at %s.", str(tool_catalog_path.absolute()))
+        self._local_tool_catalog = rosetta_core.catalog.CatalogMem.load(tool_catalog_path)
+        return self
+
+    @pydantic.model_validator(mode="after")
+    def _find_remote_catalog(self) -> typing.Self:
+        if self.conn_string is None:
+            return self
+
+        # Make sure we have {username, password, bucket}.
+        if self.username is None:
+            logger.warning("$ROSETTA_CONN_STRING is specified but $ROSETTA_USERNAME is missing.")
+            return self
+        if self.password is None:
+            logger.warning("$ROSETTA_CONN_STRING is specified but $ROSETTA_PASSWORD is missing.")
+            return self
+        if self.bucket is None:
+            logger.warning("$ROSETTA_CONN_STRING is specified but $ROSETTA_BUCKET is missing.")
+            return self
+
+        # TODO (GLENN): Load from CatalogDB here.
+        raise NotImplementedError("Provider with a remote catalog currently not supported.")
+
+    # Note: this must be placed **after** _find_local_catalog and _find_remote_catalog.
+    @pydantic.model_validator(mode="after")
+    def _initialize_provider(self) -> typing.Self:
+        if self._local_tool_catalog is None and self._remote_tool_catalog is None:
+            error_message = textwrap.dedent("""
+                Could not find $ROSETTA_CATALOG nor $ROSETTA_CONN_STRING! If this is a new project, please run the
+                command `rosetta index` before instantiating a provider. Otherwise, please set either of these
+                variables.
+            """)
+            logger.error(error_message)
+            raise ValueError(error_message)
+
+        if self._local_tool_catalog is not None and self._remote_tool_catalog is not None:
+            logger.debug("Local catalog and remote catalog found. Building a chained catalog.")
+            self._tool_catalog = rosetta_core.catalog.CatalogChain(
+                chain=[self._local_tool_catalog, self._remote_tool_catalog]
+            )
+        else:
+            self._tool_catalog = self._local_tool_catalog or self._remote_tool_catalog
+
+        # Finally, initialize our provider.
         self._tool_provider = rosetta_core.provider.Provider(
             catalog=self._tool_catalog,
             output=self.output,
@@ -212,6 +190,11 @@ class Provider(pydantic_settings.BaseSettings):
             secrets=self.secrets,
         )
         return self
+
+    @pydantic.computed_field
+    @property
+    def version(self) -> rosetta_core.version.VersionDescriptor:
+        return self._tool_catalog.catalog_descriptor.version
 
     def get_tools_for(
         self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1
