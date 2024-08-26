@@ -37,6 +37,13 @@ logging.getLogger("sentence_transformers").setLevel(logging.WARNING)
 # TODO: Or, perhaps even stage specific, like from ".env.rosetta.prod"?
 dotenv.load_dotenv(dotenv.find_dotenv(usecwd=True))
 
+# Load all Couchbase connection related data from env
+connection_details_env = CouchbaseConnect(
+    connection_url=os.getenv("CB_CONN_STRING"),
+    username=os.getenv("CB_USERNAME"),
+    password=os.getenv("CB_PASSWORD"),
+)
+
 
 # Support abbreviated command aliases, ex: "rosetta st" ==> "rosetta status".
 # From: https://click.palletsprojects.com/en/8.1.x/advanced/#command-aliases
@@ -141,8 +148,15 @@ def env(ctx):
     help='Tool-specific annotations to filter by, specified using KEY="VALUE" (AND|OR KEY="VALUE")*.',
     show_default=True,
 )
+@click.option(
+    "--search-db",
+    default=False,
+    is_flag=True,
+    help="Enable to perform DB level search",
+    show_default=True,
+)
 @click.pass_context
-def find(ctx, query, kind, limit, include_dirty, refiner, annotations):
+def find(ctx, query, kind, limit, include_dirty, refiner, annotations, search_db):
     """Find tools, prompts, etc. from the catalog based on a natural language QUERY string."""
     cmd_find(
         ctx.obj,
@@ -152,6 +166,9 @@ def find(ctx, query, kind, limit, include_dirty, refiner, annotations):
         include_dirty=include_dirty,
         refiner=refiner,
         annotations=annotations,
+        search_db=search_db,
+        bucket="travel-sample",
+        conn=connection_details_env,
     )
 
 
@@ -235,14 +252,9 @@ def publish(ctx, kind, scope, annotations):
 
     # Get keyspace and connection details
     keyspace_details = Keyspace(bucket="", scope=scope)
-    connection_details = CouchbaseConnect(
-        connection_url=os.getenv("CB_CONN_STRING"),
-        username=os.getenv("CB_USERNAME"),
-        password=os.getenv("CB_PASSWORD"),
-    )
 
     # Establish a connection
-    err, cluster = get_connection(conn=connection_details)
+    err, cluster = get_connection(conn=connection_details_env)
     if err:
         click.echo(str(err))
         return
