@@ -3,11 +3,10 @@ import logging
 import pickle
 import typing
 
-from ..annotation import AnnotationPredicate
-from ..catalog.descriptor import CatalogDescriptor
-from .catalog_base import CatalogBase
-from .catalog_base import SearchResult
+from .base import CatalogBase
+from .base import SearchResult
 from rosetta_cmd.models import CouchbaseConnect
+from rosetta_core.annotation import AnnotationPredicate
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +15,6 @@ class CatalogDB(CatalogBase):
     """Represents a catalog stored in a database."""
 
     # TODO: This probably has fields of conn info, etc.
-    catalog_descriptor: CatalogDescriptor = None
 
     @classmethod
     def create_vector_index(
@@ -135,3 +133,5 @@ class CatalogDB(CatalogBase):
         # if limit > 0:
         #     results = results[:limit]
         # return results
+
+        return []

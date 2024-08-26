@@ -3,11 +3,11 @@ import pathlib
 import pydantic
 import typing
 
-from ..annotation import AnnotationPredicate
-from ..catalog.descriptor import CatalogDescriptor
-from ..record.descriptor import RecordDescriptor
-from .catalog_base import CatalogBase
-from .catalog_base import SearchResult
+from .base import CatalogBase
+from .base import SearchResult
+from rosetta_core.annotation import AnnotationPredicate
+from rosetta_core.catalog.descriptor import CatalogDescriptor
+from rosetta_core.record.descriptor import RecordDescriptor
 
 logger = logging.getLogger(__name__)
 

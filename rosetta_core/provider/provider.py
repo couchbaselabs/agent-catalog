@@ -3,8 +3,8 @@ import pathlib
 import typing
 
 from ..annotation import AnnotationPredicate
-from ..catalog.catalog_base import CatalogBase
-from ..catalog.catalog_base import SearchResult
+from ..catalog import CatalogBase
+from ..catalog import SearchResult
 from ..secrets import put_secret
 from .loader import EntryLoader
 
@@ -29,7 +29,7 @@ class Provider:
 
         Below, we give an example of how this class is used.
         >>> import rosetta_core.provider as rp
-        >>> import rosetta_core.catalog.catalog_mem as rcm
+        >>> import rosetta_core.catalog as rcm
         >>> import os, pathlib
         >>> my_catalog = rcm.CatalogMem.load(pathlib.Path('.rosetta-catalog') / 'tool-catalog.json')
         >>> my_provider = rp.Provider(

@@ -2,7 +2,7 @@ import pathlib
 import pytest
 import uuid
 
-from rosetta_core.catalog.catalog_base import SearchResult
+from rosetta_core.catalog import SearchResult
 from rosetta_core.provider.refiner import ClosestClusterRefiner
 from rosetta_core.record.descriptor import RecordDescriptor
 from rosetta_core.record.descriptor import RecordKind

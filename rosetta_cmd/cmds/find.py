@@ -12,9 +12,9 @@ from ..models import CouchbaseConnect
 from .util import init_local
 from .util import load_repository
 from rosetta_core.annotation import AnnotationPredicate
-from rosetta_core.catalog.catalog_base import SearchResult
-from rosetta_core.catalog.catalog_db import CatalogDB
-from rosetta_core.catalog.catalog_mem import CatalogMem
+from rosetta_core.catalog import CatalogDB
+from rosetta_core.catalog import CatalogMem
+from rosetta_core.catalog import SearchResult
 from rosetta_core.catalog.index import index_catalog
 from rosetta_core.provider.refiner import ClosestClusterRefiner
 from rosetta_core.version import VersionDescriptor
