@@ -152,7 +152,7 @@ def env(ctx):
 def find(ctx, query, kind, limit, include_dirty, refiner, annotations, search_db):
     """Find tools, prompts, etc. from the catalog based on a natural language QUERY string."""
     # Get keyspace and connection details
-    keyspace_details = Keyspace(bucket="", scope="rosetta-catalog", collection="")
+    keyspace_details = Keyspace(bucket="", scope="rosetta-catalog")
 
     # Load all Couchbase connection related data from env
     connection_details_env = CouchbaseConnect(

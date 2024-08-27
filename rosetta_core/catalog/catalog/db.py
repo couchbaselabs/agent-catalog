@@ -2,7 +2,6 @@ import click
 import logging
 import typing
 
-from ..descriptor import CatalogDescriptor
 from .base import CatalogBase
 from .base import SearchResult
 from rosetta_cmd.models import Keyspace
@@ -40,16 +39,17 @@ class CatalogDB(CatalogBase):
         else:
             filter_records_query = f"SELECT * FROM `{bucket}`.`rosetta-catalog`.`{kind}_catalog`;"
 
-        res, err = execute_query(cluster, keyspace, filter_records_query)
+        res, err = execute_query(cluster, filter_records_query)
         if err is not None:
             click.secho(f"ERROR: {err}", fg="red")
             return []
 
-        catalog = CatalogDescriptor()
+        # catalog = CatalogDescriptor()
         for row in res.rows():
-            catalog.model_validate_json(row)
+            print(row)
+            # catalog.model_validate_json(row)
 
-        print(catalog[0])
+        # print(catalog[0])
 
         # TODO: If annotations have been specified, prune all tools that do not possess these annotations.
 
