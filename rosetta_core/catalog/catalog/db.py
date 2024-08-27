@@ -1,12 +1,14 @@
 import click
+import json
 import logging
-import pickle
+import requests
 import typing
 
 from .base import CatalogBase
 from .base import SearchResult
 from rosetta_cmd.models import CouchbaseConnect
 from rosetta_core.annotation import AnnotationPredicate
+from rosetta_core.defaults import DEFAULT_CB_SCOPE_NAME
 
 logger = logging.getLogger(__name__)
 
@@ -17,22 +19,36 @@ class CatalogDB(CatalogBase):
     # TODO: This probably has fields of conn info, etc.
 
     @classmethod
+    def is_index_present(
+        cls, bucket: str = "", index_to_create: str = "", conn: CouchbaseConnect = ""
+    ) -> tuple[bool | None, Exception | None]:
+        find_index_url = f"http://localhost:8094/api/bucket/{bucket}/scope/{DEFAULT_CB_SCOPE_NAME}/index"
+        auth = (conn.username, conn.password)
+
+        try:
+            response = requests.request("GET", find_index_url, auth=auth)
+            print(response.text)
+            if json.loads(response.text)["status"] == "ok":
+                created_indexes = [el for el in json.loads(response.text)["indexDefs"]["indexDefs"]]
+                print(created_indexes)
+                if index_to_create not in created_indexes:
+                    print("does not exist")
+                    return False, None
+                return True, None
+        except Exception as e:
+            return None, e
+
+    @classmethod
     def create_vector_index(
         cls, bucket: str = "", kind: str = "tool", conn: CouchbaseConnect = ""
     ) -> tuple[str | None, Exception | None]:
-        import json
-        import requests
+        index_to_create = f"{bucket}.{DEFAULT_CB_SCOPE_NAME}.rosetta-{kind}-index"
+        index_present, err = cls.is_index_present(bucket, index_to_create, conn)
 
-        index_to_create = f"{bucket}.rosetta-catalog.rosetta-{kind}-index"
-        try:
-            with open("created_indexes.p", "rb") as file:
-                created_indexes_set = pickle.load(file)
-        except pickle.UnpicklingError:
-            print("Error unpickling the file. The file may be corrupted or not a valid pickle file.")
-
-        if index_to_create not in created_indexes_set:
+        if err is None and not index_present:
+            print("in")
             create_vector_index_url = (
-                f"http://localhost:8094/api/bucket/{bucket}/scope/rosetta-catalog/index/rosetta-{kind}-index"
+                f"http://localhost:8094/api/bucket/{bucket}/scope/{DEFAULT_CB_SCOPE_NAME}/index/rosetta-{kind}-index"
             )
             headers = {
                 "Content-Type": "application/json",
@@ -42,7 +58,7 @@ class CatalogDB(CatalogBase):
             payload = json.dumps(
                 {
                     "type": "fulltext-index",
-                    "name": f"{bucket}.rosetta-catalog.rosetta-{kind}-vec",
+                    "name": f"{bucket}.{DEFAULT_CB_SCOPE_NAME}.rosetta-{kind}-vec",
                     "sourceType": "gocbcore",
                     "sourceName": f"{bucket}",
                     "planParams": {"maxPartitionsPerPIndex": 1024, "indexPartitions": 1},
@@ -65,7 +81,7 @@ class CatalogDB(CatalogBase):
                             "store_dynamic": False,
                             "type_field": "_type",
                             "types": {
-                                f"rosetta-catalog.{kind}_catalog": {
+                                f"{DEFAULT_CB_SCOPE_NAME}.{kind}_catalog": {
                                     "dynamic": False,
                                     "enabled": True,
                                     "properties": {
@@ -88,15 +104,6 @@ class CatalogDB(CatalogBase):
                 response = requests.request("PUT", create_vector_index_url, headers=headers, auth=auth, data=payload)
 
                 if json.loads(response.text)["status"] == "ok":
-                    # Add created index name to global set
-                    created_indexes_set.add(index_to_create)
-                    logger.info("add to created indexes ", created_indexes_set)
-                    try:
-                        with open("created_indexes.p", "wb") as file:
-                            pickle.dump(created_indexes_set, file)
-                    except pickle.PicklingError:
-                        print("Error pickling the data. The data may not be serializable.")
-
                     return index_to_create, None
                 elif json.loads(response.text)["status"] == "fail":
                     raise Exception(json.loads(response.text)["error"])
