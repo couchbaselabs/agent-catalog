@@ -63,4 +63,9 @@ class AnnotationPredicate:
             return [{k: v for k, v in zip(self.keys, self.values)}]
 
     def __str__(self):
-        return " OR ".join("(" + " AND ".join(f"{k} = {v}" for k, v in d.items()) + ")" for d in self.disjuncts)
+        return " OR ".join("(" + " AND ".join(f"{k} = '{v}'" for k, v in d.items()) + ")" for d in self.disjuncts)
+
+    def __catalog_query_str__(self):
+        return " OR ".join(
+            "(" + " AND ".join(f"a.annotations.{k} = '{v}'" for k, v in d.items()) + ")" for d in self.disjuncts
+        )

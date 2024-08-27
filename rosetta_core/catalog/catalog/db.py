@@ -1,6 +1,5 @@
 import click
 import logging
-import pickle
 import typing
 
 from ..annotation import AnnotationPredicate
@@ -8,6 +7,16 @@ from ..catalog.descriptor import CatalogDescriptor
 from .catalog_base import CatalogBase
 from .catalog_base import SearchResult
 from rosetta_cmd.models import CouchbaseConnect
+from rosetta_core.annotation import AnnotationPredicate
+from rosetta_core.catalog.catalog.base import CatalogBase
+from rosetta_core.catalog.catalog.base import SearchResult
+from rosetta_core.defaults import DEFAULT_SCOPE_PREFIX
+from rosetta_core.record.descriptor import RecordDescriptor
+from rosetta_core.tool.descriptor import HTTPRequestToolDescriptor
+from rosetta_core.tool.descriptor import PythonToolDescriptor
+from rosetta_core.tool.descriptor import SemanticSearchToolDescriptor
+from rosetta_core.tool.descriptor import SQLPPQueryToolDescriptor
+from rosetta_util.query import execute_query
 
 logger = logging.getLogger(__name__)
 
@@ -18,95 +27,6 @@ class CatalogDB(CatalogBase):
     # TODO: This probably has fields of conn info, etc.
     catalog_descriptor: CatalogDescriptor = None
 
-    @classmethod
-    def create_vector_index(
-        cls, bucket: str = "", kind: str = "tool", conn: CouchbaseConnect = ""
-    ) -> tuple[str | None, Exception | None]:
-        import json
-        import requests
-
-        index_to_create = f"{bucket}.rosetta-catalog.rosetta-{kind}-index"
-        try:
-            with open("created_indexes.p", "rb") as file:
-                created_indexes_set = pickle.load(file)
-        except pickle.UnpicklingError:
-            print("Error unpickling the file. The file may be corrupted or not a valid pickle file.")
-
-        if index_to_create not in created_indexes_set:
-            create_vector_index_url = (
-                f"http://localhost:8094/api/bucket/{bucket}/scope/rosetta-catalog/index/rosetta-{kind}-index"
-            )
-            headers = {
-                "Content-Type": "application/json",
-            }
-            auth = (conn.username, conn.password)
-
-            payload = json.dumps(
-                {
-                    "type": "fulltext-index",
-                    "name": f"{bucket}.rosetta-catalog.rosetta-{kind}-vec",
-                    "sourceType": "gocbcore",
-                    "sourceName": f"{bucket}",
-                    "planParams": {"maxPartitionsPerPIndex": 1024, "indexPartitions": 1},
-                    "params": {
-                        "doc_config": {
-                            "docid_prefix_delim": "",
-                            "docid_regexp": "",
-                            "mode": "scope.collection.type_field",
-                            "type_field": "type",
-                        },
-                        "mapping": {
-                            "analysis": {},
-                            "default_analyzer": "standard",
-                            "default_datetime_parser": "dateTimeOptional",
-                            "default_field": "_all",
-                            "default_mapping": {"dynamic": True, "enabled": False},
-                            "default_type": "_default",
-                            "docvalues_dynamic": False,
-                            "index_dynamic": True,
-                            "store_dynamic": False,
-                            "type_field": "_type",
-                            "types": {
-                                f"rosetta-catalog.{kind}_catalog": {
-                                    "dynamic": False,
-                                    "enabled": True,
-                                    "properties": {
-                                        "embedding": {
-                                            "dynamic": False,
-                                            "enabled": True,
-                                            "fields": [{"index": True, "name": "embedding", "type": "text"}],
-                                        }
-                                    },
-                                }
-                            },
-                        },
-                        "store": {"indexType": "scorch", "segmentVersion": 15},
-                    },
-                    "sourceParams": {},
-                }
-            )
-
-            try:
-                response = requests.request("PUT", create_vector_index_url, headers=headers, auth=auth, data=payload)
-
-                if json.loads(response.text)["status"] == "ok":
-                    # Add created index name to global set
-                    created_indexes_set.add(index_to_create)
-                    logger.info("add to created indexes ", created_indexes_set)
-                    try:
-                        with open("created_indexes.p", "wb") as file:
-                            pickle.dump(created_indexes_set, file)
-                    except pickle.PicklingError:
-                        print("Error pickling the data. The data may not be serializable.")
-
-                    return index_to_create, None
-                elif json.loads(response.text)["status"] == "fail":
-                    raise Exception(json.loads(response.text)["error"])
-            except Exception as e:
-                return None, e
-        else:
-            return index_to_create, None
-
     def find(
         self,
         query: str,
@@ -114,24 +34,109 @@ class CatalogDB(CatalogBase):
         annotations: AnnotationPredicate = None,
         bucket: str = "",
         kind: str = "tool",
-        conn: CouchbaseConnect = "",
+        snapshot_id: typing.Union[str | None] = "all",
+        cluster: any = "",
+        meta: any = None,
+        item_name: str = "",
     ) -> list[SearchResult]:
         """Returns the catalog items that best match a query."""
 
-        # TODO: If annotations have been specified, prune all tools that do not possess these annotations.
+        scope_name = DEFAULT_SCOPE_PREFIX + meta["embedding_model"].replace("/", "_")
 
-        # Create a vector index for the kind, if it does not exist
-        index, err = CatalogDB.create_vector_index(bucket, kind, conn)
-        if err is not None:
-            click.secho(f"Error creating index: {err}", fg="red")
+        # Catalog item has to be queried directly
+        if item_name != "":
+            item_query = (
+                f"SELECT a.* from `{bucket}`.`{scope_name}`.`{kind}_catalog` as a WHERE a.name = '{item_name}';"
+            )
+
+            res, err = execute_query(cluster, item_query)
+            if err is not None:
+                click.secho(f"ERROR: {err}", fg="red")
+                return []
         else:
-            logger.info(f"Index to use: {index}")
+            # Generate embeddings for user query
+            import sentence_transformers
 
-        # TODO: Perform semantic search
+            embedding_model_obj = sentence_transformers.SentenceTransformer(
+                meta["embedding_model"], tokenizer_kwargs={"clean_up_tokenization_spaces": True}
+            )
+            query_embeddings = embedding_model_obj.encode(query).tolist()
 
-        # TODO: Order results
+            # ---------------------------------------------------------------------------------------- #
+            #                         Get all relevant items from catalog                              #
+            # ---------------------------------------------------------------------------------------- #
 
-        # TODO: Apply our limit clause.
-        # if limit > 0:
-        #     results = results[:limit]
-        # return results
+            # Get annotations condition
+            annotation_condition = annotations.__catalog_query_str__() if annotations is not None else "1==1"
+
+            # User has specified a snapshot id
+            if snapshot_id != "all":
+                filter_records_query = (
+                    f"SELECT a.* FROM ( SELECT t.*, SEARCH_META() as metadata FROM `{bucket}`.`{scope_name}`.`{kind}_catalog` as t "
+                    + "WHERE SEARCH(t, "
+                    + "{'query': {'match_none': {}},"
+                    + "'knn': [{'field': 'embedding',"
+                    + f"'vector': {query_embeddings},"
+                    + "'k': 10"
+                    + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) ORDER BY metadata.score DESC ) AS a "
+                    + f"WHERE {annotation_condition} AND catalog_identifier='{snapshot_id}'"
+                    + f"LIMIT {limit};"
+                )
+            # No snapshot id has been mentioned
+            else:
+                filter_records_query = (
+                    f"SELECT a.* FROM ( SELECT t.*, SEARCH_META() as metadata FROM `{bucket}`.`{scope_name}`.`{kind}_catalog` as t "
+                    + "WHERE SEARCH(t, "
+                    + "{'query': {'match_none': {}},"
+                    + "'knn': [{'field': 'embedding',"
+                    + f"'vector': {query_embeddings},"
+                    + "'k': 10"
+                    + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) ORDER BY metadata.score DESC ) AS a "
+                    + f"WHERE {annotation_condition} "
+                    + f"LIMIT {limit};"
+                )
+
+            # Execute query after filtering by catalog_identifier if provided
+            res, err = execute_query(cluster, filter_records_query)
+            if err is not None:
+                click.secho(f"ERROR: {err}", fg="red")
+                return []
+
+        resp = list(res)
+
+        # If result set is empty
+        if len(resp) == 0:
+            click.secho("No catalog items found with given conditions...", fg="yellow")
+            return []
+
+        # ---------------------------------------------------------------------------------------- #
+        #                Format catalog items into SearchResults and child types                   #
+        # ---------------------------------------------------------------------------------------- #
+
+        # List of catalog items from query
+        catalog = []
+        deltas = []
+
+        for row in resp:
+            kind = row["record_kind"]
+            descriptor = ""
+            if item_name == "":
+                deltas.append(row["metadata"]["score"])
+            match kind:
+                case "semantic_search":
+                    descriptor = SemanticSearchToolDescriptor.model_validate(row)
+                case "python_function":
+                    descriptor = PythonToolDescriptor.model_validate(row)
+                case "sqlpp_query":
+                    descriptor = SQLPPQueryToolDescriptor.model_validate(row)
+                case "http_request":
+                    descriptor = HTTPRequestToolDescriptor.model_validate(row)
+                case _:
+                    print("not a valid descriptor of ToolDescriptorUnion type")
+            catalog.append(RecordDescriptor.model_validate(descriptor))
+
+        # Final set of results
+        if item_name != "":
+            return [SearchResult(entry=catalog[0], delta=1)]
+
+        return [SearchResult(entry=catalog[i], delta=deltas[i]) for i in range(len(deltas))]

@@ -15,6 +15,9 @@ DEFAULT_SCAN_DIRECTORY_OPTS = rosetta_core.catalog.directory.ScanDirectoryOpts(
     ignore_file_name=".gitignore",
     ignore_file_parser_factory=gitignore_parser.parse_gitignore,
 )
+DEFAULT_CATALOG_NAME = "-catalog.json"
+DEFAULT_META_COLLECTION_NAME = "_metadata"
+DEFAULT_CATALOG_COLLECTION_NAME = "_catalog"
 
 __all__ = [
     "DEFAULT_EMBEDDING_MODEL",
@@ -27,4 +30,7 @@ __all__ = [
     "DEFAULT_WEB_HOST_PORT",
     "DEFAULT_MAX_ERRS",
     "DEFAULT_SCAN_DIRECTORY_OPTS",
+    "DEFAULT_CATALOG_NAME",
+    "DEFAULT_META_COLLECTION_NAME",
+    "DEFAULT_CATALOG_COLLECTION_NAME",
 ]

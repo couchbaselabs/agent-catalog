@@ -37,13 +37,6 @@ logging.getLogger("sentence_transformers").setLevel(logging.WARNING)
 # TODO: Or, perhaps even stage specific, like from ".env.rosetta.prod"?
 dotenv.load_dotenv(dotenv.find_dotenv(usecwd=True))
 
-# Load all Couchbase connection related data from env
-connection_details_env = CouchbaseConnect(
-    connection_url=os.getenv("CB_CONN_STRING"),
-    username=os.getenv("CB_USERNAME"),
-    password=os.getenv("CB_PASSWORD"),
-)
-
 
 # Support abbreviated command aliases, ex: "rosetta st" ==> "rosetta status".
 # From: https://click.palletsprojects.com/en/8.1.x/advanced/#command-aliases
@@ -113,7 +106,18 @@ def env(ctx):
 
 
 @click_main.command()
-@click.argument("query", nargs=1)
+@click.option(
+    "--query",
+    default="",
+    help="User query describing the task for which tools are needed. Add this or provide --item-name.",
+    show_default=True,
+)
+@click.option(
+    "--item-name",
+    default="",
+    help="Name of catalog item to retrieve from the catalog directly.",
+    show_default=True,
+)
 @click.option(
     "--kind",
     default="tool",
@@ -152,24 +156,71 @@ def env(ctx):
     "--search-db",
     default=False,
     is_flag=True,
-    help="Enable to perform DB level search",
+    help="Enable this flag to perform DB level search",
+    show_default=True,
+)
+@click.option(
+    "-em",
+    "--embedding-model",
+    default=DEFAULT_EMBEDDING_MODEL,
+    help="Embedding model to generate embeddings for query.",
     show_default=True,
 )
 @click.pass_context
-def find(ctx, query, kind, limit, include_dirty, refiner, annotations, search_db):
+def find(ctx, query, kind, limit, include_dirty, refiner, annotations, search_db, embedding_model, item_name):
     """Find tools, prompts, etc. from the catalog based on a natural language QUERY string."""
-    cmd_find(
-        ctx.obj,
-        query,
-        kind=kind,
-        limit=limit,
-        include_dirty=include_dirty,
-        refiner=refiner,
-        annotations=annotations,
-        search_db=search_db,
-        bucket="travel-sample",
-        conn=connection_details_env,
-    )
+
+    if search_db:
+        # Load all Couchbase connection related data from env
+        connection_details_env = CouchbaseConnect(
+            connection_url=os.getenv("CB_CONN_STRING"),
+            username=os.getenv("CB_USERNAME"),
+            password=os.getenv("CB_PASSWORD"),
+        )
+
+        # Establish a connection
+        err, cluster = get_connection(conn=connection_details_env)
+        if err:
+            click.echo(str(err))
+            return
+
+        # Get buckets from CB Cluster
+        buckets = get_buckets(cluster=cluster)
+
+        # Prompt user to select a bucket
+        selected_bucket = click.prompt("Please select a bucket", type=click.Choice(buckets), show_choices=True)
+
+        cmd_find(
+            ctx.obj,
+            query,
+            kind=kind,
+            limit=limit,
+            include_dirty=include_dirty,
+            refiner=refiner,
+            annotations=annotations,
+            search_db=search_db,
+            bucket=selected_bucket,
+            cluster=cluster,
+            embedding_model=embedding_model,
+            item_name=item_name,
+        )
+
+        cluster.close()
+    else:
+        cmd_find(
+            ctx.obj,
+            query,
+            kind=kind,
+            limit=limit,
+            include_dirty=include_dirty,
+            refiner=refiner,
+            annotations=annotations,
+            search_db=search_db,
+            bucket="",
+            cluster=None,
+            embedding_model=embedding_model,
+            item_name=item_name,
+        )
 
 
 @click_main.command()
@@ -253,6 +304,13 @@ def publish(ctx, kind, scope, annotations):
     # Get keyspace and connection details
     keyspace_details = Keyspace(bucket="", scope=scope)
 
+    # Load all Couchbase connection related data from env
+    connection_details_env = CouchbaseConnect(
+        connection_url=os.getenv("CB_CONN_STRING"),
+        username=os.getenv("CB_USERNAME"),
+        password=os.getenv("CB_PASSWORD"),
+    )
+
     # Establish a connection
     err, cluster = get_connection(conn=connection_details_env)
     if err:
@@ -269,7 +327,7 @@ def publish(ctx, kind, scope, annotations):
     keyspace_details.bucket = selected_bucket
 
     printer = click.echo
-    cmd_publish(ctx.obj, kind, annotations, cluster, keyspace_details, printer)
+    cmd_publish(ctx.obj, kind, annotations, cluster, keyspace_details, printer, connection_details_env)
 
     cluster.close()
 

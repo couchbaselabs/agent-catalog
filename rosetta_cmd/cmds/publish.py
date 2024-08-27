@@ -1,17 +1,32 @@
+import click
 import json
 import logging
 import pathlib
 
+from ..defaults import DEFAULT_CATALOG_COLLECTION_NAME
+from ..defaults import DEFAULT_CATALOG_NAME
+from ..defaults import DEFAULT_META_COLLECTION_NAME
 from ..models import Context
+from ..models import CouchbaseConnect
 from ..models import Keyspace
 from rosetta_core.catalog import CatalogMem
+from rosetta_util.index_management import create_gsi_indexes
+from rosetta_util.index_management import create_vector_index
 from rosetta_util.publish import CustomPublishEncoder
 from rosetta_util.publish import create_scope_and_collection
 
 logger = logging.getLogger(__name__)
 
 
-def cmd_publish(ctx: Context, kind, annotations: list[dict], cluster, keyspace: Keyspace, printer):
+def cmd_publish(
+    ctx: Context,
+    kind,
+    annotations: list[dict],
+    cluster,
+    keyspace: Keyspace,
+    printer,
+    connection_details_env: CouchbaseConnect,
+):
     if kind == "all":
         kind_list = ["tool", "prompt"]
         logger.info("Inserting all catalogs...")
@@ -25,15 +40,14 @@ def cmd_publish(ctx: Context, kind, annotations: list[dict], cluster, keyspace: 
     cb = cluster.bucket(bucket)
 
     for kind in kind_list:
-        # TODO (GLENN): Can we also move these constants ('-catalog.json', '_metadata') to the defaults.py file?
-        catalog_path = pathlib.Path(ctx.catalog) / (kind + "-catalog.json")
+        catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)
         catalog = CatalogMem.load(catalog_path).catalog_descriptor
 
         # Get the bucket manager
         bucket_manager = cb.collections()
 
         # ----------Metadata collection----------
-        meta_col = kind + "_metadata"
+        meta_col = kind + DEFAULT_META_COLLECTION_NAME
         (msg, err) = create_scope_and_collection(bucket_manager, scope=scope, collection=meta_col)
         if err is not None:
             printer(msg, err)
@@ -53,7 +67,6 @@ def cmd_publish(ctx: Context, kind, annotations: list[dict], cluster, keyspace: 
         try:
             key = metadata["version"]["identifier"]
             cb_coll.upsert(key, metadata)
-            # printer("Snapshot ",result.key," added to keyspace")
         # TODO (GLENN): Should use the specific exception here instead of 'Exception'.
         except Exception as e:
             logger.error("could not insert: ", e)
@@ -61,7 +74,7 @@ def cmd_publish(ctx: Context, kind, annotations: list[dict], cluster, keyspace: 
         printer("Metadata added!")
 
         # ----------Catalog items collection----------
-        catalog_col = kind + "_catalog"
+        catalog_col = kind + DEFAULT_CATALOG_COLLECTION_NAME
         (msg, err) = create_scope_and_collection(bucket_manager, scope=scope, collection=catalog_col)
         if err is not None:
             printer(msg, err)
@@ -83,7 +96,6 @@ def cmd_publish(ctx: Context, kind, annotations: list[dict], cluster, keyspace: 
                 # convert to dict object and insert snapshot id
                 item_json: dict = json.loads(item)
                 item_json.update({"catalog_identifier": metadata["version"]["identifier"]})
-                item_json.update({"snapshot_annotations": annotations_list})
 
                 # upsert docs to CB collection
                 cb_coll.upsert(key, item_json)
@@ -92,5 +104,18 @@ def cmd_publish(ctx: Context, kind, annotations: list[dict], cluster, keyspace: 
                 return e
 
         printer(f"Inserted {kind} catalog successfully!\n")
+
+        # ----------Create GSI and Vector Indexes----------
+        s, err = create_gsi_indexes(bucket, cluster, kind)
+        if not s:
+            click.secho(f"ERROR: GSI indexes could not be created \n{err}", fg="red")
+            return
+        else:
+            logger.info("Indexes created successfully!")
+
+        _, err = create_vector_index(bucket, kind, connection_details_env)
+        if err is not None:
+            click.secho(f"ERROR: Vector index could not be created \n{err}", fg="red")
+            return
 
     logger.info("Successfully inserted all catalogs!")

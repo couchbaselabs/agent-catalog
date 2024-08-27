@@ -5,12 +5,14 @@ import pathlib
 import textwrap
 import tqdm
 
+from ..defaults import DEFAULT_CATALOG_NAME
 from ..defaults import DEFAULT_MAX_ERRS
 from ..defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from ..models import Context
-from ..models import CouchbaseConnect
 from .util import init_local
 from .util import load_repository
+from pydantic import ValidationError
+from rosetta_cmd.models.find import SearchOptions
 from rosetta_core.annotation import AnnotationPredicate
 from rosetta_core.catalog.catalog_base import SearchResult
 from rosetta_core.catalog.catalog_db import CatalogDB
@@ -37,8 +39,10 @@ def cmd_find(
     include_dirty=True,
     refiner=None,
     annotations=None,
-    search_db=False,
-    conn: CouchbaseConnect = None,
+    search_db: bool = False,
+    cluster=None,
+    embedding_model: str = None,
+    item_name: str = None,
 ):
     # TODO: One day, also handle DBCatalogRef?
     # TODO: If DB is outdated and the local catalog has newer info,
@@ -47,6 +51,16 @@ def cmd_find(
     #       and/or --db-catalog-only, and/or both, via chaining multiple CatalogRef's?
     # TODO: Possible security issue -- need to check kind is an allowed value?
 
+    # Validate that only query or only item_name is specified
+    try:
+        search_opt = SearchOptions(query=query, item_name=item_name)
+    except ValidationError as e:
+        click.secho(f"Pydantic ERROR: {e}", fg="red")
+        return
+
+    query = search_opt.query
+    item_name = search_opt.item_name
+
     if refiner == "None":
         refiner = None
     if refiner is not None and refiner not in refiners:
@@ -54,20 +68,30 @@ def cmd_find(
         valid_refiners.sort()
         raise ValueError(f"ERROR: unknown refiner, valid refiners: {valid_refiners}")
 
-    if search_db:  # WIP
+    # DB level find
+    if search_db:
         catalog = CatalogDB()
-        print("searching db...")
+        click.secho("Searching db...")
 
+        meta = init_local(ctx, embedding_model)
         annotations_predicate = AnnotationPredicate(annotations) if annotations is not None else None
 
         search_results = [
             SearchResult(entry=x.entry, delta=x.delta)
             for x in catalog.find(
-                query, limit=limit, annotations=annotations_predicate, bucket=bucket, kind=kind, conn=conn
+                query,
+                limit=limit,
+                annotations=annotations_predicate,
+                bucket=bucket,
+                kind=kind,
+                cluster=cluster,
+                meta=meta,
+                item_name=item_name,
             )
         ]
+    # Local catalog find
     else:
-        catalog_path = pathlib.Path(ctx.catalog) / (kind + "-catalog.json")
+        catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)
 
         catalog = CatalogMem().load(catalog_path)
 
@@ -101,7 +125,7 @@ def cmd_find(
         annotations_predicate = AnnotationPredicate(annotations) if annotations is not None else None
         search_results = [
             SearchResult(entry=x.entry, delta=x.delta)
-            for x in catalog.find(query, limit=limit, annotations=annotations_predicate)
+            for x in catalog.find(query, limit=limit, annotations=annotations_predicate, item_name=item_name)
         ]
 
     if refiner is not None:
