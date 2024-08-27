@@ -2,6 +2,9 @@ import json
 import logging
 import pathlib
 
+from ..defaults import DEFAULT_CATALOG_COLLECTION_NAME
+from ..defaults import DEFAULT_CATALOG_NAME
+from ..defaults import DEFAULT_META_COLLECTION_NAME
 from ..models import Context
 from ..models import Keyspace
 from rosetta_core.catalog import CatalogMem
@@ -25,15 +28,14 @@ def cmd_publish(ctx: Context, kind, annotations: list[dict], cluster, keyspace: 
     cb = cluster.bucket(bucket)
 
     for kind in kind_list:
-        # TODO (GLENN): Can we also move these constants ('-catalog.json', '_metadata') to the defaults.py file?
-        catalog_path = pathlib.Path(ctx.catalog) / (kind + "-catalog.json")
+        catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)
         catalog = CatalogMem.load(catalog_path).catalog_descriptor
 
         # Get the bucket manager
         bucket_manager = cb.collections()
 
         # ----------Metadata collection----------
-        meta_col = kind + "_metadata"
+        meta_col = kind + DEFAULT_META_COLLECTION_NAME
         (msg, err) = create_scope_and_collection(bucket_manager, scope=scope, collection=meta_col)
         if err is not None:
             printer(msg, err)
@@ -61,7 +63,7 @@ def cmd_publish(ctx: Context, kind, annotations: list[dict], cluster, keyspace: 
         printer("Metadata added!")
 
         # ----------Catalog items collection----------
-        catalog_col = kind + "_catalog"
+        catalog_col = kind + DEFAULT_CATALOG_COLLECTION_NAME
         (msg, err) = create_scope_and_collection(bucket_manager, scope=scope, collection=catalog_col)
         if err is not None:
             printer(msg, err)
