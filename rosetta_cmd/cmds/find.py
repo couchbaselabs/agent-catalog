@@ -8,7 +8,7 @@ import tqdm
 from ..defaults import DEFAULT_MAX_ERRS
 from ..defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from ..models import Context
-from ..models import CouchbaseConnect
+from ..models import Keyspace
 from .util import init_local
 from .util import load_repository
 from rosetta_core.annotation import AnnotationPredicate
@@ -38,7 +38,8 @@ def cmd_find(
     refiner=None,
     annotations=None,
     search_db=False,
-    conn: CouchbaseConnect = None,
+    cluster=None,
+    keyspace: Keyspace = None,
 ):
     # TODO: One day, also handle DBCatalogRef?
     # TODO: If DB is outdated and the local catalog has newer info,
@@ -63,7 +64,13 @@ def cmd_find(
         search_results = [
             SearchResult(entry=x.entry, delta=x.delta)
             for x in catalog.find(
-                query, limit=limit, annotations=annotations_predicate, bucket=bucket, kind=kind, conn=conn
+                query,
+                limit=limit,
+                annotations=annotations_predicate,
+                bucket=bucket,
+                kind=kind,
+                cluster=cluster,
+                keyspace=keyspace,
             )
         ]
     else:

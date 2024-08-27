@@ -87,7 +87,7 @@ def create_scope_and_collection(bucket_manager, scope, collection):
         logger.error(error_message)
         return error_message, e
 
-    return ("Successfully created scope and collection", None)
+    return "Successfully created scope and collection", None
 
 
 class CustomPublishEncoder(json.JSONEncoder):
