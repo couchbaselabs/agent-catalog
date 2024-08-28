@@ -17,6 +17,8 @@ class SearchResult(pydantic.BaseModel):
     # and with debugging.
 
 
+# TODO (GLENN): Add support for name = ... as another method called get
+# TODO (GLENN): Change this name from find to search
 class CatalogBase(abc.ABC):
     """An abstract base class for a catalog of RecordDescriptor's."""
 
