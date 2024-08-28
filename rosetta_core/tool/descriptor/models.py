@@ -66,7 +66,7 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
     input: str
     output: str
     query: str
-    secrets: list[CouchbaseSecrets] = pydantic.Field(min_items=1, max_items=1)
+    secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
     record_kind: typing.Literal[RecordKind.SQLPPQuery]
 
     class Factory(_BaseFactory):
@@ -78,7 +78,7 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
             description: str
             input: str
             output: str
-            secrets: list[CouchbaseSecrets] = pydantic.Field(min_items=1, max_items=1)
+            secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
             record_kind: typing.Optional[typing.Literal[RecordKind.SQLPPQuery] | None] = None
             annotations: typing.Optional[dict[str, str] | None] = None
 
@@ -134,7 +134,7 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
 
     input: str
     vector_search: VectorSearchMetadata
-    secrets: list[CouchbaseSecrets] = pydantic.Field(min_items=1, max_items=1)
+    secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
     record_kind: typing.Literal[RecordKind.SemanticSearch]
 
     class Factory(_BaseFactory):
@@ -146,7 +146,7 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
             name: str
             description: str
             input: str
-            secrets: list[CouchbaseSecrets] = pydantic.Field(min_items=1, max_items=1)
+            secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
             annotations: typing.Optional[dict[str, str] | None] = None
             vector_search: "SemanticSearchToolDescriptor.VectorSearchMetadata"
 
@@ -247,9 +247,9 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
 
         # We should be able to access the specification file here (validation is done internally here).
         if filename is not None:
-            open_api_spec = openapi_parser.parse(filename.absolute().as_uri())
+            open_api_spec = openapi_parser.parse(filename.absolute().as_uri(), strict_enum=False)
         else:
-            open_api_spec = openapi_parser.parse(url)
+            open_api_spec = openapi_parser.parse(url, strict_enum=False)
 
         # Determine our servers.
         if len(open_api_spec.servers) > 0:
@@ -298,7 +298,9 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
     @property
     def handle(self) -> OperationHandle:
         return HTTPRequestToolDescriptor.validate_operation(
-            filename=pathlib.Path(self.specification.filename), url=self.specification.url, operation=self.operation
+            filename=pathlib.Path(self.specification.filename) if self.specification.filename is not None else None,
+            url=self.specification.url,
+            operation=self.operation,
         )
 
     class JSONEncoder(json.JSONEncoder):
@@ -361,9 +363,3 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
                         ),
                         annotations=metadata.annotations,
                     )
-
-
-ToolDescriptorUnionType = typing.Annotated[
-    PythonToolDescriptor | SQLPPQueryToolDescriptor | SemanticSearchToolDescriptor | HTTPRequestToolDescriptor,
-    pydantic.Field(discriminator="record_kind"),
-]

@@ -18,6 +18,7 @@ DEFAULT_SCAN_DIRECTORY_OPTS = rosetta_core.catalog.directory.ScanDirectoryOpts(
 DEFAULT_CATALOG_NAME = "-catalog.json"
 DEFAULT_META_COLLECTION_NAME = "_metadata"
 DEFAULT_CATALOG_COLLECTION_NAME = "_catalog"
+DEFAULT_SCOPE_PREFIX = "rosetta-catalog-"
 
 __all__ = [
     "DEFAULT_EMBEDDING_MODEL",
@@ -33,4 +34,5 @@ __all__ = [
     "DEFAULT_CATALOG_NAME",
     "DEFAULT_META_COLLECTION_NAME",
     "DEFAULT_CATALOG_COLLECTION_NAME",
+    "DEFAULT_SCOPE_PREFIX",
 ]

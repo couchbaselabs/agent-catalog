@@ -5,20 +5,19 @@ import pydantic
 import typing
 import yaml
 
+from ..prompt.models import PromptDescriptorFactory
 from ..record.descriptor import RecordDescriptor
 from ..record.descriptor import RecordKind
-from .descriptor import HTTPRequestToolDescriptor
-from .descriptor import PythonToolDescriptor
-from .descriptor import SemanticSearchToolDescriptor
-from .descriptor import SQLPPQueryToolDescriptor
+from ..tool.descriptor import HTTPRequestToolDescriptor
+from ..tool.descriptor import PythonToolDescriptor
+from ..tool.descriptor import SemanticSearchToolDescriptor
+from ..tool.descriptor import SQLPPQueryToolDescriptor
 
 logger = logging.getLogger(__name__)
 
 
 # TODO: We should use something other than ValueError,
 # such as by capturing line numbers, etc?
-
-
 class BaseFileIndexer(pydantic.BaseModel):
     @abc.abstractmethod
     def start_descriptors(
@@ -100,7 +99,19 @@ class DotYamlFileIndexer(BaseFileIndexer):
                 return None, list()
 
 
-source_indexers = {"*.py": DotPyFileIndexer(), "*.sqlpp": DotSqlppFileIndexer(), "*.yaml": DotYamlFileIndexer()}
+class DotPromptFileIndexer(BaseFileIndexer):
+    def start_descriptors(
+        self, filename: pathlib.Path, get_version
+    ) -> typing.Tuple[list[ValueError], list[RecordDescriptor]]:
+        return None, list(PromptDescriptorFactory(filename=filename, version=get_version(filename)))
+
+
+source_indexers = {
+    "*.py": DotPyFileIndexer(),
+    "*.sqlpp": DotSqlppFileIndexer(),
+    "*.yaml": DotYamlFileIndexer(),
+    "*.prompt": DotPromptFileIndexer(),
+}
 
 
 def augment_descriptor(descriptor: RecordDescriptor) -> list[ValueError]:

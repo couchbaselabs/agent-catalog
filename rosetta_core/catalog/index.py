@@ -1,13 +1,13 @@
 import fnmatch
 import logging
 
-from ..tool.indexer import augment_descriptor
-from ..tool.indexer import source_indexers
-from ..tool.indexer import vectorize_descriptor
 from .catalog.mem import CatalogMem
 from .descriptor import CatalogDescriptor
 from .directory import ScanDirectoryOpts
 from .directory import scan_directory
+from rosetta_core.indexer import augment_descriptor
+from rosetta_core.indexer import source_indexers
+from rosetta_core.indexer import vectorize_descriptor
 
 logger = logging.getLogger(__name__)
 

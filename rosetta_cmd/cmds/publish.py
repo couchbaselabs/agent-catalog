@@ -42,19 +42,23 @@ def cmd_publish(
     for kind in kind_list:
         catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)
         catalog = CatalogMem.load(catalog_path).catalog_descriptor
+        embedding_model = catalog.embedding_model.replace("/", "_")
 
         # Get the bucket manager
         bucket_manager = cb.collections()
 
-        # ----------Metadata collection----------
+        # ---------------------------------------------------------------------------------------- #
+        #                                  Metadata collection                                     #
+        # ---------------------------------------------------------------------------------------- #
         meta_col = kind + DEFAULT_META_COLLECTION_NAME
-        (msg, err) = create_scope_and_collection(bucket_manager, scope=scope, collection=meta_col)
+        meta_scope = scope + embedding_model
+        (msg, err) = create_scope_and_collection(bucket_manager, scope=meta_scope, collection=meta_col)
         if err is not None:
             printer(msg, err)
             return
 
         # get collection ref
-        cb_coll = cb.scope(scope).collection(meta_col)
+        cb_coll = cb.scope(meta_scope).collection(meta_col)
 
         # dict to store all the metadata - snapshot related data
         metadata = {el: catalog.model_dump()[el] for el in catalog.model_dump() if el != "items"}
@@ -73,15 +77,18 @@ def cmd_publish(
             return e
         printer("Metadata added!")
 
-        # ----------Catalog items collection----------
+        # ---------------------------------------------------------------------------------------- #
+        #                               Catalog items collection                                   #
+        # ---------------------------------------------------------------------------------------- #
         catalog_col = kind + DEFAULT_CATALOG_COLLECTION_NAME
-        (msg, err) = create_scope_and_collection(bucket_manager, scope=scope, collection=catalog_col)
+        catalog_scope = scope + embedding_model
+        (msg, err) = create_scope_and_collection(bucket_manager, scope=catalog_scope, collection=catalog_col)
         if err is not None:
             printer(msg, err)
             return
 
         # get collection ref
-        cb_coll = cb.scope(scope).collection(catalog_col)
+        cb_coll = cb.scope(catalog_scope).collection(catalog_col)
 
         printer("Upserting catalog items..")
 
@@ -105,15 +112,17 @@ def cmd_publish(
 
         printer(f"Inserted {kind} catalog successfully!\n")
 
-        # ----------Create GSI and Vector Indexes----------
-        s, err = create_gsi_indexes(bucket, cluster, kind)
+        # ---------------------------------------------------------------------------------------- #
+        #                               GSI and Vector Indexes                                     #
+        # ---------------------------------------------------------------------------------------- #
+        s, err = create_gsi_indexes(bucket, cluster, kind, embedding_model)
         if not s:
             click.secho(f"ERROR: GSI indexes could not be created \n{err}", fg="red")
             return
         else:
             logger.info("Indexes created successfully!")
 
-        _, err = create_vector_index(bucket, kind, connection_details_env)
+        _, err = create_vector_index(bucket, kind, connection_details_env, embedding_model)
         if err is not None:
             click.secho(f"ERROR: Vector index could not be created \n{err}", fg="red")
             return
