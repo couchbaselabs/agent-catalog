@@ -28,6 +28,8 @@ refiners = {
 logger = logging.getLogger(__name__)
 
 
+# TODO (GLENN): Use an enum for kind instead of a string
+# TODO (GLENN): Add support for name = ...
 def cmd_find(
     ctx: Context,
     query,
@@ -79,6 +81,7 @@ def cmd_find(
         ]
     # Local catalog find
     else:
+        # TODO (GLENN): Move "-catalog.json" to defaults.py?
         catalog_path = pathlib.Path(ctx.catalog) / (kind + "-catalog.json")
 
         catalog = CatalogMem().load(catalog_path)
