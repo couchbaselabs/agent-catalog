@@ -1,3 +1,4 @@
+import click
 import json
 import logging
 import pathlib
@@ -9,6 +10,8 @@ from ..models import Context
 from ..models import CouchbaseConnect
 from ..models import Keyspace
 from rosetta_core.catalog import CatalogMem
+from rosetta_util.index_management import create_gsi_indexes
+from rosetta_util.index_management import create_vector_index
 from rosetta_util.publish import CustomPublishEncoder
 from rosetta_util.publish import create_scope_and_collection
 
@@ -101,5 +104,18 @@ def cmd_publish(
                 return e
 
         printer(f"Inserted {kind} catalog successfully!\n")
+
+        # ----------Create GSI and Vector Indexes----------
+        s, err = create_gsi_indexes(bucket, cluster, kind)
+        if not s:
+            click.secho(f"ERROR: GSI indexes could not be created \n{err}", fg="red")
+            return
+        else:
+            logger.info("Indexes created successfully!")
+
+        _, err = create_vector_index(bucket, kind, connection_details_env)
+        if err is not None:
+            click.secho(f"ERROR: Vector index could not be created \n{err}", fg="red")
+            return
 
     logger.info("Successfully inserted all catalogs!")
