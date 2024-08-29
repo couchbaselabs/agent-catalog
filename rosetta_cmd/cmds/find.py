@@ -40,6 +40,7 @@ def cmd_find(
     search_db=False,
     cluster=None,
     keyspace: Keyspace = None,
+    embedding_model: str = None,
 ):
     # TODO: One day, also handle DBCatalogRef?
     # TODO: If DB is outdated and the local catalog has newer info,
@@ -55,10 +56,12 @@ def cmd_find(
         valid_refiners.sort()
         raise ValueError(f"ERROR: unknown refiner, valid refiners: {valid_refiners}")
 
-    if search_db:  # WIP
+    # DB level find
+    if search_db:
         catalog = CatalogDB()
-        print("searching db...")
+        click.secho("Searching db...")
 
+        meta = init_local(ctx, embedding_model)
         annotations_predicate = AnnotationPredicate(annotations) if annotations is not None else None
 
         search_results = [
@@ -71,8 +74,10 @@ def cmd_find(
                 kind=kind,
                 cluster=cluster,
                 keyspace=keyspace,
+                meta=meta,
             )
         ]
+    # Local catalog find
     else:
         catalog_path = pathlib.Path(ctx.catalog) / (kind + "-catalog.json")
 
