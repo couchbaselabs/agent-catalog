@@ -148,8 +148,15 @@ def env(ctx):
     help="Enable this flag to perform DB level search",
     show_default=True,
 )
+@click.option(
+    "-em",
+    "--embedding-model",
+    default=DEFAULT_EMBEDDING_MODEL,
+    help="Embedding model to generate embeddings for query.",
+    show_default=True,
+)
 @click.pass_context
-def find(ctx, query, kind, limit, include_dirty, refiner, annotations, search_db):
+def find(ctx, query, kind, limit, include_dirty, refiner, annotations, search_db, embedding_model):
     """Find tools, prompts, etc. from the catalog based on a natural language QUERY string."""
     # Get keyspace and connection details
     keyspace_details = Keyspace(bucket="", scope="rosetta-catalog")
@@ -172,7 +179,7 @@ def find(ctx, query, kind, limit, include_dirty, refiner, annotations, search_db
 
     # Prompt user to select a bucket
     selected_bucket = click.prompt("Please select a bucket", type=click.Choice(buckets), show_choices=True)
-    click.echo(f"Inserting documents in : {selected_bucket}/{keyspace_details.scope}\n")
+    click.echo(f"Finding {kind}s in : {selected_bucket}/{keyspace_details.scope}\n")
     keyspace_details.bucket = selected_bucket
 
     cmd_find(
@@ -187,6 +194,7 @@ def find(ctx, query, kind, limit, include_dirty, refiner, annotations, search_db
         bucket="travel-sample",
         cluster=cluster,
         keyspace=keyspace_details,
+        embedding_model=embedding_model,
     )
 
 
