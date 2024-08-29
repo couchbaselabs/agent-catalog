@@ -48,26 +48,26 @@ class CatalogDB(CatalogBase):
         # User has specified a snapshot id
         if snapshot_id != "all":
             filter_records_query = (
-                f"SELECT t.* FROM `{bucket}`.`rosetta-catalog`.`{kind}_catalog` as t "
+                f"SELECT t.*, SEARCH_META() as metadata FROM `{bucket}`.`rosetta-catalog`.`{kind}_catalog` as t "
                 + f"WHERE catalog_identifier='{snapshot_id}' AND "
-                + "SEARCH(t, {"
-                + f"'query': '{query}',"
-                + "'knn': {'field': 'embedding',"
-                + f"'value': '[{query_embeddings}]',"
+                + "SEARCH(t, "
+                + "{'query': {'match_none': {}},"
+                + "'knn': [{'field': 'embedding',"
+                + f"'vector': {query_embeddings},"
                 + "'k': 10"
-                + "}, 'size': 10, 'ctl': { 'timeout': 10 } }) "
+                + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) "
                 + f"LIMIT {limit};"
             )
         # No snapshot id has been mentioned
         else:
             filter_records_query = (
-                f"SELECT t.* FROM `{bucket}`.`rosetta-catalog`.`{kind}_catalog` as t "
-                + "WHERE SEARCH(t, {"
-                + f"'query': '{query}',"
-                + "'knn': {'field': 'embedding',"
-                + f"'value': '[{query_embeddings}]',"
+                f"SELECT t.*, SEARCH_META() as metadata  FROM `{bucket}`.`rosetta-catalog`.`{kind}_catalog` as t "
+                + "WHERE SEARCH(t, "
+                + "{'query': {'match_none': {}},"
+                + "'knn': [{'field': 'embedding',"
+                + f"'vector': {query_embeddings},"
                 + "'k': 10"
-                + "}, 'size': 10, 'ctl': { 'timeout': 10 } }) "
+                + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) "
                 + f"LIMIT {limit};"
             )
 
@@ -79,9 +79,11 @@ class CatalogDB(CatalogBase):
 
         # List of catalog items from query
         catalog = []
+        deltas = []
         for row in res.rows():
             kind = row["record_kind"]
             descriptor = ""
+            deltas.append(row["metadata"]["score"])
             match kind:
                 case "semantic_search":
                     descriptor = SemanticSearchToolDescriptor.model_validate(row)
@@ -98,6 +100,6 @@ class CatalogDB(CatalogBase):
         # TODO: If annotations have been specified, prune all tools that do not possess these annotations.
 
         # Final set of results
-        results = [SearchResult(entry=cat, delta=0) for cat in catalog]
+        results = [SearchResult(entry=catalog[i], delta=deltas[i]) for i in range(len(deltas))]
 
         return results
