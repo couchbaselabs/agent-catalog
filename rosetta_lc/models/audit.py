@@ -44,6 +44,7 @@ def _determine_role_from_type(message: BaseMessage) -> rosetta.auditor.Role:
 def audit(chat_model: BaseChatModel, auditor: rosetta.Auditor = None) -> BaseChatModel:
     """A method to (dynamically) dispatch the '_generate' & '_stream' methods to methods that log LLM calls."""
     if auditor is None:
+        # TODO (GLENN): Pull the LLM name from somewhere else (e.g., we aren't capturing gpt-4o).
         auditor = rosetta.auditor.Auditor(llm_name=chat_model._llm_type)
 
     # TODO (GLENN): We should capture the _agenerate and _astream methods as well.
