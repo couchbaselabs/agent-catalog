@@ -42,7 +42,12 @@ class RecordDescriptor(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(validate_assignment=True, use_enum_values=True)
 
     record_kind: typing.Literal[
-        RecordKind.PythonFunction, RecordKind.SQLPPQuery, RecordKind.SemanticSearch, RecordKind.HTTPRequest
+        RecordKind.PythonFunction,
+        RecordKind.SQLPPQuery,
+        RecordKind.SemanticSearch,
+        RecordKind.HTTPRequest,
+        RecordKind.RawPrompt,
+        RecordKind.JinjaPrompt,
     ] = pydantic.Field(description="The type of catalog entry (python tool, prompt, etc...).")
 
     name: str = pydantic.Field(

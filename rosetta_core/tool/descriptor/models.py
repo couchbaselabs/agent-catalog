@@ -247,9 +247,9 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
 
         # We should be able to access the specification file here (validation is done internally here).
         if filename is not None:
-            open_api_spec = openapi_parser.parse(filename.absolute().as_uri())
+            open_api_spec = openapi_parser.parse(filename.absolute().as_uri(), strict_enum=False)
         else:
-            open_api_spec = openapi_parser.parse(url)
+            open_api_spec = openapi_parser.parse(url, strict_enum=False)
 
         # Determine our servers.
         if len(open_api_spec.servers) > 0:
@@ -298,7 +298,9 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
     @property
     def handle(self) -> OperationHandle:
         return HTTPRequestToolDescriptor.validate_operation(
-            filename=pathlib.Path(self.specification.filename), url=self.specification.url, operation=self.operation
+            filename=pathlib.Path(self.specification.filename) if self.specification.filename is not None else None,
+            url=self.specification.url,
+            operation=self.operation,
         )
 
     class JSONEncoder(json.JSONEncoder):
@@ -361,9 +363,3 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
                         ),
                         annotations=metadata.annotations,
                     )
-
-
-ToolDescriptorUnionType = typing.Annotated[
-    PythonToolDescriptor | SQLPPQueryToolDescriptor | SemanticSearchToolDescriptor | HTTPRequestToolDescriptor,
-    pydantic.Field(discriminator="record_kind"),
-]

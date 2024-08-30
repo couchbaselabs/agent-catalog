@@ -30,8 +30,9 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()],
 )
 
-# Keeping this here, sentence_transformers logging can be pretty verbose.
-logging.getLogger("sentence_transformers").setLevel(logging.WARNING)
+# Keeping this here, the logging these libraries do can be pretty verbose.
+logging.getLogger("sentence_transformers").setLevel(logging.ERROR)
+logging.getLogger("openapi_parser").setLevel(logging.ERROR)
 
 # TODO: Should we load from ".env.rosetta"?
 # TODO: Or, perhaps even stage specific, like from ".env.rosetta.prod"?

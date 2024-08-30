@@ -4,8 +4,13 @@ import json
 import pydantic
 import typing
 
+from ..prompt.models import JinjaPromptDescriptor
+from ..prompt.models import RawPromptDescriptor
 from ..record.descriptor import BEAUTIFY_OPTS
-from ..tool.descriptor import ToolDescriptorUnionType
+from ..tool.descriptor.models import HTTPRequestToolDescriptor
+from ..tool.descriptor.models import PythonToolDescriptor
+from ..tool.descriptor.models import SemanticSearchToolDescriptor
+from ..tool.descriptor.models import SQLPPQueryToolDescriptor
 from ..version import VersionDescriptor
 
 
@@ -14,6 +19,17 @@ class CatalogKind(enum.StrEnum):
     Prompt = "prompt"
 
     # TODO (GLENN): Include other classes.
+
+
+RecordDescriptorUnionType = typing.Annotated[
+    PythonToolDescriptor
+    | SQLPPQueryToolDescriptor
+    | SemanticSearchToolDescriptor
+    | HTTPRequestToolDescriptor
+    | RawPromptDescriptor
+    | JinjaPromptDescriptor,
+    pydantic.Field(discriminator="record_kind"),
+]
 
 
 class CatalogDescriptor(pydantic.BaseModel):
@@ -46,7 +62,7 @@ class CatalogDescriptor(pydantic.BaseModel):
         default="main",  # TODO (GLENN): Should we use a different name here?
     )
 
-    items: list[ToolDescriptorUnionType] = pydantic.Field(description="The entries in the catalog.")
+    items: list[RecordDescriptorUnionType] = pydantic.Field(description="The entries in the catalog.")
 
     def __str__(self):
         return jsbeautifier.beautify(

@@ -1,3 +1,4 @@
+import abc
 import logging
 import pathlib
 import typing
@@ -11,7 +12,35 @@ from .loader import EntryLoader
 logger = logging.getLogger(__name__)
 
 
-class Provider:
+class BaseProvider(abc.ABC):
+    def __init__(
+        self,
+        catalog: CatalogBase,
+        refiner: typing.Callable[[list[SearchResult]], list[SearchResult]] = None,
+    ):
+        self.catalog = catalog
+        self.refiner = refiner if refiner is not None else lambda s: s
+
+    @abc.abstractmethod
+    def search(self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1):
+        pass
+
+    @abc.abstractmethod
+    def get(self, name: str, annotations: str = None, limit: typing.Union[int | None] = 1):
+        pass
+
+
+class PromptProvider(BaseProvider):
+    def search(self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1):
+        annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
+        results = self.refiner(self.catalog.find(query=query, annotations=annotation_predicate, limit=limit))
+        return [r.entry.prompt for r in results]
+
+    def get(self, name: str, annotations: str = None, limit: typing.Union[int | None] = 1):
+        raise NotImplementedError()
+
+
+class ToolProvider(BaseProvider):
     def __init__(
         self,
         catalog: CatalogBase,
@@ -32,26 +61,23 @@ class Provider:
         >>> import rosetta_core.catalog as rcm
         >>> import os, pathlib
         >>> my_catalog = rcm.CatalogMem.load(pathlib.Path('.rosetta-catalog') / 'tool-catalog.json')
-        >>> my_provider = rp.Provider(
+        >>> my_provider = rp.ToolProvider(
         >>>     catalog=my_catalog,
         >>>     secrets={'CB_PASSWORD': os.getenv('MY_CB_PASSWORD')}
         >>> )
         """
-        self.catalog = catalog
+        super(ToolProvider, self).__init__(catalog=catalog, refiner=refiner)
         self._tool_cache = dict()
         self._loader = EntryLoader(output=output)
 
         # Handle our defaults.
         self.decorator = decorator if decorator is not None else lambda s: s
-        self.refiner = refiner if refiner is not None else lambda s: s
         if secrets is not None:
             # Note: we only register our secrets at instantiation-time.
             for k, v in secrets.items():
                 put_secret(k, v)
 
-    def get_tools_for(
-        self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1
-    ) -> list[typing.Any]:
+    def search(self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1) -> list[typing.Any]:
         """
         :param query: A string to search the catalog with.
         :param annotations: An annotation query string in the form of KEY=VALUE (AND|OR KEY=VALUE)*.
@@ -68,3 +94,6 @@ class Provider:
 
         # Return the tools from the cache.
         return [self.decorator(self._tool_cache[x.entry]) for x in results]
+
+    def get(self, name: str, annotations: str = None, limit: typing.Union[int | None] = 1):
+        raise NotImplementedError()
