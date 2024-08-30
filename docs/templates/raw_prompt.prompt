@@ -1,0 +1,34 @@
+---
+#
+# The following file is a template for a raw prompt.
+#
+# The content in between the '---' lines must be valid YAML.
+record_kind: raw_prompt
+
+# The name of the prompt must be a valid Python identifier (e.g., no spaces).
+# This field is mandatory.
+name: route_finding_prompt
+
+# A description of the prompt's purpose (e.g., where this prompt will be used).
+# This field is mandatory, and will be used (indirectly) when performing semantic search for prompts.
+description: >
+    Instructions on how to find routes between airports.
+
+# As a supplement to the description similarity search, users can optionally specify search annotations.
+# The values of these annotations MUST be strings (e.g., not 'true', but '"true"').
+# This field is optional, and does not have to be present.
+annotations:
+  organization: "sequoia"
+
+# Below the '---' represents the prompt in its entirety.
+---
+Goal:
+Your goal is to find a sequence of routes between the source and destination airport.
+
+Examples:
+...
+
+Instructions:
+Try to find a direct routes first between the source airport and the destination airport.
+If there are no direct routes, then find a one-layover route.
+If there are no such routes, then try another source airport that is close.
