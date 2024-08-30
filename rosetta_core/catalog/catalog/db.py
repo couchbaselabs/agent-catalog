@@ -41,33 +41,35 @@ class CatalogDB(CatalogBase):
         )
         query_embeddings = embedding_model_obj.encode(query).tolist()
 
-        # Get all relevant items from catalog
-        # TODO: check if annotations can be added in the query itself -> not a good idea to do this in query
-        # TODO: get delta (score) from SEARCH func
+        # --------Get all relevant items from catalog--------
+
+        # Get annotations condition
+        annotation_condition = annotations.__catalog_query_str__()
 
         # User has specified a snapshot id
         if snapshot_id != "all":
             filter_records_query = (
-                f"SELECT t.*, SEARCH_META() as metadata FROM `{bucket}`.`rosetta-catalog`.`{kind}_catalog` as t "
-                + f"WHERE catalog_identifier='{snapshot_id}' AND "
-                + "SEARCH(t, "
-                + "{'query': {'match_none': {}},"
-                + "'knn': [{'field': 'embedding',"
-                + f"'vector': {query_embeddings},"
-                + "'k': 10"
-                + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) "
-                + f"LIMIT {limit};"
-            )
-        # No snapshot id has been mentioned
-        else:
-            filter_records_query = (
-                f"SELECT t.*, SEARCH_META() as metadata  FROM `{bucket}`.`rosetta-catalog`.`{kind}_catalog` as t "
+                f"SELECT a.* FROM ( SELECT t.*, SEARCH_META() as metadata FROM `{bucket}`.`rosetta-catalog`.`{kind}_catalog` as t "
                 + "WHERE SEARCH(t, "
                 + "{'query': {'match_none': {}},"
                 + "'knn': [{'field': 'embedding',"
                 + f"'vector': {query_embeddings},"
                 + "'k': 10"
-                + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) "
+                + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) ) AS a "
+                + f"WHERE {annotation_condition} AND catalog_identifier='{snapshot_id}'"
+                + f"LIMIT {limit};"
+            )
+        # No snapshot id has been mentioned
+        else:
+            filter_records_query = (
+                f"SELECT a.* FROM ( SELECT t.*, SEARCH_META() as metadata FROM `{bucket}`.`rosetta-catalog`.`{kind}_catalog` as t "
+                + "WHERE SEARCH(t, "
+                + "{'query': {'match_none': {}},"
+                + "'knn': [{'field': 'embedding',"
+                + f"'vector': {query_embeddings},"
+                + "'k': 10"
+                + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) ) AS a "
+                + f"WHERE {annotation_condition} "
                 + f"LIMIT {limit};"
             )
 
@@ -96,8 +98,6 @@ class CatalogDB(CatalogBase):
                 case _:
                     print("not a valid descriptor of ToolDescriptorUnion type")
             catalog.append(RecordDescriptor.model_validate(descriptor))
-
-        # TODO: If annotations have been specified, prune all tools that do not possess these annotations.
 
         # Final set of results
         results = [SearchResult(entry=catalog[i], delta=deltas[i]) for i in range(len(deltas))]
