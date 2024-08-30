@@ -118,7 +118,12 @@ class Provider(pydantic_settings.BaseSettings):
     _local_tool_catalog: rosetta_core.catalog.CatalogMem = None
     _remote_tool_catalog: rosetta_core.catalog.CatalogDB = None
     _tool_catalog: rosetta_core.catalog.CatalogBase = None
-    _tool_provider: rosetta_core.provider.Provider = None
+    _tool_provider: rosetta_core.provider.ToolProvider = None
+
+    _local_prompt_catalog: rosetta_core.catalog.CatalogMem = None
+    _remote_prompt_catalog: rosetta_core.catalog.CatalogDB = None
+    _prompt_catalog: rosetta_core.catalog.CatalogBase = None
+    _prompt_provider: rosetta_core.provider.PromptProvider = None
 
     @pydantic.model_validator(mode="after")
     def _find_local_catalog(self) -> typing.Self:
@@ -138,8 +143,11 @@ class Provider(pydantic_settings.BaseSettings):
 
         # Set our local catalog if it exists.
         tool_catalog_path = self.catalog / rosetta_cmd.defaults.DEFAULT_TOOL_CATALOG_NAME
+        prompt_catalog_path = self.catalog / rosetta_cmd.defaults.DEFAULT_PROMPT_CATALOG_NAME
         logger.info("Loading local tool catalog at %s.", str(tool_catalog_path.absolute()))
+        logger.info("Loading local prompt catalog at %s.", str(prompt_catalog_path.absolute()))
         self._local_tool_catalog = rosetta_core.catalog.CatalogMem.load(tool_catalog_path)
+        self._local_prompt_catalog = rosetta_core.catalog.CatalogMem.load(prompt_catalog_path)
         return self
 
     @pydantic.model_validator(mode="after")
@@ -178,16 +186,24 @@ class Provider(pydantic_settings.BaseSettings):
             self._tool_catalog = rosetta_core.catalog.CatalogChain(
                 chain=[self._local_tool_catalog, self._remote_tool_catalog]
             )
+            self._prompt_catalog = rosetta_core.catalog.CatalogChain(
+                chain=[self._local_prompt_catalog, self._remote_prompt_catalog]
+            )
         else:
             self._tool_catalog = self._local_tool_catalog or self._remote_tool_catalog
+            self._prompt_catalog = self._local_prompt_catalog or self._remote_prompt_catalog
 
         # Finally, initialize our provider.
-        self._tool_provider = rosetta_core.provider.Provider(
+        self._tool_provider = rosetta_core.provider.ToolProvider(
             catalog=self._tool_catalog,
             output=self.output,
             decorator=self.decorator,
             refiner=self.refiner,
             secrets=self.secrets,
+        )
+        self._prompt_provider = rosetta_core.provider.PromptProvider(
+            catalog=self._prompt_catalog,
+            refiner=self.refiner,
         )
         return self
 
@@ -205,4 +221,13 @@ class Provider(pydantic_settings.BaseSettings):
         :param limit: The maximum number of results to return.
         :return: A list of tools (Python functions).
         """
-        return self._tool_provider.get_tools_for(query, annotations, limit)
+        return self._tool_provider.search(query, annotations, limit)
+
+    def get_prompts_for(self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1) -> list[str]:
+        """
+        :param query: A string to search the catalog with.
+        :param annotations: An annotation query string in the form of KEY=VALUE (AND|OR KEY=VALUE)*.
+        :param limit: The maximum number of results to return.
+        :return: A list of prompts.
+        """
+        return self._prompt_provider.search(query, annotations, limit)
