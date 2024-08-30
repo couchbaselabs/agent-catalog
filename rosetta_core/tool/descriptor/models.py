@@ -66,7 +66,7 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
     input: str
     output: str
     query: str
-    secrets: list[CouchbaseSecrets] = pydantic.Field(min_items=1, max_items=1)
+    secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
     record_kind: typing.Literal[RecordKind.SQLPPQuery]
 
     class Factory(_BaseFactory):
@@ -78,7 +78,7 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
             description: str
             input: str
             output: str
-            secrets: list[CouchbaseSecrets] = pydantic.Field(min_items=1, max_items=1)
+            secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
             record_kind: typing.Optional[typing.Literal[RecordKind.SQLPPQuery] | None] = None
             annotations: typing.Optional[dict[str, str] | None] = None
 
@@ -134,7 +134,7 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
 
     input: str
     vector_search: VectorSearchMetadata
-    secrets: list[CouchbaseSecrets] = pydantic.Field(min_items=1, max_items=1)
+    secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
     record_kind: typing.Literal[RecordKind.SemanticSearch]
 
     class Factory(_BaseFactory):
@@ -146,7 +146,7 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
             name: str
             description: str
             input: str
-            secrets: list[CouchbaseSecrets] = pydantic.Field(min_items=1, max_items=1)
+            secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
             annotations: typing.Optional[dict[str, str] | None] = None
             vector_search: "SemanticSearchToolDescriptor.VectorSearchMetadata"
 
