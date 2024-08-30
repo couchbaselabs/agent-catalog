@@ -223,11 +223,10 @@ class Provider(pydantic_settings.BaseSettings):
         """
         return self._tool_provider.search(query, annotations, limit)
 
-    def get_prompts_for(self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1) -> list[str]:
+    def get_prompt_for(self, query: str, annotations: str = None) -> str:
         """
         :param query: A string to search the catalog with.
         :param annotations: An annotation query string in the form of KEY=VALUE (AND|OR KEY=VALUE)*.
-        :param limit: The maximum number of results to return.
-        :return: A list of prompts.
+        :return: A single prompt.
         """
-        return self._prompt_provider.search(query, annotations, limit)
+        return self._prompt_provider.search(query, annotations, limit=1)[0]
