@@ -2,15 +2,15 @@ import click
 import logging
 import typing
 
-from ...record.descriptor import RecordDescriptor
-from ...tool.descriptor import HTTPRequestToolDescriptor
-from ...tool.descriptor import PythonToolDescriptor
-from ...tool.descriptor import SemanticSearchToolDescriptor
-from ...tool.descriptor import SQLPPQueryToolDescriptor
-from .base import CatalogBase
-from .base import SearchResult
 from rosetta_core.annotation import AnnotationPredicate
+from rosetta_core.catalog.catalog.base import CatalogBase
+from rosetta_core.catalog.catalog.base import SearchResult
 from rosetta_core.defaults import DEFAULT_SCOPE_PREFIX
+from rosetta_core.record.descriptor import RecordDescriptor
+from rosetta_core.tool.descriptor import HTTPRequestToolDescriptor
+from rosetta_core.tool.descriptor import PythonToolDescriptor
+from rosetta_core.tool.descriptor import SemanticSearchToolDescriptor
+from rosetta_core.tool.descriptor import SQLPPQueryToolDescriptor
 from rosetta_util.query import execute_query
 
 logger = logging.getLogger(__name__)
@@ -94,10 +94,19 @@ class CatalogDB(CatalogBase):
                 click.secho(f"ERROR: {err}", fg="red")
                 return []
 
+        resp = list(res)
+
+        # If result set is empty
+        if len(resp) == 0:
+            print("none")
+            click.secho("No catalog items found with given conditions...", fg="yellow")
+            return []
+
         # List of catalog items from query
         catalog = []
         deltas = []
-        for row in res.rows():
+
+        for row in resp:
             kind = row["record_kind"]
             descriptor = ""
             if item_name is None:
