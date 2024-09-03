@@ -160,44 +160,54 @@ def env(ctx):
 @click.pass_context
 def find(ctx, query, kind, limit, include_dirty, refiner, annotations, search_db, embedding_model):
     """Find tools, prompts, etc. from the catalog based on a natural language QUERY string."""
-    # Get keyspace and connection details
-    keyspace_details = Keyspace(bucket="", scope="rosetta-catalog")
 
-    # Load all Couchbase connection related data from env
-    connection_details_env = CouchbaseConnect(
-        connection_url=os.getenv("CB_CONN_STRING"),
-        username=os.getenv("CB_USERNAME"),
-        password=os.getenv("CB_PASSWORD"),
-    )
+    if search_db:
+        # Load all Couchbase connection related data from env
+        connection_details_env = CouchbaseConnect(
+            connection_url=os.getenv("CB_CONN_STRING"),
+            username=os.getenv("CB_USERNAME"),
+            password=os.getenv("CB_PASSWORD"),
+        )
 
-    # Establish a connection
-    err, cluster = get_connection(conn=connection_details_env)
-    if err:
-        click.echo(str(err))
-        return
+        # Establish a connection
+        err, cluster = get_connection(conn=connection_details_env)
+        if err:
+            click.echo(str(err))
+            return
 
-    # Get buckets from CB Cluster
-    buckets = get_buckets(cluster=cluster)
+        # Get buckets from CB Cluster
+        buckets = get_buckets(cluster=cluster)
 
-    # Prompt user to select a bucket
-    selected_bucket = click.prompt("Please select a bucket", type=click.Choice(buckets), show_choices=True)
-    click.echo(f"Finding {kind}s in : {selected_bucket}/{keyspace_details.scope}\n")
-    keyspace_details.bucket = selected_bucket
+        # Prompt user to select a bucket
+        selected_bucket = click.prompt("Please select a bucket", type=click.Choice(buckets), show_choices=True)
 
-    cmd_find(
-        ctx.obj,
-        query,
-        kind=kind,
-        limit=limit,
-        include_dirty=include_dirty,
-        refiner=refiner,
-        annotations=annotations,
-        search_db=search_db,
-        bucket="travel-sample",
-        cluster=cluster,
-        keyspace=keyspace_details,
-        embedding_model=embedding_model,
-    )
+        cmd_find(
+            ctx.obj,
+            query,
+            kind=kind,
+            limit=limit,
+            include_dirty=include_dirty,
+            refiner=refiner,
+            annotations=annotations,
+            search_db=search_db,
+            bucket=selected_bucket,
+            cluster=cluster,
+            embedding_model=embedding_model,
+        )
+    else:
+        cmd_find(
+            ctx.obj,
+            query,
+            kind=kind,
+            limit=limit,
+            include_dirty=include_dirty,
+            refiner=refiner,
+            annotations=annotations,
+            search_db=search_db,
+            bucket="",
+            cluster=None,
+            embedding_model=embedding_model,
+        )
 
 
 @click_main.command()

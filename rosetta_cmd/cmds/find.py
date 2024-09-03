@@ -5,10 +5,10 @@ import pathlib
 import textwrap
 import tqdm
 
+from ..defaults import DEFAULT_CATALOG_NAME
 from ..defaults import DEFAULT_MAX_ERRS
 from ..defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from ..models import Context
-from ..models import Keyspace
 from .util import init_local
 from .util import load_repository
 from rosetta_core.annotation import AnnotationPredicate
@@ -39,9 +39,8 @@ def cmd_find(
     include_dirty=True,
     refiner=None,
     annotations=None,
-    search_db=False,
+    search_db: bool = False,
     cluster=None,
-    keyspace: Keyspace = None,
     embedding_model: str = None,
 ):
     # TODO: One day, also handle DBCatalogRef?
@@ -75,14 +74,12 @@ def cmd_find(
                 bucket=bucket,
                 kind=kind,
                 cluster=cluster,
-                keyspace=keyspace,
                 meta=meta,
             )
         ]
     # Local catalog find
     else:
-        # TODO (GLENN): Move "-catalog.json" to defaults.py?
-        catalog_path = pathlib.Path(ctx.catalog) / (kind + "-catalog.json")
+        catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)
 
         catalog = CatalogMem().load(catalog_path)
 

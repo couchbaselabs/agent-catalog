@@ -1,5 +1,5 @@
-DEFAULT_CB_SCOPE_NAME = "rosetta-catalog"
+DEFAULT_SCOPE_PREFIX = "rosetta-catalog-"
 
 __all__ = [
-    "DEFAULT_CB_SCOPE_NAME",
+    "DEFAULT_SCOPE_PREFIX",
 ]
