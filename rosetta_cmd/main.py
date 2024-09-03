@@ -15,6 +15,7 @@ from .cmds import cmd_web
 from .defaults import DEFAULT_ACTIVITY_FOLDER
 from .defaults import DEFAULT_CATALOG_FOLDER
 from .defaults import DEFAULT_EMBEDDING_MODEL
+from .defaults import DEFAULT_SCOPE_PREFIX
 from .defaults import DEFAULT_WEB_HOST_PORT
 from .models import Context
 from .models import CouchbaseConnect
@@ -258,13 +259,6 @@ def index(ctx, source_dirs, kind, embedding_model, include_dirty, dry_run):
     show_default=True,
 )
 @click.option(
-    "-sc",
-    "--scope",
-    default="rosetta-catalog",
-    help="Couchbase Scope where data is inserted.",
-    show_default=True,
-)
-@click.option(
     "-an",
     "--annotations",
     multiple=True,
@@ -274,11 +268,11 @@ def index(ctx, source_dirs, kind, embedding_model, include_dirty, dry_run):
     show_default=True,
 )
 @click.pass_context
-def publish(ctx, kind, scope, annotations):
+def publish(ctx, kind, annotations):
     """Publish the local catalog to Couchbase DB"""
 
     # Get keyspace and connection details
-    keyspace_details = Keyspace(bucket="", scope=scope)
+    keyspace_details = Keyspace(bucket="", scope=DEFAULT_SCOPE_PREFIX)
 
     # Load all Couchbase connection related data from env
     connection_details_env = CouchbaseConnect(
