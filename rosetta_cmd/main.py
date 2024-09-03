@@ -194,6 +194,8 @@ def find(ctx, query, kind, limit, include_dirty, refiner, annotations, search_db
             cluster=cluster,
             embedding_model=embedding_model,
         )
+
+        cluster.close()
     else:
         cmd_find(
             ctx.obj,
