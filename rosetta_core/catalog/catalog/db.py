@@ -36,6 +36,7 @@ class CatalogDB(CatalogBase):
         # Generate embeddings for user query
         import sentence_transformers
 
+        embedding_model_str = meta["embedding_model"].replace("/", "_")
         embedding_model_obj = sentence_transformers.SentenceTransformer(
             meta["embedding_model"], tokenizer_kwargs={"clean_up_tokenization_spaces": True}
         )
@@ -49,7 +50,7 @@ class CatalogDB(CatalogBase):
         # User has specified a snapshot id
         if snapshot_id != "all":
             filter_records_query = (
-                f"SELECT a.* FROM ( SELECT t.*, SEARCH_META() as metadata FROM `{bucket}`.`rosetta-catalog`.`{kind}_catalog` as t "
+                f"SELECT a.* FROM ( SELECT t.*, SEARCH_META() as metadata FROM `{bucket}`.`rosetta-catalog-{embedding_model_str}`.`{kind}_catalog` as t "
                 + "WHERE SEARCH(t, "
                 + "{'query': {'match_none': {}},"
                 + "'knn': [{'field': 'embedding',"
@@ -62,7 +63,7 @@ class CatalogDB(CatalogBase):
         # No snapshot id has been mentioned
         else:
             filter_records_query = (
-                f"SELECT a.* FROM ( SELECT t.*, SEARCH_META() as metadata FROM `{bucket}`.`rosetta-catalog`.`{kind}_catalog` as t "
+                f"SELECT a.* FROM ( SELECT t.*, SEARCH_META() as metadata FROM `{bucket}`.`rosetta-catalog-{embedding_model_str}`.`{kind}_catalog` as t "
                 + "WHERE SEARCH(t, "
                 + "{'query': {'match_none': {}},"
                 + "'knn': [{'field': 'embedding',"
