@@ -157,8 +157,14 @@ def env(ctx):
     help="Embedding model to generate embeddings for query.",
     show_default=True,
 )
+@click.option(
+    "--item-name",
+    default=None,
+    help="Name of catalog item to retrieve from the catalog directly.",
+    show_default=True,
+)
 @click.pass_context
-def find(ctx, query, kind, limit, include_dirty, refiner, annotations, search_db, embedding_model):
+def find(ctx, query, kind, limit, include_dirty, refiner, annotations, search_db, embedding_model, item_name):
     """Find tools, prompts, etc. from the catalog based on a natural language QUERY string."""
 
     if search_db:
@@ -193,6 +199,7 @@ def find(ctx, query, kind, limit, include_dirty, refiner, annotations, search_db
             bucket=selected_bucket,
             cluster=cluster,
             embedding_model=embedding_model,
+            item_name=item_name,
         )
 
         cluster.close()
@@ -209,6 +216,7 @@ def find(ctx, query, kind, limit, include_dirty, refiner, annotations, search_db
             bucket="",
             cluster=None,
             embedding_model=embedding_model,
+            item_name=item_name,
         )
 
 

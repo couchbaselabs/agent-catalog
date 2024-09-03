@@ -42,6 +42,7 @@ def cmd_find(
     search_db: bool = False,
     cluster=None,
     embedding_model: str = None,
+    item_name: str = None,
 ):
     # TODO: One day, also handle DBCatalogRef?
     # TODO: If DB is outdated and the local catalog has newer info,
@@ -75,6 +76,7 @@ def cmd_find(
                 kind=kind,
                 cluster=cluster,
                 meta=meta,
+                item_name=item_name,
             )
         ]
     # Local catalog find

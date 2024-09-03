@@ -29,55 +29,70 @@ class CatalogDB(CatalogBase):
         snapshot_id: typing.Union[str | None] = "all",
         cluster: any = "",
         meta: any = None,
+        item_name: str = None,
     ) -> list[SearchResult]:
         """Returns the catalog items that best match a query."""
 
-        # Generate embeddings for user query
-        import sentence_transformers
-
         scope_name = DEFAULT_SCOPE_PREFIX + meta["embedding_model"].replace("/", "_")
-        embedding_model_obj = sentence_transformers.SentenceTransformer(
-            meta["embedding_model"], tokenizer_kwargs={"clean_up_tokenization_spaces": True}
-        )
-        query_embeddings = embedding_model_obj.encode(query).tolist()
 
-        # --------Get all relevant items from catalog--------
-
-        # Get annotations condition
-        annotation_condition = annotations.__catalog_query_str__()
-
-        # User has specified a snapshot id
-        if snapshot_id != "all":
-            filter_records_query = (
-                f"SELECT a.* FROM ( SELECT t.*, SEARCH_META() as metadata FROM `{bucket}`.`{scope_name}`.`{kind}_catalog` as t "
-                + "WHERE SEARCH(t, "
-                + "{'query': {'match_none': {}},"
-                + "'knn': [{'field': 'embedding',"
-                + f"'vector': {query_embeddings},"
-                + "'k': 10"
-                + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) ) AS a "
-                + f"WHERE {annotation_condition} AND catalog_identifier='{snapshot_id}'"
-                + f"LIMIT {limit};"
+        # Catalog item has to be queried directly
+        if item_name is not None:
+            item_query = (
+                f"SELECT a.* from `{bucket}`.`{scope_name}`.`{kind}_catalog` as a WHERE a.name = '{item_name}';"
             )
-        # No snapshot id has been mentioned
+
+            res, err = execute_query(cluster, item_query)
+            if err is not None:
+                click.secho(f"ERROR: {err}", fg="red")
+                return []
         else:
-            filter_records_query = (
-                f"SELECT a.* FROM ( SELECT t.*, SEARCH_META() as metadata FROM `{bucket}`.`{scope_name}`.`{kind}_catalog` as t "
-                + "WHERE SEARCH(t, "
-                + "{'query': {'match_none': {}},"
-                + "'knn': [{'field': 'embedding',"
-                + f"'vector': {query_embeddings},"
-                + "'k': 10"
-                + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) ) AS a "
-                + f"WHERE {annotation_condition} "
-                + f"LIMIT {limit};"
-            )
+            # Generate embeddings for user query
+            import sentence_transformers
 
-        # Execute query after filtering by catalog_identifier if provided
-        res, err = execute_query(cluster, filter_records_query)
-        if err is not None:
-            click.secho(f"ERROR: {err}", fg="red")
-            return []
+            embedding_model_obj = sentence_transformers.SentenceTransformer(
+                meta["embedding_model"], tokenizer_kwargs={"clean_up_tokenization_spaces": True}
+            )
+            query_embeddings = embedding_model_obj.encode(query).tolist()
+
+            # ---------------------------------------------------------------------------------------- #
+            #                         Get all relevant items from catalog                              #
+            # ---------------------------------------------------------------------------------------- #
+
+            # Get annotations condition
+            annotation_condition = annotations.__catalog_query_str__() if annotations is not None else "1==1"
+
+            # User has specified a snapshot id
+            if snapshot_id != "all":
+                filter_records_query = (
+                    f"SELECT a.* FROM ( SELECT t.*, SEARCH_META() as metadata FROM `{bucket}`.`{scope_name}`.`{kind}_catalog` as t "
+                    + "WHERE SEARCH(t, "
+                    + "{'query': {'match_none': {}},"
+                    + "'knn': [{'field': 'embedding',"
+                    + f"'vector': {query_embeddings},"
+                    + "'k': 10"
+                    + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) ) AS a "
+                    + f"WHERE {annotation_condition} AND catalog_identifier='{snapshot_id}'"
+                    + f"LIMIT {limit};"
+                )
+            # No snapshot id has been mentioned
+            else:
+                filter_records_query = (
+                    f"SELECT a.* FROM ( SELECT t.*, SEARCH_META() as metadata FROM `{bucket}`.`{scope_name}`.`{kind}_catalog` as t "
+                    + "WHERE SEARCH(t, "
+                    + "{'query': {'match_none': {}},"
+                    + "'knn': [{'field': 'embedding',"
+                    + f"'vector': {query_embeddings},"
+                    + "'k': 10"
+                    + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) ) AS a "
+                    + f"WHERE {annotation_condition} "
+                    + f"LIMIT {limit};"
+                )
+
+            # Execute query after filtering by catalog_identifier if provided
+            res, err = execute_query(cluster, filter_records_query)
+            if err is not None:
+                click.secho(f"ERROR: {err}", fg="red")
+                return []
 
         # List of catalog items from query
         catalog = []
@@ -85,7 +100,8 @@ class CatalogDB(CatalogBase):
         for row in res.rows():
             kind = row["record_kind"]
             descriptor = ""
-            deltas.append(row["metadata"]["score"])
+            if item_name is None:
+                deltas.append(row["metadata"]["score"])
             match kind:
                 case "semantic_search":
                     descriptor = SemanticSearchToolDescriptor.model_validate(row)
@@ -100,6 +116,7 @@ class CatalogDB(CatalogBase):
             catalog.append(RecordDescriptor.model_validate(descriptor))
 
         # Final set of results
-        results = [SearchResult(entry=catalog[i], delta=deltas[i]) for i in range(len(deltas))]
+        if item_name is not None:
+            return [SearchResult(entry=catalog[0], delta=1)]
 
-        return results
+        return [SearchResult(entry=catalog[i], delta=deltas[i]) for i in range(len(deltas))]
