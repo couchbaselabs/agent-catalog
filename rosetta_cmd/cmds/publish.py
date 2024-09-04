@@ -10,8 +10,8 @@ from ..models import Context
 from ..models import CouchbaseConnect
 from ..models import Keyspace
 from rosetta_core.catalog import CatalogMem
-from rosetta_util.index_management import create_gsi_indexes
-from rosetta_util.index_management import create_vector_index
+from rosetta_util.ddl import create_gsi_indexes
+from rosetta_util.ddl import create_vector_index
 from rosetta_util.publish import CustomPublishEncoder
 from rosetta_util.publish import create_scope_and_collection
 
@@ -40,6 +40,7 @@ def cmd_publish(
     cb = cluster.bucket(bucket)
 
     for kind in kind_list:
+        # TODO (GLENN): There should be a check here to make sure we don't publish a dirty catalog.
         catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)
         catalog = CatalogMem.load(catalog_path).catalog_descriptor
         embedding_model = catalog.embedding_model.replace("/", "_")

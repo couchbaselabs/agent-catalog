@@ -1,6 +1,7 @@
 import fnmatch
 import logging
 
+from ..record.descriptor import RecordDescriptor
 from .catalog.mem import CatalogMem
 from .descriptor import CatalogDescriptor
 from .directory import ScanDirectoryOpts
@@ -91,7 +92,9 @@ def index_catalog_start(
     # TODO: We should use different source_indexers & source_globs based on the kind?
 
     # Load the old / previous local catalog if our catalog path exists.
-    curr_catalog = CatalogMem.load(catalog_path) if catalog_path.exists() else None
+    curr_catalog = (
+        CatalogMem.load(catalog_path, embedding_model=meta["embedding_model"]) if catalog_path.exists() else None
+    )
 
     source_files = []
     for source_dir in source_dirs:
@@ -130,6 +133,32 @@ def index_catalog_start(
         )
     )
 
-    uninitialized_items = next_catalog.init_from(curr_catalog)
+    uninitialized_items = init_from_catalog(next_catalog, curr_catalog)
 
     return all_errs, next_catalog, uninitialized_items
+
+
+def init_from_catalog(working: CatalogMem, other: CatalogMem) -> list[RecordDescriptor]:
+    """Initialize the items in self by copying over attributes from
+    items found in other that have the exact same versions.
+
+    Returns a list of uninitialized items."""
+
+    uninitialized_items = []
+    if other and other.catalog_descriptor:
+        # A lookup dict of items keyed by "source:name".
+        other_items = {str(o.source) + ":" + o.name: o for o in other.catalog_descriptor.items or []}
+
+        for s in working.catalog_descriptor.items:
+            o = other_items.get(str(s.source) + ":" + s.name)
+            if o and not s.version.is_dirty and o.version.identifier == s.version.identifier:
+                # The prev item and self item have the same version IDs,
+                # so copy the prev item contents into the self item.
+                for k, v in o.model_dump().items():
+                    setattr(s, k, v)
+            else:
+                uninitialized_items.append(s)
+    else:
+        uninitialized_items += working.catalog_descriptor.items
+
+    return uninitialized_items

@@ -4,11 +4,11 @@ import pathlib
 import pydantic
 import typing
 
+from ...annotation import AnnotationPredicate
+from ...catalog.descriptor import CatalogDescriptor
+from ...version import VersionDescriptor
 from .base import CatalogBase
 from .base import SearchResult
-from rosetta_core.annotation import AnnotationPredicate
-from rosetta_core.catalog.descriptor import CatalogDescriptor
-from rosetta_core.record.descriptor import RecordDescriptor
 
 logger = logging.getLogger(__name__)
 
@@ -16,39 +16,16 @@ logger = logging.getLogger(__name__)
 class CatalogMem(pydantic.BaseModel, CatalogBase):
     """Represents an in-memory catalog."""
 
-    catalog_descriptor: CatalogDescriptor = None
+    catalog_descriptor: CatalogDescriptor
+    embedding_model: typing.Optional[str] = None
 
-    def init_from(self, other: "CatalogMem") -> list[RecordDescriptor]:
-        """Initialize the items in self by copying over attributes from
-        items found in other that have the exact same versions.
-
-        Returns a list of uninitialized items."""
-
-        uninitialized_items = []
-        if other and other.catalog_descriptor:
-            # A lookup dict of items keyed by "source:name".
-            other_items = {str(o.source) + ":" + o.name: o for o in other.catalog_descriptor.items or []}
-
-            for s in self.catalog_descriptor.items:
-                o = other_items.get(str(s.source) + ":" + s.name)
-                if o and not s.version.is_dirty and o.version.identifier == s.version.identifier:
-                    # The prev item and self item have the same version IDs,
-                    # so copy the prev item contents into the self item.
-                    for k, v in o.model_dump().items():
-                        setattr(s, k, v)
-                else:
-                    uninitialized_items.append(s)
-        else:
-            uninitialized_items += self.catalog_descriptor.items
-
-        return uninitialized_items
-
+    # TODO (GLENN): it might be better to refactor this into the constructor.
     @staticmethod
-    def load(catalog_path: pathlib.Path):
+    def load(catalog_path: pathlib.Path, embedding_model: str = None):
         """Load from a catalog_path JSON file."""
         with catalog_path.open("r") as fp:
             catalog_descriptor = CatalogDescriptor.model_validate_json(fp.read())
-        return CatalogMem(catalog_descriptor=catalog_descriptor)
+        return CatalogMem(catalog_descriptor=catalog_descriptor, embedding_model=embedding_model)
 
     def dump(self, catalog_path: pathlib.Path):
         """Save to a catalog_path JSON file."""
@@ -59,21 +36,24 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
 
     def find(
         self,
-        query: str,
+        query: str = None,
+        name: str = None,
         limit: typing.Union[int | None] = 1,
         annotations: AnnotationPredicate = None,
-        item_name: str = "",
     ) -> list[SearchResult]:
         """Returns the catalog items that best match a query."""
 
-        # Return the exact tool instead of doing vector search in case item_name is provided
-        if item_name != "":
-            catalog = [x for x in self.catalog_descriptor.items if x.name == item_name]
+        # Return the exact tool instead of doing vector search in case name is provided
+        if name is not None:
+            catalog = [x for x in self.catalog_descriptor.items if x.name == name]
             if len(catalog) != 0:
                 return [SearchResult(entry=catalog[0], delta=1)]
             else:
-                click.secho("No catalog items found with given conditions...", fg="yellow")
+                click.secho(f"No catalog items found with name '{name}'", fg="yellow")
                 return []
+
+        if self.embedding_model is None:
+            raise RuntimeError("Embedding model not set!")
 
         import sentence_transformers
         import sklearn
@@ -104,9 +84,8 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
             return list()
 
         # Compute the distance of each tool in the catalog to the query.
-        embedding_model = self.catalog_descriptor.embedding_model
         embedding_model_obj = sentence_transformers.SentenceTransformer(
-            embedding_model, tokenizer_kwargs={"clean_up_tokenization_spaces": True}
+            self.embedding_model, tokenizer_kwargs={"clean_up_tokenization_spaces": True}
         )
         query_embedding = embedding_model_obj.encode(query)
         deltas = sklearn.metrics.pairwise.cosine_similarity(
@@ -121,3 +100,7 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
         if limit > 0:
             results = results[:limit]
         return results
+
+    @property
+    def version(self) -> VersionDescriptor:
+        return self.catalog_descriptor.version

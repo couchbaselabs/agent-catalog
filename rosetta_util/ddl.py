@@ -14,6 +14,7 @@ def is_index_present(
 ) -> tuple[bool | None, Exception | None]:
     """Checks for existence of index_to_create in the given keyspace"""
 
+    # TODO (GLENN): Refactor localhost and the port out
     find_index_url = f"http://localhost:8094/api/bucket/{bucket}/scope/{scope_name}/index"
     auth = (conn.username, conn.password)
 
@@ -40,6 +41,7 @@ def create_vector_index(
     index_present, err = is_index_present(bucket, scope_name, index_to_create, conn)
 
     if err is None and not index_present:
+        # TODO (GLENN): Refactor localhost and the port out
         create_vector_index_url = (
             f"http://localhost:8094/api/bucket/{bucket}/scope/{scope_name}/index/rosetta-{kind}-index-{embedding_model}"
         )
