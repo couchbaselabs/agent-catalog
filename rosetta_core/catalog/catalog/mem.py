@@ -1,3 +1,4 @@
+import click
 import logging
 import pathlib
 import pydantic
@@ -57,9 +58,23 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
             fp.write("\n")
 
     def find(
-        self, query: str, limit: typing.Union[int | None] = 1, annotations: AnnotationPredicate = None
+        self,
+        query: str,
+        limit: typing.Union[int | None] = 1,
+        annotations: AnnotationPredicate = None,
+        item_name: str = "",
     ) -> list[SearchResult]:
         """Returns the catalog items that best match a query."""
+
+        # Return the exact tool instead of doing vector search in case item_name is provided
+        if item_name != "":
+            catalog = [x for x in self.catalog_descriptor.items if x.name == item_name]
+            if len(catalog) != 0:
+                return [SearchResult(entry=catalog[0], delta=1)]
+            else:
+                click.secho("No catalog items found with given conditions...", fg="yellow")
+                return []
+
         import sentence_transformers
         import sklearn
 

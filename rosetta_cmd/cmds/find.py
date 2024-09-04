@@ -127,7 +127,7 @@ def cmd_find(
         annotations_predicate = AnnotationPredicate(annotations) if annotations is not None else None
         search_results = [
             SearchResult(entry=x.entry, delta=x.delta)
-            for x in catalog.find(query, limit=limit, annotations=annotations_predicate)
+            for x in catalog.find(query, limit=limit, annotations=annotations_predicate, item_name=item_name)
         ]
 
     if refiner is not None:
