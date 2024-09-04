@@ -11,6 +11,8 @@ from ..defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from ..models import Context
 from .util import init_local
 from .util import load_repository
+from pydantic import ValidationError
+from rosetta_cmd.models.find import SearchOptions
 from rosetta_core.annotation import AnnotationPredicate
 from rosetta_core.catalog import CatalogDB
 from rosetta_core.catalog import CatalogMem
@@ -50,6 +52,16 @@ def cmd_find(
     # TODO: Optional, future flags might specify variations like --local-catalog-only
     #       and/or --db-catalog-only, and/or both, via chaining multiple CatalogRef's?
     # TODO: Possible security issue -- need to check kind is an allowed value?
+
+    # Validate that only query or only item_name is specified
+    try:
+        search_opt = SearchOptions(query=query, item_name=item_name)
+    except ValidationError as e:
+        click.secho(f"Pydantic ERROR: {e}", fg="red")
+        return
+
+    query = search_opt.query
+    item_name = search_opt.item_name
 
     if refiner == "None":
         refiner = None

@@ -108,7 +108,18 @@ def env(ctx):
 
 
 @click_main.command()
-@click.argument("query", nargs=1)
+@click.option(
+    "--query",
+    default="",
+    help="User query describing the task for which tools are needed. Add this or provide --item-name.",
+    show_default=True,
+)
+@click.option(
+    "--item-name",
+    default="",
+    help="Name of catalog item to retrieve from the catalog directly.",
+    show_default=True,
+)
 @click.option(
     "--kind",
     default="tool",
@@ -155,12 +166,6 @@ def env(ctx):
     "--embedding-model",
     default=DEFAULT_EMBEDDING_MODEL,
     help="Embedding model to generate embeddings for query.",
-    show_default=True,
-)
-@click.option(
-    "--item-name",
-    default=None,
-    help="Name of catalog item to retrieve from the catalog directly.",
     show_default=True,
 )
 @click.pass_context

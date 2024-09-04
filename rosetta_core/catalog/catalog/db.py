@@ -29,14 +29,14 @@ class CatalogDB(CatalogBase):
         snapshot_id: typing.Union[str | None] = "all",
         cluster: any = "",
         meta: any = None,
-        item_name: str = None,
+        item_name: str = "",
     ) -> list[SearchResult]:
         """Returns the catalog items that best match a query."""
 
         scope_name = DEFAULT_SCOPE_PREFIX + meta["embedding_model"].replace("/", "_")
 
         # Catalog item has to be queried directly
-        if item_name is not None:
+        if item_name != "":
             item_query = (
                 f"SELECT a.* from `{bucket}`.`{scope_name}`.`{kind}_catalog` as a WHERE a.name = '{item_name}';"
             )
@@ -70,7 +70,7 @@ class CatalogDB(CatalogBase):
                     + "'knn': [{'field': 'embedding',"
                     + f"'vector': {query_embeddings},"
                     + "'k': 10"
-                    + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) ) AS a "
+                    + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) ORDER BY metadata.score DESC ) AS a "
                     + f"WHERE {annotation_condition} AND catalog_identifier='{snapshot_id}'"
                     + f"LIMIT {limit};"
                 )
@@ -83,7 +83,7 @@ class CatalogDB(CatalogBase):
                     + "'knn': [{'field': 'embedding',"
                     + f"'vector': {query_embeddings},"
                     + "'k': 10"
-                    + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) ) AS a "
+                    + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) ORDER BY metadata.score DESC ) AS a "
                     + f"WHERE {annotation_condition} "
                     + f"LIMIT {limit};"
                 )
@@ -98,9 +98,12 @@ class CatalogDB(CatalogBase):
 
         # If result set is empty
         if len(resp) == 0:
-            print("none")
             click.secho("No catalog items found with given conditions...", fg="yellow")
             return []
+
+        # ---------------------------------------------------------------------------------------- #
+        #                Format catalog items into SearchResults and child types                   #
+        # ---------------------------------------------------------------------------------------- #
 
         # List of catalog items from query
         catalog = []
@@ -109,7 +112,7 @@ class CatalogDB(CatalogBase):
         for row in resp:
             kind = row["record_kind"]
             descriptor = ""
-            if item_name is None:
+            if item_name == "":
                 deltas.append(row["metadata"]["score"])
             match kind:
                 case "semantic_search":
@@ -125,7 +128,7 @@ class CatalogDB(CatalogBase):
             catalog.append(RecordDescriptor.model_validate(descriptor))
 
         # Final set of results
-        if item_name is not None:
+        if item_name != "":
             return [SearchResult(entry=catalog[0], delta=1)]
 
         return [SearchResult(entry=catalog[i], delta=deltas[i]) for i in range(len(deltas))]
