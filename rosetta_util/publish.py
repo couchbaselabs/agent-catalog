@@ -1,5 +1,6 @@
 import json
 import logging
+import typing
 
 from couchbase.auth import PasswordAuthenticator
 from couchbase.cluster import Cluster
@@ -14,7 +15,7 @@ from rosetta_cmd.models.publish import CouchbaseConnect
 logger = logging.getLogger(__name__)
 
 
-def get_connection(conn: CouchbaseConnect):
+def get_connection(conn: CouchbaseConnect) -> typing.Tuple[str, Cluster]:
     cluster_url = conn.connection_url
     username = conn.username
     password = conn.password

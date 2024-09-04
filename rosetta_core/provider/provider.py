@@ -26,18 +26,20 @@ class BaseProvider(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get(self, name: str, annotations: str = None, limit: typing.Union[int | None] = 1):
+    def get(self, name: str, annotations: str = None):
         pass
 
 
 class PromptProvider(BaseProvider):
-    def search(self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1):
+    def search(self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1) -> list[str]:
         annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
         results = self.refiner(self.catalog.find(query=query, annotations=annotation_predicate, limit=limit))
         return [r.entry.prompt for r in results]
 
-    def get(self, name: str, annotations: str = None, limit: typing.Union[int | None] = 1):
-        raise NotImplementedError()
+    def get(self, name: str, annotations: str = None) -> str | None:
+        annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
+        results = self.catalog.find(name=name, annotations=annotation_predicate, limit=1)
+        return [r.entry.prompt for r in results][0] if len(results) != 0 else None
 
 
 class ToolProvider(BaseProvider):
@@ -95,5 +97,14 @@ class ToolProvider(BaseProvider):
         # Return the tools from the cache.
         return [self.decorator(self._tool_cache[x.entry]) for x in results]
 
-    def get(self, name: str, annotations: str = None, limit: typing.Union[int | None] = 1):
-        raise NotImplementedError()
+    def get(self, name: str, annotations: str = None) -> typing.Any | None:
+        annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
+        results = self.catalog.find(name=name, annotations=annotation_predicate, limit=1)
+
+        # Load all tools that we have not already cached.
+        non_cached_results = [f.entry for f in results if f.entry not in self._tool_cache]
+        for record_descriptor, tool in self._loader.load(non_cached_results):
+            self._tool_cache[record_descriptor] = tool
+
+        # Return the tools from the cache.
+        return [self.decorator(self._tool_cache[x.entry]) for x in results][0] if len(results) != 0 else None

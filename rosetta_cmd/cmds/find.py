@@ -1,9 +1,11 @@
 import click
+import couchbase.cluster
 import logging
 import os
 import pathlib
 import textwrap
 import tqdm
+import typing
 
 from ..defaults import DEFAULT_CATALOG_NAME
 from ..defaults import DEFAULT_MAX_ERRS
@@ -11,7 +13,6 @@ from ..defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from ..models import Context
 from .util import init_local
 from .util import load_repository
-from pydantic import ValidationError
 from rosetta_cmd.models.find import SearchOptions
 from rosetta_core.annotation import AnnotationPredicate
 from rosetta_core.catalog import CatalogDB
@@ -34,17 +35,16 @@ logger = logging.getLogger(__name__)
 # TODO (GLENN): Add support for name = ...
 def cmd_find(
     ctx: Context,
-    query,
-    bucket,
-    kind="tool",
-    limit=1,
-    include_dirty=True,
-    refiner=None,
-    annotations=None,
-    search_db: bool = False,
-    cluster=None,
+    query: str = None,
+    name: str = None,
+    bucket: str = None,
+    kind: typing.Literal["tool", "prompt"] = "tool",
+    limit: int = 1,
+    include_dirty: bool = True,
+    refiner: str = None,
+    annotations: str = None,
+    cluster: couchbase.cluster.Cluster = None,
     embedding_model: str = None,
-    item_name: str = None,
 ):
     # TODO: One day, also handle DBCatalogRef?
     # TODO: If DB is outdated and the local catalog has newer info,
@@ -53,15 +53,10 @@ def cmd_find(
     #       and/or --db-catalog-only, and/or both, via chaining multiple CatalogRef's?
     # TODO: Possible security issue -- need to check kind is an allowed value?
 
-    # Validate that only query or only item_name is specified
-    try:
-        search_opt = SearchOptions(query=query, item_name=item_name)
-    except ValidationError as e:
-        click.secho(f"Pydantic ERROR: {e}", fg="red")
-        return
-
+    # Validate that only query or only item_name is specified (error will be bubbled up).
+    search_opt = SearchOptions(query=query, item_name=name)
     query = search_opt.query
-    item_name = search_opt.item_name
+    name = search_opt.name
 
     if refiner == "None":
         refiner = None
@@ -71,24 +66,19 @@ def cmd_find(
         raise ValueError(f"ERROR: unknown refiner, valid refiners: {valid_refiners}")
 
     # DB level find
-    if search_db:
-        catalog = CatalogDB()
+    if bucket is not None and cluster is not None:
+        meta = init_local(ctx, embedding_model)
+        catalog = CatalogDB(cluster=cluster, bucket=bucket, kind=kind, meta=meta)
         click.secho("Searching db...")
 
-        meta = init_local(ctx, embedding_model)
         annotations_predicate = AnnotationPredicate(annotations) if annotations is not None else None
-
         search_results = [
             SearchResult(entry=x.entry, delta=x.delta)
             for x in catalog.find(
-                query,
+                query=query,
+                name=name,
                 limit=limit,
                 annotations=annotations_predicate,
-                bucket=bucket,
-                kind=kind,
-                cluster=cluster,
-                meta=meta,
-                item_name=item_name,
             )
         ]
     # Local catalog find
@@ -127,7 +117,7 @@ def cmd_find(
         annotations_predicate = AnnotationPredicate(annotations) if annotations is not None else None
         search_results = [
             SearchResult(entry=x.entry, delta=x.delta)
-            for x in catalog.find(query, limit=limit, annotations=annotations_predicate, item_name=item_name)
+            for x in catalog.find(query, limit=limit, annotations=annotations_predicate, name=name)
         ]
 
     if refiner is not None:

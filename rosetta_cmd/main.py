@@ -111,18 +111,19 @@ def env(ctx):
 @click.option(
     "--query",
     default="",
-    help="User query describing the task for which tools are needed. Add this or provide --item-name.",
+    help="User query describing the task for which tools / prompts are needed. This field or --name must be specified.",
     show_default=True,
 )
 @click.option(
-    "--item-name",
+    "--name",
     default="",
-    help="Name of catalog item to retrieve from the catalog directly.",
+    help="Name of catalog item to retrieve from the catalog directly. This field or --query must be specified.",
     show_default=True,
 )
 @click.option(
     "--kind",
     default="tool",
+    type=click.Choice(["tool", "prompt"], case_sensitive=False),
     help="The kind of catalog to search.",
     show_default=True,
 )
@@ -158,7 +159,7 @@ def env(ctx):
     "--search-db",
     default=False,
     is_flag=True,
-    help="Enable this flag to perform DB level search",
+    help="Enable this flag to perform DB level search.",
     show_default=True,
 )
 @click.option(
@@ -169,7 +170,7 @@ def env(ctx):
     show_default=True,
 )
 @click.pass_context
-def find(ctx, query, kind, limit, include_dirty, refiner, annotations, search_db, embedding_model, item_name):
+def find(ctx, query, name, kind, limit, include_dirty, refiner, annotations, search_db, embedding_model):
     """Find tools, prompts, etc. from the catalog based on a natural language QUERY string."""
 
     if search_db:
@@ -194,34 +195,29 @@ def find(ctx, query, kind, limit, include_dirty, refiner, annotations, search_db
 
         cmd_find(
             ctx.obj,
-            query,
+            query=query,
+            name=name,
             kind=kind,
             limit=limit,
             include_dirty=include_dirty,
             refiner=refiner,
             annotations=annotations,
-            search_db=search_db,
             bucket=selected_bucket,
             cluster=cluster,
             embedding_model=embedding_model,
-            item_name=item_name,
         )
-
         cluster.close()
     else:
         cmd_find(
             ctx.obj,
-            query,
+            query=query,
+            name=name,
             kind=kind,
             limit=limit,
             include_dirty=include_dirty,
             refiner=refiner,
             annotations=annotations,
-            search_db=search_db,
-            bucket="",
-            cluster=None,
             embedding_model=embedding_model,
-            item_name=item_name,
         )
 
 
@@ -230,6 +226,7 @@ def find(ctx, query, kind, limit, include_dirty, refiner, annotations, search_db
 @click.option(
     "--kind",
     default="tool",
+    type=click.Choice(["tool", "prompt"], case_sensitive=False),
     help="The kind of items to index into the local catalog.",
     show_default=True,
 )
@@ -280,6 +277,7 @@ def index(ctx, source_dirs, kind, embedding_model, include_dirty, dry_run):
 @click.option(
     "--kind",
     default="all",
+    type=click.Choice(["tool", "prompt", "all"], case_sensitive=False),
     help="The kind of catalog to insert into DB.",
     show_default=True,
 )
@@ -331,6 +329,7 @@ def publish(ctx, kind, annotations):
 @click.option(
     "--kind",
     default="tool",
+    type=click.Choice(["tool", "prompt"], case_sensitive=False),
     help="The kind of catalog to show status.",
     show_default=True,
 )

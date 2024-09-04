@@ -59,16 +59,16 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
 
     def find(
         self,
-        query: str,
+        query: str = None,
+        name: str = None,
         limit: typing.Union[int | None] = 1,
         annotations: AnnotationPredicate = None,
-        item_name: str = "",
     ) -> list[SearchResult]:
         """Returns the catalog items that best match a query."""
 
         # Return the exact tool instead of doing vector search in case item_name is provided
-        if item_name != "":
-            catalog = [x for x in self.catalog_descriptor.items if x.name == item_name]
+        if name is not None:
+            catalog = [x for x in self.catalog_descriptor.items if x.name == name]
             if len(catalog) != 0:
                 return [SearchResult(entry=catalog[0], delta=1)]
             else:
