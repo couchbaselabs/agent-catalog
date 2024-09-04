@@ -112,13 +112,13 @@ def env(ctx):
     "--query",
     default="",
     help="User query describing the task for which tools / prompts are needed. This field or --name must be specified.",
-    show_default=True,
+    show_default=False,
 )
 @click.option(
     "--name",
     default="",
     help="Name of catalog item to retrieve from the catalog directly. This field or --query must be specified.",
-    show_default=True,
+    show_default=False,
 )
 @click.option(
     "--kind",
@@ -126,6 +126,13 @@ def env(ctx):
     type=click.Choice(["tool", "prompt"], case_sensitive=False),
     help="The kind of catalog to search.",
     show_default=True,
+)
+@click.option(
+    "--bucket",
+    default="",
+    type=str,
+    help="The name of the Couchbase bucket to search.",
+    show_default=False,
 )
 @click.option(
     "--limit",
@@ -170,7 +177,7 @@ def env(ctx):
     show_default=True,
 )
 @click.pass_context
-def find(ctx, query, name, kind, limit, include_dirty, refiner, annotations, search_db, embedding_model):
+def find(ctx, query, name, kind, bucket, limit, include_dirty, refiner, annotations, search_db, embedding_model):
     """Find tools, prompts, etc. from the catalog based on a natural language QUERY string."""
 
     if search_db:
@@ -190,8 +197,11 @@ def find(ctx, query, name, kind, limit, include_dirty, refiner, annotations, sea
         # Get buckets from CB Cluster
         buckets = get_buckets(cluster=cluster)
 
-        # Prompt user to select a bucket
-        selected_bucket = click.prompt("Please select a bucket", type=click.Choice(buckets), show_choices=True)
+        if bucket is None:
+            # Prompt user to select a bucket
+            bucket = click.prompt("Please select a bucket", type=click.Choice(buckets), show_choices=True)
+        elif bucket not in buckets:
+            raise ValueError("Bucket does not exist! The buckets available are: " + ",".join(buckets))
 
         cmd_find(
             ctx.obj,
@@ -202,7 +212,7 @@ def find(ctx, query, name, kind, limit, include_dirty, refiner, annotations, sea
             include_dirty=include_dirty,
             refiner=refiner,
             annotations=annotations,
-            bucket=selected_bucket,
+            bucket=bucket,
             cluster=cluster,
             embedding_model=embedding_model,
         )
@@ -282,6 +292,13 @@ def index(ctx, source_dirs, kind, embedding_model, include_dirty, dry_run):
     show_default=True,
 )
 @click.option(
+    "--bucket",
+    default="",
+    type=str,
+    help="The name of the Couchbase bucket to publish to.",
+    show_default=False,
+)
+@click.option(
     "-an",
     "--annotations",
     multiple=True,
@@ -291,7 +308,7 @@ def index(ctx, source_dirs, kind, embedding_model, include_dirty, dry_run):
     show_default=True,
 )
 @click.pass_context
-def publish(ctx, kind, annotations):
+def publish(ctx, kind, bucket, annotations):
     """Publish the local catalog to Couchbase DB"""
 
     # Get keyspace and connection details
@@ -312,16 +329,15 @@ def publish(ctx, kind, annotations):
 
     # Get buckets from CB Cluster
     buckets = get_buckets(cluster=cluster)
+    if bucket is None:
+        # Prompt user to select a bucket
+        bucket = click.prompt("Please select a bucket", type=click.Choice(buckets), show_choices=True)
+    elif bucket not in buckets:
+        raise ValueError("Bucket does not exist! The buckets available are: " + ",".join(buckets))
 
-    # TODO (GLENN): Have an option to bypass the prompt by allowing a user to directly specify a bucket
-    # Prompt user to select a bucket
-    selected_bucket = click.prompt("Please select a bucket", type=click.Choice(buckets), show_choices=True)
-    click.echo(f"Inserting documents in : {selected_bucket}/{keyspace_details.scope}\n")
-    keyspace_details.bucket = selected_bucket
-
-    printer = click.echo
-    cmd_publish(ctx.obj, kind, annotations, cluster, keyspace_details, printer, connection_details_env)
-
+    click.echo(f"Inserting documents in : {bucket}/{keyspace_details.scope}\n")
+    keyspace_details.bucket = bucket
+    cmd_publish(ctx.obj, kind, annotations, cluster, keyspace_details, click.echo, connection_details_env)
     cluster.close()
 
 
