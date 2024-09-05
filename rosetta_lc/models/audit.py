@@ -41,7 +41,7 @@ def _determine_role_from_type(message: BaseMessage) -> rosetta.auditor.Role:
             return rosetta.auditor.Role.System
 
 
-def audit(chat_model: BaseChatModel, auditor: rosetta.Auditor = None) -> BaseChatModel:
+def audit(chat_model: BaseChatModel, session: typing.AnyStr, auditor: rosetta.Auditor = None) -> BaseChatModel:
     """A method to (dynamically) dispatch the '_generate' & '_stream' methods to methods that log LLM calls."""
     if auditor is None:
         # TODO (GLENN): Pull the LLM name from somewhere else (e.g., we aren't capturing gpt-4o).
@@ -59,11 +59,11 @@ def audit(chat_model: BaseChatModel, auditor: rosetta.Auditor = None) -> BaseCha
         **kwargs: typing.Any,
     ) -> ChatResult:
         for message in messages:
-            auditor.accept(_determine_role_from_type(message), message.content)
+            auditor.accept(_determine_role_from_type(message), message.content, session)
         results = generate_dispatch(messages, stop, run_manager, **kwargs)
         for result in results.generations:
             logger.debug(f"LLM has returned the message: {result}")
-            auditor.accept(rosetta.auditor.Role.Assistant, result.message.content)
+            auditor.accept(rosetta.auditor.Role.Assistant, result.message.content, session)
         return results
 
     def _stream(
@@ -74,7 +74,7 @@ def audit(chat_model: BaseChatModel, auditor: rosetta.Auditor = None) -> BaseCha
         **kwargs: typing.Any,
     ) -> typing.Iterator[ChatGenerationChunk]:
         for message in messages:
-            auditor.accept(_determine_role_from_type(message), message.content)
+            auditor.accept(_determine_role_from_type(message), message.content, session)
         iterator = stream_dispatch(messages, stop, run_manager, **kwargs)
 
         # For sanity at analytics-time, we'll aggregate the chunks here.
@@ -85,7 +85,7 @@ def audit(chat_model: BaseChatModel, auditor: rosetta.Auditor = None) -> BaseCha
             yield chunk
 
         # We have exhausted our iterator. Log the resultant chunk.
-        auditor.accept(rosetta.auditor.Role.Assistant, result_text)
+        auditor.accept(rosetta.auditor.Role.Assistant, result_text, session)
 
     # Note: Pydantic fiddles around with __setattr__, so we need to skirt around this.
     object.__setattr__(chat_model, "_generate", _generate.__get__(chat_model, BaseChatModel))
