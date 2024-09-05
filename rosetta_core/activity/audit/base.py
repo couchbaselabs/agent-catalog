@@ -15,7 +15,14 @@ class BaseAuditor(abc.ABC):
         self.catalog_version = catalog_version
         self.model = model
 
-    def accept(self, role: Role, content: typing.AnyStr, timestamp: datetime.datetime = None, model: str = None):
+    def accept(
+        self,
+        role: Role,
+        content: typing.AnyStr,
+        session: typing.AnyStr,
+        timestamp: datetime.datetime = None,
+        model: str = None,
+    ):
         if self.model is None and model is None:
             raise ValueError('"model" must be specified either in accept() or on instantiation!')
 
@@ -25,6 +32,7 @@ class BaseAuditor(abc.ABC):
 
         message = Message(
             timestamp=timestamp.isoformat(),
+            session=session,
             role=role,
             content=content,
             model=model or self.model,

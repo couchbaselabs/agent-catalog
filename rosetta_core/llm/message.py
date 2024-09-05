@@ -1,6 +1,7 @@
 import enum
 import pydantic
 import typing
+import uuid
 
 from ..version import VersionDescriptor
 
@@ -19,6 +20,11 @@ class Message(pydantic.BaseModel):
     timestamp: pydantic.AwareDatetime = pydantic.Field(
         description="Timestamp of the generated message. This field must have a timezone attached as well.",
         examples=["2024-08-26T12:02:59.500Z", "2024-08-26T12:02:59.500+00:00"],
+    )
+
+    session: typing.AnyStr = pydantic.Field(
+        default_factory=lambda: uuid.uuid4().hex,
+        description="The thread / session / conversation this message belongs to.",
     )
 
     role: Role = pydantic.Field(
