@@ -10,7 +10,10 @@ if importlib.util.find_spec("rosetta_lc") is not None:
 
     class AuditType(typing.Protocol):
         def __call__(
-            self, chat_model: langchain_core.language_models.chat_models.BaseChatModel, auditor: rosetta.auditor = None
+            self,
+            chat_model: langchain_core.language_models.chat_models.BaseChatModel,
+            session: typing.AnyStr,
+            auditor: rosetta.auditor = None,
         ) -> langchain_core.language_models.chat_models.BaseChatModel: ...
 
     # TODO (GLENN): Is there a less messy way to do this that doesn't erase symbols? (to keep IDEs happy)
