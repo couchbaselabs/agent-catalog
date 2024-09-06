@@ -37,6 +37,7 @@ def test_raw_prompt():
     assert len(positive_1_prompts[0].tools) == 2
     assert positive_1_prompts[0].tools[0].name == "find_direct_routes"
     assert positive_1_prompts[0].tools[0].annotations == 'gdpr_2016_compliant = "true"'
+    assert positive_1_prompts[0].tools[0].limit == 1
     assert positive_1_prompts[0].tools[1].query == "finding routes"
     assert positive_1_prompts[0].tools[1].limit == 2
 

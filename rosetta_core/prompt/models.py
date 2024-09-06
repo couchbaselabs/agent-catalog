@@ -18,7 +18,7 @@ class ToolSearchMetadata(pydantic.BaseModel):
     name: typing.Optional[str] = None
     query: typing.Optional[str] = None
     annotations: typing.Optional[str] = None
-    limit: typing.Optional[int] = pydantic.Field(default=None, gt=-1)
+    limit: typing.Optional[int] = pydantic.Field(default=1, gt=-1)
 
     @pydantic.field_validator("annotations")
     @classmethod
