@@ -6,7 +6,7 @@
 record_kind: raw_prompt
 
 # The name of the prompt must be a valid Python identifier (e.g., no spaces).
-# This field is mandatory.
+# This field is mandatory, and will be used when searching for prompts by name.
 name: route_finding_prompt
 
 # A description of the prompt's purpose (e.g., where this prompt will be used).
@@ -19,6 +19,22 @@ description: >
 # This field is optional, and does not have to be present.
 annotations:
   organization: "sequoia"
+
+# A prompt is _generally_ (more often than not) associated with a small collection of tools.
+# This field is used at provider time to search the catalog for tools.
+# This field is optional, and does not have to be present.
+tools:
+  # Tools can be specified using the same parameters found in Provider.get_tools_for.
+  # For instance, we can condition on the tool name...
+  - name: "find_indirect_routes"
+
+  # ...the tool name and some annotations...
+  - name: "find_direct_routes"
+    annotations: gdpr_2016_compliant = "true"
+
+  # ...or even a semantic search via the tool description.
+  - query: "finding flights by name"
+    limit: 2
 
 # Below the '---' represents the prompt in its entirety.
 ---
