@@ -1338,13 +1338,13 @@ openapi-schema-validator = ">=0.6.0,<0.7.0"
 
 [[package]]
 name = "openapi3-parser"
-version = "1.1.17"
+version = "1.1.18"
 description = "OpenAPI v3 parser"
 optional = false
 python-versions = "*"
 files = [
-    {file = "openapi3-parser-1.1.17.tar.gz", hash = "sha256:0132bdc239dcf92ebe6dc797b2b614fcc2d40d1f4a9ebf246b58933694a7264b"},
-    {file = "openapi3_parser-1.1.17-py3-none-any.whl", hash = "sha256:3863b3111e640354860227829a49449935ed7747617b48c1d1d44a27d6971b7f"},
+    {file = "openapi3_parser-1.1.18-py3-none-any.whl", hash = "sha256:c5ff90273718aef356f126b039912259b01b8dad6a6c8e82e929fc7a4600cba9"},
+    {file = "openapi3_parser-1.1.18.tar.gz", hash = "sha256:ff905e33fabe46f29d9192c4c7c954979e524b970d467963c32361e43f978595"},
 ]
 
 [package.dependencies]

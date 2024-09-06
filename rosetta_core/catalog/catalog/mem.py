@@ -66,7 +66,7 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
     ) -> list[SearchResult]:
         """Returns the catalog items that best match a query."""
 
-        # Return the exact tool instead of doing vector search in case item_name is provided
+        # Return the exact tool instead of doing vector search in case name is provided
         if name is not None:
             catalog = [x for x in self.catalog_descriptor.items if x.name == name]
             if len(catalog) != 0:

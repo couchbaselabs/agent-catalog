@@ -40,6 +40,7 @@ def cmd_publish(
     cb = cluster.bucket(bucket)
 
     for kind in kind_list:
+        # TODO (GLENN): There should be a check here to make sure we don't publish a dirty catalog.
         catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)
         catalog = CatalogMem.load(catalog_path).catalog_descriptor
         embedding_model = catalog.embedding_model.replace("/", "_")

@@ -53,8 +53,9 @@ def cmd_find(
     #       and/or --db-catalog-only, and/or both, via chaining multiple CatalogRef's?
     # TODO: Possible security issue -- need to check kind is an allowed value?
 
-    # Validate that only query or only item_name is specified (error will be bubbled up).
-    search_opt = SearchOptions(query=query, item_name=name)
+    # TODO (GLENN): We should probably push this into core/catalog .
+    # Validate that only query or only name is specified (error will be bubbled up).
+    search_opt = SearchOptions(query=query, name=name)
     query = search_opt.query
     name = search_opt.name
 

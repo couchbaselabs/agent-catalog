@@ -6,6 +6,7 @@ import re
 import typing
 import yaml
 
+from ..annotation.annotation import AnnotationPredicate
 from ..record.descriptor import RecordDescriptor
 from ..record.descriptor import RecordKind
 from ..version import VersionDescriptor
@@ -13,14 +14,37 @@ from ..version import VersionDescriptor
 logger = logging.getLogger(__name__)
 
 
+class ToolSearchMetadata(pydantic.BaseModel):
+    name: typing.Optional[str] = None
+    query: typing.Optional[str] = None
+    annotations: typing.Optional[str] = None
+    limit: typing.Optional[int] = pydantic.Field(default=None, gt=-1)
+
+    @pydantic.field_validator("annotations")
+    @classmethod
+    def annotations_must_be_valid_string(cls, v: str):
+        # We raise an error on instantiation here if v is not valid.
+        AnnotationPredicate(v)
+        return v
+
+    # TODO (GLENN): There is similar validation being done in rosetta_cmd/find... converge these?
+    @pydantic.model_validator(mode="after")
+    def name_or_query_must_be_specified(self):
+        if self.name is None and self.query is None:
+            raise ValueError("Either name or query must be specified!")
+        elif self.name is not None and self.query is not None:
+            raise ValueError("Both name and query cannot be specified!")
+        return self
+
+
 class RawPromptDescriptor(RecordDescriptor):
     record_kind: typing.Literal[RecordKind.RawPrompt]
     prompt: str
+    tools: typing.Optional[list[ToolSearchMetadata] | None] = None
 
 
-class JinjaPromptDescriptor(RecordDescriptor):
+class JinjaPromptDescriptor(RawPromptDescriptor):
     record_kind: typing.Literal[RecordKind.JinjaPrompt]
-    prompt: str
 
     @pydantic.field_validator("prompt")
     @classmethod
@@ -29,14 +53,14 @@ class JinjaPromptDescriptor(RecordDescriptor):
         jinja2.Template(source=v)
 
 
-class PromptMetadata(pydantic.BaseModel):
-    name: str
-    description: str
-    record_kind: typing.Literal[RecordKind.RawPrompt] | typing.Literal[RecordKind.JinjaPrompt]
-    annotations: typing.Optional[dict[str, str] | None] = None
-
-
 class PromptDescriptorFactory:
+    class PromptMetadata(pydantic.BaseModel):
+        name: str
+        description: str
+        record_kind: typing.Literal[RecordKind.RawPrompt, RecordKind.JinjaPrompt]
+        annotations: typing.Optional[dict[str, str] | None] = None
+        tools: typing.Optional[list[ToolSearchMetadata] | None] = None
+
     def __init__(self, filename: pathlib.Path, version: VersionDescriptor):
         """
         :param filename: Name of the file to load the record descriptor from.
@@ -55,11 +79,12 @@ class PromptDescriptorFactory:
             front_matter = yaml.safe_load(matches[0][0])
             prompt_text = matches[0][1]
 
-        metadata = PromptMetadata.model_validate(front_matter)
+        metadata = PromptDescriptorFactory.PromptMetadata.model_validate(front_matter)
         descriptor_args = {
             "name": metadata.name,
             "description": metadata.description,
             "record_kind": metadata.record_kind,
+            "tools": metadata.tools,
             "prompt": prompt_text,
             "source": self.filename,
             "version": self.version,
