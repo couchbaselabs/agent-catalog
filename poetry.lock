@@ -1359,13 +1359,13 @@ langchain-core = ">=0.2.38,<0.3.0"
 
 [[package]]
 name = "langsmith"
-version = "0.1.114"
+version = "0.1.116"
 description = "Client library to connect to the LangSmith LLM Tracing and Evaluation Platform."
 optional = true
 python-versions = "<4.0,>=3.8.1"
 files = [
-    {file = "langsmith-0.1.114-py3-none-any.whl", hash = "sha256:2b6b6b49ddb1cea75f465da107ddc21e60d3c7242813dcc0de90f914e4957249"},
-    {file = "langsmith-0.1.114.tar.gz", hash = "sha256:1683e1505d034d1bf7c960067c1357fd0d294172dd20540f913093e4b86857a2"},
+    {file = "langsmith-0.1.116-py3-none-any.whl", hash = "sha256:4b5ea64c81ba5ca309695c85dc3fb4617429a985129ed5d9eca00d1c9d6483f4"},
+    {file = "langsmith-0.1.116.tar.gz", hash = "sha256:5ccd7f5c1840f7c507ab3ee56334a1391de28c8bf72669782e2d82cafeefffa7"},
 ]
 
 [package.dependencies]
@@ -1874,13 +1874,13 @@ files = [
 
 [[package]]
 name = "openai"
-version = "1.43.0"
+version = "1.44.0"
 description = "The official Python library for the openai API"
 optional = true
 python-versions = ">=3.7.1"
 files = [
-    {file = "openai-1.43.0-py3-none-any.whl", hash = "sha256:1a748c2728edd3a738a72a0212ba866f4fdbe39c9ae03813508b267d45104abe"},
-    {file = "openai-1.43.0.tar.gz", hash = "sha256:e607aff9fc3e28eade107e5edd8ca95a910a4b12589336d3cbb6bfe2ac306b3c"},
+    {file = "openai-1.44.0-py3-none-any.whl", hash = "sha256:99a12bbda15f9c632ee911851e101669a82ee34992fbfd658a9db27d90dc0a9c"},
+    {file = "openai-1.44.0.tar.gz", hash = "sha256:acde74598976ec85bc477e9abb94eeb17f6efd998914d5685eeb46a69116894a"},
 ]
 
 [package.dependencies]
@@ -1931,13 +1931,13 @@ openapi-schema-validator = ">=0.6.0,<0.7.0"
 
 [[package]]
 name = "openapi3-parser"
-version = "1.1.17"
+version = "1.1.18"
 description = "OpenAPI v3 parser"
 optional = false
 python-versions = "*"
 files = [
-    {file = "openapi3-parser-1.1.17.tar.gz", hash = "sha256:0132bdc239dcf92ebe6dc797b2b614fcc2d40d1f4a9ebf246b58933694a7264b"},
-    {file = "openapi3_parser-1.1.17-py3-none-any.whl", hash = "sha256:3863b3111e640354860227829a49449935ed7747617b48c1d1d44a27d6971b7f"},
+    {file = "openapi3_parser-1.1.18-py3-none-any.whl", hash = "sha256:c5ff90273718aef356f126b039912259b01b8dad6a6c8e82e929fc7a4600cba9"},
+    {file = "openapi3_parser-1.1.18.tar.gz", hash = "sha256:ff905e33fabe46f29d9192c4c7c954979e524b970d467963c32361e43f978595"},
 ]
 
 [package.dependencies]
@@ -2652,7 +2652,7 @@ tqdm = "^4.66.5"
 type = "git"
 url = "git@github.com:couchbaselabs/rosetta-core.git"
 reference = "HEAD"
-resolved_reference = "82b993f9e4028ffdf0d4ca4c52fde6e0c813399f"
+resolved_reference = "95af8cbb1db117d8f465be74bbbacdcbb6044f0f"
 
 [[package]]
 name = "rosetta-lc"

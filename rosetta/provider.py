@@ -13,7 +13,11 @@ logger = logging.getLogger(__name__)
 # To support custom refiners, we must export this model.
 SearchResult = rosetta_core.catalog.SearchResult
 
+# To support returning prompts with defined tools, we export this model.
+Prompt = rosetta_core.provider.PromptProvider.PromptResult
 
+
+# TODO (GLENN): We should be able to set the parameters below with ROSETTA_* but this has not been tested yet.
 class Provider(pydantic_settings.BaseSettings):
     """A provider of Rosetta indexed "agent building blocks" (e.g., tools)."""
 
@@ -203,6 +207,7 @@ class Provider(pydantic_settings.BaseSettings):
             secrets=self.secrets,
         )
         self._prompt_provider = rosetta_core.provider.PromptProvider(
+            tool_provider=self._tool_provider,
             catalog=self._prompt_catalog,
             refiner=self.refiner,
         )
@@ -219,7 +224,7 @@ class Provider(pydantic_settings.BaseSettings):
         """
         :param query: A query string (natural language) to search the catalog with.
         :param name: The specific name of the catalog entry to search for.
-        :param annotations: An annotation query string in the form of KEY=VALUE (AND|OR KEY=VALUE)*.
+        :param annotations: An annotation query string in the form of KEY="VALUE" (AND|OR KEY="VALUE")*.
         :param limit: The maximum number of results to return.
         :return: A list of tools (Python functions).
         """
@@ -228,12 +233,12 @@ class Provider(pydantic_settings.BaseSettings):
         else:
             return self._tool_provider.get(name=name, annotations=annotations, limit=limit)
 
-    def get_prompt_for(self, query: str = None, name: str = None, annotations: str = None) -> str | None:
+    def get_prompt_for(self, query: str = None, name: str = None, annotations: str = None) -> Prompt | None:
         """
         :param query: A query string (natural language) to search the catalog with.
         :param name: The specific name of the catalog entry to search for.
-        :param annotations: An annotation query string in the form of KEY=VALUE (AND|OR KEY=VALUE)*.
-        :return: A single prompt.
+        :param annotations: An annotation query string in the form of KEY="VALUE" (AND|OR KEY="VALUE")*.
+        :return: A single prompt as well any tools attached to the prompt.
         """
         if query is not None:
             results = self._prompt_provider.search(query=query, annotations=annotations, limit=1)
