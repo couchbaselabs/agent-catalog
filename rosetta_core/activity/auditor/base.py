@@ -10,6 +10,18 @@ from ...version import VersionDescriptor
 logger = logging.getLogger(__name__)
 
 
+# We have this signature / prototype so the rosetta repo can mock a BaseAuditor instance w/o implementing _accept.
+class AuditorType(typing.Protocol):
+    def accept(
+        self,
+        role: Role,
+        content: typing.AnyStr,
+        session: typing.AnyStr,
+        timestamp: datetime.datetime = None,
+        model: str = None,
+    ) -> None: ...
+
+
 class BaseAuditor(abc.ABC):
     def __init__(self, catalog_version: VersionDescriptor, model: str):
         self.catalog_version = catalog_version
