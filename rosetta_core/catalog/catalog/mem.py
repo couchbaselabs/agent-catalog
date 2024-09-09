@@ -17,7 +17,7 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
     """Represents an in-memory catalog."""
 
     catalog_descriptor: CatalogDescriptor
-    embedding_model: str = None
+    embedding_model: typing.Optional[str] = None
 
     def init_from(self, other: "CatalogMem") -> list[RecordDescriptor]:
         """Initialize the items in self by copying over attributes from
@@ -73,7 +73,7 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
             if len(catalog) != 0:
                 return [SearchResult(entry=catalog[0], delta=1)]
             else:
-                click.secho("No catalog items found with given conditions...", fg="yellow")
+                click.secho(f"No catalog items found with name '{name}'", fg="yellow")
                 return []
 
         import sentence_transformers
