@@ -1,5 +1,5 @@
-from .audit.base import BaseAuditor
-from .audit.db import DBAuditor
-from .audit.local import LocalAuditor
+from .auditor.base import BaseAuditor
+from .auditor.db import DBAuditor
+from .auditor.local import LocalAuditor
 
 __all__ = ["LocalAuditor", "DBAuditor", "BaseAuditor"]
