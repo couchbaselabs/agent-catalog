@@ -1,5 +1,5 @@
 import logging
-import rosetta_core
+import rosetta_core.activity.auditor.base
 import rosetta_core.llm
 import typing
 
@@ -43,7 +43,7 @@ def _determine_role_from_type(message: BaseMessage) -> rosetta_core.llm.Role:
 
 
 def audit(
-    chat_model: BaseChatModel, session: typing.AnyStr, auditor: rosetta_core.auditor.BaseAuditor
+    chat_model: BaseChatModel, session: typing.AnyStr, auditor: rosetta_core.activity.auditor.base.AuditorType
 ) -> BaseChatModel:
     """A method to (dynamically) dispatch the '_generate' & '_stream' methods to methods that log LLM calls."""
     # TODO (GLENN): We should capture the _agenerate and _astream methods as well.

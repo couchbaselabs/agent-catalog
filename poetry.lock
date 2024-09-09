@@ -2632,7 +2632,7 @@ tqdm = "^4.66.5"
 type = "git"
 url = "git@github.com:couchbaselabs/rosetta-core.git"
 reference = "HEAD"
-resolved_reference = "dd64a06ff4cd2abb8be6cc743aa756f53ae7c55a"
+resolved_reference = "9ae92a3ba3b751b5f974be9f7c35a68989545fbe"
 
 [[package]]
 name = "rpds-py"
