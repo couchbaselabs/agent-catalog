@@ -88,16 +88,6 @@ class ToolProvider(BaseProvider):
         :param decorator: Function to apply to each search result.
         :param refiner: Refiner (reranker / post processor) to use when retrieving tools.
         :param secrets: Map of identifiers to secret values.
-
-        Below, we give an example of how this class is used.
-        >>> import rosetta_core.provider as rp
-        >>> import rosetta_core.catalog as rcm
-        >>> import os, pathlib
-        >>> my_catalog = rcm.CatalogMem.load(pathlib.Path('.rosetta-catalog') / 'tool-catalog.json')
-        >>> my_provider = rp.ToolProvider(
-        >>>     catalog=my_catalog,
-        >>>     secrets={'CB_PASSWORD': os.getenv('MY_CB_PASSWORD')}
-        >>> )
         """
         super(ToolProvider, self).__init__(catalog=catalog, refiner=refiner)
         self._tool_cache = dict()

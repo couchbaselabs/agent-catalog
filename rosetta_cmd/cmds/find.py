@@ -67,9 +67,9 @@ def cmd_find(
         raise ValueError(f"ERROR: unknown refiner, valid refiners: {valid_refiners}")
 
     # DB level find
+    meta = init_local(ctx, embedding_model, read_only=True)
     if bucket is not None and cluster is not None:
-        meta = init_local(ctx, embedding_model)
-        catalog = CatalogDB(cluster=cluster, bucket=bucket, kind=kind, meta=meta)
+        catalog = CatalogDB(cluster=cluster, bucket=bucket, kind=kind, embedding_model=meta["embedding_model"])
         click.secho("Searching db...")
 
         annotations_predicate = AnnotationPredicate(annotations) if annotations is not None else None
@@ -85,14 +85,11 @@ def cmd_find(
     # Local catalog find
     else:
         catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)
-
-        catalog = CatalogMem().load(catalog_path)
+        catalog = CatalogMem.load(catalog_path, embedding_model=meta["embedding_model"])
 
         if include_dirty:
             repo, get_path_version = load_repository(pathlib.Path(os.getcwd()))
             if repo and repo.is_dirty():
-                meta = init_local(ctx, catalog.catalog_descriptor.embedding_model, read_only=True)
-
                 # The repo and any dirty files do not have real commit id's, so use "DIRTY".
                 version = VersionDescriptor(is_dirty=True)
 

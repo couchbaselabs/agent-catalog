@@ -16,7 +16,8 @@ logger = logging.getLogger(__name__)
 class CatalogMem(pydantic.BaseModel, CatalogBase):
     """Represents an in-memory catalog."""
 
-    catalog_descriptor: CatalogDescriptor = None
+    catalog_descriptor: CatalogDescriptor
+    embedding_model: str = None
 
     def init_from(self, other: "CatalogMem") -> list[RecordDescriptor]:
         """Initialize the items in self by copying over attributes from
@@ -44,11 +45,11 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
         return uninitialized_items
 
     @staticmethod
-    def load(catalog_path: pathlib.Path):
+    def load(catalog_path: pathlib.Path, embedding_model: str = None):
         """Load from a catalog_path JSON file."""
         with catalog_path.open("r") as fp:
             catalog_descriptor = CatalogDescriptor.model_validate_json(fp.read())
-        return CatalogMem(catalog_descriptor=catalog_descriptor)
+        return CatalogMem(catalog_descriptor=catalog_descriptor, embedding_model=embedding_model)
 
     def dump(self, catalog_path: pathlib.Path):
         """Save to a catalog_path JSON file."""
@@ -78,6 +79,9 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
         import sentence_transformers
         import sklearn
 
+        if self.embedding_model is None:
+            raise RuntimeError("Embedding model not set!")
+
         # If annotations have been specified, prune all tools that do not possess these annotations.
         candidate_tools = [x for x in self.catalog_descriptor.items]
         if annotations is not None:
@@ -104,9 +108,8 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
             return list()
 
         # Compute the distance of each tool in the catalog to the query.
-        embedding_model = self.catalog_descriptor.embedding_model
         embedding_model_obj = sentence_transformers.SentenceTransformer(
-            embedding_model, tokenizer_kwargs={"clean_up_tokenization_spaces": True}
+            self.embedding_model, tokenizer_kwargs={"clean_up_tokenization_spaces": True}
         )
         query_embedding = embedding_model_obj.encode(query)
         deltas = sklearn.metrics.pairwise.cosine_similarity(

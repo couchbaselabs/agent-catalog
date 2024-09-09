@@ -26,7 +26,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
     cluster: couchbase.cluster.Cluster
     bucket: str
     kind: typing.Literal["tool", "prompt"]
-    meta: dict
+    embedding_model: str
 
     # TODO (GLENN): Might need to add this to mem as well.
     snapshot_id: typing.Union[str | None] = "all"
@@ -40,10 +40,12 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
     ) -> list[SearchResult]:
         """Returns the catalog items that best match a query."""
 
-        scope_name = DEFAULT_SCOPE_PREFIX + self.meta["embedding_model"].replace("/", "_")
+        scope_name = DEFAULT_SCOPE_PREFIX + self.embedding_model.replace("/", "_")
 
         # Catalog item has to be queried directly
         if name != "":
+            # TODO (GLENN): Need to add some validation around bucket (to prevent injection)
+            # TODO (GLENN): Need to add some validation around name (to prevent injection)
             item_query = (
                 f"SELECT a.* from `{self.bucket}`.`{scope_name}`.`{self.kind}_catalog` as a WHERE a.name = '{name}';"
             )
@@ -57,7 +59,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             import sentence_transformers
 
             embedding_model_obj = sentence_transformers.SentenceTransformer(
-                self.meta["embedding_model"], tokenizer_kwargs={"clean_up_tokenization_spaces": True}
+                self.embedding_model, tokenizer_kwargs={"clean_up_tokenization_spaces": True}
             )
             query_embeddings = embedding_model_obj.encode(query).tolist()
 
