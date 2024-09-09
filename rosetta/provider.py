@@ -1,3 +1,6 @@
+import couchbase.auth
+import couchbase.cluster
+import couchbase.options
 import logging
 import pathlib
 import pydantic
@@ -111,6 +114,12 @@ class Provider(pydantic_settings.BaseSettings):
     ```
     """
 
+    embedding_model: typing.Optional[typing.AnyStr] = pydantic.Field(default="sentence-transformers/all-MiniLM-L12-v2")
+    """ The embedding model used when performing a semantic search for tools / prompts.
+
+    Currently, only models that can specified with sentence-transformers through its string constructor are supported.
+    """
+
     _local_tool_catalog: rosetta_core.catalog.CatalogMem = None
     _remote_tool_catalog: rosetta_core.catalog.CatalogDB = None
     _tool_catalog: rosetta_core.catalog.CatalogBase = None
@@ -142,8 +151,8 @@ class Provider(pydantic_settings.BaseSettings):
         prompt_catalog_path = self.catalog / rosetta_cmd.defaults.DEFAULT_PROMPT_CATALOG_NAME
         logger.info("Loading local tool catalog at %s.", str(tool_catalog_path.absolute()))
         logger.info("Loading local prompt catalog at %s.", str(prompt_catalog_path.absolute()))
-        self._local_tool_catalog = rosetta_core.catalog.CatalogMem.load(tool_catalog_path)
-        self._local_prompt_catalog = rosetta_core.catalog.CatalogMem.load(prompt_catalog_path)
+        self._local_tool_catalog = rosetta_core.catalog.CatalogMem.load(tool_catalog_path, self.embedding_model)
+        self._local_prompt_catalog = rosetta_core.catalog.CatalogMem.load(prompt_catalog_path, self.embedding_model)
         return self
 
     @pydantic.model_validator(mode="after")
@@ -162,8 +171,22 @@ class Provider(pydantic_settings.BaseSettings):
             logger.warning("$ROSETTA_CONN_STRING is specified but $ROSETTA_BUCKET is missing.")
             return self
 
-        # TODO (GLENN): Load from CatalogDB here.
-        self._remote_tool_catalog = rosetta_core.catalog.CatalogDB()
+        # Try to connect to our cluster.
+        cluster = couchbase.cluster.Cluster.connect(
+            self.conn_string,
+            couchbase.options.ClusterOptions(
+                couchbase.auth.PasswordAuthenticator(
+                    username=self.username,
+                    password=self.password,
+                )
+            ),
+        )
+        self._remote_tool_catalog = rosetta_core.catalog.CatalogDB(
+            cluster=cluster, bucket=self.bucket, kind="tool", embedding_model=self.embedding_model
+        )
+        self._remote_prompt_catalog = rosetta_core.catalog.CatalogDB(
+            cluster=cluster, bucket=self.bucket, kind="prompt", embedding_model=self.embedding_model
+        )
         return self
 
     # Note: this must be placed **after** _find_local_catalog and _find_remote_catalog.
