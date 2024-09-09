@@ -134,6 +134,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                 case RecordKind.JinjaPrompt.value:
                     descriptor = JinjaPromptDescriptor.model_validate(row)
                 case _:
-                    raise LookupError(f"Unknown record encountered of kind = '{row["record_kind"]}'!")
+                    kind = row["record_kind"]
+                    raise LookupError(f"Unknown record encountered of kind = '{kind}'!")
             results.append(SearchResult(entry=descriptor, delta=delta))
         return results
