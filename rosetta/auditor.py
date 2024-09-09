@@ -29,15 +29,7 @@ class Auditor(pydantic_settings.BaseSettings):
     specified on instantiation.
     """
 
-    conn_string: typing.Annotated[
-        typing.Optional[pydantic.AnyUrl],
-        pydantic.UrlConstraints(
-            allowed_schemes=["couchbase", "couchbases"],
-            host_required=True,
-            default_host="localhost",
-            default_port=8091,
-        ),
-    ] = None
+    conn_string: typing.Optional[pydantic.AnyUrl] = None
     """ Couchbase connection string that points to the Rosetta audit logs.
 
     This Couchbase instance refers to a CB instance that possesses the audit log collection. This collection is
