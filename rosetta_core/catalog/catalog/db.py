@@ -8,7 +8,9 @@ from rosetta_core.annotation import AnnotationPredicate
 from rosetta_core.catalog.catalog.base import CatalogBase
 from rosetta_core.catalog.catalog.base import SearchResult
 from rosetta_core.defaults import DEFAULT_SCOPE_PREFIX
-from rosetta_core.record.descriptor import RecordDescriptor
+from rosetta_core.prompt.models import JinjaPromptDescriptor
+from rosetta_core.prompt.models import RawPromptDescriptor
+from rosetta_core.record.descriptor import RecordKind
 from rosetta_core.tool.descriptor import HTTPRequestToolDescriptor
 from rosetta_core.tool.descriptor import PythonToolDescriptor
 from rosetta_core.tool.descriptor import SemanticSearchToolDescriptor
@@ -115,29 +117,23 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
         # ---------------------------------------------------------------------------------------- #
 
         # List of catalog items from query
-        catalog = []
-        deltas = []
-
+        results = []
         for row in resp:
-            kind = row["record_kind"]
-            descriptor = ""
-            if name == "":
-                deltas.append(row["metadata"]["score"])
-            match kind:  # TODO (GLENN): Use RecordKind.SemanticSearch.value() instead (and same for the rest)
-                case "semantic_search":
+            delta = row["metadata"]["score"] if name == "" else 1
+            match row["record_kind"]:
+                case RecordKind.SemanticSearch.value:
                     descriptor = SemanticSearchToolDescriptor.model_validate(row)
-                case "python_function":
+                case RecordKind.PythonFunction.value:
                     descriptor = PythonToolDescriptor.model_validate(row)
-                case "sqlpp_query":
+                case RecordKind.SQLPPQuery.value:
                     descriptor = SQLPPQueryToolDescriptor.model_validate(row)
-                case "http_request":
+                case RecordKind.HTTPRequest.value:
                     descriptor = HTTPRequestToolDescriptor.model_validate(row)
+                case RecordKind.RawPrompt.value:
+                    descriptor = RawPromptDescriptor.model_validate(row)
+                case RecordKind.JinjaPrompt.value:
+                    descriptor = JinjaPromptDescriptor.model_validate(row)
                 case _:
-                    print("not a valid descriptor of ToolDescriptorUnion type")
-            catalog.append(RecordDescriptor.model_validate(descriptor))
-
-        # Final set of results
-        if name != "":
-            return [SearchResult(entry=catalog[0], delta=1)]
-
-        return [SearchResult(entry=catalog[i], delta=deltas[i]) for i in range(len(deltas))]
+                    raise LookupError(f"Unknown record encountered of kind = '{row["record_kind"]}'!")
+            results.append(SearchResult(entry=descriptor, delta=delta))
+        return results
