@@ -20,12 +20,12 @@ rosetta = "rosetta.__main__:main"
 python = "^3.11"
 pydantic-settings = "^2.4.0"
 
-rosetta-core = { git = "git@github.com:couchbaselabs/rosetta-core.git" }
-rosetta-lc = { git = "git@github.com:couchbaselabs/rosetta-lc.git", optional = true }
+#rosetta-core = { git = "git@github.com:couchbaselabs/rosetta-core.git" }
+#rosetta-lc = { git = "git@github.com:couchbaselabs/rosetta-lc.git", optional = true }
 
 # For developers that want to use a local version of Rosetta.
-# rosetta-core = { path = PATH_TO_LOCAL_ROSETTA_CORE, develop = true }
-# rosetta-lc = { path = PATH_TO_LOCAL_ROSETTA_LC, develop = true, optional = true }
+rosetta-core = { path = "/Users/tjohari/rosetta/rosetta-core", develop = true }
+rosetta-lc = { path = "/Users/tjohari/rosetta/rosetta-lc", develop = true, optional = true }
 
 [tool.poetry.extras]
 langchain = ["rosetta-lc"]
