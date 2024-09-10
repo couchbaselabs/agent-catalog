@@ -20,7 +20,6 @@ SearchResult = rosetta_core.catalog.SearchResult
 Prompt = rosetta_core.provider.PromptProvider.PromptResult
 
 
-# TODO (GLENN): We should be able to set the parameters below with ROSETTA_* but this has not been tested yet.
 class Provider(pydantic_settings.BaseSettings):
     """A provider of Rosetta indexed "agent building blocks" (e.g., tools)."""
 
@@ -148,11 +147,13 @@ class Provider(pydantic_settings.BaseSettings):
 
         # Set our local catalog if it exists.
         tool_catalog_path = self.catalog / rosetta_cmd.defaults.DEFAULT_TOOL_CATALOG_NAME
+        if tool_catalog_path.exists():
+            logger.info("Loading local tool catalog at %s.", str(tool_catalog_path.absolute()))
+            self._local_tool_catalog = rosetta_core.catalog.CatalogMem.load(tool_catalog_path, self.embedding_model)
         prompt_catalog_path = self.catalog / rosetta_cmd.defaults.DEFAULT_PROMPT_CATALOG_NAME
-        logger.info("Loading local tool catalog at %s.", str(tool_catalog_path.absolute()))
-        logger.info("Loading local prompt catalog at %s.", str(prompt_catalog_path.absolute()))
-        self._local_tool_catalog = rosetta_core.catalog.CatalogMem.load(tool_catalog_path, self.embedding_model)
-        self._local_prompt_catalog = rosetta_core.catalog.CatalogMem.load(prompt_catalog_path, self.embedding_model)
+        if prompt_catalog_path.exists():
+            logger.info("Loading local prompt catalog at %s.", str(prompt_catalog_path.absolute()))
+            self._local_prompt_catalog = rosetta_core.catalog.CatalogMem.load(prompt_catalog_path, self.embedding_model)
         return self
 
     @pydantic.model_validator(mode="after")
@@ -173,11 +174,11 @@ class Provider(pydantic_settings.BaseSettings):
 
         # Try to connect to our cluster.
         cluster = couchbase.cluster.Cluster.connect(
-            self.conn_string,
+            str(self.conn_string),
             couchbase.options.ClusterOptions(
                 couchbase.auth.PasswordAuthenticator(
-                    username=self.username,
-                    password=self.password,
+                    username=self.username.get_secret_value(),
+                    password=self.password.get_secret_value(),
                 )
             ),
         )

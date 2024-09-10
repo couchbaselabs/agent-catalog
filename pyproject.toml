@@ -2,7 +2,7 @@
 name = "rosetta"
 version = "0.1.0"
 description = "User facing repository for all things rosetta (tooling around agent workflows)."
-repository = "https://github.com/couchbaselabs/agentiq"
+repository = "https://github.com/couchbaselabs/rosetta"
 authors = [
     "Glenn Galvizo <glenn.galvizo@couchbase.com>"
 ]
@@ -11,7 +11,7 @@ readme = "README.md"
 [tool.poetry.urls]
 Homepage = "https://couchbase.com"
 Documentation = "https://docs.couchbase.com"
-Repository = "https://github.com/couchbaselabs/agentiq"
+Repository = "https://github.com/couchbaselabs/rosetta"
 
 [tool.poetry.scripts]
 rosetta = "rosetta.__main__:main"
