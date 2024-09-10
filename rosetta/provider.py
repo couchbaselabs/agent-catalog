@@ -113,6 +113,12 @@ class Provider(pydantic_settings.BaseSettings):
     ```
     """
 
+    embedding_model: typing.Optional[typing.AnyStr] = pydantic.Field(default="sentence-transformers/all-MiniLM-L12-v2")
+    """ The embedding model used when performing a semantic search for tools / prompts.
+
+    Currently, only models that can specified with sentence-transformers through its string constructor are supported.
+    """
+
     _local_tool_catalog: rosetta_core.catalog.CatalogMem = None
     _remote_tool_catalog: rosetta_core.catalog.CatalogDB = None
     _tool_catalog: rosetta_core.catalog.CatalogBase = None
