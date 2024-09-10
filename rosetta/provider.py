@@ -19,15 +19,7 @@ class Provider(pydantic_settings.BaseSettings):
 
     model_config = pydantic_settings.SettingsConfigDict(env_prefix="ROSETTA_", use_attribute_docstrings=True)
 
-    conn_string: typing.Annotated[
-        typing.Optional[pydantic.AnyUrl],
-        pydantic.UrlConstraints(
-            allowed_schemes=["couchbase", "couchbases"],
-            host_required=True,
-            default_host="localhost",
-            default_port=8091,
-        ),
-    ] = None
+    conn_string: typing.Optional[str] = None
     """ Couchbase connection string that points to the Rosetta catalog.
 
     This Couchbase instance refers to the CB instance used with the publish command. If there exists no local catalog
