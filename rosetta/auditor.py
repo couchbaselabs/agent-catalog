@@ -147,21 +147,23 @@ class Auditor(pydantic_settings.BaseSettings):
                 output=self.local_log, catalog_version=provider.version, model=self.llm_name
             )
         if self.conn_string is not None:
-            secrets = {
-                'CB_CONN_STRING': self.conn_string,
-                'CB_USERNAME': 'Administrator', # TODO: use secrets here - type should be string and not Pydantic Secret
-                'CB_PASSWORD': 'password',
-            }
-            self._db_auditor = rosetta_core.activity.DBAuditor(bucket=self.bucket,secrets=secrets,catalog_version=provider.version, model=self.llm_name)
+            self._db_auditor = rosetta_core.activity.DBAuditor(
+                conn_string=self.conn_string,
+                username=self.username.get_secret_value(),
+                password=self.password.get_secret_value(),
+                model=self.llm_name,
+                bucket=self.bucket,
+                catalog_version=provider.version,
+            )
         return self
 
     def accept(
-            self,
-            role: Role,
-            content: typing.AnyStr,
-            session: typing.AnyStr,
-            timestamp: datetime.datetime = None,
-            model: str = None,
+        self,
+        role: Role,
+        content: typing.AnyStr,
+        session: typing.AnyStr,
+        timestamp: datetime.datetime = None,
+        model: str = None,
     ) -> None:
         """
         :param role: Role associated with the message. See rosetta_core.llm.message.Role for all options here.
