@@ -28,7 +28,7 @@ repos:
     hooks:
       - id: do-not-commit-local-dev
         name: check for local dev environment
-        entry: ^rosetta\s*=\s*\{\s*path\s*=
+        entry: ^rosetta-\w+\s*=\s*\{\s*path\s*=
         language: pygrep
         types: [toml]
 

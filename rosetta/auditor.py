@@ -118,7 +118,8 @@ class Auditor(pydantic_settings.BaseSettings):
             logger.warning("$ROSETTA_CONN_STRING is specified but $ROSETTA_BUCKET is missing.")
             return self
 
-        return self
+        # TODO (GLENN): Use DBAuditor here.
+        raise NotImplementedError("Auditor with a Couchbase collection is currently not supported.")
 
     @pydantic.model_validator(mode="after")
     def _initialize_auditor(self) -> typing.Self:
@@ -142,18 +143,11 @@ class Auditor(pydantic_settings.BaseSettings):
 
         # Finally, instantiate our auditors.
         if self.local_log is not None:
-            logger.info("tanvi: local log--")
             self._local_auditor = rosetta_core.activity.LocalAuditor(
                 output=self.local_log, catalog_version=provider.version, model=self.llm_name
             )
         if self.conn_string is not None:
-            logger.info("tanvi: remote log--")
-            secrets = {
-                'CB_CONN_STRING': provider.conn_string,
-                'CB_USERNAME': provider.username,
-                'CB_PASSWORD': provider.password,
-            }
-            self._db_auditor = rosetta_core.activity.DBAuditor(bucket=provider.bucket, secrets=secrets, catalog_version=provider.version, model=self.llm_name)
+            self._db_auditor = rosetta_core.activity.DBAuditor(catalog_version=provider.version, model=self.llm_name)
         return self
 
     def accept(

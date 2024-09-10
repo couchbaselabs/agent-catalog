@@ -13,7 +13,11 @@ logger = logging.getLogger(__name__)
 # To support custom refiners, we must export this model.
 SearchResult = rosetta_core.catalog.SearchResult
 
+# To support returning prompts with defined tools, we export this model.
+Prompt = rosetta_core.provider.PromptProvider.PromptResult
 
+
+# TODO (GLENN): We should be able to set the parameters below with ROSETTA_* but this has not been tested yet.
 class Provider(pydantic_settings.BaseSettings):
     """A provider of Rosetta indexed "agent building blocks" (e.g., tools)."""
 
@@ -138,8 +142,8 @@ class Provider(pydantic_settings.BaseSettings):
         prompt_catalog_path = self.catalog / rosetta_cmd.defaults.DEFAULT_PROMPT_CATALOG_NAME
         logger.info("Loading local tool catalog at %s.", str(tool_catalog_path.absolute()))
         logger.info("Loading local prompt catalog at %s.", str(prompt_catalog_path.absolute()))
-        self._local_tool_catalog = rosetta_core.catalog.CatalogMem.load(tool_catalog_path)
-        self._local_prompt_catalog = rosetta_core.catalog.CatalogMem.load(prompt_catalog_path)
+        self._local_tool_catalog = rosetta_core.catalog.CatalogMem.load(tool_catalog_path, self.embedding_model)
+        self._local_prompt_catalog = rosetta_core.catalog.CatalogMem.load(prompt_catalog_path, self.embedding_model)
         return self
 
     @pydantic.model_validator(mode="after")
@@ -158,8 +162,22 @@ class Provider(pydantic_settings.BaseSettings):
             logger.warning("$ROSETTA_CONN_STRING is specified but $ROSETTA_BUCKET is missing.")
             return self
 
-        # TODO (GLENN): Load from CatalogDB here.
-        self._remote_tool_catalog = rosetta_core.catalog.CatalogDB()
+        # Try to connect to our cluster.
+        cluster = couchbase.cluster.Cluster.connect(
+            self.conn_string,
+            couchbase.options.ClusterOptions(
+                couchbase.auth.PasswordAuthenticator(
+                    username=self.username,
+                    password=self.password,
+                )
+            ),
+        )
+        self._remote_tool_catalog = rosetta_core.catalog.CatalogDB(
+            cluster=cluster, bucket=self.bucket, kind="tool", embedding_model=self.embedding_model
+        )
+        self._remote_prompt_catalog = rosetta_core.catalog.CatalogDB(
+            cluster=cluster, bucket=self.bucket, kind="prompt", embedding_model=self.embedding_model
+        )
         return self
 
     # Note: this must be placed **after** _find_local_catalog and _find_remote_catalog.
@@ -195,6 +213,7 @@ class Provider(pydantic_settings.BaseSettings):
             secrets=self.secrets,
         )
         self._prompt_provider = rosetta_core.provider.PromptProvider(
+            tool_provider=self._tool_provider,
             catalog=self._prompt_catalog,
             refiner=self.refiner,
         )
@@ -211,7 +230,7 @@ class Provider(pydantic_settings.BaseSettings):
         """
         :param query: A query string (natural language) to search the catalog with.
         :param name: The specific name of the catalog entry to search for.
-        :param annotations: An annotation query string in the form of KEY=VALUE (AND|OR KEY=VALUE)*.
+        :param annotations: An annotation query string in the form of KEY="VALUE" (AND|OR KEY="VALUE")*.
         :param limit: The maximum number of results to return.
         :return: A list of tools (Python functions).
         """
@@ -220,12 +239,12 @@ class Provider(pydantic_settings.BaseSettings):
         else:
             return self._tool_provider.get(name=name, annotations=annotations, limit=limit)
 
-    def get_prompt_for(self, query: str = None, name: str = None, annotations: str = None) -> str | None:
+    def get_prompt_for(self, query: str = None, name: str = None, annotations: str = None) -> Prompt | None:
         """
         :param query: A query string (natural language) to search the catalog with.
         :param name: The specific name of the catalog entry to search for.
-        :param annotations: An annotation query string in the form of KEY=VALUE (AND|OR KEY=VALUE)*.
-        :return: A single prompt.
+        :param annotations: An annotation query string in the form of KEY="VALUE" (AND|OR KEY="VALUE")*.
+        :return: A single prompt as well any tools attached to the prompt.
         """
         if query is not None:
             results = self._prompt_provider.search(query=query, annotations=annotations, limit=1)

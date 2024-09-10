@@ -2,48 +2,6 @@
 
 User facing repository for all things rosetta (tooling around agent workflows).
 
-## Getting Started
-
-(TODO: We need to upload this to PyPI somehow)
-
-1. Ensure that you have `python3.11` installed.
-2. Use `pip` to install `rosetta`.
-   ```bash
-   pip install rosetta
-   ```
-   For users that want to install the LangChain extra package, add `[langchain]` after `rosetta`.
-   ```bash
-   pip install rosetta[langchain]
-   ```
-3. You should now have the `rosetta` command line tool installed.
-   Run the `rosetta` command to test your installation.
-   ```bash
-    Usage: rosetta [OPTIONS] COMMAND [ARGS]...
-
-      A command line tool for Rosetta.
-
-    Options:
-      -c, --catalog DIRECTORY   Directory of local catalog files. The local
-                                catalog DIRECTORY should be checked into git.
-                                [default: .rosetta-catalog]
-      -a, --activity DIRECTORY  Directory of local activity files (runtime data).
-                                The local activity DIRECTORY should NOT be checked
-                                into git, as it holds runtime activity data like
-                                logs, etc.  [default: .rosetta-activity]
-      -v, --verbose             Enable verbose output.
-      --help                    Show this message and exit.
-
-    Commands:
-      clean       Clean up the catalog folder, the activity folder, any...
-      env         Show this program's environment or configuration parameters...
-      find        Find tools, prompts, etc.
-      index       Walk the source directory trees (SOURCE_DIRS) to index...
-      publish     Publish the local catalog to a Couchbase instance.
-      status      Show the status of the local catalog.
-      version     Show the version of this tool.
-      web         Start a local web server to view our tools.
-   ```
-
 ## Building From Source
 
 1. Ensure that you have `python3.11` and `poetry` installed.
