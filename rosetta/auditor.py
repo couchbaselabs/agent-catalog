@@ -22,14 +22,14 @@ class Auditor(pydantic_settings.BaseSettings):
 
     model_config = pydantic_settings.SettingsConfigDict(env_prefix="ROSETTA_", use_attribute_docstrings=True)
 
-    llm_name: typing.AnyStr = None
+    llm_name: str = None
     """ Name of the LLM model used to generate the chat messages to-be-audited.
 
     This field can be specified on instantiation or on accept(). A model specified in accept() overrides a model
     specified on instantiation.
     """
 
-    conn_string: typing.Optional[pydantic.AnyUrl] = None
+    conn_string: typing.Optional[str] = None
     """ Couchbase connection string that points to the Rosetta audit logs.
 
     This Couchbase instance refers to a CB instance that possesses the audit log collection. This collection is
@@ -118,8 +118,7 @@ class Auditor(pydantic_settings.BaseSettings):
             logger.warning("$ROSETTA_CONN_STRING is specified but $ROSETTA_BUCKET is missing.")
             return self
 
-        # TODO (GLENN): Use DBAuditor here.
-        raise NotImplementedError("Auditor with a Couchbase collection is currently not supported.")
+        return self
 
     @pydantic.model_validator(mode="after")
     def _initialize_auditor(self) -> typing.Self:
@@ -143,20 +142,26 @@ class Auditor(pydantic_settings.BaseSettings):
 
         # Finally, instantiate our auditors.
         if self.local_log is not None:
+            logger.info("tanvi: local log--")
             self._local_auditor = rosetta_core.activity.LocalAuditor(
                 output=self.local_log, catalog_version=provider.version, model=self.llm_name
             )
         if self.conn_string is not None:
-            self._db_auditor = rosetta_core.activity.DBAuditor(catalog_version=provider.version, model=self.llm_name)
+            secrets = {
+                'CB_CONN_STRING': self.conn_string,
+                'CB_USERNAME': 'Administrator', # TODO: use secrets here - type should be string and not Pydantic Secret
+                'CB_PASSWORD': 'password',
+            }
+            self._db_auditor = rosetta_core.activity.DBAuditor(bucket=self.bucket,secrets=secrets,catalog_version=provider.version, model=self.llm_name)
         return self
 
     def accept(
-        self,
-        role: Role,
-        content: typing.AnyStr,
-        session: typing.AnyStr,
-        timestamp: datetime.datetime = None,
-        model: str = None,
+            self,
+            role: Role,
+            content: typing.AnyStr,
+            session: typing.AnyStr,
+            timestamp: datetime.datetime = None,
+            model: str = None,
     ) -> None:
         """
         :param role: Role associated with the message. See rosetta_core.llm.message.Role for all options here.
