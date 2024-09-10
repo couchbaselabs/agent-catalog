@@ -25,7 +25,7 @@ class Provider(pydantic_settings.BaseSettings):
 
     model_config = pydantic_settings.SettingsConfigDict(env_prefix="ROSETTA_", use_attribute_docstrings=True)
 
-    conn_string: typing.Optional[pydantic.AnyUrl] = None
+    conn_string: typing.Optional[str] = None
     """ Couchbase connection string that points to the Rosetta catalog.
 
     This Couchbase instance refers to the CB instance used with the publish command. If there exists no local catalog
@@ -111,12 +111,6 @@ class Provider(pydantic_settings.BaseSettings):
         "MY_CB_PASSWORD": os.getenv("THE_CB_PASSWORD")
     })
     ```
-    """
-
-    embedding_model: typing.Optional[typing.AnyStr] = pydantic.Field(default="sentence-transformers/all-MiniLM-L12-v2")
-    """ The embedding model used when performing a semantic search for tools / prompts.
-
-    Currently, only models that can specified with sentence-transformers through its string constructor are supported.
     """
 
     _local_tool_catalog: rosetta_core.catalog.CatalogMem = None
