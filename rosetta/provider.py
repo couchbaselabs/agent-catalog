@@ -177,8 +177,10 @@ class Provider(pydantic_settings.BaseSettings):
             str(self.conn_string),
             couchbase.options.ClusterOptions(
                 couchbase.auth.PasswordAuthenticator(
-                    username=self.username.get_secret_value(),
-                    password=self.password.get_secret_value(),
+                    # username=self.username.get_secret_value(), # TODO: ensure type is string while sending otherwise conn err
+                    # password=self.password.get_secret_value(),
+                    username="Administrator",
+                    password="password",
                 )
             ),
         )
@@ -232,7 +234,10 @@ class Provider(pydantic_settings.BaseSettings):
     @pydantic.computed_field
     @property
     def version(self) -> rosetta_core.version.VersionDescriptor:
-        return self._tool_catalog.catalog_descriptor.version
+        if self._local_tool_catalog is not None:
+            return self._tool_catalog.catalog_descriptor.version
+        if self._remote_tool_catalog is not None:
+            return self._remote_tool_catalog.get_version(kind="tool")
 
     def get_tools_for(
         self, query: str = None, name: str = None, annotations: str = None, limit: typing.Union[int | None] = 1

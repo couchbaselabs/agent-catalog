@@ -118,8 +118,7 @@ class Auditor(pydantic_settings.BaseSettings):
             logger.warning("$ROSETTA_CONN_STRING is specified but $ROSETTA_BUCKET is missing.")
             return self
 
-        # TODO (GLENN): Use DBAuditor here.
-        raise NotImplementedError("Auditor with a Couchbase collection is currently not supported.")
+        return self
 
     @pydantic.model_validator(mode="after")
     def _initialize_auditor(self) -> typing.Self:
@@ -147,20 +146,31 @@ class Auditor(pydantic_settings.BaseSettings):
                 output=self.local_log, catalog_version=provider.version, model=self.llm_name
             )
         if self.conn_string is not None:
-            self._db_auditor = rosetta_core.activity.DBAuditor(catalog_version=provider.version, model=self.llm_name)
+            secrets = {
+                'CB_CONN_STRING': self.conn_string,
+                'CB_USERNAME': 'Administrator', # TODO: use secrets here - type should be string and not Pydantic Secret
+                'CB_PASSWORD': 'password',
+            }
+            self._db_auditor = rosetta_core.activity.DBAuditor(bucket=self.bucket,secrets=secrets,catalog_version=provider.version, model=self.llm_name)
         return self
 
     def accept(
-        self, role: Role, content: typing.AnyStr, timestamp: datetime.datetime = None, model: str = None
+            self,
+            role: Role,
+            content: typing.AnyStr,
+            session: typing.AnyStr,
+            timestamp: datetime.datetime = None,
+            model: str = None,
     ) -> None:
         """
         :param role: Role associated with the message. See rosetta_core.llm.message.Role for all options here.
         :param content: The message to record. Ideally, the content should be as close to the producer as possible.
+        :param session: A unique string associated with the current session / conversation / thread.
         :param timestamp: The time associated with the message production. This must have time-zone information.
         :param model: LLM model used with this audit instance. This field can be specified on instantiation
                       or on accept(). A model specified in accept() overrides a model specified on instantiation.
         """
         if self._local_auditor is not None:
-            self._local_auditor.accept(role, content, timestamp=timestamp, model=model or self.llm_name)
+            self._local_auditor.accept(role, content, session, timestamp=timestamp, model=model or self.llm_name)
         if self._db_auditor is not None:
-            self._db_auditor.accept(role, content, timestamp=timestamp, model=model or self.llm_name)
+            self._db_auditor.accept(role, content, session, timestamp=timestamp, model=model or self.llm_name)
