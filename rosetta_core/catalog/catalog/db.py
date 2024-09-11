@@ -147,7 +147,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             FROM
                 `{self.bucket}`.`{scope_name}`.`{self.kind}_catalog` AS t
             SELECT VALUE
-                t.version,
+                t.version
             ORDER BY
                 META().cas DESC
             LIMIT 1
@@ -156,5 +156,5 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
         res, err = execute_query(self.cluster, ts_query)
         if err is not None:
             logger.error(err)
-            return []
+            raise LookupError(f"No results found? -- Error: {err}")
         return VersionDescriptor.model_validate(next(iter(res)))
