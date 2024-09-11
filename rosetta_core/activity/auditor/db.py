@@ -1,3 +1,4 @@
+import json
 import logging
 
 from ...defaults import DEFAULT_AUDIT_COLLECTION
@@ -48,9 +49,11 @@ class DBAuditor(BaseAuditor):
         cb_coll = self.cb_coll
 
         # serialise message object to str
-        message_json = message.model_dump_json()
+        message_str = message.model_dump_json()
+        message_json = json.loads(message_str)
+
         try:
-            key = message.timestamp
+            key = message_json["timestamp"]
             # upsert docs to CB collection
             cb_coll.upsert(key, message_json)
         except Exception as e:

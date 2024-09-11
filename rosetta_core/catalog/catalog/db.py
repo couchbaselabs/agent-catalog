@@ -15,6 +15,7 @@ from rosetta_core.tool.descriptor import HTTPRequestToolDescriptor
 from rosetta_core.tool.descriptor import PythonToolDescriptor
 from rosetta_core.tool.descriptor import SemanticSearchToolDescriptor
 from rosetta_core.tool.descriptor import SQLPPQueryToolDescriptor
+from rosetta_core.version import VersionDescriptor
 from rosetta_util.query import execute_query
 
 logger = logging.getLogger(__name__)
@@ -138,3 +139,23 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                     raise LookupError(f"Unknown record encountered of kind = '{kind}'!")
             results.append(SearchResult(entry=descriptor, delta=delta))
         return results
+
+    def get_version(self, kind: str = "tool"):
+        """Returns the lates version of the kind catalog"""
+        scope_name = DEFAULT_SCOPE_PREFIX + self.embedding_model.replace("/", "_")
+        ts_query = f"SELECT t.version, meta().cas as timestamp FROM `{self.bucket}`.`{scope_name}`.`{self.kind}_catalog` as t ;"
+
+        res, err = execute_query(self.cluster, ts_query)
+        if err is not None:
+            click.secho(f"ERROR: {err}", fg="red")
+            return []
+
+        max_ts = 0
+        required_ver = {}
+        for row in res:
+            curr_ts = row["timestamp"]
+            if curr_ts > max_ts:
+                max_ts = curr_ts
+                required_ver = row["version"]
+
+        return VersionDescriptor.model_validate(required_ver)
