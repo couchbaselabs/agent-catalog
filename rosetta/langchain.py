@@ -8,6 +8,7 @@ if importlib.util.find_spec("rosetta_lc") is not None:
 
     mod = importlib.import_module("rosetta_lc")
 
+    # TODO (GLENN): Is there a less messy way to do this that doesn't erase symbols? (to keep IDEs happy)
     class AuditType(typing.Protocol):
         def __call__(
             self,
@@ -16,10 +17,8 @@ if importlib.util.find_spec("rosetta_lc") is not None:
             auditor: rosetta.auditor,
         ) -> langchain_core.language_models.chat_models.BaseChatModel: ...
 
-    # TODO (GLENN): Is there a less messy way to do this that doesn't erase symbols? (to keep IDEs happy)
     audit: AuditType = mod.audit
-    IQBackedChatModel: langchain_core.language_models.chat_models.BaseChatModel = mod.IQBackedChatModel
-    __all__ = ["audit", "IQBackedChatModel"]
+    __all__ = ["audit"]
 
 else:
     __all__ = []
