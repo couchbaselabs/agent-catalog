@@ -142,6 +142,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
 
     def get_version(self, kind: str = "tool"):
         """Returns the lates version of the kind catalog"""
+        # TODO (GLENN): Should this have an ORDER-BY?
         scope_name = DEFAULT_SCOPE_PREFIX + self.embedding_model.replace("/", "_")
         ts_query = f"SELECT t.version, meta().cas as timestamp FROM `{self.bucket}`.`{scope_name}`.`{self.kind}_catalog` as t ;"
 

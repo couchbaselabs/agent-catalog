@@ -13,15 +13,21 @@ from rosetta_util.publish import get_connection
 logger = logging.getLogger(__name__)
 
 
-# TODO (GLENN): Implement this.
 class DBAuditor(BaseAuditor):
-    def __init__(self, bucket: str, secrets: dict, catalog_version: VersionDescriptor, model: str):
+    def __init__(
+        self,
+        conn_string: str,
+        username: str,
+        password: str,
+        bucket: str,
+        catalog_version: VersionDescriptor,
+        model: str,
+    ):
         super().__init__(catalog_version, model)
-        self.secrets = secrets
         conn = CouchbaseConnect(
-            connection_url=self.secrets["CB_CONN_STRING"],
-            username=self.secrets["CB_USERNAME"],
-            password=self.secrets["CB_PASSWORD"],
+            connection_url=conn_string,
+            username=username,
+            password=password,
         )
         err, cluster = get_connection(conn)
         if err is not None:
@@ -52,18 +58,12 @@ class DBAuditor(BaseAuditor):
         message_str = message.model_dump_json()
         message_json = json.loads(message_str)
 
-        try:
-            key = message_json["timestamp"]
-            # upsert docs to CB collection
-            cb_coll.upsert(key, message_json)
-        except Exception as e:
-            logger.error("could not insert log: ", e)
+        # TODO (GLENN): Maybe use a composite PK (timestamp and session ID) instead?
+        # upsert docs to CB collection
+        key = message_json["timestamp"]
+        cb_coll.upsert(key, message_json)
 
-        return
-
+    # TODO (GLENN): I don't think this ever gets explicitly called
     def close(self):
         self.cluster.close()
         return
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        pass
