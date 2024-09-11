@@ -1,4 +1,3 @@
-import click
 import couchbase.cluster
 import logging
 import pydantic
@@ -55,7 +54,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
 
             res, err = execute_query(self.cluster, item_query)
             if err is not None:
-                click.secho(f"ERROR: {err}", fg="red")
+                logger.error(err)
                 return []
         else:
             # Generate embeddings for user query
@@ -103,14 +102,14 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             # Execute query after filtering by catalog_identifier if provided
             res, err = execute_query(self.cluster, filter_records_query)
             if err is not None:
-                click.secho(f"ERROR: {err}", fg="red")
+                logger.error(err)
                 return []
 
         resp = list(res)
 
         # If result set is empty
         if len(resp) == 0:
-            click.secho("No catalog items found with given conditions...", fg="yellow")
+            logger.warning("No catalog items found with given conditions...")
             return []
 
         # ---------------------------------------------------------------------------------------- #
@@ -140,23 +139,22 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             results.append(SearchResult(entry=descriptor, delta=delta))
         return results
 
-    def get_version(self, kind: str = "tool"):
+    @property
+    def version(self) -> VersionDescriptor:
         """Returns the lates version of the kind catalog"""
-        # TODO (GLENN): Should this have an ORDER-BY?
         scope_name = DEFAULT_SCOPE_PREFIX + self.embedding_model.replace("/", "_")
-        ts_query = f"SELECT t.version, meta().cas as timestamp FROM `{self.bucket}`.`{scope_name}`.`{self.kind}_catalog` as t ;"
+        ts_query = f"""
+            FROM
+                `{self.bucket}`.`{scope_name}`.`{self.kind}_catalog` AS t
+            SELECT VALUE
+                t.version,
+            ORDER BY
+                META().cas DESC
+            LIMIT 1
+        """
 
         res, err = execute_query(self.cluster, ts_query)
         if err is not None:
-            click.secho(f"ERROR: {err}", fg="red")
+            logger.error(err)
             return []
-
-        max_ts = 0
-        required_ver = {}
-        for row in res:
-            curr_ts = row["timestamp"]
-            if curr_ts > max_ts:
-                max_ts = curr_ts
-                required_ver = row["version"]
-
-        return VersionDescriptor.model_validate(required_ver)
+        return VersionDescriptor.model_validate(next(iter(res)))

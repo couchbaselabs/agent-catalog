@@ -4,11 +4,11 @@ import pathlib
 import pydantic
 import typing
 
+from ...annotation import AnnotationPredicate
+from ...catalog.descriptor import CatalogDescriptor
+from ...version import VersionDescriptor
 from .base import CatalogBase
 from .base import SearchResult
-from rosetta_core.annotation import AnnotationPredicate
-from rosetta_core.catalog.descriptor import CatalogDescriptor
-from rosetta_core.record.descriptor import RecordDescriptor
 
 logger = logging.getLogger(__name__)
 
@@ -19,31 +19,7 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
     catalog_descriptor: CatalogDescriptor
     embedding_model: typing.Optional[str] = None
 
-    def init_from(self, other: "CatalogMem") -> list[RecordDescriptor]:
-        """Initialize the items in self by copying over attributes from
-        items found in other that have the exact same versions.
-
-        Returns a list of uninitialized items."""
-
-        uninitialized_items = []
-        if other and other.catalog_descriptor:
-            # A lookup dict of items keyed by "source:name".
-            other_items = {str(o.source) + ":" + o.name: o for o in other.catalog_descriptor.items or []}
-
-            for s in self.catalog_descriptor.items:
-                o = other_items.get(str(s.source) + ":" + s.name)
-                if o and not s.version.is_dirty and o.version.identifier == s.version.identifier:
-                    # The prev item and self item have the same version IDs,
-                    # so copy the prev item contents into the self item.
-                    for k, v in o.model_dump().items():
-                        setattr(s, k, v)
-                else:
-                    uninitialized_items.append(s)
-        else:
-            uninitialized_items += self.catalog_descriptor.items
-
-        return uninitialized_items
-
+    # TODO (GLENN): it might be better to refactor this into the constructor.
     @staticmethod
     def load(catalog_path: pathlib.Path, embedding_model: str = None):
         """Load from a catalog_path JSON file."""
@@ -76,11 +52,11 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
                 click.secho(f"No catalog items found with name '{name}'", fg="yellow")
                 return []
 
-        import sentence_transformers
-        import sklearn
-
         if self.embedding_model is None:
             raise RuntimeError("Embedding model not set!")
+
+        import sentence_transformers
+        import sklearn
 
         # If annotations have been specified, prune all tools that do not possess these annotations.
         candidate_tools = [x for x in self.catalog_descriptor.items]
@@ -124,3 +100,7 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
         if limit > 0:
             results = results[:limit]
         return results
+
+    @property
+    def version(self) -> VersionDescriptor:
+        return self.catalog_descriptor.version

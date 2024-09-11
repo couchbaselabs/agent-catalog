@@ -22,9 +22,10 @@ class ToolSearchMetadata(pydantic.BaseModel):
 
     @pydantic.field_validator("annotations")
     @classmethod
-    def annotations_must_be_valid_string(cls, v: str):
+    def annotations_must_be_valid_string(cls, v: str | None):
         # We raise an error on instantiation here if v is not valid.
-        AnnotationPredicate(v)
+        if v is not None:
+            AnnotationPredicate(v)
         return v
 
     # TODO (GLENN): There is similar validation being done in rosetta_cmd/find... converge these?
