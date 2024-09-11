@@ -91,7 +91,9 @@ def index_catalog_start(
     # TODO: We should use different source_indexers & source_globs based on the kind?
 
     # Load the old / previous local catalog if our catalog path exists.
-    curr_catalog = CatalogMem.load(catalog_path) if catalog_path.exists() else None
+    curr_catalog = (
+        CatalogMem.load(catalog_path, embedding_model=meta["embedding_model"]) if catalog_path.exists() else None
+    )
 
     source_files = []
     for source_dir in source_dirs:

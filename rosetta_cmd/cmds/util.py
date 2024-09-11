@@ -5,6 +5,7 @@ import os
 import pathlib
 import sentence_transformers
 
+from ..defaults import DEFAULT_META_CATALOG_NAME
 from ..models.context import Context
 from rosetta_core.catalog import __version__ as CATALOG_SCHEMA_VERSION
 from rosetta_core.catalog.version import catalog_schema_version_compare
@@ -29,10 +30,9 @@ def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
         "embedding_model": None,
     }
 
-    meta_path = ctx.catalog + "/meta.json"
-
-    if os.path.exists(meta_path):
-        with open(meta_path, "r") as f:
+    meta_path = pathlib.Path(ctx.catalog) / DEFAULT_META_CATALOG_NAME
+    if meta_path.exists():
+        with meta_path.open("r") as f:
             meta = json.load(f)
 
     if catalog_schema_version_compare(meta["catalog_schema_version"], CATALOG_SCHEMA_VERSION) > 0:
@@ -73,7 +73,7 @@ def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
         meta["embedding_model"] = embedding_model
 
     if not read_only:
-        with open(meta_path, "w") as f:
+        with meta_path.open("w") as f:
             json.dump(meta, f, sort_keys=True, indent=4)
 
     return meta

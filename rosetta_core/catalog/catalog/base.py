@@ -24,7 +24,11 @@ class CatalogBase(abc.ABC):
 
     @abc.abstractmethod
     def find(
-        self, query: str, limit: typing.Union[int | None] = 1, annotations: AnnotationPredicate = None
+        self,
+        query: str = None,
+        name: str = None,
+        limit: typing.Union[int | None] = 1,
+        annotations: AnnotationPredicate = None,
     ) -> list[SearchResult]:
         """Returns the catalog items that best match a query."""
 

@@ -1,4 +1,5 @@
 import abc
+import dataclasses
 import logging
 import pathlib
 import typing
@@ -6,6 +7,7 @@ import typing
 from ..annotation import AnnotationPredicate
 from ..catalog import CatalogBase
 from ..catalog import SearchResult
+from ..prompt.models import RawPromptDescriptor
 from ..secrets import put_secret
 from .loader import EntryLoader
 
@@ -26,18 +28,49 @@ class BaseProvider(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get(self, name: str, annotations: str = None, limit: typing.Union[int | None] = 1):
+    def get(self, name: str, annotations: str = None):
         pass
 
 
 class PromptProvider(BaseProvider):
-    def search(self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1):
+    @dataclasses.dataclass
+    class PromptResult:
+        prompt: str
+        tools: typing.Optional[list[typing.Any]]
+
+    def __init__(
+        self,
+        tool_provider: "ToolProvider",
+        catalog: CatalogBase,
+        refiner: typing.Callable[[list[SearchResult]], list[SearchResult]] = None,
+    ):
+        super(PromptProvider, self).__init__(catalog, refiner)
+        self.tool_provider = tool_provider
+
+    def _generate_result(self, prompt_descriptor: RawPromptDescriptor) -> PromptResult:
+        # If our prompt has defined tools, fetch them here.
+        tools = None
+        if prompt_descriptor.tools is not None:
+            tools = list()
+            for tool in prompt_descriptor.tools:
+                if tool.query is not None:
+                    tools += self.tool_provider.search(query=tool.query, annotations=tool.annotations, limit=tool.limit)
+                else:  # tool.name is not None
+                    tools.append(self.tool_provider.get(name=tool.name, annotations=tool.annotations))
+
+        return PromptProvider.PromptResult(prompt=prompt_descriptor.prompt, tools=tools)
+
+    def search(
+        self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1
+    ) -> list["PromptProvider.PromptResult"]:
         annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
         results = self.refiner(self.catalog.find(query=query, annotations=annotation_predicate, limit=limit))
-        return [r.entry.prompt for r in results]
+        return [self._generate_result(r.entry) for r in results]
 
-    def get(self, name: str, annotations: str = None, limit: typing.Union[int | None] = 1):
-        raise NotImplementedError()
+    def get(self, name: str, annotations: str = None) -> typing.Optional["PromptProvider.PromptResult"]:
+        annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
+        results = self.catalog.find(name=name, annotations=annotation_predicate, limit=1)
+        return [self._generate_result(r.entry) for r in results][0] if len(results) != 0 else None
 
 
 class ToolProvider(BaseProvider):
@@ -55,16 +88,6 @@ class ToolProvider(BaseProvider):
         :param decorator: Function to apply to each search result.
         :param refiner: Refiner (reranker / post processor) to use when retrieving tools.
         :param secrets: Map of identifiers to secret values.
-
-        Below, we give an example of how this class is used.
-        >>> import rosetta_core.provider as rp
-        >>> import rosetta_core.catalog as rcm
-        >>> import os, pathlib
-        >>> my_catalog = rcm.CatalogMem.load(pathlib.Path('.rosetta-catalog') / 'tool-catalog.json')
-        >>> my_provider = rp.ToolProvider(
-        >>>     catalog=my_catalog,
-        >>>     secrets={'CB_PASSWORD': os.getenv('MY_CB_PASSWORD')}
-        >>> )
         """
         super(ToolProvider, self).__init__(catalog=catalog, refiner=refiner)
         self._tool_cache = dict()
@@ -95,5 +118,14 @@ class ToolProvider(BaseProvider):
         # Return the tools from the cache.
         return [self.decorator(self._tool_cache[x.entry]) for x in results]
 
-    def get(self, name: str, annotations: str = None, limit: typing.Union[int | None] = 1):
-        raise NotImplementedError()
+    def get(self, name: str, annotations: str = None) -> typing.Any | None:
+        annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
+        results = self.catalog.find(name=name, annotations=annotation_predicate, limit=1)
+
+        # Load all tools that we have not already cached.
+        non_cached_results = [f.entry for f in results if f.entry not in self._tool_cache]
+        for record_descriptor, tool in self._loader.load(non_cached_results):
+            self._tool_cache[record_descriptor] = tool
+
+        # Return the tools from the cache.
+        return [self.decorator(self._tool_cache[x.entry]) for x in results][0] if len(results) != 0 else None

@@ -71,7 +71,7 @@ def catalog_status(ctx, kind, include_dirty=True):
 
     sections = []
 
-    catalog = CatalogMem().load(catalog_path)
+    catalog = CatalogMem.load(catalog_path)
 
     if include_dirty:
         repo, get_path_version = load_repository(pathlib.Path(os.getcwd()))

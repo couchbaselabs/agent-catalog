@@ -16,7 +16,8 @@ logger = logging.getLogger(__name__)
 class CatalogMem(pydantic.BaseModel, CatalogBase):
     """Represents an in-memory catalog."""
 
-    catalog_descriptor: CatalogDescriptor = None
+    catalog_descriptor: CatalogDescriptor
+    embedding_model: typing.Optional[str] = None
 
     def init_from(self, other: "CatalogMem") -> list[RecordDescriptor]:
         """Initialize the items in self by copying over attributes from
@@ -44,11 +45,11 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
         return uninitialized_items
 
     @staticmethod
-    def load(catalog_path: pathlib.Path):
+    def load(catalog_path: pathlib.Path, embedding_model: str = None):
         """Load from a catalog_path JSON file."""
         with catalog_path.open("r") as fp:
             catalog_descriptor = CatalogDescriptor.model_validate_json(fp.read())
-        return CatalogMem(catalog_descriptor=catalog_descriptor)
+        return CatalogMem(catalog_descriptor=catalog_descriptor, embedding_model=embedding_model)
 
     def dump(self, catalog_path: pathlib.Path):
         """Save to a catalog_path JSON file."""
@@ -59,24 +60,27 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
 
     def find(
         self,
-        query: str,
+        query: str = None,
+        name: str = None,
         limit: typing.Union[int | None] = 1,
         annotations: AnnotationPredicate = None,
-        item_name: str = "",
     ) -> list[SearchResult]:
         """Returns the catalog items that best match a query."""
 
-        # Return the exact tool instead of doing vector search in case item_name is provided
-        if item_name != "":
-            catalog = [x for x in self.catalog_descriptor.items if x.name == item_name]
+        # Return the exact tool instead of doing vector search in case name is provided
+        if name is not None:
+            catalog = [x for x in self.catalog_descriptor.items if x.name == name]
             if len(catalog) != 0:
                 return [SearchResult(entry=catalog[0], delta=1)]
             else:
-                click.secho("No catalog items found with given conditions...", fg="yellow")
+                click.secho(f"No catalog items found with name '{name}'", fg="yellow")
                 return []
 
         import sentence_transformers
         import sklearn
+
+        if self.embedding_model is None:
+            raise RuntimeError("Embedding model not set!")
 
         # If annotations have been specified, prune all tools that do not possess these annotations.
         candidate_tools = [x for x in self.catalog_descriptor.items]
@@ -104,9 +108,8 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
             return list()
 
         # Compute the distance of each tool in the catalog to the query.
-        embedding_model = self.catalog_descriptor.embedding_model
         embedding_model_obj = sentence_transformers.SentenceTransformer(
-            embedding_model, tokenizer_kwargs={"clean_up_tokenization_spaces": True}
+            self.embedding_model, tokenizer_kwargs={"clean_up_tokenization_spaces": True}
         )
         query_embedding = embedding_model_obj.encode(query)
         deltas = sklearn.metrics.pairwise.cosine_similarity(
