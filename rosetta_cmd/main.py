@@ -94,10 +94,70 @@ def click_main(ctx, catalog, activity, verbose):
 
 
 @click_main.command()
+@click.option(
+    "--clean-db",
+    default=False,
+    is_flag=True,
+    help="Enable this flag to perform DB level clean.",
+    show_default=True,
+)
+@click.option(
+    "--clean-local",
+    default=False,
+    is_flag=True,
+    help="Enable this flag to perform local repo clean.",
+    show_default=True,
+)
+@click.option(
+    "--bucket",
+    default=None,
+    type=str,
+    help="The name of the Couchbase bucket to search.",
+    show_default=False,
+)
+@click.option(
+    "-em",
+    "--embedding-model",
+    default=DEFAULT_EMBEDDING_MODEL,
+    help="Embedding model to generate embeddings for query.",
+    show_default=True,
+)
 @click.pass_context
-def clean(ctx):
+def clean(ctx, clean_db, clean_local, bucket, embedding_model):
     """Clean up the catalog folder, the activity folder, any generated files, etc..."""
-    cmd_clean(ctx.obj)
+
+    if clean_db:
+        click.confirm("Are you sure you want to delete all catalogs and audit logs?", abort=True)
+
+        # Load all Couchbase connection related data from env
+        connection_details_env = CouchbaseConnect(
+            connection_url=os.getenv("CB_CONN_STRING"),
+            username=os.getenv("CB_USERNAME"),
+            password=os.getenv("CB_PASSWORD"),
+        )
+
+        # Establish a connection
+        err, cluster = get_connection(conn=connection_details_env)
+        if err:
+            click.echo(str(err))
+            return
+
+        # Get buckets from CB Cluster
+        buckets = get_buckets(cluster=cluster)
+
+        if bucket is None:
+            # Prompt user to select a bucket
+            bucket = click.prompt("Please select a bucket: ", type=click.Choice(buckets), show_choices=True)
+        elif bucket not in buckets:
+            raise ValueError(
+                "Bucket does not exist! Available buckets from cluster are: "
+                + ",".join(buckets)
+                + "\nRun rosetta --help for more information."
+            )
+
+        cmd_clean(ctx.obj, clean_local, clean_db, bucket, cluster, embedding_model)
+    else:
+        cmd_clean(ctx.obj, clean_local, clean_db, None, None, None)
 
 
 @click_main.command()
@@ -201,7 +261,11 @@ def find(ctx, query, name, kind, bucket, limit, include_dirty, refiner, annotati
             # Prompt user to select a bucket
             bucket = click.prompt("Please select a bucket: ", type=click.Choice(buckets), show_choices=True)
         elif bucket not in buckets:
-            raise ValueError("Bucket does not exist! The buckets available are: " + ",".join(buckets))
+            raise ValueError(
+                "Bucket does not exist! Available buckets from cluster are: "
+                + ",".join(buckets)
+                + "\nRun rosetta --help for more information."
+            )
 
         cmd_find(
             ctx.obj,
@@ -333,9 +397,12 @@ def publish(ctx, kind, bucket, annotations):
         # Prompt user to select a bucket
         bucket = click.prompt("Please select a bucket: ", type=click.Choice(buckets), show_choices=True)
     elif bucket not in buckets:
-        raise ValueError("Bucket does not exist! The buckets available are: " + ",".join(buckets))
+        raise ValueError(
+            "Bucket does not exist! Available buckets from cluster are: "
+            + ",".join(buckets)
+            + "\nRun rosetta --help for more information."
+        )
 
-    click.echo(f"Inserting documents in : {bucket}/{keyspace_details.scope}\n")
     keyspace_details.bucket = bucket
     cmd_publish(ctx.obj, kind, annotations, cluster, keyspace_details, click.echo, connection_details_env)
     cluster.close()

@@ -9,6 +9,11 @@ class VersionSystem(enum.StrEnum):
 
 
 class VersionDescriptor(pydantic.BaseModel):
+    timestamp: pydantic.AwareDatetime = pydantic.Field(
+        description="Timestamp of the generated message. This field must have a timezone attached as well.",
+        examples=["2024-08-26T12:02:59.500Z", "2024-08-26T12:02:59.500+00:00"],
+    )
+
     identifier: typing.Optional[str] = pydantic.Field(
         description="A unique identifier that defines a catalog snapshot / version / commit. "
         "For git, this is the git repo commit SHA / HASH.",

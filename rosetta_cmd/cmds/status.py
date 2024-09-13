@@ -1,4 +1,5 @@
 import click
+import datetime
 import flask
 import os
 import pathlib
@@ -88,7 +89,9 @@ def catalog_status(ctx, kind, include_dirty=True):
                 )
             )
         else:
-            version = VersionDescriptor(identifier=str(repo.head.commit))
+            version = VersionDescriptor(
+                identifier=str(repo.head.commit), timestamp=datetime.datetime.now(tz=datetime.timezone.utc)
+            )
             sections.append(
                 (
                     "repo commit",
@@ -103,7 +106,7 @@ def catalog_status(ctx, kind, include_dirty=True):
 
             meta = init_local(ctx, catalog.catalog_descriptor.embedding_model, read_only=True)
 
-            version = VersionDescriptor(is_dirty=True)
+            version = VersionDescriptor(is_dirty=True, timestamp=datetime.datetime.now(tz=datetime.timezone.utc))
 
             # Scan the same source_dirs that were used in the last "rosetta index".
             source_dirs = catalog.catalog_descriptor.source_dirs

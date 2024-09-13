@@ -58,12 +58,6 @@ class DBAuditor(BaseAuditor):
         message_str = message.model_dump_json()
         message_json = json.loads(message_str)
 
-        # TODO (GLENN): Maybe use a composite PK (timestamp and session ID) instead?
         # upsert docs to CB collection
-        key = message_json["timestamp"]
+        key = message_json["timestamp"] + message_json["session"]
         cb_coll.upsert(key, message_json)
-
-    # TODO (GLENN): I don't think this ever gets explicitly called
-    def close(self):
-        self.cluster.close()
-        return

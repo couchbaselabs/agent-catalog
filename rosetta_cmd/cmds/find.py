@@ -1,5 +1,6 @@
 import click
 import couchbase.cluster
+import datetime
 import logging
 import os
 import pathlib
@@ -91,7 +92,7 @@ def cmd_find(
             repo, get_path_version = load_repository(pathlib.Path(os.getcwd()))
             if repo and repo.is_dirty():
                 # The repo and any dirty files do not have real commit id's, so use "DIRTY".
-                version = VersionDescriptor(is_dirty=True)
+                version = VersionDescriptor(is_dirty=True, timestamp=datetime.datetime.now(tz=datetime.timezone.utc))
 
                 # Scan the same source_dirs that were used in the last "rosetta index".
                 source_dirs = catalog.catalog_descriptor.source_dirs

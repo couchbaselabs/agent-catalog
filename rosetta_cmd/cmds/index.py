@@ -1,4 +1,5 @@
 import click
+import datetime
 import logging
 import os
 import pathlib
@@ -52,7 +53,11 @@ def cmd_index(
     # approach of opening & reading file contents directly,
 
     # The version for the repo's HEAD commit.
-    version = VersionDescriptor(identifier=str(repo.head.commit), is_dirty=repo.is_dirty())
+    version = VersionDescriptor(
+        identifier=str(repo.head.commit),
+        is_dirty=repo.is_dirty(),
+        timestamp=datetime.datetime.now(tz=datetime.timezone.utc),
+    )
 
     # TODO: The kind needs a security check as it's part of the path?
     catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")

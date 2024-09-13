@@ -1,4 +1,5 @@
 import click
+import datetime
 import git
 import json
 import os
@@ -97,13 +98,13 @@ def load_repository(top_dir: pathlib.Path = None):
         path_absolute = path.absolute()
 
         if repo.is_dirty(path=path_absolute):
-            return VersionDescriptor(is_dirty=True)
+            return VersionDescriptor(is_dirty=True, timestamp=datetime.datetime.now(tz=datetime.timezone.utc))
 
         commits = list(repo.iter_commits(paths=path_absolute, max_count=1))
         if not commits or len(commits) <= 0:
-            return VersionDescriptor(is_dirty=True)
+            return VersionDescriptor(is_dirty=True, timestamp=datetime.datetime.now(tz=datetime.timezone.utc))
 
-        return VersionDescriptor(identifier=str(commits[0]))
+        return VersionDescriptor(identifier=str(commits[0]), timestamp=datetime.datetime.now(tz=datetime.timezone.utc))
 
     return repo, get_path_version
 

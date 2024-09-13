@@ -12,7 +12,7 @@ from ..models import Keyspace
 from rosetta_core.catalog import CatalogMem
 from rosetta_util.ddl import create_gsi_indexes
 from rosetta_util.ddl import create_vector_index
-from rosetta_util.publish import CustomPublishEncoder
+from rosetta_util.models import CustomPublishEncoder
 from rosetta_util.publish import create_scope_and_collection
 
 logger = logging.getLogger(__name__)
@@ -27,6 +27,8 @@ def cmd_publish(
     printer,
     connection_details_env: CouchbaseConnect,
 ):
+    """Command to publish catalog items to user's Couchbase cluster"""
+
     if kind == "all":
         kind_list = ["tool", "prompt"]
         logger.info("Inserting all catalogs...")
@@ -40,10 +42,20 @@ def cmd_publish(
     cb = cluster.bucket(bucket)
 
     for kind in kind_list:
-        # TODO (GLENN): There should be a check here to make sure we don't publish a dirty catalog.
         catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)
-        catalog = CatalogMem.load(catalog_path).catalog_descriptor
+        try:
+            catalog = CatalogMem.load(catalog_path)
+        except FileNotFoundError:
+            # If only one type of catalog is present
+            continue
+        catalog = catalog.catalog_descriptor
         embedding_model = catalog.embedding_model.replace("/", "_")
+
+        # Check to ensure a dirty catalog is not published
+        if catalog.version.is_dirty:
+            click.secho("Cannot publish catalog to DB if dirty!", fg="red")
+            click.secho("Please index catalog with a clean repo!", fg="yellow")
+            continue
 
         # Get the bucket manager
         bucket_manager = cb.collections()
@@ -67,6 +79,7 @@ def cmd_publish(
         # add annotations to metadata
         annotations_list = {an[0]: an[1].split("+") if "+" in an[1] else an[1] for an in annotations}
         metadata.update({"snapshot_annotations": annotations_list})
+        metadata["version"]["timestamp"] = str(metadata["version"]["timestamp"])
 
         printer("Upserting metadata..")
         try:
@@ -127,5 +140,3 @@ def cmd_publish(
         if err is not None:
             click.secho(f"ERROR: Vector index could not be created \n{err}", fg="red")
             return
-
-    logger.info("Successfully inserted all catalogs!")
