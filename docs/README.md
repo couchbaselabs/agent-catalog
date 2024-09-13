@@ -2,9 +2,9 @@
 
 ## Instructions
 - Install rosetta package
-- Create tools and/or prompts using the provided [templates](#templates) 
+- Create tools and/or prompts using the provided [templates](#templates)
 - Run `rosetta --help` to view a complete list of available commands
-- Index your tools and create a catalog using the `rosetta index` command - all catalogs will be shown in `./rosetta-catalog` 
+- Index your tools and create a catalog using the `rosetta index` command - all catalogs will be shown in `./rosetta-catalog`
 - Find catalog items to provide to your agent later using the `rosetta find` command
 - After local dev, publish your catalog to Couchbase using the `rosetta publish` command
 - Write you agent flow with rosetta
