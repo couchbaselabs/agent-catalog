@@ -45,6 +45,11 @@ def cmd_publish(
         catalog = CatalogMem.load(catalog_path).catalog_descriptor
         embedding_model = catalog.embedding_model.replace("/", "_")
 
+        if catalog.version.is_dirty:
+            click.secho("Cannot publish catalog to DB if dirty!", fg="red")
+            click.secho("Please index catalog with a clean repo!", fg="yellow")
+            continue
+
         # Get the bucket manager
         bucket_manager = cb.collections()
 
@@ -127,5 +132,3 @@ def cmd_publish(
         if err is not None:
             click.secho(f"ERROR: Vector index could not be created \n{err}", fg="red")
             return
-
-    logger.info("Successfully inserted all catalogs!")

@@ -335,7 +335,6 @@ def publish(ctx, kind, bucket, annotations):
     elif bucket not in buckets:
         raise ValueError("Bucket does not exist! The buckets available are: " + ",".join(buckets))
 
-    click.echo(f"Inserting documents in : {bucket}/{keyspace_details.scope}\n")
     keyspace_details.bucket = bucket
     cmd_publish(ctx.obj, kind, annotations, cluster, keyspace_details, click.echo, connection_details_env)
     cluster.close()
