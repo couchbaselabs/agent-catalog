@@ -24,6 +24,10 @@ User facing repository for all things rosetta (tooling around agent workflows).
 For examples on what an agentic workflow with Rosetta looks like, see
 the [rosetta-example](https://github.com/couchbaselabs/rosetta-example) repository.
 
+## Docs and templates
+
+Refer to [`docs/`](docs) to explore templates and other references while writing your agent workflow with rosetta.
+
 ## For Contributors / Developers
 
 ### On Child Repositories
