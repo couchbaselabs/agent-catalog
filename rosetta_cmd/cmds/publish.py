@@ -43,9 +43,10 @@ def cmd_publish(
 
     for kind in kind_list:
         catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)
-        (catalog, err) = CatalogMem.load(catalog_path)
-        # If only one type of catalog is present
-        if err is not None and err == "Catalog not found":
+        try:
+            catalog = CatalogMem.load(catalog_path)
+        except FileNotFoundError:
+            # If only one type of catalog is present
             continue
         catalog = catalog.catalog_descriptor
         embedding_model = catalog.embedding_model.replace("/", "_")

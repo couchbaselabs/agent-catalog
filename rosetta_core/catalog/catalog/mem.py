@@ -21,14 +21,11 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
 
     # TODO (GLENN): it might be better to refactor this into the constructor.
     @staticmethod
-    def load(catalog_path: pathlib.Path, embedding_model: str = None):
+    def load(catalog_path: pathlib.Path, embedding_model: str = None) -> "CatalogMem":
         """Load from a catalog_path JSON file."""
-        try:
-            with catalog_path.open("r") as fp:
-                catalog_descriptor = CatalogDescriptor.model_validate_json(fp.read())
-            return CatalogMem(catalog_descriptor=catalog_descriptor, embedding_model=embedding_model), None
-        except FileNotFoundError:
-            return None, "Catalog not found"
+        with catalog_path.open("r") as fp:
+            catalog_descriptor = CatalogDescriptor.model_validate_json(fp.read())
+        return CatalogMem(catalog_descriptor=catalog_descriptor, embedding_model=embedding_model), None
 
     def dump(self, catalog_path: pathlib.Path):
         """Save to a catalog_path JSON file."""
