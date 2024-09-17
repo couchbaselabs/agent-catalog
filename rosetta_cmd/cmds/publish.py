@@ -12,7 +12,7 @@ from ..models import Keyspace
 from rosetta_core.catalog import CatalogMem
 from rosetta_util.ddl import create_gsi_indexes
 from rosetta_util.ddl import create_vector_index
-from rosetta_util.publish import CustomPublishEncoder
+from rosetta_util.models import CustomPublishEncoder
 from rosetta_util.publish import create_scope_and_collection
 
 logger = logging.getLogger(__name__)
@@ -27,6 +27,8 @@ def cmd_publish(
     printer,
     connection_details_env: CouchbaseConnect,
 ):
+    """Command to publish catalog items to user's Couchbase cluster"""
+
     if kind == "all":
         kind_list = ["tool", "prompt"]
         logger.info("Inserting all catalogs...")

@@ -1,5 +1,3 @@
-import datetime
-import json
 import logging
 
 from .models import CouchbaseConnect
@@ -8,12 +6,13 @@ from couchbase.cluster import Cluster
 from couchbase.exceptions import CouchbaseException
 from couchbase.options import ClusterOptions
 from datetime import timedelta
-from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
 
 def get_connection(conn: CouchbaseConnect) -> tuple[str, None] | tuple[None, Cluster]:
+    """Get cluster object by connecting to user's Couchbase cluster"""
+
     cluster_url = conn.connection_url
     username = conn.username
     password = conn.password
@@ -42,6 +41,8 @@ def get_connection(conn: CouchbaseConnect) -> tuple[str, None] | tuple[None, Clu
 
 
 def get_buckets(cluster):
+    """Get list of buckets from user's Couchbase cluster"""
+
     if cluster:
         buckets = cluster.buckets().get_all_buckets()
         list_buckets = []
@@ -54,7 +55,9 @@ def get_buckets(cluster):
 
 
 def create_scope_and_collection(bucket_manager, scope, collection):
-    # Create a new scope if does not exist
+    """Create new Couchbase scope and collection within it if they do not exist"""
+
+    # Create a new scope if it does not exist
     try:
         scopes = bucket_manager.get_all_scopes()
         scope_exists = any(s.name == scope for s in scopes)
@@ -87,12 +90,3 @@ def create_scope_and_collection(bucket_manager, scope, collection):
         return error_message, e
 
     return "Successfully created scope and collection", None
-
-
-class CustomPublishEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, Path):
-            return str(o)
-        if isinstance(o, datetime.datetime):
-            return str(o)
-        return super().default(o)
