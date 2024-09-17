@@ -201,7 +201,11 @@ def find(ctx, query, name, kind, bucket, limit, include_dirty, refiner, annotati
             # Prompt user to select a bucket
             bucket = click.prompt("Please select a bucket", type=click.Choice(buckets), show_choices=True)
         elif bucket not in buckets:
-            raise ValueError("Bucket does not exist! The buckets available are: " + ",".join(buckets))
+            raise ValueError(
+                "Bucket does not exist! Available buckets from cluster are: "
+                + ",".join(buckets)
+                + "\nRun rosetta --help for more information."
+            )
 
         cmd_find(
             ctx.obj,
@@ -333,7 +337,11 @@ def publish(ctx, kind, bucket, annotations):
         # Prompt user to select a bucket
         bucket = click.prompt("Please select a bucket", type=click.Choice(buckets), show_choices=True)
     elif bucket not in buckets:
-        raise ValueError("Bucket does not exist! The buckets available are: " + ",".join(buckets))
+        raise ValueError(
+            "Bucket does not exist! Available buckets from cluster are: "
+            + ",".join(buckets)
+            + "\nRun rosetta --help for more information."
+        )
 
     keyspace_details.bucket = bucket
     cmd_publish(ctx.obj, kind, annotations, cluster, keyspace_details, click.echo, connection_details_env)
