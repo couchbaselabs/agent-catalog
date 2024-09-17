@@ -40,11 +40,15 @@ def cmd_publish(
     cb = cluster.bucket(bucket)
 
     for kind in kind_list:
-        # TODO (GLENN): There should be a check here to make sure we don't publish a dirty catalog.
         catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)
-        catalog = CatalogMem.load(catalog_path).catalog_descriptor
+        (catalog, err) = CatalogMem.load(catalog_path)
+        # If only one type of catalog is present
+        if err is not None and err == "Catalog not found":
+            continue
+        catalog = catalog.catalog_descriptor
         embedding_model = catalog.embedding_model.replace("/", "_")
 
+        # Check to ensure a dirty catalog is not published
         if catalog.version.is_dirty:
             click.secho("Cannot publish catalog to DB if dirty!", fg="red")
             click.secho("Please index catalog with a clean repo!", fg="yellow")
