@@ -3,11 +3,13 @@ import couchbase.cluster
 import couchbase.options
 import logging
 import pathlib
+import platform
 import pydantic
 import pydantic_settings
 import rosetta_cmd.defaults
 import rosetta_core.provider
 import rosetta_core.version
+import tempfile
 import textwrap
 import typing
 
@@ -16,8 +18,12 @@ logger = logging.getLogger(__name__)
 # To support custom refiners, we must export this model.
 SearchResult = rosetta_core.catalog.SearchResult
 
-# To support returning prompts with defined tools, we export this model.
+# To support the generation of different (schema) models, we export this model.
+SchemaModel = rosetta_core.provider.ModelType
+
+# To support returning prompts with defined tools + the ability to utilize the tool schema, we export this model.
 Prompt = rosetta_core.provider.PromptProvider.PromptResult
+Tool = rosetta_core.provider.ToolProvider.ToolResult
 
 
 class Provider(pydantic_settings.BaseSettings):
@@ -61,15 +67,15 @@ class Provider(pydantic_settings.BaseSettings):
     current working directory until we find the 'rosetta.cmd.defaults.DEFAULT_CATALOG_FOLDER' folder.
     """
 
-    output: typing.Optional[pathlib.Path] = None
+    output: typing.Optional[pathlib.Path | tempfile.TemporaryDirectory] = None
     """ Location to save generated Python stubs to, if desired.
 
     On 'get_tools_for', tools are dynamically generated and served as annotated Python callables. By default, this
     code is never written to disk. If this field is specified, we will write all generated files to the given output
-    directory.
+    directory and serve the generated Python callables from these files with a "standard import".
     """
 
-    decorator: typing.Optional[typing.Callable[[typing.Callable], typing.Any]] = lambda record: record
+    decorator: typing.Optional[typing.Callable[[Tool], typing.Any]] = lambda record: record.func
     """ A Python decorator (function) to apply to each result yielded by 'get_tools_for'.
 
     By default, yielded results are callable and possess type annotations + documentation strings, but some agent
@@ -119,6 +125,14 @@ class Provider(pydantic_settings.BaseSettings):
     Currently, only models that can specified with sentence-transformers through its string constructor are supported.
     """
 
+    tool_model: SchemaModel = SchemaModel.TypingTypedDict
+    """ The target model type for the generated (schema) code for tools.
+
+    By default, we generate TypedDict models and attach these as type hints to the generated Python functions. Other
+    options include Pydantic (V2 and V1) models and dataclasses, though these may not be supported by all agent
+    frameworks.
+    """
+
     _local_tool_catalog: rosetta_core.catalog.CatalogMem = None
     _remote_tool_catalog: rosetta_core.catalog.CatalogDB = None
     _tool_catalog: rosetta_core.catalog.CatalogBase = None
@@ -148,11 +162,11 @@ class Provider(pydantic_settings.BaseSettings):
         # Set our local catalog if it exists.
         tool_catalog_path = self.catalog / rosetta_cmd.defaults.DEFAULT_TOOL_CATALOG_NAME
         if tool_catalog_path.exists():
-            logger.info("Loading local tool catalog at %s.", str(tool_catalog_path.absolute()))
+            logger.debug("Loading local tool catalog at %s.", str(tool_catalog_path.absolute()))
             self._local_tool_catalog = rosetta_core.catalog.CatalogMem.load(tool_catalog_path, self.embedding_model)
         prompt_catalog_path = self.catalog / rosetta_cmd.defaults.DEFAULT_PROMPT_CATALOG_NAME
         if prompt_catalog_path.exists():
-            logger.info("Loading local prompt catalog at %s.", str(prompt_catalog_path.absolute()))
+            logger.debug("Loading local prompt catalog at %s.", str(prompt_catalog_path.absolute()))
             self._local_prompt_catalog = rosetta_core.catalog.CatalogMem.load(prompt_catalog_path, self.embedding_model)
         return self
 
@@ -174,7 +188,7 @@ class Provider(pydantic_settings.BaseSettings):
 
         # Try to connect to our cluster.
         cluster = couchbase.cluster.Cluster.connect(
-            str(self.conn_string),
+            self.conn_string,
             couchbase.options.ClusterOptions(
                 couchbase.auth.PasswordAuthenticator(
                     username=self.username.get_secret_value(),
@@ -182,37 +196,77 @@ class Provider(pydantic_settings.BaseSettings):
                 )
             ),
         )
-        self._remote_tool_catalog = rosetta_core.catalog.CatalogDB(
-            cluster=cluster, bucket=self.bucket, kind="tool", embedding_model=self.embedding_model
-        )
-        self._remote_prompt_catalog = rosetta_core.catalog.CatalogDB(
-            cluster=cluster, bucket=self.bucket, kind="prompt", embedding_model=self.embedding_model
-        )
+        cluster.close()
+
+        # TODO (GLENN): Add support for passing an already open connection to CatalogDB.
+        try:
+            self._remote_tool_catalog = rosetta_core.catalog.CatalogDB(
+                cluster=cluster, bucket=self.bucket, kind="tool", embedding_model=self.embedding_model
+            )
+        except pydantic.ValidationError:
+            logger.debug("'rosetta-publish --kind tool' has not been run. Skipping remote tool catalog.")
+            self._remote_tool_catalog = None
+        try:
+            self._remote_prompt_catalog = rosetta_core.catalog.CatalogDB(
+                cluster=cluster, bucket=self.bucket, kind="prompt", embedding_model=self.embedding_model
+            )
+        except pydantic.ValidationError:
+            logger.debug("'rosetta-publish --kind prompt' has not been run. Skipping remote prompt catalog.")
+            self._remote_prompt_catalog = None
         return self
 
     # Note: this must be placed **after** _find_local_catalog and _find_remote_catalog.
     @pydantic.model_validator(mode="after")
     def _initialize_provider(self) -> typing.Self:
-        if self._local_tool_catalog is None and self._remote_tool_catalog is None:
-            error_message = textwrap.dedent("""
-                Could not find $ROSETTA_CATALOG nor $ROSETTA_CONN_STRING! If this is a new project, please run the
-                command `rosetta index` before instantiating a provider. Otherwise, please set either of these
-                variables.
-            """)
-            logger.error(error_message)
-            raise ValueError(error_message)
+        local_catalogs = self._local_tool_catalog, self._local_prompt_catalog
+        remote_catalogs = self._remote_tool_catalog, self._remote_prompt_catalog
+        catalog_mutators = (
+            lambda t: self.__setattr__("_tool_catalog", t),
+            lambda p: self.__setattr__("_prompt_catalog", p),
+        )
+        for catalog_tuple in zip(local_catalogs, remote_catalogs, catalog_mutators):
+            local_catalog, remote_catalog, set_catalog = catalog_tuple
+            if local_catalog is None and remote_catalog is None:
+                error_message = textwrap.dedent("""
+                    Could not find $ROSETTA_CATALOG nor $ROSETTA_CONN_STRING! If this is a new project, please run the
+                    command `rosetta index` before instantiating a provider. Otherwise, please set either of these
+                    variables.
+                """)
+                logger.error(error_message)
+                raise ValueError(error_message)
+            if local_catalog is not None and remote_catalog is not None:
+                logger.info("A local catalog and a remote catalog have been found. Building a chained catalog.")
+                set_catalog(rosetta_core.catalog.CatalogChain(chain=[local_catalog, remote_catalog]))
+            elif local_catalog is not None:
+                logger.info("Only a local catalog has been found. Using the local catalog.")
+                set_catalog(local_catalog)
+            else:  # remote_catalog is not None:
+                logger.info("Only a remote catalog has been found. Using the remote catalog.")
+                set_catalog(remote_catalog)
 
-        if self._local_tool_catalog is not None and self._remote_tool_catalog is not None:
-            logger.debug("Local catalog and remote catalog found. Building a chained catalog.")
-            self._tool_catalog = rosetta_core.catalog.CatalogChain(
-                chain=[self._local_tool_catalog, self._remote_tool_catalog]
-            )
-            self._prompt_catalog = rosetta_core.catalog.CatalogChain(
-                chain=[self._local_prompt_catalog, self._remote_prompt_catalog]
-            )
-        else:
-            self._tool_catalog = self._local_tool_catalog or self._remote_tool_catalog
-            self._prompt_catalog = self._local_prompt_catalog or self._remote_prompt_catalog
+        # Check the version of Python (this is needed for the code-generator).
+        target_python_version = None
+        match platform.python_version_tuple():
+            case ("3", "6", _):
+                target_python_version = rosetta_core.provider.PythonTarget.PY_36
+            case ("3", "7", _):
+                target_python_version = rosetta_core.provider.PythonTarget.PY_37
+            case ("3", "8", _):
+                target_python_version = rosetta_core.provider.PythonTarget.PY_38
+            case ("3", "9", _):
+                target_python_version = rosetta_core.provider.PythonTarget.PY_39
+            case ("3", "10", _):
+                target_python_version = rosetta_core.provider.PythonTarget.PY_310
+            case ("3", "11", _):
+                target_python_version = rosetta_core.provider.PythonTarget.PY_311
+            case ("3", "12", _):
+                target_python_version = rosetta_core.provider.PythonTarget.PY_312
+            case _:
+                if int(target_python_version[1]) > 12:
+                    logger.debug("Python version not recognized. Defaulting to Python 3.11.")
+                    target_python_version = rosetta_core.provider.PythonTarget.PY_311
+                else:
+                    raise ValueError(f"Python version {platform.python_version()} not supported.")
 
         # Finally, initialize our provider.
         self._tool_provider = rosetta_core.provider.ToolProvider(
@@ -221,6 +275,8 @@ class Provider(pydantic_settings.BaseSettings):
             decorator=self.decorator,
             refiner=self.refiner,
             secrets=self.secrets,
+            python_version=target_python_version,
+            model_type=self.tool_model,
         )
         self._prompt_provider = rosetta_core.provider.PromptProvider(
             tool_provider=self._tool_provider,
