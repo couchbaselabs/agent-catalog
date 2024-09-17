@@ -1,3 +1,4 @@
+import datetime
 import pathlib
 import pytest
 import uuid
@@ -20,7 +21,11 @@ def _generate_test_tools(deltas: list[int]) -> list[SearchResult]:
                     name="dummy tool #" + str(i),
                     description="a dummy tool #" + str(i),
                     source=pathlib.Path("."),
-                    version=VersionDescriptor(identifier=uuid.uuid4().hex, version_system=VersionSystem.Raw),
+                    version=VersionDescriptor(
+                        identifier=uuid.uuid4().hex,
+                        version_system=VersionSystem.Raw,
+                        timestamp=datetime.datetime.now(tz=datetime.timezone.utc),
+                    ),
                 ),
                 delta=delta,
             )

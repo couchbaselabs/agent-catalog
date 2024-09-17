@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 import typing
@@ -94,5 +95,7 @@ def create_scope_and_collection(bucket_manager, scope, collection):
 class CustomPublishEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, Path):
+            return str(o)
+        if isinstance(o, datetime.datetime):
             return str(o)
         return super().default(o)

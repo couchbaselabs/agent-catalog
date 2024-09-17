@@ -1,3 +1,4 @@
+import datetime
 import importlib
 import inspect
 import pathlib
@@ -20,7 +21,11 @@ def _get_tool_descriptor_factory(cls, filename: pathlib.Path):
     filename_prefix = pathlib.Path(__file__).parent / "resources"
     factory_args = {
         "filename": filename_prefix / filename,
-        "version": VersionDescriptor(identifier=uuid.uuid4().hex, version_system=VersionSystem.Raw),
+        "version": VersionDescriptor(
+            identifier=uuid.uuid4().hex,
+            version_system=VersionSystem.Raw,
+            timestamp=datetime.datetime.now(tz=datetime.timezone.utc),
+        ),
     }
     return cls(**factory_args)
 

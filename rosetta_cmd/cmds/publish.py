@@ -76,6 +76,7 @@ def cmd_publish(
         # add annotations to metadata
         annotations_list = {an[0]: an[1].split("+") if "+" in an[1] else an[1] for an in annotations}
         metadata.update({"snapshot_annotations": annotations_list})
+        metadata["version"]["timestamp"] = str(metadata["version"]["timestamp"])
 
         printer("Upserting metadata..")
         try:
