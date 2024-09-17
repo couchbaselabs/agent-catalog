@@ -210,9 +210,12 @@ class Provider(pydantic_settings.BaseSettings):
             self._prompt_catalog = rosetta_core.catalog.CatalogChain(
                 chain=[self._local_prompt_catalog, self._remote_prompt_catalog]
             )
-        else:
-            self._tool_catalog = self._local_tool_catalog or self._remote_tool_catalog
-            self._prompt_catalog = self._local_prompt_catalog or self._remote_prompt_catalog
+        elif self._local_tool_catalog is not None:
+            self._tool_catalog = self._local_tool_catalog
+            self._prompt_catalog = self._local_prompt_catalog
+        else:  # self._remote_tool_catalog is not None
+            self._tool_catalog = self._remote_tool_catalog
+            self._prompt_catalog = self._remote_prompt_catalog
 
         # Finally, initialize our provider.
         self._tool_provider = rosetta_core.provider.ToolProvider(

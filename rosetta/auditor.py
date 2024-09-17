@@ -172,7 +172,8 @@ class Auditor(pydantic_settings.BaseSettings):
         :param model: LLM model used with this audit instance. This field can be specified on instantiation
                       or on accept(). A model specified in accept() overrides a model specified on instantiation.
         """
+        model = model if model is not None else self.llm_name
         if self._local_auditor is not None:
-            self._local_auditor.accept(role, content, session, timestamp=timestamp, model=model or self.llm_name)
+            self._local_auditor.accept(role, content, session, timestamp=timestamp, model=model)
         if self._db_auditor is not None:
-            self._db_auditor.accept(role, content, session, timestamp=timestamp, model=model or self.llm_name)
+            self._db_auditor.accept(role, content, session, timestamp=timestamp, model=model)
