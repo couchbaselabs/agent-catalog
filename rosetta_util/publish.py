@@ -1,8 +1,8 @@
 import datetime
 import json
 import logging
-import typing
 
+from .models import CouchbaseConnect
 from couchbase.auth import PasswordAuthenticator
 from couchbase.cluster import Cluster
 from couchbase.exceptions import CouchbaseException
@@ -10,13 +10,10 @@ from couchbase.options import ClusterOptions
 from datetime import timedelta
 from pathlib import Path
 
-# TODO (GLENN): Should this model be pushed into this module?
-from rosetta_cmd.models.publish import CouchbaseConnect
-
 logger = logging.getLogger(__name__)
 
 
-def get_connection(conn: CouchbaseConnect) -> typing.Tuple[str, Cluster]:
+def get_connection(conn: CouchbaseConnect) -> tuple[str, None] | tuple[None, Cluster]:
     cluster_url = conn.connection_url
     username = conn.username
     password = conn.password
