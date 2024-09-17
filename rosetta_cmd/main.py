@@ -129,7 +129,7 @@ def env(ctx):
 )
 @click.option(
     "--bucket",
-    default="",
+    default=None,
     type=str,
     help="The name of the Couchbase bucket to search.",
     show_default=False,
@@ -199,7 +199,7 @@ def find(ctx, query, name, kind, bucket, limit, include_dirty, refiner, annotati
 
         if bucket is None:
             # Prompt user to select a bucket
-            bucket = click.prompt("Please select a bucket", type=click.Choice(buckets), show_choices=True)
+            bucket = click.prompt("Please select a bucket: ", type=click.Choice(buckets), show_choices=True)
         elif bucket not in buckets:
             raise ValueError(
                 "Bucket does not exist! Available buckets from cluster are: "
@@ -297,7 +297,7 @@ def index(ctx, source_dirs, kind, embedding_model, include_dirty, dry_run):
 )
 @click.option(
     "--bucket",
-    default="",
+    default=None,
     type=str,
     help="The name of the Couchbase bucket to publish to.",
     show_default=False,
@@ -335,7 +335,7 @@ def publish(ctx, kind, bucket, annotations):
     buckets = get_buckets(cluster=cluster)
     if bucket is None:
         # Prompt user to select a bucket
-        bucket = click.prompt("Please select a bucket", type=click.Choice(buckets), show_choices=True)
+        bucket = click.prompt("Please select a bucket: ", type=click.Choice(buckets), show_choices=True)
     elif bucket not in buckets:
         raise ValueError(
             "Bucket does not exist! Available buckets from cluster are: "
