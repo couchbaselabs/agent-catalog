@@ -25,7 +25,7 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
         """Load from a catalog_path JSON file."""
         with catalog_path.open("r") as fp:
             catalog_descriptor = CatalogDescriptor.model_validate_json(fp.read())
-        return CatalogMem(catalog_descriptor=catalog_descriptor, embedding_model=embedding_model), None
+        return CatalogMem(catalog_descriptor=catalog_descriptor, embedding_model=embedding_model)
 
     def dump(self, catalog_path: pathlib.Path):
         """Save to a catalog_path JSON file."""
