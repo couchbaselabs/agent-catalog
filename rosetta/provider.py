@@ -188,40 +188,42 @@ class Provider(pydantic_settings.BaseSettings):
             )
         except pydantic.ValidationError:
             logger.debug("'rosetta-publish --kind tool' has not been run. Skipping remote tool catalog.")
+            self._remote_tool_catalog = None
         try:
             self._remote_prompt_catalog = rosetta_core.catalog.CatalogDB(
                 cluster=cluster, bucket=self.bucket, kind="prompt", embedding_model=self.embedding_model
             )
         except pydantic.ValidationError:
             logger.debug("'rosetta-publish --kind prompt' has not been run. Skipping remote prompt catalog.")
+            self._remote_prompt_catalog = None
         return self
 
     # Note: this must be placed **after** _find_local_catalog and _find_remote_catalog.
     @pydantic.model_validator(mode="after")
     def _initialize_provider(self) -> typing.Self:
-        if self._local_tool_catalog is None and self._remote_tool_catalog is None:
-            error_message = textwrap.dedent("""
-                Could not find $ROSETTA_CATALOG nor $ROSETTA_CONN_STRING! If this is a new project, please run the
-                command `rosetta index` before instantiating a provider. Otherwise, please set either of these
-                variables.
-            """)
-            logger.error(error_message)
-            raise ValueError(error_message)
-
-        if self._local_tool_catalog is not None and self._remote_tool_catalog is not None:
-            logger.debug("Local catalog and remote catalog found. Building a chained catalog.")
-            self._tool_catalog = rosetta_core.catalog.CatalogChain(
-                chain=[self._local_tool_catalog, self._remote_tool_catalog]
-            )
-            self._prompt_catalog = rosetta_core.catalog.CatalogChain(
-                chain=[self._local_prompt_catalog, self._remote_prompt_catalog]
-            )
-        elif self._local_tool_catalog is not None:
-            self._tool_catalog = self._local_tool_catalog
-            self._prompt_catalog = self._local_prompt_catalog
-        else:  # self._remote_tool_catalog is not None:
-            self._tool_catalog = self._remote_tool_catalog
-            self._prompt_catalog = self._remote_prompt_catalog
+        local_catalogs = self._local_tool_catalog, self._local_prompt_catalog
+        remote_catalogs = self._remote_tool_catalog, self._remote_prompt_catalog
+        catalog_mutators = (
+            lambda t: self.__setattr__("_tool_catalog", t),
+            lambda p: self.__setattr__("_prompt_catalog", p),
+        )
+        for catalog_tuple in zip(local_catalogs, remote_catalogs, catalog_mutators):
+            local_catalog, remote_catalog, set_catalog = catalog_tuple
+            if local_catalog is None and remote_catalog is None:
+                error_message = textwrap.dedent("""
+                    Could not find $ROSETTA_CATALOG nor $ROSETTA_CONN_STRING! If this is a new project, please run the
+                    command `rosetta index` before instantiating a provider. Otherwise, please set either of these
+                    variables.
+                """)
+                logger.error(error_message)
+                raise ValueError(error_message)
+            if local_catalog is not None and remote_catalog is not None:
+                logger.debug("Local catalog and remote catalog found. Building a chained catalog.")
+                set_catalog(rosetta_core.catalog.CatalogChain(chain=[local_catalog, remote_catalog]))
+            elif local_catalog is not None:
+                set_catalog(local_catalog)
+            else:  # remote_catalog is not None:
+                set_catalog(remote_catalog)
 
         # Finally, initialize our provider.
         self._tool_provider = rosetta_core.provider.ToolProvider(
