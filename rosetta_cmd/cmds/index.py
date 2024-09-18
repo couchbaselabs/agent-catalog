@@ -21,7 +21,6 @@ def cmd_index(
     source_dirs: list[str],
     kind: str,
     embedding_model: str,
-    include_dirty: bool = True,
     dry_run: bool = False,
     **_,
 ):
@@ -38,12 +37,6 @@ def cmd_index(
     # and on how to add .rosetta-activity/ to the .gitignore file? Or, should
     # we instead preemptively generate a .rosetta-activity/.gitiginore
     # file during init_local()?
-
-    if repo.is_dirty() and not include_dirty:
-        raise ValueError(
-            "Repo is dirty! Please commit your files to your local branch "
-            "or use 'rosetta index [folder] --include-dirty'."
-        )
 
     # TODO: One day, maybe allow users to choose a different branch instead of assuming
     # the HEAD branch, as users currently would have to 'git checkout BRANCH_THEY_WANT'
