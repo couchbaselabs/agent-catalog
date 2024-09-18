@@ -40,6 +40,7 @@ class _BaseFactory(abc.ABC):
 # Note: a Python Tool does not add any additional fields.
 class PythonToolDescriptor(RecordDescriptor):
     record_kind: typing.Literal[RecordKind.PythonFunction]
+    contents: str
 
     class Factory(_BaseFactory):
         def __iter__(self) -> typing.Iterable["PythonToolDescriptor"]:
@@ -47,6 +48,8 @@ class PythonToolDescriptor(RecordDescriptor):
             # TODO (GLENN): We should avoid blindly putting things in our path.
             if str(self.filename.parent.absolute()) not in sys.path:
                 sys.path.append(str(self.filename.parent.absolute()))
+            with open(self.filename, "r") as fp:
+                source_contents = fp.read()
             imported_module = importlib.import_module(self.filename.stem)
             for name, tool in inspect.getmembers(imported_module):
                 if not isinstance(tool, ToolMarker):
@@ -56,6 +59,7 @@ class PythonToolDescriptor(RecordDescriptor):
                     name=name,
                     description=tool.__doc__,
                     source=self.filename,
+                    contents=source_contents,
                     version=self.version,
                     # TODO (GLENN): Add support for user-defined annotations here.
                     annotations=dict(),
