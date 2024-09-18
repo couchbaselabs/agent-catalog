@@ -1341,13 +1341,13 @@ langchain-core = ">=0.2.38,<0.3.0"
 
 [[package]]
 name = "langsmith"
-version = "0.1.121"
+version = "0.1.122"
 description = "Client library to connect to the LangSmith LLM Tracing and Evaluation Platform."
 optional = true
 python-versions = "<4.0,>=3.8.1"
 files = [
-    {file = "langsmith-0.1.121-py3-none-any.whl", hash = "sha256:fdb1ac8a671d3904201bfeea197d87bded46a10d08f1034af464211872e29893"},
-    {file = "langsmith-0.1.121.tar.gz", hash = "sha256:e9381b82a5bd484af9a51c3e96faea572746b8d617b070c1cda40cbbe48e33df"},
+    {file = "langsmith-0.1.122-py3-none-any.whl", hash = "sha256:9c9cde442d7321e8557f5c45c14b1b643b8aa28acc3f844d3a0021a9571aad7c"},
+    {file = "langsmith-0.1.122.tar.gz", hash = "sha256:56dff727ca529fe8df300e6e4759dc920efe10ab8cd602b4d6b51e33599214e6"},
 ]
 
 [package.dependencies]
@@ -2651,7 +2651,7 @@ tqdm = "^4.66.5"
 type = "git"
 url = "git@github.com:couchbaselabs/rosetta-core.git"
 reference = "HEAD"
-resolved_reference = "a745e31714e4c349713dcbf5caf25b74239f6ac2"
+resolved_reference = "bd7b4fc1d384a8bfbf0223f2c349629d18e84725"
 
 [[package]]
 name = "rosetta-lc"
@@ -2677,7 +2677,7 @@ rosetta_core = {git = "git@github.com:couchbaselabs/rosetta-core.git"}
 type = "git"
 url = "git@github.com:couchbaselabs/rosetta-lc.git"
 reference = "HEAD"
-resolved_reference = "a0fe8da613972a7afa9b1753dcbb04e6438ac3e3"
+resolved_reference = "807c00757cf54da597bcf379a727fe1091a09ca2"
 
 [[package]]
 name = "rpds-py"
@@ -3795,13 +3795,13 @@ test = ["Cython (>=0.29.36,<0.30.0)", "aiohttp (==3.9.0b0)", "aiohttp (>=3.8.1)"
 
 [[package]]
 name = "virtualenv"
-version = "20.26.4"
+version = "20.26.5"
 description = "Virtual Python Environment builder"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "virtualenv-20.26.4-py3-none-any.whl", hash = "sha256:48f2695d9809277003f30776d155615ffc11328e6a0a8c1f0ec80188d7874a55"},
-    {file = "virtualenv-20.26.4.tar.gz", hash = "sha256:c17f4e0f3e6036e9f26700446f85c76ab11df65ff6d8a9cbfad9f71aabfcf23c"},
+    {file = "virtualenv-20.26.5-py3-none-any.whl", hash = "sha256:4f3ac17b81fba3ce3bd6f4ead2749a72da5929c01774948e243db9ba41df4ff6"},
+    {file = "virtualenv-20.26.5.tar.gz", hash = "sha256:ce489cac131aa58f4b25e321d6d186171f78e6cb13fafbf32a840cee67733ff4"},
 ]
 
 [package.dependencies]

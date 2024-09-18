@@ -182,12 +182,18 @@ class Provider(pydantic_settings.BaseSettings):
                 )
             ),
         )
-        self._remote_tool_catalog = rosetta_core.catalog.CatalogDB(
-            cluster=cluster, bucket=self.bucket, kind="tool", embedding_model=self.embedding_model
-        )
-        self._remote_prompt_catalog = rosetta_core.catalog.CatalogDB(
-            cluster=cluster, bucket=self.bucket, kind="prompt", embedding_model=self.embedding_model
-        )
+        try:
+            self._remote_tool_catalog = rosetta_core.catalog.CatalogDB(
+                cluster=cluster, bucket=self.bucket, kind="tool", embedding_model=self.embedding_model
+            )
+        except pydantic.ValidationError:
+            logger.debug("'rosetta-publish --kind tool' has not been run. Skipping remote tool catalog.")
+        try:
+            self._remote_prompt_catalog = rosetta_core.catalog.CatalogDB(
+                cluster=cluster, bucket=self.bucket, kind="prompt", embedding_model=self.embedding_model
+            )
+        except pydantic.ValidationError:
+            logger.debug("'rosetta-publish --kind prompt' has not been run. Skipping remote prompt catalog.")
         return self
 
     # Note: this must be placed **after** _find_local_catalog and _find_remote_catalog.
@@ -213,7 +219,7 @@ class Provider(pydantic_settings.BaseSettings):
         elif self._local_tool_catalog is not None:
             self._tool_catalog = self._local_tool_catalog
             self._prompt_catalog = self._local_prompt_catalog
-        else:  # self._remote_tool_catalog is not None
+        else:  # self._remote_tool_catalog is not None:
             self._tool_catalog = self._remote_tool_catalog
             self._prompt_catalog = self._remote_prompt_catalog
 
