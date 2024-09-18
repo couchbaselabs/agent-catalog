@@ -40,14 +40,13 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             # TODO (GLENN): Factor our embedding model here
             scope_name = DEFAULT_SCOPE_PREFIX + self.embedding_model.replace("/", "_")
             collection_name = f"{self.kind}_catalog"
-            execute_query(
-                self.cluster,
+            self.cluster.query(
                 f"""
                 FROM   `{self.bucket}`.`{scope_name}`.`{collection_name}`
                 SELECT 1
                 LIMIT  1;
             """,
-            )
+            ).execute()
             return self
         except ScopeNotFoundException as e:
             raise ValueError("Catalog does not exist! Please run 'rosetta publish' first.") from e
