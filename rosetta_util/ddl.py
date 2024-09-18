@@ -14,21 +14,25 @@ def is_index_present(
 ) -> tuple[bool | None, Exception | None]:
     """Checks for existence of index_to_create in the given keyspace"""
 
-    # TODO (GLENN): Refactor localhost and the port out
-    find_index_url = f"http://localhost:8094/api/bucket/{bucket}/scope/{scope_name}/index"
+    url = "localhost"
+    port = "8094"
+    find_index_url = f"http://{url}:{port}/api/bucket/{bucket}/scope/{scope_name}/index"
     auth = (conn.username, conn.password)
 
     try:
         # REST call to get list of indexes
         response = requests.request("GET", find_index_url, auth=auth)
-
         if json.loads(response.text)["status"] == "ok":
+            # If no vector indexes are present
+            if json.loads(response.text)["indexDefs"] is None:
+                return False, None
+            # If index_to_create not in existing vector index list
             created_indexes = [el for el in json.loads(response.text)["indexDefs"]["indexDefs"]]
             if index_to_create not in created_indexes:
                 return False, None
             return True, None
     except Exception as e:
-        return None, e
+        return False, e
 
 
 def create_vector_index(
@@ -38,12 +42,13 @@ def create_vector_index(
 
     scope_name = DEFAULT_SCOPE_PREFIX + embedding_model
     index_to_create = f"{bucket}.{scope_name}.rosetta-{kind}-index-{embedding_model}"
-    index_present, err = is_index_present(bucket, scope_name, index_to_create, conn)
+    (index_present, err) = is_index_present(bucket, scope_name, index_to_create, conn)
+    url = "localhost"
+    port = "8094"
 
     if err is None and not index_present:
-        # TODO (GLENN): Refactor localhost and the port out
         create_vector_index_url = (
-            f"http://localhost:8094/api/bucket/{bucket}/scope/{scope_name}/index/rosetta-{kind}-index-{embedding_model}"
+            f"http://{url}:{port}/api/bucket/{bucket}/scope/{scope_name}/index/rosetta-{kind}-index-{embedding_model}"
         )
         headers = {
             "Content-Type": "application/json",
@@ -109,6 +114,7 @@ def create_vector_index(
             response = requests.request("PUT", create_vector_index_url, headers=headers, auth=auth, data=payload)
 
             if json.loads(response.text)["status"] == "ok":
+                logger.info("Created vector index!!")
                 return index_to_create, None
             elif json.loads(response.text)["status"] == "fail":
                 raise Exception(json.loads(response.text)["error"])
