@@ -15,6 +15,11 @@ packages = [
     { include = "rosetta_util"}
 ]
 
+include = [
+    # These are the Jinja templates we use for code-gen.
+    "rosetta_core/tool/generate/templates/*"
+]
+
 [tool.poetry.urls]
 Homepage = "https://couchbase.com"
 Documentation = "https://docs.couchbase.com"

@@ -38,6 +38,23 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
     # TODO (GLENN): Might need to add this to mem as well.
     snapshot_id: typing.Union[str | None] = "all"
 
+    @pydantic.model_validator(mode="after")
+    def cluster_should_be_reachable(self) -> "CatalogDB":
+        try:
+            # TODO (GLENN): Factor our embedding model here
+            scope_name = DEFAULT_SCOPE_PREFIX + self.embedding_model.replace("/", "_")
+            collection_name = f"{self.kind}_catalog"
+            self.cluster.query(
+                f"""
+                FROM   `{self.bucket}`.`{scope_name}`.`{collection_name}`
+                SELECT 1
+                LIMIT  1;
+            """,
+            ).execute()
+            return self
+        except ScopeNotFoundException as e:
+            raise ValueError("Catalog does not exist! Please run 'rosetta publish' first.") from e
+
     def find(
         self,
         query: str = None,
@@ -149,13 +166,10 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
         """Returns the lates version of the kind catalog"""
         scope_name = DEFAULT_SCOPE_PREFIX + self.embedding_model.replace("/", "_")
         ts_query = f"""
-            FROM
-                `{self.bucket}`.`{scope_name}`.`{self.kind}_catalog` AS t
-            SELECT VALUE
-                t.version
-            ORDER BY
-                META().cas DESC
-            LIMIT 1
+            FROM     `{self.bucket}`.`{scope_name}`.`{self.kind}_catalog` AS t
+            SELECT   VALUE  t.version
+            ORDER BY META().cas DESC
+            LIMIT    1
         """
 
         res, err = execute_query(self.cluster, ts_query)
