@@ -17,6 +17,7 @@ from rosetta_core.tool.descriptor import SemanticSearchToolDescriptor
 from rosetta_core.tool.descriptor import SQLPPQueryToolDescriptor
 from rosetta_core.version import VersionDescriptor
 from rosetta_util.query import execute_query
+from rosetta_util.query import execute_query_with_parameters
 
 logger = logging.getLogger(__name__)
 
@@ -67,10 +68,10 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             # TODO (GLENN): Need to add some validation around bucket (to prevent injection)
             # TODO (GLENN): Need to add some validation around name (to prevent injection)
             item_query = (
-                f"SELECT a.* from `{self.bucket}`.`{scope_name}`.`{self.kind}_catalog` as a WHERE a.name = '{name}';"
+                f"SELECT a.* from `{self.bucket}`.`{scope_name}`.`{self.kind}_catalog` as a WHERE a.name = $name;"
             )
 
-            res, err = execute_query(self.cluster, item_query)
+            res, err = execute_query_with_parameters(self.cluster, item_query, {"name": name})
             if err is not None:
                 logger.error(err)
                 return []

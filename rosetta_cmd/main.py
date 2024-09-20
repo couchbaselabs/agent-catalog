@@ -312,20 +312,13 @@ def find(ctx, query, name, kind, bucket, limit, include_dirty, refiner, annotati
     show_default=True,
 )
 @click.option(
-    "--include-dirty",
-    default=False,
-    is_flag=True,
-    help="Whether to index dirty source files into the local catalog.",
-    show_default=True,
-)
-@click.option(
     "--dry-run",
     default=False,
     help="When true, do not update the local catalog files.",
     show_default=True,
 )
 @click.pass_context
-def index(ctx, source_dirs, kind, embedding_model, include_dirty, dry_run):
+def index(ctx, source_dirs, kind, embedding_model, dry_run):
     """Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
     SOURCE_DIRS defaults to ".", the current working directory.
     Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc."""
@@ -342,7 +335,6 @@ def index(ctx, source_dirs, kind, embedding_model, include_dirty, dry_run):
         source_dirs=source_dirs,
         kind=kind,
         embedding_model=embedding_model,
-        include_dirty=include_dirty,
         dry_run=dry_run,
     )
 
