@@ -49,7 +49,7 @@ def cmd_publish(
             # If only one type of catalog is present
             continue
         catalog = catalog.catalog_descriptor
-        embedding_model = catalog.embedding_model.replace("/", "_")
+        # embedding_model = catalog.embedding_model.replace("/", "_")
 
         # Check to ensure a dirty catalog is not published
         if catalog.version.is_dirty:
@@ -64,7 +64,7 @@ def cmd_publish(
         #                                  Metadata collection                                     #
         # ---------------------------------------------------------------------------------------- #
         meta_col = kind + DEFAULT_META_COLLECTION_NAME
-        meta_scope = scope + embedding_model
+        meta_scope = scope
         (msg, err) = create_scope_and_collection(bucket_manager, scope=meta_scope, collection=meta_col)
         if err is not None:
             printer(msg, err)
@@ -95,7 +95,7 @@ def cmd_publish(
         #                               Catalog items collection                                   #
         # ---------------------------------------------------------------------------------------- #
         catalog_col = kind + DEFAULT_CATALOG_COLLECTION_NAME
-        catalog_scope = scope + embedding_model
+        catalog_scope = scope
         (msg, err) = create_scope_and_collection(bucket_manager, scope=catalog_scope, collection=catalog_col)
         if err is not None:
             printer(msg, err)
@@ -129,14 +129,16 @@ def cmd_publish(
         # ---------------------------------------------------------------------------------------- #
         #                               GSI and Vector Indexes                                     #
         # ---------------------------------------------------------------------------------------- #
-        s, err = create_gsi_indexes(bucket, cluster, kind, embedding_model)
+        s, err = create_gsi_indexes(bucket, cluster, kind)
         if not s:
             click.secho(f"ERROR: GSI indexes could not be created \n{err}", fg="red")
             return
         else:
             logger.info("Indexes created successfully!")
 
-        _, err = create_vector_index(bucket, kind, connection_details_env, embedding_model)
+        dims = len(catalog.items[0].embedding)
+
+        _, err = create_vector_index(bucket, kind, connection_details_env, dims)
         if err is not None:
             click.secho(f"ERROR: Vector index could not be created \n{err}", fg="red")
             return
