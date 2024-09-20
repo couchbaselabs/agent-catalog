@@ -1,3 +1,4 @@
+import click
 import json
 import logging
 import requests
@@ -10,45 +11,49 @@ logger = logging.getLogger(__name__)
 
 
 def is_index_present(
-    bucket: str = "", scope_name: str = "", index_to_create: str = "", conn: CouchbaseConnect = ""
-) -> tuple[bool | None, Exception | None]:
+    bucket: str = "", index_to_create: str = "", conn: CouchbaseConnect = ""
+) -> tuple[bool | dict | None, Exception | None]:
     """Checks for existence of index_to_create in the given keyspace"""
 
     url = "localhost"
     port = "8094"
-    find_index_url = f"http://{url}:{port}/api/bucket/{bucket}/scope/{scope_name}/index"
+    find_index_url = f"http://{url}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index"
     auth = (conn.username, conn.password)
 
     try:
         # REST call to get list of indexes
         response = requests.request("GET", find_index_url, auth=auth)
-        if json.loads(response.text)["status"] == "ok":
+        json_response = json.loads(response.text)
+        if json_response["status"] == "ok":
             # If no vector indexes are present
-            if json.loads(response.text)["indexDefs"] is None:
+            if json_response["indexDefs"] is None:
                 return False, None
             # If index_to_create not in existing vector index list
-            created_indexes = [el for el in json.loads(response.text)["indexDefs"]["indexDefs"]]
+            created_indexes = [el for el in json_response["indexDefs"]["indexDefs"]]
             if index_to_create not in created_indexes:
                 return False, None
-            return True, None
+            else:
+                index_def = json_response["indexDefs"]["indexDefs"][index_to_create]
+                return index_def, None
     except Exception as e:
         return False, e
 
 
 def create_vector_index(
-    bucket: str = "", kind: str = "tool", conn: CouchbaseConnect = "", embedding_model: str = ""
+    bucket: str = "", kind: str = "tool", conn: CouchbaseConnect = "", dim: int = None
 ) -> tuple[str | None, Exception | None]:
     """Creates required vector index at publish"""
 
-    scope_name = DEFAULT_SCOPE_PREFIX + embedding_model
-    index_to_create = f"{bucket}.{scope_name}.rosetta-{kind}-index-{embedding_model}"
-    (index_present, err) = is_index_present(bucket, scope_name, index_to_create, conn)
+    index_to_create = f"{bucket}.{DEFAULT_SCOPE_PREFIX}.rosetta-{kind}-index"
+    (index_present, err) = is_index_present(bucket, index_to_create, conn)
     url = "localhost"
     port = "8094"
 
-    if err is None and not index_present:
+    if err is None and isinstance(index_present, bool) and not index_present:
+        click.echo("Creating vector index...")
+        # Create the index for the first time
         create_vector_index_url = (
-            f"http://{url}:{port}/api/bucket/{bucket}/scope/{scope_name}/index/rosetta-{kind}-index-{embedding_model}"
+            f"http://{url}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta-{kind}-index"
         )
         headers = {
             "Content-Type": "application/json",
@@ -58,7 +63,7 @@ def create_vector_index(
         payload = json.dumps(
             {
                 "type": "fulltext-index",
-                "name": f"{bucket}.{scope_name}.rosetta-{kind}-vec",
+                "name": f"{bucket}.{DEFAULT_SCOPE_PREFIX}.rosetta-{kind}-index",
                 "sourceType": "gocbcore",
                 "sourceName": f"{bucket}",
                 "planParams": {"maxPartitionsPerPIndex": 1024, "indexPartitions": 1},
@@ -81,7 +86,7 @@ def create_vector_index(
                         "store_dynamic": False,
                         "type_field": "_type",
                         "types": {
-                            f"{scope_name}.{kind}_catalog": {
+                            f"{DEFAULT_SCOPE_PREFIX}.{kind}_catalog": {
                                 "dynamic": False,
                                 "enabled": True,
                                 "properties": {
@@ -90,22 +95,23 @@ def create_vector_index(
                                         "enabled": True,
                                         "fields": [
                                             {
+                                                "dims": dim,
                                                 "index": True,
-                                                "name": "embedding",
-                                                "type": "vector",
+                                                "name": f"embedding-{dim}",
                                                 "similarity": "dot_product",
+                                                "type": "vector",
                                                 "vector_index_optimized_for": "recall",
-                                                "dims": 384,
-                                            }
+                                            },
                                         ],
                                     }
                                 },
                             }
                         },
                     },
-                    "store": {"indexType": "scorch", "segmentVersion": 15},
+                    "store": {"indexType": "scorch", "segmentVersion": 16},
                 },
                 "sourceParams": {},
+                "uuid": "",
             }
         )
 
@@ -120,51 +126,92 @@ def create_vector_index(
                 raise Exception(json.loads(response.text)["error"])
         except Exception as e:
             return None, e
+    elif err is None and isinstance(index_present, dict):
+        click.echo("\nUpdating the index....")
+        # Update the index
+        new_field_mapping = {
+            "dims": dim,
+            "index": True,
+            "name": f"embedding-{dim}",
+            "similarity": "dot_product",
+            "type": "vector",
+            "vector_index_optimized_for": "recall",
+        }
+
+        # Add field mapping with new model dim
+        field_mappings = index_present["params"]["mapping"]["types"][f"{DEFAULT_SCOPE_PREFIX}.{kind}_catalog"][
+            "properties"
+        ]["embedding"]["fields"]
+        field_mappings.append(new_field_mapping) if new_field_mapping not in field_mappings else field_mappings
+        index_present["params"]["mapping"]["types"][f"{DEFAULT_SCOPE_PREFIX}.{kind}_catalog"]["properties"][
+            "embedding"
+        ]["fields"] = field_mappings
+
+        update_vector_index_url = (
+            f"http://{url}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta-{kind}-index"
+        )
+        headers = {
+            "Content-Type": "application/json",
+        }
+        auth = (conn.username, conn.password)
+
+        payload = json.dumps(index_present)
+
+        try:
+            # REST call to update the index
+            response = requests.request("PUT", update_vector_index_url, headers=headers, auth=auth, data=payload)
+
+            if json.loads(response.text)["status"] == "ok":
+                logger.info("Updated vector index!!")
+                return "Success", None
+            elif json.loads(response.text)["status"] == "fail":
+                raise Exception(json.loads(response.text)["error"])
+        except Exception as e:
+            return None, e
     else:
         return index_to_create, None
 
 
-def create_gsi_indexes(bucket, cluster, kind, embedding_model):
+def create_gsi_indexes(bucket, cluster, kind):
     """Creates required indexes at publish"""
 
-    success = True
+    completion_status = True
     all_errs = ""
-    scope_name = DEFAULT_SCOPE_PREFIX + embedding_model
 
     # Primary index on kind_catalog
-    primary_idx = f"CREATE PRIMARY INDEX IF NOT EXISTS `rosetta_primary_{kind}cat_{embedding_model}` ON `{bucket}`.`{scope_name}`.`{kind}_catalog` USING GSI;"
+    primary_idx = f"CREATE PRIMARY INDEX IF NOT EXISTS `rosetta_primary_{kind}cat` ON `{bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{kind}_catalog` USING GSI;"
     res, err = execute_query(cluster, primary_idx)
     for r in res.rows():
         logger.debug(r)
     if err is not None:
         all_errs += err
-        success = False
+        completion_status = False
 
     # Secondary index on catalog_identifier
-    cat_idx = f"CREATE INDEX IF NOT EXISTS `rosetta_{kind}cat_catalog_identifier_{embedding_model}` ON `{bucket}`.`{scope_name}`.`{kind}_catalog`(`catalog_identifier`);"
+    cat_idx = f"CREATE INDEX IF NOT EXISTS `rosetta_{kind}cat_catalog_identifier` ON `{bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{kind}_catalog`(`catalog_identifier`);"
     res, err = execute_query(cluster, cat_idx)
     for r in res.rows():
         logger.debug(r)
     if err is not None:
         all_errs += err
-        success = False
+        completion_status = False
 
     # Secondary index on catalog_identifier + annotations
-    cat_ann_idx = f"CREATE INDEX IF NOT EXISTS `rosetta_{kind}cat_catalog_identifier_annotations_{embedding_model}` ON `{bucket}`.`{scope_name}`.`{kind}_catalog`(`catalog_identifier`,`annotations`);"
+    cat_ann_idx = f"CREATE INDEX IF NOT EXISTS `rosetta_{kind}cat_catalog_identifier_annotations` ON `{bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{kind}_catalog`(`catalog_identifier`,`annotations`);"
     res, err = execute_query(cluster, cat_ann_idx)
     for r in res.rows():
         logger.debug(r)
     if err is not None:
         all_errs += err
-        success = False
+        completion_status = False
 
     # Secondary index on annotations
-    ann_idx = f"CREATE INDEX IF NOT EXISTS `rosetta_{kind}cat_annotations_{embedding_model}` ON `{bucket}`.`{scope_name}`.`{kind}_catalog`(`annotations`);"
+    ann_idx = f"CREATE INDEX IF NOT EXISTS `rosetta_{kind}cat_annotations` ON `{bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{kind}_catalog`(`annotations`);"
     res, err = execute_query(cluster, ann_idx)
     for r in res.rows():
         logger.debug(r)
     if err is not None:
         all_errs += err
-        success = False
+        completion_status = False
 
-    return success, all_errs
+    return completion_status, all_errs
