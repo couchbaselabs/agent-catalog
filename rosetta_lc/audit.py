@@ -2,9 +2,11 @@ import logging
 import rosetta_core.activity.auditor.base
 import rosetta_core.llm
 import typing
+import uuid
 
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.language_models import BaseChatModel
+from langchain_core.load.dump import default
 from langchain_core.messages import AIMessage
 from langchain_core.messages import AIMessageChunk
 from langchain_core.messages import BaseMessage
@@ -57,12 +59,20 @@ def audit(
         run_manager: typing.Optional[CallbackManagerForLLMRun] = None,
         **kwargs: typing.Any,
     ) -> ChatResult:
+        grouping_id = uuid.uuid4().hex
         for message in messages:
-            auditor.accept(_determine_role_from_type(message), message.content, session)
+            auditor.accept(
+                role=_determine_role_from_type(message), content=default(message), session=session, grouping=grouping_id
+            )
         results = generate_dispatch(messages, stop, run_manager, **kwargs)
         for result in results.generations:
             logger.debug(f"LLM has returned the message: {result}")
-            auditor.accept(rosetta_core.llm.Role.Assistant, result.message.content, session)
+            auditor.accept(
+                role=rosetta_core.llm.Role.Assistant,
+                content=default(result.message),
+                session=session,
+                grouping=grouping_id,
+            )
         return results
 
     def _stream(
@@ -72,19 +82,30 @@ def audit(
         run_manager: typing.Optional[CallbackManagerForLLMRun] = None,
         **kwargs: typing.Any,
     ) -> typing.Iterator[ChatGenerationChunk]:
+        grouping_id = uuid.uuid4().hex
         for message in messages:
-            auditor.accept(_determine_role_from_type(message), message.content, session)
+            auditor.accept(
+                role=_determine_role_from_type(message), content=default(message), session=session, grouping=grouping_id
+            )
         iterator = stream_dispatch(messages, stop, run_manager, **kwargs)
 
         # For sanity at analytics-time, we'll aggregate the chunks here.
-        result_text = ""
+        result_chunk: ChatGenerationChunk = None
         for chunk in iterator:
             logger.debug(f"LLM has returned the chunk: {chunk}")
-            result_text += chunk.text
+            if result_chunk is None:
+                result_chunk = chunk
+            else:
+                result_chunk += chunk
             yield chunk
 
         # We have exhausted our iterator. Log the resultant chunk.
-        auditor.accept(rosetta_core.llm.Role.Assistant, result_text, session)
+        auditor.accept(
+            role=rosetta_core.llm.Role.Assistant,
+            content=default(result_chunk.message),
+            session=session,
+            grouping=grouping_id,
+        )
 
     # Note: Pydantic fiddles around with __setattr__, so we need to skirt around this.
     object.__setattr__(chat_model, "_generate", _generate.__get__(chat_model, BaseChatModel))
