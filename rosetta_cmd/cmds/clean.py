@@ -1,6 +1,6 @@
 import click
 import couchbase.cluster
-import flask
+import importlib.util
 import logging
 import os
 import pathlib
@@ -62,19 +62,22 @@ def cmd_clean(ctx: Context, is_local: bool, is_db: bool, bucket: str, cluster: c
         clean_db(ctx, bucket, cluster, embedding_model)
 
 
-blueprint = flask.Blueprint("clean", __name__)
+# Note: flask is an optional dependency.
+if importlib.util.find_spec("flask") is not None:
+    import flask
 
+    blueprint = flask.Blueprint("clean", __name__)
 
-@blueprint.route("/clean", methods=["POST"])
-def route_clean():
-    # TODO: Check creds as it's destructive.
+    @blueprint.route("/clean", methods=["POST"])
+    def route_clean():
+        # TODO: Check creds as it's destructive.
 
-    ctx = flask.current_app.config["ctx"]
+        ctx = flask.current_app.config["ctx"]
 
-    if True:  # TODO: Should check REST args on whether to clean local catalog.
-        clean_local(ctx, None)
+        if True:  # TODO: Should check REST args on whether to clean local catalog.
+            clean_local(ctx, None)
 
-    if False:  # TODO: Should check REST args on whether to clean db.
-        clean_db(ctx, "TODO", None)
+        if False:  # TODO: Should check REST args on whether to clean db.
+            clean_db(ctx, "TODO", None)
 
-    return "OK"  # TODO.
+        return "OK"  # TODO.

@@ -1,6 +1,6 @@
 import click
 import datetime
-import flask
+import importlib.util
 import os
 import pathlib
 import typing
@@ -12,17 +12,6 @@ from ..models.context import Context
 from rosetta_core.catalog import CatalogMem
 from rosetta_core.catalog.index import index_catalog_start
 from rosetta_core.version import VersionDescriptor
-
-blueprint = flask.Blueprint("status", __name__)
-
-
-@blueprint.route("/status")
-def route_status():
-    kind = flask.request.args.get("kind", default="tool", type=str)
-    include_dirty = flask.request.args.get("include_dirty", default="true", type=str).lower() == "true"
-
-    return flask.jsonify(catalog_status(flask.current_app.config["ctx"], kind, include_dirty))
-
 
 level_colors = {"good": "green", "warn": "yellow", "error": "red"}
 
@@ -157,3 +146,17 @@ def catalog_status(ctx, kind, include_dirty=True):
     )
 
     return sections
+
+
+# Note: flask is an optional dependency.
+if importlib.util.find_spec("flask") is not None:
+    import flask
+
+    blueprint = flask.Blueprint("status", __name__)
+
+    @blueprint.route("/status")
+    def route_status():
+        kind = flask.request.args.get("kind", default="tool", type=str)
+        include_dirty = flask.request.args.get("include_dirty", default="true", type=str).lower() == "true"
+
+        return flask.jsonify(catalog_status(flask.current_app.config["ctx"], kind, include_dirty))

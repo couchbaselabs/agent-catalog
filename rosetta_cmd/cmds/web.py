@@ -1,5 +1,3 @@
-import flask
-
 from ..models.context import Context
 
 
@@ -20,6 +18,8 @@ def register_blueprints(app):
 
 
 def cmd_web(ctx: Context, host_port: str, debug: bool = True):
+    import flask
+
     app = flask.Flask(__name__)
 
     app.config["ctx"] = ctx
