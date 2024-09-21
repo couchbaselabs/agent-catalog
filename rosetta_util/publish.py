@@ -56,6 +56,8 @@ def get_buckets(cluster):
 
 def create_scope_and_collection(bucket_manager, scope, collection):
     """Create new Couchbase scope and collection within it if they do not exist"""
+    # TODO (GLENN): Refactor to just use cluster.query and CREATE SCOPE and CREATE COLLECTION statements
+    #               (you can use IF NOT EXISTS instead of checking if the scope / collection exists)
 
     # Create a new scope if it does not exist
     try:

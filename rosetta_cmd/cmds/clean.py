@@ -1,4 +1,5 @@
 import click
+import couchbase.cluster
 import flask
 import logging
 import os
@@ -53,11 +54,11 @@ def clean_db(ctx, bucket, cluster, embedding_model):
         logger.error(all_errs)
 
 
-def cmd_clean(ctx, is_clean_local, is_clean_db, bucket, cluster, embedding_model):
-    if is_clean_local:
+def cmd_clean(ctx: Context, is_local: bool, is_db: bool, bucket: str, cluster: couchbase.cluster, embedding_model: str):
+    if is_local:
         clean_local(ctx)
 
-    if is_clean_db:
+    if is_db:
         clean_db(ctx, bucket, cluster, embedding_model)
 
 

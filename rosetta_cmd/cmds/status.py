@@ -3,10 +3,12 @@ import datetime
 import flask
 import os
 import pathlib
+import typing
 
 from ..cmds.util import init_local
 from ..cmds.util import load_repository
 from ..defaults import DEFAULT_SCAN_DIRECTORY_OPTS
+from ..models.context import Context
 from rosetta_core.catalog import CatalogMem
 from rosetta_core.catalog.index import index_catalog_start
 from rosetta_core.version import VersionDescriptor
@@ -25,7 +27,7 @@ def route_status():
 level_colors = {"good": "green", "warn": "yellow", "error": "red"}
 
 
-def cmd_status(ctx, kind="tool", include_dirty=True):
+def cmd_status(ctx: Context, kind: typing.Literal["tool", "prompt"] = "tool", include_dirty: bool = True):
     # TODO: Allow the kind to be '*' or None to show the
     # status on all the available kinds of catalogs.
 
