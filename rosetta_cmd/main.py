@@ -11,15 +11,13 @@ from .cmds import cmd_index
 from .cmds import cmd_publish
 from .cmds import cmd_status
 from .cmds import cmd_version
-from .cmds import cmd_web
 from .defaults import DEFAULT_ACTIVITY_FOLDER
 from .defaults import DEFAULT_CATALOG_FOLDER
 from .defaults import DEFAULT_EMBEDDING_MODEL
 from .defaults import DEFAULT_SCOPE_PREFIX
-from .defaults import DEFAULT_WEB_HOST_PORT
 from .models import Context
-from .models import CouchbaseConnect
-from .models import Keyspace
+from rosetta_util.models import CouchbaseConnect
+from rosetta_util.models import Keyspace
 from rosetta_util.publish import get_buckets
 from rosetta_util.publish import get_connection
 
@@ -169,14 +167,38 @@ def env(ctx):
 
 @click_main.command()
 @click.option(
+    "--bucket",
+    default=None,
+    type=str,
+    help="The name of the Couchbase bucket to run analysis over.",
+    show_default=False,
+)
+@click.option(
+    "-m",
+    "--metric",
+    multiple=True,
+    help="Metric to evaluate the log files on.",
+    type=click.Choice(["faithfulness", "answer-relevancy", "context-utilization"], case_sensitive=False),
+    default=["faithfulness", "answer-relevancy", "context-utilization"],
+    show_default=True,
+)
+@click.pass_context
+def analyze(ctx, bucket, metrics):
+    """Find tools, prompts, etc. from the catalog based on a natural language QUERY string."""
+    # cmd_analyze(ctx.obj, bucket=bucket, metrics=metrics)
+    pass
+
+
+@click_main.command()
+@click.option(
     "--query",
-    default="",
+    default=None,
     help="User query describing the task for which tools / prompts are needed. This field or --name must be specified.",
     show_default=False,
 )
 @click.option(
     "--name",
-    default="",
+    default=None,
     help="Name of catalog item to retrieve from the catalog directly. This field or --query must be specified.",
     show_default=False,
 )
@@ -428,25 +450,25 @@ def version(ctx):
     cmd_version(ctx.obj)
 
 
-@click_main.command()
-@click.option(
-    "--host-port",
-    default=DEFAULT_WEB_HOST_PORT,
-    envvar="ROSETTA_WEB_HOST_PORT",
-    help="The host:port to listen on.",
-    show_default=True,
-)
-@click.option(
-    "--debug/--no-debug",
-    envvar="ROSETTA_WEB_DEBUG",
-    default=True,
-    help="Debug mode.",
-    show_default=True,
-)
-@click.pass_context
-def web(ctx, host_port, debug):
-    """Start a local web server to view our tools."""
-    cmd_web(ctx.obj, host_port, debug)
+# @click_main.command()
+# @click.option(
+#     "--host-port",
+#     default=DEFAULT_WEB_HOST_PORT,
+#     envvar="ROSETTA_WEB_HOST_PORT",
+#     help="The host:port to listen on.",
+#     show_default=True,
+# )
+# @click.option(
+#     "--debug/--no-debug",
+#     envvar="ROSETTA_WEB_DEBUG",
+#     default=True,
+#     help="Debug mode.",
+#     show_default=True,
+# )
+# @click.pass_context
+# def web(ctx, host_port, debug):
+#     """Start a local web server to view our tools."""
+#     cmd_web(ctx.obj, host_port, debug)
 
 
 def main():

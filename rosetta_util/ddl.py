@@ -3,9 +3,11 @@ import json
 import logging
 import requests
 
+
+# TODO (GLENN): rosetta_cmd should not be a dependency for rosetta_util
+from .models import CouchbaseConnect
+from .query import execute_query
 from rosetta_cmd.defaults import DEFAULT_SCOPE_PREFIX
-from rosetta_cmd.models import CouchbaseConnect
-from rosetta_util.query import execute_query
 from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
