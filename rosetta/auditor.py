@@ -159,21 +159,24 @@ class Auditor(pydantic_settings.BaseSettings):
     def accept(
         self,
         role: Role,
-        content: typing.AnyStr,
+        content: typing.Any,
         session: typing.AnyStr,
+        grouping: typing.AnyStr = None,
         timestamp: datetime.datetime = None,
         model: str = None,
+        **kwargs,
     ) -> None:
         """
         :param role: Role associated with the message. See rosetta_core.llm.message.Role for all options here.
-        :param content: The message to record. Ideally, the content should be as close to the producer as possible.
+        :param content: The (JSON-serializable) message to record. This should be as close to the producer as possible.
         :param session: A unique string associated with the current session / conversation / thread.
+        :param grouping: A unique string associated with one "generate" invocation across a group of messages.
         :param timestamp: The time associated with the message production. This must have time-zone information.
         :param model: LLM model used with this audit instance. This field can be specified on instantiation
                       or on accept(). A model specified in accept() overrides a model specified on instantiation.
         """
         model = model if model is not None else self.llm_name
-        if self._local_auditor is not None:
-            self._local_auditor.accept(role, content, session, timestamp=timestamp, model=model)
-        if self._db_auditor is not None:
-            self._db_auditor.accept(role, content, session, timestamp=timestamp, model=model)
+        auditor = self._local_auditor if self._local_auditor is not None else self._db_auditor
+        auditor.accept(
+            role=role, content=content, session=session, grouping=grouping, timestamp=timestamp, model=model, **kwargs
+        )

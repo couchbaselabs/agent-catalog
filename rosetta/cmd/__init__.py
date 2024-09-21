@@ -7,3 +7,6 @@ index = rosetta_cmd.cmds.cmd_index
 publish = rosetta_cmd.cmds.cmd_publish
 status = rosetta_cmd.cmds.cmd_status
 version = rosetta_cmd.cmds.cmd_version
+analyze = rosetta_cmd.cmds.cmd_analyze
+
+__all__ = ["clean", "env", "find", "index", "publish", "status", "version", "analyze"]
