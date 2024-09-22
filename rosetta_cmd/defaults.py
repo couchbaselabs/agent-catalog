@@ -10,6 +10,7 @@ DEFAULT_PROMPT_CATALOG_NAME = "prompt-catalog.json"
 DEFAULT_META_CATALOG_NAME = "meta.json"
 DEFAULT_WEB_HOST_PORT = "127.0.0.1:5555"
 DEFAULT_MAX_ERRS = 10
+DEFAULT_VERBOSITY_LEVEL = 0
 DEFAULT_SCAN_DIRECTORY_OPTS = rosetta_core.catalog.directory.ScanDirectoryOpts(
     unwanted_patterns=frozenset([".git"]),
     ignore_file_name=".gitignore",

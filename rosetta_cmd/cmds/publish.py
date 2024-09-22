@@ -9,12 +9,12 @@ from ..defaults import DEFAULT_CATALOG_COLLECTION_NAME
 from ..defaults import DEFAULT_CATALOG_NAME
 from ..defaults import DEFAULT_META_COLLECTION_NAME
 from ..models import Context
-from ..models import CouchbaseConnect
-from ..models import Keyspace
 from rosetta_core.catalog import CatalogMem
 from rosetta_util.ddl import create_gsi_indexes
 from rosetta_util.ddl import create_vector_index
+from rosetta_util.models import CouchbaseConnect
 from rosetta_util.models import CustomPublishEncoder
+from rosetta_util.models import Keyspace
 from rosetta_util.publish import create_scope_and_collection
 
 logger = logging.getLogger(__name__)

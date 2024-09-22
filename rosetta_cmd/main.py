@@ -16,8 +16,8 @@ from .defaults import DEFAULT_CATALOG_FOLDER
 from .defaults import DEFAULT_EMBEDDING_MODEL
 from .defaults import DEFAULT_SCOPE_PREFIX
 from .models import Context
-from .models import CouchbaseConnect
-from .models import Keyspace
+from rosetta_util.models import CouchbaseConnect
+from rosetta_util.models import Keyspace
 from rosetta_util.publish import get_buckets
 from rosetta_util.publish import get_connection
 

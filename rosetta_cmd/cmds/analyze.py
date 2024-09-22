@@ -1,9 +1,9 @@
 import couchbase.cluster
 import typing
 
-from ..models import CouchbaseConnect
-from ..models import Keyspace
 from ..models.context import Context
+from rosetta_util.models import CouchbaseConnect
+from rosetta_util.models import Keyspace
 
 
 def cmd_analyze(
