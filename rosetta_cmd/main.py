@@ -425,8 +425,8 @@ def publish(ctx, kind, bucket, annotations):
 @click_main.command()
 @click.option(
     "--kind",
-    default="tool",
-    type=click.Choice(["tool", "prompt"], case_sensitive=False),
+    default="all",
+    type=click.Choice(["all", "tool", "prompt"], case_sensitive=False),
     help="The kind of catalog to show status.",
     show_default=True,
 )
