@@ -1,0 +1,79 @@
+CREATE OR REPLACE ANALYTICS VIEW
+    `[BUCKET_NAME]`.`[SCOPE_NAME]`.Exchanges AS
+    WITH
+        HumanAssistantWindows AS (
+            FROM
+               `[BUCKET_NAME]`.`[SCOPE_NAME]`.Conversations AS c,
+               c.msgs AS m
+            LETTING
+                is_human =
+                    CASE m.role
+                        WHEN "human" THEN 1
+                        ELSE 0
+                    END
+            SELECT
+                SUM(is_human) OVER (
+                    PARTITION BY
+                        c.sid
+                    ORDER BY
+                        m.timestamp
+                ) AS h_count,
+                c.sid AS sid,
+                m AS msg
+        ),
+        HumanAssistantGroups AS (
+            FROM
+                HumanAssistantWindows AS haw
+            WHERE
+                -- Only consider threads with at least one human message.
+                haw.h_count > 0
+            GROUP BY
+                haw.h_count AS thread,
+                haw.sid AS sid
+                GROUP AS g
+            LETTING
+                msgs = (
+                    FROM
+                        g AS gi
+                    SELECT VALUE
+                        gi.haw.msg
+                )
+            SELECT
+                thread,
+                sid,
+                msgs
+        )
+    FROM
+        HumanAssistantGroups AS hag
+    LETTING
+        question = (
+            FROM
+                hag.msgs m
+            WHERE
+                m.role = "human"
+            SELECT VALUE
+                m.content
+        )[0],
+        answer = (
+            FROM
+                hag.msgs AS m
+            WHERE
+                m.role = "assistant"
+            SELECT VALUE
+                m.content
+            ORDER BY
+                m.timestamp DESC
+        )[0],
+        context = (
+            FROM
+                hag.msgs AS m
+            WHERE
+                m.role != "human" AND
+                m.role != "assistant"
+            SELECT VALUE
+                m.content
+        )
+    SELECT
+        question,
+        answer,
+        context;
