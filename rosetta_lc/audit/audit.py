@@ -24,28 +24,33 @@ from langchain_core.outputs import ChatResult
 logger = logging.getLogger(__name__)
 
 
+_TYPE_TO_ROLE_MAPPING = {
+    HumanMessage.__name__: rosetta_core.llm.Role.Human,
+    HumanMessageChunk.__name__: rosetta_core.llm.Role.Human,
+    AIMessage.__name__: rosetta_core.llm.Role.LLM,
+    AIMessageChunk.__name__: rosetta_core.llm.Role.LLM,
+    SystemMessage.__name__: rosetta_core.llm.Role.System,
+    SystemMessageChunk.__name__: rosetta_core.llm.Role.System,
+    ToolMessage.__name__: rosetta_core.llm.Role.Tool,
+    ToolMessageChunk.__name__: rosetta_core.llm.Role.Tool,
+    FunctionMessage.__name__: rosetta_core.llm.Role.Tool,
+    FunctionMessageChunk.__name__: rosetta_core.llm.Role.Tool,
+}
+
+
 def _determine_role_from_type(message: BaseMessage) -> rosetta_core.llm.Role:
-    match type(message).__name__:
-        case HumanMessage.__name__ | HumanMessageChunk.__name__:
-            return rosetta_core.llm.Role.Human
-        case AIMessage.__name__ | AIMessageChunk.__name__:
-            return rosetta_core.llm.Role.Assistant
-        case SystemMessage.__name__ | SystemMessageChunk.__name__:
-            return rosetta_core.llm.Role.System
-        case (
-            ToolMessage.__name__
-            | ToolMessageChunk.__name__
-            | FunctionMessage.__name__
-            | FunctionMessageChunk.__name__
-        ):
-            return rosetta_core.llm.Role.Tool
-        case _:
-            logger.debug(f'Unknown message type encountered: {message.type}. Tagging as "system".')
-            return rosetta_core.llm.Role.System
+    message_type_name = type(message).__name__
+    if message_type_name in _TYPE_TO_ROLE_MAPPING:
+        return _TYPE_TO_ROLE_MAPPING[message_type_name]
+    else:
+        logger.debug(f'Unknown message type encountered: {message.type}. Tagging as "system".')
+        return rosetta_core.llm.Role.System
 
 
 def audit(
-    chat_model: BaseChatModel, session: typing.AnyStr, auditor: rosetta_core.activity.auditor.base.AuditorType
+    chat_model: BaseChatModel,
+    session: typing.AnyStr,
+    auditor: rosetta_core.activity.auditor.base.AuditorType,
 ) -> BaseChatModel:
     """A method to (dynamically) dispatch the '_generate' & '_stream' methods to methods that log LLM calls."""
     # TODO (GLENN): We should capture the _agenerate and _astream methods as well.
@@ -68,7 +73,7 @@ def audit(
         for result in results.generations:
             logger.debug(f"LLM has returned the message: {result}")
             auditor.accept(
-                role=rosetta_core.llm.Role.Assistant,
+                role=rosetta_core.llm.Role.LLM,
                 content=default(result.message),
                 session=session,
                 grouping=grouping_id,
@@ -101,7 +106,7 @@ def audit(
 
         # We have exhausted our iterator. Log the resultant chunk.
         auditor.accept(
-            role=rosetta_core.llm.Role.Assistant,
+            role=rosetta_core.llm.Role.LLM,
             content=default(result_chunk.message),
             session=session,
             grouping=grouping_id,
