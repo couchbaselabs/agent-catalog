@@ -54,14 +54,14 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
     def find(
         self,
         query: str = None,
-        name: str = "",
+        name: str = None,
         limit: typing.Union[int | None] = 1,
         annotations: AnnotationPredicate = None,
     ) -> list[SearchResult]:
         """Returns the catalog items that best match a query."""
 
         # Catalog item has to be queried directly
-        if name != "":
+        if name is not None:
             # TODO (GLENN): Need to add some validation around bucket (to prevent injection)
             # TODO (GLENN): Need to add some validation around name (to prevent injection)
             item_query = f"SELECT a.* from `{self.bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{self.kind}_catalog` as a WHERE a.name = $name;"
@@ -135,7 +135,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
         # List of catalog items from query
         results = []
         for row in resp:
-            delta = row["metadata"]["score"] if name == "" else 1
+            delta = row["metadata"]["score"] if name is None else 1
             match row["record_kind"]:
                 case RecordKind.SemanticSearch.value:
                     descriptor = SemanticSearchToolDescriptor.model_validate(row)

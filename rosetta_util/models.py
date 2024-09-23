@@ -5,6 +5,13 @@ from pathlib import Path
 from pydantic import BaseModel
 
 
+class Keyspace(BaseModel):
+    """Pydantic model to capture keyspace"""
+
+    bucket: str
+    scope: str
+
+
 class CouchbaseConnect(BaseModel):
     """Pydantic model to capture couchbase connection details"""
 

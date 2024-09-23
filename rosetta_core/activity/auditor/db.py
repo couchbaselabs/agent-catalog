@@ -6,7 +6,7 @@ from ...defaults import DEFAULT_AUDIT_SCOPE
 from ...llm import Message
 from ...version import VersionDescriptor
 from .base import BaseAuditor
-from rosetta_cmd.models import CouchbaseConnect
+from rosetta_util.models import CouchbaseConnect
 from rosetta_util.publish import create_scope_and_collection
 from rosetta_util.publish import get_connection
 

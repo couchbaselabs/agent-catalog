@@ -4,9 +4,11 @@ import logging
 import os
 import pathlib
 import tqdm
+import typing
 
 from ..cmds.util import init_local
 from ..cmds.util import load_repository
+from ..defaults import DEFAULT_EMBEDDING_MODEL
 from ..defaults import DEFAULT_MAX_ERRS
 from ..defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from ..models.context import Context
@@ -18,9 +20,9 @@ logger = logging.getLogger(__name__)
 
 def cmd_index(
     ctx: Context,
-    source_dirs: list[str],
-    kind: str,
-    embedding_model: str,
+    source_dirs: list[str | os.PathLike],
+    kind: typing.Literal["tool", "prompt"],
+    embedding_model: str = DEFAULT_EMBEDDING_MODEL,
     dry_run: bool = False,
     **_,
 ):

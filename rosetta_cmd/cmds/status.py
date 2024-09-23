@@ -1,51 +1,47 @@
 import click
 import datetime
-import flask
+import importlib.util
 import os
 import pathlib
+import typing
 
 from ..cmds.util import init_local
 from ..cmds.util import load_repository
 from ..defaults import DEFAULT_SCAN_DIRECTORY_OPTS
+from ..models.context import Context
 from rosetta_core.catalog import CatalogMem
 from rosetta_core.catalog.index import index_catalog_start
 from rosetta_core.version import VersionDescriptor
 
-blueprint = flask.Blueprint("status", __name__)
-
-
-@blueprint.route("/status")
-def route_status():
-    kind = flask.request.args.get("kind", default="tool", type=str)
-    include_dirty = flask.request.args.get("include_dirty", default="true", type=str).lower() == "true"
-
-    return flask.jsonify(catalog_status(flask.current_app.config["ctx"], kind, include_dirty))
-
-
 level_colors = {"good": "green", "warn": "yellow", "error": "red"}
+kind_colors = {"tool": "bright_magenta", "prompt": "blue"}
 
 
-def cmd_status(ctx, kind="tool", include_dirty=True):
-    # TODO: Allow the kind to be '*' or None to show the
-    # status on all the available kinds of catalogs.
+def cmd_status(ctx: Context, kind: typing.Literal["all", "tool", "prompt"] = "all", include_dirty: bool = True):
+    catalog_kinds = ["tool", "prompt"] if kind == "all" else [kind]
 
-    sections = catalog_status(ctx, kind, include_dirty=include_dirty)
+    for catalog_kind in catalog_kinds:
+        sections = catalog_status(ctx, catalog_kind, include_dirty=include_dirty)
 
-    for section in sections:
-        name, parts = section
-        if name:
-            click.echo("-------------")
-            click.echo(name + ":")
-            indent = "  "
-        else:
-            indent = ""
+        click.secho("-----------------------------------------------------------------", fg=kind_colors[catalog_kind])
+        click.secho(catalog_kind.upper(), fg=kind_colors[catalog_kind])
 
-        for part in parts:
-            level, msg = part
-            if level in level_colors:
-                click.secho(indent + msg, fg=level_colors[level])
+        for section in sections:
+            name, parts = section
+            if name:
+                click.secho("-------------", fg=kind_colors[catalog_kind])
+                click.echo(name + ":")
+                indent = "  "
             else:
-                click.echo(indent + msg)
+                indent = ""
+
+            for part in parts:
+                level, msg = part
+                if level in level_colors:
+                    click.secho(indent + msg, fg=level_colors[level])
+                else:
+                    click.echo(indent + msg)
+        click.secho("-----------------------------------------------------------------", fg=kind_colors[catalog_kind])
 
 
 def catalog_status(ctx, kind, include_dirty=True):
@@ -64,7 +60,7 @@ def catalog_status(ctx, kind, include_dirty=True):
                 [
                     (
                         "error",
-                        "ERROR: local catalog does not exist yet: please use the index command.",
+                        f"ERROR: local catalog of kind {kind} does not exist yet: please use the index command by specifying the kind.",
                     )
                 ],
             )
@@ -83,7 +79,7 @@ def catalog_status(ctx, kind, include_dirty=True):
                     [
                         (
                             "warn",
-                            "repo is DIRTY: please use the index command to update the local catalog.",
+                            f"repo of kind {kind} is DIRTY: please use the index command to update the local catalog.",
                         )
                     ],
                 )
@@ -155,3 +151,17 @@ def catalog_status(ctx, kind, include_dirty=True):
     )
 
     return sections
+
+
+# Note: flask is an optional dependency.
+if importlib.util.find_spec("flask") is not None:
+    import flask
+
+    blueprint = flask.Blueprint("status", __name__)
+
+    @blueprint.route("/status")
+    def route_status():
+        kind = flask.request.args.get("kind", default="tool", type=str)
+        include_dirty = flask.request.args.get("include_dirty", default="true", type=str).lower() == "true"
+
+        return flask.jsonify(catalog_status(flask.current_app.config["ctx"], kind, include_dirty))

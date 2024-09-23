@@ -15,10 +15,12 @@ class AuditorType(typing.Protocol):
     def accept(
         self,
         role: Role,
-        content: typing.AnyStr,
+        content: typing.Any,
         session: typing.AnyStr,
+        grouping: typing.AnyStr = None,
         timestamp: datetime.datetime = None,
         model: str = None,
+        **kwargs,
     ) -> None: ...
 
 
@@ -30,10 +32,12 @@ class BaseAuditor(abc.ABC):
     def accept(
         self,
         role: Role,
-        content: typing.AnyStr,
+        content: typing.Any,
         session: typing.AnyStr,
+        grouping: typing.AnyStr = None,
         timestamp: datetime.datetime = None,
         model: str = None,
+        **kwargs,
     ):
         if self.model is None and model is None:
             raise ValueError('"model" must be specified either in accept() or on instantiation!')
@@ -47,8 +51,10 @@ class BaseAuditor(abc.ABC):
             session=session,
             role=role,
             content=content,
+            grouping=grouping,
             model=model or self.model,
             catalog_version=self.catalog_version,
+            annotations=kwargs,
         )
         self._accept(message)
 

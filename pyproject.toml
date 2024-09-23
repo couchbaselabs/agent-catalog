@@ -11,8 +11,8 @@ authors = [
 readme = "README.md"
 packages = [
     { include = "rosetta_core" },
-    { include = "rosetta_cmd"},
-    { include = "rosetta_util"}
+    { include = "rosetta_cmd" },
+    { include = "rosetta_util" }
 ]
 
 include = [
@@ -31,27 +31,47 @@ rosetta = "rosetta_cmd.main:main"
 [tool.poetry.dependencies]
 python = "^3.11"
 python-dotenv = "^1.0.1"
-click = "^8.1.7"
 requests = "^2.32.3"
 PyYAML = "^6.0.1"
 semantic_version = "^2.10.0"
 gitignore-parser = "^0.1.11"
 GitPython = "^3.1.43"
-cachetools = "^5.4.0"
-scikit-learn = ">1.0.2"
-numpy = ">1.13.3"
-scipy = ">0.14.0"
-sentence-transformers = "^3.0.1"
+sentence-transformers = "^3.1.1"
 pydantic = "^2.8.2"
-datamodel-code-generator = "^0.25.8"
-fastapi = "^0.111.1"
-Flask = "^3.0.3"
+datamodel-code-generator = "^0.26.0"
 couchbase = "^4.3.0"
 jinja2 = "^3.1.4"
 openapi3-parser = "^1.1.17"
 py-openapi-schema-to-json-schema = "^0.0.3"
+
+[tool.poetry.group.cli.dependencies]
+click = "^8.1.7"
 tqdm = "^4.66.5"
 jsbeautifier = "^1.15.1"
+
+[tool.poetry.group.refiner.dependencies]
+scikit-learn = ">1.0.2"
+numpy = ">1.13.3"
+scipy = ">0.14.0"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.2.2"
+pytest = "^8.3.2"
+
+# Optional groups are specified below.
+[tool.poetry.group.analyze]
+optional = true
+
+[tool.poetry.group.analyze.dependencies]
+# Note: the langchain dependency specification is to speed up poetry.
+langchain = "^0.2.16"
+ragas = "^0.1.20"
+
+[tool.poetry.group.web]
+optional = true
+
+[tool.poetry.group.web.dependencies]
+Flask = "^3.0.3"
 
 [tool.pytest.ini_options]
 markers = [
@@ -69,10 +89,6 @@ force-single-line = true
 lines-between-types = 1
 force-wrap-aliases = true
 split-on-trailing-comma = false
-
-[tool.poetry.group.dev.dependencies]
-pre-commit = "^3.2.2"
-pytest = "^8.3.2"
 
 [build-system]
 requires = ["poetry-core"]

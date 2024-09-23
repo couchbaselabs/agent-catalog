@@ -3,9 +3,12 @@ import json
 import logging
 import requests
 
+
+# TODO (GLENN): rosetta_cmd should not be a dependency for rosetta_util
+from .models import CouchbaseConnect
+from .query import execute_query
 from rosetta_cmd.defaults import DEFAULT_SCOPE_PREFIX
-from rosetta_cmd.models import CouchbaseConnect
-from rosetta_util.query import execute_query
+from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
@@ -15,9 +18,10 @@ def is_index_present(
 ) -> tuple[bool | dict | None, Exception | None]:
     """Checks for existence of index_to_create in the given keyspace"""
 
-    url = "localhost"
+    url = conn.connection_url
+    host = urlparse(url).netloc
     port = "8094"
-    find_index_url = f"http://{url}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index"
+    find_index_url = f"http://{host}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index"
     auth = (conn.username, conn.password)
 
     try:
@@ -46,14 +50,15 @@ def create_vector_index(
 
     index_to_create = f"{bucket}.{DEFAULT_SCOPE_PREFIX}.rosetta-{kind}-index"
     (index_present, err) = is_index_present(bucket, index_to_create, conn)
-    url = "localhost"
+    url = conn.connection_url
+    host = urlparse(url).netloc
     port = "8094"
 
     if err is None and isinstance(index_present, bool) and not index_present:
         click.echo("Creating vector index...")
         # Create the index for the first time
         create_vector_index_url = (
-            f"http://{url}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta-{kind}-index"
+            f"http://{host}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta-{kind}-index"
         )
         headers = {
             "Content-Type": "application/json",
@@ -63,9 +68,9 @@ def create_vector_index(
         payload = json.dumps(
             {
                 "type": "fulltext-index",
-                "name": f"{bucket}.{DEFAULT_SCOPE_PREFIX}.rosetta-{kind}-index",
+                "name": index_to_create,
                 "sourceType": "gocbcore",
-                "sourceName": f"{bucket}",
+                "sourceName": bucket,
                 "planParams": {"maxPartitionsPerPIndex": 1024, "indexPartitions": 1},
                 "params": {
                     "doc_config": {
@@ -148,7 +153,7 @@ def create_vector_index(
         ]["fields"] = field_mappings
 
         update_vector_index_url = (
-            f"http://{url}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta-{kind}-index"
+            f"http://{host}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta-{kind}-index"
         )
         headers = {
             "Content-Type": "application/json",
