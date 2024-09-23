@@ -174,7 +174,7 @@ class Provider(pydantic_settings.BaseSettings):
 
         # Try to connect to our cluster.
         cluster = couchbase.cluster.Cluster.connect(
-            str(self.conn_string),
+            self.conn_string,
             couchbase.options.ClusterOptions(
                 couchbase.auth.PasswordAuthenticator(
                     username=self.username.get_secret_value(),
@@ -182,6 +182,9 @@ class Provider(pydantic_settings.BaseSettings):
                 )
             ),
         )
+        cluster.close()
+
+        # TODO (GLENN): Add support for passing an already open connection to CatalogDB.
         try:
             self._remote_tool_catalog = rosetta_core.catalog.CatalogDB(
                 cluster=cluster, bucket=self.bucket, kind="tool", embedding_model=self.embedding_model

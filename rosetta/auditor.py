@@ -78,7 +78,7 @@ class Auditor(pydantic_settings.BaseSettings):
 
     _local_auditor: rosetta_core.activity.LocalAuditor = None
     _db_auditor: rosetta_core.activity.DBAuditor = None
-    _auditor: rosetta_core.activity.BaseAuditor = None
+    _audit: typing.Callable = None
 
     @pydantic.model_validator(mode="after")
     def _find_local_log(self) -> typing.Self:
@@ -154,6 +154,23 @@ class Auditor(pydantic_settings.BaseSettings):
                 bucket=self.bucket,
                 catalog_version=provider.version,
             )
+
+        # If we have both a local and remote auditor, we'll use both.
+        if self._local_auditor is not None and self._db_auditor is not None:
+
+            def accept(*args, **kwargs):
+                self._local_auditor.accept(*args, **kwargs)
+                self._db_auditor.accept(*args, **kwargs)
+
+            self._audit = accept
+        elif self._local_auditor is not None:
+            self._audit = self._local_auditor.accept
+        elif self._db_auditor is not None:
+            self._audit = self._db_auditor.accept
+        else:
+            # We should never reach this point (this error is handled above).
+            raise ValueError("Could not instantiate an auditor.")
+
         return self
 
     def accept(
@@ -176,7 +193,6 @@ class Auditor(pydantic_settings.BaseSettings):
                       or on accept(). A model specified in accept() overrides a model specified on instantiation.
         """
         model = model if model is not None else self.llm_name
-        auditor = self._local_auditor if self._local_auditor is not None else self._db_auditor
-        auditor.accept(
+        self._audit(
             role=role, content=content, session=session, grouping=grouping, timestamp=timestamp, model=model, **kwargs
         )
