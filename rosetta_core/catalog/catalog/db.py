@@ -39,11 +39,10 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
     def cluster_should_be_reachable(self) -> "CatalogDB":
         try:
             # TODO (GLENN): Factor our embedding model here
-            scope_name = DEFAULT_SCOPE_PREFIX + self.embedding_model.replace("/", "_")
             collection_name = f"{self.kind}_catalog"
             self.cluster.query(
                 f"""
-                FROM   `{self.bucket}`.`{scope_name}`.`{collection_name}`
+                FROM   `{self.bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{collection_name}`
                 SELECT 1
                 LIMIT  1;
             """,
@@ -61,15 +60,11 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
     ) -> list[SearchResult]:
         """Returns the catalog items that best match a query."""
 
-        scope_name = DEFAULT_SCOPE_PREFIX + self.embedding_model.replace("/", "_")
-
         # Catalog item has to be queried directly
         if name != "":
             # TODO (GLENN): Need to add some validation around bucket (to prevent injection)
             # TODO (GLENN): Need to add some validation around name (to prevent injection)
-            item_query = (
-                f"SELECT a.* from `{self.bucket}`.`{scope_name}`.`{self.kind}_catalog` as a WHERE a.name = $name;"
-            )
+            item_query = f"SELECT a.* from `{self.bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{self.kind}_catalog` as a WHERE a.name = $name;"
 
             res, err = execute_query_with_parameters(self.cluster, item_query, {"name": name})
             if err is not None:
@@ -94,10 +89,11 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             # User has specified a snapshot id
             if self.snapshot_id != "all":
                 filter_records_query = (  # TODO (GLENN): Use a """ """ string instead?
-                    f"SELECT a.* FROM ( SELECT t.*, SEARCH_META() as metadata FROM `{self.bucket}`.`{scope_name}`.`{self.kind}_catalog` as t "
+                    f"SELECT a.* FROM ( SELECT t.*, SEARCH_META() as metadata FROM `{self.bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{self.kind}_catalog` as t "
                     + "WHERE SEARCH(t, "
                     + "{'query': {'match_none': {}},"
-                    + "'knn': [{'field': 'embedding',"
+                    + "'knn': [{'field': "
+                    + "'embedding',"  # WIP - trying to see how vec search needs this field (searchable_as or the field only)
                     + f"'vector': {query_embeddings},"
                     + "'k': 10"
                     + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) ORDER BY metadata.score DESC ) AS a "
@@ -107,10 +103,11 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             # No snapshot id has been mentioned
             else:
                 filter_records_query = (
-                    f"SELECT a.* FROM ( SELECT t.*, SEARCH_META() as metadata FROM `{self.bucket}`.`{scope_name}`.`{self.kind}_catalog` as t "
+                    f"SELECT a.* FROM ( SELECT t.*, SEARCH_META() as metadata FROM `{self.bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{self.kind}_catalog` as t "
                     + "WHERE SEARCH(t, "
                     + "{'query': {'match_none': {}},"
-                    + "'knn': [{'field': 'embedding',"
+                    + "'knn': [{'field': "
+                    + "'embedding',"  # WIP - trying to see how vec search needs this field (searchable_as or the field only)
                     + f"'vector': {query_embeddings},"
                     + "'k': 10"
                     + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) ORDER BY metadata.score DESC ) AS a "
@@ -161,9 +158,8 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
     @property
     def version(self) -> VersionDescriptor:
         """Returns the lates version of the kind catalog"""
-        scope_name = DEFAULT_SCOPE_PREFIX + self.embedding_model.replace("/", "_")
         ts_query = f"""
-            FROM     `{self.bucket}`.`{scope_name}`.`{self.kind}_catalog` AS t
+            FROM     `{self.bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{self.kind}_catalog` AS t
             SELECT   VALUE  t.version
             ORDER BY META().cas DESC
             LIMIT    1
