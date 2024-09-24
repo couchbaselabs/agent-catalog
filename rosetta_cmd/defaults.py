@@ -12,7 +12,7 @@ DEFAULT_WEB_HOST_PORT = "127.0.0.1:5555"
 DEFAULT_MAX_ERRS = 10
 DEFAULT_VERBOSITY_LEVEL = 0
 DEFAULT_SCAN_DIRECTORY_OPTS = rosetta_core.catalog.directory.ScanDirectoryOpts(
-    unwanted_patterns=frozenset([".git", "*__pycache__*", "*.lock", "*.toml", "*.md"]),
+    unwanted_patterns=frozenset([".git"]),
     ignore_file_name=".gitignore",
     ignore_file_parser_factory=gitignore_parser.parse_gitignore,
 )
@@ -20,7 +20,7 @@ DEFAULT_CATALOG_NAME = "-catalog.json"
 DEFAULT_META_COLLECTION_NAME = "_metadata"
 DEFAULT_CATALOG_COLLECTION_NAME = "_catalog"
 DEFAULT_SCOPE_PREFIX = "rosetta_catalog"
-DEFAULT_CATALOG_SCHEMA_VERSION = "0.0.0"
+DEFAULT_CATALOG_SCHEMA_VERSION = "0_0_0"
 
 __all__ = [
     "DEFAULT_EMBEDDING_MODEL",

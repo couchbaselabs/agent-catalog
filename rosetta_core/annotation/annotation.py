@@ -19,7 +19,8 @@ class AnnotationPredicate:
         matches = query_pattern.match(query)
         if matches is None:
             raise ValueError(
-                "Invalid query string for annotations! " 'Please use the format KEY="VALUE" (AND|OR KEY="VALUE")*.'
+                "Invalid query string for annotations! "
+                """Please use the format 'KEY="VALUE" (AND|OR KEY="VALUE")*'."""
             )
 
         # Save our predicate.

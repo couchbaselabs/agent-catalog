@@ -1,10 +1,11 @@
 from pydantic import BaseModel
 from pydantic import model_validator
+from typing_extensions import Optional
 
 
 class SearchOptions(BaseModel):
-    query: str = ""
-    name: str = ""
+    query: Optional[str] = ""
+    name: Optional[str] = ""
 
     @model_validator(mode="after")
     @classmethod

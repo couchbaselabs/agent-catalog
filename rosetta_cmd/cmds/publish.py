@@ -131,7 +131,8 @@ def cmd_publish(
         # ---------------------------------------------------------------------------------------- #
         #                               GSI and Vector Indexes                                     #
         # ---------------------------------------------------------------------------------------- #
-        s, err = create_gsi_indexes(bucket, cluster, kind)
+        catalog_schema_version = metadata["catalog_schema_version"].replace(".", "_")
+        s, err = create_gsi_indexes(bucket, cluster, kind, catalog_schema_version)
         if not s:
             click.secho(f"ERROR: GSI indexes could not be created \n{err}", fg="red")
             return
@@ -140,7 +141,7 @@ def cmd_publish(
 
         dims = len(catalog.items[0].embedding)
 
-        _, err = create_vector_index(bucket, kind, connection_details_env, dims, metadata["catalog_schema_version"])
+        _, err = create_vector_index(bucket, kind, connection_details_env, dims, catalog_schema_version)
         if err is not None:
             click.secho(f"ERROR: Vector index could not be created \n{err}", fg="red")
             return
