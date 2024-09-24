@@ -30,11 +30,12 @@ def clean_local(ctx: Context):
         elif x_path.is_dir():
             shutil.rmtree(x_path.absolute())
 
+    click.secho("Successfully cleaned up local catalog!", fg="green")
 
-def clean_db(ctx, bucket, cluster, embedding_model):
+
+def clean_db(ctx, bucket, cluster):
     all_errs = []
-    catalog_scope_name = DEFAULT_SCOPE_PREFIX + embedding_model.replace("/", "_")
-    drop_scope_query = f"DROP SCOPE `{bucket}`.`{catalog_scope_name}` IF EXISTS;"
+    drop_scope_query = f"DROP SCOPE `{bucket}`.`{DEFAULT_SCOPE_PREFIX}` IF EXISTS;"
     res, err = execute_query(cluster, drop_scope_query)
     for r in res.rows():
         logger.debug(r)
@@ -49,17 +50,17 @@ def clean_db(ctx, bucket, cluster, embedding_model):
         all_errs.append(err)
 
     if len(all_errs) == 0:
-        click.secho("Successfully cleaned up db!", fg="green")
+        click.secho("Successfully cleaned up db catalog!", fg="green")
     else:
         logger.error(all_errs)
 
 
-def cmd_clean(ctx: Context, is_local: bool, is_db: bool, bucket: str, cluster: couchbase.cluster, embedding_model: str):
+def cmd_clean(ctx: Context, is_local: bool, is_db: bool, bucket: str, cluster: couchbase.cluster):
     if is_local:
         clean_local(ctx)
 
     if is_db:
-        clean_db(ctx, bucket, cluster, embedding_model)
+        clean_db(ctx, bucket, cluster)
 
 
 # Note: flask is an optional dependency.
