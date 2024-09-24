@@ -50,7 +50,7 @@ def create_vector_index(
 
     index_to_create = f"{bucket}.{DEFAULT_SCOPE_PREFIX}.rosetta_{kind}_index_{catalog_schema_ver}"
     (index_present, err) = is_index_present(bucket, index_to_create, conn)
-    url = conn.connection_url
+    url = conn.connection_url  # should be of the format couchbase://localhost or similar
     host = urlparse(url).netloc
     port = "8094"
 
@@ -130,6 +130,15 @@ def create_vector_index(
         except Exception as e:
             return None, e
     elif err is None and isinstance(index_present, dict):
+        # Check if the mapping already exists
+        existing_fields = index_present["params"]["mapping"]["types"][f"{DEFAULT_SCOPE_PREFIX}.{kind}_catalog"][
+            "properties"
+        ]["embedding"]["fields"]
+        existing_dims = [el["dims"] for el in existing_fields]
+        if dim in existing_dims:
+            return None, None
+
+        # If it doesn't, create it
         click.echo("\nUpdating the index....")
         # Update the index
         new_field_mapping = {

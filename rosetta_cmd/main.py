@@ -279,7 +279,7 @@ def find(
     annotations,
     search_db,
     embedding_model,
-    catalog_schema_version,
+    catalog_version,
 ):
     """Find tools, prompts, etc. from the catalog based on a natural language QUERY string."""
 
@@ -322,7 +322,7 @@ def find(
             bucket=bucket,
             cluster=cluster,
             embedding_model=embedding_model,
-            catalog_schema_version=catalog_schema_version,
+            catalog_schema_version=catalog_version,
         )
         cluster.close()
     else:
@@ -336,7 +336,7 @@ def find(
             refiner=refiner,
             annotations=annotations,
             embedding_model=embedding_model,
-            catalog_schema_version=catalog_schema_version,
+            catalog_schema_version=catalog_version,
         )
 
 

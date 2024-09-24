@@ -84,6 +84,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             )
             query_embeddings = embedding_model_obj.encode(query).tolist()
             dim = len(query_embeddings)
+            print(dim)
 
             # ---------------------------------------------------------------------------------------- #
             #                         Get all relevant items from catalog                              #
@@ -92,36 +93,68 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             # Get annotations condition
             annotation_condition = annotations.__catalog_query_str__() if annotations is not None else "1==1"
 
+            # Index used
+            idx = f"rosetta_{self.kind}_index_{catalog_schema_version}"
+
             # User has specified a snapshot id
             if self.snapshot_id != "all":
-                filter_records_query = (  # TODO (GLENN): Use a """ """ string instead?
-                    f"SELECT a.* FROM ( SELECT t.*, SEARCH_META() as metadata FROM `{self.bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{self.kind}_catalog` as t "
-                    + "WHERE SEARCH(t, "
-                    + "{'query': {'match_none': {}},"
-                    + "'knn': [{'field': "
-                    + f"'embedding_{dim}',"
-                    + f"'vector': {query_embeddings},"
-                    + "'k': 10 }, { "
-                    + f"'index': '{self.bucket}.{DEFAULT_SCOPE_PREFIX}.rosetta_{self.kind}_index_{catalog_schema_version}'"
-                    + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) ORDER BY metadata.score DESC ) AS a "
-                    + f"WHERE {annotation_condition} AND catalog_identifier='{self.snapshot_id}'"
-                    + f"LIMIT {limit};"
-                )
+                filter_records_query = f"""
+                    SELECT a.* FROM (
+                        SELECT t.*, SEARCH_META() as metadata
+                        FROM `{self.bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{self.kind}_catalog` as t
+                        WHERE SEARCH(
+                            t,
+                            {{
+                                'query': {{ 'match_none': {{}} }},
+                                'knn': [
+                                    {{
+                                        'field': 'embedding_{dim}',
+                                        'vector': {query_embeddings},
+                                        'k': 10
+                                    }}
+                                ],
+                                'size': 10,
+                                'ctl': {{ 'timeout': 10 }}
+                            }},
+                            {{
+                                'index': '{self.bucket}.{DEFAULT_SCOPE_PREFIX}.{idx}'
+                            }}
+                        )
+                        ORDER BY metadata.score DESC
+                    ) AS a
+                    WHERE {annotation_condition} AND catalog_identifier='{self.snapshot_id}'
+                    LIMIT {limit};
+                """
+
             # No snapshot id has been mentioned
             else:
-                filter_records_query = (
-                    f"SELECT a.* FROM ( SELECT t.*, SEARCH_META() as metadata FROM `{self.bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{self.kind}_catalog` as t "
-                    + "WHERE SEARCH(t, "
-                    + "{'query': {'match_none': {}},"
-                    + "'knn': [{'field': "
-                    + f"'embedding_{dim}',"
-                    + f"'vector': {query_embeddings},"
-                    + +"'k': 10 }, { "
-                    + f"'index': '{self.bucket}.{DEFAULT_SCOPE_PREFIX}.rosetta_{self.kind}_index_{catalog_schema_version}'"
-                    + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) ORDER BY metadata.score DESC ) AS a "
-                    + f"WHERE {annotation_condition} "
-                    + f"LIMIT {limit};"
-                )
+                filter_records_query = f"""
+                    SELECT a.* FROM (
+                        SELECT t.*, SEARCH_META() as metadata
+                        FROM `{self.bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{self.kind}_catalog` as t
+                        WHERE SEARCH(
+                            t,
+                            {{
+                                'query': {{ 'match_none': {{}} }},
+                                'knn': [
+                                    {{
+                                        'field': 'embedding_{dim}',
+                                        'vector': {query_embeddings},
+                                        'k': 10
+                                    }}
+                                ],
+                                'size': 10,
+                                'ctl': {{ 'timeout': 10 }}
+                            }},
+                            {{
+                                'index': '{self.bucket}.{DEFAULT_SCOPE_PREFIX}.{idx}'
+                            }}
+                        )
+                        ORDER BY metadata.score DESC
+                    ) AS a
+                    WHERE {annotation_condition}
+                    LIMIT {limit};
+                """
 
             # Execute query after filtering by catalog_identifier if provided
             res, err = execute_query(self.cluster, filter_records_query)

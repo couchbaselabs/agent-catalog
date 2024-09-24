@@ -81,7 +81,7 @@ def cmd_find(
                 name=name,
                 limit=limit,
                 annotations=annotations_predicate,
-                catalog_schema_version=catalog_schema_version,
+                catalog_schema_version=catalog_schema_version.replace(".", "/"),
             )
         ]
     # Local catalog find
