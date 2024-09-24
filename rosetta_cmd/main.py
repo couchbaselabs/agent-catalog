@@ -13,6 +13,7 @@ from .cmds import cmd_status
 from .cmds import cmd_version
 from .defaults import DEFAULT_ACTIVITY_FOLDER
 from .defaults import DEFAULT_CATALOG_FOLDER
+from .defaults import DEFAULT_CATALOG_SCHEMA_VERSION
 from .defaults import DEFAULT_EMBEDDING_MODEL
 from .defaults import DEFAULT_SCOPE_PREFIX
 from .models import Context
@@ -258,8 +259,28 @@ def analyze(ctx, bucket, metrics):
     help="Embedding model to generate embeddings for query.",
     show_default=True,
 )
+@click.option(
+    "-cver",
+    "--catalog_version",
+    default=DEFAULT_CATALOG_SCHEMA_VERSION,
+    help="Catalog schema version that your catalog is in.",
+    show_default=True,
+)
 @click.pass_context
-def find(ctx, query, name, kind, bucket, limit, include_dirty, refiner, annotations, search_db, embedding_model):
+def find(
+    ctx,
+    query,
+    name,
+    kind,
+    bucket,
+    limit,
+    include_dirty,
+    refiner,
+    annotations,
+    search_db,
+    embedding_model,
+    catalog_schema_version,
+):
     """Find tools, prompts, etc. from the catalog based on a natural language QUERY string."""
 
     if search_db:
@@ -301,6 +322,7 @@ def find(ctx, query, name, kind, bucket, limit, include_dirty, refiner, annotati
             bucket=bucket,
             cluster=cluster,
             embedding_model=embedding_model,
+            catalog_schema_version=catalog_schema_version,
         )
         cluster.close()
     else:
@@ -314,6 +336,7 @@ def find(ctx, query, name, kind, bucket, limit, include_dirty, refiner, annotati
             refiner=refiner,
             annotations=annotations,
             embedding_model=embedding_model,
+            catalog_schema_version=catalog_schema_version,
         )
 
 

@@ -45,6 +45,7 @@ def cmd_find(
     annotations: str = None,
     cluster: couchbase.cluster.Cluster = None,
     embedding_model: str = None,
+    catalog_schema_version: str = None,
 ):
     # TODO: One day, also handle DBCatalogRef?
     # TODO: If DB is outdated and the local catalog has newer info,
@@ -80,6 +81,7 @@ def cmd_find(
                 name=name,
                 limit=limit,
                 annotations=annotations_predicate,
+                catalog_schema_version=catalog_schema_version,
             )
         ]
     # Local catalog find

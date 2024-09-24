@@ -44,11 +44,11 @@ def is_index_present(
 
 
 def create_vector_index(
-    bucket: str = "", kind: str = "tool", conn: CouchbaseConnect = "", dim: int = None
+    bucket: str = "", kind: str = "tool", conn: CouchbaseConnect = "", dim: int = None, catalog_schema_ver: str = None
 ) -> tuple[str | None, Exception | None]:
     """Creates required vector index at publish"""
 
-    index_to_create = f"{bucket}.{DEFAULT_SCOPE_PREFIX}.rosetta-{kind}-index"
+    index_to_create = f"{bucket}.{DEFAULT_SCOPE_PREFIX}.rosetta_{kind}_index_{catalog_schema_ver}"
     (index_present, err) = is_index_present(bucket, index_to_create, conn)
     url = conn.connection_url
     host = urlparse(url).netloc
@@ -57,9 +57,7 @@ def create_vector_index(
     if err is None and isinstance(index_present, bool) and not index_present:
         click.echo("Creating vector index...")
         # Create the index for the first time
-        create_vector_index_url = (
-            f"http://{host}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta-{kind}-index"
-        )
+        create_vector_index_url = f"http://{host}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta_{kind}_index_{catalog_schema_ver}"
         headers = {
             "Content-Type": "application/json",
         }
@@ -102,7 +100,7 @@ def create_vector_index(
                                             {
                                                 "dims": dim,
                                                 "index": True,
-                                                "name": f"embedding-{dim}",
+                                                "name": f"embedding_{dim}",
                                                 "similarity": "dot_product",
                                                 "type": "vector",
                                                 "vector_index_optimized_for": "recall",
@@ -152,9 +150,7 @@ def create_vector_index(
             "embedding"
         ]["fields"] = field_mappings
 
-        update_vector_index_url = (
-            f"http://{host}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta-{kind}-index"
-        )
+        update_vector_index_url = f"http://{host}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta_{kind}_index_{catalog_schema_ver}"
         headers = {
             "Content-Type": "application/json",
         }
@@ -177,14 +173,14 @@ def create_vector_index(
         return index_to_create, None
 
 
-def create_gsi_indexes(bucket, cluster, kind):
+def create_gsi_indexes(bucket, cluster, kind, catalog_schema_version):
     """Creates required indexes at publish"""
 
     completion_status = True
     all_errs = ""
 
     # Primary index on kind_catalog
-    primary_idx = f"CREATE PRIMARY INDEX IF NOT EXISTS `rosetta_primary_{kind}cat` ON `{bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{kind}_catalog` USING GSI;"
+    primary_idx = f"CREATE PRIMARY INDEX IF NOT EXISTS `rosetta_primary_{kind}cat_{catalog_schema_version}` ON `{bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{kind}_catalog` USING GSI;"
     res, err = execute_query(cluster, primary_idx)
     for r in res.rows():
         logger.debug(r)
@@ -193,7 +189,7 @@ def create_gsi_indexes(bucket, cluster, kind):
         completion_status = False
 
     # Secondary index on catalog_identifier
-    cat_idx = f"CREATE INDEX IF NOT EXISTS `rosetta_{kind}cat_catalog_identifier` ON `{bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{kind}_catalog`(`catalog_identifier`);"
+    cat_idx = f"CREATE INDEX IF NOT EXISTS `rosetta_{kind}cat_catalog_identifier_{catalog_schema_version}` ON `{bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{kind}_catalog`(`catalog_identifier`);"
     res, err = execute_query(cluster, cat_idx)
     for r in res.rows():
         logger.debug(r)
@@ -202,7 +198,7 @@ def create_gsi_indexes(bucket, cluster, kind):
         completion_status = False
 
     # Secondary index on catalog_identifier + annotations
-    cat_ann_idx = f"CREATE INDEX IF NOT EXISTS `rosetta_{kind}cat_catalog_identifier_annotations` ON `{bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{kind}_catalog`(`catalog_identifier`,`annotations`);"
+    cat_ann_idx = f"CREATE INDEX IF NOT EXISTS `rosetta_{kind}cat_catalog_identifier_annotations_{catalog_schema_version}` ON `{bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{kind}_catalog`(`catalog_identifier`,`annotations`);"
     res, err = execute_query(cluster, cat_ann_idx)
     for r in res.rows():
         logger.debug(r)
@@ -211,7 +207,7 @@ def create_gsi_indexes(bucket, cluster, kind):
         completion_status = False
 
     # Secondary index on annotations
-    ann_idx = f"CREATE INDEX IF NOT EXISTS `rosetta_{kind}cat_annotations` ON `{bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{kind}_catalog`(`annotations`);"
+    ann_idx = f"CREATE INDEX IF NOT EXISTS `rosetta_{kind}cat_annotations_{catalog_schema_version}` ON `{bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{kind}_catalog`(`annotations`);"
     res, err = execute_query(cluster, ann_idx)
     for r in res.rows():
         logger.debug(r)

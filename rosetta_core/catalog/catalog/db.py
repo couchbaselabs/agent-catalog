@@ -57,6 +57,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
         name: str = None,
         limit: typing.Union[int | None] = 1,
         annotations: AnnotationPredicate = None,
+        catalog_schema_version: str = None,
     ) -> list[SearchResult]:
         """Returns the catalog items that best match a query."""
 
@@ -78,6 +79,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                 self.embedding_model, tokenizer_kwargs={"clean_up_tokenization_spaces": True}
             )
             query_embeddings = embedding_model_obj.encode(query).tolist()
+            dim = len(query_embeddings)
 
             # ---------------------------------------------------------------------------------------- #
             #                         Get all relevant items from catalog                              #
@@ -93,9 +95,10 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                     + "WHERE SEARCH(t, "
                     + "{'query': {'match_none': {}},"
                     + "'knn': [{'field': "
-                    + "'embedding',"  # WIP - trying to see how vec search needs this field (searchable_as or the field only)
+                    + f"'embedding_{dim}',"
                     + f"'vector': {query_embeddings},"
-                    + "'k': 10"
+                    + "'k': 10 }, { "
+                    + f"'index': '{self.bucket}.{DEFAULT_SCOPE_PREFIX}.rosetta_{self.kind}_index_{catalog_schema_version}'"
                     + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) ORDER BY metadata.score DESC ) AS a "
                     + f"WHERE {annotation_condition} AND catalog_identifier='{self.snapshot_id}'"
                     + f"LIMIT {limit};"
@@ -107,9 +110,10 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                     + "WHERE SEARCH(t, "
                     + "{'query': {'match_none': {}},"
                     + "'knn': [{'field': "
-                    + "'embedding',"  # WIP - trying to see how vec search needs this field (searchable_as or the field only)
+                    + f"'embedding_{dim}',"
                     + f"'vector': {query_embeddings},"
-                    + "'k': 10"
+                    + +"'k': 10 }, { "
+                    + f"'index': '{self.bucket}.{DEFAULT_SCOPE_PREFIX}.rosetta_{self.kind}_index_{catalog_schema_version}'"
                     + "}], 'size': 10, 'ctl': { 'timeout': 10 } }) ORDER BY metadata.score DESC ) AS a "
                     + f"WHERE {annotation_condition} "
                     + f"LIMIT {limit};"
