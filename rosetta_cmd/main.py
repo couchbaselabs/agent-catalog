@@ -94,17 +94,11 @@ def click_main(ctx, catalog, activity, verbose):
 
 @click_main.command()
 @click.option(
-    "--clean-db",
-    default=False,
-    is_flag=True,
-    help="Enable this flag to perform DB level clean.",
-    show_default=True,
-)
-@click.option(
-    "--clean-local",
-    default=False,
-    is_flag=True,
-    help="Enable this flag to perform local repo clean.",
+    "-etype",
+    "--env-type",
+    default="local",
+    type=click.Choice(["local", "db", "all"], case_sensitive=False),
+    help="The kind of environment to delete catalogs and audit logs from.",
     show_default=True,
 )
 @click.option(
@@ -115,19 +109,39 @@ def click_main(ctx, catalog, activity, verbose):
     show_default=False,
 )
 @click.option(
-    "-em",
-    "--embedding-model",
-    default=DEFAULT_EMBEDDING_MODEL,
-    help="Embedding model to generate embeddings for query.",
-    show_default=True,
+    "-y",
+    "--skip_prompt",
+    default=False,
+    is_flag=True,
+    help="Enable this flag to delete catalogs without confirm prompting.",
+    show_default=False,
 )
 @click.pass_context
-def clean(ctx, clean_db, clean_local, bucket, embedding_model):
+def clean(ctx, env_type, bucket, skip_prompt):
     """Clean up the catalog folder, the activity folder, any generated files, etc..."""
+    clean_db = False
+    clean_local = False
+
+    match env_type:
+        case "local":
+            clean_local = True
+        case "db":
+            clean_db = True
+        case "all":
+            clean_db = True
+            clean_local = True
+
+    env_string_to_delete = "both local and db" if env_type == "all" else env_type
+    if not skip_prompt:
+        click.confirm(
+            f"Are you sure you want to delete all catalogs and audit logs from {env_string_to_delete} catalog?",
+            abort=True,
+        )
+
+    if clean_local:
+        cmd_clean(ctx.obj, True, False, None, None)
 
     if clean_db:
-        click.confirm("Are you sure you want to delete all catalogs and audit logs?", abort=True)
-
         # Load all Couchbase connection related data from env
         connection_details_env = CouchbaseConnect(
             connection_url=os.getenv("CB_CONN_STRING"),
@@ -154,9 +168,7 @@ def clean(ctx, clean_db, clean_local, bucket, embedding_model):
                 + "\nRun rosetta --help for more information."
             )
 
-        cmd_clean(ctx.obj, clean_local, clean_db, bucket, cluster, embedding_model)
-    else:
-        cmd_clean(ctx.obj, clean_local, clean_db, None, None, None)
+        cmd_clean(ctx.obj, False, True, bucket, cluster)
 
 
 @click_main.command()
