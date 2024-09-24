@@ -26,8 +26,8 @@ def test_clean(tmp_path):
             fp.write("dummy content")
         with dummy_file_2.open("w") as fp:
             fp.write("more dummy content")
-        # TODO: might need to test for --clean-db as well
-        runner.invoke(click_main, ["clean", "--clean-local"])
+        # TODO: might need to test for clean db as well
+        runner.invoke(click_main, ["clean", "-y"])
 
         assert not dummy_file_1.exists()
         assert not dummy_file_2.exists()

@@ -108,8 +108,16 @@ def click_main(ctx, catalog, activity, verbose):
     help="The name of the Couchbase bucket to search.",
     show_default=False,
 )
+@click.option(
+    "-y",
+    "--skip_prompt",
+    default=False,
+    is_flag=True,
+    help="Enable this flag to delete catalogs without confirm prompting.",
+    show_default=False,
+)
 @click.pass_context
-def clean(ctx, env_type, bucket):
+def clean(ctx, env_type, bucket, skip_prompt):
     """Clean up the catalog folder, the activity folder, any generated files, etc..."""
     clean_db = False
     clean_local = False
@@ -124,9 +132,11 @@ def clean(ctx, env_type, bucket):
             clean_local = True
 
     env_string_to_delete = "both local and db" if env_type == "all" else env_type
-    click.confirm(
-        f"Are you sure you want to delete all catalogs and audit logs from {env_string_to_delete} catalog?", abort=True
-    )
+    if not skip_prompt:
+        click.confirm(
+            f"Are you sure you want to delete all catalogs and audit logs from {env_string_to_delete} catalog?",
+            abort=True,
+        )
 
     if clean_local:
         cmd_clean(ctx.obj, True, False, None, None)
