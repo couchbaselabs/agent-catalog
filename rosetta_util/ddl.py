@@ -8,7 +8,6 @@ import requests
 from .models import CouchbaseConnect
 from .query import execute_query
 from rosetta_cmd.defaults import DEFAULT_SCOPE_PREFIX
-from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
@@ -19,9 +18,8 @@ def is_index_present(
     """Checks for existence of index_to_create in the given keyspace"""
 
     url = conn.connection_url
-    host = urlparse(url).netloc
     port = "8094"
-    find_index_url = f"http://{host}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index"
+    find_index_url = f"http://{url}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index"
     auth = (conn.username, conn.password)
 
     try:
@@ -50,14 +48,13 @@ def create_vector_index(
 
     index_to_create = f"{bucket}.{DEFAULT_SCOPE_PREFIX}.rosetta_{kind}_index_{catalog_schema_ver}"
     (index_present, err) = is_index_present(bucket, index_to_create, conn)
-    url = conn.connection_url  # should be of the format couchbase://localhost or similar
-    host = urlparse(url).netloc
+    url = conn.connection_url
     port = "8094"
 
     if err is None and isinstance(index_present, bool) and not index_present:
         click.echo("Creating vector index...")
         # Create the index for the first time
-        create_vector_index_url = f"http://{host}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta_{kind}_index_{catalog_schema_ver}"
+        create_vector_index_url = f"http://{url}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta_{kind}_index_{catalog_schema_ver}"
         headers = {
             "Content-Type": "application/json",
         }
@@ -159,7 +156,7 @@ def create_vector_index(
             "embedding"
         ]["fields"] = field_mappings
 
-        update_vector_index_url = f"http://{host}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta_{kind}_index_{catalog_schema_ver}"
+        update_vector_index_url = f"http://{url}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta_{kind}_index_{catalog_schema_ver}"
         headers = {
             "Content-Type": "application/json",
         }

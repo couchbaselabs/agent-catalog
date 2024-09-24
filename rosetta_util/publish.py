@@ -18,15 +18,9 @@ def get_connection(conn: CouchbaseConnect) -> tuple[str, None] | tuple[None, Clu
     password = conn.password
 
     # Connect to Couchbase
-    if cluster_url == "localhost" or cluster_url == "couchbase://localhost":
-        auth = PasswordAuthenticator(username, password)
-        options = ClusterOptions(auth)
-        options.apply_profile("wan_development")
-    else:
-        # Connect to Capella
-        auth = PasswordAuthenticator(username, password, cert_path="certificates/cert.pem")
-        options = ClusterOptions(auth)
-        options.apply_profile("wan_development")
+    auth = PasswordAuthenticator(username, password)
+    options = ClusterOptions(auth)
+    options.apply_profile("wan_development")
 
     try:
         logger.debug(f"Connecting to Couchbase cluster at {cluster_url}...")
