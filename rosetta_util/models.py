@@ -15,9 +15,10 @@ class Keyspace(BaseModel):
 class CouchbaseConnect(BaseModel):
     """Pydantic model to capture couchbase connection details"""
 
-    connection_url: str = "localhost"
+    connection_url: str = "couchbase://localhost"
     username: str = "Administrator"
     password: str = "password"
+    host: str = "localhost"
 
 
 class CustomPublishEncoder(json.JSONEncoder):
