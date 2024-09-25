@@ -3,11 +3,10 @@ import json
 import logging
 import requests
 
-
-# TODO (GLENN): rosetta_cmd should not be a dependency for rosetta_util
 from .models import CouchbaseConnect
 from .query import execute_query
-from rosetta_cmd.defaults import DEFAULT_SCOPE_PREFIX
+from rosetta_core.defaults import DEFAULT_FTS_PORT_NUMBER
+from rosetta_core.defaults import DEFAULT_SCOPE_PREFIX
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +17,7 @@ def is_index_present(
     """Checks for existence of index_to_create in the given keyspace"""
 
     url = conn.connection_url
-    port = "8094"
+    port = DEFAULT_FTS_PORT_NUMBER
     find_index_url = f"http://{url}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index"
     auth = (conn.username, conn.password)
 
@@ -49,7 +48,7 @@ def create_vector_index(
     index_to_create = f"{bucket}.{DEFAULT_SCOPE_PREFIX}.rosetta_{kind}_index_{catalog_schema_ver}"
     (index_present, err) = is_index_present(bucket, index_to_create, conn)
     url = conn.connection_url
-    port = "8094"
+    port = DEFAULT_FTS_PORT_NUMBER
 
     if err is None and isinstance(index_present, bool) and not index_present:
         click.echo("Creating vector index...")
