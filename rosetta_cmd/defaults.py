@@ -12,7 +12,7 @@ DEFAULT_WEB_HOST_PORT = "127.0.0.1:5555"
 DEFAULT_MAX_ERRS = 10
 DEFAULT_VERBOSITY_LEVEL = 0
 DEFAULT_SCAN_DIRECTORY_OPTS = rosetta_core.catalog.directory.ScanDirectoryOpts(
-    unwanted_patterns=frozenset([".git"]),
+    unwanted_patterns=frozenset([".git", "*__pycache__*", "*.lock", "*.toml", "*.md"]),
     ignore_file_name=".gitignore",
     ignore_file_parser_factory=gitignore_parser.parse_gitignore,
 )

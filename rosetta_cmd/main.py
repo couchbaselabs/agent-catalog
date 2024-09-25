@@ -17,6 +17,7 @@ from .defaults import DEFAULT_CATALOG_SCHEMA_VERSION
 from .defaults import DEFAULT_EMBEDDING_MODEL
 from .defaults import DEFAULT_SCOPE_PREFIX
 from .models import Context
+from rosetta_util.connection import get_host_name
 from rosetta_util.models import CouchbaseConnect
 from rosetta_util.models import Keyspace
 from rosetta_util.publish import get_buckets
@@ -147,6 +148,7 @@ def clean(ctx, env_type, bucket, skip_prompt):
             connection_url=os.getenv("CB_CONN_STRING"),
             username=os.getenv("CB_USERNAME"),
             password=os.getenv("CB_PASSWORD"),
+            host=get_host_name(os.getenv("CB_CONN_STRING")),
         )
 
         # Establish a connection
@@ -310,6 +312,7 @@ def find(
             connection_url=os.getenv("CB_CONN_STRING"),
             username=os.getenv("CB_USERNAME"),
             password=os.getenv("CB_PASSWORD"),
+            host=get_host_name(os.getenv("CB_CONN_STRING")),
         )
 
         # Establish a connection
@@ -443,6 +446,7 @@ def publish(ctx, kind, bucket, annotations):
         connection_url=os.getenv("CB_CONN_STRING"),
         username=os.getenv("CB_USERNAME"),
         password=os.getenv("CB_PASSWORD"),
+        host=get_host_name(os.getenv("CB_CONN_STRING")),
     )
 
     # Establish a connection

@@ -2,11 +2,19 @@ import click
 import json
 import logging
 import requests
+import warnings
 
 from .models import CouchbaseConnect
 from .query import execute_query
 from rosetta_core.defaults import DEFAULT_HTTP_FTS_PORT_NUMBER
+from rosetta_core.defaults import DEFAULT_HTTPS_FTS_PORT_NUMBER
 from rosetta_core.defaults import DEFAULT_SCOPE_PREFIX
+
+# TODO: Add ca certificate authentication
+warnings.filterwarnings(
+    action="ignore",
+    message=".*Unverified HTTPS.*",
+)
 
 logger = logging.getLogger(__name__)
 
@@ -15,21 +23,40 @@ def is_index_present(
     bucket: str = "", index_to_create: str = "", conn: CouchbaseConnect = ""
 ) -> tuple[bool | dict | None, Exception | None]:
     """Checks for existence of index_to_create in the given keyspace"""
-
-    url = conn.connection_url
-    port = DEFAULT_HTTP_FTS_PORT_NUMBER
-    find_index_url = f"http://{url}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index"
+    find_index_https_url = (
+        f"https://{conn.host}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index"
+    )
+    find_index_http_url = (
+        f"http://{conn.host}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index"
+    )
     auth = (conn.username, conn.password)
 
+    # Make HTTPS request to FTS
     try:
         # REST call to get list of indexes
-        response = requests.request("GET", find_index_url, auth=auth)
+        response = requests.request("GET", find_index_https_url, auth=auth, verify=False)
         json_response = json.loads(response.text)
         if json_response["status"] == "ok":
             # If no vector indexes are present
             if json_response["indexDefs"] is None:
                 return False, None
             # If index_to_create not in existing vector index list
+            created_indexes = [el for el in json_response["indexDefs"]["indexDefs"]]
+            if index_to_create not in created_indexes:
+                return False, None
+            else:
+                index_def = json_response["indexDefs"]["indexDefs"][index_to_create]
+                return index_def, None
+    except Exception:
+        pass
+
+    # Make HTTP request if in case HTTPS ports are not made public
+    try:
+        response = requests.request("GET", find_index_http_url, auth=auth)
+        json_response = json.loads(response.text)
+        if json_response["status"] == "ok":
+            if json_response["indexDefs"] is None:
+                return False, None
             created_indexes = [el for el in json_response["indexDefs"]["indexDefs"]]
             if index_to_create not in created_indexes:
                 return False, None
@@ -47,13 +74,12 @@ def create_vector_index(
 
     index_to_create = f"{bucket}.{DEFAULT_SCOPE_PREFIX}.rosetta_{kind}_index_{catalog_schema_ver}"
     (index_present, err) = is_index_present(bucket, index_to_create, conn)
-    url = conn.connection_url
-    port = DEFAULT_HTTP_FTS_PORT_NUMBER
-
     if err is None and isinstance(index_present, bool) and not index_present:
         click.echo("Creating vector index...")
         # Create the index for the first time
-        create_vector_index_url = f"http://{url}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta_{kind}_index_{catalog_schema_ver}"
+        create_vector_index_https_url = f"https://{conn.host}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta_{kind}_index_{catalog_schema_ver}"
+        create_vector_index_http_url = f"http://{conn.host}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta_{kind}_index_{catalog_schema_ver}"
+
         headers = {
             "Content-Type": "application/json",
         }
@@ -114,10 +140,23 @@ def create_vector_index(
             }
         )
 
+        # HTTPS call
         try:
             # REST call to create the index
-            response = requests.request("PUT", create_vector_index_url, headers=headers, auth=auth, data=payload)
+            response = requests.request(
+                "PUT", create_vector_index_https_url, headers=headers, auth=auth, data=payload, verify=False
+            )
+            if json.loads(response.text)["status"] == "ok":
+                logger.info("Created vector index!!")
+                return index_to_create, None
+            elif json.loads(response.text)["status"] == "fail":
+                raise Exception(json.loads(response.text)["error"])
+        except Exception:
+            pass
 
+        # HTTP fallback call if HTTPS doesn't work
+        try:
+            response = requests.request("PUT", create_vector_index_http_url, headers=headers, auth=auth, data=payload)
             if json.loads(response.text)["status"] == "ok":
                 logger.info("Created vector index!!")
                 return index_to_create, None
@@ -125,6 +164,7 @@ def create_vector_index(
                 raise Exception(json.loads(response.text)["error"])
         except Exception as e:
             return None, e
+
     elif err is None and isinstance(index_present, dict):
         # Check if the mapping already exists
         existing_fields = index_present["params"]["mapping"]["types"][f"{DEFAULT_SCOPE_PREFIX}.{kind}_catalog"][
@@ -155,7 +195,8 @@ def create_vector_index(
             "embedding"
         ]["fields"] = field_mappings
 
-        update_vector_index_url = f"http://{url}:{port}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta_{kind}_index_{catalog_schema_ver}"
+        update_vector_index_https_url = f"https://{conn.host}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta_{kind}_index_{catalog_schema_ver}"
+        update_vector_index_http_url = f"http://{conn.host}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta_{kind}_index_{catalog_schema_ver}"
         headers = {
             "Content-Type": "application/json",
         }
@@ -163,10 +204,23 @@ def create_vector_index(
 
         payload = json.dumps(index_present)
 
+        # HTTPS call
         try:
             # REST call to update the index
-            response = requests.request("PUT", update_vector_index_url, headers=headers, auth=auth, data=payload)
+            response = requests.request(
+                "PUT", update_vector_index_https_url, headers=headers, auth=auth, data=payload, verify=False
+            )
+            if json.loads(response.text)["status"] == "ok":
+                logger.info("Updated vector index!!")
+                return "Success", None
+            elif json.loads(response.text)["status"] == "fail":
+                raise Exception(json.loads(response.text)["error"])
+        except Exception:
+            pass
 
+        # HTTP fallback call if HTTPS ports are not made public
+        try:
+            response = requests.request("PUT", update_vector_index_http_url, headers=headers, auth=auth, data=payload)
             if json.loads(response.text)["status"] == "ok":
                 logger.info("Updated vector index!!")
                 return "Success", None
@@ -174,6 +228,7 @@ def create_vector_index(
                 raise Exception(json.loads(response.text)["error"])
         except Exception as e:
             return None, e
+
     else:
         return index_to_create, None
 
