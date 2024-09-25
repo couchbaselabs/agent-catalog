@@ -43,6 +43,7 @@ def cmd_find(
     include_dirty: bool = True,
     refiner: str = None,
     annotations: str = None,
+    catalog_id: str = None,
     cluster: couchbase.cluster.Cluster = None,
     embedding_model: str = None,
     catalog_schema_version: str = None,
@@ -71,6 +72,7 @@ def cmd_find(
     meta = init_local(ctx, embedding_model, read_only=True)
     if bucket is not None and cluster is not None:
         catalog = CatalogDB(cluster=cluster, bucket=bucket, kind=kind, embedding_model=meta["embedding_model"])
+        catalog.snapshot_id = catalog_id if catalog_id is not None else "all"
         click.secho("Searching db...")
 
         annotations_predicate = AnnotationPredicate(annotations) if annotations is not None else None

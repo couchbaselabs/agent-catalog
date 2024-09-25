@@ -80,7 +80,6 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             )
             query_embeddings = embedding_model_obj.encode(query).tolist()
             dim = len(query_embeddings)
-            print(dim)
 
             # ---------------------------------------------------------------------------------------- #
             #                         Get all relevant items from catalog                              #

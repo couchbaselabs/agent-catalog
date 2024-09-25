@@ -258,6 +258,14 @@ def analyze(ctx, bucket, metrics):
     show_default=True,
 )
 @click.option(
+    "-cid",
+    "--catalog-id",
+    type=str,
+    default=None,
+    help="Catalog identifier that uniquely specifies a catalog version (git commit id).",
+    show_default=True,
+)
+@click.option(
     "--search-db",
     default=False,
     is_flag=True,
@@ -289,6 +297,7 @@ def find(
     include_dirty,
     refiner,
     annotations,
+    catalog_id,
     search_db,
     embedding_model,
     catalog_version,
@@ -331,6 +340,7 @@ def find(
             include_dirty=include_dirty,
             refiner=refiner,
             annotations=annotations,
+            catalog_id=catalog_id,
             bucket=bucket,
             cluster=cluster,
             embedding_model=embedding_model,
@@ -347,6 +357,7 @@ def find(
             include_dirty=include_dirty,
             refiner=refiner,
             annotations=annotations,
+            catalog_id=catalog_id,
             embedding_model=embedding_model,
             catalog_schema_version=catalog_version,
         )
