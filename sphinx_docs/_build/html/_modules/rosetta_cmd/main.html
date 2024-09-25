@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rosetta_cmd.main &mdash; Rosetta v0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=f8c80a57"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../../index.html" class="icon icon-home">
+            Rosetta
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cmd/modules.html">rosetta_cmd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../core/modules.html">rosetta_core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../util/modules.html">rosetta_util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Rosetta</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rosetta_cmd.main</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for rosetta_cmd.main</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">click</span>
+<span class="kn">import</span> <span class="nn">dotenv</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">.cmds</span> <span class="kn">import</span> <span class="n">cmd_clean</span>
+<span class="kn">from</span> <span class="nn">.cmds</span> <span class="kn">import</span> <span class="n">cmd_env</span>
+<span class="kn">from</span> <span class="nn">.cmds</span> <span class="kn">import</span> <span class="n">cmd_find</span>
+<span class="kn">from</span> <span class="nn">.cmds</span> <span class="kn">import</span> <span class="n">cmd_index</span>
+<span class="kn">from</span> <span class="nn">.cmds</span> <span class="kn">import</span> <span class="n">cmd_publish</span>
+<span class="kn">from</span> <span class="nn">.cmds</span> <span class="kn">import</span> <span class="n">cmd_status</span>
+<span class="kn">from</span> <span class="nn">.cmds</span> <span class="kn">import</span> <span class="n">cmd_version</span>
+<span class="kn">from</span> <span class="nn">.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_ACTIVITY_FOLDER</span>
+<span class="kn">from</span> <span class="nn">.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_CATALOG_FOLDER</span>
+<span class="kn">from</span> <span class="nn">.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_CATALOG_SCHEMA_VERSION</span>
+<span class="kn">from</span> <span class="nn">.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_EMBEDDING_MODEL</span>
+<span class="kn">from</span> <span class="nn">.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_SCOPE_PREFIX</span>
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Context</span>
+<span class="kn">from</span> <span class="nn">rosetta_util.models</span> <span class="kn">import</span> <span class="n">CouchbaseConnect</span>
+<span class="kn">from</span> <span class="nn">rosetta_util.models</span> <span class="kn">import</span> <span class="n">Keyspace</span>
+<span class="kn">from</span> <span class="nn">rosetta_util.publish</span> <span class="kn">import</span> <span class="n">get_buckets</span>
+<span class="kn">from</span> <span class="nn">rosetta_util.publish</span> <span class="kn">import</span> <span class="n">get_connection</span>
+
+<span class="c1"># Configure all logging here before we continue with our imports.</span>
+<span class="c1"># By default, we won&#39;t print any log messages below WARNING.</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> [</span><span class="si">%(levelname)s</span><span class="s2">] </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()],</span>
+<span class="p">)</span>
+
+<span class="c1"># Keeping this here, the logging these libraries do can be pretty verbose.</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;sentence_transformers&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;openapi_parser&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+
+<span class="c1"># TODO: Should we load from &quot;.env.rosetta&quot;?</span>
+<span class="c1"># TODO: Or, perhaps even stage specific, like from &quot;.env.rosetta.prod&quot;?</span>
+<span class="n">dotenv</span><span class="o">.</span><span class="n">load_dotenv</span><span class="p">(</span><span class="n">dotenv</span><span class="o">.</span><span class="n">find_dotenv</span><span class="p">(</span><span class="n">usecwd</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+
+<span class="c1"># Support abbreviated command aliases, ex: &quot;rosetta st&quot; ==&gt; &quot;rosetta status&quot;.</span>
+<span class="c1"># From: https://click.palletsprojects.com/en/8.1.x/advanced/#command-aliases</span>
+<div class="viewcode-block" id="AliasedGroup">
+<a class="viewcode-back" href="../../cmd/rosetta_cmd.html#rosetta_cmd.main.AliasedGroup">[docs]</a>
+<span class="k">class</span> <span class="nc">AliasedGroup</span><span class="p">(</span><span class="n">click</span><span class="o">.</span><span class="n">Group</span><span class="p">):</span>
+<div class="viewcode-block" id="AliasedGroup.get_command">
+<a class="viewcode-back" href="../../cmd/rosetta_cmd.html#rosetta_cmd.main.AliasedGroup.get_command">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">cmd_name</span><span class="p">):</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">Group</span><span class="o">.</span><span class="n">get_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">cmd_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">rv</span>
+
+        <span class="n">matches</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_commands</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">matches</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">click</span><span class="o">.</span><span class="n">Group</span><span class="o">.</span><span class="n">get_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">ctx</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Too many matches: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">matches</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AliasedGroup.resolve_command">
+<a class="viewcode-back" href="../../cmd/rosetta_cmd.html#rosetta_cmd.main.AliasedGroup.resolve_command">[docs]</a>
+    <span class="k">def</span> <span class="nf">resolve_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctx</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="c1"># Always return the full command name.</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">resolve_command</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cmd</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">args</span></div>
+</div>
+
+
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="bp">cls</span><span class="o">=</span><span class="n">AliasedGroup</span><span class="p">,</span> <span class="n">epilog</span><span class="o">=</span><span class="s2">&quot;See: https://docs.couchbase.com for more information.&quot;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;-c&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;--catalog&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_CATALOG_FOLDER</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">exists</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">file_okay</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dir_okay</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;Directory of local catalog files.</span>
+<span class="s2">            The local catalog DIRECTORY should be checked into git.&quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="n">envvar</span><span class="o">=</span><span class="s2">&quot;ROSETTA_CATALOG&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;-a&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;--activity&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_ACTIVITY_FOLDER</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">exists</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">file_okay</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dir_okay</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;Directory of local activity files (runtime data).</span>
+<span class="s2">            The local activity DIRECTORY should NOT be checked into git,</span>
+<span class="s2">            as it holds runtime activity data like logs, etc.&quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="n">envvar</span><span class="o">=</span><span class="s2">&quot;ROSETTA_ACTIVITY&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="s2">&quot;--verbose&quot;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Enable verbose output.&quot;</span><span class="p">,</span> <span class="n">envvar</span><span class="o">=</span><span class="s2">&quot;ROSETTA_VERBOSE&quot;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">pass_context</span>
+<span class="k">def</span> <span class="nf">click_main</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">catalog</span><span class="p">,</span> <span class="n">activity</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A command line tool for Rosetta.&quot;&quot;&quot;</span>
+    <span class="n">ctx</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span><span class="n">activity</span><span class="o">=</span><span class="n">activity</span><span class="p">,</span> <span class="n">catalog</span><span class="o">=</span><span class="n">catalog</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="c1"># ctx.obj = ctx.obj or {&quot;catalog&quot;: catalog, &quot;activity&quot;: activity, &quot;verbose&quot;: verbose}</span>
+
+
+<span class="nd">@click_main</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;-etype&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;--env-type&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="s2">&quot;local&quot;</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Choice</span><span class="p">([</span><span class="s2">&quot;local&quot;</span><span class="p">,</span> <span class="s2">&quot;db&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">],</span> <span class="n">case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The kind of environment to delete catalogs and audit logs from.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;--bucket&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The name of the Couchbase bucket to search.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;-y&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;--skip_prompt&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Enable this flag to delete catalogs without confirm prompting.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">pass_context</span>
+<span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">env_type</span><span class="p">,</span> <span class="n">bucket</span><span class="p">,</span> <span class="n">skip_prompt</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Clean up the catalog folder, the activity folder, any generated files, etc...&quot;&quot;&quot;</span>
+    <span class="n">clean_db</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">clean_local</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">match</span> <span class="n">env_type</span><span class="p">:</span>
+        <span class="k">case</span> <span class="s2">&quot;local&quot;</span><span class="p">:</span>
+            <span class="n">clean_local</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">case</span> <span class="s2">&quot;db&quot;</span><span class="p">:</span>
+            <span class="n">clean_db</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">case</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="n">clean_db</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">clean_local</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">env_string_to_delete</span> <span class="o">=</span> <span class="s2">&quot;both local and db&quot;</span> <span class="k">if</span> <span class="n">env_type</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span> <span class="k">else</span> <span class="n">env_type</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_prompt</span><span class="p">:</span>
+        <span class="n">click</span><span class="o">.</span><span class="n">confirm</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Are you sure you want to delete all catalogs and audit logs from </span><span class="si">{</span><span class="n">env_string_to_delete</span><span class="si">}</span><span class="s2"> catalog?&quot;</span><span class="p">,</span>
+            <span class="n">abort</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">clean_local</span><span class="p">:</span>
+        <span class="n">cmd_clean</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">clean_db</span><span class="p">:</span>
+        <span class="c1"># Load all Couchbase connection related data from env</span>
+        <span class="n">connection_details_env</span> <span class="o">=</span> <span class="n">CouchbaseConnect</span><span class="p">(</span>
+            <span class="n">connection_url</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;CB_CONN_STRING&quot;</span><span class="p">),</span>
+            <span class="n">username</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;CB_USERNAME&quot;</span><span class="p">),</span>
+            <span class="n">password</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;CB_PASSWORD&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Establish a connection</span>
+        <span class="n">err</span><span class="p">,</span> <span class="n">cluster</span> <span class="o">=</span> <span class="n">get_connection</span><span class="p">(</span><span class="n">conn</span><span class="o">=</span><span class="n">connection_details_env</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Get buckets from CB Cluster</span>
+        <span class="n">buckets</span> <span class="o">=</span> <span class="n">get_buckets</span><span class="p">(</span><span class="n">cluster</span><span class="o">=</span><span class="n">cluster</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">bucket</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Prompt user to select a bucket</span>
+            <span class="n">bucket</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">prompt</span><span class="p">(</span><span class="s2">&quot;Please select a bucket: &quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Choice</span><span class="p">(</span><span class="n">buckets</span><span class="p">),</span> <span class="n">show_choices</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">bucket</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">buckets</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Bucket does not exist! Available buckets from cluster are: &quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">buckets</span><span class="p">)</span>
+                <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Run rosetta --help for more information.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">cmd_clean</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">bucket</span><span class="p">,</span> <span class="n">cluster</span><span class="p">)</span>
+
+
+<span class="nd">@click_main</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">pass_context</span>
+<span class="k">def</span> <span class="nf">env</span><span class="p">(</span><span class="n">ctx</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Show this program&#39;s environment or configuration parameters as a JSON object.&quot;&quot;&quot;</span>
+    <span class="n">cmd_env</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span>
+
+
+<span class="nd">@click_main</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;--bucket&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The name of the Couchbase bucket to run analysis over.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;-m&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;--metric&quot;</span><span class="p">,</span>
+    <span class="n">multiple</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Metric to evaluate the log files on.&quot;</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Choice</span><span class="p">([</span><span class="s2">&quot;faithfulness&quot;</span><span class="p">,</span> <span class="s2">&quot;answer-relevancy&quot;</span><span class="p">,</span> <span class="s2">&quot;context-utilization&quot;</span><span class="p">],</span> <span class="n">case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;faithfulness&quot;</span><span class="p">,</span> <span class="s2">&quot;answer-relevancy&quot;</span><span class="p">,</span> <span class="s2">&quot;context-utilization&quot;</span><span class="p">],</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">pass_context</span>
+<span class="k">def</span> <span class="nf">analyze</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">bucket</span><span class="p">,</span> <span class="n">metrics</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find tools, prompts, etc. from the catalog based on a natural language QUERY string.&quot;&quot;&quot;</span>
+    <span class="c1"># cmd_analyze(ctx.obj, bucket=bucket, metrics=metrics)</span>
+    <span class="k">pass</span>
+
+
+<span class="nd">@click_main</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;--query&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;User query describing the task for which tools / prompts are needed. This field or --name must be specified.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;--name&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of catalog item to retrieve from the catalog directly. This field or --query must be specified.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;--kind&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Choice</span><span class="p">([</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="s2">&quot;prompt&quot;</span><span class="p">],</span> <span class="n">case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The kind of catalog to search.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;--bucket&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The name of the Couchbase bucket to search.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;--limit&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The maximum number of results to show.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;--include-dirty&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Whether to consider and process dirty source files for the find query.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;--refiner&quot;</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Choice</span><span class="p">([</span><span class="s2">&quot;ClosestCluster&quot;</span><span class="p">,</span> <span class="s2">&quot;None&quot;</span><span class="p">],</span> <span class="n">case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specify how to post-process find results.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;-an&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;--annotations&quot;</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Tool-specific annotations to filter by, specified using KEY=&quot;VALUE&quot; (AND|OR KEY=&quot;VALUE&quot;)*.&#39;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;-cid&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;--catalog-id&quot;</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Catalog identifier that uniquely specifies a catalog version (git commit id).&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;--search-db&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Enable this flag to perform DB level search.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;-em&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;--embedding-model&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_EMBEDDING_MODEL</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Embedding model to generate embeddings for query.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;-cver&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;--catalog_version&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_CATALOG_SCHEMA_VERSION</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Catalog schema version that your catalog is in.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">pass_context</span>
+<span class="k">def</span> <span class="nf">find</span><span class="p">(</span>
+    <span class="n">ctx</span><span class="p">,</span>
+    <span class="n">query</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">,</span>
+    <span class="n">kind</span><span class="p">,</span>
+    <span class="n">bucket</span><span class="p">,</span>
+    <span class="n">limit</span><span class="p">,</span>
+    <span class="n">include_dirty</span><span class="p">,</span>
+    <span class="n">refiner</span><span class="p">,</span>
+    <span class="n">annotations</span><span class="p">,</span>
+    <span class="n">catalog_id</span><span class="p">,</span>
+    <span class="n">search_db</span><span class="p">,</span>
+    <span class="n">embedding_model</span><span class="p">,</span>
+    <span class="n">catalog_version</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find tools, prompts, etc. from the catalog based on a natural language QUERY string.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">search_db</span><span class="p">:</span>
+        <span class="c1"># Load all Couchbase connection related data from env</span>
+        <span class="n">connection_details_env</span> <span class="o">=</span> <span class="n">CouchbaseConnect</span><span class="p">(</span>
+            <span class="n">connection_url</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;CB_CONN_STRING&quot;</span><span class="p">),</span>
+            <span class="n">username</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;CB_USERNAME&quot;</span><span class="p">),</span>
+            <span class="n">password</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;CB_PASSWORD&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Establish a connection</span>
+        <span class="n">err</span><span class="p">,</span> <span class="n">cluster</span> <span class="o">=</span> <span class="n">get_connection</span><span class="p">(</span><span class="n">conn</span><span class="o">=</span><span class="n">connection_details_env</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Get buckets from CB Cluster</span>
+        <span class="n">buckets</span> <span class="o">=</span> <span class="n">get_buckets</span><span class="p">(</span><span class="n">cluster</span><span class="o">=</span><span class="n">cluster</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">bucket</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Prompt user to select a bucket</span>
+            <span class="n">bucket</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">prompt</span><span class="p">(</span><span class="s2">&quot;Please select a bucket: &quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Choice</span><span class="p">(</span><span class="n">buckets</span><span class="p">),</span> <span class="n">show_choices</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">bucket</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">buckets</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Bucket does not exist! Available buckets from cluster are: &quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">buckets</span><span class="p">)</span>
+                <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Run rosetta --help for more information.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">cmd_find</span><span class="p">(</span>
+            <span class="n">ctx</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span>
+            <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span>
+            <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">,</span>
+            <span class="n">include_dirty</span><span class="o">=</span><span class="n">include_dirty</span><span class="p">,</span>
+            <span class="n">refiner</span><span class="o">=</span><span class="n">refiner</span><span class="p">,</span>
+            <span class="n">annotations</span><span class="o">=</span><span class="n">annotations</span><span class="p">,</span>
+            <span class="n">catalog_id</span><span class="o">=</span><span class="n">catalog_id</span><span class="p">,</span>
+            <span class="n">bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span>
+            <span class="n">cluster</span><span class="o">=</span><span class="n">cluster</span><span class="p">,</span>
+            <span class="n">embedding_model</span><span class="o">=</span><span class="n">embedding_model</span><span class="p">,</span>
+            <span class="n">catalog_schema_version</span><span class="o">=</span><span class="n">catalog_version</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">cluster</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cmd_find</span><span class="p">(</span>
+            <span class="n">ctx</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span>
+            <span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span>
+            <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">,</span>
+            <span class="n">include_dirty</span><span class="o">=</span><span class="n">include_dirty</span><span class="p">,</span>
+            <span class="n">refiner</span><span class="o">=</span><span class="n">refiner</span><span class="p">,</span>
+            <span class="n">annotations</span><span class="o">=</span><span class="n">annotations</span><span class="p">,</span>
+            <span class="n">catalog_id</span><span class="o">=</span><span class="n">catalog_id</span><span class="p">,</span>
+            <span class="n">embedding_model</span><span class="o">=</span><span class="n">embedding_model</span><span class="p">,</span>
+            <span class="n">catalog_schema_version</span><span class="o">=</span><span class="n">catalog_version</span><span class="p">,</span>
+        <span class="p">)</span>
+
+
+<span class="nd">@click_main</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="s2">&quot;source_dirs&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;--kind&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Choice</span><span class="p">([</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="s2">&quot;prompt&quot;</span><span class="p">],</span> <span class="n">case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The kind of items to index into the local catalog.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;-em&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;--embedding-model&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_EMBEDDING_MODEL</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Embedding model when indexing source files into the local catalog.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;--dry-run&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;When true, do not update the local catalog files.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">pass_context</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">source_dirs</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">embedding_model</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.</span>
+<span class="sd">    SOURCE_DIRS defaults to &quot;.&quot;, the current working directory.</span>
+<span class="sd">    Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">source_dirs</span><span class="p">:</span>
+        <span class="n">source_dirs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="p">]</span>
+
+    <span class="c1"># TODO: The index command should default to the &#39;.&#39; directory / current directory.</span>
+    <span class="c1"># TODO: The index command should ignore the &#39;.git&#39; subdirectory.</span>
+    <span class="c1"># TODO: The index command should ignore whatever&#39;s in the &#39;.gitignore&#39; file.</span>
+
+    <span class="n">cmd_index</span><span class="p">(</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span>
+        <span class="n">source_dirs</span><span class="o">=</span><span class="n">source_dirs</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span>
+        <span class="n">embedding_model</span><span class="o">=</span><span class="n">embedding_model</span><span class="p">,</span>
+        <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="nd">@click_main</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;--kind&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Choice</span><span class="p">([</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="s2">&quot;prompt&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">],</span> <span class="n">case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The kind of catalog to insert into DB.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;--bucket&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The name of the Couchbase bucket to publish to.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;-an&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;--annotations&quot;</span><span class="p">,</span>
+    <span class="n">multiple</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Tuple</span><span class="p">([</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]),</span>
+    <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Snapshot level annotations to be added while publishing.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">pass_context</span>
+<span class="k">def</span> <span class="nf">publish</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">bucket</span><span class="p">,</span> <span class="n">annotations</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Publish the local catalog to Couchbase DB&quot;&quot;&quot;</span>
+
+    <span class="c1"># Get keyspace and connection details</span>
+    <span class="n">keyspace_details</span> <span class="o">=</span> <span class="n">Keyspace</span><span class="p">(</span><span class="n">bucket</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">DEFAULT_SCOPE_PREFIX</span><span class="p">)</span>
+
+    <span class="c1"># Load all Couchbase connection related data from env</span>
+    <span class="n">connection_details_env</span> <span class="o">=</span> <span class="n">CouchbaseConnect</span><span class="p">(</span>
+        <span class="n">connection_url</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;CB_CONN_STRING&quot;</span><span class="p">),</span>
+        <span class="n">username</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;CB_USERNAME&quot;</span><span class="p">),</span>
+        <span class="n">password</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;CB_PASSWORD&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Establish a connection</span>
+    <span class="n">err</span><span class="p">,</span> <span class="n">cluster</span> <span class="o">=</span> <span class="n">get_connection</span><span class="p">(</span><span class="n">conn</span><span class="o">=</span><span class="n">connection_details_env</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+        <span class="k">return</span>
+
+    <span class="c1"># Get buckets from CB Cluster</span>
+    <span class="n">buckets</span> <span class="o">=</span> <span class="n">get_buckets</span><span class="p">(</span><span class="n">cluster</span><span class="o">=</span><span class="n">cluster</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">bucket</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Prompt user to select a bucket</span>
+        <span class="n">bucket</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">prompt</span><span class="p">(</span><span class="s2">&quot;Please select a bucket: &quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Choice</span><span class="p">(</span><span class="n">buckets</span><span class="p">),</span> <span class="n">show_choices</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">bucket</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">buckets</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Bucket does not exist! Available buckets from cluster are: &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">buckets</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Run rosetta --help for more information.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">keyspace_details</span><span class="o">.</span><span class="n">bucket</span> <span class="o">=</span> <span class="n">bucket</span>
+    <span class="n">cmd_publish</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">annotations</span><span class="p">,</span> <span class="n">cluster</span><span class="p">,</span> <span class="n">keyspace_details</span><span class="p">,</span> <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">,</span> <span class="n">connection_details_env</span><span class="p">)</span>
+    <span class="n">cluster</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="nd">@click_main</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;--kind&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Choice</span><span class="p">([</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="s2">&quot;prompt&quot;</span><span class="p">],</span> <span class="n">case_sensitive</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The kind of catalog to show status.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s2">&quot;--include-dirty&quot;</span><span class="p">,</span>
+    <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Whether to consider dirty source files for status.&quot;</span><span class="p">,</span>
+    <span class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">pass_context</span>
+<span class="k">def</span> <span class="nf">status</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">include_dirty</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Show the status of the local catalog.&quot;&quot;&quot;</span>
+    <span class="n">cmd_status</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span> <span class="n">include_dirty</span><span class="o">=</span><span class="n">include_dirty</span><span class="p">)</span>
+
+
+<span class="nd">@click_main</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">pass_context</span>
+<span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="n">ctx</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Show the version of this tool.&quot;&quot;&quot;</span>
+    <span class="n">cmd_version</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span>
+
+
+<span class="c1"># @click_main.command()</span>
+<span class="c1"># @click.option(</span>
+<span class="c1">#     &quot;--host-port&quot;,</span>
+<span class="c1">#     default=DEFAULT_WEB_HOST_PORT,</span>
+<span class="c1">#     envvar=&quot;ROSETTA_WEB_HOST_PORT&quot;,</span>
+<span class="c1">#     help=&quot;The host:port to listen on.&quot;,</span>
+<span class="c1">#     show_default=True,</span>
+<span class="c1"># )</span>
+<span class="c1"># @click.option(</span>
+<span class="c1">#     &quot;--debug/--no-debug&quot;,</span>
+<span class="c1">#     envvar=&quot;ROSETTA_WEB_DEBUG&quot;,</span>
+<span class="c1">#     default=True,</span>
+<span class="c1">#     help=&quot;Debug mode.&quot;,</span>
+<span class="c1">#     show_default=True,</span>
+<span class="c1"># )</span>
+<span class="c1"># @click.pass_context</span>
+<span class="c1"># def web(ctx, host_port, debug):</span>
+<span class="c1">#     &quot;&quot;&quot;Start a local web server to view our tools.&quot;&quot;&quot;</span>
+<span class="c1">#     cmd_web(ctx.obj, host_port, debug)</span>
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../cmd/rosetta_cmd.html#rosetta_cmd.main.main">[docs]</a>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">click_main</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ERROR: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">err</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;ROSETTA_DEBUG&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Set ROSETTA_DEBUG so standard python stack trace is emitted.</span>
+            <span class="k">raise</span> <span class="n">e</span>
+
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Tanvi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

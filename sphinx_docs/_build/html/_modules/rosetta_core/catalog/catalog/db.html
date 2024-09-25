@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rosetta_core.catalog.catalog.db &mdash; Rosetta v0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=f8c80a57"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            Rosetta
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cmd/modules.html">rosetta_cmd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../core/modules.html">rosetta_core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../util/modules.html">rosetta_util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Rosetta</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rosetta_core.catalog.catalog.db</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for rosetta_core.catalog.catalog.db</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">couchbase.cluster</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">pydantic</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">from</span> <span class="nn">couchbase.exceptions</span> <span class="kn">import</span> <span class="n">ScopeNotFoundException</span>
+<span class="kn">from</span> <span class="nn">rosetta_core.annotation</span> <span class="kn">import</span> <span class="n">AnnotationPredicate</span>
+<span class="kn">from</span> <span class="nn">rosetta_core.catalog.catalog.base</span> <span class="kn">import</span> <span class="n">CatalogBase</span>
+<span class="kn">from</span> <span class="nn">rosetta_core.catalog.catalog.base</span> <span class="kn">import</span> <span class="n">SearchResult</span>
+<span class="kn">from</span> <span class="nn">rosetta_core.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_SCOPE_PREFIX</span>
+<span class="kn">from</span> <span class="nn">rosetta_core.prompt.models</span> <span class="kn">import</span> <span class="n">JinjaPromptDescriptor</span>
+<span class="kn">from</span> <span class="nn">rosetta_core.prompt.models</span> <span class="kn">import</span> <span class="n">RawPromptDescriptor</span>
+<span class="kn">from</span> <span class="nn">rosetta_core.record.descriptor</span> <span class="kn">import</span> <span class="n">RecordKind</span>
+<span class="kn">from</span> <span class="nn">rosetta_core.tool.descriptor</span> <span class="kn">import</span> <span class="n">HTTPRequestToolDescriptor</span>
+<span class="kn">from</span> <span class="nn">rosetta_core.tool.descriptor</span> <span class="kn">import</span> <span class="n">PythonToolDescriptor</span>
+<span class="kn">from</span> <span class="nn">rosetta_core.tool.descriptor</span> <span class="kn">import</span> <span class="n">SemanticSearchToolDescriptor</span>
+<span class="kn">from</span> <span class="nn">rosetta_core.tool.descriptor</span> <span class="kn">import</span> <span class="n">SQLPPQueryToolDescriptor</span>
+<span class="kn">from</span> <span class="nn">rosetta_core.version</span> <span class="kn">import</span> <span class="n">VersionDescriptor</span>
+<span class="kn">from</span> <span class="nn">rosetta_util.query</span> <span class="kn">import</span> <span class="n">execute_query</span>
+<span class="kn">from</span> <span class="nn">rosetta_util.query</span> <span class="kn">import</span> <span class="n">execute_query_with_parameters</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CatalogDB">
+<a class="viewcode-back" href="../../../../core/rosetta_core.catalog.catalog.html#rosetta_core.catalog.CatalogDB">[docs]</a>
+<span class="k">class</span> <span class="nc">CatalogDB</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">CatalogBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a catalog stored in a database.&quot;&quot;&quot;</span>
+
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">ConfigDict</span><span class="p">(</span><span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">cluster</span><span class="p">:</span> <span class="n">couchbase</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">Cluster</span>
+    <span class="n">bucket</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="s2">&quot;prompt&quot;</span><span class="p">]</span>
+    <span class="n">embedding_model</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="c1"># TODO (GLENN): Might need to add this to mem as well.</span>
+    <span class="n">snapshot_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span>
+
+<div class="viewcode-block" id="CatalogDB.cluster_should_be_reachable">
+<a class="viewcode-back" href="../../../../core/rosetta_core.catalog.catalog.html#rosetta_core.catalog.CatalogDB.cluster_should_be_reachable">[docs]</a>
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">cluster_should_be_reachable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CatalogDB&quot;</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># TODO (GLENN): Factor our embedding model here</span>
+            <span class="n">collection_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="si">}</span><span class="s2">_catalog&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                FROM   `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="si">}</span><span class="s2">`.`</span><span class="si">{</span><span class="n">DEFAULT_SCOPE_PREFIX</span><span class="si">}</span><span class="s2">`.`</span><span class="si">{</span><span class="n">collection_name</span><span class="si">}</span><span class="s2">`</span>
+<span class="s2">                SELECT 1</span>
+<span class="s2">                LIMIT  1;</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">except</span> <span class="n">ScopeNotFoundException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Catalog does not exist! Please run &#39;rosetta publish&#39; first.&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="CatalogDB.find">
+<a class="viewcode-back" href="../../../../core/rosetta_core.catalog.catalog.html#rosetta_core.catalog.CatalogDB.find">[docs]</a>
+    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">limit</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">annotations</span><span class="p">:</span> <span class="n">AnnotationPredicate</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">catalog_schema_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">SearchResult</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the catalog items that best match a query.&quot;&quot;&quot;</span>
+
+        <span class="c1"># Catalog item has to be queried directly</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># TODO (GLENN): Need to add some validation around bucket (to prevent injection)</span>
+            <span class="c1"># TODO (GLENN): Need to add some validation around name (to prevent injection)</span>
+            <span class="n">item_query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SELECT a.* from `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="si">}</span><span class="s2">`.`</span><span class="si">{</span><span class="n">DEFAULT_SCOPE_PREFIX</span><span class="si">}</span><span class="s2">`.`</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="si">}</span><span class="s2">_catalog` as a WHERE a.name = $name;&quot;</span>
+
+            <span class="n">res</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">execute_query_with_parameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="p">,</span> <span class="n">item_query</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">})</span>
+            <span class="k">if</span> <span class="n">err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Generate embeddings for user query</span>
+            <span class="kn">import</span> <span class="nn">sentence_transformers</span>
+
+            <span class="n">embedding_model_obj</span> <span class="o">=</span> <span class="n">sentence_transformers</span><span class="o">.</span><span class="n">SentenceTransformer</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">embedding_model</span><span class="p">,</span> <span class="n">tokenizer_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;clean_up_tokenization_spaces&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+            <span class="p">)</span>
+            <span class="n">query_embeddings</span> <span class="o">=</span> <span class="n">embedding_model_obj</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">query_embeddings</span><span class="p">)</span>
+
+            <span class="c1"># ---------------------------------------------------------------------------------------- #</span>
+            <span class="c1">#                         Get all relevant items from catalog                              #</span>
+            <span class="c1"># ---------------------------------------------------------------------------------------- #</span>
+
+            <span class="c1"># Get annotations condition</span>
+            <span class="n">annotation_condition</span> <span class="o">=</span> <span class="n">annotations</span><span class="o">.</span><span class="n">__catalog_query_str__</span><span class="p">()</span> <span class="k">if</span> <span class="n">annotations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;1==1&quot;</span>
+
+            <span class="c1"># Index used</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;rosetta_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="si">}</span><span class="s2">_index_</span><span class="si">{</span><span class="n">catalog_schema_version</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="c1"># User has specified a snapshot id</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">snapshot_id</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+                <span class="n">filter_records_query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                    SELECT a.* FROM (</span>
+<span class="s2">                        SELECT t.*, SEARCH_META() as metadata</span>
+<span class="s2">                        FROM `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="si">}</span><span class="s2">`.`</span><span class="si">{</span><span class="n">DEFAULT_SCOPE_PREFIX</span><span class="si">}</span><span class="s2">`.`</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="si">}</span><span class="s2">_catalog` as t</span>
+<span class="s2">                        WHERE SEARCH(</span>
+<span class="s2">                            t,</span>
+<span class="s2">                            </span><span class="se">{{</span>
+<span class="s2">                                &#39;query&#39;: </span><span class="se">{{</span><span class="s2"> &#39;match_none&#39;: </span><span class="se">{{}}</span><span class="s2"> </span><span class="se">}}</span><span class="s2">,</span>
+<span class="s2">                                &#39;knn&#39;: [</span>
+<span class="s2">                                    </span><span class="se">{{</span>
+<span class="s2">                                        &#39;field&#39;: &#39;embedding_</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">&#39;,</span>
+<span class="s2">                                        &#39;vector&#39;: </span><span class="si">{</span><span class="n">query_embeddings</span><span class="si">}</span><span class="s2">,</span>
+<span class="s2">                                        &#39;k&#39;: 10</span>
+<span class="s2">                                    </span><span class="se">}}</span>
+<span class="s2">                                ],</span>
+<span class="s2">                                &#39;size&#39;: 10,</span>
+<span class="s2">                                &#39;ctl&#39;: </span><span class="se">{{</span><span class="s2"> &#39;timeout&#39;: 10 </span><span class="se">}}</span>
+<span class="s2">                            </span><span class="se">}}</span><span class="s2">,</span>
+<span class="s2">                            </span><span class="se">{{</span>
+<span class="s2">                                &#39;index&#39;: &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">DEFAULT_SCOPE_PREFIX</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">&#39;</span>
+<span class="s2">                            </span><span class="se">}}</span>
+<span class="s2">                        )</span>
+<span class="s2">                        ORDER BY metadata.score DESC</span>
+<span class="s2">                    ) AS a</span>
+<span class="s2">                    WHERE </span><span class="si">{</span><span class="n">annotation_condition</span><span class="si">}</span><span class="s2"> AND catalog_identifier=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">snapshot_id</span><span class="si">}</span><span class="s2">&#39;</span>
+<span class="s2">                    LIMIT </span><span class="si">{</span><span class="n">limit</span><span class="si">}</span><span class="s2">;</span>
+<span class="s2">                &quot;&quot;&quot;</span>
+
+            <span class="c1"># No snapshot id has been mentioned</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">filter_records_query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                    SELECT a.* FROM (</span>
+<span class="s2">                        SELECT t.*, SEARCH_META() as metadata</span>
+<span class="s2">                        FROM `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="si">}</span><span class="s2">`.`</span><span class="si">{</span><span class="n">DEFAULT_SCOPE_PREFIX</span><span class="si">}</span><span class="s2">`.`</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="si">}</span><span class="s2">_catalog` as t</span>
+<span class="s2">                        WHERE SEARCH(</span>
+<span class="s2">                            t,</span>
+<span class="s2">                            </span><span class="se">{{</span>
+<span class="s2">                                &#39;query&#39;: </span><span class="se">{{</span><span class="s2"> &#39;match_none&#39;: </span><span class="se">{{}}</span><span class="s2"> </span><span class="se">}}</span><span class="s2">,</span>
+<span class="s2">                                &#39;knn&#39;: [</span>
+<span class="s2">                                    </span><span class="se">{{</span>
+<span class="s2">                                        &#39;field&#39;: &#39;embedding_</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s2">&#39;,</span>
+<span class="s2">                                        &#39;vector&#39;: </span><span class="si">{</span><span class="n">query_embeddings</span><span class="si">}</span><span class="s2">,</span>
+<span class="s2">                                        &#39;k&#39;: 10</span>
+<span class="s2">                                    </span><span class="se">}}</span>
+<span class="s2">                                ],</span>
+<span class="s2">                                &#39;size&#39;: 10,</span>
+<span class="s2">                                &#39;ctl&#39;: </span><span class="se">{{</span><span class="s2"> &#39;timeout&#39;: 10 </span><span class="se">}}</span>
+<span class="s2">                            </span><span class="se">}}</span><span class="s2">,</span>
+<span class="s2">                            </span><span class="se">{{</span>
+<span class="s2">                                &#39;index&#39;: &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">DEFAULT_SCOPE_PREFIX</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">&#39;</span>
+<span class="s2">                            </span><span class="se">}}</span>
+<span class="s2">                        )</span>
+<span class="s2">                        ORDER BY metadata.score DESC</span>
+<span class="s2">                    ) AS a</span>
+<span class="s2">                    WHERE </span><span class="si">{</span><span class="n">annotation_condition</span><span class="si">}</span>
+<span class="s2">                    LIMIT </span><span class="si">{</span><span class="n">limit</span><span class="si">}</span><span class="s2">;</span>
+<span class="s2">                &quot;&quot;&quot;</span>
+
+            <span class="c1"># Execute query after filtering by catalog_identifier if provided</span>
+            <span class="n">res</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">execute_query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="p">,</span> <span class="n">filter_records_query</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="n">resp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+
+        <span class="c1"># If result set is empty</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No catalog items found with given conditions...&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="c1"># ---------------------------------------------------------------------------------------- #</span>
+        <span class="c1">#                Format catalog items into SearchResults and child types                   #</span>
+        <span class="c1"># ---------------------------------------------------------------------------------------- #</span>
+
+        <span class="c1"># List of catalog items from query</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">resp</span><span class="p">:</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;metadata&quot;</span><span class="p">][</span><span class="s2">&quot;score&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">1</span>
+            <span class="k">match</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;record_kind&quot;</span><span class="p">]:</span>
+                <span class="k">case</span> <span class="n">RecordKind</span><span class="o">.</span><span class="n">SemanticSearch</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                    <span class="n">descriptor</span> <span class="o">=</span> <span class="n">SemanticSearchToolDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                <span class="k">case</span> <span class="n">RecordKind</span><span class="o">.</span><span class="n">PythonFunction</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                    <span class="n">descriptor</span> <span class="o">=</span> <span class="n">PythonToolDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                <span class="k">case</span> <span class="n">RecordKind</span><span class="o">.</span><span class="n">SQLPPQuery</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                    <span class="n">descriptor</span> <span class="o">=</span> <span class="n">SQLPPQueryToolDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                <span class="k">case</span> <span class="n">RecordKind</span><span class="o">.</span><span class="n">HTTPRequest</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                    <span class="n">descriptor</span> <span class="o">=</span> <span class="n">HTTPRequestToolDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                <span class="k">case</span> <span class="n">RecordKind</span><span class="o">.</span><span class="n">RawPrompt</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                    <span class="n">descriptor</span> <span class="o">=</span> <span class="n">RawPromptDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                <span class="k">case</span> <span class="n">RecordKind</span><span class="o">.</span><span class="n">JinjaPrompt</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                    <span class="n">descriptor</span> <span class="o">=</span> <span class="n">JinjaPromptDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+                    <span class="n">kind</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;record_kind&quot;</span><span class="p">]</span>
+                    <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown record encountered of kind = &#39;</span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2">&#39;!&quot;</span><span class="p">)</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SearchResult</span><span class="p">(</span><span class="n">entry</span><span class="o">=</span><span class="n">descriptor</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="n">delta</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">results</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VersionDescriptor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the lates version of the kind catalog&quot;&quot;&quot;</span>
+        <span class="n">ts_query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            FROM     `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="si">}</span><span class="s2">`.`</span><span class="si">{</span><span class="n">DEFAULT_SCOPE_PREFIX</span><span class="si">}</span><span class="s2">`.`</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="si">}</span><span class="s2">_catalog` AS t</span>
+<span class="s2">            SELECT   VALUE  t.version</span>
+<span class="s2">            ORDER BY META().cas DESC</span>
+<span class="s2">            LIMIT    1</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="n">res</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">execute_query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="p">,</span> <span class="n">ts_query</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No results found? -- Error: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">VersionDescriptor</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">res</span><span class="p">)))</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Tanvi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

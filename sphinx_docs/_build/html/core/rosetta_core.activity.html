@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rosetta_core.activity package &mdash; Rosetta v0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=f8c80a57"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rosetta_core.activity.analyzer package" href="rosetta_core.activity.analyzer.html" />
+    <link rel="prev" title="rosetta_core package" href="rosetta_core.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            Rosetta
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../cmd/modules.html">rosetta_cmd</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">rosetta_core</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="rosetta_core.html">rosetta_core package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="rosetta_core.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">rosetta_core.activity package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.annotation.html">rosetta_core.annotation package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html">rosetta_core.catalog package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html">rosetta_core.indexer package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html">rosetta_core.llm package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html">rosetta_core.prompt package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html">rosetta_core.provider package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html">rosetta_core.record package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.secrets.html">rosetta_core.secrets package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.tool.html">rosetta_core.tool package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html">rosetta_core.version package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.html#module-rosetta_core.defaults">rosetta_core.defaults module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.html#module-rosetta_core">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../util/modules.html">rosetta_util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Rosetta</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">rosetta_core</a></li>
+          <li class="breadcrumb-item"><a href="rosetta_core.html">rosetta_core package</a></li>
+      <li class="breadcrumb-item active">rosetta_core.activity package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/core/rosetta_core.activity.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="rosetta-core-activity-package">
+<h1>rosetta_core.activity package<a class="headerlink" href="#rosetta-core-activity-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rosetta_core.activity.analyzer.html">rosetta_core.activity.analyzer package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.activity.analyzer.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.activity.analyzer.html#module-rosetta_core.activity.analyzer.analyzer">rosetta_core.activity.analyzer.analyzer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.activity.analyzer.html#rosetta_core.activity.analyzer.analyzer.Analyzer"><code class="docutils literal notranslate"><span class="pre">Analyzer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.analyzer.html#rosetta_core.activity.analyzer.analyzer.Analyzer.run"><code class="docutils literal notranslate"><span class="pre">Analyzer.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.activity.analyzer.html#rosetta_core.activity.analyzer.analyzer.Metric"><code class="docutils literal notranslate"><span class="pre">Metric</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.analyzer.html#rosetta_core.activity.analyzer.analyzer.Metric.ANSWER_RELEVANCY"><code class="docutils literal notranslate"><span class="pre">Metric.ANSWER_RELEVANCY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.analyzer.html#rosetta_core.activity.analyzer.analyzer.Metric.CONTEXT_UTILIZATION"><code class="docutils literal notranslate"><span class="pre">Metric.CONTEXT_UTILIZATION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.analyzer.html#rosetta_core.activity.analyzer.analyzer.Metric.FAITHFULNESS"><code class="docutils literal notranslate"><span class="pre">Metric.FAITHFULNESS</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.activity.analyzer.html#module-rosetta_core.activity.analyzer">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.activity.analyzer.html#rosetta_core.activity.analyzer.Analyzer"><code class="docutils literal notranslate"><span class="pre">Analyzer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.analyzer.html#rosetta_core.activity.analyzer.Analyzer.run"><code class="docutils literal notranslate"><span class="pre">Analyzer.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rosetta_core.activity.auditor.html">rosetta_core.activity.auditor package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.activity.auditor.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.activity.auditor.html#module-rosetta_core.activity.auditor.base">rosetta_core.activity.auditor.base module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.activity.auditor.html#rosetta_core.activity.auditor.base.AuditorType"><code class="docutils literal notranslate"><span class="pre">AuditorType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.auditor.html#rosetta_core.activity.auditor.base.AuditorType.accept"><code class="docutils literal notranslate"><span class="pre">AuditorType.accept()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.activity.auditor.html#rosetta_core.activity.auditor.base.BaseAuditor"><code class="docutils literal notranslate"><span class="pre">BaseAuditor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.auditor.html#rosetta_core.activity.auditor.base.BaseAuditor.accept"><code class="docutils literal notranslate"><span class="pre">BaseAuditor.accept()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.activity.auditor.html#module-rosetta_core.activity.auditor.db">rosetta_core.activity.auditor.db module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.activity.auditor.html#rosetta_core.activity.auditor.db.DBAuditor"><code class="docutils literal notranslate"><span class="pre">DBAuditor</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.activity.auditor.html#module-rosetta_core.activity.auditor.local">rosetta_core.activity.auditor.local module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.activity.auditor.html#rosetta_core.activity.auditor.local.LocalAuditor"><code class="docutils literal notranslate"><span class="pre">LocalAuditor</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.activity.auditor.html#module-rosetta_core.activity.auditor">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.activity.auditor.html#rosetta_core.activity.auditor.BaseAuditor"><code class="docutils literal notranslate"><span class="pre">BaseAuditor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.auditor.html#rosetta_core.activity.auditor.BaseAuditor.accept"><code class="docutils literal notranslate"><span class="pre">BaseAuditor.accept()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.activity.auditor.html#rosetta_core.activity.auditor.DBAuditor"><code class="docutils literal notranslate"><span class="pre">DBAuditor</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.activity.auditor.html#rosetta_core.activity.auditor.LocalAuditor"><code class="docutils literal notranslate"><span class="pre">LocalAuditor</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="module-rosetta_core.activity">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-rosetta_core.activity" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.activity.BaseAuditor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.activity.</span></span><span class="sig-name descname"><span class="pre">BaseAuditor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">catalog_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.identifier.VersionDescriptor" title="rosetta_core.version.identifier.VersionDescriptor"><span class="pre">VersionDescriptor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_core/activity/auditor/base.html#BaseAuditor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.activity.BaseAuditor" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="rosetta_core.activity.BaseAuditor.accept">
+<span class="sig-name descname"><span class="pre">accept</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">role</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Role" title="rosetta_core.llm.message.Role"><span class="pre">Role</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnyStr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grouping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnyStr</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_core/activity/auditor/base.html#BaseAuditor.accept"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.activity.BaseAuditor.accept" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.activity.DBAuditor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.activity.</span></span><span class="sig-name descname"><span class="pre">DBAuditor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn_string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bucket</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.identifier.VersionDescriptor" title="rosetta_core.version.identifier.VersionDescriptor"><span class="pre">VersionDescriptor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_core/activity/auditor/db.html#DBAuditor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.activity.DBAuditor" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="rosetta_core.activity.auditor.html#rosetta_core.activity.auditor.base.BaseAuditor" title="rosetta_core.activity.auditor.base.BaseAuditor"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseAuditor</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.activity.LocalAuditor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.activity.</span></span><span class="sig-name descname"><span class="pre">LocalAuditor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.identifier.VersionDescriptor" title="rosetta_core.version.identifier.VersionDescriptor"><span class="pre">VersionDescriptor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">rollover</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">128000000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_core/activity/auditor/local.html#LocalAuditor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.activity.LocalAuditor" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="rosetta_core.activity.auditor.html#rosetta_core.activity.auditor.base.BaseAuditor" title="rosetta_core.activity.auditor.base.BaseAuditor"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseAuditor</span></code></a></p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rosetta_core.html" class="btn btn-neutral float-left" title="rosetta_core package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rosetta_core.activity.analyzer.html" class="btn btn-neutral float-right" title="rosetta_core.activity.analyzer package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Tanvi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

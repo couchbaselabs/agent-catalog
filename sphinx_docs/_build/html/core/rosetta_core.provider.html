@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rosetta_core.provider package &mdash; Rosetta v0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=f8c80a57"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rosetta_core.record package" href="rosetta_core.record.html" />
+    <link rel="prev" title="rosetta_core.prompt package" href="rosetta_core.prompt.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            Rosetta
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../cmd/modules.html">rosetta_cmd</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">rosetta_core</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="rosetta_core.html">rosetta_core package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="rosetta_core.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.html">rosetta_core.activity package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.annotation.html">rosetta_core.annotation package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html">rosetta_core.catalog package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html">rosetta_core.indexer package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html">rosetta_core.llm package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html">rosetta_core.prompt package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">rosetta_core.provider package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html">rosetta_core.record package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.secrets.html">rosetta_core.secrets package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.tool.html">rosetta_core.tool package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html">rosetta_core.version package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.html#module-rosetta_core.defaults">rosetta_core.defaults module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.html#module-rosetta_core">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../util/modules.html">rosetta_util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Rosetta</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">rosetta_core</a></li>
+          <li class="breadcrumb-item"><a href="rosetta_core.html">rosetta_core package</a></li>
+      <li class="breadcrumb-item active">rosetta_core.provider package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/core/rosetta_core.provider.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="rosetta-core-provider-package">
+<h1>rosetta_core.provider package<a class="headerlink" href="#rosetta-core-provider-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-rosetta_core.provider.loader">
+<span id="rosetta-core-provider-loader-module"></span><h2>rosetta_core.provider.loader module<a class="headerlink" href="#module-rosetta_core.provider.loader" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.provider.loader.EntryLoader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.provider.loader.</span></span><span class="sig-name descname"><span class="pre">EntryLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_core/provider/loader.html#EntryLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.loader.EntryLoader" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="rosetta_core.provider.loader.EntryLoader.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_descriptors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor" title="rosetta_core.record.descriptor.RecordDescriptor"><span class="pre">RecordDescriptor</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor" title="rosetta_core.record.descriptor.RecordDescriptor"><span class="pre">RecordDescriptor</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/rosetta_core/provider/loader.html#EntryLoader.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.loader.EntryLoader.load" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rosetta_core.provider.provider">
+<span id="rosetta-core-provider-provider-module"></span><h2>rosetta_core.provider.provider module<a class="headerlink" href="#module-rosetta_core.provider.provider" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.provider.provider.BaseProvider">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.provider.provider.</span></span><span class="sig-name descname"><span class="pre">BaseProvider</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">catalog</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_core.catalog.catalog.html#rosetta_core.catalog.catalog.base.CatalogBase" title="rosetta_core.catalog.catalog.base.CatalogBase"><span class="pre">CatalogBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">refiner</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rosetta_core.catalog.catalog.html#rosetta_core.catalog.catalog.base.SearchResult" title="rosetta_core.catalog.catalog.base.SearchResult"><span class="pre">SearchResult</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rosetta_core.catalog.catalog.html#rosetta_core.catalog.catalog.base.SearchResult" title="rosetta_core.catalog.catalog.base.SearchResult"><span class="pre">SearchResult</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_core/provider/provider.html#BaseProvider"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.provider.BaseProvider" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="rosetta_core.provider.provider.BaseProvider.get">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_core/provider/provider.html#BaseProvider.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.provider.BaseProvider.get" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosetta_core.provider.provider.BaseProvider.search">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_core/provider/provider.html#BaseProvider.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.provider.BaseProvider.search" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.provider.provider.PromptProvider">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.provider.provider.</span></span><span class="sig-name descname"><span class="pre">PromptProvider</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tool_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#rosetta_core.provider.provider.ToolProvider" title="rosetta_core.provider.provider.ToolProvider"><span class="pre">ToolProvider</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_core.catalog.catalog.html#rosetta_core.catalog.catalog.base.CatalogBase" title="rosetta_core.catalog.catalog.base.CatalogBase"><span class="pre">CatalogBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">refiner</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rosetta_core.catalog.catalog.html#rosetta_core.catalog.catalog.base.SearchResult" title="rosetta_core.catalog.catalog.base.SearchResult"><span class="pre">SearchResult</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rosetta_core.catalog.catalog.html#rosetta_core.catalog.catalog.base.SearchResult" title="rosetta_core.catalog.catalog.base.SearchResult"><span class="pre">SearchResult</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_core/provider/provider.html#PromptProvider"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.provider.PromptProvider" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rosetta_core.provider.provider.BaseProvider" title="rosetta_core.provider.provider.BaseProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseProvider</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.provider.provider.PromptProvider.PromptResult">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PromptResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tools</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_core/provider/provider.html#PromptProvider.PromptResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.provider.PromptProvider.PromptResult" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.provider.provider.PromptProvider.PromptResult.prompt">
+<span class="sig-name descname"><span class="pre">prompt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#rosetta_core.provider.provider.PromptProvider.PromptResult.prompt" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.provider.provider.PromptProvider.PromptResult.tools">
+<span class="sig-name descname"><span class="pre">tools</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rosetta_core.provider.provider.PromptProvider.PromptResult.tools" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosetta_core.provider.provider.PromptProvider.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#rosetta_core.provider.provider.PromptProvider.PromptResult" title="rosetta_core.provider.provider.PromptProvider.PromptResult"><span class="pre">PromptResult</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/rosetta_core/provider/provider.html#PromptProvider.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.provider.PromptProvider.get" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosetta_core.provider.provider.PromptProvider.search">
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#rosetta_core.provider.provider.PromptProvider.PromptResult" title="rosetta_core.provider.provider.PromptProvider.PromptResult"><span class="pre">PromptResult</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/rosetta_core/provider/provider.html#PromptProvider.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.provider.PromptProvider.search" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.provider.provider.ToolProvider">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.provider.provider.</span></span><span class="sig-name descname"><span class="pre">ToolProvider</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">catalog</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_core.catalog.catalog.html#rosetta_core.catalog.catalog.base.CatalogBase" title="rosetta_core.catalog.catalog.base.CatalogBase"><span class="pre">CatalogBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decorator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refiner</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rosetta_core.catalog.catalog.html#rosetta_core.catalog.catalog.base.SearchResult" title="rosetta_core.catalog.catalog.base.SearchResult"><span class="pre">SearchResult</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rosetta_core.catalog.catalog.html#rosetta_core.catalog.catalog.base.SearchResult" title="rosetta_core.catalog.catalog.base.SearchResult"><span class="pre">SearchResult</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secrets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_core/provider/provider.html#ToolProvider"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.provider.ToolProvider" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rosetta_core.provider.provider.BaseProvider" title="rosetta_core.provider.provider.BaseProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseProvider</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="rosetta_core.provider.provider.ToolProvider.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/rosetta_core/provider/provider.html#ToolProvider.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.provider.ToolProvider.get" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosetta_core.provider.provider.ToolProvider.search">
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/rosetta_core/provider/provider.html#ToolProvider.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.provider.ToolProvider.search" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> – A string to search the catalog with.</p></li>
+<li><p><strong>annotations</strong> – An annotation query string in the form of KEY=VALUE (AND|OR KEY=VALUE)*.</p></li>
+<li><p><strong>limit</strong> – The maximum number of results to return.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of tools (Python functions).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rosetta_core.provider.refiner">
+<span id="rosetta-core-provider-refiner-module"></span><h2>rosetta_core.provider.refiner module<a class="headerlink" href="#module-rosetta_core.provider.refiner" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.provider.refiner.BaseRefiner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.provider.refiner.</span></span><span class="sig-name descname"><span class="pre">BaseRefiner</span></span><a class="reference internal" href="../_modules/rosetta_core/provider/refiner.html#BaseRefiner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.refiner.BaseRefiner" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.provider.refiner.ClosestClusterRefiner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.provider.refiner.</span></span><span class="sig-name descname"><span class="pre">ClosestClusterRefiner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kde_distribution_n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deepening_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_deepen_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_more_than_k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_core/provider/refiner.html#ClosestClusterRefiner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.refiner.ClosestClusterRefiner" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code>, <a class="reference internal" href="#rosetta_core.provider.refiner.BaseRefiner" title="rosetta_core.provider.refiner.BaseRefiner"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseRefiner</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.provider.refiner.ClosestClusterRefiner.deepening_factor">
+<span class="sig-name descname"><span class="pre">deepening_factor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#rosetta_core.provider.refiner.ClosestClusterRefiner.deepening_factor" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.provider.refiner.ClosestClusterRefiner.kde_distribution_n">
+<span class="sig-name descname"><span class="pre">kde_distribution_n</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#rosetta_core.provider.refiner.ClosestClusterRefiner.kde_distribution_n" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.provider.refiner.ClosestClusterRefiner.max_deepen_steps">
+<span class="sig-name descname"><span class="pre">max_deepen_steps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#rosetta_core.provider.refiner.ClosestClusterRefiner.max_deepen_steps" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.provider.refiner.ClosestClusterRefiner.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rosetta_core.provider.refiner.ClosestClusterRefiner.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.provider.refiner.ClosestClusterRefiner.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rosetta_core.provider.refiner.ClosestClusterRefiner.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.provider.refiner.ClosestClusterRefiner.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'deepening_factor':</span> <span class="pre">FieldInfo(annotation=float,</span> <span class="pre">required=False,</span> <span class="pre">default=0.1,</span> <span class="pre">metadata=[Gt(gt=0)]),</span> <span class="pre">'kde_distribution_n':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=10000,</span> <span class="pre">metadata=[Gt(gt=0)]),</span> <span class="pre">'max_deepen_steps':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=10,</span> <span class="pre">metadata=[Gt(gt=0)]),</span> <span class="pre">'no_more_than_k':</span> <span class="pre">FieldInfo(annotation=Union[int,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None,</span> <span class="pre">metadata=[Gt(gt=0)])}</span></em><a class="headerlink" href="#rosetta_core.provider.refiner.ClosestClusterRefiner.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo] objects.</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.provider.refiner.ClosestClusterRefiner.no_more_than_k">
+<span class="sig-name descname"><span class="pre">no_more_than_k</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rosetta_core.provider.refiner.ClosestClusterRefiner.no_more_than_k" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rosetta_core.provider">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-rosetta_core.provider" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.provider.BaseRefiner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.provider.</span></span><span class="sig-name descname"><span class="pre">BaseRefiner</span></span><a class="reference internal" href="../_modules/rosetta_core/provider/refiner.html#BaseRefiner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.BaseRefiner" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.provider.ClosestClusterRefiner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.provider.</span></span><span class="sig-name descname"><span class="pre">ClosestClusterRefiner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kde_distribution_n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deepening_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_deepen_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_more_than_k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Gt</span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">gt</span></span><span class="o"><span class="pre">=</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_core/provider/refiner.html#ClosestClusterRefiner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.ClosestClusterRefiner" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code>, <a class="reference internal" href="#rosetta_core.provider.refiner.BaseRefiner" title="rosetta_core.provider.refiner.BaseRefiner"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseRefiner</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.provider.ClosestClusterRefiner.deepening_factor">
+<span class="sig-name descname"><span class="pre">deepening_factor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#rosetta_core.provider.ClosestClusterRefiner.deepening_factor" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.provider.ClosestClusterRefiner.kde_distribution_n">
+<span class="sig-name descname"><span class="pre">kde_distribution_n</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#rosetta_core.provider.ClosestClusterRefiner.kde_distribution_n" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.provider.ClosestClusterRefiner.max_deepen_steps">
+<span class="sig-name descname"><span class="pre">max_deepen_steps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#rosetta_core.provider.ClosestClusterRefiner.max_deepen_steps" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.provider.ClosestClusterRefiner.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rosetta_core.provider.ClosestClusterRefiner.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.provider.ClosestClusterRefiner.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rosetta_core.provider.ClosestClusterRefiner.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.provider.ClosestClusterRefiner.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'deepening_factor':</span> <span class="pre">FieldInfo(annotation=float,</span> <span class="pre">required=False,</span> <span class="pre">default=0.1,</span> <span class="pre">metadata=[Gt(gt=0)]),</span> <span class="pre">'kde_distribution_n':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=10000,</span> <span class="pre">metadata=[Gt(gt=0)]),</span> <span class="pre">'max_deepen_steps':</span> <span class="pre">FieldInfo(annotation=int,</span> <span class="pre">required=False,</span> <span class="pre">default=10,</span> <span class="pre">metadata=[Gt(gt=0)]),</span> <span class="pre">'no_more_than_k':</span> <span class="pre">FieldInfo(annotation=Union[int,</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None,</span> <span class="pre">metadata=[Gt(gt=0)])}</span></em><a class="headerlink" href="#rosetta_core.provider.ClosestClusterRefiner.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo] objects.</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.provider.ClosestClusterRefiner.no_more_than_k">
+<span class="sig-name descname"><span class="pre">no_more_than_k</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rosetta_core.provider.ClosestClusterRefiner.no_more_than_k" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.provider.PromptProvider">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.provider.</span></span><span class="sig-name descname"><span class="pre">PromptProvider</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tool_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#rosetta_core.provider.provider.ToolProvider" title="rosetta_core.provider.provider.ToolProvider"><span class="pre">ToolProvider</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_core.catalog.catalog.html#rosetta_core.catalog.catalog.base.CatalogBase" title="rosetta_core.catalog.catalog.base.CatalogBase"><span class="pre">CatalogBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">refiner</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rosetta_core.catalog.catalog.html#rosetta_core.catalog.catalog.base.SearchResult" title="rosetta_core.catalog.catalog.base.SearchResult"><span class="pre">SearchResult</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rosetta_core.catalog.catalog.html#rosetta_core.catalog.catalog.base.SearchResult" title="rosetta_core.catalog.catalog.base.SearchResult"><span class="pre">SearchResult</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_core/provider/provider.html#PromptProvider"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.PromptProvider" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rosetta_core.provider.provider.BaseProvider" title="rosetta_core.provider.provider.BaseProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseProvider</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.provider.PromptProvider.PromptResult">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PromptResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tools</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_core/provider/provider.html#PromptProvider.PromptResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.PromptProvider.PromptResult" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.provider.PromptProvider.PromptResult.prompt">
+<span class="sig-name descname"><span class="pre">prompt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#rosetta_core.provider.PromptProvider.PromptResult.prompt" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.provider.PromptProvider.PromptResult.tools">
+<span class="sig-name descname"><span class="pre">tools</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rosetta_core.provider.PromptProvider.PromptResult.tools" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosetta_core.provider.PromptProvider.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#rosetta_core.provider.provider.PromptProvider.PromptResult" title="rosetta_core.provider.provider.PromptProvider.PromptResult"><span class="pre">PromptResult</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/rosetta_core/provider/provider.html#PromptProvider.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.PromptProvider.get" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosetta_core.provider.PromptProvider.search">
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#rosetta_core.provider.provider.PromptProvider.PromptResult" title="rosetta_core.provider.provider.PromptProvider.PromptResult"><span class="pre">PromptResult</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/rosetta_core/provider/provider.html#PromptProvider.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.PromptProvider.search" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.provider.ToolProvider">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.provider.</span></span><span class="sig-name descname"><span class="pre">ToolProvider</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">catalog</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_core.catalog.catalog.html#rosetta_core.catalog.catalog.base.CatalogBase" title="rosetta_core.catalog.catalog.base.CatalogBase"><span class="pre">CatalogBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decorator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refiner</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rosetta_core.catalog.catalog.html#rosetta_core.catalog.catalog.base.SearchResult" title="rosetta_core.catalog.catalog.base.SearchResult"><span class="pre">SearchResult</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rosetta_core.catalog.catalog.html#rosetta_core.catalog.catalog.base.SearchResult" title="rosetta_core.catalog.catalog.base.SearchResult"><span class="pre">SearchResult</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secrets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_core/provider/provider.html#ToolProvider"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.ToolProvider" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rosetta_core.provider.provider.BaseProvider" title="rosetta_core.provider.provider.BaseProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseProvider</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="rosetta_core.provider.ToolProvider.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/rosetta_core/provider/provider.html#ToolProvider.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.ToolProvider.get" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosetta_core.provider.ToolProvider.search">
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/rosetta_core/provider/provider.html#ToolProvider.search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.provider.ToolProvider.search" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> – A string to search the catalog with.</p></li>
+<li><p><strong>annotations</strong> – An annotation query string in the form of KEY=VALUE (AND|OR KEY=VALUE)*.</p></li>
+<li><p><strong>limit</strong> – The maximum number of results to return.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of tools (Python functions).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rosetta_core.prompt.html" class="btn btn-neutral float-left" title="rosetta_core.prompt package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rosetta_core.record.html" class="btn btn-neutral float-right" title="rosetta_core.record package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Tanvi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

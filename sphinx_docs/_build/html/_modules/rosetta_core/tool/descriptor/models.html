@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rosetta_core.tool.descriptor.models &mdash; Rosetta v0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=f8c80a57"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            Rosetta
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cmd/modules.html">rosetta_cmd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../core/modules.html">rosetta_core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../util/modules.html">rosetta_util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Rosetta</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rosetta_core.tool.descriptor.models</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for rosetta_core.tool.descriptor.models</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">import</span> <span class="nn">dataclasses</span>
+<span class="kn">import</span> <span class="nn">enum</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">openapi_parser</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">import</span> <span class="nn">pydantic</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+<span class="kn">from</span> <span class="nn">...record.descriptor</span> <span class="kn">import</span> <span class="n">RecordDescriptor</span>
+<span class="kn">from</span> <span class="nn">...record.descriptor</span> <span class="kn">import</span> <span class="n">RecordKind</span>
+<span class="kn">from</span> <span class="nn">...version</span> <span class="kn">import</span> <span class="n">VersionDescriptor</span>
+<span class="kn">from</span> <span class="nn">..decorator</span> <span class="kn">import</span> <span class="n">ToolMarker</span>
+<span class="kn">from</span> <span class="nn">.helper</span> <span class="kn">import</span> <span class="n">JSONSchemaValidatingMixin</span>
+<span class="kn">from</span> <span class="nn">.secrets</span> <span class="kn">import</span> <span class="n">CouchbaseSecrets</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">_BaseFactory</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="n">VersionDescriptor</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param filename: Name of the file to load the record descriptor from.</span>
+<span class="sd">        :param version: The version descriptor associated with file describing a set of tools.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">version</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+
+<span class="c1"># Note: a Python Tool does not add any additional fields.</span>
+<div class="viewcode-block" id="PythonToolDescriptor">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.PythonToolDescriptor">[docs]</a>
+<span class="k">class</span> <span class="nc">PythonToolDescriptor</span><span class="p">(</span><span class="n">RecordDescriptor</span><span class="p">):</span>
+    <span class="n">record_kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="n">RecordKind</span><span class="o">.</span><span class="n">PythonFunction</span><span class="p">]</span>
+    <span class="n">contents</span><span class="p">:</span> <span class="nb">str</span>
+
+<div class="viewcode-block" id="PythonToolDescriptor.Factory">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.PythonToolDescriptor.Factory">[docs]</a>
+    <span class="k">class</span> <span class="nc">Factory</span><span class="p">(</span><span class="n">_BaseFactory</span><span class="p">):</span>
+        <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="s2">&quot;PythonToolDescriptor&quot;</span><span class="p">]:</span>
+            <span class="c1"># Note: this **does not** load the tools themselves into memory.</span>
+            <span class="c1"># TODO (GLENN): We should avoid blindly putting things in our path.</span>
+            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">absolute</span><span class="p">())</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">absolute</span><span class="p">()))</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">source_contents</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">imported_module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">stem</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">tool</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">imported_module</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tool</span><span class="p">,</span> <span class="n">ToolMarker</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="k">yield</span> <span class="n">PythonToolDescriptor</span><span class="p">(</span>
+                    <span class="n">record_kind</span><span class="o">=</span><span class="n">RecordKind</span><span class="o">.</span><span class="n">PythonFunction</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="n">tool</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
+                    <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span>
+                    <span class="n">contents</span><span class="o">=</span><span class="n">source_contents</span><span class="p">,</span>
+                    <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
+                    <span class="c1"># TODO (GLENN): Add support for user-defined annotations here.</span>
+                    <span class="n">annotations</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+                <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SQLPPQueryToolDescriptor">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.SQLPPQueryToolDescriptor">[docs]</a>
+<span class="k">class</span> <span class="nc">SQLPPQueryToolDescriptor</span><span class="p">(</span><span class="n">RecordDescriptor</span><span class="p">):</span>
+    <span class="nb">input</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">output</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">query</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">secrets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">CouchbaseSecrets</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">record_kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="n">RecordKind</span><span class="o">.</span><span class="n">SQLPPQuery</span><span class="p">]</span>
+
+<div class="viewcode-block" id="SQLPPQueryToolDescriptor.Factory">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.SQLPPQueryToolDescriptor.Factory">[docs]</a>
+    <span class="k">class</span> <span class="nc">Factory</span><span class="p">(</span><span class="n">_BaseFactory</span><span class="p">):</span>
+<div class="viewcode-block" id="SQLPPQueryToolDescriptor.Factory.Metadata">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.SQLPPQueryToolDescriptor.Factory.Metadata">[docs]</a>
+        <span class="k">class</span> <span class="nc">Metadata</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">JSONSchemaValidatingMixin</span><span class="p">):</span>
+            <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_enum_values</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Below, we enumerate all fields that appear in a .sqlpp file.</span>
+            <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+            <span class="n">description</span><span class="p">:</span> <span class="nb">str</span>
+            <span class="nb">input</span><span class="p">:</span> <span class="nb">str</span>
+            <span class="n">output</span><span class="p">:</span> <span class="nb">str</span>
+            <span class="n">secrets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">CouchbaseSecrets</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">record_kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="n">RecordKind</span><span class="o">.</span><span class="n">SQLPPQuery</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">annotations</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="SQLPPQueryToolDescriptor.Factory.Metadata.value_should_be_valid_json_schema">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.SQLPPQueryToolDescriptor.Factory.Metadata.value_should_be_valid_json_schema">[docs]</a>
+            <span class="nd">@pydantic</span><span class="o">.</span><span class="n">field_validator</span><span class="p">(</span><span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="s2">&quot;output&quot;</span><span class="p">)</span>
+            <span class="nd">@classmethod</span>
+            <span class="k">def</span> <span class="nf">value_should_be_valid_json_schema</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">check_if_valid_json_schema</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="SQLPPQueryToolDescriptor.Factory.Metadata.name_should_be_valid_identifier">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.SQLPPQueryToolDescriptor.Factory.Metadata.name_should_be_valid_identifier">[docs]</a>
+            <span class="nd">@pydantic</span><span class="o">.</span><span class="n">field_validator</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+            <span class="nd">@classmethod</span>
+            <span class="k">def</span> <span class="nf">name_should_be_valid_identifier</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">isidentifier</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;name </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2"> is not a valid identifier!&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">v</span></div>
+</div>
+
+
+        <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="s2">&quot;SQLPPQueryToolDescriptor&quot;</span><span class="p">]:</span>
+            <span class="c1"># First, get the front matter from our .sqlpp file.</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">matches</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/\*(.*)\*/&quot;</span><span class="p">,</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Malformed input! No multiline comment found for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;More than one multi-line comment found. Using first comment.&quot;</span><span class="p">)</span>
+                <span class="n">metadata</span> <span class="o">=</span> <span class="n">SQLPPQueryToolDescriptor</span><span class="o">.</span><span class="n">Factory</span><span class="o">.</span><span class="n">Metadata</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+            <span class="c1"># Now, generate a single SQL++ tool descriptor.</span>
+            <span class="k">yield</span> <span class="n">SQLPPQueryToolDescriptor</span><span class="p">(</span>
+                <span class="n">record_kind</span><span class="o">=</span><span class="n">RecordKind</span><span class="o">.</span><span class="n">SQLPPQuery</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span>
+                <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
+                <span class="n">secrets</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">secrets</span><span class="p">,</span>
+                <span class="nb">input</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
+                <span class="n">output</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
+                <span class="n">query</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span>
+                <span class="n">annotations</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">annotations</span><span class="p">,</span>
+            <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SemanticSearchToolDescriptor">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.SemanticSearchToolDescriptor">[docs]</a>
+<span class="k">class</span> <span class="nc">SemanticSearchToolDescriptor</span><span class="p">(</span><span class="n">RecordDescriptor</span><span class="p">):</span>
+<div class="viewcode-block" id="SemanticSearchToolDescriptor.VectorSearchMetadata">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.SemanticSearchToolDescriptor.VectorSearchMetadata">[docs]</a>
+    <span class="k">class</span> <span class="nc">VectorSearchMetadata</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+        <span class="c1"># TODO (GLENN): Copy all vector-search-specific validations here.</span>
+        <span class="n">bucket</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="n">scope</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="n">collection</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="n">index</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="n">vector_field</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="n">text_field</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="n">embedding_model</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="n">num_candidates</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+    <span class="nb">input</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">vector_search</span><span class="p">:</span> <span class="n">VectorSearchMetadata</span>
+    <span class="n">secrets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">CouchbaseSecrets</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">record_kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="n">RecordKind</span><span class="o">.</span><span class="n">SemanticSearch</span><span class="p">]</span>
+
+<div class="viewcode-block" id="SemanticSearchToolDescriptor.Factory">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.SemanticSearchToolDescriptor.Factory">[docs]</a>
+    <span class="k">class</span> <span class="nc">Factory</span><span class="p">(</span><span class="n">_BaseFactory</span><span class="p">):</span>
+<div class="viewcode-block" id="SemanticSearchToolDescriptor.Factory.Metadata">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.SemanticSearchToolDescriptor.Factory.Metadata">[docs]</a>
+        <span class="k">class</span> <span class="nc">Metadata</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">JSONSchemaValidatingMixin</span><span class="p">):</span>
+            <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_enum_values</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Below, we enumerate all fields that appear in a .yaml file for semantic search.</span>
+            <span class="n">record_kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="n">RecordKind</span><span class="o">.</span><span class="n">SemanticSearch</span><span class="p">]</span>
+            <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+            <span class="n">description</span><span class="p">:</span> <span class="nb">str</span>
+            <span class="nb">input</span><span class="p">:</span> <span class="nb">str</span>
+            <span class="n">secrets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">CouchbaseSecrets</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">min_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">annotations</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">vector_search</span><span class="p">:</span> <span class="s2">&quot;SemanticSearchToolDescriptor.VectorSearchMetadata&quot;</span>
+
+<div class="viewcode-block" id="SemanticSearchToolDescriptor.Factory.Metadata.value_should_be_valid_json_schema">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.SemanticSearchToolDescriptor.Factory.Metadata.value_should_be_valid_json_schema">[docs]</a>
+            <span class="nd">@pydantic</span><span class="o">.</span><span class="n">field_validator</span><span class="p">(</span><span class="s2">&quot;input&quot;</span><span class="p">)</span>
+            <span class="nd">@classmethod</span>
+            <span class="k">def</span> <span class="nf">value_should_be_valid_json_schema</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">check_if_valid_json_schema</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="SemanticSearchToolDescriptor.Factory.Metadata.value_should_be_non_empty">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.SemanticSearchToolDescriptor.Factory.Metadata.value_should_be_non_empty">[docs]</a>
+            <span class="nd">@pydantic</span><span class="o">.</span><span class="n">field_validator</span><span class="p">(</span><span class="s2">&quot;input&quot;</span><span class="p">)</span>
+            <span class="nd">@classmethod</span>
+            <span class="k">def</span> <span class="nf">value_should_be_non_empty</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">input_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_dict</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;SemanticSearch cannot have an empty input!&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="SemanticSearchToolDescriptor.Factory.Metadata.name_should_be_valid_identifier">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.SemanticSearchToolDescriptor.Factory.Metadata.name_should_be_valid_identifier">[docs]</a>
+            <span class="nd">@pydantic</span><span class="o">.</span><span class="n">field_validator</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+            <span class="nd">@classmethod</span>
+            <span class="k">def</span> <span class="nf">name_should_be_valid_identifier</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">isidentifier</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;name </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2"> is not a valid identifier!&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">v</span></div>
+</div>
+
+
+        <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="s2">&quot;SemanticSearchToolDescriptor&quot;</span><span class="p">]:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">metadata</span> <span class="o">=</span> <span class="n">SemanticSearchToolDescriptor</span><span class="o">.</span><span class="n">Factory</span><span class="o">.</span><span class="n">Metadata</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">fp</span><span class="p">))</span>
+                <span class="k">yield</span> <span class="n">SemanticSearchToolDescriptor</span><span class="p">(</span>
+                    <span class="n">record_kind</span><span class="o">=</span><span class="n">RecordKind</span><span class="o">.</span><span class="n">SemanticSearch</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                    <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span>
+                    <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
+                    <span class="n">secrets</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">secrets</span><span class="p">,</span>
+                    <span class="nb">input</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
+                    <span class="n">vector_search</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">vector_search</span><span class="p">,</span>
+                    <span class="n">annotations</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">annotations</span><span class="p">,</span>
+                <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="HTTPRequestToolDescriptor">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.HTTPRequestToolDescriptor">[docs]</a>
+<span class="k">class</span> <span class="nc">HTTPRequestToolDescriptor</span><span class="p">(</span><span class="n">RecordDescriptor</span><span class="p">):</span>
+<div class="viewcode-block" id="HTTPRequestToolDescriptor.OperationMetadata">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.HTTPRequestToolDescriptor.OperationMetadata">[docs]</a>
+    <span class="k">class</span> <span class="nc">OperationMetadata</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="n">method</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+<div class="viewcode-block" id="HTTPRequestToolDescriptor.SpecificationMetadata">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.HTTPRequestToolDescriptor.SpecificationMetadata">[docs]</a>
+    <span class="k">class</span> <span class="nc">SpecificationMetadata</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+        <span class="n">filename</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">url</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="HTTPRequestToolDescriptor.OperationHandle">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.HTTPRequestToolDescriptor.OperationHandle">[docs]</a>
+    <span class="k">class</span> <span class="nc">OperationHandle</span><span class="p">:</span>
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">operation</span><span class="p">:</span> <span class="n">openapi_parser</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">Operation</span><span class="p">,</span>
+            <span class="n">servers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">openapi_parser</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">Server</span><span class="p">],</span>
+            <span class="n">parent_parameters</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">openapi_parser</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">Parameter</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">servers</span> <span class="o">=</span> <span class="n">servers</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_operation</span> <span class="o">=</span> <span class="n">operation</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parent_parameters</span> <span class="o">=</span> <span class="n">parent_parameters</span>
+
+        <span class="nd">@property</span>
+        <span class="k">def</span> <span class="nf">parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">openapi_parser</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">Parameter</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_operation</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent_parameters</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_operation</span><span class="o">.</span><span class="n">parameters</span>
+
+        <span class="nd">@property</span>
+        <span class="k">def</span> <span class="nf">operation_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_operation</span><span class="o">.</span><span class="n">operation_id</span>
+
+        <span class="nd">@property</span>
+        <span class="k">def</span> <span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_operation</span><span class="o">.</span><span class="n">description</span>
+
+        <span class="nd">@property</span>
+        <span class="k">def</span> <span class="nf">request_body</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_operation</span><span class="o">.</span><span class="n">request_body</span>
+
+        <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+    <span class="n">operation</span><span class="p">:</span> <span class="n">OperationMetadata</span>
+    <span class="n">specification</span><span class="p">:</span> <span class="n">SpecificationMetadata</span>
+    <span class="n">record_kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="n">RecordKind</span><span class="o">.</span><span class="n">HTTPRequest</span><span class="p">]</span>
+
+<div class="viewcode-block" id="HTTPRequestToolDescriptor.validate_operation">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.HTTPRequestToolDescriptor.validate_operation">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">validate_operation</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">operation</span><span class="p">:</span> <span class="n">OperationMetadata</span><span class="p">):</span>
+        <span class="c1"># We need the filename or the URL. Also, both cannot exist at the same time.</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Either filename or url must be specified.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Both filename and url cannot be specified at the same time.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># We should be able to access the specification file here (validation is done internally here).</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">open_api_spec</span> <span class="o">=</span> <span class="n">openapi_parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">filename</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="o">.</span><span class="n">as_uri</span><span class="p">(),</span> <span class="n">strict_enum</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">open_api_spec</span> <span class="o">=</span> <span class="n">openapi_parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">strict_enum</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Determine our servers.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">open_api_spec</span><span class="o">.</span><span class="n">servers</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">servers</span> <span class="o">=</span> <span class="n">open_api_spec</span><span class="o">.</span><span class="n">servers</span>
+        <span class="k">elif</span> <span class="n">filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">servers</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">openapi_parser</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">Server</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://localhost/&quot;</span><span class="p">),</span>
+                <span class="n">openapi_parser</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">Server</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://localhost/&quot;</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># url is not None</span>
+            <span class="n">servers</span> <span class="o">=</span> <span class="p">[</span><span class="n">openapi_parser</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">Server</span><span class="p">(</span><span class="n">url</span><span class="p">)]</span>
+
+        <span class="c1"># Check the operation path...</span>
+        <span class="n">specification_path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">open_api_spec</span><span class="o">.</span><span class="n">paths</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">operation</span><span class="o">.</span><span class="n">path</span> <span class="o">==</span> <span class="n">p</span><span class="o">.</span><span class="n">url</span><span class="p">:</span>
+                <span class="n">specification_path</span> <span class="o">=</span> <span class="n">p</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="n">specification_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Operation </span><span class="si">{</span><span class="n">operation</span><span class="si">}</span><span class="s2"> does not exist in the spec.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># ...and then the method.</span>
+        <span class="n">specification_operation</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">specification_path</span><span class="o">.</span><span class="n">operations</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">operation</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">m</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="n">specification_operation</span> <span class="o">=</span> <span class="n">m</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="n">specification_operation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Operation </span><span class="si">{</span><span class="n">operation</span><span class="si">}</span><span class="s2"> does not exist in the spec.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># We additionally impose that a description and an operationId must exist.</span>
+        <span class="k">if</span> <span class="n">specification_operation</span><span class="o">.</span><span class="n">description</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Description must be specified for operation </span><span class="si">{</span><span class="n">operation</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">specification_operation</span><span class="o">.</span><span class="n">operation_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;OperationId must be specified for operation </span><span class="si">{</span><span class="n">operation</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># TODO (GLENN): openapi_parser doesn&#39;t support operation servers (OpenAPI 3.1.0).</span>
+        <span class="k">return</span> <span class="n">HTTPRequestToolDescriptor</span><span class="o">.</span><span class="n">OperationHandle</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="n">operation</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+            <span class="n">path</span><span class="o">=</span><span class="n">operation</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+            <span class="n">servers</span><span class="o">=</span><span class="n">servers</span><span class="p">,</span>
+            <span class="n">operation</span><span class="o">=</span><span class="n">specification_operation</span><span class="p">,</span>
+            <span class="n">parent_parameters</span><span class="o">=</span><span class="n">specification_path</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OperationHandle</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HTTPRequestToolDescriptor</span><span class="o">.</span><span class="n">validate_operation</span><span class="p">(</span>
+            <span class="n">filename</span><span class="o">=</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">specification</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">specification</span><span class="o">.</span><span class="n">filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">specification</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="n">operation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">operation</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="HTTPRequestToolDescriptor.JSONEncoder">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.HTTPRequestToolDescriptor.JSONEncoder">[docs]</a>
+    <span class="k">class</span> <span class="nc">JSONEncoder</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
+<div class="viewcode-block" id="HTTPRequestToolDescriptor.JSONEncoder.default">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.HTTPRequestToolDescriptor.JSONEncoder.default">[docs]</a>
+        <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">openapi_parser</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">Schema</span><span class="p">):</span>
+                <span class="n">result_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">asdict</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">result_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">result_dict</span>
+
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">openapi_parser</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">Property</span><span class="p">):</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;schema&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">schema</span><span class="p">)}</span>
+
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">value</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">obj</span></div>
+</div>
+
+
+<div class="viewcode-block" id="HTTPRequestToolDescriptor.Factory">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.HTTPRequestToolDescriptor.Factory">[docs]</a>
+    <span class="k">class</span> <span class="nc">Factory</span><span class="p">(</span><span class="n">_BaseFactory</span><span class="p">):</span>
+<div class="viewcode-block" id="HTTPRequestToolDescriptor.Factory.Metadata">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.HTTPRequestToolDescriptor.Factory.Metadata">[docs]</a>
+        <span class="k">class</span> <span class="nc">Metadata</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+            <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_enum_values</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="HTTPRequestToolDescriptor.Factory.Metadata.OpenAPIMetadata">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.HTTPRequestToolDescriptor.Factory.Metadata.OpenAPIMetadata">[docs]</a>
+            <span class="k">class</span> <span class="nc">OpenAPIMetadata</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+                <span class="n">filename</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">url</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">operations</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="s2">&quot;HTTPRequestToolDescriptor.OperationMetadata&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="HTTPRequestToolDescriptor.Factory.Metadata.OpenAPIMetadata.operations_must_be_valid">
+<a class="viewcode-back" href="../../../../core/rosetta_core.tool.descriptor.html#rosetta_core.tool.descriptor.models.HTTPRequestToolDescriptor.Factory.Metadata.OpenAPIMetadata.operations_must_be_valid">[docs]</a>
+                <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+                <span class="k">def</span> <span class="nf">operations_must_be_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">operation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">operations</span><span class="p">:</span>
+                        <span class="n">HTTPRequestToolDescriptor</span><span class="o">.</span><span class="n">validate_operation</span><span class="p">(</span>
+                            <span class="n">filename</span><span class="o">=</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">),</span> <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">operation</span><span class="o">=</span><span class="n">operation</span>
+                        <span class="p">)</span>
+                    <span class="k">return</span> <span class="bp">self</span></div>
+</div>
+
+
+            <span class="c1"># Below, we enumerate all fields that appear in a .yaml file for http requests.</span>
+            <span class="n">record_kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="n">RecordKind</span><span class="o">.</span><span class="n">HTTPRequest</span><span class="p">]</span>
+            <span class="n">open_api</span><span class="p">:</span> <span class="n">OpenAPIMetadata</span>
+            <span class="n">annotations</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+        <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="s2">&quot;HTTPRequestToolDescriptor&quot;</span><span class="p">]:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">metadata</span> <span class="o">=</span> <span class="n">HTTPRequestToolDescriptor</span><span class="o">.</span><span class="n">Factory</span><span class="o">.</span><span class="n">Metadata</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">fp</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">operation</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">open_api</span><span class="o">.</span><span class="n">operations</span><span class="p">:</span>
+                    <span class="n">operation_handle</span> <span class="o">=</span> <span class="n">HTTPRequestToolDescriptor</span><span class="o">.</span><span class="n">validate_operation</span><span class="p">(</span>
+                        <span class="n">filename</span><span class="o">=</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">open_api</span><span class="o">.</span><span class="n">filename</span><span class="p">),</span>
+                        <span class="n">url</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">open_api</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+                        <span class="n">operation</span><span class="o">=</span><span class="n">operation</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">yield</span> <span class="n">HTTPRequestToolDescriptor</span><span class="p">(</span>
+                        <span class="n">record_kind</span><span class="o">=</span><span class="n">RecordKind</span><span class="o">.</span><span class="n">HTTPRequest</span><span class="p">,</span>
+                        <span class="n">name</span><span class="o">=</span><span class="n">operation_handle</span><span class="o">.</span><span class="n">operation_id</span><span class="p">,</span>
+                        <span class="n">description</span><span class="o">=</span><span class="n">operation_handle</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                        <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span>
+                        <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
+                        <span class="n">operation</span><span class="o">=</span><span class="n">operation</span><span class="p">,</span>
+                        <span class="n">specification</span><span class="o">=</span><span class="n">HTTPRequestToolDescriptor</span><span class="o">.</span><span class="n">SpecificationMetadata</span><span class="p">(</span>
+                            <span class="n">filename</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">open_api</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">open_api</span><span class="o">.</span><span class="n">url</span>
+                        <span class="p">),</span>
+                        <span class="n">annotations</span><span class="o">=</span><span class="n">metadata</span><span class="o">.</span><span class="n">annotations</span><span class="p">,</span>
+                    <span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Tanvi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

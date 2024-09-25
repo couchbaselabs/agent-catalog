@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rosetta_core package &mdash; Rosetta v0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=f8c80a57"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rosetta_core.activity package" href="rosetta_core.activity.html" />
+    <link rel="prev" title="rosetta_core" href="modules.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            Rosetta
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../cmd/modules.html">rosetta_cmd</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">rosetta_core</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">rosetta_core package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.html">rosetta_core.activity package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.annotation.html">rosetta_core.annotation package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html">rosetta_core.catalog package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html">rosetta_core.indexer package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html">rosetta_core.llm package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html">rosetta_core.prompt package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html">rosetta_core.provider package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html">rosetta_core.record package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.secrets.html">rosetta_core.secrets package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.tool.html">rosetta_core.tool package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html">rosetta_core.version package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-rosetta_core.defaults">rosetta_core.defaults module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-rosetta_core">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../util/modules.html">rosetta_util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Rosetta</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">rosetta_core</a></li>
+      <li class="breadcrumb-item active">rosetta_core package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/core/rosetta_core.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="rosetta-core-package">
+<h1>rosetta_core package<a class="headerlink" href="#rosetta-core-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rosetta_core.activity.html">rosetta_core.activity package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.activity.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.activity.analyzer.html">rosetta_core.activity.analyzer package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.analyzer.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.analyzer.html#module-rosetta_core.activity.analyzer.analyzer">rosetta_core.activity.analyzer.analyzer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.analyzer.html#module-rosetta_core.activity.analyzer">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.activity.auditor.html">rosetta_core.activity.auditor package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.auditor.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.auditor.html#module-rosetta_core.activity.auditor.base">rosetta_core.activity.auditor.base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.auditor.html#module-rosetta_core.activity.auditor.db">rosetta_core.activity.auditor.db module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.auditor.html#module-rosetta_core.activity.auditor.local">rosetta_core.activity.auditor.local module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.auditor.html#module-rosetta_core.activity.auditor">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.activity.html#module-rosetta_core.activity">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.activity.html#rosetta_core.activity.BaseAuditor"><code class="docutils literal notranslate"><span class="pre">BaseAuditor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.html#rosetta_core.activity.BaseAuditor.accept"><code class="docutils literal notranslate"><span class="pre">BaseAuditor.accept()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.activity.html#rosetta_core.activity.DBAuditor"><code class="docutils literal notranslate"><span class="pre">DBAuditor</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.activity.html#rosetta_core.activity.LocalAuditor"><code class="docutils literal notranslate"><span class="pre">LocalAuditor</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rosetta_core.annotation.html">rosetta_core.annotation package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.annotation.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.annotation.html#module-rosetta_core.annotation.annotation">rosetta_core.annotation.annotation module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.annotation.html#rosetta_core.annotation.annotation.AnnotationPredicate"><code class="docutils literal notranslate"><span class="pre">AnnotationPredicate</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.annotation.html#rosetta_core.annotation.annotation.AnnotationPredicate.disjuncts"><code class="docutils literal notranslate"><span class="pre">AnnotationPredicate.disjuncts</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.annotation.html#module-rosetta_core.annotation">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.annotation.html#rosetta_core.annotation.AnnotationPredicate"><code class="docutils literal notranslate"><span class="pre">AnnotationPredicate</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.annotation.html#rosetta_core.annotation.AnnotationPredicate.disjuncts"><code class="docutils literal notranslate"><span class="pre">AnnotationPredicate.disjuncts</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rosetta_core.catalog.html">rosetta_core.catalog package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.catalog.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.catalog.catalog.html">rosetta_core.catalog.catalog package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.catalog.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.catalog.html#module-rosetta_core.catalog.catalog.base">rosetta_core.catalog.catalog.base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.catalog.html#module-rosetta_core.catalog.catalog.chain">rosetta_core.catalog.catalog.chain module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.catalog.html#module-rosetta_core.catalog.catalog.db">rosetta_core.catalog.catalog.db module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.catalog.html#module-rosetta_core.catalog.catalog.mem">rosetta_core.catalog.catalog.mem module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.catalog.html#module-rosetta_core.catalog.catalog">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.catalog.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.catalog.html#module-rosetta_core.catalog.descriptor">rosetta_core.catalog.descriptor module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.descriptor.CatalogDescriptor"><code class="docutils literal notranslate"><span class="pre">CatalogDescriptor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.descriptor.CatalogDescriptor.catalog_schema_version"><code class="docutils literal notranslate"><span class="pre">CatalogDescriptor.catalog_schema_version</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.descriptor.CatalogDescriptor.embedding_model"><code class="docutils literal notranslate"><span class="pre">CatalogDescriptor.embedding_model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.descriptor.CatalogDescriptor.items"><code class="docutils literal notranslate"><span class="pre">CatalogDescriptor.items</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.descriptor.CatalogDescriptor.kind"><code class="docutils literal notranslate"><span class="pre">CatalogDescriptor.kind</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.descriptor.CatalogDescriptor.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">CatalogDescriptor.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.descriptor.CatalogDescriptor.model_config"><code class="docutils literal notranslate"><span class="pre">CatalogDescriptor.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.descriptor.CatalogDescriptor.model_fields"><code class="docutils literal notranslate"><span class="pre">CatalogDescriptor.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.descriptor.CatalogDescriptor.project"><code class="docutils literal notranslate"><span class="pre">CatalogDescriptor.project</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.descriptor.CatalogDescriptor.source_dirs"><code class="docutils literal notranslate"><span class="pre">CatalogDescriptor.source_dirs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.descriptor.CatalogDescriptor.version"><code class="docutils literal notranslate"><span class="pre">CatalogDescriptor.version</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.descriptor.CatalogKind"><code class="docutils literal notranslate"><span class="pre">CatalogKind</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.descriptor.CatalogKind.Prompt"><code class="docutils literal notranslate"><span class="pre">CatalogKind.Prompt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.descriptor.CatalogKind.Tool"><code class="docutils literal notranslate"><span class="pre">CatalogKind.Tool</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.catalog.html#module-rosetta_core.catalog.directory">rosetta_core.catalog.directory module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.directory.ScanDirectoryOpts"><code class="docutils literal notranslate"><span class="pre">ScanDirectoryOpts</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.directory.ScanDirectoryOpts.ignore_file_name"><code class="docutils literal notranslate"><span class="pre">ScanDirectoryOpts.ignore_file_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.directory.ScanDirectoryOpts.ignore_file_parser_factory"><code class="docutils literal notranslate"><span class="pre">ScanDirectoryOpts.ignore_file_parser_factory</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.directory.ScanDirectoryOpts.unwanted_patterns"><code class="docutils literal notranslate"><span class="pre">ScanDirectoryOpts.unwanted_patterns</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.directory.scan_directory"><code class="docutils literal notranslate"><span class="pre">scan_directory()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.catalog.html#module-rosetta_core.catalog.index">rosetta_core.catalog.index module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.index.index_catalog"><code class="docutils literal notranslate"><span class="pre">index_catalog()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.index.index_catalog_start"><code class="docutils literal notranslate"><span class="pre">index_catalog_start()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.index.init_from_catalog"><code class="docutils literal notranslate"><span class="pre">init_from_catalog()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.catalog.html#module-rosetta_core.catalog.version">rosetta_core.catalog.version module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.version.catalog_schema_version_compare"><code class="docutils literal notranslate"><span class="pre">catalog_schema_version_compare()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.version.lib_version"><code class="docutils literal notranslate"><span class="pre">lib_version()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.version.lib_version_compare"><code class="docutils literal notranslate"><span class="pre">lib_version_compare()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.version.lib_version_parse"><code class="docutils literal notranslate"><span class="pre">lib_version_parse()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.version.semantic_version_compare"><code class="docutils literal notranslate"><span class="pre">semantic_version_compare()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.catalog.html#module-rosetta_core.catalog">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogBase"><code class="docutils literal notranslate"><span class="pre">CatalogBase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogBase.find"><code class="docutils literal notranslate"><span class="pre">CatalogBase.find()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogBase.version"><code class="docutils literal notranslate"><span class="pre">CatalogBase.version</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogChain"><code class="docutils literal notranslate"><span class="pre">CatalogChain</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogChain.chain"><code class="docutils literal notranslate"><span class="pre">CatalogChain.chain</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogChain.find"><code class="docutils literal notranslate"><span class="pre">CatalogChain.find()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogChain.version"><code class="docutils literal notranslate"><span class="pre">CatalogChain.version</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogDB"><code class="docutils literal notranslate"><span class="pre">CatalogDB</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogDB.bucket"><code class="docutils literal notranslate"><span class="pre">CatalogDB.bucket</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogDB.cluster"><code class="docutils literal notranslate"><span class="pre">CatalogDB.cluster</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogDB.cluster_should_be_reachable"><code class="docutils literal notranslate"><span class="pre">CatalogDB.cluster_should_be_reachable()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogDB.embedding_model"><code class="docutils literal notranslate"><span class="pre">CatalogDB.embedding_model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogDB.find"><code class="docutils literal notranslate"><span class="pre">CatalogDB.find()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogDB.kind"><code class="docutils literal notranslate"><span class="pre">CatalogDB.kind</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogDB.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">CatalogDB.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogDB.model_config"><code class="docutils literal notranslate"><span class="pre">CatalogDB.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogDB.model_fields"><code class="docutils literal notranslate"><span class="pre">CatalogDB.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogDB.snapshot_id"><code class="docutils literal notranslate"><span class="pre">CatalogDB.snapshot_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogDB.version"><code class="docutils literal notranslate"><span class="pre">CatalogDB.version</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogMem"><code class="docutils literal notranslate"><span class="pre">CatalogMem</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogMem.catalog_descriptor"><code class="docutils literal notranslate"><span class="pre">CatalogMem.catalog_descriptor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogMem.dump"><code class="docutils literal notranslate"><span class="pre">CatalogMem.dump()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogMem.embedding_model"><code class="docutils literal notranslate"><span class="pre">CatalogMem.embedding_model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogMem.find"><code class="docutils literal notranslate"><span class="pre">CatalogMem.find()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogMem.load"><code class="docutils literal notranslate"><span class="pre">CatalogMem.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogMem.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">CatalogMem.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogMem.model_config"><code class="docutils literal notranslate"><span class="pre">CatalogMem.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogMem.model_fields"><code class="docutils literal notranslate"><span class="pre">CatalogMem.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.CatalogMem.version"><code class="docutils literal notranslate"><span class="pre">CatalogMem.version</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.SearchResult"><code class="docutils literal notranslate"><span class="pre">SearchResult</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.SearchResult.delta"><code class="docutils literal notranslate"><span class="pre">SearchResult.delta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.SearchResult.entry"><code class="docutils literal notranslate"><span class="pre">SearchResult.entry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.SearchResult.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">SearchResult.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.SearchResult.model_config"><code class="docutils literal notranslate"><span class="pre">SearchResult.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html#rosetta_core.catalog.SearchResult.model_fields"><code class="docutils literal notranslate"><span class="pre">SearchResult.model_fields</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rosetta_core.indexer.html">rosetta_core.indexer package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.indexer.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.indexer.html#module-rosetta_core.indexer.indexer">rosetta_core.indexer.indexer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.BaseFileIndexer"><code class="docutils literal notranslate"><span class="pre">BaseFileIndexer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.BaseFileIndexer.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">BaseFileIndexer.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.BaseFileIndexer.model_config"><code class="docutils literal notranslate"><span class="pre">BaseFileIndexer.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.BaseFileIndexer.model_fields"><code class="docutils literal notranslate"><span class="pre">BaseFileIndexer.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.BaseFileIndexer.start_descriptors"><code class="docutils literal notranslate"><span class="pre">BaseFileIndexer.start_descriptors()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotPromptFileIndexer"><code class="docutils literal notranslate"><span class="pre">DotPromptFileIndexer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotPromptFileIndexer.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">DotPromptFileIndexer.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotPromptFileIndexer.model_config"><code class="docutils literal notranslate"><span class="pre">DotPromptFileIndexer.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotPromptFileIndexer.model_fields"><code class="docutils literal notranslate"><span class="pre">DotPromptFileIndexer.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotPromptFileIndexer.start_descriptors"><code class="docutils literal notranslate"><span class="pre">DotPromptFileIndexer.start_descriptors()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotPyFileIndexer"><code class="docutils literal notranslate"><span class="pre">DotPyFileIndexer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotPyFileIndexer.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">DotPyFileIndexer.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotPyFileIndexer.model_config"><code class="docutils literal notranslate"><span class="pre">DotPyFileIndexer.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotPyFileIndexer.model_fields"><code class="docutils literal notranslate"><span class="pre">DotPyFileIndexer.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotPyFileIndexer.start_descriptors"><code class="docutils literal notranslate"><span class="pre">DotPyFileIndexer.start_descriptors()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotSqlppFileIndexer"><code class="docutils literal notranslate"><span class="pre">DotSqlppFileIndexer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotSqlppFileIndexer.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">DotSqlppFileIndexer.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotSqlppFileIndexer.model_config"><code class="docutils literal notranslate"><span class="pre">DotSqlppFileIndexer.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotSqlppFileIndexer.model_fields"><code class="docutils literal notranslate"><span class="pre">DotSqlppFileIndexer.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotSqlppFileIndexer.start_descriptors"><code class="docutils literal notranslate"><span class="pre">DotSqlppFileIndexer.start_descriptors()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotYamlFileIndexer"><code class="docutils literal notranslate"><span class="pre">DotYamlFileIndexer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotYamlFileIndexer.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">DotYamlFileIndexer.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotYamlFileIndexer.model_config"><code class="docutils literal notranslate"><span class="pre">DotYamlFileIndexer.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotYamlFileIndexer.model_fields"><code class="docutils literal notranslate"><span class="pre">DotYamlFileIndexer.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.DotYamlFileIndexer.start_descriptors"><code class="docutils literal notranslate"><span class="pre">DotYamlFileIndexer.start_descriptors()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.augment_descriptor"><code class="docutils literal notranslate"><span class="pre">augment_descriptor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.indexer.vectorize_descriptor"><code class="docutils literal notranslate"><span class="pre">vectorize_descriptor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.indexer.html#module-rosetta_core.indexer">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.augment_descriptor"><code class="docutils literal notranslate"><span class="pre">augment_descriptor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.indexer.html#rosetta_core.indexer.vectorize_descriptor"><code class="docutils literal notranslate"><span class="pre">vectorize_descriptor()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rosetta_core.llm.html">rosetta_core.llm package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.llm.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.llm.html#module-rosetta_core.llm.message">rosetta_core.llm.message module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Message"><code class="docutils literal notranslate"><span class="pre">Message</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Message.annotations"><code class="docutils literal notranslate"><span class="pre">Message.annotations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Message.catalog_version"><code class="docutils literal notranslate"><span class="pre">Message.catalog_version</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Message.content"><code class="docutils literal notranslate"><span class="pre">Message.content</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Message.grouping"><code class="docutils literal notranslate"><span class="pre">Message.grouping</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Message.model"><code class="docutils literal notranslate"><span class="pre">Message.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Message.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">Message.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Message.model_config"><code class="docutils literal notranslate"><span class="pre">Message.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Message.model_fields"><code class="docutils literal notranslate"><span class="pre">Message.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Message.role"><code class="docutils literal notranslate"><span class="pre">Message.role</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Message.session"><code class="docutils literal notranslate"><span class="pre">Message.session</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Message.timestamp"><code class="docutils literal notranslate"><span class="pre">Message.timestamp</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Role"><code class="docutils literal notranslate"><span class="pre">Role</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Role.Assistant"><code class="docutils literal notranslate"><span class="pre">Role.Assistant</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Role.Feedback"><code class="docutils literal notranslate"><span class="pre">Role.Feedback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Role.Human"><code class="docutils literal notranslate"><span class="pre">Role.Human</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Role.LLM"><code class="docutils literal notranslate"><span class="pre">Role.LLM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Role.System"><code class="docutils literal notranslate"><span class="pre">Role.System</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.message.Role.Tool"><code class="docutils literal notranslate"><span class="pre">Role.Tool</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.llm.html#module-rosetta_core.llm">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.Message"><code class="docutils literal notranslate"><span class="pre">Message</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.Message.annotations"><code class="docutils literal notranslate"><span class="pre">Message.annotations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.Message.catalog_version"><code class="docutils literal notranslate"><span class="pre">Message.catalog_version</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.Message.content"><code class="docutils literal notranslate"><span class="pre">Message.content</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.Message.grouping"><code class="docutils literal notranslate"><span class="pre">Message.grouping</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.Message.model"><code class="docutils literal notranslate"><span class="pre">Message.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.Message.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">Message.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.Message.model_config"><code class="docutils literal notranslate"><span class="pre">Message.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.Message.model_fields"><code class="docutils literal notranslate"><span class="pre">Message.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.Message.role"><code class="docutils literal notranslate"><span class="pre">Message.role</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.Message.session"><code class="docutils literal notranslate"><span class="pre">Message.session</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.Message.timestamp"><code class="docutils literal notranslate"><span class="pre">Message.timestamp</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.Role"><code class="docutils literal notranslate"><span class="pre">Role</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.Role.Assistant"><code class="docutils literal notranslate"><span class="pre">Role.Assistant</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.Role.Feedback"><code class="docutils literal notranslate"><span class="pre">Role.Feedback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.Role.Human"><code class="docutils literal notranslate"><span class="pre">Role.Human</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.Role.LLM"><code class="docutils literal notranslate"><span class="pre">Role.LLM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.Role.System"><code class="docutils literal notranslate"><span class="pre">Role.System</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html#rosetta_core.llm.Role.Tool"><code class="docutils literal notranslate"><span class="pre">Role.Tool</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rosetta_core.prompt.html">rosetta_core.prompt package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.prompt.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.prompt.html#module-rosetta_core.prompt.models">rosetta_core.prompt.models module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.JinjaPromptDescriptor"><code class="docutils literal notranslate"><span class="pre">JinjaPromptDescriptor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.JinjaPromptDescriptor.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">JinjaPromptDescriptor.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.JinjaPromptDescriptor.model_config"><code class="docutils literal notranslate"><span class="pre">JinjaPromptDescriptor.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.JinjaPromptDescriptor.model_fields"><code class="docutils literal notranslate"><span class="pre">JinjaPromptDescriptor.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.JinjaPromptDescriptor.prompt_must_be_valid_jinja_template"><code class="docutils literal notranslate"><span class="pre">JinjaPromptDescriptor.prompt_must_be_valid_jinja_template()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.JinjaPromptDescriptor.record_kind"><code class="docutils literal notranslate"><span class="pre">JinjaPromptDescriptor.record_kind</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.PromptDescriptorFactory"><code class="docutils literal notranslate"><span class="pre">PromptDescriptorFactory</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.PromptDescriptorFactory.PromptMetadata"><code class="docutils literal notranslate"><span class="pre">PromptDescriptorFactory.PromptMetadata</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.RawPromptDescriptor"><code class="docutils literal notranslate"><span class="pre">RawPromptDescriptor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.RawPromptDescriptor.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">RawPromptDescriptor.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.RawPromptDescriptor.model_config"><code class="docutils literal notranslate"><span class="pre">RawPromptDescriptor.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.RawPromptDescriptor.model_fields"><code class="docutils literal notranslate"><span class="pre">RawPromptDescriptor.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.RawPromptDescriptor.prompt"><code class="docutils literal notranslate"><span class="pre">RawPromptDescriptor.prompt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.RawPromptDescriptor.record_kind"><code class="docutils literal notranslate"><span class="pre">RawPromptDescriptor.record_kind</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.RawPromptDescriptor.tools"><code class="docutils literal notranslate"><span class="pre">RawPromptDescriptor.tools</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.ToolSearchMetadata"><code class="docutils literal notranslate"><span class="pre">ToolSearchMetadata</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.ToolSearchMetadata.annotations"><code class="docutils literal notranslate"><span class="pre">ToolSearchMetadata.annotations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.ToolSearchMetadata.annotations_must_be_valid_string"><code class="docutils literal notranslate"><span class="pre">ToolSearchMetadata.annotations_must_be_valid_string()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.ToolSearchMetadata.limit"><code class="docutils literal notranslate"><span class="pre">ToolSearchMetadata.limit</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.ToolSearchMetadata.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">ToolSearchMetadata.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.ToolSearchMetadata.model_config"><code class="docutils literal notranslate"><span class="pre">ToolSearchMetadata.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.ToolSearchMetadata.model_fields"><code class="docutils literal notranslate"><span class="pre">ToolSearchMetadata.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.ToolSearchMetadata.name"><code class="docutils literal notranslate"><span class="pre">ToolSearchMetadata.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.ToolSearchMetadata.name_or_query_must_be_specified"><code class="docutils literal notranslate"><span class="pre">ToolSearchMetadata.name_or_query_must_be_specified()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html#rosetta_core.prompt.models.ToolSearchMetadata.query"><code class="docutils literal notranslate"><span class="pre">ToolSearchMetadata.query</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.prompt.html#module-rosetta_core.prompt">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rosetta_core.provider.html">rosetta_core.provider package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.provider.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.provider.html#module-rosetta_core.provider.loader">rosetta_core.provider.loader module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.loader.EntryLoader"><code class="docutils literal notranslate"><span class="pre">EntryLoader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.loader.EntryLoader.load"><code class="docutils literal notranslate"><span class="pre">EntryLoader.load()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.provider.html#module-rosetta_core.provider.provider">rosetta_core.provider.provider module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.provider.BaseProvider"><code class="docutils literal notranslate"><span class="pre">BaseProvider</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.provider.BaseProvider.get"><code class="docutils literal notranslate"><span class="pre">BaseProvider.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.provider.BaseProvider.search"><code class="docutils literal notranslate"><span class="pre">BaseProvider.search()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.provider.PromptProvider"><code class="docutils literal notranslate"><span class="pre">PromptProvider</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.provider.PromptProvider.PromptResult"><code class="docutils literal notranslate"><span class="pre">PromptProvider.PromptResult</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.provider.PromptProvider.get"><code class="docutils literal notranslate"><span class="pre">PromptProvider.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.provider.PromptProvider.search"><code class="docutils literal notranslate"><span class="pre">PromptProvider.search()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.provider.ToolProvider"><code class="docutils literal notranslate"><span class="pre">ToolProvider</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.provider.ToolProvider.get"><code class="docutils literal notranslate"><span class="pre">ToolProvider.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.provider.ToolProvider.search"><code class="docutils literal notranslate"><span class="pre">ToolProvider.search()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.provider.html#module-rosetta_core.provider.refiner">rosetta_core.provider.refiner module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.refiner.BaseRefiner"><code class="docutils literal notranslate"><span class="pre">BaseRefiner</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.refiner.ClosestClusterRefiner"><code class="docutils literal notranslate"><span class="pre">ClosestClusterRefiner</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.refiner.ClosestClusterRefiner.deepening_factor"><code class="docutils literal notranslate"><span class="pre">ClosestClusterRefiner.deepening_factor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.refiner.ClosestClusterRefiner.kde_distribution_n"><code class="docutils literal notranslate"><span class="pre">ClosestClusterRefiner.kde_distribution_n</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.refiner.ClosestClusterRefiner.max_deepen_steps"><code class="docutils literal notranslate"><span class="pre">ClosestClusterRefiner.max_deepen_steps</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.refiner.ClosestClusterRefiner.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">ClosestClusterRefiner.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.refiner.ClosestClusterRefiner.model_config"><code class="docutils literal notranslate"><span class="pre">ClosestClusterRefiner.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.refiner.ClosestClusterRefiner.model_fields"><code class="docutils literal notranslate"><span class="pre">ClosestClusterRefiner.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.refiner.ClosestClusterRefiner.no_more_than_k"><code class="docutils literal notranslate"><span class="pre">ClosestClusterRefiner.no_more_than_k</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.provider.html#module-rosetta_core.provider">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.BaseRefiner"><code class="docutils literal notranslate"><span class="pre">BaseRefiner</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.ClosestClusterRefiner"><code class="docutils literal notranslate"><span class="pre">ClosestClusterRefiner</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.ClosestClusterRefiner.deepening_factor"><code class="docutils literal notranslate"><span class="pre">ClosestClusterRefiner.deepening_factor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.ClosestClusterRefiner.kde_distribution_n"><code class="docutils literal notranslate"><span class="pre">ClosestClusterRefiner.kde_distribution_n</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.ClosestClusterRefiner.max_deepen_steps"><code class="docutils literal notranslate"><span class="pre">ClosestClusterRefiner.max_deepen_steps</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.ClosestClusterRefiner.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">ClosestClusterRefiner.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.ClosestClusterRefiner.model_config"><code class="docutils literal notranslate"><span class="pre">ClosestClusterRefiner.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.ClosestClusterRefiner.model_fields"><code class="docutils literal notranslate"><span class="pre">ClosestClusterRefiner.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.ClosestClusterRefiner.no_more_than_k"><code class="docutils literal notranslate"><span class="pre">ClosestClusterRefiner.no_more_than_k</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.PromptProvider"><code class="docutils literal notranslate"><span class="pre">PromptProvider</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.PromptProvider.PromptResult"><code class="docutils literal notranslate"><span class="pre">PromptProvider.PromptResult</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.PromptProvider.get"><code class="docutils literal notranslate"><span class="pre">PromptProvider.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.PromptProvider.search"><code class="docutils literal notranslate"><span class="pre">PromptProvider.search()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.ToolProvider"><code class="docutils literal notranslate"><span class="pre">ToolProvider</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.ToolProvider.get"><code class="docutils literal notranslate"><span class="pre">ToolProvider.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html#rosetta_core.provider.ToolProvider.search"><code class="docutils literal notranslate"><span class="pre">ToolProvider.search()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rosetta_core.record.html">rosetta_core.record package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.record.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.record.html#module-rosetta_core.record.descriptor">rosetta_core.record.descriptor module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor"><code class="docutils literal notranslate"><span class="pre">RecordDescriptor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor.annotations"><code class="docutils literal notranslate"><span class="pre">RecordDescriptor.annotations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor.description"><code class="docutils literal notranslate"><span class="pre">RecordDescriptor.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor.embedding"><code class="docutils literal notranslate"><span class="pre">RecordDescriptor.embedding</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor.identifier"><code class="docutils literal notranslate"><span class="pre">RecordDescriptor.identifier</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">RecordDescriptor.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor.model_config"><code class="docutils literal notranslate"><span class="pre">RecordDescriptor.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor.model_fields"><code class="docutils literal notranslate"><span class="pre">RecordDescriptor.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor.name"><code class="docutils literal notranslate"><span class="pre">RecordDescriptor.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor.record_kind"><code class="docutils literal notranslate"><span class="pre">RecordDescriptor.record_kind</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor.source"><code class="docutils literal notranslate"><span class="pre">RecordDescriptor.source</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor.version"><code class="docutils literal notranslate"><span class="pre">RecordDescriptor.version</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordKind"><code class="docutils literal notranslate"><span class="pre">RecordKind</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordKind.HTTPRequest"><code class="docutils literal notranslate"><span class="pre">RecordKind.HTTPRequest</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordKind.JinjaPrompt"><code class="docutils literal notranslate"><span class="pre">RecordKind.JinjaPrompt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordKind.PythonFunction"><code class="docutils literal notranslate"><span class="pre">RecordKind.PythonFunction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordKind.RawPrompt"><code class="docutils literal notranslate"><span class="pre">RecordKind.RawPrompt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordKind.SQLPPQuery"><code class="docutils literal notranslate"><span class="pre">RecordKind.SQLPPQuery</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordKind.SemanticSearch"><code class="docutils literal notranslate"><span class="pre">RecordKind.SemanticSearch</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.record.html#module-rosetta_core.record">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rosetta_core.secrets.html">rosetta_core.secrets package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.secrets.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.secrets.html#module-rosetta_core.secrets.secrets">rosetta_core.secrets.secrets module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.secrets.html#rosetta_core.secrets.secrets.get_secret"><code class="docutils literal notranslate"><span class="pre">get_secret()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.secrets.html#rosetta_core.secrets.secrets.put_secret"><code class="docutils literal notranslate"><span class="pre">put_secret()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.secrets.html#module-rosetta_core.secrets">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.secrets.html#rosetta_core.secrets.get_secret"><code class="docutils literal notranslate"><span class="pre">get_secret()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.secrets.html#rosetta_core.secrets.put_secret"><code class="docutils literal notranslate"><span class="pre">put_secret()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rosetta_core.tool.html">rosetta_core.tool package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.tool.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.tool.descriptor.html">rosetta_core.tool.descriptor package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.tool.descriptor.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.tool.descriptor.html#module-rosetta_core.tool.descriptor.helper">rosetta_core.tool.descriptor.helper module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.tool.descriptor.html#module-rosetta_core.tool.descriptor.models">rosetta_core.tool.descriptor.models module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.tool.descriptor.html#module-rosetta_core.tool.descriptor.secrets">rosetta_core.tool.descriptor.secrets module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.tool.descriptor.html#module-rosetta_core.tool.descriptor">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.tool.generate.html">rosetta_core.tool.generate package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.tool.generate.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.tool.generate.html#module-rosetta_core.tool.generate.common">rosetta_core.tool.generate.common module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.tool.generate.html#module-rosetta_core.tool.generate.generator">rosetta_core.tool.generate.generator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.tool.generate.html#module-rosetta_core.tool.generate">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.tool.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.tool.html#module-rosetta_core.tool.decorator">rosetta_core.tool.decorator module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.tool.html#rosetta_core.tool.decorator.ToolMarker"><code class="docutils literal notranslate"><span class="pre">ToolMarker</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.tool.html#rosetta_core.tool.decorator.tool"><code class="docutils literal notranslate"><span class="pre">tool()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.tool.html#module-rosetta_core.tool">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.tool.html#rosetta_core.tool.tool"><code class="docutils literal notranslate"><span class="pre">tool()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rosetta_core.version.html">rosetta_core.version package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.version.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.version.html#module-rosetta_core.version.identifier">rosetta_core.version.identifier module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.identifier.VersionDescriptor"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.identifier.VersionDescriptor.identifier"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor.identifier</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.identifier.VersionDescriptor.is_dirty"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor.is_dirty</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.identifier.VersionDescriptor.metadata"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor.metadata</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.identifier.VersionDescriptor.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.identifier.VersionDescriptor.model_config"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.identifier.VersionDescriptor.model_fields"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.identifier.VersionDescriptor.non_dirty_must_have_identifier"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor.non_dirty_must_have_identifier()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.identifier.VersionDescriptor.timestamp"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor.timestamp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.identifier.VersionDescriptor.version_system"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor.version_system</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.identifier.VersionSystem"><code class="docutils literal notranslate"><span class="pre">VersionSystem</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.identifier.VersionSystem.Git"><code class="docutils literal notranslate"><span class="pre">VersionSystem.Git</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.identifier.VersionSystem.Raw"><code class="docutils literal notranslate"><span class="pre">VersionSystem.Raw</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rosetta_core.version.html#module-rosetta_core.version">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.VersionDescriptor"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.VersionDescriptor.identifier"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor.identifier</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.VersionDescriptor.is_dirty"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor.is_dirty</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.VersionDescriptor.metadata"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor.metadata</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.VersionDescriptor.model_computed_fields"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor.model_computed_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.VersionDescriptor.model_config"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.VersionDescriptor.model_fields"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor.model_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.VersionDescriptor.non_dirty_must_have_identifier"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor.non_dirty_must_have_identifier()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.VersionDescriptor.timestamp"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor.timestamp</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.VersionDescriptor.version_system"><code class="docutils literal notranslate"><span class="pre">VersionDescriptor.version_system</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-rosetta_core.defaults">
+<span id="rosetta-core-defaults-module"></span><h2>rosetta_core.defaults module<a class="headerlink" href="#module-rosetta_core.defaults" title="Link to this heading"></a></h2>
+</section>
+<section id="module-rosetta_core">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-rosetta_core" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="rosetta_core" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rosetta_core.activity.html" class="btn btn-neutral float-right" title="rosetta_core.activity package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Tanvi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

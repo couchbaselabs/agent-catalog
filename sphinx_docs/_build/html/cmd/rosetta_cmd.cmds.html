@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rosetta_cmd.cmds package &mdash; Rosetta v0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=f8c80a57"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rosetta_cmd.models package" href="rosetta_cmd.models.html" />
+    <link rel="prev" title="rosetta_cmd package" href="rosetta_cmd.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            Rosetta
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">rosetta_cmd</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="rosetta_cmd.html">rosetta_cmd package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="rosetta_cmd.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">rosetta_cmd.cmds package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_cmd.models.html">rosetta_cmd.models package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_cmd.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_cmd.html#module-rosetta_cmd.defaults">rosetta_cmd.defaults module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_cmd.html#module-rosetta_cmd.main">rosetta_cmd.main module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_cmd.html#module-rosetta_cmd">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../core/modules.html">rosetta_core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../util/modules.html">rosetta_util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Rosetta</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">rosetta_cmd</a></li>
+          <li class="breadcrumb-item"><a href="rosetta_cmd.html">rosetta_cmd package</a></li>
+      <li class="breadcrumb-item active">rosetta_cmd.cmds package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/cmd/rosetta_cmd.cmds.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="rosetta-cmd-cmds-package">
+<h1>rosetta_cmd.cmds package<a class="headerlink" href="#rosetta-cmd-cmds-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-rosetta_cmd.cmds.analyze">
+<span id="rosetta-cmd-cmds-analyze-module"></span><h2>rosetta_cmd.cmds.analyze module<a class="headerlink" href="#module-rosetta_cmd.cmds.analyze" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.analyze.cmd_analyze">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.analyze.</span></span><span class="sig-name descname"><span class="pre">cmd_analyze</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_cmd.models.html#rosetta_cmd.models.context.Context" title="rosetta_cmd.models.context.Context"><span class="pre">Context</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Cluster</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyspace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../util/rosetta_util.html#rosetta_util.models.Keyspace" title="rosetta_util.models.Keyspace"><span class="pre">Keyspace</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../util/rosetta_util.html#rosetta_util.models.CouchbaseConnect" title="rosetta_util.models.CouchbaseConnect"><span class="pre">CouchbaseConnect</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">printer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/analyze.html#cmd_analyze"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.analyze.cmd_analyze" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-rosetta_cmd.cmds.clean">
+<span id="rosetta-cmd-cmds-clean-module"></span><h2>rosetta_cmd.cmds.clean module<a class="headerlink" href="#module-rosetta_cmd.cmds.clean" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.clean.clean_db">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.clean.</span></span><span class="sig-name descname"><span class="pre">clean_db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bucket</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/clean.html#clean_db"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.clean.clean_db" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.clean.clean_local">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.clean.</span></span><span class="sig-name descname"><span class="pre">clean_local</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_cmd.models.html#rosetta_cmd.models.context.Context" title="rosetta_cmd.models.context.Context"><span class="pre">Context</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/clean.html#clean_local"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.clean.clean_local" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.clean.cmd_clean">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.clean.</span></span><span class="sig-name descname"><span class="pre">cmd_clean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx:</span> <span class="pre">~rosetta_cmd.models.context.Context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_local:</span> <span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_db:</span> <span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bucket:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster:</span> <span class="pre">&lt;module</span> <span class="pre">'couchbase.cluster'</span> <span class="pre">from</span> <span class="pre">'/Users/tjohari/Library/Caches/pypoetry/virtualenvs/rosetta-core-PCZacP5u-py3.11/lib/python3.11/site-packages/couchbase/cluster.py'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/clean.html#cmd_clean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.clean.cmd_clean" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.clean.route_clean">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.clean.</span></span><span class="sig-name descname"><span class="pre">route_clean</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/clean.html#route_clean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.clean.route_clean" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-rosetta_cmd.cmds.env">
+<span id="rosetta-cmd-cmds-env-module"></span><h2>rosetta_cmd.cmds.env module<a class="headerlink" href="#module-rosetta_cmd.cmds.env" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.env.cmd_env">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.env.</span></span><span class="sig-name descname"><span class="pre">cmd_env</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_cmd.models.html#rosetta_cmd.models.context.Context" title="rosetta_cmd.models.context.Context"><span class="pre">Context</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/env.html#cmd_env"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.env.cmd_env" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.env.route_env">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.env.</span></span><span class="sig-name descname"><span class="pre">route_env</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/env.html#route_env"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.env.route_env" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-rosetta_cmd.cmds.find">
+<span id="rosetta-cmd-cmds-find-module"></span><h2>rosetta_cmd.cmds.find module<a class="headerlink" href="#module-rosetta_cmd.cmds.find" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.find.cmd_find">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.find.</span></span><span class="sig-name descname"><span class="pre">cmd_find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_cmd.models.html#rosetta_cmd.models.context.Context" title="rosetta_cmd.models.context.Context"><span class="pre">Context</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bucket</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'tool'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'prompt'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'tool'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_dirty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refiner</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Cluster</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog_schema_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/find.html#cmd_find"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.find.cmd_find" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-rosetta_cmd.cmds.index">
+<span id="rosetta-cmd-cmds-index-module"></span><h2>rosetta_cmd.cmds.index module<a class="headerlink" href="#module-rosetta_cmd.cmds.index" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.index.cmd_index">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.index.</span></span><span class="sig-name descname"><span class="pre">cmd_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_cmd.models.html#rosetta_cmd.models.context.Context" title="rosetta_cmd.models.context.Context"><span class="pre">Context</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_dirs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'tool'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'prompt'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'sentence-transformers/all-MiniLM-L12-v2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/index.html#cmd_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.index.cmd_index" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-rosetta_cmd.cmds.publish">
+<span id="rosetta-cmd-cmds-publish-module"></span><h2>rosetta_cmd.cmds.publish module<a class="headerlink" href="#module-rosetta_cmd.cmds.publish" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.publish.cmd_publish">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.publish.</span></span><span class="sig-name descname"><span class="pre">cmd_publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_cmd.models.html#rosetta_cmd.models.context.Context" title="rosetta_cmd.models.context.Context"><span class="pre">Context</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'tool'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'prompt'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'all'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Cluster</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyspace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../util/rosetta_util.html#rosetta_util.models.Keyspace" title="rosetta_util.models.Keyspace"><span class="pre">Keyspace</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">printer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_details_env</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../util/rosetta_util.html#rosetta_util.models.CouchbaseConnect" title="rosetta_util.models.CouchbaseConnect"><span class="pre">CouchbaseConnect</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/publish.html#cmd_publish"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.publish.cmd_publish" title="Link to this definition"></a></dt>
+<dd><p>Command to publish catalog items to user’s Couchbase cluster</p>
+</dd></dl>
+
+</section>
+<section id="module-rosetta_cmd.cmds.status">
+<span id="rosetta-cmd-cmds-status-module"></span><h2>rosetta_cmd.cmds.status module<a class="headerlink" href="#module-rosetta_cmd.cmds.status" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.status.catalog_status">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.status.</span></span><span class="sig-name descname"><span class="pre">catalog_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_dirty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/status.html#catalog_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.status.catalog_status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.status.cmd_status">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.status.</span></span><span class="sig-name descname"><span class="pre">cmd_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_cmd.models.html#rosetta_cmd.models.context.Context" title="rosetta_cmd.models.context.Context"><span class="pre">Context</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'all'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'tool'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'prompt'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_dirty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/status.html#cmd_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.status.cmd_status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.status.route_status">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.status.</span></span><span class="sig-name descname"><span class="pre">route_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/status.html#route_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.status.route_status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-rosetta_cmd.cmds.util">
+<span id="rosetta-cmd-cmds-util-module"></span><h2>rosetta_cmd.cmds.util module<a class="headerlink" href="#module-rosetta_cmd.cmds.util" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.util.init_local">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.util.</span></span><span class="sig-name descname"><span class="pre">init_local</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_cmd.models.html#rosetta_cmd.models.context.Context" title="rosetta_cmd.models.context.Context"><span class="pre">Context</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_only</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/util.html#init_local"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.util.init_local" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.util.load_repository">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.util.</span></span><span class="sig-name descname"><span class="pre">load_repository</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">top_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/util.html#load_repository"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.util.load_repository" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-rosetta_cmd.cmds.version">
+<span id="rosetta-cmd-cmds-version-module"></span><h2>rosetta_cmd.cmds.version module<a class="headerlink" href="#module-rosetta_cmd.cmds.version" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.version.cmd_version">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.version.</span></span><span class="sig-name descname"><span class="pre">cmd_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_cmd.models.html#rosetta_cmd.models.context.Context" title="rosetta_cmd.models.context.Context"><span class="pre">Context</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/version.html#cmd_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.version.cmd_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.version.route_version">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.version.</span></span><span class="sig-name descname"><span class="pre">route_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/version.html#route_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.version.route_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-rosetta_cmd.cmds.web">
+<span id="rosetta-cmd-cmds-web-module"></span><h2>rosetta_cmd.cmds.web module<a class="headerlink" href="#module-rosetta_cmd.cmds.web" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.web.cmd_web">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.web.</span></span><span class="sig-name descname"><span class="pre">cmd_web</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_cmd.models.html#rosetta_cmd.models.context.Context" title="rosetta_cmd.models.context.Context"><span class="pre">Context</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">host_port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/web.html#cmd_web"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.web.cmd_web" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.web.register_blueprints">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.web.</span></span><span class="sig-name descname"><span class="pre">register_blueprints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/web.html#register_blueprints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.web.register_blueprints" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-rosetta_cmd.cmds">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-rosetta_cmd.cmds" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.cmd_analyze">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.</span></span><span class="sig-name descname"><span class="pre">cmd_analyze</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_cmd.models.html#rosetta_cmd.models.context.Context" title="rosetta_cmd.models.context.Context"><span class="pre">Context</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Cluster</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyspace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../util/rosetta_util.html#rosetta_util.models.Keyspace" title="rosetta_util.models.Keyspace"><span class="pre">Keyspace</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../util/rosetta_util.html#rosetta_util.models.CouchbaseConnect" title="rosetta_util.models.CouchbaseConnect"><span class="pre">CouchbaseConnect</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">printer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/analyze.html#cmd_analyze"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.cmd_analyze" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.cmd_clean">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.</span></span><span class="sig-name descname"><span class="pre">cmd_clean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx:</span> <span class="pre">~rosetta_cmd.models.context.Context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_local:</span> <span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_db:</span> <span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bucket:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster:</span> <span class="pre">&lt;module</span> <span class="pre">'couchbase.cluster'</span> <span class="pre">from</span> <span class="pre">'/Users/tjohari/Library/Caches/pypoetry/virtualenvs/rosetta-core-PCZacP5u-py3.11/lib/python3.11/site-packages/couchbase/cluster.py'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/clean.html#cmd_clean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.cmd_clean" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.cmd_env">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.</span></span><span class="sig-name descname"><span class="pre">cmd_env</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_cmd.models.html#rosetta_cmd.models.context.Context" title="rosetta_cmd.models.context.Context"><span class="pre">Context</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/env.html#cmd_env"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.cmd_env" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.cmd_find">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.</span></span><span class="sig-name descname"><span class="pre">cmd_find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_cmd.models.html#rosetta_cmd.models.context.Context" title="rosetta_cmd.models.context.Context"><span class="pre">Context</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bucket</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'tool'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'prompt'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'tool'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_dirty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refiner</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Cluster</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog_schema_version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/find.html#cmd_find"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.cmd_find" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.cmd_index">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.</span></span><span class="sig-name descname"><span class="pre">cmd_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_cmd.models.html#rosetta_cmd.models.context.Context" title="rosetta_cmd.models.context.Context"><span class="pre">Context</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_dirs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'tool'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'prompt'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'sentence-transformers/all-MiniLM-L12-v2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/index.html#cmd_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.cmd_index" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.cmd_publish">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.</span></span><span class="sig-name descname"><span class="pre">cmd_publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_cmd.models.html#rosetta_cmd.models.context.Context" title="rosetta_cmd.models.context.Context"><span class="pre">Context</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'tool'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'prompt'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'all'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Cluster</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keyspace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../util/rosetta_util.html#rosetta_util.models.Keyspace" title="rosetta_util.models.Keyspace"><span class="pre">Keyspace</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">printer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_details_env</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../util/rosetta_util.html#rosetta_util.models.CouchbaseConnect" title="rosetta_util.models.CouchbaseConnect"><span class="pre">CouchbaseConnect</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/publish.html#cmd_publish"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.cmd_publish" title="Link to this definition"></a></dt>
+<dd><p>Command to publish catalog items to user’s Couchbase cluster</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.cmd_status">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.</span></span><span class="sig-name descname"><span class="pre">cmd_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_cmd.models.html#rosetta_cmd.models.context.Context" title="rosetta_cmd.models.context.Context"><span class="pre">Context</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'all'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'tool'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'prompt'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_dirty</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/status.html#cmd_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.cmd_status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.cmd_version">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.</span></span><span class="sig-name descname"><span class="pre">cmd_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_cmd.models.html#rosetta_cmd.models.context.Context" title="rosetta_cmd.models.context.Context"><span class="pre">Context</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/version.html#cmd_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.cmd_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_cmd.cmds.cmd_web">
+<span class="sig-prename descclassname"><span class="pre">rosetta_cmd.cmds.</span></span><span class="sig-name descname"><span class="pre">cmd_web</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_cmd.models.html#rosetta_cmd.models.context.Context" title="rosetta_cmd.models.context.Context"><span class="pre">Context</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">host_port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_cmd/cmds/web.html#cmd_web"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_cmd.cmds.cmd_web" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rosetta_cmd.html" class="btn btn-neutral float-left" title="rosetta_cmd package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rosetta_cmd.models.html" class="btn btn-neutral float-right" title="rosetta_cmd.models package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Tanvi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

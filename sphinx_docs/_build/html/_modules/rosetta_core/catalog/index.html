@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rosetta_core.catalog.index &mdash; Rosetta v0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=f8c80a57"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../../../index.html" class="icon icon-home">
+            Rosetta
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cmd/modules.html">rosetta_cmd</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../core/modules.html">rosetta_core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../util/modules.html">rosetta_util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Rosetta</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rosetta_core.catalog.index</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for rosetta_core.catalog.index</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">fnmatch</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">..record.descriptor</span> <span class="kn">import</span> <span class="n">RecordDescriptor</span>
+<span class="kn">from</span> <span class="nn">.catalog.mem</span> <span class="kn">import</span> <span class="n">CatalogMem</span>
+<span class="kn">from</span> <span class="nn">.descriptor</span> <span class="kn">import</span> <span class="n">CatalogDescriptor</span>
+<span class="kn">from</span> <span class="nn">.directory</span> <span class="kn">import</span> <span class="n">ScanDirectoryOpts</span>
+<span class="kn">from</span> <span class="nn">.directory</span> <span class="kn">import</span> <span class="n">scan_directory</span>
+<span class="kn">from</span> <span class="nn">rosetta_core.indexer</span> <span class="kn">import</span> <span class="n">augment_descriptor</span>
+<span class="kn">from</span> <span class="nn">rosetta_core.indexer</span> <span class="kn">import</span> <span class="n">source_indexers</span>
+<span class="kn">from</span> <span class="nn">rosetta_core.indexer</span> <span class="kn">import</span> <span class="n">vectorize_descriptor</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">source_globs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">source_indexers</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="index_catalog">
+<a class="viewcode-back" href="../../../core/rosetta_core.catalog.html#rosetta_core.catalog.index.index_catalog">[docs]</a>
+<span class="k">def</span> <span class="nf">index_catalog</span><span class="p">(</span>
+    <span class="n">meta</span><span class="p">,</span>
+    <span class="n">version</span><span class="p">,</span>
+    <span class="n">get_path_version</span><span class="p">,</span>
+    <span class="n">kind</span><span class="p">,</span>
+    <span class="n">catalog_path</span><span class="p">,</span>
+    <span class="n">source_dirs</span><span class="p">,</span>
+    <span class="n">scan_directory_opts</span><span class="p">:</span> <span class="n">ScanDirectoryOpts</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">printer</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">progress</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>
+    <span class="n">max_errs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">all_errs</span><span class="p">,</span> <span class="n">next_catalog</span><span class="p">,</span> <span class="n">uninitialized_items</span> <span class="o">=</span> <span class="n">index_catalog_start</span><span class="p">(</span>
+        <span class="n">meta</span><span class="p">,</span>
+        <span class="n">version</span><span class="p">,</span>
+        <span class="n">get_path_version</span><span class="p">,</span>
+        <span class="n">kind</span><span class="p">,</span>
+        <span class="n">catalog_path</span><span class="p">,</span>
+        <span class="n">source_dirs</span><span class="p">,</span>
+        <span class="n">scan_directory_opts</span><span class="o">=</span><span class="n">scan_directory_opts</span><span class="p">,</span>
+        <span class="n">printer</span><span class="o">=</span><span class="n">printer</span><span class="p">,</span>
+        <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">,</span>
+        <span class="n">max_errs</span><span class="o">=</span><span class="n">max_errs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">printer</span><span class="p">(</span><span class="s2">&quot;Augmenting descriptor metadata.&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Now augmenting descriptor metadata.&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">descriptor</span> <span class="ow">in</span> <span class="n">progress</span><span class="p">(</span><span class="n">uninitialized_items</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">max_errs</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_errs</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">max_errs</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">printer</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- </span><span class="si">{</span><span class="n">descriptor</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Augmenting </span><span class="si">{</span><span class="n">descriptor</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="n">errs</span> <span class="o">=</span> <span class="n">augment_descriptor</span><span class="p">(</span><span class="n">descriptor</span><span class="p">)</span>
+        <span class="n">all_errs</span> <span class="o">+=</span> <span class="n">errs</span> <span class="ow">or</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">all_errs</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Encountered error(s) during augmenting: &quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">all_errs</span><span class="p">]))</span>
+        <span class="k">raise</span> <span class="n">all_errs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="kn">import</span> <span class="nn">sentence_transformers</span>
+
+    <span class="n">embedding_model_obj</span> <span class="o">=</span> <span class="n">sentence_transformers</span><span class="o">.</span><span class="n">SentenceTransformer</span><span class="p">(</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;embedding_model&quot;</span><span class="p">],</span> <span class="n">tokenizer_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;clean_up_tokenization_spaces&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="n">printer</span><span class="p">(</span><span class="s2">&quot;Generating embeddings for descriptors.&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Now generating embeddings for descriptors.&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">descriptor</span> <span class="ow">in</span> <span class="n">progress</span><span class="p">(</span><span class="n">uninitialized_items</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">max_errs</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_errs</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">max_errs</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">printer</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- </span><span class="si">{</span><span class="n">descriptor</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generating embedding for </span><span class="si">{</span><span class="n">descriptor</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="n">errs</span> <span class="o">=</span> <span class="n">vectorize_descriptor</span><span class="p">(</span><span class="n">descriptor</span><span class="p">,</span> <span class="n">embedding_model_obj</span><span class="p">)</span>
+        <span class="n">all_errs</span> <span class="o">+=</span> <span class="n">errs</span> <span class="ow">or</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">all_errs</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Encountered error(s) during embedding generation: &quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">all_errs</span><span class="p">]))</span>
+        <span class="k">raise</span> <span class="n">all_errs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">next_catalog</span></div>
+
+
+
+<div class="viewcode-block" id="index_catalog_start">
+<a class="viewcode-back" href="../../../core/rosetta_core.catalog.html#rosetta_core.catalog.index.index_catalog_start">[docs]</a>
+<span class="k">def</span> <span class="nf">index_catalog_start</span><span class="p">(</span>
+    <span class="n">meta</span><span class="p">,</span>
+    <span class="n">version</span><span class="p">,</span>
+    <span class="n">get_path_version</span><span class="p">,</span>
+    <span class="n">kind</span><span class="p">,</span>
+    <span class="n">catalog_path</span><span class="p">,</span>
+    <span class="n">source_dirs</span><span class="p">,</span>
+    <span class="n">scan_directory_opts</span><span class="p">:</span> <span class="n">ScanDirectoryOpts</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">printer</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">progress</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>
+    <span class="n">max_errs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="c1"># TODO: We should use different source_indexers &amp; source_globs based on the kind?</span>
+
+    <span class="c1"># Load the old / previous local catalog if our catalog path exists.</span>
+    <span class="n">curr_catalog</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">CatalogMem</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">,</span> <span class="n">embedding_model</span><span class="o">=</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;embedding_model&quot;</span><span class="p">])</span> <span class="k">if</span> <span class="n">catalog_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="p">)</span>
+
+    <span class="n">source_files</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">source_dir</span> <span class="ow">in</span> <span class="n">source_dirs</span><span class="p">:</span>
+        <span class="n">source_files</span> <span class="o">+=</span> <span class="n">scan_directory</span><span class="p">(</span><span class="n">source_dir</span><span class="p">,</span> <span class="n">source_globs</span><span class="p">,</span> <span class="n">opts</span><span class="o">=</span><span class="n">scan_directory_opts</span><span class="p">)</span>
+
+    <span class="n">all_errs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">all_descriptors</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">printer</span><span class="p">(</span><span class="s2">&quot;Crawling source directories.&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Now crawling source directories.&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">source_file</span> <span class="ow">in</span> <span class="n">progress</span><span class="p">(</span><span class="n">source_files</span><span class="p">):</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">max_errs</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_errs</span><span class="p">):</span>
+            <span class="k">break</span>
+
+        <span class="k">for</span> <span class="n">glob</span><span class="p">,</span> <span class="n">indexer</span> <span class="ow">in</span> <span class="n">source_indexers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">source_file</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">glob</span><span class="p">):</span>
+                <span class="n">printer</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- </span><span class="si">{</span><span class="n">source_file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Indexing file </span><span class="si">{</span><span class="n">source_file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                <span class="n">errs</span><span class="p">,</span> <span class="n">descriptors</span> <span class="o">=</span> <span class="n">indexer</span><span class="o">.</span><span class="n">start_descriptors</span><span class="p">(</span><span class="n">source_file</span><span class="p">,</span> <span class="n">get_path_version</span><span class="p">)</span>
+                <span class="n">all_errs</span> <span class="o">+=</span> <span class="n">errs</span> <span class="ow">or</span> <span class="p">[]</span>
+                <span class="n">all_descriptors</span> <span class="o">+=</span> <span class="n">descriptors</span> <span class="ow">or</span> <span class="p">[]</span>
+                <span class="k">break</span>
+
+    <span class="k">if</span> <span class="n">all_errs</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Encountered error(s) while crawling source directories: &quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">all_errs</span><span class="p">]))</span>
+        <span class="k">raise</span> <span class="n">all_errs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">next_catalog</span> <span class="o">=</span> <span class="n">CatalogMem</span><span class="p">(</span>
+        <span class="n">catalog_descriptor</span><span class="o">=</span><span class="n">CatalogDescriptor</span><span class="p">(</span>
+            <span class="n">catalog_schema_version</span><span class="o">=</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;catalog_schema_version&quot;</span><span class="p">],</span>
+            <span class="n">embedding_model</span><span class="o">=</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;embedding_model&quot;</span><span class="p">],</span>
+            <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span>
+            <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span>
+            <span class="n">source_dirs</span><span class="o">=</span><span class="n">source_dirs</span><span class="p">,</span>
+            <span class="n">items</span><span class="o">=</span><span class="n">all_descriptors</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">uninitialized_items</span> <span class="o">=</span> <span class="n">init_from_catalog</span><span class="p">(</span><span class="n">next_catalog</span><span class="p">,</span> <span class="n">curr_catalog</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">all_errs</span><span class="p">,</span> <span class="n">next_catalog</span><span class="p">,</span> <span class="n">uninitialized_items</span></div>
+
+
+
+<div class="viewcode-block" id="init_from_catalog">
+<a class="viewcode-back" href="../../../core/rosetta_core.catalog.html#rosetta_core.catalog.index.init_from_catalog">[docs]</a>
+<span class="k">def</span> <span class="nf">init_from_catalog</span><span class="p">(</span><span class="n">working</span><span class="p">:</span> <span class="n">CatalogMem</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">CatalogMem</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RecordDescriptor</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the items in self by copying over attributes from</span>
+<span class="sd">    items found in other that have the exact same versions.</span>
+
+<span class="sd">    Returns a list of uninitialized items.&quot;&quot;&quot;</span>
+
+    <span class="n">uninitialized_items</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">other</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">catalog_descriptor</span><span class="p">:</span>
+        <span class="c1"># A lookup dict of items keyed by &quot;source:name&quot;.</span>
+        <span class="n">other_items</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">source</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="n">o</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">catalog_descriptor</span><span class="o">.</span><span class="n">items</span> <span class="ow">or</span> <span class="p">[]}</span>
+
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">working</span><span class="o">.</span><span class="n">catalog_descriptor</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">other_items</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">source</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">o</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">s</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">is_dirty</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">identifier</span> <span class="o">==</span> <span class="n">s</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">identifier</span><span class="p">:</span>
+                <span class="c1"># The prev item and self item have the same version IDs,</span>
+                <span class="c1"># so copy the prev item contents into the self item.</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">uninitialized_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">uninitialized_items</span> <span class="o">+=</span> <span class="n">working</span><span class="o">.</span><span class="n">catalog_descriptor</span><span class="o">.</span><span class="n">items</span>
+
+    <span class="k">return</span> <span class="n">uninitialized_items</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Tanvi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rosetta_core.indexer package &mdash; Rosetta v0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=f8c80a57"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rosetta_core.llm package" href="rosetta_core.llm.html" />
+    <link rel="prev" title="rosetta_core.catalog.catalog package" href="rosetta_core.catalog.catalog.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            Rosetta
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../cmd/modules.html">rosetta_cmd</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">rosetta_core</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="rosetta_core.html">rosetta_core package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="rosetta_core.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.html">rosetta_core.activity package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.annotation.html">rosetta_core.annotation package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html">rosetta_core.catalog package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">rosetta_core.indexer package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html">rosetta_core.llm package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html">rosetta_core.prompt package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html">rosetta_core.provider package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.record.html">rosetta_core.record package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.secrets.html">rosetta_core.secrets package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.tool.html">rosetta_core.tool package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html">rosetta_core.version package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.html#module-rosetta_core.defaults">rosetta_core.defaults module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.html#module-rosetta_core">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../util/modules.html">rosetta_util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Rosetta</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">rosetta_core</a></li>
+          <li class="breadcrumb-item"><a href="rosetta_core.html">rosetta_core package</a></li>
+      <li class="breadcrumb-item active">rosetta_core.indexer package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/core/rosetta_core.indexer.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="rosetta-core-indexer-package">
+<h1>rosetta_core.indexer package<a class="headerlink" href="#rosetta-core-indexer-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-rosetta_core.indexer.indexer">
+<span id="rosetta-core-indexer-indexer-module"></span><h2>rosetta_core.indexer.indexer module<a class="headerlink" href="#module-rosetta_core.indexer.indexer" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.BaseFileIndexer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.indexer.indexer.</span></span><span class="sig-name descname"><span class="pre">BaseFileIndexer</span></span><a class="reference internal" href="../_modules/rosetta_core/indexer/indexer.html#BaseFileIndexer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.indexer.indexer.BaseFileIndexer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.BaseFileIndexer.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rosetta_core.indexer.indexer.BaseFileIndexer.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.BaseFileIndexer.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rosetta_core.indexer.indexer.BaseFileIndexer.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.BaseFileIndexer.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rosetta_core.indexer.indexer.BaseFileIndexer.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo] objects.</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.BaseFileIndexer.start_descriptors">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_descriptors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_path_version</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ValueError</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor" title="rosetta_core.record.descriptor.RecordDescriptor"><span class="pre">RecordDescriptor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/rosetta_core/indexer/indexer.html#BaseFileIndexer.start_descriptors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.indexer.indexer.BaseFileIndexer.start_descriptors" title="Link to this definition"></a></dt>
+<dd><p>Returns zero or more ‘bare’ catalog item descriptors for a filename,
+and/or return non-fatal or ‘keep-on-going’ errors if any encountered.</p>
+<p>The returned descriptors are ‘bare’ in that they only capture
+immediately available information and properties. Any slow
+operators such as LLM augmentation, vector embeddings, etc. are
+handled by other methods &amp; processing phases that are called later.</p>
+<p>A ‘keep-on-going’ error means the top level command should
+ultimately error, but more processing on other files might
+still be attempted to increase the user’s productivity –
+e.g., show the user multiple error messages instead of
+giving up on the very first encountered error.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotPromptFileIndexer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.indexer.indexer.</span></span><span class="sig-name descname"><span class="pre">DotPromptFileIndexer</span></span><a class="reference internal" href="../_modules/rosetta_core/indexer/indexer.html#DotPromptFileIndexer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.indexer.indexer.DotPromptFileIndexer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rosetta_core.indexer.indexer.BaseFileIndexer" title="rosetta_core.indexer.indexer.BaseFileIndexer"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFileIndexer</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotPromptFileIndexer.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rosetta_core.indexer.indexer.DotPromptFileIndexer.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotPromptFileIndexer.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rosetta_core.indexer.indexer.DotPromptFileIndexer.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotPromptFileIndexer.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rosetta_core.indexer.indexer.DotPromptFileIndexer.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo] objects.</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotPromptFileIndexer.start_descriptors">
+<span class="sig-name descname"><span class="pre">start_descriptors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_version</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ValueError</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor" title="rosetta_core.record.descriptor.RecordDescriptor"><span class="pre">RecordDescriptor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/rosetta_core/indexer/indexer.html#DotPromptFileIndexer.start_descriptors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.indexer.indexer.DotPromptFileIndexer.start_descriptors" title="Link to this definition"></a></dt>
+<dd><p>Returns zero or more ‘bare’ catalog item descriptors for a filename,
+and/or return non-fatal or ‘keep-on-going’ errors if any encountered.</p>
+<p>The returned descriptors are ‘bare’ in that they only capture
+immediately available information and properties. Any slow
+operators such as LLM augmentation, vector embeddings, etc. are
+handled by other methods &amp; processing phases that are called later.</p>
+<p>A ‘keep-on-going’ error means the top level command should
+ultimately error, but more processing on other files might
+still be attempted to increase the user’s productivity –
+e.g., show the user multiple error messages instead of
+giving up on the very first encountered error.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotPyFileIndexer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.indexer.indexer.</span></span><span class="sig-name descname"><span class="pre">DotPyFileIndexer</span></span><a class="reference internal" href="../_modules/rosetta_core/indexer/indexer.html#DotPyFileIndexer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.indexer.indexer.DotPyFileIndexer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rosetta_core.indexer.indexer.BaseFileIndexer" title="rosetta_core.indexer.indexer.BaseFileIndexer"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFileIndexer</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotPyFileIndexer.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rosetta_core.indexer.indexer.DotPyFileIndexer.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotPyFileIndexer.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rosetta_core.indexer.indexer.DotPyFileIndexer.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotPyFileIndexer.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rosetta_core.indexer.indexer.DotPyFileIndexer.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo] objects.</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotPyFileIndexer.start_descriptors">
+<span class="sig-name descname"><span class="pre">start_descriptors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_path_version</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ValueError</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor" title="rosetta_core.record.descriptor.RecordDescriptor"><span class="pre">RecordDescriptor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/rosetta_core/indexer/indexer.html#DotPyFileIndexer.start_descriptors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.indexer.indexer.DotPyFileIndexer.start_descriptors" title="Link to this definition"></a></dt>
+<dd><p>Returns zero or more ‘bare’ catalog item descriptors
+for a <a href="#id1"><span class="problematic" id="id2">*</span></a>.py, and/or returns ‘keep-on-going’ errors
+if any encountered.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotSqlppFileIndexer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.indexer.indexer.</span></span><span class="sig-name descname"><span class="pre">DotSqlppFileIndexer</span></span><a class="reference internal" href="../_modules/rosetta_core/indexer/indexer.html#DotSqlppFileIndexer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.indexer.indexer.DotSqlppFileIndexer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rosetta_core.indexer.indexer.BaseFileIndexer" title="rosetta_core.indexer.indexer.BaseFileIndexer"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFileIndexer</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotSqlppFileIndexer.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rosetta_core.indexer.indexer.DotSqlppFileIndexer.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotSqlppFileIndexer.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rosetta_core.indexer.indexer.DotSqlppFileIndexer.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotSqlppFileIndexer.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rosetta_core.indexer.indexer.DotSqlppFileIndexer.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo] objects.</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotSqlppFileIndexer.start_descriptors">
+<span class="sig-name descname"><span class="pre">start_descriptors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_path_version</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ValueError</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor" title="rosetta_core.record.descriptor.RecordDescriptor"><span class="pre">RecordDescriptor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/rosetta_core/indexer/indexer.html#DotSqlppFileIndexer.start_descriptors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.indexer.indexer.DotSqlppFileIndexer.start_descriptors" title="Link to this definition"></a></dt>
+<dd><p>Returns zero or 1 ‘bare’ catalog item descriptors
+for a <a href="#id3"><span class="problematic" id="id4">*</span></a>.sqlpp, and/or return ‘keep-on-going’ errors
+if any encountered.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotYamlFileIndexer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.indexer.indexer.</span></span><span class="sig-name descname"><span class="pre">DotYamlFileIndexer</span></span><a class="reference internal" href="../_modules/rosetta_core/indexer/indexer.html#DotYamlFileIndexer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.indexer.indexer.DotYamlFileIndexer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rosetta_core.indexer.indexer.BaseFileIndexer" title="rosetta_core.indexer.indexer.BaseFileIndexer"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFileIndexer</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotYamlFileIndexer.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rosetta_core.indexer.indexer.DotYamlFileIndexer.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotYamlFileIndexer.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rosetta_core.indexer.indexer.DotYamlFileIndexer.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotYamlFileIndexer.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rosetta_core.indexer.indexer.DotYamlFileIndexer.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo] objects.</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.DotYamlFileIndexer.start_descriptors">
+<span class="sig-name descname"><span class="pre">start_descriptors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_version</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ValueError</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor" title="rosetta_core.record.descriptor.RecordDescriptor"><span class="pre">RecordDescriptor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/rosetta_core/indexer/indexer.html#DotYamlFileIndexer.start_descriptors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.indexer.indexer.DotYamlFileIndexer.start_descriptors" title="Link to this definition"></a></dt>
+<dd><p>Returns zero or more ‘bare’ catalog item descriptors
+for a <a href="#id5"><span class="problematic" id="id6">*</span></a>.yaml, and/or return ‘keep-on-going’ errors
+if any encountered.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.augment_descriptor">
+<span class="sig-prename descclassname"><span class="pre">rosetta_core.indexer.indexer.</span></span><span class="sig-name descname"><span class="pre">augment_descriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor" title="rosetta_core.record.descriptor.RecordDescriptor"><span class="pre">RecordDescriptor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ValueError</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/rosetta_core/indexer/indexer.html#augment_descriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.indexer.indexer.augment_descriptor" title="Link to this definition"></a></dt>
+<dd><p>Augments a single catalog item descriptor (in-place, destructive),
+with additional information, such as generated by an LLM,
+and/or return ‘keep-on-going’ errors if any encountered.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_core.indexer.indexer.vectorize_descriptor">
+<span class="sig-prename descclassname"><span class="pre">rosetta_core.indexer.indexer.</span></span><span class="sig-name descname"><span class="pre">vectorize_descriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor" title="rosetta_core.record.descriptor.RecordDescriptor"><span class="pre">RecordDescriptor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_model_obj</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ValueError</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/rosetta_core/indexer/indexer.html#vectorize_descriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.indexer.indexer.vectorize_descriptor" title="Link to this definition"></a></dt>
+<dd><p>Adds vector embeddings to a single catalog item descriptor (in-place,
+destructive), and/or return ‘keep-on-going’ errors if any encountered.</p>
+</dd></dl>
+
+</section>
+<section id="module-rosetta_core.indexer">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-rosetta_core.indexer" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_core.indexer.augment_descriptor">
+<span class="sig-prename descclassname"><span class="pre">rosetta_core.indexer.</span></span><span class="sig-name descname"><span class="pre">augment_descriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor" title="rosetta_core.record.descriptor.RecordDescriptor"><span class="pre">RecordDescriptor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ValueError</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/rosetta_core/indexer/indexer.html#augment_descriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.indexer.augment_descriptor" title="Link to this definition"></a></dt>
+<dd><p>Augments a single catalog item descriptor (in-place, destructive),
+with additional information, such as generated by an LLM,
+and/or return ‘keep-on-going’ errors if any encountered.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rosetta_core.indexer.vectorize_descriptor">
+<span class="sig-prename descclassname"><span class="pre">rosetta_core.indexer.</span></span><span class="sig-name descname"><span class="pre">vectorize_descriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">descriptor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_core.record.html#rosetta_core.record.descriptor.RecordDescriptor" title="rosetta_core.record.descriptor.RecordDescriptor"><span class="pre">RecordDescriptor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_model_obj</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ValueError</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/rosetta_core/indexer/indexer.html#vectorize_descriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.indexer.vectorize_descriptor" title="Link to this definition"></a></dt>
+<dd><p>Adds vector embeddings to a single catalog item descriptor (in-place,
+destructive), and/or return ‘keep-on-going’ errors if any encountered.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rosetta_core.catalog.catalog.html" class="btn btn-neutral float-left" title="rosetta_core.catalog.catalog package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rosetta_core.llm.html" class="btn btn-neutral float-right" title="rosetta_core.llm package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Tanvi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

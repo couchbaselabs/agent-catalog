@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rosetta_core.record package &mdash; Rosetta v0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=f8c80a57"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rosetta_core.secrets package" href="rosetta_core.secrets.html" />
+    <link rel="prev" title="rosetta_core.provider package" href="rosetta_core.provider.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            Rosetta
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../cmd/modules.html">rosetta_cmd</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">rosetta_core</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="rosetta_core.html">rosetta_core package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="rosetta_core.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.activity.html">rosetta_core.activity package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.annotation.html">rosetta_core.annotation package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.catalog.html">rosetta_core.catalog package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.indexer.html">rosetta_core.indexer package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.llm.html">rosetta_core.llm package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.prompt.html">rosetta_core.prompt package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.provider.html">rosetta_core.provider package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">rosetta_core.record package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.secrets.html">rosetta_core.secrets package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.tool.html">rosetta_core.tool package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rosetta_core.version.html">rosetta_core.version package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.html#module-rosetta_core.defaults">rosetta_core.defaults module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rosetta_core.html#module-rosetta_core">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../util/modules.html">rosetta_util</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Rosetta</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">rosetta_core</a></li>
+          <li class="breadcrumb-item"><a href="rosetta_core.html">rosetta_core package</a></li>
+      <li class="breadcrumb-item active">rosetta_core.record package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/core/rosetta_core.record.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="rosetta-core-record-package">
+<h1>rosetta_core.record package<a class="headerlink" href="#rosetta-core-record-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-rosetta_core.record.descriptor">
+<span id="rosetta-core-record-descriptor-module"></span><h2>rosetta_core.record.descriptor module<a class="headerlink" href="#module-rosetta_core.record.descriptor" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.record.descriptor.RecordDescriptor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.record.descriptor.</span></span><span class="sig-name descname"><span class="pre">RecordDescriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="pre">RecordKind.PythonFunction</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">RecordKind.SQLPPQuery</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">RecordKind.SemanticSearch</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">RecordKind.HTTPRequest</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">RecordKind.RawPrompt</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">RecordKind.JinjaPrompt</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.identifier.VersionDescriptor" title="rosetta_core.version.identifier.VersionDescriptor"><span class="pre">VersionDescriptor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_core/record/descriptor.html#RecordDescriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.record.descriptor.RecordDescriptor" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>This model represents a tool’s persistable description or metadata.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.record.descriptor.RecordDescriptor.annotations">
+<span class="sig-name descname"><span class="pre">annotations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rosetta_core.record.descriptor.RecordDescriptor.annotations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.record.descriptor.RecordDescriptor.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#rosetta_core.record.descriptor.RecordDescriptor.description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.record.descriptor.RecordDescriptor.embedding">
+<span class="sig-name descname"><span class="pre">embedding</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#rosetta_core.record.descriptor.RecordDescriptor.embedding" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="rosetta_core.record.descriptor.RecordDescriptor.identifier">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">identifier</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#rosetta_core.record.descriptor.RecordDescriptor.identifier" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.record.descriptor.RecordDescriptor.model_computed_fields">
+<span class="sig-name descname"><span class="pre">model_computed_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ComputedFieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'identifier':</span> <span class="pre">ComputedFieldInfo(wrapped_property=&lt;property</span> <span class="pre">object&gt;,</span> <span class="pre">return_type=&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">alias=None,</span> <span class="pre">alias_priority=None,</span> <span class="pre">title=None,</span> <span class="pre">field_title_generator=None,</span> <span class="pre">description=None,</span> <span class="pre">deprecated=None,</span> <span class="pre">examples=None,</span> <span class="pre">json_schema_extra=None,</span> <span class="pre">repr=True)}</span></em><a class="headerlink" href="#rosetta_core.record.descriptor.RecordDescriptor.model_computed_fields" title="Link to this definition"></a></dt>
+<dd><p>A dictionary of computed field names and their corresponding <cite>ComputedFieldInfo</cite> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.record.descriptor.RecordDescriptor.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'use_enum_values':</span> <span class="pre">True,</span> <span class="pre">'validate_assignment':</span> <span class="pre">True}</span></em><a class="headerlink" href="#rosetta_core.record.descriptor.RecordDescriptor.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.record.descriptor.RecordDescriptor.model_fields">
+<span class="sig-name descname"><span class="pre">model_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">FieldInfo</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'annotations':</span> <span class="pre">FieldInfo(annotation=Union[dict[str,</span> <span class="pre">str],</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default=None,</span> <span class="pre">description='Dictionary</span> <span class="pre">of</span> <span class="pre">user-defined</span> <span class="pre">annotations</span> <span class="pre">attached</span> <span class="pre">to</span> <span class="pre">this</span> <span class="pre">record.',</span> <span class="pre">examples=[{'gdpr_2016_compliant':</span> <span class="pre">'&quot;false&quot;',</span> <span class="pre">'ccpa_2019_compliant':</span> <span class="pre">'&quot;true&quot;'}]),</span> <span class="pre">'description':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True,</span> <span class="pre">description=&quot;Text</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">describe</span> <span class="pre">an</span> <span class="pre">entry's</span> <span class="pre">purpose.</span> <span class="pre">For</span> <span class="pre">a</span> <span class="pre">*.py</span> <span class="pre">tool,</span> <span class="pre">this</span> <span class="pre">is</span> <span class="pre">the</span> <span class="pre">python</span> <span class="pre">function's</span> <span class="pre">docstring.</span> <span class="pre">&quot;),</span> <span class="pre">'embedding':</span> <span class="pre">FieldInfo(annotation=Union[list[float],</span> <span class="pre">NoneType],</span> <span class="pre">required=False,</span> <span class="pre">default_factory=list,</span> <span class="pre">description='Embedding</span> <span class="pre">used</span> <span class="pre">to</span> <span class="pre">search</span> <span class="pre">for</span> <span class="pre">the</span> <span class="pre">record.'),</span> <span class="pre">'name':</span> <span class="pre">FieldInfo(annotation=str,</span> <span class="pre">required=True,</span> <span class="pre">description='A</span> <span class="pre">short</span> <span class="pre">(Python-identifier-valid)</span> <span class="pre">name</span> <span class="pre">for</span> <span class="pre">the</span> <span class="pre">tool,</span> <span class="pre">where</span> <span class="pre">multiple</span> <span class="pre">versions</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">same</span> <span class="pre">tool</span> <span class="pre">would</span> <span class="pre">have</span> <span class="pre">the</span> <span class="pre">same</span> <span class="pre">name.',</span> <span class="pre">examples=['get_current_stock_price']),</span> <span class="pre">'record_kind':</span> <span class="pre">FieldInfo(annotation=Literal[&lt;RecordKind.PythonFunction:</span> <span class="pre">'python_function'&gt;,</span> <span class="pre">&lt;RecordKind.SQLPPQuery:</span> <span class="pre">'sqlpp_query'&gt;,</span> <span class="pre">&lt;RecordKind.SemanticSearch:</span> <span class="pre">'semantic_search'&gt;,</span> <span class="pre">&lt;RecordKind.HTTPRequest:</span> <span class="pre">'http_request'&gt;,</span> <span class="pre">&lt;RecordKind.RawPrompt:</span> <span class="pre">'raw_prompt'&gt;,</span> <span class="pre">&lt;RecordKind.JinjaPrompt:</span> <span class="pre">'jinja_prompt'&gt;],</span> <span class="pre">required=True,</span> <span class="pre">description='The</span> <span class="pre">type</span> <span class="pre">of</span> <span class="pre">catalog</span> <span class="pre">entry</span> <span class="pre">(python</span> <span class="pre">tool,</span> <span class="pre">prompt,</span> <span class="pre">etc...).'),</span> <span class="pre">'source':</span> <span class="pre">FieldInfo(annotation=Path,</span> <span class="pre">required=True,</span> <span class="pre">description='Source</span> <span class="pre">location</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">file,</span> <span class="pre">relative</span> <span class="pre">to</span> <span class="pre">where</span> <span class="pre">index</span> <span class="pre">was</span> <span class="pre">called.',</span> <span class="pre">examples=[PosixPath('src/tools/finance.py')]),</span> <span class="pre">'version':</span> <span class="pre">FieldInfo(annotation=VersionDescriptor,</span> <span class="pre">required=True,</span> <span class="pre">description='A</span> <span class="pre">low</span> <span class="pre">water-mark</span> <span class="pre">that</span> <span class="pre">defines</span> <span class="pre">the</span> <span class="pre">earliest</span> <span class="pre">version</span> <span class="pre">this</span> <span class="pre">record</span> <span class="pre">is</span> <span class="pre">valid</span> <span class="pre">under.')}</span></em><a class="headerlink" href="#rosetta_core.record.descriptor.RecordDescriptor.model_fields" title="Link to this definition"></a></dt>
+<dd><p>Metadata about the fields defined on the model,
+mapping of field names to [<cite>FieldInfo</cite>][pydantic.fields.FieldInfo] objects.</p>
+<p>This replaces <cite>Model.__fields__</cite> from Pydantic V1.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.record.descriptor.RecordDescriptor.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#rosetta_core.record.descriptor.RecordDescriptor.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.record.descriptor.RecordDescriptor.record_kind">
+<span class="sig-name descname"><span class="pre">record_kind</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="pre">RecordKind.PythonFunction</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">RecordKind.SQLPPQuery</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">RecordKind.SemanticSearch</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">RecordKind.HTTPRequest</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">RecordKind.RawPrompt</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">RecordKind.JinjaPrompt</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#rosetta_core.record.descriptor.RecordDescriptor.record_kind" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.record.descriptor.RecordDescriptor.source">
+<span class="sig-name descname"><span class="pre">source</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#rosetta_core.record.descriptor.RecordDescriptor.source" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.record.descriptor.RecordDescriptor.version">
+<span class="sig-name descname"><span class="pre">version</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="rosetta_core.version.html#rosetta_core.version.identifier.VersionDescriptor" title="rosetta_core.version.identifier.VersionDescriptor"><span class="pre">VersionDescriptor</span></a></em><a class="headerlink" href="#rosetta_core.record.descriptor.RecordDescriptor.version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rosetta_core.record.descriptor.RecordKind">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rosetta_core.record.descriptor.</span></span><span class="sig-name descname"><span class="pre">RecordKind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rosetta_core/record/descriptor.html#RecordKind"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rosetta_core.record.descriptor.RecordKind" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">StrEnum</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.record.descriptor.RecordKind.HTTPRequest">
+<span class="sig-name descname"><span class="pre">HTTPRequest</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'http_request'</span></em><a class="headerlink" href="#rosetta_core.record.descriptor.RecordKind.HTTPRequest" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.record.descriptor.RecordKind.JinjaPrompt">
+<span class="sig-name descname"><span class="pre">JinjaPrompt</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'jinja_prompt'</span></em><a class="headerlink" href="#rosetta_core.record.descriptor.RecordKind.JinjaPrompt" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.record.descriptor.RecordKind.PythonFunction">
+<span class="sig-name descname"><span class="pre">PythonFunction</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'python_function'</span></em><a class="headerlink" href="#rosetta_core.record.descriptor.RecordKind.PythonFunction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.record.descriptor.RecordKind.RawPrompt">
+<span class="sig-name descname"><span class="pre">RawPrompt</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'raw_prompt'</span></em><a class="headerlink" href="#rosetta_core.record.descriptor.RecordKind.RawPrompt" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.record.descriptor.RecordKind.SQLPPQuery">
+<span class="sig-name descname"><span class="pre">SQLPPQuery</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sqlpp_query'</span></em><a class="headerlink" href="#rosetta_core.record.descriptor.RecordKind.SQLPPQuery" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rosetta_core.record.descriptor.RecordKind.SemanticSearch">
+<span class="sig-name descname"><span class="pre">SemanticSearch</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'semantic_search'</span></em><a class="headerlink" href="#rosetta_core.record.descriptor.RecordKind.SemanticSearch" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rosetta_core.record">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-rosetta_core.record" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rosetta_core.provider.html" class="btn btn-neutral float-left" title="rosetta_core.provider package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rosetta_core.secrets.html" class="btn btn-neutral float-right" title="rosetta_core.secrets package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Tanvi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>
