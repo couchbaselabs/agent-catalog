@@ -1,0 +1,12 @@
+---
+record_kind: raw_prompt
+
+name: handle_failed_task
+
+description: Instructions on what to do when you cannot fulfill a user request.
+
+annotations:
+  framework: "controlflow"
+---
+Tell the user that you cannot help them with their request right now.
+You MUST talk to the user here and communicate your response to them.
