@@ -527,7 +527,7 @@ def main():
     try:
         click_main()
     except Exception as e:
-        click.echo(f"ERROR: {e}", err=True)
+        click.secho(f"ERROR: {e}", fg="red", err=True)
 
         if os.getenv("ROSETTA_DEBUG") is not None:
             # Set ROSETTA_DEBUG so standard python stack trace is emitted.
