@@ -62,14 +62,14 @@ def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
                     Use the 'clean' command to start over with a new embedding model of {embedding_model}."""
                 )
         else:
-            click.echo(f"Downloading and caching embedding model: {embedding_model} ...")
+            click.secho(f"Downloading and caching embedding model: {embedding_model} ...", fg="yellow")
 
             # Download embedding model to be cached for later runtime usage.
             sentence_transformers.SentenceTransformer(
                 embedding_model, tokenizer_kwargs={"clean_up_tokenization_spaces": True}
             )
 
-            click.echo(f"Downloading and caching embedding model: {embedding_model} ... DONE.")
+            click.echo(f"Successfully downloaded and cached embedding model: {embedding_model}.")
 
         meta["embedding_model"] = embedding_model
 

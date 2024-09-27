@@ -70,9 +70,11 @@ def cmd_index(
         max_errs=DEFAULT_MAX_ERRS,
     )
 
-    print("==================\nsaving local catalog...")
+    click.echo("==================")
+    click.secho("Saving local catalog...", fg="yellow")
 
     if not dry_run:
         next_catalog.dump(catalog_path)
+        click.secho("Successfully saved local catalog.", fg="green")
     else:
-        print("SKIPPING: local catalog saving due to --dry-run")
+        click.secho("Skipping local catalog saving due to --dry-run", fg="yellow")

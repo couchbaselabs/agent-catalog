@@ -30,10 +30,8 @@ def clean_local(ctx: Context):
         elif x_path.is_dir():
             shutil.rmtree(x_path.absolute())
 
-    click.secho("Successfully cleaned up local catalog!", fg="green")
 
-
-def clean_db(ctx, bucket, cluster):
+def clean_db(ctx, bucket, cluster) -> int:
     all_errs = []
     drop_scope_query = f"DROP SCOPE `{bucket}`.`{DEFAULT_SCOPE_PREFIX}` IF EXISTS;"
     res, err = execute_query(cluster, drop_scope_query)
@@ -49,18 +47,25 @@ def clean_db(ctx, bucket, cluster):
     if err is not None:
         all_errs.append(err)
 
-    if len(all_errs) == 0:
-        click.secho("Successfully cleaned up db catalog!", fg="green")
-    else:
+    if len(all_errs) > 0:
         logger.error(all_errs)
+
+    return len(all_errs)
 
 
 def cmd_clean(ctx: Context, is_local: bool, is_db: bool, bucket: str, cluster: couchbase.cluster):
     if is_local:
+        click.secho("Started cleaning local catalog....", fg="yellow")
         clean_local(ctx)
+        click.secho("Successfully cleaned up local catalog!", fg="green")
 
     if is_db:
-        clean_db(ctx, bucket, cluster)
+        click.secho("Started cleaning db catalog....", fg="yellow")
+        num_errs = clean_db(ctx, bucket, cluster)
+        if num_errs > 0:
+            click.secho("ERROR: Failed to cleanup db catalog!", fg="red")
+        else:
+            click.secho("Successfully cleaned up db catalog!", fg="green")
 
 
 # Note: flask is an optional dependency.

@@ -1,3 +1,4 @@
+import click
 import fnmatch
 import logging
 
@@ -113,7 +114,17 @@ def index_catalog_start(
             if fnmatch.fnmatch(source_file.name, glob):
                 printer(f"- {source_file.name}")
                 logger.debug(f"Indexing file {source_file.name}.")
+                is_description_empty = False
                 errs, descriptors = indexer.start_descriptors(source_file, get_path_version)
+                for descriptor in descriptors:
+                    if len(descriptor.description) == 0:
+                        click.secho(f"WARNING: Catalog item {descriptor.name} has an empty description.", fg="yellow")
+                        is_description_empty = True
+                        break
+                if is_description_empty:
+                    raise ValueError(
+                        "Catalog contains file(s) with empty description! Please provide a description and index again."
+                    )
                 all_errs += errs or []
                 all_descriptors += descriptors or []
                 break

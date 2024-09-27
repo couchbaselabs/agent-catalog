@@ -29,7 +29,7 @@ def get_connection(conn: CouchbaseConnect) -> tuple[str, None] | tuple[None, Clu
         logger.debug("Connection successfully established.")
 
     except CouchbaseException as e:
-        return f"Error connecting to couchbase : {e}", None
+        return e.message, None
 
     return None, cluster
 
@@ -62,7 +62,7 @@ def create_scope_and_collection(bucket_manager, scope, collection):
             bucket_manager.create_scope(scope)
             logger.debug(f"Scope {scope} was created successfully.")
     except CouchbaseException as e:
-        error_message = f"Encountered error while creating scope {scope}:\n{str(e)}"
+        error_message = f"Encountered error while creating scope {scope}:\n{e.message}"
         logger.error(error_message)
         return error_message, e
 
@@ -81,7 +81,7 @@ def create_scope_and_collection(bucket_manager, scope, collection):
             logger.debug(f"Collection {scope}.{collection} was created successfully.")
 
     except CouchbaseException as e:
-        error_message = f"Encountered error while creating collection {scope}.{collection}:\n{str(e)}"
+        error_message = f"Encountered error while creating collection {scope}.{collection}:\n{e.message}"
         logger.error(error_message)
         return error_message, e
 
