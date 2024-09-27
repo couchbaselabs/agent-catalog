@@ -9,6 +9,7 @@ from ..defaults import DEFAULT_CATALOG_COLLECTION_NAME
 from ..defaults import DEFAULT_CATALOG_NAME
 from ..defaults import DEFAULT_META_COLLECTION_NAME
 from ..models import Context
+from couchbase.exceptions import CouchbaseException
 from rosetta_core.catalog import CatalogMem
 from rosetta_util.ddl import create_gsi_indexes
 from rosetta_util.ddl import create_vector_index
@@ -69,7 +70,7 @@ def cmd_publish(
         meta_scope = scope
         (msg, err) = create_scope_and_collection(bucket_manager, scope=meta_scope, collection=meta_col)
         if err is not None:
-            printer(msg, err)
+            click.secho(msg, fg="red")
             return
 
         # get collection ref
@@ -83,15 +84,15 @@ def cmd_publish(
         metadata.update({"snapshot_annotations": annotations_list})
         metadata["version"]["timestamp"] = str(metadata["version"]["timestamp"])
 
-        printer("Upserting metadata..")
+        click.secho("Inserting metadata...", fg="yellow")
         try:
             key = metadata["version"]["identifier"]
             cb_coll.upsert(key, metadata)
         # TODO (GLENN): Should use the specific exception here instead of 'Exception'.
-        except Exception as e:
-            logger.error("could not insert: ", e)
+        except CouchbaseException as e:
+            click.secho(f"Couldn't insert metadata!\n{e.message}", fg="red")
             return e
-        printer("Metadata added!")
+        click.secho("Successfully inserted metadata.", fg="green")
 
         # ---------------------------------------------------------------------------------------- #
         #                               Catalog items collection                                   #
@@ -100,14 +101,13 @@ def cmd_publish(
         catalog_scope = scope
         (msg, err) = create_scope_and_collection(bucket_manager, scope=catalog_scope, collection=catalog_col)
         if err is not None:
-            printer(msg, err)
+            click.secho(msg, fg="red")
             return
 
         # get collection ref
         cb_coll = cb.scope(catalog_scope).collection(catalog_col)
 
-        printer("Upserting catalog items..")
-
+        click.secho("Inserting catalog items...", fg="yellow")
         # iterate over individual catalog items
         for item in catalog.items:
             try:
@@ -122,15 +122,16 @@ def cmd_publish(
 
                 # upsert docs to CB collection
                 cb_coll.upsert(key, item_json)
-            except Exception as e:
-                logger.error("could not insert: ", e)
+            except CouchbaseException as e:
+                click.secho(f"Couldn't insert catalog items!\n{e.message}", fg="red")
                 return e
 
-        printer(f"Inserted {kind} catalog successfully!\n")
+        click.secho("Successfully inserted catalog items.", fg="green")
 
         # ---------------------------------------------------------------------------------------- #
         #                               GSI and Vector Indexes                                     #
         # ---------------------------------------------------------------------------------------- #
+        click.secho("Creating GSI indexes...", fg="yellow")
         catalog_schema_version = metadata["catalog_schema_version"].replace(".", "_")
         s, err = create_gsi_indexes(bucket, cluster, kind, catalog_schema_version)
         if not s:
@@ -138,10 +139,14 @@ def cmd_publish(
             return
         else:
             logger.info("Indexes created successfully!")
+            click.secho("Successfully created GSI indexes.", fg="green")
 
+        click.secho("Creating vector index...", fg="yellow")
         dims = len(catalog.items[0].embedding)
-
         _, err = create_vector_index(bucket, kind, connection_details_env, dims, catalog_schema_version)
         if err is not None:
             click.secho(f"ERROR: Vector index could not be created \n{err}", fg="red")
             return
+        else:
+            logger.info("Vector index created successfully!")
+            click.secho("Successfully created vector index.", fg="green")

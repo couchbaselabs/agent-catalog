@@ -75,7 +75,6 @@ def create_vector_index(
     index_to_create = f"{bucket}.{DEFAULT_SCOPE_PREFIX}.rosetta_{kind}_index_{catalog_schema_ver}"
     (index_present, err) = is_index_present(bucket, index_to_create, conn)
     if err is None and isinstance(index_present, bool) and not index_present:
-        click.echo("Creating vector index...")
         # Create the index for the first time
         create_vector_index_https_url = f"https://{conn.host}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta_{kind}_index_{catalog_schema_ver}"
         create_vector_index_http_url = f"http://{conn.host}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_SCOPE_PREFIX}/index/rosetta_{kind}_index_{catalog_schema_ver}"

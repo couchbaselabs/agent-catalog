@@ -154,7 +154,8 @@ def clean(ctx, env_type, bucket, skip_prompt):
         # Establish a connection
         err, cluster = get_connection(conn=connection_details_env)
         if err:
-            click.echo(str(err))
+            click.secho("ERROR: Unable to connect to Couchbase!", fg="red")
+            click.secho(err, fg="red")
             return
 
         # Get buckets from CB Cluster
@@ -164,13 +165,14 @@ def clean(ctx, env_type, bucket, skip_prompt):
             # Prompt user to select a bucket
             bucket = click.prompt("Please select a bucket: ", type=click.Choice(buckets), show_choices=True)
         elif bucket not in buckets:
-            raise ValueError(
-                "Bucket does not exist! Available buckets from cluster are: "
-                + ",".join(buckets)
-                + "\nRun rosetta --help for more information."
+            click.secho("ERROR: Bucket does not exist!", fg="red")
+            click.echo(
+                f"Available buckets from cluster are: {','.join(buckets)}\nRun rosetta --help for more information."
             )
+            return
 
         cmd_clean(ctx.obj, False, True, bucket, cluster)
+        cluster.close()
 
 
 @click_main.command()
@@ -318,7 +320,8 @@ def find(
         # Establish a connection
         err, cluster = get_connection(conn=connection_details_env)
         if err:
-            click.echo(str(err))
+            click.secho("ERROR: Unable to connect to Couchbase!", fg="red")
+            click.secho(err, fg="red")
             return
 
         # Get buckets from CB Cluster
@@ -328,11 +331,11 @@ def find(
             # Prompt user to select a bucket
             bucket = click.prompt("Please select a bucket: ", type=click.Choice(buckets), show_choices=True)
         elif bucket not in buckets:
-            raise ValueError(
-                "Bucket does not exist! Available buckets from cluster are: "
-                + ",".join(buckets)
-                + "\nRun rosetta --help for more information."
+            click.secho("ERROR: Bucket does not exist!", fg="red")
+            click.echo(
+                f"Available buckets from cluster are: {','.join(buckets)}\nRun rosetta --help for more information."
             )
+            return
 
         cmd_find(
             ctx.obj,
@@ -350,6 +353,7 @@ def find(
             catalog_schema_version=catalog_version,
         )
         cluster.close()
+
     else:
         cmd_find(
             ctx.obj,
@@ -385,6 +389,7 @@ def find(
 @click.option(
     "--dry-run",
     default=False,
+    is_flag=True,
     help="When true, do not update the local catalog files.",
     show_default=True,
 )
@@ -398,8 +403,6 @@ def index(ctx, source_dirs, kind, embedding_model, dry_run):
         source_dirs = ["."]
 
     # TODO: The index command should default to the '.' directory / current directory.
-    # TODO: The index command should ignore the '.git' subdirectory.
-    # TODO: The index command should ignore whatever's in the '.gitignore' file.
 
     cmd_index(
         ctx.obj,
@@ -452,7 +455,8 @@ def publish(ctx, kind, bucket, annotations):
     # Establish a connection
     err, cluster = get_connection(conn=connection_details_env)
     if err:
-        click.echo(str(err))
+        click.secho("ERROR: Unable to connect to Couchbase!", fg="red")
+        click.secho(err, fg="red")
         return
 
     # Get buckets from CB Cluster
@@ -461,11 +465,9 @@ def publish(ctx, kind, bucket, annotations):
         # Prompt user to select a bucket
         bucket = click.prompt("Please select a bucket: ", type=click.Choice(buckets), show_choices=True)
     elif bucket not in buckets:
-        raise ValueError(
-            "Bucket does not exist! Available buckets from cluster are: "
-            + ",".join(buckets)
-            + "\nRun rosetta --help for more information."
-        )
+        click.secho("ERROR: Bucket does not exist!", fg="red")
+        click.echo(f"Available buckets from cluster are: {','.join(buckets)}\nRun rosetta --help for more information.")
+        return
 
     keyspace_details.bucket = bucket
     cmd_publish(ctx.obj, kind, annotations, cluster, keyspace_details, click.echo, connection_details_env)
