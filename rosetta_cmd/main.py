@@ -489,10 +489,64 @@ def publish(ctx, kind, bucket, annotations):
     help="Whether to consider dirty source files for status.",
     show_default=True,
 )
+@click.option(
+    "--status-db",
+    default=False,
+    is_flag=True,
+    help="Enable to check status of catalogs in the Cluster.",
+    show_default=True,
+)
+@click.option(
+    "--bucket",
+    default=None,
+    type=str,
+    help="Name of Couchbase bucket that is being used for rosetta functionalities.",
+    show_default=True,
+)
 @click.pass_context
-def status(ctx, kind, include_dirty):
+def status(ctx, kind, include_dirty, status_db, bucket):
     """Show the status of the local catalog."""
-    cmd_status(ctx.obj, kind=kind, include_dirty=include_dirty)
+    if status_db:
+        # Get keyspace and connection details
+        keyspace_details = Keyspace(bucket="", scope=DEFAULT_SCOPE_PREFIX)
+
+        # Load all Couchbase connection related data from env
+        connection_details_env = CouchbaseConnect(
+            connection_url=os.getenv("CB_CONN_STRING"),
+            username=os.getenv("CB_USERNAME"),
+            password=os.getenv("CB_PASSWORD"),
+            host=get_host_name(os.getenv("CB_CONN_STRING")),
+        )
+
+        # Establish a connection
+        err, cluster = get_connection(conn=connection_details_env)
+        if err:
+            click.echo(str(err))
+            return
+
+        # Get buckets from CB Cluster
+        buckets = get_buckets(cluster=cluster)
+        if bucket is None:
+            # Prompt user to select a bucket
+            bucket = click.prompt("Please select a bucket: ", type=click.Choice(buckets), show_choices=True)
+        elif bucket not in buckets:
+            raise ValueError(
+                "Bucket does not exist! Available buckets from cluster are: "
+                + ",".join(buckets)
+                + "\nRun rosetta --help for more information."
+            )
+        keyspace_details.bucket = bucket
+
+        cmd_status(
+            ctx.obj,
+            kind=kind,
+            include_dirty=include_dirty,
+            status_db=status_db,
+            bucket=keyspace_details.bucket,
+            cluster=cluster,
+        )
+    else:
+        cmd_status(ctx.obj, kind=kind, include_dirty=include_dirty, status_db=status_db)
 
 
 @click_main.command()
