@@ -7,6 +7,7 @@ from .catalog.mem import CatalogMem
 from .descriptor import CatalogDescriptor
 from .directory import ScanDirectoryOpts
 from .directory import scan_directory
+from rosetta_cmd.defaults import DEFAULT_ITEM_DESCRIPTION_MAX_LEN
 from rosetta_core.indexer import augment_descriptor
 from rosetta_core.indexer import source_indexers
 from rosetta_core.indexer import vectorize_descriptor
@@ -114,16 +115,33 @@ def index_catalog_start(
             if fnmatch.fnmatch(source_file.name, glob):
                 printer(f"- {source_file.name}")
                 logger.debug(f"Indexing file {source_file.name}.")
+
+                # Flags to validate catalog item description
                 is_description_empty = False
+                is_description_length_valid = True
+
                 errs, descriptors = indexer.start_descriptors(source_file, get_path_version)
                 for descriptor in descriptors:
+                    # Validate description lengths
                     if len(descriptor.description) == 0:
                         click.secho(f"WARNING: Catalog item {descriptor.name} has an empty description.", fg="yellow")
                         is_description_empty = True
                         break
+                    if len(descriptor.description.split()) > DEFAULT_ITEM_DESCRIPTION_MAX_LEN:
+                        click.secho(
+                            f"WARNING: Catalog item {descriptor.name} has a description with token size more than the allowed limit.",
+                            fg="yellow",
+                        )
+                        is_description_length_valid = False
+                        break
+
                 if is_description_empty:
                     raise ValueError(
-                        "Catalog contains file(s) with empty description! Please provide a description and index again."
+                        "Catalog contains item(s) with empty description! Please provide a description and index again."
+                    )
+                if not is_description_length_valid:
+                    raise ValueError(
+                        f"Catalog contains item(s) with description length more than the allowed limit of {DEFAULT_ITEM_DESCRIPTION_MAX_LEN}! Please provide a valid description and index again."
                     )
                 all_errs += errs or []
                 all_descriptors += descriptors or []
