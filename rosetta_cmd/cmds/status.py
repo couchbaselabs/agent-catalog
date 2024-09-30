@@ -11,6 +11,8 @@ from ..cmds.util import load_repository
 from ..defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from ..defaults import DEFAULT_SCOPE_PREFIX
 from ..models.context import Context
+from couchbase.exceptions import KeyspaceNotFoundException
+from couchbase.exceptions import ScopeNotFoundException
 from rosetta_core.catalog import CatalogMem
 from rosetta_core.catalog.index import index_catalog_start
 from rosetta_core.version import VersionDescriptor
@@ -88,21 +90,23 @@ def db_catalog_status(kind, bucket, cluster):
     if err is not None:
         logger.error(err)
         return []
-    resp = list(res)
 
-    # If result set is empty
-    if len(resp) == 0:
-        click.secho(
-            f"No {kind} catalog found in the specified bucket...please run rosetta publish to push catalogs to the DB.",
-            fg="red",
-        )
-        logger.error("No catalogs published...")
-        return []
+    try:
+        resp = res.execute()
 
-    click.secho("db catalog info\n")
-    for row in resp:
-        click.secho(
-            f"""catalog id: {row["version"]["identifier"]}
+        # If result set is empty
+        if len(resp) == 0:
+            click.secho(
+                f"No {kind} catalog found in the specified bucket...please run rosetta publish to push catalogs to the DB.",
+                fg="red",
+            )
+            logger.error("No catalogs published...")
+            return []
+
+        click.secho("db catalog info\n")
+        for row in resp:
+            click.secho(
+                f"""catalog id: {row["version"]["identifier"]}
      \tpath            : {bucket}.{DEFAULT_SCOPE_PREFIX}.{kind}
      \tschema version  : {row['catalog_schema_version']}
      \tkind of catalog : {kind}
@@ -111,8 +115,11 @@ def db_catalog_status(kind, bucket, cluster):
      \tsource dirs     : {row['source_dirs']}
      \tnumber of items : {row['distinct_identifier_count']}
         """
-        )
-    return
+            )
+    except KeyspaceNotFoundException:
+        raise ValueError("Catalog does not exist! Please run 'rosetta publish' first.") from None
+    except ScopeNotFoundException:
+        raise ValueError("Catalog does not exist! Please run 'rosetta publish' first.") from None
 
 
 def catalog_status(ctx, kind, include_dirty=True):
