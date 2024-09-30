@@ -1,9 +1,11 @@
+import couchbase.cluster
 import json
 import logging
+import pathlib
 
+from ...analytics import Log
 from ...defaults import DEFAULT_AUDIT_COLLECTION
 from ...defaults import DEFAULT_AUDIT_SCOPE
-from ...llm import Message
 from ...version import VersionDescriptor
 from .base import BaseAuditor
 from rosetta_util.connection import get_host_name
@@ -12,6 +14,24 @@ from rosetta_util.publish import create_scope_and_collection
 from rosetta_util.publish import get_connection
 
 logger = logging.getLogger(__name__)
+
+
+# TODO (GLENN): This needs to be "plugged in" somewhere (and actually tested :-)).
+def _create_analytics_views(cluster: couchbase.cluster.Cluster, bucket: str) -> None:
+    ddls_folder = pathlib.Path(__file__).parent / "ddls"
+    for ddl_file in ddls_folder.iterdir():
+        with open(ddl_file, "r") as fp:
+            raw_ddl_string = fp.read()
+            ddl_string = (
+                raw_ddl_string.replace("[BUCKET_NAME]", bucket)
+                .replace("[SCOPE_NAME]", DEFAULT_AUDIT_SCOPE)
+                .replace("[LOG_COLLECTION_NAME]", DEFAULT_AUDIT_COLLECTION)
+            )
+
+            # TODO (GLENN): There should be a warning here (instead of an error) if Analytics is not enabled.
+            ddl_result = cluster.analytics_query(ddl_string)
+            for _ in ddl_result.rows():
+                pass
 
 
 class DBAuditor(BaseAuditor):
@@ -53,7 +73,7 @@ class DBAuditor(BaseAuditor):
         self.cb_coll = cb_coll
         self.cluster = cluster
 
-    def _accept(self, message: Message):
+    def _accept(self, message: Log):
         cb_coll = self.cb_coll
 
         # serialise message object to str

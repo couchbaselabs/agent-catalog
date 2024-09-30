@@ -3,8 +3,8 @@ import datetime
 import logging
 import typing
 
-from ...llm import Message
-from ...llm import Role
+from ...analytics import Kind
+from ...analytics import Log
 from ...version import VersionDescriptor
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class AuditorType(typing.Protocol):
     def accept(
         self,
-        role: Role,
+        kind: Kind,
         content: typing.Any,
         session: typing.AnyStr,
         grouping: typing.AnyStr = None,
@@ -31,7 +31,7 @@ class BaseAuditor(abc.ABC):
 
     def accept(
         self,
-        role: Role,
+        kind: Kind,
         content: typing.Any,
         session: typing.AnyStr,
         grouping: typing.AnyStr = None,
@@ -46,10 +46,10 @@ class BaseAuditor(abc.ABC):
         if timestamp is None:
             timestamp = datetime.datetime.now().astimezone()
 
-        message = Message(
+        message = Log(
             timestamp=timestamp.isoformat(),
             session=session,
-            role=role,
+            kind=kind,
             content=content,
             grouping=grouping,
             model=model or self.model,
@@ -63,5 +63,5 @@ class BaseAuditor(abc.ABC):
             logger.debug(f"Logging message: {message.model_dump_json(indent=2)}")
 
     @abc.abstractmethod
-    def _accept(self, message: Message):
+    def _accept(self, message: Log):
         pass

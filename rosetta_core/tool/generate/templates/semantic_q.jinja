@@ -6,6 +6,7 @@ import couchbase.options
 import couchbase.cluster
 import couchbase.search
 import couchbase.vector_search
+import dataclasses
 import typing
 import json
 import sentence_transformers
@@ -43,6 +44,8 @@ def {{ tool.name }}(question: {{ input.type_name }}) -> list[str]:
         formatted_question = json.dumps(question)
     elif isinstance(question, str):
         formatted_question = question
+    elif dataclasses.is_dataclass(argument_input):
+        named_parameters = json.dumps(argument_input.asdict())
     elif isinstance(question, {{ input.type_name }}):
         formatted_question = json.dumps(question.dict())
     else:

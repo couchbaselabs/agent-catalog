@@ -5,8 +5,8 @@ import json
 import pydantic
 import re
 
-INPUT_MODEL_CLASS_NAME_IN_TEMPLATES = "_ArgumentInput"
-OUTPUT_MODEL_CLASS_NAME_IN_TEMPLATES = "_ToolOutput"
+INPUT_MODEL_CLASS_NAME_IN_TEMPLATES = "ArgumentInput"
+OUTPUT_MODEL_CLASS_NAME_IN_TEMPLATES = "ToolOutput"
 
 
 class GeneratedCode(pydantic.BaseModel):
@@ -16,22 +16,26 @@ class GeneratedCode(pydantic.BaseModel):
 
 
 def _post_process_model_code(generated_code: str, class_name: str) -> str:
-    replace_results = (
-        generated_code
-        # This should not appear in the output (this is most likely a bug in datamodel_code_generator).
-        .replace("from __future__ import annotations", "")
+    # Because we are only using a snippet of the generated code, we need to remove this.
+    without_future_import = generated_code.replace("from __future__ import annotations", "")
+
+    # We need to find the last class in the generated code (this might be fragile).
+    with_replaced_name = re.sub(
+        pattern=r"class \w+(\(?.*\)?)(:[\s\S]*?(?=class|\Z))",
+        repl=rf"class {class_name}\1\2",
+        string=without_future_import,
+        flags=re.MULTILINE,
     )
-
-    last_class_regex = re.compile(r"class \w+\((.*)\):(?!(\n|.)*class)")
-    regex_results = last_class_regex.sub(rf"class {class_name}(\1):", replace_results)
-    return regex_results
+    return with_replaced_name
 
 
-def generate_model_from_json_schema(json_schema: str, class_name: str) -> GeneratedCode:
-    model_types = datamodel_code_generator.model.get_data_model_types(
-        datamodel_code_generator.DataModelType.TypingTypedDict,
-        target_python_version=datamodel_code_generator.PythonVersion.PY_311,
-    )
+def generate_model_from_json_schema(
+    json_schema: str,
+    class_name: str,
+    python_version: datamodel_code_generator.PythonVersion,
+    model_type: datamodel_code_generator.DataModelType,
+) -> GeneratedCode:
+    model_types = datamodel_code_generator.model.get_data_model_types(model_type, python_version)
 
     # If we have a list-valued field, first extract the fields involved.
     parsed_json_schema = json.loads(json_schema)

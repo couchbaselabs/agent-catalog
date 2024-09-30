@@ -16,7 +16,7 @@ import yaml
 from ...record.descriptor import RecordDescriptor
 from ...record.descriptor import RecordKind
 from ...version import VersionDescriptor
-from ..decorator import ToolMarker
+from ..decorator import is_tool
 from .helper import JSONSchemaValidatingMixin
 from .secrets import CouchbaseSecrets
 
@@ -52,7 +52,7 @@ class PythonToolDescriptor(RecordDescriptor):
                 source_contents = fp.read()
             imported_module = importlib.import_module(self.filename.stem)
             for name, tool in inspect.getmembers(imported_module):
-                if not isinstance(tool, ToolMarker):
+                if not is_tool(tool):
                     continue
                 yield PythonToolDescriptor(
                     record_kind=RecordKind.PythonFunction,

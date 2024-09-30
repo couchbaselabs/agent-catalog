@@ -1,5 +1,6 @@
 import abc
 import dataclasses
+import datamodel_code_generator
 import datetime
 import jinja2
 import json
@@ -20,6 +21,9 @@ from .common import generate_model_from_json_schema
 
 logger = logging.getLogger(__name__)
 
+ModelType = datamodel_code_generator.DataModelType
+PythonTarget = datamodel_code_generator.PythonVersion
+
 
 class _BaseCodeGenerator(pydantic.BaseModel):
     template_directory: pathlib.Path = pydantic.Field(
@@ -27,8 +31,19 @@ class _BaseCodeGenerator(pydantic.BaseModel):
         description="Location of the the template files.",
     )
 
+    target_python_version: PythonTarget = pydantic.Field(
+        default=PythonTarget.PY_311,
+        description="The target Python version for the generated (schema) code.",
+    )
+
+    target_model_type: ModelType = pydantic.Field(
+        default=ModelType.PydanticV2BaseModel,
+        examples=[ModelType.TypingTypedDict, ModelType.PydanticV2BaseModel],
+        description="The target model type for the generated (schema) code.",
+    )
+
     @abc.abstractmethod
-    def generate(self) -> typing.Iterable[str]:
+    def generate(self) -> typing.Iterable[tuple[str, str]]:
         pass
 
 
@@ -42,12 +57,18 @@ class SQLPPCodeGenerator(_BaseCodeGenerator):
     def generate(self) -> typing.Iterable[str]:
         # Generate a Pydantic model for the input schema...
         input_model = generate_model_from_json_schema(
-            json_schema=self.record_descriptor.input, class_name=INPUT_MODEL_CLASS_NAME_IN_TEMPLATES
+            json_schema=self.record_descriptor.input,
+            class_name=INPUT_MODEL_CLASS_NAME_IN_TEMPLATES,
+            python_version=self.target_python_version,
+            model_type=self.target_model_type,
         )
 
         # ...and the output schema.
         output_model = generate_model_from_json_schema(
-            json_schema=self.record_descriptor.output, class_name=OUTPUT_MODEL_CLASS_NAME_IN_TEMPLATES
+            json_schema=self.record_descriptor.output,
+            class_name=OUTPUT_MODEL_CLASS_NAME_IN_TEMPLATES,
+            python_version=self.target_python_version,
+            model_type=self.target_model_type,
         )
 
         # Instantiate our template.
@@ -78,7 +99,10 @@ class SemanticSearchCodeGenerator(_BaseCodeGenerator):
     def generate(self) -> typing.Iterable[str]:
         # Generate a Pydantic model for the input schema.
         input_model = generate_model_from_json_schema(
-            json_schema=self.record_descriptor.input, class_name=INPUT_MODEL_CLASS_NAME_IN_TEMPLATES
+            json_schema=self.record_descriptor.input,
+            class_name=INPUT_MODEL_CLASS_NAME_IN_TEMPLATES,
+            python_version=self.target_python_version,
+            model_type=self.target_model_type,
         )
 
         # Instantiate our template.
@@ -172,7 +196,10 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
             input_context = self._create_json_schema_from_specification(operation)
             if input_context is not None:
                 input_context.model = generate_model_from_json_schema(
-                    json_schema=json.dumps(input_context.json_schema), class_name=INPUT_MODEL_CLASS_NAME_IN_TEMPLATES
+                    json_schema=json.dumps(input_context.json_schema),
+                    class_name=INPUT_MODEL_CLASS_NAME_IN_TEMPLATES,
+                    python_version=self.target_python_version,
+                    model_type=self.target_model_type,
                 )
 
             # Instantiate our template.

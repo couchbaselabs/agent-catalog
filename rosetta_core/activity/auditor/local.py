@@ -5,7 +5,7 @@ import os
 import pathlib
 import shutil
 
-from ...llm import Message
+from ...analytics import Log
 from ...version import VersionDescriptor
 from .base import BaseAuditor
 
@@ -41,5 +41,5 @@ class LocalAuditor(BaseAuditor):
         rotating_handler.setFormatter(logging.Formatter("%(message)s"))
         self.audit_logger.addHandler(rotating_handler)
 
-    def _accept(self, message: Message):
+    def _accept(self, message: Log):
         self.audit_logger.info(message.model_dump_json())

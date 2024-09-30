@@ -3,8 +3,8 @@ CREATE OR REPLACE ANALYTICS VIEW
     WITH
         HumanAssistantWindows AS (
             FROM
-               `[BUCKET_NAME]`.`[SCOPE_NAME]`.Conversations AS c,
-               c.msgs AS m
+               `[BUCKET_NAME]`.`[SCOPE_NAME]`.Trajectories AS t,
+               t.msgs AS m
             LETTING
                 is_human =
                     CASE m.role
@@ -14,11 +14,11 @@ CREATE OR REPLACE ANALYTICS VIEW
             SELECT
                 SUM(is_human) OVER (
                     PARTITION BY
-                        c.sid
+                        t.sid
                     ORDER BY
                         m.timestamp
                 ) AS h_count,
-                c.sid AS sid,
+                t.sid AS sid,
                 m AS msg
         ),
         HumanAssistantGroups AS (
@@ -52,7 +52,7 @@ CREATE OR REPLACE ANALYTICS VIEW
             WHERE
                 m.role = "human"
             SELECT VALUE
-                m.content
+                m
         )[0],
         answer = (
             FROM
@@ -60,20 +60,21 @@ CREATE OR REPLACE ANALYTICS VIEW
             WHERE
                 m.role = "assistant"
             SELECT VALUE
-                m.content
+                m
             ORDER BY
                 m.timestamp DESC
         )[0],
-        context = (
+        walk = (
             FROM
                 hag.msgs AS m
             WHERE
                 m.role != "human" AND
                 m.role != "assistant"
             SELECT VALUE
-                m.content
+                m
         )
     SELECT
+        hag.sid,
         question,
         answer,
-        context;
+        walk;

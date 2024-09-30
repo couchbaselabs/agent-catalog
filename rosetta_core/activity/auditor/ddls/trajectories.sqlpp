@@ -1,5 +1,5 @@
 CREATE OR REPLACE ANALYTICS VIEW
-    `[BUCKET_NAME]`.`[SCOPE_NAME]`.Conversations AS
+    `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions AS
     WITH
         DeDuplicatedLogs AS (
             FROM
@@ -51,6 +51,7 @@ CREATE OR REPLACE ANALYTICS VIEW
             "timestamp": ver.timestamp
         }
     SELECT
+        sid,
         (
             FROM
                 g AS gi
@@ -61,8 +62,7 @@ CREATE OR REPLACE ANALYTICS VIEW
             LIMIT 1
         )[0] AS start_t,
         vid,
-        sid,
         msgs
     ORDER BY
-        -- The earliest conversations will appear first.
+        -- The earliest sessions will appear first.
         start_t ASC;
