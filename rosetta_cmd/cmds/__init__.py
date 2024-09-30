@@ -1,4 +1,3 @@
-from .analyze import cmd_analyze
 from .clean import cmd_clean
 from .env import cmd_env
 from .find import cmd_find
@@ -10,7 +9,6 @@ from .web import cmd_web
 
 __all__ = [
     "cmd_clean",
-    "cmd_analyze",
     "cmd_env",
     "cmd_find",
     "cmd_index",

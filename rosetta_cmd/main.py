@@ -184,30 +184,6 @@ def env(ctx):
 
 @click_main.command()
 @click.option(
-    "--bucket",
-    default=None,
-    type=str,
-    help="The name of the Couchbase bucket to run analysis over.",
-    show_default=False,
-)
-@click.option(
-    "-m",
-    "--metric",
-    multiple=True,
-    help="Metric to evaluate the log files on.",
-    type=click.Choice(["faithfulness", "answer-relevancy", "context-utilization"], case_sensitive=False),
-    default=["faithfulness", "answer-relevancy", "context-utilization"],
-    show_default=True,
-)
-@click.pass_context
-def analyze(ctx, bucket, metrics):
-    """Find tools, prompts, etc. from the catalog based on a natural language QUERY string."""
-    # cmd_analyze(ctx.obj, bucket=bucket, metrics=metrics)
-    pass
-
-
-@click_main.command()
-@click.option(
     "--query",
     default=None,
     help="User query describing the task for which tools / prompts are needed. This field or --name must be specified.",

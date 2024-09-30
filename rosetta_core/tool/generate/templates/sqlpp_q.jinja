@@ -5,6 +5,7 @@ import couchbase.auth
 import couchbase.options
 import couchbase.cluster
 import logging
+import dataclasses
 import typing
 
 from rosetta_core.tool import tool
@@ -23,9 +24,9 @@ def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
     conn_string = get_secret("{{ secrets.conn_string }}").get_secret_value()
     return couchbase.cluster.Cluster(conn_string, couchbase.options.ClusterOptions(authenticator))
 
+# TODO (GLENN): The output type is currently not being recognized with Pydantic + ControlFlow.
 @tool
-def {{ tool.name }}(argument_input: {{ input.type_name }}) \
-        -> {% if output.is_list_valued %}list[{{ output.type_name }}]{% else %}{{ output.type_name }}{% endif %}:
+def {{ tool.name }}(argument_input: {{ input.type_name }}):
     """
     {{ tool.description }}
     """
@@ -36,6 +37,8 @@ def {{ tool.name }}(argument_input: {{ input.type_name }}) \
     logger.debug("{{ tool.name }} has been given the input: " + str(argument_input) + ".")
     if isinstance(argument_input, dict):
         named_parameters = argument_input
+    elif dataclasses.is_dataclass(argument_input):
+        named_parameters = argument_input.asdict()
     elif isinstance(argument_input, {{ input.type_name }}):
         named_parameters = argument_input.dict()
     else:

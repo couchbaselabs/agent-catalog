@@ -6,7 +6,7 @@ import sys
 import tempfile
 import uuid
 
-from rosetta_core.tool.decorator import ToolMarker
+from rosetta_core.tool.decorator import is_tool
 from rosetta_core.tool.descriptor.models import HTTPRequestToolDescriptor
 from rosetta_core.tool.descriptor.models import SemanticSearchToolDescriptor
 from rosetta_core.tool.descriptor.models import SQLPPQueryToolDescriptor
@@ -50,11 +50,11 @@ def test_sqlpp_generator():
         sys.path.append(tmp_dir)
         mod = importlib.import_module(generated_files[0].stem)
         members = inspect.getmembers(mod)
-        assert any(x[0] == "_ArgumentInput" for x in members)
-        assert any(x[0] == "_ToolOutput" for x in members)
+        assert any(x[0] == "ArgumentInput" for x in members)
+        assert any(x[0] == "ToolOutput" for x in members)
         assert any(x[0] == "tool_1" for x in members)
         tool = [x[1] for x in members if x[0] == "tool_1"][0]
-        assert isinstance(tool, ToolMarker)
+        assert is_tool(tool)
         sys.path.remove(tmp_dir)
 
 
@@ -78,10 +78,10 @@ def test_semantic_search_generator():
         sys.path.append(tmp_dir)
         mod = importlib.import_module(generated_files[0].stem)
         members = inspect.getmembers(mod)
-        assert any(x[0] == "_ArgumentInput" for x in members)
+        assert any(x[0] == "ArgumentInput" for x in members)
         assert any(x[0] == "get_travel_blog_snippets_from_user_interests" for x in members)
         tool = [x[1] for x in members if x[0] == "get_travel_blog_snippets_from_user_interests"][0]
-        assert isinstance(tool, ToolMarker)
+        assert is_tool(tool)
         sys.path.remove(tmp_dir)
 
 
@@ -106,9 +106,9 @@ def test_http_request_generator():
         for file in generated_files:
             mod = importlib.import_module(file.stem)
             members = inspect.getmembers(mod)
-            assert any(x[0] == "_ArgumentInput" for x in members)
+            assert any(x[0] == "ArgumentInput" for x in members)
             names = {"create_new_member_create_post", "get_member_rewards_rewards__member_id__get"}
             assert any(x[0] in names for x in members)
             tool = [x[1] for x in members if x[0] in names][0]
-            assert isinstance(tool, ToolMarker)
+            assert is_tool(tool)
         sys.path.remove(tmp_dir)

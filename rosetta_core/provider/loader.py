@@ -4,16 +4,19 @@ import inspect
 import logging
 import pathlib
 import sys
+import tempfile
 import types
 import typing
 import uuid
 
 from ..record.descriptor import RecordDescriptor
 from ..record.descriptor import RecordKind
-from ..tool.decorator import ToolMarker
+from ..tool.decorator import is_tool
 from ..tool.generate import HTTPRequestCodeGenerator
 from ..tool.generate import SemanticSearchCodeGenerator
 from ..tool.generate import SQLPPCodeGenerator
+from ..tool.generate.generator import ModelType
+from ..tool.generate.generator import PythonTarget
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +36,9 @@ class _ModuleLoader(importlib.abc.Loader):
     def create_module(self, spec: importlib.machinery.ModuleSpec) -> types.ModuleType:
         if self.has_module(spec.name):
             module = types.ModuleType(spec.name)
-            exec(self._modules[spec.name], module.__dict__)
+            module.__module__ = spec.name
+            pyc = compile(self._modules[spec.name], spec.name, mode="exec")
+            exec(pyc, module.__dict__)
             return module
 
     def exec_module(self, module):
@@ -52,8 +57,23 @@ class _ModuleFinder(importlib.abc.MetaPathFinder):
 
 
 class EntryLoader:
-    def __init__(self, output: pathlib.Path = None):
-        self.output = output
+    def __init__(
+        self,
+        output: typing.Optional[pathlib.Path | tempfile.TemporaryDirectory],
+        python_version: PythonTarget = PythonTarget.PY_312,
+        model_type: ModelType = ModelType.TypingTypedDict,
+    ):
+        self.python_version = python_version
+        self.model_type = model_type
+
+        # Our output should be a path object.
+        if output is None:
+            self.output = output
+        elif isinstance(output, tempfile.TemporaryDirectory):
+            self.output = pathlib.Path(output.__enter__())
+            # TODO (GLENN): We should close this somewhere (need to add a close method).
+
+        # Signal to Python that it should also search for modules in our _ModuleFinder.
         self._modules = dict()
         self._loader = _ModuleLoader()
         sys.meta_path.append(_ModuleFinder(self._loader))
@@ -68,13 +88,20 @@ class EntryLoader:
 
     def _load_module_from_string(self, module_name: str, module_content: str) -> typing.Callable:
         if module_name not in self._modules:
-            logger.debug(f"Loading module {module_name} (dynamically generated).")
-            self._loader.add_module(module_name, module_content)
-            self._modules[module_name] = importlib.import_module(module_name)
+            if self.output is None:
+                # Note: this is experimental!! We should prefer to load from files.
+                logger.debug(f"Loading module {module_name} (dynamically generated).")
+                self._loader.add_module(module_name, module_content)
+                self._modules[module_name] = importlib.import_module(module_name)
+            else:
+                logger.debug(f"Saving module {module_name} to {self.output}.")
+                with (self.output / f"{module_name}.py").open("w") as fp:
+                    fp.write(module_content)
+                self._load_module_from_filename(self.output / f"{module_name}.py")
 
     def _get_tool_from_module(self, module_name: str, entry: RecordDescriptor) -> typing.Callable:
         for name, tool in inspect.getmembers(self._modules[module_name]):
-            if not isinstance(tool, ToolMarker):
+            if not is_tool(tool):
                 continue
             if entry.name == name:
                 return tool
@@ -94,6 +121,12 @@ class EntryLoader:
         for source, group in source_groups.items():
             logger.debug(f"Handling entries with source {source}.")
             entries = group["entries"]
+            generator_args = {
+                "record_descriptors": entries,
+                "target_python_version": self.python_version,
+                "target_model_type": self.model_type,
+                "global_suffix": uuid.uuid4().hex,
+            }
             match group["kind"]:
                 # For PythonFunction records, we load the source directly (using importlib).
                 case RecordKind.PythonFunction:
@@ -113,16 +146,16 @@ class EntryLoader:
 
                 # For all other records, we generate the source and load this with a custom importlib loader.
                 case RecordKind.SQLPPQuery:
-                    generator = SQLPPCodeGenerator(record_descriptors=entries).generate
+                    generator = SQLPPCodeGenerator(**generator_args).generate
                 case RecordKind.SemanticSearch:
-                    generator = SemanticSearchCodeGenerator(record_descriptors=entries).generate
+                    generator = SemanticSearchCodeGenerator(**generator_args).generate
                 case RecordKind.HTTPRequest:
-                    generator = HTTPRequestCodeGenerator(record_descriptors=entries).generate
+                    generator = HTTPRequestCodeGenerator(**generator_args).generate
                 case _:
                     raise ValueError("Unexpected tool-kind encountered!")
 
             for entry, code in zip(entries, generator()):
-                module_id = uuid.uuid4().hex
+                module_id = uuid.uuid4().hex.replace("-", "")
                 self._load_module_from_string(module_id, code)
                 loaded_entry = self._get_tool_from_module(module_id, entry)
                 yield (

@@ -5,6 +5,7 @@ import requests
 import logging
 import typing
 import json
+import dataclasses
 import os
 import logging
 
@@ -30,6 +31,8 @@ def {{ tool.name }}({% if input is not none %}argument_input: {{ input.model.typ
     logger.debug("{{ tool.name }} has been given the input: " + str(argument_input) + ".")
     if isinstance(argument_input, dict):
         named_parameters = argument_input
+    elif dataclasses.is_dataclass(argument_input):
+        named_parameters = argument_input.asdict()
     elif isinstance(argument_input, {{ input.model.type_name }}):
         named_parameters = argument_input.dict()
     else:
