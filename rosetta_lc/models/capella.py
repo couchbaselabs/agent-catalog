@@ -16,6 +16,8 @@ from langchain_core.outputs import ChatResult
 from langchain_core.pydantic_v1 import BaseModel
 from langchain_core.tools import BaseTool
 from langchain_core.utils.function_calling import convert_to_openai_tool
+
+# TODO (GLENN): Update this to use Pydantic.v2, LangChain finally uses v2 models under the hood.
 from pydantic.v1 import HttpUrl
 from pydantic.v1 import PrivateAttr
 from pydantic.v1 import root_validator
