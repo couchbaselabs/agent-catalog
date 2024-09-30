@@ -20,6 +20,7 @@ from rosetta_util.query import execute_query
 
 level_colors = {"good": "green", "warn": "yellow", "error": "red"}
 kind_colors = {"tool": "bright_magenta", "prompt": "blue"}
+dashes = "-----------------------------------------------------------------"
 
 logger = logging.getLogger(__name__)
 
@@ -36,28 +37,22 @@ def cmd_status(
 
     for catalog_kind in catalog_kinds:
         if status_db:
-            click.secho(
-                "-----------------------------------------------------------------", fg=kind_colors[catalog_kind]
-            )
-            click.secho(catalog_kind.upper(), fg=kind_colors[catalog_kind])
+            click.secho(dashes, fg=kind_colors[catalog_kind])
+            click.secho(catalog_kind.upper(), fg=kind_colors[catalog_kind], bold=True)
             db_catalog_status(catalog_kind, bucket, cluster)
-            click.secho(
-                "-----------------------------------------------------------------", fg=kind_colors[catalog_kind]
-            )
+            click.secho(dashes, fg=kind_colors[catalog_kind])
         else:
             sections = catalog_status(ctx, catalog_kind, include_dirty=include_dirty)
 
-            click.secho(
-                "-----------------------------------------------------------------", fg=kind_colors[catalog_kind]
-            )
-            click.secho(catalog_kind.upper(), fg=kind_colors[catalog_kind])
+            click.secho(dashes, fg=kind_colors[catalog_kind])
+            click.secho(catalog_kind.upper(), fg=kind_colors[catalog_kind], bold=True)
 
             for section in sections:
                 name, parts = section
+                click.secho(dashes, fg=kind_colors[catalog_kind])
                 if name:
-                    click.secho("-------------", fg=kind_colors[catalog_kind])
                     click.echo(name + ":")
-                    indent = "  "
+                    indent = "\t"
                 else:
                     indent = ""
 
@@ -67,9 +62,7 @@ def cmd_status(
                         click.secho(indent + msg, fg=level_colors[level])
                     else:
                         click.echo(indent + msg)
-            click.secho(
-                "-----------------------------------------------------------------", fg=kind_colors[catalog_kind]
-            )
+            click.secho(dashes, fg=kind_colors[catalog_kind])
 
 
 def db_catalog_status(kind, bucket, cluster):
@@ -103,23 +96,33 @@ def db_catalog_status(kind, bucket, cluster):
             logger.error("No catalogs published...")
             return []
 
-        click.secho("db catalog info\n")
+        click.secho(dashes, fg=kind_colors[kind])
+        click.secho("db catalog info:")
         for row in resp:
+            click.echo()
             click.secho(
-                f"""catalog id: {row["version"]["identifier"]}
-     \tpath            : {bucket}.{DEFAULT_SCOPE_PREFIX}.{kind}
-     \tschema version  : {row['catalog_schema_version']}
-     \tkind of catalog : {kind}
-     \trepo version    : \n\t\ttime of publish: {row['version']['timestamp']}\n\t\tcatalog identifier: {row['version']['identifier']}
-     \tembedding model : {row['embedding_model']}
-     \tsource dirs     : {row['source_dirs']}
-     \tnumber of items : {row['distinct_identifier_count']}
+                f"""\tcatalog id: {row["version"]["identifier"]}
+     \t\tpath            : {bucket}.{DEFAULT_SCOPE_PREFIX}.{kind}
+     \t\tschema version  : {row['catalog_schema_version']}
+     \t\tkind of catalog : {kind}
+     \t\trepo version    : \n\t\t\ttime of publish: {row['version']['timestamp']}\n\t\t\tcatalog identifier: {row['version']['identifier']}
+     \t\tembedding model : {row['embedding_model']}
+     \t\tsource dirs     : {row['source_dirs']}
+     \t\tnumber of items : {row['distinct_identifier_count']}
         """
             )
     except KeyspaceNotFoundException:
-        raise ValueError("Catalog does not exist! Please run 'rosetta publish' first.") from None
+        click.secho(dashes, fg=kind_colors[kind])
+        click.secho(
+            f"ERROR: db catalog of kind {kind} does not exist yet: please use the publish command by specifying the kind.",
+            fg="red",
+        )
     except ScopeNotFoundException:
-        raise ValueError("Catalog does not exist! Please run 'rosetta publish' first.") from None
+        click.secho(dashes, fg=kind_colors[kind])
+        click.secho(
+            f"ERROR: db catalog of kind {kind} does not exist yet: please use the publish command by specifying the kind.",
+            fg="red",
+        )
 
 
 def catalog_status(ctx, kind, include_dirty=True):
@@ -169,7 +172,13 @@ def catalog_status(ctx, kind, include_dirty=True):
             sections.append(
                 (
                     "repo commit",
-                    [(None, "repo is clean"), (None, f"repo version: {version}")],
+                    [
+                        (None, "repo is clean"),
+                        (
+                            None,
+                            f"repo version:\n\t\ttime of publish: {version.timestamp}\n\t\tcatalog identifier: {version.identifier}",
+                        ),
+                    ],
                 )
             )
 
