@@ -74,10 +74,10 @@ workflow:
    you can find them in the `rosetta_logs` scope of your Couchbase instance. For logs stored locally, you can find them
    in the `./rosetta-activity` directory. _We recommend the former, as it allows for easy ad-hoc analysis through
    Couchbase Query and/or Couchbase Analytics._
-2. **Log Analysis**: For users with Couchbase Analytics enabled, we provide two views to help you get started with
+2. **Log Analysis**: For users with Couchbase Analytics enabled, we provide three views to help you get started with
    conversational-based agents:
-    1. `Sessions (sid, start_t, vid, msgs)`, which provides one record per (conversational) session. Each session record
-       contains the session ID `sid`, the start time `start_t`, the catalog version `vid`, and a list of messages
+    1. `Sessions (sid, start_t, vid, msgs)`, which provides one record per session (alt. trajectory). Each session
+       record contains the session ID `sid`, the start time `start_t`, the catalog version `vid`, and a list of messages
        `msgs`. The `msgs` field details all events that occurred during the session (e.g., the user's messages, the
        response to the user, the internal "thinking" performed by the agent, the agent's transitions between tasks,
        etc...).
@@ -85,6 +85,10 @@ workflow:
        user question and an assistant response) in a given session. Each exchange record contains the session ID `sid`,
        the user's question `question`, the agent's answer `answer`, and the agent's walk `walk` (e.g., the messages sent
        to the LLMs, the tools executed, etc...).
+   3. `ToolCalls (sid, vid, tool_calls)`, which provides one record per session (alt. trajectory). Each tool call
+      record contains the session ID `sid`, the catalog version `vid`, and a list of tool calls `tool_calls`. The
+      `tool_calls` field details all information around an LLM tool call (e.g., the tool name, the tool-call arguments,
+      and the tool result).
 3. **Log Visualization**: Users are free to define their own views from the steps above and visualize their results
    using dashboards like [Tableau](https://exchange.tableau.com/en-us/products/627) or
    [Grafana](https://developer.couchbase.com/grafana-dashboards).

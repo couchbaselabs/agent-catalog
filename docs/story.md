@@ -48,7 +48,7 @@ of agent v0.0.2.
 ### Building Prompts for Agent v0.0.1
 
 Let's write the prompts for our first task: fetching descriptive information about a ticket. Using the template given
-in the `prompts` directory, we will duplicate the template and create a file called `prompts/describe_ticket.yaml`.
+in the `prompts` directory, we will duplicate the template and create a file called `prompts/describe_ticket.prompt`.
 We will fill out the template with the necessary information and have an artifact that looks like this:
 
 ```text
@@ -78,8 +78,8 @@ Note that we haven't defined the tools yet, _but_ we know that we will need tool
 labels. Rosetta's semantic tool search enables users to find tools that match tool descriptions rather than rigid tool
 names (if you have existing tools, you can forgo the semantic search altogether).
 
-Let's now finish the remaining four prompts, which we will name `prompts/should_fetch_more_info.yaml`,
-`prompts/find_similar_labels.yaml`, `prompts/generate_labels_if_necessary.yaml`, and `prompts/label_ticket.yaml`.
+Let's now finish the remaining four prompts, which we will name `prompts/should_fetch_more_info.prompt`,
+`prompts/find_similar_labels.prompt`, `prompts/generate_labels_if_necessary.prompt`, and `prompts/label_ticket.prompt`.
 
 ```text
 ---
@@ -129,6 +129,8 @@ description: >
 tools:
   - query: "adding a new label to the label store"
     limit: 1
+  - query: "generating a vector for a label"
+    limit: 1
   - query: "finding labels using a description"
     limit: 1
 ---
@@ -173,24 +175,35 @@ label mapping (a process that is out of the scope of this article, but is tradit
 enables). For our specific problem, we will consider the following Couchbase collections with the following schemas
 (in the bucket `Rosetta` and the scope `Support`):
 
-```sql
-Rosetta
-.
-Support
-.
-Tickets
-(ticket_id STRING, ...)
+```text
+Rosetta.Support.Tickets(`Issue key` STRING, ...)
 Rosetta.Support.Labels (label STRING, vec: ARRAY[FLOAT])
 Rosetta.Support.RecommendedLabels (ticket_id STRING, label STRING)
 ```
 
-Using Vulcan, we can automatically attach embeddings to our labels (TODO). The end result is a vector index managed by
-the Couchbase Search Service which we can subsequently perform semantic search over. Our resultant index is
-named `Rosetta.Support.LabelsVectorIndex` and the embedding model used was `sentence-transformers/all-MiniLM-L12-v2`
-(we'll need both of these for later).
+For now, in addition to the five tools above, we will use a sixth tool to generate the vector that we will attach to
+the label. This is also a good chance to illustrate how Python tools are recognized by Rosetta:
+
+```python
+import sentence_transformers
+import rosetta
+
+@rosetta.tool
+def get_vector_for_label(label: str) -> list[float]:
+    """Generating a vector for a label, for use before applying this to a vector index."""
+    model = sentence_transformers.SentenceTransformer("sentence-transformers/all-MiniLM-L12-v2")
+    label_vector = model.encode(label)
+    return label_vector
+```
+
+The code above exists in a file called `tools/generate_vector_for_label.py`. Note that all Rosetta requires is that you
+annotate your existing Python code with @rosetta.tool._In the future, this tool will be deprecated with Vulcan._ In both
+cases, the end result is a vector index managed by the Couchbase Search Service which we can subsequently perform
+semantic search over. Our resultant index is named `Rosetta.Support.LabelsIndex` and the embedding model used was
+`sentence-transformers/all-MiniLM-L12-v2` (we'll need both of these for later).
 
 Now, let us build the tools required by our prompts with our Couchbase collections in mind. Tools #1 and #2 are
-straightforward SQL queries (a lookup by the primary key). We author these tools below with iQ (TODO) and save them as
+straightforward SQL queries (a lookup by the primary key). We author these tools below and save them as
 `tools/find_ticket_description_by_id.sqlpp` and `tools/find_ticket_labels_by_id.sqlpp`, respectively:
 
 ```sql
@@ -198,13 +211,13 @@ straightforward SQL queries (a lookup by the primary key). We author these tools
 name: find_ticket_description_by_id
 
 description: >
-    A tool to find a ticket's description by its ID.
+    A tool to find a ticket's description by its issue key.
 
 input: >
     {
        "type": "object",
        "properties": {
-          "ticket_id": {
+          "issue_key": {
                 "type": "string"
           }
        }
@@ -214,7 +227,7 @@ output: >
     {
        "type": "object",
        "properties": {
-          "description": {
+          "Description": {
                 "type": "string"
           }
        }
@@ -226,9 +239,9 @@ secrets:
         username: CB_USERNAME
         password: CB_PASSWORD
 */
-SELECT t.description
+SELECT t.Description
 FROM Rosetta.Support.Tickets AS t
-WHERE t.ticket_id = $ticket_id;
+WHERE t.`Issue key` = $issue_key;
 ```
 
 ```sql
@@ -236,13 +249,13 @@ WHERE t.ticket_id = $ticket_id;
 name: find_ticket_labels_by_id
 
 description: >
-    A tool to find a ticket's (pre-existing) labels by its ID.
+    A tool to find a ticket's (pre-existing) labels by its issue key.
 
 input: >
     {
        "type": "object",
        "properties": {
-          "ticket_id": {
+          "issue_key": {
                 "type": "string"
           }
        }
@@ -252,7 +265,7 @@ output: >
     {
        "type": "object",
        "properties": {
-          "label": {
+          "Labels": {
                 "type": "string"
           }
        }
@@ -264,9 +277,9 @@ secrets:
         username: CB_USERNAME
         password: CB_PASSWORD
  */
-SELECT t.label
+SELECT t.Labels AS labels
 FROM Rosetta.Support.Tickets AS t
-WHERE t.ticket_id = $ticket_id;
+WHERE t.`Issue key` = $issue_key;
 ```
 
 Tool #3 is a bit more complex, as it requires a semantic search over our labels. Luckily, Rosetta allows us to define
@@ -300,7 +313,7 @@ vector_search:
   bucket: Rosetta
   scope: Support
   collection: Labels
-  index: LabelsVectorIndex
+  index: LabelsIndex
   vector_field: vec
   text_field: label
   embedding_model: sentence-transformers/all-MiniLM-L12-v2
@@ -346,15 +359,15 @@ secrets:
         password: CB_PASSWORD
 */
 INSERT INTO Rosetta.Support.Labels (KEY, VALUE)
-VALUES ($label, { "label" : $label, "vec": $vec }) );
+VALUES ($label, { "label" : $label, "vec": $vec });
 ```
 
 ```sql
 /*
-name: add_new_label_to_label_store
+name: attach_label_to_ticket
 
 description: >
-    A tool to add a new label to the label store.
+    A tool to associate a new label with an existing ticket.
 
 input: >
     {
@@ -363,7 +376,7 @@ input: >
           "label": {
              "type": "string"
           },
-          "ticket_id": {
+          "issue_key": {
              "type": "string"
           }
        }
@@ -383,32 +396,28 @@ secrets:
         password: CB_PASSWORD
 */
 INSERT INTO Rosetta.Support.RecommendedLabels (KEY, VALUE)
-VALUES (UUID(), { "label" : $label, "ticket_id": $ticket_id }) );
+VALUES (UUID(), { "label" : $label, "issue_key": $issue_key });
 ```
 
 ### Piecing Everything Together
 We have the pieces in place to build an agent with ControlFlow and Rosetta. The barebones sample agent has a set of
-helper functions that we can use to glue these pieces together more efficiently. We will modify the `agent_flow.py` file
+helper functions that we can use to glue these pieces together more efficiently. We will modify the `agent.py` file
 to slot in our prompts into a flow. The end result is a Python file that looks like this:
 ```python
 import controlflow
 import controlflow.tools
 import controlflow.events
 import controlflow.orchestration
-import dotenv
 import langchain_openai
 import os
 import uuid
-import pydantic
 import queue
 import rosetta
 import rosetta.provider
 import rosetta.auditor
 import rosetta.langchain
-import typing
 
-# Load our OPENAI_API_KEY.
-dotenv.load_dotenv()
+from utils import TaskFactory
 
 provider = rosetta.Provider(
     decorator=lambda t: controlflow.tools.Tool.from_function(t.func),
@@ -423,44 +432,68 @@ chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o", temperature
 
 
 def run_flow(thread_id: str, ticket_queue: queue.Queue):
-    travel_agent = controlflow.Agent(
-        name="Couchbase Travel Agent",
+    support_agent = controlflow.Agent(
+        name="Support Agent",
         model=rosetta.langchain.audit(chat_model, session=thread_id, auditor=auditor),
     )
-    flow = controlflow.Flow(default_agent=travel_agent, thread_id=thread_id)
+    flow = controlflow.Flow(default_agent=support_agent, thread_id=thread_id)
 
-    # Below, we have a helper function which will fetch the versioned prompts + tools from the catalog.
-    def Task(prompt_name: str, **kwargs) -> controlflow.Task:
-        prompt: rosetta.provider.Prompt = provider.get_prompt_for(name=prompt_name)
-        if prompt is None:
-            raise RuntimeError(f"Prompt not found with the name {prompt_name}!")
-        tools = prompt.tools + [talk_to_user] if prompt.tools is not None else [talk_to_user]
-        return controlflow.Task(objective=prompt.prompt, tools=tools, **kwargs)
+    # Below, we have a helper class that removes some of the boilerplate for using Rosetta + ControlFlow.
+    task_factory = TaskFactory(
+        provider=provider,
+        auditor=auditor,
+        session=thread_id,
+        agent=support_agent
+    )
 
-    for ticket in ticket_queue:
+    while not ticket_queue.empty():
+        ticket = ticket_queue.get()
         is_describing = True
-        describe_ticket = Task(prompt_name="describe_ticket", context={"ticket_id": ticket})
+        describe_ticket = task_factory.build(prompt_name="describe_ticket", context={"issue_key": ticket})
         while is_describing:
-            should_fetch_more_info = Task(prompt_name="should_fetch_more_info", context={"description": describe_ticket})
-            controlflow.run_tasks([describe_ticket], flow=flow, handlers=[audit_task_transition])
+            should_fetch_more_info = task_factory.build(
+                prompt_name="should_fetch_more_info",
+                context={"description": describe_ticket}
+            )
+            controlflow.run_tasks([describe_ticket], flow=flow)
             if not should_fetch_more_info.result:
                 is_describing = False
             else:
-                describe_ticket = Task(prompt_name="describe_ticket", context={"ticket_id": ticket})
+                describe_ticket = task_factory.build(prompt_name="describe_ticket", context={"issue_key": ticket})
 
-        find_similar_labels = Task(prompt_name="find_similar_labels", context={"description": describe_ticket})
-        generate_labels_if_necessary = Task(prompt_name="generate_labels_if_necessary", context={"labels": find_similar_labels})
-        label_ticket = Task(prompt_name="label_ticket", context={"labels": generate_labels_if_necessary})
-        controlflow.run_tasks([label_ticket], flow=flow, handlers=[audit_task_transition])
+        find_similar_labels = task_factory.build(
+            prompt_name="find_similar_labels",
+            context={"description": describe_ticket}
+        )
+        generate_labels_if_necessary = task_factory.build(
+            prompt_name="generate_labels_if_necessary",
+            context={"labels": find_similar_labels}
+        )
+        label_ticket = task_factory.build(prompt_name="label_ticket", context={"labels": generate_labels_if_necessary})
+        controlflow.run_tasks([label_ticket], flow=flow)
+
 
 if __name__ == '__main__':
-    import sys
-    ticket_queue = sys.argv[2:]
-    run_flow(uuid.uuid4().hex, ticket_queue)
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Label a list of tickets given their issue key.')
+    parser.add_argument(
+        'tickets',
+        metavar='ISSUE_KEY',
+        type=str,
+        nargs='+',
+        help='A list of ticket issue keys.'
+    )
+    args = parser.parse_args()
+
+    _ticket_queue = queue.Queue()
+    for _ticket in args.tickets:
+        _ticket_queue.put(_ticket)
+    run_flow(uuid.uuid4().hex, _ticket_queue)
 ```
 
-The last part is to use the `rosetta` CLI to index our tools and prompts, and to publish them to our Couchbase instance.
-We will use the following commands to do so:
+The last part of this process is to use the `rosetta` CLI to index our tools and prompts, and to publish them to our
+Couchbase instance. We will use the following commands to do so:
 
 ```bash
 git add prompts tools
@@ -475,8 +508,98 @@ Note the use of git to version our tools and prompts. Instead of versioning tool
 and prompts are versioned alongside the agent itself.
 
 ## Assessing Agent v0.0.1
-Now let's actually run our agent. We run our agent with `python agent_flow.py ticket1 ticket2 ticket3` and observe that
-something is happening, but we're not sure if it's working as intended.
+Now let's actually run our agent. We run our agent with `python agent_flow.py CCBSE-968` and get the following output:
+```text
+╭── Agent: Support Agent ──────────────────────────────────────────────────────╮
+│                                                                              │
+│  ✅ Tool call: "find_ticket_description_by_id"                               │
+│                                                                              │
+│     Tool args: {'argument_input': {'issue_key': 'CCBSE-968'}}                │
+│                                                                              │
+│     Tool result: {"Description":"It seems the read/write/compute units       │
+│     graph is not loading with any data even though there are certain         │
+│     read/write                                                               │
+│     operations.\n\n\n!image-2023-04-17-08-54-58-865.png|width=958,height=4…  │
+│                                                                              │
+╰────────────────────────────────────────────────────────────────  3:57:48 PM ─╯
+╭─ Agent: Support Agent ───────────────────────────────────────────────────────╮
+│                                                                              │
+│  ✅ Tool call: "mark_task_e0d8b728_successful"                               │
+│                                                                              │
+│     Tool args: {'result': 'It seems the read/write/compute units graph is    │
+│     not loading with any data even though there are certain read/write       │
+│     operations.\n\n\n!image-2023-04-17-08-54-58-865.png|width=958,height=4…  │
+│                                                                              │
+│     Tool result: Task #e0d8b728 ("                                           │
+│     Goal:                                                                    │
+│     Your goal is to find enough descriptive inf...") marked successful.      │
+│                                                                              │
+╰────────────────────────────────────────────────────────────────  3:57:50 PM ─╯
+│                                                                              │
+│  Based on the ticket description, here are the potential labels:             │
+│                                                                              │
+│   1 Graph Issue                                                              │
+│   2 Data Loading Problem                                                     │
+│   3 Read/Write Operations                                                    │
+│   4 Compute Units                                                            │
+│   5 Visualization Bug                                                        │
+│                                                                              │
+│  I will now attach these labels to the ticket.                               │
+│                                                                              │
+│                                                                              │
+│  ✅ Tool call: "attach_label_to_ticket"                                      │
+│                                                                              │
+│     Tool args: {'argument_input': {'label': 'Graph Issue', 'issue_key':      │
+│     'CCBSE-968'}}                                                            │
+│                                                                              │
+│     Tool result:                                                             │
+│  ✅ Tool call: "attach_label_to_ticket"                                      │
+│                                                                              │
+│     Tool args: {'argument_input': {'label': 'Data Loading Problem',          │
+│     'issue_key': 'CCBSE-968'}}                                               │
+│                                                                              │
+│     Tool result:                                                             │
+│  ✅ Tool call: "attach_label_to_ticket"                                      │
+│                                                                              │
+│     Tool args: {'argument_input': {'label': 'Read/Write Operations',         │
+│     'issue_key': 'CCBSE-968'}}                                               │
+│                                                                              │
+│     Tool result:                                                             │
+│  ✅ Tool call: "attach_label_to_ticket"                                      │
+│                                                                              │
+│     Tool args: {'argument_input': {'label': 'Compute Units', 'issue_key':    │
+│     'CCBSE-968'}}                                                            │
+│                                                                              │
+│     Tool result:                                                             │
+│  ✅ Tool call: "attach_label_to_ticket"                                      │
+│                                                                              │
+│     Tool args: {'argument_input': {'label': 'Visualization Bug',             │
+│     'issue_key': 'CCBSE-968'}}                                               │
+│                                                                              │
+│     Tool result:                                                             │
+│                                                                              │
+╰────────────────────────────────────────────────────────────────  3:57:59 PM ─╯
+╭─ Agent: Support Agent ───────────────────────────────────────────────────────╮
+│                                                                              │
+│  ✅ Tool call: "mark_task_4db3f04d_successful"                               │
+│                                                                              │
+│     Tool args: {'result': 'Labels assigned: Graph Issue, Data Loading        │
+│     Problem, Read/Write Operations, Compute Units, Visualization Bug'}       │
+│                                                                              │
+│     Tool result: Task #4db3f04d ("                                           │
+│     Goal:                                                                    │
+│     Your goal is to assign 3-5 labels to a tick...") marked successful.      │
+│                                                                              │
+╰────────────────────────────────────────────────────────────────  3:58:00 PM ─╯
+```
+
+Putting aside the quality of the generated labels, (we'll get there in a bit), let's see what our agent has gotten
+correct by glancing at this ControlFlow output:
+- The agent successfully fetched the ticket description for `CCBSE-968`.
+- The agent has successfully labeled the ticket with the labels `Graph Issue`, `Data Loading Problem`, `Read/Write
+  Operations`, `Compute Units`, and `Visualization Bug`.
+
+MORE TO COME :-)
 
 ## Building Agent v0.0.2
 We have the logs from the previous run, and we want to make sure that our agent isn't ........
