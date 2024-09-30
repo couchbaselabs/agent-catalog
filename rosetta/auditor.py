@@ -5,7 +5,8 @@ import pydantic
 import pydantic_settings
 import rosetta_cmd.defaults
 import rosetta_core.activity
-import rosetta_core.llm
+import rosetta_core.analytics
+import rosetta_core.analytics.content
 import textwrap
 import typing
 
@@ -13,8 +14,11 @@ from .provider import Provider
 
 logger = logging.getLogger(__name__)
 
-# On audits, we need to export the "role" associated with a message.
-Role = rosetta_core.llm.message.Role
+# On audits, we need to export the "kind" associated with a log...
+Kind = rosetta_core.analytics.log.Kind
+
+# ...and for transitions, we'll export the "TransitionContent".
+TransitionContent = rosetta_core.analytics.content.TransitionContent
 
 
 class Auditor(pydantic_settings.BaseSettings):
@@ -175,7 +179,7 @@ class Auditor(pydantic_settings.BaseSettings):
 
     def accept(
         self,
-        role: Role,
+        kind: Kind,
         content: typing.Any,
         session: typing.AnyStr,
         grouping: typing.AnyStr = None,
@@ -184,7 +188,7 @@ class Auditor(pydantic_settings.BaseSettings):
         **kwargs,
     ) -> None:
         """
-        :param role: Role associated with the message. See rosetta_core.llm.message.Role for all options here.
+        :param kind: Kind associated with the message. See rosetta_core.analytics.log.Kind for all options here.
         :param content: The (JSON-serializable) message to record. This should be as close to the producer as possible.
         :param session: A unique string associated with the current session / conversation / thread.
         :param grouping: A unique string associated with one "generate" invocation across a group of messages.
@@ -194,5 +198,40 @@ class Auditor(pydantic_settings.BaseSettings):
         """
         model = model if model is not None else self.llm_name
         self._audit(
-            role=role, content=content, session=session, grouping=grouping, timestamp=timestamp, model=model, **kwargs
+            kind=kind, content=content, session=session, grouping=grouping, timestamp=timestamp, model=model, **kwargs
+        )
+
+    def move(
+        self,
+        node_name: typing.AnyStr,
+        direction: typing.Literal["enter", "exit"],
+        session: typing.AnyStr,
+        content: typing.Any = None,
+        timestamp: datetime.datetime = None,
+        model: str = None,
+        **kwargs,
+    ):
+        """
+        :param node_name: The node / state this message applies to.
+        :param direction: The direction of the move. This can be either "enter" or "exit".
+        :param session: A unique string associated with the current session / conversation / thread.
+        :param content: Any additional content that should be recorded with this message.
+        :param timestamp: The time associated with the message production. This must have time-zone information.
+        :param model: LLM model used with this audit instance. This field can be specified on instantiation
+                      or on enter(). A model specified in enter() overrides a model specified on instantiation.
+        """
+        model = model if model is not None else self.llm_name
+        if direction == "enter":
+            content = TransitionContent(to_node=node_name, extra=content)
+        elif direction == "exit":
+            content = TransitionContent(from_node=node_name, extra=content)
+        else:
+            raise ValueError('Direction must be either "enter" or "exit".')
+        self._audit(
+            kind=Kind.Transition,
+            content=content,
+            session=session,
+            timestamp=timestamp,
+            model=model,
+            **kwargs,
         )

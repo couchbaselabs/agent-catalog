@@ -17,7 +17,7 @@ Repository = "https://github.com/couchbaselabs/rosetta"
 rosetta = "rosetta.__main__:main"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 pydantic-settings = "^2.4.0"
 
 rosetta-core = { git = "git@github.com:couchbaselabs/rosetta-core.git" }

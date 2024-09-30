@@ -3,11 +3,13 @@ import couchbase.cluster
 import couchbase.options
 import logging
 import pathlib
+import platform
 import pydantic
 import pydantic_settings
 import rosetta_cmd.defaults
 import rosetta_core.provider
 import rosetta_core.version
+import tempfile
 import textwrap
 import typing
 
@@ -16,8 +18,12 @@ logger = logging.getLogger(__name__)
 # To support custom refiners, we must export this model.
 SearchResult = rosetta_core.catalog.SearchResult
 
-# To support returning prompts with defined tools, we export this model.
+# To support the generation of different (schema) models, we export this model.
+SchemaModel = rosetta_core.provider.ModelType
+
+# To support returning prompts with defined tools + the ability to utilize the tool schema, we export this model.
 Prompt = rosetta_core.provider.PromptProvider.PromptResult
+Tool = rosetta_core.provider.ToolProvider.ToolResult
 
 
 class Provider(pydantic_settings.BaseSettings):
@@ -61,15 +67,15 @@ class Provider(pydantic_settings.BaseSettings):
     current working directory until we find the 'rosetta.cmd.defaults.DEFAULT_CATALOG_FOLDER' folder.
     """
 
-    output: typing.Optional[pathlib.Path] = None
+    output: typing.Optional[pathlib.Path | tempfile.TemporaryDirectory] = None
     """ Location to save generated Python stubs to, if desired.
 
     On 'get_tools_for', tools are dynamically generated and served as annotated Python callables. By default, this
     code is never written to disk. If this field is specified, we will write all generated files to the given output
-    directory.
+    directory and serve the generated Python callables from these files with a "standard import".
     """
 
-    decorator: typing.Optional[typing.Callable[[typing.Callable], typing.Any]] = lambda record: record
+    decorator: typing.Optional[typing.Callable[[Tool], typing.Any]] = lambda record: record.func
     """ A Python decorator (function) to apply to each result yielded by 'get_tools_for'.
 
     By default, yielded results are callable and possess type annotations + documentation strings, but some agent
@@ -117,6 +123,14 @@ class Provider(pydantic_settings.BaseSettings):
     """ The embedding model used when performing a semantic search for tools / prompts.
 
     Currently, only models that can specified with sentence-transformers through its string constructor are supported.
+    """
+
+    tool_model: SchemaModel = SchemaModel.TypingTypedDict
+    """ The target model type for the generated (schema) code for tools.
+
+    By default, we generate TypedDict models and attach these as type hints to the generated Python functions. Other
+    options include Pydantic (V2 and V1) models and dataclasses, though these may not be supported by all agent
+    frameworks.
     """
 
     _local_tool_catalog: rosetta_core.catalog.CatalogMem = None
@@ -228,6 +242,30 @@ class Provider(pydantic_settings.BaseSettings):
             else:  # remote_catalog is not None:
                 set_catalog(remote_catalog)
 
+        # Check the version of Python (this is needed for the code-generator).
+        target_python_version = None
+        match platform.python_version_tuple():
+            case ("3", "6", _):
+                target_python_version = rosetta_core.provider.PythonTarget.PY_36
+            case ("3", "7", _):
+                target_python_version = rosetta_core.provider.PythonTarget.PY_37
+            case ("3", "8", _):
+                target_python_version = rosetta_core.provider.PythonTarget.PY_38
+            case ("3", "9", _):
+                target_python_version = rosetta_core.provider.PythonTarget.PY_39
+            case ("3", "10", _):
+                target_python_version = rosetta_core.provider.PythonTarget.PY_310
+            case ("3", "11", _):
+                target_python_version = rosetta_core.provider.PythonTarget.PY_311
+            case ("3", "12", _):
+                target_python_version = rosetta_core.provider.PythonTarget.PY_312
+            case _:
+                if int(target_python_version[1]) > 12:
+                    logger.debug("Python version not recognized. Defaulting to Python 3.11.")
+                    target_python_version = rosetta_core.provider.PythonTarget.PY_311
+                else:
+                    raise ValueError(f"Python version {platform.python_version()} not supported.")
+
         # Finally, initialize our provider.
         self._tool_provider = rosetta_core.provider.ToolProvider(
             catalog=self._tool_catalog,
@@ -235,6 +273,8 @@ class Provider(pydantic_settings.BaseSettings):
             decorator=self.decorator,
             refiner=self.refiner,
             secrets=self.secrets,
+            python_version=target_python_version,
+            model_type=self.tool_model,
         )
         self._prompt_provider = rosetta_core.provider.PromptProvider(
             tool_provider=self._tool_provider,
