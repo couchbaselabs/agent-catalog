@@ -44,7 +44,7 @@ CREATE OR REPLACE ANALYTICS VIEW
             ) AS gi
             SELECT
                 gi.rsl.content AS content,
-                gi.rsl.role AS role
+                gi.rsl.kind AS kind
         ),
         vid = {
             "identifier": ver.identifier,
@@ -64,5 +64,5 @@ CREATE OR REPLACE ANALYTICS VIEW
         vid,
         msgs
     ORDER BY
-        -- The earliest sessions will appear first.
-        start_t ASC;
+        -- The last sessions will appear first.
+        start_t DESC;
