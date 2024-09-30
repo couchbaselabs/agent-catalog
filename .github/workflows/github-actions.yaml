@@ -26,7 +26,7 @@ jobs:
       - name: Set up Python Poetry
         uses: mishaga/action-poetry@1
         with:
-          python-version: "3.11"
+          python-version: "3.12"
           poetry-version: "latest"
           shell: "bash"
       - name: Install repository with Poetry
