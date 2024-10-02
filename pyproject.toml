@@ -17,7 +17,10 @@ packages = [
 
 include = [
     # These are the Jinja templates we use for code-gen.
-    "rosetta_core/tool/generate/templates/*"
+    "rosetta_core/tool/generate/templates/*",
+
+    # These are the Analytics DDLs for log analysis.
+    "rosetta_core/activity/auditor/ddls/*"
 ]
 
 [tool.poetry.urls]

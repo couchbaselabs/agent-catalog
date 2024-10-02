@@ -1,0 +1,9 @@
+-- Note: all_sessions.sqlpp should be run before this script.
+CREATE OR REPLACE ANALYTICS VIEW
+    `[BUCKET_NAME]`.`[SCOPE_NAME]`.LastSession AS
+    FROM
+        `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions AS s
+    SELECT VALUE
+        s
+    ORDER BY
+        s.start_t DESC;
