@@ -37,13 +37,14 @@ CREATE OR REPLACE ANALYTICS VIEW
             FROM (
                 FROM
                     g AS gii
-                SELECT DISTINCT VALUE
+                SELECT VALUE
                     gii
                 ORDER BY
                     gii.rsl.timestamp ASC
             ) AS gi
             SELECT
                 gi.rsl.content AS content,
+                gi.rsl.timestamp AS timestamp,
                 gi.rsl.kind AS kind
         ),
         vid = {
