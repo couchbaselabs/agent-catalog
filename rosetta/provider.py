@@ -162,11 +162,11 @@ class Provider(pydantic_settings.BaseSettings):
         # Set our local catalog if it exists.
         tool_catalog_path = self.catalog / rosetta_cmd.defaults.DEFAULT_TOOL_CATALOG_NAME
         if tool_catalog_path.exists():
-            logger.info("Loading local tool catalog at %s.", str(tool_catalog_path.absolute()))
+            logger.debug("Loading local tool catalog at %s.", str(tool_catalog_path.absolute()))
             self._local_tool_catalog = rosetta_core.catalog.CatalogMem.load(tool_catalog_path, self.embedding_model)
         prompt_catalog_path = self.catalog / rosetta_cmd.defaults.DEFAULT_PROMPT_CATALOG_NAME
         if prompt_catalog_path.exists():
-            logger.info("Loading local prompt catalog at %s.", str(prompt_catalog_path.absolute()))
+            logger.debug("Loading local prompt catalog at %s.", str(prompt_catalog_path.absolute()))
             self._local_prompt_catalog = rosetta_core.catalog.CatalogMem.load(prompt_catalog_path, self.embedding_model)
         return self
 
@@ -235,11 +235,13 @@ class Provider(pydantic_settings.BaseSettings):
                 logger.error(error_message)
                 raise ValueError(error_message)
             if local_catalog is not None and remote_catalog is not None:
-                logger.debug("Local catalog and remote catalog found. Building a chained catalog.")
+                logger.info("A local catalog and a remote catalog have been found. Building a chained catalog.")
                 set_catalog(rosetta_core.catalog.CatalogChain(chain=[local_catalog, remote_catalog]))
             elif local_catalog is not None:
+                logger.info("Only a local catalog has been found. Using the local catalog.")
                 set_catalog(local_catalog)
             else:  # remote_catalog is not None:
+                logger.info("Only a remote catalog has been found. Using the remote catalog.")
                 set_catalog(remote_catalog)
 
         # Check the version of Python (this is needed for the code-generator).

@@ -161,6 +161,7 @@ class Auditor(pydantic_settings.BaseSettings):
 
         # If we have both a local and remote auditor, we'll use both.
         if self._local_auditor is not None and self._db_auditor is not None:
+            logger.info("Using both a local auditor and a remote auditor.")
 
             def accept(*args, **kwargs):
                 self._local_auditor.accept(*args, **kwargs)
@@ -168,8 +169,10 @@ class Auditor(pydantic_settings.BaseSettings):
 
             self._audit = accept
         elif self._local_auditor is not None:
+            logger.info("Using a local auditor (a connection to a remote auditor could not be established).")
             self._audit = self._local_auditor.accept
         elif self._db_auditor is not None:
+            logger.info("Using a remote auditor (a local auditor could not be instantiated).")
             self._audit = self._db_auditor.accept
         else:
             # We should never reach this point (this error is handled above).
