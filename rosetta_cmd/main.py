@@ -479,10 +479,17 @@ def publish(ctx, kind, bucket, annotations):
     help="Name of Couchbase bucket that is being used for rosetta functionalities.",
     show_default=True,
 )
+@click.option(
+    "--compare",
+    default=None,
+    is_flag=True,
+    help="Compare local catalog with the last published catalog.",
+    show_default=True,
+)
 @click.pass_context
-def status(ctx, kind, include_dirty, status_db, bucket):
+def status(ctx, kind, include_dirty, status_db, bucket, compare):
     """Show the status of the local catalog."""
-    if status_db:
+    if status_db or compare:
         # Get keyspace and connection details
         keyspace_details = Keyspace(bucket="", scope=DEFAULT_SCOPE_PREFIX)
 
@@ -520,6 +527,7 @@ def status(ctx, kind, include_dirty, status_db, bucket):
             status_db=status_db,
             bucket=keyspace_details.bucket,
             cluster=cluster,
+            compare=compare,
         )
     else:
         cmd_status(ctx.obj, kind=kind, include_dirty=include_dirty, status_db=status_db)
