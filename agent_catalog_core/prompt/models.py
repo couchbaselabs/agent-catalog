@@ -1,4 +1,6 @@
+import abc
 import jinja2
+import jinja2.exceptions
 import logging
 import pathlib
 import pydantic
@@ -38,23 +40,7 @@ class ToolSearchMetadata(pydantic.BaseModel):
         return self
 
 
-class RawPromptDescriptor(RecordDescriptor):
-    record_kind: typing.Literal[RecordKind.RawPrompt]
-    prompt: str
-    tools: typing.Optional[list[ToolSearchMetadata] | None] = None
-
-
-class JinjaPromptDescriptor(RawPromptDescriptor):
-    record_kind: typing.Literal[RecordKind.JinjaPrompt]
-
-    @pydantic.field_validator("prompt")
-    @classmethod
-    def prompt_must_be_valid_jinja_template(cls, v: str):
-        # We'll rely on Jinja to raise an error here.
-        jinja2.Template(source=v)
-
-
-class PromptDescriptorFactory:
+class _BaseFactory(abc.ABC):
     class PromptMetadata(pydantic.BaseModel):
         name: str
         description: str
@@ -70,8 +56,11 @@ class PromptDescriptorFactory:
         self.filename = filename
         self.version = version
 
-    def __iter__(self) -> typing.Iterable[RawPromptDescriptor] | typing.Iterable[JinjaPromptDescriptor]:
-        # First, get the front matter from our .prompt file.
+    @abc.abstractmethod
+    def __iter__(self):
+        pass
+
+    def _get_prompt_metadata(self) -> tuple[dict, str]:
         with self.filename.open("r") as fp:
             matches = re.findall(r"---(.*)---(.*)", fp.read(), re.DOTALL)
             # TODO (GLENN): Make the specification of this front matter optional in the future.
@@ -79,23 +68,57 @@ class PromptDescriptorFactory:
                 raise ValueError(f"Malformed input! No front-matter found for {self.filename.name}.")
             front_matter = yaml.safe_load(matches[0][0])
             prompt_text = matches[0][1]
+        return front_matter, prompt_text
 
-        metadata = PromptDescriptorFactory.PromptMetadata.model_validate(front_matter)
-        descriptor_args = {
-            "name": metadata.name,
-            "description": metadata.description,
-            "record_kind": metadata.record_kind,
-            "tools": metadata.tools,
-            "prompt": prompt_text,
-            "source": self.filename,
-            "version": self.version,
-        }
-        if metadata.annotations is not None:
-            descriptor_args["annotations"] = metadata.annotations
-        match metadata.record_kind:
-            case RecordKind.RawPrompt:
-                yield RawPromptDescriptor(**descriptor_args)
-            case RecordKind.JinjaPrompt:
-                yield JinjaPromptDescriptor(**descriptor_args)
-            case _:
-                raise ValueError("Unknown prompt-kind encountered!")
+
+class RawPromptDescriptor(RecordDescriptor):
+    record_kind: typing.Literal[RecordKind.RawPrompt]
+    prompt: str
+    tools: typing.Optional[list[ToolSearchMetadata] | None] = None
+
+    class Factory(_BaseFactory):
+        def __iter__(self) -> typing.Iterable["RawPromptDescriptor"]:
+            front_matter, prompt_text = self._get_prompt_metadata()
+            metadata = RawPromptDescriptor.Factory.PromptMetadata.model_validate(front_matter)
+            descriptor_args = {
+                "name": metadata.name,
+                "description": metadata.description,
+                "record_kind": metadata.record_kind,
+                "tools": metadata.tools,
+                "prompt": prompt_text,
+                "source": self.filename,
+                "version": self.version,
+            }
+            if metadata.annotations is not None:
+                descriptor_args["annotations"] = metadata.annotations
+            yield RawPromptDescriptor(**descriptor_args)
+
+
+class JinjaPromptDescriptor(RawPromptDescriptor):
+    record_kind: typing.Literal[RecordKind.JinjaPrompt]
+
+    @pydantic.field_validator("prompt")
+    @classmethod
+    def prompt_must_be_valid_jinja_template(cls, v: str):
+        # We'll rely on Jinja to raise an error here.
+        try:
+            jinja2.Template(source=v)
+        except jinja2.exceptions.TemplateError as e:
+            raise ValueError("Malformed input! Invalid Jinja template.") from e
+
+    class Factory(_BaseFactory):
+        def __iter__(self) -> typing.Iterable["JinjaPromptDescriptor"]:
+            front_matter, prompt_text = self._get_prompt_metadata()
+            metadata = JinjaPromptDescriptor.Factory.PromptMetadata.model_validate(front_matter)
+            descriptor_args = {
+                "name": metadata.name,
+                "description": metadata.description,
+                "record_kind": metadata.record_kind,
+                "tools": metadata.tools,
+                "prompt": prompt_text,
+                "source": self.filename,
+                "version": self.version,
+            }
+            if metadata.annotations is not None:
+                descriptor_args["annotations"] = metadata.annotations
+            yield JinjaPromptDescriptor(**descriptor_args)

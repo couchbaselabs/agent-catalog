@@ -5,7 +5,8 @@ import pydantic
 import typing
 import yaml
 
-from ..prompt.models import PromptDescriptorFactory
+from ..prompt.models import JinjaPromptDescriptor
+from ..prompt.models import RawPromptDescriptor
 from ..record.descriptor import RecordDescriptor
 from ..record.descriptor import RecordKind
 from ..tool.descriptor import HTTPRequestToolDescriptor
@@ -103,7 +104,14 @@ class DotPromptFileIndexer(BaseFileIndexer):
     def start_descriptors(
         self, filename: pathlib.Path, get_version
     ) -> typing.Tuple[list[ValueError], list[RecordDescriptor]]:
-        return None, list(PromptDescriptorFactory(filename=filename, version=get_version(filename)))
+        return None, list(RawPromptDescriptor.Factory(filename=filename, version=get_version(filename)))
+
+
+class DotJinjaFileIndexer(BaseFileIndexer):
+    def start_descriptors(
+        self, filename: pathlib.Path, get_path_version
+    ) -> typing.Tuple[list[ValueError], list[RecordDescriptor]]:
+        return None, list(JinjaPromptDescriptor.Factory(filename=filename, version=get_path_version(filename)))
 
 
 source_indexers = {
@@ -111,6 +119,7 @@ source_indexers = {
     "*.sqlpp": DotSqlppFileIndexer(),
     "*.yaml": DotYamlFileIndexer(),
     "*.prompt": DotPromptFileIndexer(),
+    "*.jinja": DotJinjaFileIndexer(),
 }
 
 
