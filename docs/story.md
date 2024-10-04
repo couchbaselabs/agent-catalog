@@ -1,8 +1,8 @@
-# Why Rosetta?
+# Why Agent Catalog?
 
-Rosetta is an open-source Python package that provides a foundation for building agents using metrics-driven
+Agent Catalog is an open-source Python package that provides a foundation for building agents using metrics-driven
 development. It is not just a tool/prompt catalog, but a framework that integrates with agent applications in two main
-areas: i) tool / prompt serving and ii) auditing. The purpose of this document is to provide a story of how Rosetta
+areas: i) tool / prompt serving and ii) auditing. The purpose of this document is to provide a story of how Agent Catalog
 helps your agent development.
 
 ## Building Agent v0.0.1
@@ -41,7 +41,7 @@ The general flow of our agent will be as follows (where `T_n` represents the `n`
 ```
 
 Note that each of these tasks require some level of "intelligence" to be performed correctly, and each task requires
-some tool or function to be executed. We will use Rosetta to a) help build our tools, b) help build our prompts, and
+some tool or function to be executed. We will use Agent Catalog to a) help build our tools, b) help build our prompts, and
 c) audit our agent's actions. Item c) is especially important, as we want to use these logs to guide the development
 of agent v0.0.2.
 
@@ -75,7 +75,7 @@ If this is your second attempt, you MUST find the ticket's labels by its ID.
 ```
 
 Note that we haven't defined the tools yet, _but_ we know that we will need tools to find the ticket's description and
-labels. Rosetta's semantic tool search enables users to find tools that match tool descriptions rather than rigid tool
+labels. Agent Catalog's semantic tool search enables users to find tools that match tool descriptions rather than rigid tool
 names (if you have existing tools, you can forgo the semantic search altogether).
 
 Let's now finish the remaining four prompts, which we will name `prompts/should_fetch_more_info.prompt`,
@@ -170,7 +170,7 @@ below:
 4. a tool to add a new label to the label store, and
 5. a tool to attach a label to a ticket.
 
-Because Rosetta integrates nicely with Couchbase, we will use Couchbase to store our tickets, labels, and the ticket-to-
+Because Agent Catalog integrates nicely with Couchbase, we will use Couchbase to store our tickets, labels, and the ticket-to-
 label mapping (a process that is out of the scope of this article, but is traditional database design that Couchbase
 enables). For our specific problem, we will consider the following Couchbase collections with the following schemas
 (in the bucket `Rosetta` and the scope `Support`):
@@ -186,9 +186,9 @@ the label. This is also a good chance to illustrate how Python tools are recogni
 
 ```python
 import sentence_transformers
-import rosetta
+import agent_catalog
 
-@rosetta.tool
+@agent_catalog.tool
 def get_vector_for_label(label: str) -> list[float]:
     """Generating a vector for a label, for use before applying this to a vector index."""
     model = sentence_transformers.SentenceTransformer("sentence-transformers/all-MiniLM-L12-v2")
@@ -197,7 +197,7 @@ def get_vector_for_label(label: str) -> list[float]:
 ```
 
 The code above exists in a file called `tools/generate_vector_for_label.py`. Note that all Rosetta requires is that you
-annotate your existing Python code with @rosetta.tool._In the future, this tool will be deprecated with Vulcan._ In both
+annotate your existing Python code with @agent_catalog.tool._In the future, this tool will be deprecated with Vulcan._ In both
 cases, the end result is a vector index managed by the Couchbase Search Service which we can subsequently perform
 semantic search over. Our resultant index is named `Rosetta.Support.LabelsIndex` and the embedding model used was
 `sentence-transformers/all-MiniLM-L12-v2` (we'll need both of these for later).
@@ -412,14 +412,14 @@ import langchain_openai
 import os
 import uuid
 import queue
-import rosetta
-import rosetta.provider
-import rosetta.auditor
-import rosetta.langchain
+import agent_catalog
+import agent_catalog.provider
+import agent_catalog.auditor
+import agent_catalog.langchain
 
 from utils import TaskFactory
 
-provider = rosetta.Provider(
+provider = agent_catalog.Provider(
     decorator=lambda t: controlflow.tools.Tool.from_function(t.func),
     secrets={
         "CB_CONN_STRING": os.getenv("CB_CONN_STRING"),
@@ -427,14 +427,14 @@ provider = rosetta.Provider(
         "CB_PASSWORD": os.getenv("CB_PASSWORD"),
     },
 )
-auditor = rosetta.auditor.Auditor(llm_name="gpt-4o")
+auditor = agent_catalog.auditor.Auditor(llm_name="gpt-4o")
 chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o", temperature=0)
 
 
 def run_flow(thread_id: str, ticket_queue: queue.Queue):
     support_agent = controlflow.Agent(
         name="Support Agent",
-        model=rosetta.langchain.audit(chat_model, session=thread_id, auditor=auditor),
+        model=agent_catalog.langchain.audit(chat_model, session=thread_id, auditor=auditor),
     )
     flow = controlflow.Flow(default_agent=support_agent, thread_id=thread_id)
 
@@ -492,16 +492,16 @@ if __name__ == '__main__':
     run_flow(uuid.uuid4().hex, _ticket_queue)
 ```
 
-The last part of this process is to use the `rosetta` CLI to index our tools and prompts, and to publish them to our
+The last part of this process is to use the `agent_catalog` CLI to index our tools and prompts, and to publish them to our
 Couchbase instance. We will use the following commands to do so:
 
 ```bash
 git add prompts tools
 git commit -m "feat: add prompts and tools for ticket labeling agent"
 
-rosetta index tools --kind tool
-rosetta index prompts --kind prompt
-rosetta publish --kind all --bucket Rosetta
+agentc index tools --kind tool
+agentc index prompts --kind prompt
+agentc publish --kind all --bucket Rosetta
 ```
 
 Note the use of git to version our tools and prompts. Instead of versioning tools and prompts individually, these tools

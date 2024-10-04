@@ -3,10 +3,10 @@ import logging
 import pathlib
 import pydantic
 import pydantic_settings
-import rosetta_cmd.defaults
-import rosetta_core.activity
-import rosetta_core.analytics
-import rosetta_core.analytics.content
+import agent_catalog_cmd.defaults
+import agent_catalog_core.activity
+import agent_catalog_core.analytics
+import agent_catalog_core.analytics.content
 import textwrap
 import typing
 
@@ -15,16 +15,16 @@ from .provider import Provider
 logger = logging.getLogger(__name__)
 
 # On audits, we need to export the "kind" associated with a log...
-Kind = rosetta_core.analytics.log.Kind
+Kind = agent_catalog_core.analytics.log.Kind
 
 # ...and for transitions, we'll export the "TransitionContent".
-TransitionContent = rosetta_core.analytics.content.TransitionContent
+TransitionContent = agent_catalog_core.analytics.content.TransitionContent
 
 
 class Auditor(pydantic_settings.BaseSettings):
-    """An auditor of various events (e.g., LLM completions) given a Rosetta catalog."""
+    """An auditor of various events (e.g., LLM completions) given a catalog."""
 
-    model_config = pydantic_settings.SettingsConfigDict(env_prefix="ROSETTA_", use_attribute_docstrings=True)
+    model_config = pydantic_settings.SettingsConfigDict(env_prefix="AGENT_CATALOG_", use_attribute_docstrings=True)
 
     llm_name: str = None
     """ Name of the LLM model used to generate the chat messages to-be-audited.
@@ -34,31 +34,31 @@ class Auditor(pydantic_settings.BaseSettings):
     """
 
     conn_string: typing.Optional[str] = None
-    """ Couchbase connection string that points to the Rosetta audit logs.
+    """ Couchbase connection string that points to the audit logs.
 
     This Couchbase instance refers to a CB instance that possesses the audit log collection. This collection is
-    automatically generated on `rosetta index`, so this field is most likely the same instance as the CB instance
+    automatically generated on `agentc index`, so this field is most likely the same instance as the CB instance
     possessing the catalog. If there exists no local audit log location (e.g., this is deployed in a standalone
-    environment) OR if $ROSETTA_CATALOG is not explicitly set, we will perform all "accept" commands directly on the
+    environment) OR if $AGENT_CATALOG_CATALOG is not explicitly set, we will perform all "accept" commands directly on the
     remote audit log collection.
 
     This field must be specified with username, password, and bucket.
     """
 
     username: typing.Optional[pydantic.SecretStr] = None
-    """ Username associated with the Couchbase instance possessing the Rosetta audit logs.
+    """ Username associated with the Couchbase instance possessing the audit logs.
 
     This field must be specified with conn_string, password, and bucket.
     """
 
     password: typing.Optional[pydantic.SecretStr] = None
-    """ Password associated with the Couchbase instance possessing the Rosetta audit logs.
+    """ Password associated with the Couchbase instance possessing the audit logs.
 
     This field must be specified with conn_string, username, and bucket.
     """
 
     bucket: typing.Optional[str] = None
-    """ The name of the Couchbase bucket possessing the Rosetta audit logs.
+    """ The name of the Couchbase bucket possessing the audit logs.
 
     This field must be specified with conn_string, username, and password.
     """
@@ -67,21 +67,21 @@ class Auditor(pydantic_settings.BaseSettings):
     """ Location of the catalog path.
 
     This field is used to search for the catalog version. If this field is not set, we will defer to the default
-    behavior of rosetta.Provider.
+    behavior of agent_catalog.Provider.
     """
 
     local_log: typing.Optional[pathlib.Path] = None
     """ Local audit log file to write to.
 
-    If this field and $ROSETTA_CONN_STRING are not set, we will perform a best-effort search by walking upward from the
-    current working directory until we find the 'rosetta.cmd.defaults.DEFAULT_ACTIVITY_FOLDER' folder and subsequently
+    If this field and $AGENT_CATALOG_CONN_STRING are not set, we will perform a best-effort search by walking upward from the
+    current working directory until we find the 'agent_catalog.cmd.defaults.DEFAULT_ACTIVITY_FOLDER' folder and subsequently
     generate an audit log here.
 
     Audit log files will reach a maximum of 128MB (by default) before they are rotated and compressed.
     """
 
-    _local_auditor: rosetta_core.activity.LocalAuditor = None
-    _db_auditor: rosetta_core.activity.DBAuditor = None
+    _local_auditor: agent_catalog_core.activity.LocalAuditor = None
+    _db_auditor: agent_catalog_core.activity.DBAuditor = None
     _audit: typing.Callable = None
 
     @pydantic.model_validator(mode="after")
@@ -90,18 +90,18 @@ class Auditor(pydantic_settings.BaseSettings):
             working_path = pathlib.Path.cwd()
             logger.debug(
                 'Starting best effort search for the activity folder. Searching for "%s".',
-                rosetta_cmd.defaults.DEFAULT_ACTIVITY_FOLDER,
+                agent_catalog_cmd.defaults.DEFAULT_ACTIVITY_FOLDER,
             )
 
             # Iteratively ascend our starting path until we find the activity folder.
-            while not (working_path / rosetta_cmd.defaults.DEFAULT_ACTIVITY_FOLDER).exists():
+            while not (working_path / agent_catalog_cmd.defaults.DEFAULT_ACTIVITY_FOLDER).exists():
                 if working_path.parent == working_path:
                     return self
                 working_path = working_path.parent
             self.local_log = (
                 working_path
-                / rosetta_cmd.defaults.DEFAULT_ACTIVITY_FOLDER
-                / rosetta_cmd.defaults.DEFAULT_LLM_ACTIVITY_NAME
+                / agent_catalog_cmd.defaults.DEFAULT_ACTIVITY_FOLDER
+                / agent_catalog_cmd.defaults.DEFAULT_LLM_ACTIVITY_NAME
             )
 
         return self
@@ -113,13 +113,13 @@ class Auditor(pydantic_settings.BaseSettings):
 
         # Make sure we have {username, password, bucket}.
         if self.username is None:
-            logger.warning("$ROSETTA_CONN_STRING is specified but $ROSETTA_USERNAME is missing.")
+            logger.warning("$AGENT_CATALOG_CONN_STRING is specified but $AGENT_CATALOG_USERNAME is missing.")
             return self
         if self.password is None:
-            logger.warning("$ROSETTA_CONN_STRING is specified but $ROSETTA_PASSWORD is missing.")
+            logger.warning("$AGENT_CATALOG_CONN_STRING is specified but $AGENT_CATALOG_PASSWORD is missing.")
             return self
         if self.bucket is None:
-            logger.warning("$ROSETTA_CONN_STRING is specified but $ROSETTA_BUCKET is missing.")
+            logger.warning("$AGENT_CATALOG_CONN_STRING is specified but $AGENT_CATALOG_BUCKET is missing.")
             return self
 
         return self
@@ -128,8 +128,8 @@ class Auditor(pydantic_settings.BaseSettings):
     def _initialize_auditor(self) -> typing.Self:
         if self.local_log is None and self.conn_string is None:
             error_message = textwrap.dedent("""
-                Could not find $ROSETTA_ACTIVITY nor $ROSETTA_CONN_STRING! If this is a new project, please run the
-                command `rosetta index` before instantiating an auditor. Otherwise, please set either of these
+                Could not find $AGENT_CATALOG_ACTIVITY nor $AGENT_CATALOG_CONN_STRING! If this is a new project, please run the
+                command `agentc index` before instantiating an auditor. Otherwise, please set either of these
                 variables.
             """)
             logger.error(error_message)
@@ -146,11 +146,11 @@ class Auditor(pydantic_settings.BaseSettings):
 
         # Finally, instantiate our auditors.
         if self.local_log is not None:
-            self._local_auditor = rosetta_core.activity.LocalAuditor(
+            self._local_auditor = agent_catalog_core.activity.LocalAuditor(
                 output=self.local_log, catalog_version=provider.version, model=self.llm_name
             )
         if self.conn_string is not None:
-            self._db_auditor = rosetta_core.activity.DBAuditor(
+            self._db_auditor = agent_catalog_core.activity.DBAuditor(
                 conn_string=self.conn_string,
                 username=self.username.get_secret_value(),
                 password=self.password.get_secret_value(),
@@ -191,7 +191,7 @@ class Auditor(pydantic_settings.BaseSettings):
         **kwargs,
     ) -> None:
         """
-        :param kind: Kind associated with the message. See rosetta_core.analytics.log.Kind for all options here.
+        :param kind: Kind associated with the message. See agent_catalog_core.analytics.log.Kind for all options here.
         :param content: The (JSON-serializable) message to record. This should be as close to the producer as possible.
         :param session: A unique string associated with the current session / conversation / thread.
         :param grouping: A unique string associated with one "generate" invocation across a group of messages.

@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "rosetta"
+name = "agent-catalog"
 version = "0.1.0"
-description = "User facing repository for all things rosetta (tooling around agent workflows)."
+description = "User facing repository for all things agent-catalog (tooling around agent workflows)."
 repository = "https://github.com/couchbaselabs/rosetta"
 authors = [
     "Glenn Galvizo <glenn.galvizo@couchbase.com>"
@@ -14,21 +14,21 @@ Documentation = "https://docs.couchbase.com"
 Repository = "https://github.com/couchbaselabs/rosetta"
 
 [tool.poetry.scripts]
-rosetta = "rosetta.__main__:main"
+agent_catalog = "agent_catalog.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.12"
 pydantic-settings = "^2.4.0"
 
-rosetta-core = { git = "git@github.com:couchbaselabs/rosetta-core.git" }
-rosetta-lc = { git = "git@github.com:couchbaselabs/rosetta-lc.git", optional = true }
+agent-catalog-core = { git = "git@github.com:couchbaselabs/rosetta-core.git" }
+agent-catalog-lc = { git = "git@github.com:couchbaselabs/rosetta-lc.git", optional = true }
 
 # For developers that want to use a local version of Rosetta.
-# rosetta-core = { path = PATH_TO_LOCAL_ROSETTA_CORE, develop = true }
-# rosetta-lc = { path = PATH_TO_LOCAL_ROSETTA_LC, develop = true, optional = true }
+# agent-catalog-core = { path = ".../rosetta-core", develop = true }
+# agent-catalog-lc = { path = ".../rosetta-lc", develop = true, optional = true }
 
 [tool.poetry.extras]
-langchain = ["rosetta-lc"]
+langchain = ["agent-catalog-lc"]
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.0.0"
