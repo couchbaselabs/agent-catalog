@@ -1,6 +1,6 @@
 import logging
-import rosetta_core.activity.auditor.base
-import rosetta_core.analytics.log
+import agent_catalog_core.activity.auditor.base
+import agent_catalog_core.analytics.log
 import typing
 import uuid
 
@@ -25,26 +25,26 @@ logger = logging.getLogger(__name__)
 
 
 _TYPE_TO_KIND_MAPPING = {
-    HumanMessage.__name__: rosetta_core.analytics.Kind.Human,
-    HumanMessageChunk.__name__: rosetta_core.analytics.Kind.Human,
-    AIMessage.__name__: rosetta_core.analytics.Kind.LLM,
-    AIMessageChunk.__name__: rosetta_core.analytics.Kind.LLM,
-    SystemMessage.__name__: rosetta_core.analytics.Kind.System,
-    SystemMessageChunk.__name__: rosetta_core.analytics.Kind.System,
-    ToolMessage.__name__: rosetta_core.analytics.Kind.Tool,
-    ToolMessageChunk.__name__: rosetta_core.analytics.Kind.Tool,
-    FunctionMessage.__name__: rosetta_core.analytics.Kind.Tool,
-    FunctionMessageChunk.__name__: rosetta_core.analytics.Kind.Tool,
+    HumanMessage.__name__: agent_catalog_core.analytics.Kind.Human,
+    HumanMessageChunk.__name__: agent_catalog_core.analytics.Kind.Human,
+    AIMessage.__name__: agent_catalog_core.analytics.Kind.LLM,
+    AIMessageChunk.__name__: agent_catalog_core.analytics.Kind.LLM,
+    SystemMessage.__name__: agent_catalog_core.analytics.Kind.System,
+    SystemMessageChunk.__name__: agent_catalog_core.analytics.Kind.System,
+    ToolMessage.__name__: agent_catalog_core.analytics.Kind.Tool,
+    ToolMessageChunk.__name__: agent_catalog_core.analytics.Kind.Tool,
+    FunctionMessage.__name__: agent_catalog_core.analytics.Kind.Tool,
+    FunctionMessageChunk.__name__: agent_catalog_core.analytics.Kind.Tool,
 }
 
 
-def _determine_kind_from_type(message: BaseMessage) -> rosetta_core.analytics.Kind:
+def _determine_kind_from_type(message: BaseMessage) -> agent_catalog_core.analytics.Kind:
     message_type_name = type(message).__name__
     if message_type_name in _TYPE_TO_KIND_MAPPING:
         return _TYPE_TO_KIND_MAPPING[message_type_name]
     else:
         logger.debug(f'Unknown message type encountered: {message.type}. Tagging as "system".')
-        return rosetta_core.analytics.Kind.System
+        return agent_catalog_core.analytics.Kind.System
 
 
 def _content_from_message(message: BaseMessage) -> dict[str, typing.Any]:
@@ -66,7 +66,7 @@ def _content_from_message(message: BaseMessage) -> dict[str, typing.Any]:
 
 
 def _accept_messages(
-    messages: typing.List[BaseMessage], auditor: rosetta_core.activity.auditor.base.AuditorType, **kwargs
+    messages: typing.List[BaseMessage], auditor: agent_catalog_core.activity.auditor.base.AuditorType, **kwargs
 ) -> None:
     for message in messages:
         auditor.accept(kind=_determine_kind_from_type(message), content=_content_from_message(message), **kwargs)
@@ -75,7 +75,7 @@ def _accept_messages(
 def audit(
     chat_model: BaseChatModel,
     session: typing.AnyStr,
-    auditor: rosetta_core.activity.auditor.base.AuditorType,
+    auditor: agent_catalog_core.activity.auditor.base.AuditorType,
 ) -> BaseChatModel:
     """A method to (dynamically) dispatch the '_generate' & '_stream' methods to methods that log LLM calls."""
     # TODO (GLENN): We should capture the _agenerate and _astream methods as well.
@@ -95,7 +95,7 @@ def audit(
         for result in results.generations:
             logger.debug(f"LLM has returned the message: {result}")
             auditor.accept(
-                kind=rosetta_core.analytics.Kind.LLM,
+                kind=agent_catalog_core.analytics.Kind.LLM,
                 content=_content_from_message(result.message),
                 session=session,
                 grouping=grouping_id,
@@ -125,7 +125,7 @@ def audit(
 
         # We have exhausted our iterator. Log the resultant chunk.
         auditor.accept(
-            kind=rosetta_core.analytics.Kind.LLM,
+            kind=agent_catalog_core.analytics.Kind.LLM,
             content=_content_from_message(result_chunk.message),
             session=session,
             grouping=grouping_id,

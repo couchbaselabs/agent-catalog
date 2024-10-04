@@ -8,7 +8,7 @@ import langchain.agents
 import langchain.prompts
 import langchain_core.tools
 import os
-import rosetta_lc
+import agent_catalog_lc
 import typing
 
 # Load our environment variables.
@@ -74,7 +74,7 @@ def assemble_airline_document(document_id: int, airline_name: str, callsign: str
 
 
 if __name__ == "__main__":
-    chat_model = rosetta_lc.models.IQBackedChatModel(
+    chat_model = agent_catalog_lc.models.IQBackedChatModel(
         model_name="gpt-4o",
         capella_address=os.getenv("CAPELLA_ADDRESS"),
         organization_id=os.getenv("CAPELLA_ORG_ID"),

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "rosetta-lc"
+name = "agent-catalog-lc"
 version = "0.1.0"
 description = "Collection of LangChain-specific classes and functions used with rosetta-core."
 authors = [
@@ -7,7 +7,7 @@ authors = [
   "Glenn Galvizo <glenn.galvizo@couchbase.com>"
 ]
 readme = "README.md"
-packages = [{include = "rosetta_lc"}]
+packages = [{include = "agent_catalog_lc"}]
 
 [tool.poetry.urls]
 Homepage = "https://couchbase.com"
@@ -25,10 +25,10 @@ pydantic = "2.8.2"
 requests = "^2.32.3"
 python-dotenv = "^1.0.1"
 
-rosetta_core = { git = "git@github.com:couchbaselabs/rosetta-core.git" }
+agent_catalog_core = { git = "git@github.com:couchbaselabs/rosetta-core.git" }
 
 # For developers that want to use a local version of Rosetta.
-# rosetta = { path = PATH_TO_LOCAL_ROSETTA, develop = true }
+#agent_catalog_core = { path = ".../rosetta-core", develop = true }
 
 [tool.ruff]
 line-length = 120
