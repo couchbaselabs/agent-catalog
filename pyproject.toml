@@ -76,7 +76,7 @@ optional = true
 [tool.poetry.group.web.dependencies]
 Flask = "^3.0.3"
 
-
+# TODO (GLENN): Can we factor out the controlflow dependency?
 [tool.poetry.group.exec_cmd.dependencies]
 controlflow = "^0.9.4"
 

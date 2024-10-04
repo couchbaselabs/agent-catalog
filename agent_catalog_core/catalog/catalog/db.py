@@ -6,6 +6,7 @@ import typing
 from agent_catalog_core.annotation import AnnotationPredicate
 from agent_catalog_core.catalog.catalog.base import CatalogBase
 from agent_catalog_core.catalog.catalog.base import SearchResult
+from agent_catalog_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
 from agent_catalog_core.defaults import DEFAULT_SCOPE_PREFIX
 from agent_catalog_core.prompt.models import JinjaPromptDescriptor
 from agent_catalog_core.prompt.models import RawPromptDescriptor
@@ -76,7 +77,10 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             import sentence_transformers
 
             embedding_model_obj = sentence_transformers.SentenceTransformer(
-                self.embedding_model, tokenizer_kwargs={"clean_up_tokenization_spaces": True}
+                self.embedding_model,
+                tokenizer_kwargs={"clean_up_tokenization_spaces": True},
+                cache_folder=DEFAULT_MODEL_CACHE_FOLDER,
+                local_files_only=True,
             )
             query_embeddings = embedding_model_obj.encode(query).tolist()
             dim = len(query_embeddings)

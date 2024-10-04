@@ -103,6 +103,7 @@ class JinjaPromptDescriptor(RawPromptDescriptor):
         # We'll rely on Jinja to raise an error here.
         try:
             jinja2.Template(source=v)
+            return v
         except jinja2.exceptions.TemplateError as e:
             raise ValueError("Malformed input! Invalid Jinja template.") from e
 

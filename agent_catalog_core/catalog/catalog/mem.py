@@ -6,6 +6,7 @@ import typing
 
 from ...annotation import AnnotationPredicate
 from ...catalog.descriptor import CatalogDescriptor
+from ...defaults import DEFAULT_MODEL_CACHE_FOLDER
 from ...version import VersionDescriptor
 from .base import CatalogBase
 from .base import SearchResult
@@ -85,7 +86,10 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
 
         # Compute the distance of each tool in the catalog to the query.
         embedding_model_obj = sentence_transformers.SentenceTransformer(
-            self.embedding_model, tokenizer_kwargs={"clean_up_tokenization_spaces": True}
+            self.embedding_model,
+            tokenizer_kwargs={"clean_up_tokenization_spaces": True},
+            cache_folder=DEFAULT_MODEL_CACHE_FOLDER,
+            local_files_only=True,
         )
         query_embedding = embedding_model_obj.encode(query)
         deltas = sklearn.metrics.pairwise.cosine_similarity(

@@ -9,9 +9,9 @@ import couchbase.vector_search
 import dataclasses
 import typing
 import json
-import sentence_transformers
 import logging
 
+from agent_catalog_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
 from agent_catalog_core.tool import tool
 from agent_catalog_core.secrets import get_secret
 
@@ -51,10 +51,14 @@ def {{ tool.name }}(question: {{ input.type_name }}) -> list[str]:
     else:
         raise ValueError("Bad input given to tool!")
 
+    import sentence_transformers
+
     logger.debug("{{ tool.name }} is generating an embedding for: " + formatted_question + ".")
     embedding_model = sentence_transformers.SentenceTransformer(
         '{{ vector_search.embedding_model }}',
-        tokenizer_kwargs={'clean_up_tokenization_spaces': True}
+        tokenizer_kwargs={'clean_up_tokenization_spaces': True},
+        cache_folder=DEFAULT_MODEL_CACHE_FOLDER,
+        local_files_only=True
     )
     _embedding = embedding_model.encode(formatted_question)
     for_q = list(_embedding.astype('float64'))
