@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "rosetta-core"
+name = "agent-catalog-core"
 version = "0.1.0"
 description = "Core library associated with agentic workflows in Couchbase."
 repository = "https://github.com/couchbaselabs/rosetta-core"
@@ -10,17 +10,17 @@ authors = [
 ]
 readme = "README.md"
 packages = [
-    { include = "rosetta_core" },
-    { include = "rosetta_cmd" },
-    { include = "rosetta_util" }
+    { include = "agent_catalog_core" },
+    { include = "agent_catalog_cmd" },
+    { include = "agent_catalog_util" }
 ]
 
 include = [
     # These are the Jinja templates we use for code-gen.
-    "rosetta_core/tool/generate/templates/*",
+    "agent_catalog_core/tool/generate/templates/*",
 
     # These are the Analytics DDLs for log analysis.
-    "rosetta_core/activity/auditor/ddls/*"
+    "agent_catalog_core/activity/auditor/ddls/*"
 ]
 
 [tool.poetry.urls]
@@ -29,7 +29,7 @@ Documentation = "https://docs.couchbase.com"
 Repository = "https://github.com/couchbaselabs/rosetta-core"
 
 [tool.poetry.scripts]
-rosetta = "rosetta_cmd.main:main"
+agentc = "agent_catalog_cmd.main:main"
 
 [tool.poetry.dependencies]
 python = "^3.12"

@@ -4,9 +4,9 @@ import pydantic
 import pytest
 import uuid
 
-from rosetta_core.prompt.models import PromptDescriptorFactory
-from rosetta_core.version import VersionDescriptor
-from rosetta_core.version.identifier import VersionSystem
+from agent_catalog_core.prompt.models import PromptDescriptorFactory
+from agent_catalog_core.version import VersionDescriptor
+from agent_catalog_core.version.identifier import VersionSystem
 
 
 def _get_prompt_descriptor_factory(cls, filename: pathlib.Path):

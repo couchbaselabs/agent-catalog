@@ -6,15 +6,15 @@ import sys
 import tempfile
 import uuid
 
-from rosetta_core.tool.decorator import is_tool
-from rosetta_core.tool.descriptor.models import HTTPRequestToolDescriptor
-from rosetta_core.tool.descriptor.models import SemanticSearchToolDescriptor
-from rosetta_core.tool.descriptor.models import SQLPPQueryToolDescriptor
-from rosetta_core.tool.generate.generator import HTTPRequestCodeGenerator
-from rosetta_core.tool.generate.generator import SemanticSearchCodeGenerator
-from rosetta_core.tool.generate.generator import SQLPPCodeGenerator
-from rosetta_core.version.identifier import VersionDescriptor
-from rosetta_core.version.identifier import VersionSystem
+from agent_catalog_core.tool.decorator import is_tool
+from agent_catalog_core.tool.descriptor.models import HTTPRequestToolDescriptor
+from agent_catalog_core.tool.descriptor.models import SemanticSearchToolDescriptor
+from agent_catalog_core.tool.descriptor.models import SQLPPQueryToolDescriptor
+from agent_catalog_core.tool.generate.generator import HTTPRequestCodeGenerator
+from agent_catalog_core.tool.generate.generator import SemanticSearchCodeGenerator
+from agent_catalog_core.tool.generate.generator import SQLPPCodeGenerator
+from agent_catalog_core.version.identifier import VersionDescriptor
+from agent_catalog_core.version.identifier import VersionSystem
 
 
 def _get_tool_descriptor_factory(cls, filename: pathlib.Path):

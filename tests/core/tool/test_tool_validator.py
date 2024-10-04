@@ -5,13 +5,13 @@ import pydantic
 import pytest
 import uuid
 
-from rosetta_core.record.descriptor import RecordKind
-from rosetta_core.tool.descriptor.models import HTTPRequestToolDescriptor
-from rosetta_core.tool.descriptor.models import PythonToolDescriptor
-from rosetta_core.tool.descriptor.models import SemanticSearchToolDescriptor
-from rosetta_core.tool.descriptor.models import SQLPPQueryToolDescriptor
-from rosetta_core.version.identifier import VersionDescriptor
-from rosetta_core.version.identifier import VersionSystem
+from agent_catalog_core.record.descriptor import RecordKind
+from agent_catalog_core.tool.descriptor.models import HTTPRequestToolDescriptor
+from agent_catalog_core.tool.descriptor.models import PythonToolDescriptor
+from agent_catalog_core.tool.descriptor.models import SemanticSearchToolDescriptor
+from agent_catalog_core.tool.descriptor.models import SQLPPQueryToolDescriptor
+from agent_catalog_core.version.identifier import VersionDescriptor
+from agent_catalog_core.version.identifier import VersionSystem
 
 
 def _get_tool_descriptor_factory(cls, filename: pathlib.Path):

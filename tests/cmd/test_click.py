@@ -4,11 +4,11 @@ import pytest
 import shutil
 import uuid
 
-from rosetta_cmd.defaults import DEFAULT_ACTIVITY_FOLDER
-from rosetta_cmd.defaults import DEFAULT_CATALOG_FOLDER
-from rosetta_cmd.defaults import DEFAULT_PROMPT_CATALOG_NAME
-from rosetta_cmd.defaults import DEFAULT_TOOL_CATALOG_NAME
-from rosetta_cmd.main import click_main
+from agent_catalog_cmd.defaults import DEFAULT_ACTIVITY_FOLDER
+from agent_catalog_cmd.defaults import DEFAULT_CATALOG_FOLDER
+from agent_catalog_cmd.defaults import DEFAULT_PROMPT_CATALOG_NAME
+from agent_catalog_cmd.defaults import DEFAULT_TOOL_CATALOG_NAME
+from agent_catalog_cmd.main import click_main
 
 
 @pytest.mark.smoke
