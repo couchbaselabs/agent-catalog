@@ -28,7 +28,7 @@ repos:
     hooks:
       - id: do-not-commit-local-dev
         name: check for local dev environment
-        entry: ^agent_catalog-\w+\s*=\s*\{\s*path\s*=
+        entry: ^agent-catalog-\w+\s*=\s*\{\s*path\s*=
         language: pygrep
         types: [toml]
 
