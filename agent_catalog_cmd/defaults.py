@@ -19,7 +19,7 @@ DEFAULT_SCAN_DIRECTORY_OPTS = agent_catalog_core.catalog.directory.ScanDirectory
 DEFAULT_CATALOG_NAME = "-catalog.json"
 DEFAULT_META_COLLECTION_NAME = "_metadata"
 DEFAULT_CATALOG_COLLECTION_NAME = "_catalog"
-DEFAULT_SCOPE_PREFIX = "agent_catalog_catalog"
+DEFAULT_SCOPE_PREFIX = "agent_catalog"
 DEFAULT_CATALOG_SCHEMA_VERSION = "0_0_0"
 DEFAULT_ITEM_DESCRIPTION_MAX_LEN = 256
 
