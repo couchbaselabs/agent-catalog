@@ -17,6 +17,7 @@ from .defaults import DEFAULT_CATALOG_SCHEMA_VERSION
 from .defaults import DEFAULT_EMBEDDING_MODEL
 from .defaults import DEFAULT_SCOPE_PREFIX
 from .models import Context
+from rosetta_cmd.cmds.execute import cmd_execute
 from rosetta_util.connection import get_host_name
 from rosetta_util.models import CouchbaseConnect
 from rosetta_util.models import Keyspace
@@ -538,6 +539,26 @@ def status(ctx, kind, include_dirty, status_db, bucket, compare):
 def version(ctx):
     """Show the version of this tool."""
     cmd_version(ctx.obj)
+
+
+@click_main.command()
+@click.option(
+    "--name",
+    default=None,
+    type=str,
+    help="The name of the tool to execute.",
+    show_default=True,
+)
+@click.option(
+    "--model",
+    default=None,
+    type=str,
+    help="Name of the LLM to be used for the tool execution. Format: {provider}/{model_name}. Example: openai/gpt-4o-mini",
+    show_default=True,
+)
+@click.pass_context
+def execute(ctx, name, model):
+    cmd_execute(ctx.obj, name, model)
 
 
 # @click_main.command()
