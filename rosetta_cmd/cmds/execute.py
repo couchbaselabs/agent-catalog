@@ -23,6 +23,7 @@ def cmd_execute(ctx: Context, name: str, model: str):
     tool_info = tool[0].entry
     cf.settings.pretty_print_agent_events = False
     cf.settings.prefect_log_level = "CRITICAL"
+    cf.settings.log_level = "CRITICAL"
     agent = cf.Agent(
         name="Test Agent",
         model=model,
