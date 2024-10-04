@@ -14,7 +14,7 @@ Documentation = "https://docs.couchbase.com"
 Repository = "https://github.com/couchbaselabs/rosetta"
 
 [tool.poetry.scripts]
-agentc = "agent_catalog.__main__:main"
+agentc = "agentc.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.12"

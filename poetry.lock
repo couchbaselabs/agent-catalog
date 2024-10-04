@@ -29,7 +29,7 @@ sentence-transformers = "^3.1.1"
 type = "git"
 url = "git@github.com:couchbaselabs/rosetta-core.git"
 reference = "HEAD"
-resolved_reference = "8f1259436231babf034e4bae73da88e81f64d631"
+resolved_reference = "3ddffc9d87248fde87bb4857a450f5a226b43432"
 
 [[package]]
 name = "agent-catalog-lc"
