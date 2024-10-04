@@ -1,6 +1,6 @@
 import pytest
 
-from rosetta_core.annotation import AnnotationPredicate
+from agent_catalog_core.annotation import AnnotationPredicate
 
 
 @pytest.mark.smoke

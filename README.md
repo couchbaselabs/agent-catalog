@@ -1,4 +1,4 @@
-# rosetta-core
+# agent-catalog-core
 
 The core for a Couchbase-backed agentic workflow SDK.
 
@@ -16,24 +16,24 @@ The core for a Couchbase-backed agentic workflow SDK.
    ```bash
    poetry install
    ```
-4. You should now have the `rosetta` command line tool installed.
-   Run the `rosetta` command to test your installation.
+4. You should now have the `agentc` command line tool installed.
+   Run the `agentc` command to test your installation.
    ```bash
-   rosetta
+   agentc
    ```
    ```
-   Usage: rosetta [OPTIONS] COMMAND [ARGS]...
+   Usage: agentc [OPTIONS] COMMAND [ARGS]...
 
    A command line tool for Rosetta.
 
    Options:
      -c, --catalog DIRECTORY   Directory of local catalog files. The local
                                catalog DIRECTORY should be checked into git.
-                               [default: .rosetta-catalog]
+                               [default: .agent-catalog]
      -a, --activity DIRECTORY  Directory of local activity files (runtime data).
                                The local activity DIRECTORY should NOT be checked
                                into git, as it holds runtime activity data like
-                               logs, call histories, etc.  [default: .rosetta-
+                               logs, call histories, etc.  [default: .agent-
                                activity]
      -v, --verbose             Enable verbose output.
      --help                    Show this message and exit.
@@ -69,7 +69,7 @@ pre-commit install
 To enable debug mode, execute the following command:
 
 ```bash
-export ROSETTA_DEBUG=1
+export AGENT_CATALOG_DEBUG=1
 ```
 
 ### Working with Poetry
@@ -91,10 +91,10 @@ Below, we lay out some important directories & files.
 README.md
 pyproject.toml
 
-rosetta_cmd/
-   main.py       -- Main entry point for rosetta command-line tool (CLI).
+agent_catalog_cmd/
+   main.py       -- Main entry point for agent command-line tool (CLI).
    defaults.py   -- All command-line-tool defaults belong in here.
-   cmds/         -- Each "rosetta SUBCMD" has its own cmds/SUBCMD.py file.
+   cmds/         -- Each "agentc SUBCMD" has its own cmds/SUBCMD.py file.
       ...
       find.py
       index.py
@@ -103,7 +103,7 @@ rosetta_cmd/
       web.py      -- Provides an HTML/REST interface for the SUBCMD's.
    models/
 
-rosetta_core/     -- The core rosetta library used by applications and by the rosetta CLI.
+agent_catalog_core/     -- The core agentc library used by applications and by the agentc CLI.
    catalog/
    provider/
    record/

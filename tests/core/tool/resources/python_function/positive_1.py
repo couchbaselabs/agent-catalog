@@ -1,6 +1,6 @@
 import pydantic
 
-from rosetta_core.tool import tool
+from agent_catalog_core.tool import tool
 
 
 class TravelCost(pydantic.BaseModel):

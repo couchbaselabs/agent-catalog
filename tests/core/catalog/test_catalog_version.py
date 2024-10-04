@@ -1,8 +1,8 @@
 import pytest
 import semantic_version
 
-from rosetta_core.catalog.version import lib_version_compare
-from rosetta_core.catalog.version import lib_version_parse
+from agent_catalog_core.catalog.version import lib_version_compare
+from agent_catalog_core.catalog.version import lib_version_parse
 
 
 def test_semantic_version():
