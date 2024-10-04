@@ -64,7 +64,7 @@ class Provider(pydantic_settings.BaseSettings):
     """ Location of the catalog path.
 
     If this field and $AGENT_CATALOG_CONN_STRING are not set, we will perform a best-effort search by walking upward from the
-    current working directory until we find the 'agent_catalog.cmd.defaults.DEFAULT_CATALOG_FOLDER' folder.
+    current working directory until we find the 'agentc.cmd.defaults.DEFAULT_CATALOG_FOLDER' folder.
     """
 
     output: typing.Optional[pathlib.Path | tempfile.TemporaryDirectory] = None
@@ -111,7 +111,7 @@ class Provider(pydantic_settings.BaseSettings):
 
     To map the secret keys to values, users will specify their secrets using this field (secrets).
     ```python
-    provider = agent_catalog.Provider(secrets={
+    provider = agentc.Provider(secrets={
         "MY_CB_CONN_STRING": "couchbase//23.52.12.254",
         "MY_CB_USERNAME": "admin_7823",
         "MY_CB_PASSWORD": os.getenv("THE_CB_PASSWORD")

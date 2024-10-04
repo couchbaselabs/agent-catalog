@@ -1,12 +1,12 @@
+import agent_catalog_cmd.defaults
+import agent_catalog_core.activity
+import agent_catalog_core.analytics
+import agent_catalog_core.analytics.content
 import datetime
 import logging
 import pathlib
 import pydantic
 import pydantic_settings
-import agent_catalog_cmd.defaults
-import agent_catalog_core.activity
-import agent_catalog_core.analytics
-import agent_catalog_core.analytics.content
 import textwrap
 import typing
 
@@ -16,9 +16,6 @@ logger = logging.getLogger(__name__)
 
 # On audits, we need to export the "kind" associated with a log...
 Kind = agent_catalog_core.analytics.log.Kind
-
-# ...and for transitions, we'll export the "TransitionContent".
-TransitionContent = agent_catalog_core.analytics.content.TransitionContent
 
 
 class Auditor(pydantic_settings.BaseSettings):
@@ -67,14 +64,14 @@ class Auditor(pydantic_settings.BaseSettings):
     """ Location of the catalog path.
 
     This field is used to search for the catalog version. If this field is not set, we will defer to the default
-    behavior of agent_catalog.Provider.
+    behavior of agentc.Provider.
     """
 
     local_log: typing.Optional[pathlib.Path] = None
     """ Local audit log file to write to.
 
     If this field and $AGENT_CATALOG_CONN_STRING are not set, we will perform a best-effort search by walking upward from the
-    current working directory until we find the 'agent_catalog.cmd.defaults.DEFAULT_ACTIVITY_FOLDER' folder and subsequently
+    current working directory until we find the 'agentc.cmd.defaults.DEFAULT_ACTIVITY_FOLDER' folder and subsequently
     generate an audit log here.
 
     Audit log files will reach a maximum of 128MB (by default) before they are rotated and compressed.
@@ -225,9 +222,9 @@ class Auditor(pydantic_settings.BaseSettings):
         """
         model = model if model is not None else self.llm_name
         if direction == "enter":
-            content = TransitionContent(to_node=node_name, extra=content)
+            content = dict(to_node=node_name, extra=content)
         elif direction == "exit":
-            content = TransitionContent(from_node=node_name, extra=content)
+            content = dict(from_node=node_name, extra=content)
         else:
             raise ValueError('Direction must be either "enter" or "exit".')
         self._audit(

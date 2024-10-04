@@ -7,6 +7,5 @@ index = agent_catalog_cmd.cmds.cmd_index
 publish = agent_catalog_cmd.cmds.cmd_publish
 status = agent_catalog_cmd.cmds.cmd_status
 version = agent_catalog_cmd.cmds.cmd_version
-analyze = agent_catalog_cmd.cmds.cmd_analyze
 
-__all__ = ["clean", "env", "find", "index", "publish", "status", "version", "analyze"]
+__all__ = ["clean", "env", "find", "index", "publish", "status", "version"]

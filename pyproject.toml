@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "agent-catalog"
+name = "agentc"
 version = "0.1.0"
 description = "User facing repository for all things agent-catalog (tooling around agent workflows)."
 repository = "https://github.com/couchbaselabs/rosetta"
@@ -14,7 +14,7 @@ Documentation = "https://docs.couchbase.com"
 Repository = "https://github.com/couchbaselabs/rosetta"
 
 [tool.poetry.scripts]
-agent_catalog = "agent_catalog.__main__:main"
+agentc = "agent_catalog.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.12"
