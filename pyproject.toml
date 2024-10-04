@@ -76,6 +76,10 @@ optional = true
 [tool.poetry.group.web.dependencies]
 Flask = "^3.0.3"
 
+
+[tool.poetry.group.exec_cmd.dependencies]
+controlflow = "^0.9.4"
+
 [tool.pytest.ini_options]
 markers = [
     "smoke: marks tests for running on each git-push"
