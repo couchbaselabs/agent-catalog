@@ -8,7 +8,7 @@ import shutil
 
 from ..defaults import DEFAULT_ACTIVITY_FOLDER
 from ..defaults import DEFAULT_CATALOG_FOLDER
-from ..defaults import DEFAULT_SCOPE_PREFIX
+from ..defaults import DEFAULT_CATALOG_SCOPE
 from ..models.context import Context
 from agent_catalog_core.defaults import DEFAULT_AUDIT_SCOPE
 from agent_catalog_util.query import execute_query
@@ -33,7 +33,7 @@ def clean_local(ctx: Context):
 
 def clean_db(ctx, bucket, cluster) -> int:
     all_errs = []
-    drop_scope_query = f"DROP SCOPE `{bucket}`.`{DEFAULT_SCOPE_PREFIX}` IF EXISTS;"
+    drop_scope_query = f"DROP SCOPE `{bucket}`.`{DEFAULT_CATALOG_SCOPE}` IF EXISTS;"
     res, err = execute_query(cluster, drop_scope_query)
     for r in res.rows():
         logger.debug(r)

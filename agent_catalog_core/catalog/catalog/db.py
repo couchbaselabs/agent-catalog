@@ -6,8 +6,8 @@ import typing
 from agent_catalog_core.annotation import AnnotationPredicate
 from agent_catalog_core.catalog.catalog.base import CatalogBase
 from agent_catalog_core.catalog.catalog.base import SearchResult
+from agent_catalog_core.defaults import DEFAULT_CATALOG_SCOPE
 from agent_catalog_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
-from agent_catalog_core.defaults import DEFAULT_SCOPE_PREFIX
 from agent_catalog_core.prompt.models import JinjaPromptDescriptor
 from agent_catalog_core.prompt.models import RawPromptDescriptor
 from agent_catalog_core.record.descriptor import RecordKind
@@ -43,7 +43,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             collection_name = f"{self.kind}_catalog"
             self.cluster.query(
                 f"""
-                FROM   `{self.bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{collection_name}`
+                FROM   `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection_name}`
                 SELECT 1
                 LIMIT  1;
             """,
@@ -66,7 +66,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
         if name is not None:
             # TODO (GLENN): Need to add some validation around bucket (to prevent injection)
             # TODO (GLENN): Need to add some validation around name (to prevent injection)
-            item_query = f"SELECT a.* from `{self.bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{self.kind}_catalog` as a WHERE a.name = $name;"
+            item_query = f"SELECT a.* from `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{self.kind}_catalog` as a WHERE a.name = $name;"
 
             res, err = execute_query_with_parameters(self.cluster, item_query, {"name": name})
             if err is not None:
@@ -100,7 +100,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                 filter_records_query = f"""
                     SELECT a.* FROM (
                         SELECT t.*, SEARCH_META() as metadata
-                        FROM `{self.bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{self.kind}_catalog` as t
+                        FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{self.kind}_catalog` as t
                         WHERE SEARCH(
                             t,
                             {{
@@ -116,7 +116,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                                 'ctl': {{ 'timeout': 10 }}
                             }},
                             {{
-                                'index': '{self.bucket}.{DEFAULT_SCOPE_PREFIX}.{idx}'
+                                'index': '{self.bucket}.{DEFAULT_CATALOG_SCOPE}.{idx}'
                             }}
                         )
                         ORDER BY metadata.score DESC
@@ -130,7 +130,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                 filter_records_query = f"""
                     SELECT a.* FROM (
                         SELECT t.*, SEARCH_META() as metadata
-                        FROM `{self.bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{self.kind}_catalog` as t
+                        FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{self.kind}_catalog` as t
                         WHERE SEARCH(
                             t,
                             {{
@@ -146,7 +146,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                                 'ctl': {{ 'timeout': 10 }}
                             }},
                             {{
-                                'index': '{self.bucket}.{DEFAULT_SCOPE_PREFIX}.{idx}'
+                                'index': '{self.bucket}.{DEFAULT_CATALOG_SCOPE}.{idx}'
                             }}
                         )
                         ORDER BY metadata.score DESC
@@ -199,7 +199,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
     def version(self) -> VersionDescriptor:
         """Returns the lates version of the kind catalog"""
         ts_query = f"""
-            FROM     `{self.bucket}`.`{DEFAULT_SCOPE_PREFIX}`.`{self.kind}_catalog` AS t
+            FROM     `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{self.kind}_catalog` AS t
             SELECT   VALUE  t.version
             ORDER BY META().cas DESC
             LIMIT    1
