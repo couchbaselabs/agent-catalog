@@ -1,3 +1,6 @@
+import agent_catalog_cmd.defaults
+import agent_catalog_core.provider
+import agent_catalog_core.version
 import couchbase.auth
 import couchbase.cluster
 import couchbase.options
@@ -6,9 +9,6 @@ import pathlib
 import platform
 import pydantic
 import pydantic_settings
-import agent_catalog_cmd.defaults
-import agent_catalog_core.provider
-import agent_catalog_core.version
 import tempfile
 import textwrap
 import typing
@@ -163,11 +163,15 @@ class Provider(pydantic_settings.BaseSettings):
         tool_catalog_path = self.catalog / agent_catalog_cmd.defaults.DEFAULT_TOOL_CATALOG_NAME
         if tool_catalog_path.exists():
             logger.debug("Loading local tool catalog at %s.", str(tool_catalog_path.absolute()))
-            self._local_tool_catalog = agent_catalog_core.catalog.CatalogMem.load(tool_catalog_path, self.embedding_model)
+            self._local_tool_catalog = agent_catalog_core.catalog.CatalogMem.load(
+                tool_catalog_path, self.embedding_model
+            )
         prompt_catalog_path = self.catalog / agent_catalog_cmd.defaults.DEFAULT_PROMPT_CATALOG_NAME
         if prompt_catalog_path.exists():
             logger.debug("Loading local prompt catalog at %s.", str(prompt_catalog_path.absolute()))
-            self._local_prompt_catalog = agent_catalog_core.catalog.CatalogMem.load(prompt_catalog_path, self.embedding_model)
+            self._local_prompt_catalog = agent_catalog_core.catalog.CatalogMem.load(
+                prompt_catalog_path, self.embedding_model
+            )
         return self
 
     @pydantic.model_validator(mode="after")
@@ -245,8 +249,7 @@ class Provider(pydantic_settings.BaseSettings):
                 set_catalog(remote_catalog)
 
         # Check the version of Python (this is needed for the code-generator).
-        target_python_version = None
-        match platform.python_version_tuple():
+        match version_tuple := platform.python_version_tuple():
             case ("3", "6", _):
                 target_python_version = agent_catalog_core.provider.PythonTarget.PY_36
             case ("3", "7", _):
@@ -262,7 +265,7 @@ class Provider(pydantic_settings.BaseSettings):
             case ("3", "12", _):
                 target_python_version = agent_catalog_core.provider.PythonTarget.PY_312
             case _:
-                if int(target_python_version[1]) > 12:
+                if hasattr(version_tuple, "__getitem__") and int(version_tuple[1]) > 12:
                     logger.debug("Python version not recognized. Defaulting to Python 3.11.")
                     target_python_version = agent_catalog_core.provider.PythonTarget.PY_311
                 else:
