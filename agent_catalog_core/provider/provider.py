@@ -1,5 +1,6 @@
 import abc
 import dataclasses
+import jinja2
 import logging
 import os
 import typing
@@ -7,6 +8,7 @@ import typing
 from ..annotation import AnnotationPredicate
 from ..catalog import CatalogBase
 from ..catalog import SearchResult
+from ..prompt.models import JinjaPromptDescriptor
 from ..prompt.models import RawPromptDescriptor
 from ..record.descriptor import RecordDescriptor
 from ..secrets import put_secret
@@ -108,7 +110,7 @@ class ToolProvider(BaseProvider):
 class PromptProvider(BaseProvider):
     @dataclasses.dataclass
     class PromptResult:
-        prompt: str
+        prompt: str | jinja2.Template
         tools: typing.Optional[list[typing.Any]]
         meta: RecordDescriptor
 
@@ -117,11 +119,15 @@ class PromptProvider(BaseProvider):
         tool_provider: ToolProvider,
         catalog: CatalogBase,
         refiner: typing.Callable[[list[SearchResult]], list[SearchResult]] = None,
+        jinja2_environment: jinja2.Environment = None,
     ):
         super(PromptProvider, self).__init__(catalog, refiner)
         self.tool_provider = tool_provider
+        self.jinja2_environment = (
+            jinja2_environment if jinja2_environment is not None else jinja2.Environment(loader=jinja2.BaseLoader)
+        )
 
-    def _generate_result(self, prompt_descriptor: RawPromptDescriptor) -> PromptResult:
+    def _generate_result(self, prompt_descriptor: RawPromptDescriptor | JinjaPromptDescriptor) -> PromptResult:
         # If our prompt has defined tools, fetch them here.
         tools = None
         if prompt_descriptor.tools is not None:
@@ -132,7 +138,12 @@ class PromptProvider(BaseProvider):
                 else:  # tool.name is not None
                     tools.append(self.tool_provider.get(name=tool.name, annotations=tool.annotations))
 
-        return PromptProvider.PromptResult(prompt=prompt_descriptor.prompt, tools=tools, meta=prompt_descriptor)
+        # If our prompt is a Jinja prompt, return the template.
+        if prompt_descriptor.record_kind == RecordDescriptor.RecordKind.JinjaPrompt:
+            prompt = self.jinja2_environment.from_string(prompt_descriptor.prompt)
+        else:
+            prompt = prompt_descriptor.prompt
+        return PromptProvider.PromptResult(prompt=prompt, tools=tools, meta=prompt_descriptor)
 
     def search(
         self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1

@@ -15,9 +15,9 @@ import yaml
 
 from ...record.descriptor import RecordDescriptor
 from ...record.descriptor import RecordKind
+from ...record.helper import JSONSchemaValidatingMixin
 from ...version import VersionDescriptor
 from ..decorator import is_tool
-from .helper import JSONSchemaValidatingMixin
 from .secrets import CouchbaseSecrets
 
 logger = logging.getLogger(__name__)
