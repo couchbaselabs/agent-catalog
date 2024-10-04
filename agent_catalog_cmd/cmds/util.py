@@ -4,9 +4,9 @@ import git
 import json
 import os
 import pathlib
-import sentence_transformers
 
 from ..defaults import DEFAULT_META_CATALOG_NAME
+from ..defaults import DEFAULT_MODEL_CACHE_FOLDER
 from ..models.context import Context
 from agent_catalog_core.catalog import __version__ as CATALOG_SCHEMA_VERSION
 from agent_catalog_core.catalog.version import catalog_schema_version_compare
@@ -64,9 +64,14 @@ def init_local(ctx: Context, embedding_model: str, read_only: bool = False):
         else:
             click.secho(f"Downloading and caching embedding model: {embedding_model} ...", fg="yellow")
 
+            import sentence_transformers
+
             # Download embedding model to be cached for later runtime usage.
             sentence_transformers.SentenceTransformer(
-                embedding_model, tokenizer_kwargs={"clean_up_tokenization_spaces": True}
+                embedding_model,
+                tokenizer_kwargs={"clean_up_tokenization_spaces": True},
+                cache_folder=DEFAULT_MODEL_CACHE_FOLDER,
+                local_files_only=False,
             )
 
             click.echo(f"Successfully downloaded and cached embedding model: {embedding_model}.")

@@ -9,8 +9,8 @@ import typing
 
 from ..cmds.util import init_local
 from ..cmds.util import load_repository
+from ..defaults import DEFAULT_CATALOG_SCOPE
 from ..defaults import DEFAULT_SCAN_DIRECTORY_OPTS
-from ..defaults import DEFAULT_SCOPE_PREFIX
 from ..models.context import Context
 from agent_catalog_core.catalog import CatalogMem
 from agent_catalog_core.catalog.index import index_catalog_start
@@ -103,10 +103,10 @@ def db_catalog_status(kind, bucket, cluster, compare):
     if compare:
         query_get_metadata = f"""
                 SELECT a.*, subquery.distinct_identifier_count
-                FROM `{bucket}`.{DEFAULT_SCOPE_PREFIX}.{kind}_metadata AS a
+                FROM `{bucket}`.{DEFAULT_CATALOG_SCOPE}.{kind}_metadata AS a
                 JOIN (
                     SELECT b.catalog_identifier, COUNT(b.catalog_identifier) AS distinct_identifier_count
-                    FROM `{bucket}`.{DEFAULT_SCOPE_PREFIX}.{kind}_catalog AS b
+                    FROM `{bucket}`.{DEFAULT_CATALOG_SCOPE}.{kind}_catalog AS b
                     GROUP BY b.catalog_identifier
                 ) AS subquery
                 ON a.version.identifier = subquery.catalog_identifier
@@ -116,10 +116,10 @@ def db_catalog_status(kind, bucket, cluster, compare):
         # Query to get the metadata based on the kind of catalog
         query_get_metadata = f"""
             SELECT a.*, subquery.distinct_identifier_count
-            FROM `{bucket}`.{DEFAULT_SCOPE_PREFIX}.{kind}_metadata AS a
+            FROM `{bucket}`.{DEFAULT_CATALOG_SCOPE}.{kind}_metadata AS a
             JOIN (
                 SELECT b.catalog_identifier, COUNT(b.catalog_identifier) AS distinct_identifier_count
-                FROM `{bucket}`.{DEFAULT_SCOPE_PREFIX}.{kind}_catalog AS b
+                FROM `{bucket}`.{DEFAULT_CATALOG_SCOPE}.{kind}_catalog AS b
                 GROUP BY b.catalog_identifier
             ) AS subquery
             ON a.version.identifier = subquery.catalog_identifier;
@@ -148,7 +148,7 @@ def db_catalog_status(kind, bucket, cluster, compare):
         for row in resp:
             click.secho(
                 f"""\tcatalog id: {row["version"]["identifier"]}
-     \t\tpath            : {bucket}.{DEFAULT_SCOPE_PREFIX}.{kind}
+     \t\tpath            : {bucket}.{DEFAULT_CATALOG_SCOPE}.{kind}
      \t\tschema version  : {row['catalog_schema_version']}
      \t\tkind of catalog : {kind}
      \t\trepo version    : \n\t\t\ttime of publish: {row['version']['timestamp']}\n\t\t\tcatalog identifier: {row['version']['identifier']}

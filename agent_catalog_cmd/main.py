@@ -14,8 +14,8 @@ from .cmds import cmd_version
 from .defaults import DEFAULT_ACTIVITY_FOLDER
 from .defaults import DEFAULT_CATALOG_FOLDER
 from .defaults import DEFAULT_CATALOG_SCHEMA_VERSION
+from .defaults import DEFAULT_CATALOG_SCOPE
 from .defaults import DEFAULT_EMBEDDING_MODEL
-from .defaults import DEFAULT_SCOPE_PREFIX
 from .models import Context
 from agent_catalog_util.connection import get_host_name
 from agent_catalog_util.models import CouchbaseConnect
@@ -418,7 +418,7 @@ def publish(ctx, kind, bucket, annotations):
     """Publish the local catalog to Couchbase DB"""
 
     # Get keyspace and connection details
-    keyspace_details = Keyspace(bucket="", scope=DEFAULT_SCOPE_PREFIX)
+    keyspace_details = Keyspace(bucket="", scope=DEFAULT_CATALOG_SCOPE)
 
     # Load all Couchbase connection related data from env
     connection_details_env = CouchbaseConnect(
@@ -491,7 +491,7 @@ def status(ctx, kind, include_dirty, status_db, bucket, compare):
     """Show the status of the local catalog."""
     if status_db or compare:
         # Get keyspace and connection details
-        keyspace_details = Keyspace(bucket="", scope=DEFAULT_SCOPE_PREFIX)
+        keyspace_details = Keyspace(bucket="", scope=DEFAULT_CATALOG_SCOPE)
 
         # Load all Couchbase connection related data from env
         connection_details_env = CouchbaseConnect(

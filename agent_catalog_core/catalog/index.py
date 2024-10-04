@@ -7,7 +7,8 @@ from .catalog.mem import CatalogMem
 from .descriptor import CatalogDescriptor
 from .directory import ScanDirectoryOpts
 from .directory import scan_directory
-from agent_catalog_cmd.defaults import DEFAULT_ITEM_DESCRIPTION_MAX_LEN
+from agent_catalog_core.defaults import DEFAULT_ITEM_DESCRIPTION_MAX_LEN
+from agent_catalog_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
 from agent_catalog_core.indexer import augment_descriptor
 from agent_catalog_core.indexer import source_indexers
 from agent_catalog_core.indexer import vectorize_descriptor
@@ -59,7 +60,10 @@ def index_catalog(
     import sentence_transformers
 
     embedding_model_obj = sentence_transformers.SentenceTransformer(
-        meta["embedding_model"], tokenizer_kwargs={"clean_up_tokenization_spaces": True}
+        meta["embedding_model"],
+        tokenizer_kwargs={"clean_up_tokenization_spaces": True},
+        cache_folder=DEFAULT_MODEL_CACHE_FOLDER,
+        local_files_only=True,
     )
 
     printer("Generating embeddings for descriptors.")

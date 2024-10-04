@@ -11,6 +11,7 @@ from ..catalog import SearchResult
 from ..prompt.models import JinjaPromptDescriptor
 from ..prompt.models import RawPromptDescriptor
 from ..record.descriptor import RecordDescriptor
+from ..record.descriptor import RecordKind
 from ..secrets import put_secret
 from .loader import EntryLoader
 from .loader import ModelType
@@ -139,9 +140,9 @@ class PromptProvider(BaseProvider):
                     tools.append(self.tool_provider.get(name=tool.name, annotations=tool.annotations))
 
         # If our prompt is a Jinja prompt, return the template.
-        if prompt_descriptor.record_kind == RecordDescriptor.RecordKind.JinjaPrompt:
+        if prompt_descriptor.record_kind == RecordKind.JinjaPrompt:
             prompt = self.jinja2_environment.from_string(prompt_descriptor.prompt)
-        else:
+        else:  # prompt_descriptor.record_kind == RecordKind.RawPrompt
             prompt = prompt_descriptor.prompt
         return PromptProvider.PromptResult(prompt=prompt, tools=tools, meta=prompt_descriptor)
 
