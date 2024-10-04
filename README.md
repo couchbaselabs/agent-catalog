@@ -1,6 +1,6 @@
-# rosetta
+# agent-catalog
 
-User facing repository for all things rosetta (tooling around agent workflows).
+User facing repository for all things agent-catalog (tooling around agent workflows).
 
 ## Building From Source
 
@@ -26,7 +26,7 @@ the [rosetta-example](https://github.com/couchbaselabs/rosetta-example) reposito
 
 ## Docs and templates
 
-Refer to [`docs/`](docs) to explore templates and other references while writing your agent workflow with rosetta.
+Refer to [`docs/`](docs) to explore templates and other references while writing your agent workflow with agent_catalog.
 
 ## For Contributors / Developers
 
@@ -35,7 +35,7 @@ Refer to [`docs/`](docs) to explore templates and other references while writing
 At the moment, there exists two child repositories:
 
 1. [`rosetta-core`](https://github.com/couchbaselabs/rosetta-core), which implements the core functionality of
-   `rosetta` in an "un-opinionated" manner, and...
+   `agentc` in an "un-opinionated" manner, and...
 2. [`rosetta-lc`](https://github.com/couchbaselabs/rosetta-example), which supplies additional tooling around building
    LangChain-specific agents.
 

@@ -6,9 +6,9 @@ import pathlib
 import platform
 import pydantic
 import pydantic_settings
-import rosetta_cmd.defaults
-import rosetta_core.provider
-import rosetta_core.version
+import agent_catalog_cmd.defaults
+import agent_catalog_core.provider
+import agent_catalog_core.version
 import tempfile
 import textwrap
 import typing
@@ -16,46 +16,46 @@ import typing
 logger = logging.getLogger(__name__)
 
 # To support custom refiners, we must export this model.
-SearchResult = rosetta_core.catalog.SearchResult
+SearchResult = agent_catalog_core.catalog.SearchResult
 
 # To support the generation of different (schema) models, we export this model.
-SchemaModel = rosetta_core.provider.ModelType
+SchemaModel = agent_catalog_core.provider.ModelType
 
 # To support returning prompts with defined tools + the ability to utilize the tool schema, we export this model.
-Prompt = rosetta_core.provider.PromptProvider.PromptResult
-Tool = rosetta_core.provider.ToolProvider.ToolResult
+Prompt = agent_catalog_core.provider.PromptProvider.PromptResult
+Tool = agent_catalog_core.provider.ToolProvider.ToolResult
 
 
 class Provider(pydantic_settings.BaseSettings):
-    """A provider of Rosetta indexed "agent building blocks" (e.g., tools)."""
+    """A provider of indexed "agent building blocks" (e.g., tools)."""
 
-    model_config = pydantic_settings.SettingsConfigDict(env_prefix="ROSETTA_", use_attribute_docstrings=True)
+    model_config = pydantic_settings.SettingsConfigDict(env_prefix="AGENT_CATALOG_", use_attribute_docstrings=True)
 
     conn_string: typing.Optional[str] = None
-    """ Couchbase connection string that points to the Rosetta catalog.
+    """ Couchbase connection string that points to the catalog.
 
     This Couchbase instance refers to the CB instance used with the publish command. If there exists no local catalog
     (e.g., this is deployed in a standalone environment), we will perform all "find" commands directly on the remote
-    catalog. If this field AND $ROSETTA_CATALOG are specified, we will issue "find" on both the remote and local
+    catalog. If this field AND $AGENT_CATALOG_CATALOG are specified, we will issue "find" on both the remote and local
     catalog.
 
     This field must be specified with username, password, and bucket.
     """
 
     username: typing.Optional[pydantic.SecretStr] = None
-    """ Username associated with the Couchbase instance possessing the Rosetta catalog.
+    """ Username associated with the Couchbase instance possessing the catalog.
 
     This field must be specified with conn_string, password, and bucket.
     """
 
     password: typing.Optional[pydantic.SecretStr] = None
-    """ Password associated with the Couchbase instance possessing the Rosetta catalog.
+    """ Password associated with the Couchbase instance possessing the catalog.
 
     This field must be specified with conn_string, username, and bucket.
     """
 
     bucket: typing.Optional[str] = None
-    """ The name of the Couchbase bucket possessing the Rosetta catalog.
+    """ The name of the Couchbase bucket possessing the catalog.
 
     This field must be specified with conn_string, username, and password.
     """
@@ -63,8 +63,8 @@ class Provider(pydantic_settings.BaseSettings):
     catalog: typing.Optional[pathlib.Path] = None
     """ Location of the catalog path.
 
-    If this field and $ROSETTA_CONN_STRING are not set, we will perform a best-effort search by walking upward from the
-    current working directory until we find the 'rosetta.cmd.defaults.DEFAULT_CATALOG_FOLDER' folder.
+    If this field and $AGENT_CATALOG_CONN_STRING are not set, we will perform a best-effort search by walking upward from the
+    current working directory until we find the 'agent_catalog.cmd.defaults.DEFAULT_CATALOG_FOLDER' folder.
     """
 
     output: typing.Optional[pathlib.Path | tempfile.TemporaryDirectory] = None
@@ -92,7 +92,7 @@ class Provider(pydantic_settings.BaseSettings):
     SearchResult instances (a model with the fields "entry" and "delta") and return a list of SearchResult instances.
 
     We offer an experimental post-processor to cluster closely related results (using delta as the loss function) and
-    subsequently yield the closest cluster (see rosetta_core.provider.refiner.ClosestClusterRefiner).
+    subsequently yield the closest cluster (see agent_catalog_core.provider.refiner.ClosestClusterRefiner).
     """
 
     secrets: typing.Optional[dict[str, pydantic.SecretStr]] = pydantic.Field(default_factory=dict, frozen=True)
@@ -111,7 +111,7 @@ class Provider(pydantic_settings.BaseSettings):
 
     To map the secret keys to values, users will specify their secrets using this field (secrets).
     ```python
-    provider = rosetta.Provider(secrets={
+    provider = agent_catalog.Provider(secrets={
         "MY_CB_CONN_STRING": "couchbase//23.52.12.254",
         "MY_CB_USERNAME": "admin_7823",
         "MY_CB_PASSWORD": os.getenv("THE_CB_PASSWORD")
@@ -133,15 +133,15 @@ class Provider(pydantic_settings.BaseSettings):
     frameworks.
     """
 
-    _local_tool_catalog: rosetta_core.catalog.CatalogMem = None
-    _remote_tool_catalog: rosetta_core.catalog.CatalogDB = None
-    _tool_catalog: rosetta_core.catalog.CatalogBase = None
-    _tool_provider: rosetta_core.provider.ToolProvider = None
+    _local_tool_catalog: agent_catalog_core.catalog.CatalogMem = None
+    _remote_tool_catalog: agent_catalog_core.catalog.CatalogDB = None
+    _tool_catalog: agent_catalog_core.catalog.CatalogBase = None
+    _tool_provider: agent_catalog_core.provider.ToolProvider = None
 
-    _local_prompt_catalog: rosetta_core.catalog.CatalogMem = None
-    _remote_prompt_catalog: rosetta_core.catalog.CatalogDB = None
-    _prompt_catalog: rosetta_core.catalog.CatalogBase = None
-    _prompt_provider: rosetta_core.provider.PromptProvider = None
+    _local_prompt_catalog: agent_catalog_core.catalog.CatalogMem = None
+    _remote_prompt_catalog: agent_catalog_core.catalog.CatalogDB = None
+    _prompt_catalog: agent_catalog_core.catalog.CatalogBase = None
+    _prompt_provider: agent_catalog_core.provider.PromptProvider = None
 
     @pydantic.model_validator(mode="after")
     def _find_local_catalog(self) -> typing.Self:
@@ -149,25 +149,25 @@ class Provider(pydantic_settings.BaseSettings):
             working_path = pathlib.Path.cwd()
             logger.debug(
                 'Starting best effort search for the catalog folder. Searching for "%s".',
-                rosetta_cmd.defaults.DEFAULT_CATALOG_FOLDER,
+                agent_catalog_cmd.defaults.DEFAULT_CATALOG_FOLDER,
             )
 
             # Iteratively ascend our starting path until we find the catalog folder.
-            while not (working_path / rosetta_cmd.defaults.DEFAULT_CATALOG_FOLDER).exists():
+            while not (working_path / agent_catalog_cmd.defaults.DEFAULT_CATALOG_FOLDER).exists():
                 if working_path.parent == working_path:
                     return self
                 working_path = working_path.parent
-            self.catalog = working_path / rosetta_cmd.defaults.DEFAULT_CATALOG_FOLDER
+            self.catalog = working_path / agent_catalog_cmd.defaults.DEFAULT_CATALOG_FOLDER
 
         # Set our local catalog if it exists.
-        tool_catalog_path = self.catalog / rosetta_cmd.defaults.DEFAULT_TOOL_CATALOG_NAME
+        tool_catalog_path = self.catalog / agent_catalog_cmd.defaults.DEFAULT_TOOL_CATALOG_NAME
         if tool_catalog_path.exists():
             logger.debug("Loading local tool catalog at %s.", str(tool_catalog_path.absolute()))
-            self._local_tool_catalog = rosetta_core.catalog.CatalogMem.load(tool_catalog_path, self.embedding_model)
-        prompt_catalog_path = self.catalog / rosetta_cmd.defaults.DEFAULT_PROMPT_CATALOG_NAME
+            self._local_tool_catalog = agent_catalog_core.catalog.CatalogMem.load(tool_catalog_path, self.embedding_model)
+        prompt_catalog_path = self.catalog / agent_catalog_cmd.defaults.DEFAULT_PROMPT_CATALOG_NAME
         if prompt_catalog_path.exists():
             logger.debug("Loading local prompt catalog at %s.", str(prompt_catalog_path.absolute()))
-            self._local_prompt_catalog = rosetta_core.catalog.CatalogMem.load(prompt_catalog_path, self.embedding_model)
+            self._local_prompt_catalog = agent_catalog_core.catalog.CatalogMem.load(prompt_catalog_path, self.embedding_model)
         return self
 
     @pydantic.model_validator(mode="after")
@@ -177,13 +177,13 @@ class Provider(pydantic_settings.BaseSettings):
 
         # Make sure we have {username, password, bucket}.
         if self.username is None:
-            logger.warning("$ROSETTA_CONN_STRING is specified but $ROSETTA_USERNAME is missing.")
+            logger.warning("$AGENT_CATALOG_CONN_STRING is specified but $AGENT_CATALOG_USERNAME is missing.")
             return self
         if self.password is None:
-            logger.warning("$ROSETTA_CONN_STRING is specified but $ROSETTA_PASSWORD is missing.")
+            logger.warning("$AGENT_CATALOG_CONN_STRING is specified but $AGENT_CATALOG_PASSWORD is missing.")
             return self
         if self.bucket is None:
-            logger.warning("$ROSETTA_CONN_STRING is specified but $ROSETTA_BUCKET is missing.")
+            logger.warning("$AGENT_CATALOG_CONN_STRING is specified but $AGENT_CATALOG_BUCKET is missing.")
             return self
 
         # Try to connect to our cluster.
@@ -200,18 +200,18 @@ class Provider(pydantic_settings.BaseSettings):
 
         # TODO (GLENN): Add support for passing an already open connection to CatalogDB.
         try:
-            self._remote_tool_catalog = rosetta_core.catalog.CatalogDB(
+            self._remote_tool_catalog = agent_catalog_core.catalog.CatalogDB(
                 cluster=cluster, bucket=self.bucket, kind="tool", embedding_model=self.embedding_model
             )
         except pydantic.ValidationError:
-            logger.debug("'rosetta-publish --kind tool' has not been run. Skipping remote tool catalog.")
+            logger.debug("'agentc publish --kind tool' has not been run. Skipping remote tool catalog.")
             self._remote_tool_catalog = None
         try:
-            self._remote_prompt_catalog = rosetta_core.catalog.CatalogDB(
+            self._remote_prompt_catalog = agent_catalog_core.catalog.CatalogDB(
                 cluster=cluster, bucket=self.bucket, kind="prompt", embedding_model=self.embedding_model
             )
         except pydantic.ValidationError:
-            logger.debug("'rosetta-publish --kind prompt' has not been run. Skipping remote prompt catalog.")
+            logger.debug("'agentc publish --kind prompt' has not been run. Skipping remote prompt catalog.")
             self._remote_prompt_catalog = None
         return self
 
@@ -228,15 +228,15 @@ class Provider(pydantic_settings.BaseSettings):
             local_catalog, remote_catalog, set_catalog = catalog_tuple
             if local_catalog is None and remote_catalog is None:
                 error_message = textwrap.dedent("""
-                    Could not find $ROSETTA_CATALOG nor $ROSETTA_CONN_STRING! If this is a new project, please run the
-                    command `rosetta index` before instantiating a provider. Otherwise, please set either of these
+                    Could not find $AGENT_CATALOG_CATALOG nor $AGENT_CATALOG_CONN_STRING! If this is a new project, please run the
+                    command `agentc index` before instantiating a provider. Otherwise, please set either of these
                     variables.
                 """)
                 logger.error(error_message)
                 raise ValueError(error_message)
             if local_catalog is not None and remote_catalog is not None:
                 logger.info("A local catalog and a remote catalog have been found. Building a chained catalog.")
-                set_catalog(rosetta_core.catalog.CatalogChain(chain=[local_catalog, remote_catalog]))
+                set_catalog(agent_catalog_core.catalog.CatalogChain(chain=[local_catalog, remote_catalog]))
             elif local_catalog is not None:
                 logger.info("Only a local catalog has been found. Using the local catalog.")
                 set_catalog(local_catalog)
@@ -248,28 +248,28 @@ class Provider(pydantic_settings.BaseSettings):
         target_python_version = None
         match platform.python_version_tuple():
             case ("3", "6", _):
-                target_python_version = rosetta_core.provider.PythonTarget.PY_36
+                target_python_version = agent_catalog_core.provider.PythonTarget.PY_36
             case ("3", "7", _):
-                target_python_version = rosetta_core.provider.PythonTarget.PY_37
+                target_python_version = agent_catalog_core.provider.PythonTarget.PY_37
             case ("3", "8", _):
-                target_python_version = rosetta_core.provider.PythonTarget.PY_38
+                target_python_version = agent_catalog_core.provider.PythonTarget.PY_38
             case ("3", "9", _):
-                target_python_version = rosetta_core.provider.PythonTarget.PY_39
+                target_python_version = agent_catalog_core.provider.PythonTarget.PY_39
             case ("3", "10", _):
-                target_python_version = rosetta_core.provider.PythonTarget.PY_310
+                target_python_version = agent_catalog_core.provider.PythonTarget.PY_310
             case ("3", "11", _):
-                target_python_version = rosetta_core.provider.PythonTarget.PY_311
+                target_python_version = agent_catalog_core.provider.PythonTarget.PY_311
             case ("3", "12", _):
-                target_python_version = rosetta_core.provider.PythonTarget.PY_312
+                target_python_version = agent_catalog_core.provider.PythonTarget.PY_312
             case _:
                 if int(target_python_version[1]) > 12:
                     logger.debug("Python version not recognized. Defaulting to Python 3.11.")
-                    target_python_version = rosetta_core.provider.PythonTarget.PY_311
+                    target_python_version = agent_catalog_core.provider.PythonTarget.PY_311
                 else:
                     raise ValueError(f"Python version {platform.python_version()} not supported.")
 
         # Finally, initialize our provider.
-        self._tool_provider = rosetta_core.provider.ToolProvider(
+        self._tool_provider = agent_catalog_core.provider.ToolProvider(
             catalog=self._tool_catalog,
             output=self.output,
             decorator=self.decorator,
@@ -278,7 +278,7 @@ class Provider(pydantic_settings.BaseSettings):
             python_version=target_python_version,
             model_type=self.tool_model,
         )
-        self._prompt_provider = rosetta_core.provider.PromptProvider(
+        self._prompt_provider = agent_catalog_core.provider.PromptProvider(
             tool_provider=self._tool_provider,
             catalog=self._prompt_catalog,
             refiner=self.refiner,
@@ -287,7 +287,7 @@ class Provider(pydantic_settings.BaseSettings):
 
     @pydantic.computed_field
     @property
-    def version(self) -> rosetta_core.version.VersionDescriptor:
+    def version(self) -> agent_catalog_core.version.VersionDescriptor:
         # TODO (GLENN): How should we factor the prompt catalog version into all of this?
         if self._local_tool_catalog is not None:
             return self._tool_catalog.version
