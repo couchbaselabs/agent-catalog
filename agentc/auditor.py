@@ -77,14 +77,6 @@ class Auditor(pydantic_settings.BaseSettings):
     Audit log files will reach a maximum of 128MB (by default) before they are rotated and compressed.
     """
 
-    log_callback: typing.Callable[[Kind, typing.Any], None] = pydantic.Field(default=lambda k, c: None)
-    """ Callback to use whenever a log is accepted.
-
-    The purpose of this field is to give auditor users the ability to inject custom behavior to the logging process.
-    An example use-case here is involves displaying intermediate steps that your agent is taking before reaching
-    responding.
-    """
-
     _local_auditor: agent_catalog_core.activity.LocalAuditor = None
     _db_auditor: agent_catalog_core.activity.DBAuditor = None
     _audit: typing.Callable = None
@@ -205,7 +197,6 @@ class Auditor(pydantic_settings.BaseSettings):
                       or on accept(). A model specified in accept() overrides a model specified on instantiation.
         """
         model = model if model is not None else self.llm_name
-        self.log_callback(kind, content)
         self._audit(
             kind=kind, content=content, session=session, grouping=grouping, timestamp=timestamp, model=model, **kwargs
         )
@@ -236,7 +227,6 @@ class Auditor(pydantic_settings.BaseSettings):
             content = dict(from_node=node_name, extra=content)
         else:
             raise ValueError('Direction must be either "enter" or "exit".')
-        self.log_callback(Kind.Transition, content)
         self._audit(
             kind=Kind.Transition,
             content=content,
