@@ -18,7 +18,7 @@ def create_analytics_views(cluster: couchbase.cluster.Cluster, bucket: str) -> N
                 .replace("[SCOPE_NAME]", DEFAULT_AUDIT_SCOPE)
                 .replace("[LOG_COLLECTION_NAME]", DEFAULT_AUDIT_COLLECTION)
             )
-            print(f"Issuing the following statement: {ddl_string}")
+            logger.debug(f"Issuing the following statement: {ddl_string}")
 
             # TODO (GLENN): There should be a warning here (instead of an error) if Analytics is not enabled.
             ddl_result = cluster.analytics_query(ddl_string)
