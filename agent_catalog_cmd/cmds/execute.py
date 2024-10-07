@@ -5,7 +5,7 @@ import pathlib
 
 from ..defaults import DEFAULT_TOOL_CATALOG_NAME
 from ..models import Context
-from rosetta_core.catalog import CatalogMem
+from agent_catalog_core.catalog import CatalogMem
 
 supported_providers = ["openai", "azure-openai", "anthropic", "google", "groq"]
 
