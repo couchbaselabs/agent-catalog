@@ -1,5 +1,4 @@
 import click
-import controlflow as cf
 import os
 import pathlib
 
@@ -11,6 +10,8 @@ supported_providers = ["openai", "azure-openai", "anthropic", "google", "groq"]
 
 
 def cmd_execute(ctx: Context, name: str, model: str):
+    import controlflow as cf
+
     catalog_path = pathlib.Path(ctx.catalog) / DEFAULT_TOOL_CATALOG_NAME
     catalog = CatalogMem.load(catalog_path)
     tool = catalog.find(name=name)

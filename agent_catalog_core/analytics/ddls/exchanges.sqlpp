@@ -74,7 +74,10 @@ CREATE OR REPLACE ANALYTICS VIEW
                 m
         )
     SELECT
-        hag.sid,
         question,
         answer,
-        walk;
+        walk,
+        hag.sid,
+        ROW_NUMBER() OVER(
+            PARTITION BY hag.sid
+        ) AS exchange_num;
