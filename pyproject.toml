@@ -20,7 +20,7 @@ include = [
     "agent_catalog_core/tool/generate/templates/*",
 
     # These are the Analytics DDLs for log analysis.
-    "agent_catalog_core/activity/auditor/ddls/*"
+    "agent_catalog_core/analytics/ddls/*"
 ]
 
 [tool.poetry.urls]

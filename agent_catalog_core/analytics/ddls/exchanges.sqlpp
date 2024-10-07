@@ -3,22 +3,22 @@ CREATE OR REPLACE ANALYTICS VIEW
     WITH
         HumanAssistantWindows AS (
             FROM
-               `[BUCKET_NAME]`.`[SCOPE_NAME]`.Trajectories AS t,
-               t.msgs AS m
+               `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions AS s,
+               s.msgs AS m
             LETTING
                 is_human =
-                    CASE m.role
+                    CASE m.kind
                         WHEN "human" THEN 1
                         ELSE 0
                     END
             SELECT
                 SUM(is_human) OVER (
                     PARTITION BY
-                        t.sid
+                        s.sid
                     ORDER BY
                         m.timestamp
                 ) AS h_count,
-                t.sid AS sid,
+                s.sid AS sid,
                 m AS msg
         ),
         HumanAssistantGroups AS (
@@ -50,7 +50,7 @@ CREATE OR REPLACE ANALYTICS VIEW
             FROM
                 hag.msgs m
             WHERE
-                m.role = "human"
+                m.kind = "human"
             SELECT VALUE
                 m
         )[0],
@@ -58,7 +58,7 @@ CREATE OR REPLACE ANALYTICS VIEW
             FROM
                 hag.msgs AS m
             WHERE
-                m.role = "assistant"
+                m.kind = "assistant"
             SELECT VALUE
                 m
             ORDER BY
@@ -68,13 +68,16 @@ CREATE OR REPLACE ANALYTICS VIEW
             FROM
                 hag.msgs AS m
             WHERE
-                m.role != "human" AND
-                m.role != "assistant"
+                m.kind != "human" AND
+                m.kind != "assistant"
             SELECT VALUE
                 m
         )
     SELECT
-        hag.sid,
         question,
         answer,
-        walk;
+        walk,
+        hag.sid,
+        ROW_NUMBER() OVER(
+            PARTITION BY hag.sid
+        ) AS exchange_num;

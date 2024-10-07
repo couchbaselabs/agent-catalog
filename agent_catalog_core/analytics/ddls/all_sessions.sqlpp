@@ -19,7 +19,7 @@ CREATE OR REPLACE ANALYTICS VIEW
                         PARTITION BY
                             _id
                         ORDER BY
-                            rsli.timestamp DESC
+                            rsli.timestamp ASC
                     ) AS rn
         )
     FROM
@@ -45,7 +45,8 @@ CREATE OR REPLACE ANALYTICS VIEW
             SELECT
                 gi.rsl.content AS content,
                 gi.rsl.timestamp AS timestamp,
-                gi.rsl.kind AS kind
+                gi.rsl.kind AS kind,
+                ROW_NUMBER() OVER() AS msg_num
         ),
         vid = {
             "identifier": ver.identifier,
