@@ -48,7 +48,7 @@ class DBAuditor(BaseAuditor):
             logger.error(err)
             return
 
-        create_analytics_views(cb, bucket)
+        create_analytics_views(cluster, bucket)
 
         # get collection ref
         cb_coll = cb.scope(DEFAULT_AUDIT_SCOPE).collection(DEFAULT_AUDIT_COLLECTION)
