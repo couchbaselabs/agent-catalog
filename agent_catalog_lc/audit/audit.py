@@ -21,7 +21,6 @@ from langchain_core.messages import ToolMessage
 from langchain_core.messages import ToolMessageChunk
 from langchain_core.outputs import ChatGenerationChunk
 from langchain_core.outputs import ChatResult
-from langchain_core.runnables.config import run_in_executor
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +80,9 @@ def audit(
 ) -> BaseChatModel:
     """A method to (dynamically) dispatch the '_generate' & '_stream' methods to methods that log LLM calls."""
     generate_dispatch = chat_model._generate
+    agenerate_dispatch = chat_model._agenerate
     stream_dispatch = chat_model._stream
+    astream_dispatch = chat_model._astream
 
     def _generate(
         self,
@@ -132,10 +133,6 @@ def audit(
             grouping=grouping_id,
         )
 
-    # Note: Pydantic fiddles around with __setattr__, so we need to skirt around this.
-    object.__setattr__(chat_model, "_generate", _generate.__get__(chat_model, BaseChatModel))
-    object.__setattr__(chat_model, "_stream", _stream.__get__(chat_model, BaseChatModel))
-
     async def _agenerate(
         self,
         messages: typing.List[BaseMessage],
@@ -143,9 +140,18 @@ def audit(
         run_manager: typing.Optional[AsyncCallbackManagerForLLMRun] = None,
         **kwargs: typing.Any,
     ):
-        return await run_in_executor(
-            None, self._generate, messages, stop, run_manager.get_sync() if run_manager else None, **kwargs
-        )
+        grouping_id = uuid.uuid4().hex
+        _accept_messages(messages, auditor, session=session, grouping=grouping_id)
+        results = await agenerate_dispatch(messages, stop, run_manager, **kwargs)
+        for result in results.generations:
+            logger.debug(f"LLM has returned the message: {result}")
+            auditor.accept(
+                kind=agent_catalog_core.analytics.Kind.LLM,
+                content=_content_from_message(result.message),
+                session=session,
+                grouping=grouping_id,
+            )
+        return results
 
     async def _astream(
         self,
@@ -154,27 +160,31 @@ def audit(
         run_manager: typing.Optional[AsyncCallbackManagerForLLMRun] = None,
         **kwargs: typing.Any,
     ) -> typing.AsyncIterator[ChatGenerationChunk]:
-        iterator = await run_in_executor(
-            None,
-            self._stream,
-            messages,
-            stop,
-            run_manager.get_sync() if run_manager else None,
-            **kwargs,
-        )
-        done = object()
-        while True:
-            item = await run_in_executor(
-                None,
-                next,
-                iterator,
-                done,
-            )
-            if item is done:
-                break
-            yield item
+        grouping_id = uuid.uuid4().hex
+        _accept_messages(messages, auditor, session=session, grouping=grouping_id)
+        iterator = astream_dispatch(messages, stop, run_manager, **kwargs)
 
-    # Note: Pydantic fiddles around with __setattr__, so we need to skirt around this (this must run after).
+        # For sanity at analytics-time, we'll aggregate the chunks here.
+        result_chunk: ChatGenerationChunk = None
+        async for chunk in iterator:
+            logger.debug(f"LLM has returned the chunk: {chunk}")
+            if result_chunk is None:
+                result_chunk = chunk
+            else:
+                result_chunk += chunk
+            yield chunk
+
+        # We have exhausted our iterator. Log the resultant chunk.
+        auditor.accept(
+            kind=agent_catalog_core.analytics.Kind.LLM,
+            content=_content_from_message(result_chunk.message),
+            session=session,
+            grouping=grouping_id,
+        )
+
+    # Note: Pydantic fiddles around with __setattr__, so we need to skirt around this.
+    object.__setattr__(chat_model, "_generate", _generate.__get__(chat_model, BaseChatModel))
+    object.__setattr__(chat_model, "_stream", _stream.__get__(chat_model, BaseChatModel))
     object.__setattr__(chat_model, "_agenerate", _agenerate.__get__(chat_model, BaseChatModel))
     object.__setattr__(chat_model, "_astream", _astream.__get__(chat_model, BaseChatModel))
     return chat_model
