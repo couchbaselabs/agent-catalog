@@ -1,9 +1,10 @@
-import logging
 import agent_catalog_core.activity.auditor.base
 import agent_catalog_core.analytics.log
+import logging
 import typing
 import uuid
 
+from langchain_core.callbacks import AsyncCallbackManagerForLLMRun
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.language_models import BaseChatModel
 from langchain_core.load.dump import default
@@ -20,6 +21,7 @@ from langchain_core.messages import ToolMessage
 from langchain_core.messages import ToolMessageChunk
 from langchain_core.outputs import ChatGenerationChunk
 from langchain_core.outputs import ChatResult
+from langchain_core.runnables.config import run_in_executor
 
 logger = logging.getLogger(__name__)
 
@@ -78,7 +80,6 @@ def audit(
     auditor: agent_catalog_core.activity.auditor.base.AuditorType,
 ) -> BaseChatModel:
     """A method to (dynamically) dispatch the '_generate' & '_stream' methods to methods that log LLM calls."""
-    # TODO (GLENN): We should capture the _agenerate and _astream methods as well.
     generate_dispatch = chat_model._generate
     stream_dispatch = chat_model._stream
 
@@ -134,4 +135,46 @@ def audit(
     # Note: Pydantic fiddles around with __setattr__, so we need to skirt around this.
     object.__setattr__(chat_model, "_generate", _generate.__get__(chat_model, BaseChatModel))
     object.__setattr__(chat_model, "_stream", _stream.__get__(chat_model, BaseChatModel))
+
+    async def _agenerate(
+        self,
+        messages: typing.List[BaseMessage],
+        stop: typing.Optional[typing.List[str]] = None,
+        run_manager: typing.Optional[AsyncCallbackManagerForLLMRun] = None,
+        **kwargs: typing.Any,
+    ):
+        return await run_in_executor(
+            None, self._generate, messages, stop, run_manager.get_sync() if run_manager else None, **kwargs
+        )
+
+    async def _astream(
+        self,
+        messages: list[BaseMessage],
+        stop: typing.Optional[list[str]] = None,
+        run_manager: typing.Optional[AsyncCallbackManagerForLLMRun] = None,
+        **kwargs: typing.Any,
+    ) -> typing.AsyncIterator[ChatGenerationChunk]:
+        iterator = await run_in_executor(
+            None,
+            self._stream,
+            messages,
+            stop,
+            run_manager.get_sync() if run_manager else None,
+            **kwargs,
+        )
+        done = object()
+        while True:
+            item = await run_in_executor(
+                None,
+                next,
+                iterator,
+                done,
+            )
+            if item is done:
+                break
+            yield item
+
+    # Note: Pydantic fiddles around with __setattr__, so we need to skirt around this (this must run after).
+    object.__setattr__(chat_model, "_agenerate", _agenerate.__get__(chat_model, BaseChatModel))
+    object.__setattr__(chat_model, "_astream", _astream.__get__(chat_model, BaseChatModel))
     return chat_model

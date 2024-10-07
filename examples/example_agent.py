@@ -1,3 +1,4 @@
+import agent_catalog_lc
 import couchbase.auth
 import couchbase.cluster
 import couchbase.exceptions
@@ -8,7 +9,6 @@ import langchain.agents
 import langchain.prompts
 import langchain_core.tools
 import os
-import agent_catalog_lc
 import typing
 
 # Load our environment variables.
