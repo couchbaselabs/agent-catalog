@@ -19,7 +19,7 @@ CREATE OR REPLACE ANALYTICS VIEW
                         PARTITION BY
                             _id
                         ORDER BY
-                            rsli.timestamp DESC
+                            rsli.timestamp ASC
                     ) AS rn
         )
     FROM
