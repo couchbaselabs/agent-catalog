@@ -1,0 +1,48 @@
+[tool.poetry]
+name = "agent_catalog"
+version = "0.1.0"
+description = "User facing repository for agent-catalog."
+repository = "https://github.com/couchbaselabs/agent-catalog"
+authors = ["Tanvi Johari <tanvi.johari@couchbase.com>"]
+readme = "README.md"
+
+[tool.poetry.urls]
+Homepage = "https://couchbase.com"
+Documentation = "https://docs.couchbase.com"
+Repository = "https://github.com/couchbaselabs/agent-catalog"
+
+[tool.poetry.scripts]
+agentc = "agentc.__main__:main"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+agent-catalog-libs = { path = "./libs" }
+agent-catalog-lc = { path = "./lc" }
+
+# For developers that wish to make changes
+#agent-catalog-libs = { path = "./libs", develop=true }
+#agent-catalog-lc = { path = "./lc", develop=true }
+
+[tool.poetry.extras]
+langchain = ["agent-catalog-lc"]
+
+# Group dependencies for development tools (optional)
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.2.2"
+
+[tool.ruff]
+line-length = 120
+lint.select = ["F", "B", "I", "SIM"]
+show-fixes = true
+
+[tool.ruff.lint.isort]
+no-sections = true
+force-single-line = true
+lines-between-types = 1
+force-wrap-aliases = true
+split-on-trailing-comma = false
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,7 +1,7 @@
 import agent_catalog_cmd.defaults
-import agent_catalog_core.activity
-import agent_catalog_core.analytics
-import agent_catalog_core.analytics.content
+import agent_catalog_libs.activity
+import agent_catalog_libs.analytics
+import agent_catalog_libs.analytics.content
 import datetime
 import logging
 import pathlib
@@ -15,7 +15,7 @@ from .provider import Provider
 logger = logging.getLogger(__name__)
 
 # On audits, we need to export the "kind" associated with a log...
-Kind = agent_catalog_core.analytics.log.Kind
+Kind = agent_catalog_libs.analytics.log.Kind
 
 
 class Auditor(pydantic_settings.BaseSettings):
@@ -77,8 +77,8 @@ class Auditor(pydantic_settings.BaseSettings):
     Audit log files will reach a maximum of 128MB (by default) before they are rotated and compressed.
     """
 
-    _local_auditor: agent_catalog_core.activity.LocalAuditor = None
-    _db_auditor: agent_catalog_core.activity.DBAuditor = None
+    _local_auditor: agent_catalog_libs.activity.LocalAuditor = None
+    _db_auditor: agent_catalog_libs.activity.DBAuditor = None
     _audit: typing.Callable = None
 
     @pydantic.model_validator(mode="after")
@@ -143,11 +143,11 @@ class Auditor(pydantic_settings.BaseSettings):
 
         # Finally, instantiate our auditors.
         if self.local_log is not None:
-            self._local_auditor = agent_catalog_core.activity.LocalAuditor(
+            self._local_auditor = agent_catalog_libs.activity.LocalAuditor(
                 output=self.local_log, catalog_version=provider.version, model=self.llm_name
             )
         if self.conn_string is not None:
-            self._db_auditor = agent_catalog_core.activity.DBAuditor(
+            self._db_auditor = agent_catalog_libs.activity.DBAuditor(
                 conn_string=self.conn_string,
                 username=self.username.get_secret_value(),
                 password=self.password.get_secret_value(),
@@ -188,7 +188,7 @@ class Auditor(pydantic_settings.BaseSettings):
         **kwargs,
     ) -> None:
         """
-        :param kind: Kind associated with the message. See agent_catalog_core.analytics.log.Kind for all options here.
+        :param kind: Kind associated with the message. See agent_catalog_libs.analytics.log.Kind for all options here.
         :param content: The (JSON-serializable) message to record. This should be as close to the producer as possible.
         :param session: A unique string associated with the current session / conversation / thread.
         :param grouping: A unique string associated with one "generate" invocation across a group of messages.

@@ -1,6 +1,6 @@
 import agent_catalog_cmd.defaults
-import agent_catalog_core.provider
-import agent_catalog_core.version
+import agent_catalog_libs.provider
+import agent_catalog_libs.version
 import couchbase.auth
 import couchbase.cluster
 import couchbase.options
@@ -16,14 +16,14 @@ import typing
 logger = logging.getLogger(__name__)
 
 # To support custom refiners, we must export this model.
-SearchResult = agent_catalog_core.catalog.SearchResult
+SearchResult = agent_catalog_libs.catalog.SearchResult
 
 # To support the generation of different (schema) models, we export this model.
-SchemaModel = agent_catalog_core.provider.ModelType
+SchemaModel = agent_catalog_libs.provider.ModelType
 
 # To support returning prompts with defined tools + the ability to utilize the tool schema, we export this model.
-Prompt = agent_catalog_core.provider.PromptProvider.PromptResult
-Tool = agent_catalog_core.provider.ToolProvider.ToolResult
+Prompt = agent_catalog_libs.provider.PromptProvider.PromptResult
+Tool = agent_catalog_libs.provider.ToolProvider.ToolResult
 
 
 class Provider(pydantic_settings.BaseSettings):
@@ -92,7 +92,7 @@ class Provider(pydantic_settings.BaseSettings):
     SearchResult instances (a model with the fields "entry" and "delta") and return a list of SearchResult instances.
 
     We offer an experimental post-processor to cluster closely related results (using delta as the loss function) and
-    subsequently yield the closest cluster (see agent_catalog_core.provider.refiner.ClosestClusterRefiner).
+    subsequently yield the closest cluster (see agent_catalog_libs.provider.refiner.ClosestClusterRefiner).
     """
 
     secrets: typing.Optional[dict[str, pydantic.SecretStr]] = pydantic.Field(default_factory=dict, frozen=True)
@@ -133,15 +133,15 @@ class Provider(pydantic_settings.BaseSettings):
     frameworks.
     """
 
-    _local_tool_catalog: agent_catalog_core.catalog.CatalogMem = None
-    _remote_tool_catalog: agent_catalog_core.catalog.CatalogDB = None
-    _tool_catalog: agent_catalog_core.catalog.CatalogBase = None
-    _tool_provider: agent_catalog_core.provider.ToolProvider = None
+    _local_tool_catalog: agent_catalog_libs.catalog.CatalogMem = None
+    _remote_tool_catalog: agent_catalog_libs.catalog.CatalogDB = None
+    _tool_catalog: agent_catalog_libs.catalog.CatalogBase = None
+    _tool_provider: agent_catalog_libs.provider.ToolProvider = None
 
-    _local_prompt_catalog: agent_catalog_core.catalog.CatalogMem = None
-    _remote_prompt_catalog: agent_catalog_core.catalog.CatalogDB = None
-    _prompt_catalog: agent_catalog_core.catalog.CatalogBase = None
-    _prompt_provider: agent_catalog_core.provider.PromptProvider = None
+    _local_prompt_catalog: agent_catalog_libs.catalog.CatalogMem = None
+    _remote_prompt_catalog: agent_catalog_libs.catalog.CatalogDB = None
+    _prompt_catalog: agent_catalog_libs.catalog.CatalogBase = None
+    _prompt_provider: agent_catalog_libs.provider.PromptProvider = None
 
     @pydantic.model_validator(mode="after")
     def _find_local_catalog(self) -> typing.Self:
@@ -163,13 +163,13 @@ class Provider(pydantic_settings.BaseSettings):
         tool_catalog_path = self.catalog / agent_catalog_cmd.defaults.DEFAULT_TOOL_CATALOG_NAME
         if tool_catalog_path.exists():
             logger.debug("Loading local tool catalog at %s.", str(tool_catalog_path.absolute()))
-            self._local_tool_catalog = agent_catalog_core.catalog.CatalogMem.load(
+            self._local_tool_catalog = agent_catalog_libs.catalog.CatalogMem.load(
                 tool_catalog_path, self.embedding_model
             )
         prompt_catalog_path = self.catalog / agent_catalog_cmd.defaults.DEFAULT_PROMPT_CATALOG_NAME
         if prompt_catalog_path.exists():
             logger.debug("Loading local prompt catalog at %s.", str(prompt_catalog_path.absolute()))
-            self._local_prompt_catalog = agent_catalog_core.catalog.CatalogMem.load(
+            self._local_prompt_catalog = agent_catalog_libs.catalog.CatalogMem.load(
                 prompt_catalog_path, self.embedding_model
             )
         return self
@@ -204,14 +204,14 @@ class Provider(pydantic_settings.BaseSettings):
 
         # TODO (GLENN): Add support for passing an already open connection to CatalogDB.
         try:
-            self._remote_tool_catalog = agent_catalog_core.catalog.CatalogDB(
+            self._remote_tool_catalog = agent_catalog_libs.catalog.CatalogDB(
                 cluster=cluster, bucket=self.bucket, kind="tool", embedding_model=self.embedding_model
             )
         except pydantic.ValidationError:
             logger.debug("'agent_catalog publish --kind tool' has not been run. Skipping remote tool catalog.")
             self._remote_tool_catalog = None
         try:
-            self._remote_prompt_catalog = agent_catalog_core.catalog.CatalogDB(
+            self._remote_prompt_catalog = agent_catalog_libs.catalog.CatalogDB(
                 cluster=cluster, bucket=self.bucket, kind="prompt", embedding_model=self.embedding_model
             )
         except pydantic.ValidationError:
@@ -240,7 +240,7 @@ class Provider(pydantic_settings.BaseSettings):
                 raise ValueError(error_message)
             if local_catalog is not None and remote_catalog is not None:
                 logger.info("A local catalog and a remote catalog have been found. Building a chained catalog.")
-                set_catalog(agent_catalog_core.catalog.CatalogChain(chain=[local_catalog, remote_catalog]))
+                set_catalog(agent_catalog_libs.catalog.CatalogChain(chain=[local_catalog, remote_catalog]))
             elif local_catalog is not None:
                 logger.info("Only a local catalog has been found. Using the local catalog.")
                 set_catalog(local_catalog)
@@ -251,28 +251,28 @@ class Provider(pydantic_settings.BaseSettings):
         # Check the version of Python (this is needed for the code-generator).
         match version_tuple := platform.python_version_tuple():
             case ("3", "6", _):
-                target_python_version = agent_catalog_core.provider.PythonTarget.PY_36
+                target_python_version = agent_catalog_libs.provider.PythonTarget.PY_36
             case ("3", "7", _):
-                target_python_version = agent_catalog_core.provider.PythonTarget.PY_37
+                target_python_version = agent_catalog_libs.provider.PythonTarget.PY_37
             case ("3", "8", _):
-                target_python_version = agent_catalog_core.provider.PythonTarget.PY_38
+                target_python_version = agent_catalog_libs.provider.PythonTarget.PY_38
             case ("3", "9", _):
-                target_python_version = agent_catalog_core.provider.PythonTarget.PY_39
+                target_python_version = agent_catalog_libs.provider.PythonTarget.PY_39
             case ("3", "10", _):
-                target_python_version = agent_catalog_core.provider.PythonTarget.PY_310
+                target_python_version = agent_catalog_libs.provider.PythonTarget.PY_310
             case ("3", "11", _):
-                target_python_version = agent_catalog_core.provider.PythonTarget.PY_311
+                target_python_version = agent_catalog_libs.provider.PythonTarget.PY_311
             case ("3", "12", _):
-                target_python_version = agent_catalog_core.provider.PythonTarget.PY_312
+                target_python_version = agent_catalog_libs.provider.PythonTarget.PY_312
             case _:
                 if hasattr(version_tuple, "__getitem__") and int(version_tuple[1]) > 12:
                     logger.debug("Python version not recognized. Defaulting to Python 3.11.")
-                    target_python_version = agent_catalog_core.provider.PythonTarget.PY_311
+                    target_python_version = agent_catalog_libs.provider.PythonTarget.PY_311
                 else:
                     raise ValueError(f"Python version {platform.python_version()} not supported.")
 
         # Finally, initialize our provider.
-        self._tool_provider = agent_catalog_core.provider.ToolProvider(
+        self._tool_provider = agent_catalog_libs.provider.ToolProvider(
             catalog=self._tool_catalog,
             output=self.output,
             decorator=self.decorator,
@@ -281,7 +281,7 @@ class Provider(pydantic_settings.BaseSettings):
             python_version=target_python_version,
             model_type=self.tool_model,
         )
-        self._prompt_provider = agent_catalog_core.provider.PromptProvider(
+        self._prompt_provider = agent_catalog_libs.provider.PromptProvider(
             tool_provider=self._tool_provider,
             catalog=self._prompt_catalog,
             refiner=self.refiner,
@@ -290,7 +290,7 @@ class Provider(pydantic_settings.BaseSettings):
 
     @pydantic.computed_field
     @property
-    def version(self) -> agent_catalog_core.version.VersionDescriptor:
+    def version(self) -> agent_catalog_libs.version.VersionDescriptor:
         # TODO (GLENN): How should we factor the prompt catalog version into all of this?
         if self._local_tool_catalog is not None:
             return self._tool_catalog.version
