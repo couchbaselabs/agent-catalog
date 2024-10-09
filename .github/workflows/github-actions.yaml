@@ -14,14 +14,13 @@ jobs:
       - name: Verify existence of essential files
         uses: thebinaryfelix/check-file-existence-action@1.0.0
         with:
-          files: 'README.md, pyproject.toml, .gitignore, agent_catalog_cmd/, agent_catalog_core/, tests/'
+          files: 'README.md, pyproject.toml, .gitignore, libs/agent_catalog_libs/cmd/, libs/agent_catalog_libs/core/, libs/agent_catalog_libs/tests/, libs/lc/agent_catalog_lc/, libs/lc/examples/'
 
-      # TODO (TANVI): add more to this later
       - name: Verify command file existence
         uses: thebinaryfelix/check-file-existence-action@1.0.0
         with:
-          files: 'libs/agent_catalog_cmd/cmds/index.py, libs/agent_catalog_cmd/cmds/publish.py, libs/agent_catalog_cmd/cmds/version.py, libs/agent_catalog_cmd/cmds/find.py,
-          libs/agent_catalog_cmd/cmds/clean.py, libs/agent_catalog_cmd/cmds/env.py, libs/agent_catalog_cmd/cmds/execute.py, libs/agent_catalog_cmd/cmds/status, libs/agent_catalog_cmd/cmds/util'
+          files: 'libs/agent_catalog_libs/cmd/cmds/index.py, libs/agent_catalog_libs/cmd/cmds/publish.py, libs/agent_catalog_libs/cmd/cmds/version.py, libs/agent_catalog_libs/cmd/cmds/find.py,
+          libs/agent_catalog_libs/cmd/cmds/clean.py, libs/agent_catalog_libs/cmd/cmds/env.py, libs/agent_catalog_libs/cmd/cmds/execute.py, libs/agent_catalog_libs/cmd/cmds/status.py, libs/agent_catalog_libs/cmd/cmds/util.py'
 
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - name: Set up Python Poetry

@@ -1,0 +1,51 @@
+[tool.poetry]
+name = "agent-catalog-lc"
+version = "0.1.0"
+description = "Collection of LangChain-specific classes and functions used with rosetta-core."
+authors = [
+  "Kush Khanna <kush.khanna@couchbase.com>",
+  "Glenn Galvizo <glenn.galvizo@couchbase.com>"
+]
+readme = "README.md"
+packages = [{include = "agent_catalog_lc"}]
+
+[tool.poetry.urls]
+Homepage = "https://couchbase.com"
+Documentation = "https://docs.couchbase.com"
+Repository = "https://github.com/couchbaselabs/rosetta-lc"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+couchbase = "^4.3.0"
+joblib = "^1.4.2"
+langchain = ">=0.2.12"
+langchain-core = ">=0.2.28"
+langchain-openai = ">=0.1.20"
+pydantic = "2.8.2"
+requests = "^2.32.3"
+python-dotenv = "^1.0.1"
+
+agent_catalog_libs = { path = "../agent_catalog_libs" }
+
+# For developers that want to use a local version
+# agent_catalog_libs = { path = "../agent_catalog_libs", develop = true }
+
+[tool.ruff]
+line-length = 120
+lint.select = ["F", "B", "I", "SIM"]
+show-fixes = true
+
+[tool.ruff.lint.isort]
+no-sections = true
+force-single-line = true
+lines-between-types = 1
+force-wrap-aliases = true
+split-on-trailing-comma = false
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.2.2"
+# pytest = "^8.3.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
