@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "agent-catalog-core"
+name = "agent-catalog-libs"
 version = "0.1.0"
 description = "Core library associated with agentic workflows in Couchbase."
 repository = "https://github.com/couchbaselabs/rosetta-core"
