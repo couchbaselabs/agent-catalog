@@ -1,4 +1,4 @@
-import agentc.auditor
+import agent_catalog.auditor
 import importlib.util
 import langchain_core.language_models.chat_models
 import logging
@@ -16,7 +16,7 @@ if importlib.util.find_spec("agent_catalog_lc") is not None:
             self,
             chat_model: langchain_core.language_models.chat_models.BaseChatModel,
             session: typing.AnyStr,
-            auditor: agentc.auditor,
+            auditor: agent_catalog.auditor,
         ) -> langchain_core.language_models.chat_models.BaseChatModel: ...
 
     audit: AuditType = mod.audit
@@ -26,7 +26,7 @@ else:
     def audit(
         chat_model: langchain_core.language_models.chat_models.BaseChatModel,
         session: typing.AnyStr,
-        auditor: agentc.auditor,
+        auditor: agent_catalog.auditor,
     ) -> langchain_core.language_models.chat_models.BaseChatModel:
         logger.warning("agent_catalog_lc not found! Returning chat_model without modification.")
         return chat_model

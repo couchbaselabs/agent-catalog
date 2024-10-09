@@ -64,7 +64,7 @@ class Provider(pydantic_settings.BaseSettings):
     """ Location of the catalog path.
 
     If this field and $AGENT_CATALOG_CONN_STRING are not set, we will perform a best-effort search by walking upward from the
-    current working directory until we find the 'agentc.cmd.defaults.DEFAULT_CATALOG_FOLDER' folder.
+    current working directory until we find the 'agent_catalog.cmd.defaults.DEFAULT_CATALOG_FOLDER' folder.
     """
 
     output: typing.Optional[pathlib.Path | tempfile.TemporaryDirectory] = None
@@ -111,7 +111,7 @@ class Provider(pydantic_settings.BaseSettings):
 
     To map the secret keys to values, users will specify their secrets using this field (secrets).
     ```python
-    provider = agentc.Provider(secrets={
+    provider = agent_catalog.Provider(secrets={
         "MY_CB_CONN_STRING": "couchbase//23.52.12.254",
         "MY_CB_USERNAME": "admin_7823",
         "MY_CB_PASSWORD": os.getenv("THE_CB_PASSWORD")
@@ -208,14 +208,14 @@ class Provider(pydantic_settings.BaseSettings):
                 cluster=cluster, bucket=self.bucket, kind="tool", embedding_model=self.embedding_model
             )
         except pydantic.ValidationError:
-            logger.debug("'agentc publish --kind tool' has not been run. Skipping remote tool catalog.")
+            logger.debug("'agent_catalog publish --kind tool' has not been run. Skipping remote tool catalog.")
             self._remote_tool_catalog = None
         try:
             self._remote_prompt_catalog = agent_catalog_core.catalog.CatalogDB(
                 cluster=cluster, bucket=self.bucket, kind="prompt", embedding_model=self.embedding_model
             )
         except pydantic.ValidationError:
-            logger.debug("'agentc publish --kind prompt' has not been run. Skipping remote prompt catalog.")
+            logger.debug("'agent_catalog publish --kind prompt' has not been run. Skipping remote prompt catalog.")
             self._remote_prompt_catalog = None
         return self
 
@@ -233,7 +233,7 @@ class Provider(pydantic_settings.BaseSettings):
             if local_catalog is None and remote_catalog is None:
                 error_message = textwrap.dedent("""
                     Could not find $AGENT_CATALOG_CATALOG nor $AGENT_CATALOG_CONN_STRING! If this is a new project, please run the
-                    command `agentc index` before instantiating a provider. Otherwise, please set either of these
+                    command `agent_catalog index` before instantiating a provider. Otherwise, please set either of these
                     variables.
                 """)
                 logger.error(error_message)
