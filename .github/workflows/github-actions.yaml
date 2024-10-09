@@ -14,7 +14,7 @@ jobs:
       - name: Verify existence of essential files
         uses: thebinaryfelix/check-file-existence-action@1.0.0
         with:
-          files: 'README.md, pyproject.toml, .gitignore, agent_catalog_cmd/, agent_catalog_core/, tests/'
+          files: 'README.md, pyproject.toml, .gitignore, libs/agent_catalog_cmd/, libs/agent_catalog_core/, libs/tests/, lc/agent_catalog_lc/, lc/examples/'
 
       # TODO (TANVI): add more to this later
       - name: Verify command file existence
