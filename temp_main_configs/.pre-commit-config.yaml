@@ -1,0 +1,40 @@
+repos:
+  # Check various file formats.
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: "v4.6.0"
+    hooks:
+      - id: check-added-large-files
+      - id: check-toml
+      - id: check-yaml
+      - id: check-json
+      - id: check-xml
+      - id: end-of-file-fixer
+        exclude: \.json$
+        files: \.py$
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+
+  # For linting & style checks.
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.1
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+      - id: ruff-format
+        name: format code with ruff
+
+  # To make sure we don't commit anything incorrectly.
+  - repo: local
+    hooks:
+      - id: do-not-commit-local-dev
+        name: check for local dev environment
+        entry: ^agent-catalog-\w+\s*=\s*\{\s*path\s*=
+        language: pygrep
+        types: [toml]
+
+  # For making sure the poetry.lock file is up-to-date.
+  - repo: https://github.com/python-poetry/poetry
+    rev: '1.8.0'
+    hooks:
+    - id: poetry-check
+    - id: poetry-lock
