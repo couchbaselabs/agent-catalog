@@ -1,7 +1,7 @@
 #
 # The following file is a template for a Python tool.
 #
-from agentc import tool
+from agent_catalog import tool
 from pydantic import BaseModel
 
 

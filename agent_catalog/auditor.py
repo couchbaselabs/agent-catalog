@@ -34,7 +34,7 @@ class Auditor(pydantic_settings.BaseSettings):
     """ Couchbase connection string that points to the audit logs.
 
     This Couchbase instance refers to a CB instance that possesses the audit log collection. This collection is
-    automatically generated on `agentc index`, so this field is most likely the same instance as the CB instance
+    automatically generated on `agent_catalog index`, so this field is most likely the same instance as the CB instance
     possessing the catalog. If there exists no local audit log location (e.g., this is deployed in a standalone
     environment) OR if $AGENT_CATALOG_CATALOG is not explicitly set, we will perform all "accept" commands directly on the
     remote audit log collection.
@@ -64,14 +64,14 @@ class Auditor(pydantic_settings.BaseSettings):
     """ Location of the catalog path.
 
     This field is used to search for the catalog version. If this field is not set, we will defer to the default
-    behavior of agentc.Provider.
+    behavior of agent_catalog.Provider.
     """
 
     local_log: typing.Optional[pathlib.Path] = None
     """ Local audit log file to write to.
 
     If this field and $AGENT_CATALOG_CONN_STRING are not set, we will perform a best-effort search by walking upward from the
-    current working directory until we find the 'agentc.cmd.defaults.DEFAULT_ACTIVITY_FOLDER' folder and subsequently
+    current working directory until we find the 'agent_catalog.cmd.defaults.DEFAULT_ACTIVITY_FOLDER' folder and subsequently
     generate an audit log here.
 
     Audit log files will reach a maximum of 128MB (by default) before they are rotated and compressed.
@@ -126,7 +126,7 @@ class Auditor(pydantic_settings.BaseSettings):
         if self.local_log is None and self.conn_string is None:
             error_message = textwrap.dedent("""
                 Could not find $AGENT_CATALOG_ACTIVITY nor $AGENT_CATALOG_CONN_STRING! If this is a new project, please run the
-                command `agentc index` before instantiating an auditor. Otherwise, please set either of these
+                command `agent_catalog index` before instantiating an auditor. Otherwise, please set either of these
                 variables.
             """)
             logger.error(error_message)
