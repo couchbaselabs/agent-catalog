@@ -1,0 +1,77 @@
+""" This file has been generated automatically by AGENT_CATALOG at {{ time }} as a semantic_search tool. """
+from __future__ import annotations
+
+import couchbase.auth
+import couchbase.options
+import couchbase.cluster
+import couchbase.search
+import couchbase.vector_search
+import dataclasses
+import typing
+import json
+import logging
+
+from agent_catalog_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
+from agent_catalog_core.tool import tool
+from agent_catalog_core.secrets import get_secret
+
+logger = logging.getLogger(__name__)
+
+{{ input.generated_code }}
+
+
+def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
+    authenticator = couchbase.auth.PasswordAuthenticator(
+        username=get_secret("{{ secrets.username }}").get_secret_value(),
+        password=get_secret("{{ secrets.password }}").get_secret_value()
+    )
+    conn_string = get_secret("{{ secrets.conn_string }}").get_secret_value()
+    return couchbase.cluster.Cluster(conn_string, couchbase.options.ClusterOptions(authenticator))
+
+
+@tool
+def {{ tool.name }}(question: {{ input.type_name }}) -> list[str]:
+    """ {{ tool.description }} """
+    cluster = _get_couchbase_cluster()
+    bucket = cluster.bucket('{{ vector_search.bucket }}')
+    scope = bucket.scope('{{ vector_search.scope }}')
+    collection = scope.collection('{{ vector_search.collection }}')
+    logger.debug("{{ tool.name }} has been called.")
+
+    # We need to safeguard against weird LLM function calls.
+    logger.debug("{{ tool.name }} has been given the input: " + str(question) + ".")
+    if isinstance(question, dict):
+        formatted_question = json.dumps(question)
+    elif isinstance(question, str):
+        formatted_question = question
+    elif dataclasses.is_dataclass(argument_input):
+        named_parameters = json.dumps(argument_input.asdict())
+    elif isinstance(question, {{ input.type_name }}):
+        formatted_question = json.dumps(question.dict())
+    else:
+        raise ValueError("Bad input given to tool!")
+
+    import sentence_transformers
+
+    logger.debug("{{ tool.name }} is generating an embedding for: " + formatted_question + ".")
+    embedding_model = sentence_transformers.SentenceTransformer(
+        '{{ vector_search.embedding_model }}',
+        tokenizer_kwargs={'clean_up_tokenization_spaces': True},
+        cache_folder=DEFAULT_MODEL_CACHE_FOLDER,
+        local_files_only=True
+    )
+    _embedding = embedding_model.encode(formatted_question)
+    for_q = list(_embedding.astype('float64'))
+    vector_req = couchbase.vector_search.VectorSearch.from_vector_query(
+        couchbase.vector_search.VectorQuery('{{ vector_search.vector_field }}', for_q, num_candidates={{ vector_search.num_candidates }})
+    )
+    search_req = couchbase.search.SearchRequest.create(couchbase.search.MatchNoneQuery())
+    search_req = search_req.with_vector_search(vector_req)
+    search_opt = couchbase.options.SearchOptions(fields=["*"])
+    search_result = scope.search('{{ vector_search.index }}', search_req, search_opt)
+
+    tool_results = []
+    for r in search_result.rows():
+        tool_results.append(collection.get(r.id).content_as[dict]['{{ vector_search.text_field }}'])
+    logger.debug("{{ tool.name }} has returned the following: " + str(tool_results))
+    return tool_results
