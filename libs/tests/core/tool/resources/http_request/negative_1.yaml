@@ -1,7 +1,7 @@
 record_kind: python_function
 
 open_api:
-  filename: resources/_good_spec.json
+  filename: libs/tests/core/tool/resources/_good_spec.json
   operations:
     - path: /create
       method: post
