@@ -16,6 +16,7 @@ agentc = "agentc.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.12"
+pytest = "^8.3.2"
 
 agent-catalog-libs = { path = "./libs" }
 agent-catalog-lc = { path = "./lc" }
