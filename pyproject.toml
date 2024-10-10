@@ -5,6 +5,7 @@ description = "User facing repository for agent-catalog."
 repository = "https://github.com/couchbaselabs/agent-catalog"
 authors = ["Tanvi Johari <tanvi.johari@couchbase.com>"]
 readme = "README.md"
+#package-mode = false
 
 [tool.poetry.urls]
 Homepage = "https://couchbase.com"
@@ -12,17 +13,17 @@ Documentation = "https://docs.couchbase.com"
 Repository = "https://github.com/couchbaselabs/agent-catalog"
 
 [tool.poetry.scripts]
-agentc = "agentc.__main__:main"
+agentc = "agent_catalog.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.12"
 pytest = "^8.3.2"
 
-agent-catalog-libs = { path = "./libs" }
-agent-catalog-lc = { path = "./lc" }
+agent_catalog_libs = { path = "agent_catalog_libs/" , develop = true }
+agent-catalog-lc = { path = "lc/" , develop = true }
 
 # For developers that wish to make changes
-#agent-catalog-libs = { path = "./libs", develop=true }
+#agent-catalog-agent_catalog_libs = { path = "./agent_catalog_libs", develop=true }
 #agent-catalog-lc = { path = "./lc", develop=true }
 
 [tool.poetry.extras]

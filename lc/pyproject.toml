@@ -25,10 +25,10 @@ pydantic = "2.8.2"
 requests = "^2.32.3"
 python-dotenv = "^1.0.1"
 
-agent_catalog_libs = { path = "../libs" }
+agent_catalog_libs = { path = "../agent_catalog_libs" }
 
 # For developers that want to use a local version
-# agent_catalog_libs = { path = "../libs", develop = true }
+# agent_catalog_libs = { path = "../agent_catalog_libs", develop = true }
 
 [tool.ruff]
 line-length = 120
