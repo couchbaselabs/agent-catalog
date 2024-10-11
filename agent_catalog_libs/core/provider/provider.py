@@ -5,17 +5,17 @@ import logging
 import os
 import typing
 
-from ..annotation import AnnotationPredicate
-from ..catalog import CatalogBase
-from ..catalog import SearchResult
-from ..prompt.models import JinjaPromptDescriptor
-from ..prompt.models import RawPromptDescriptor
-from ..record.descriptor import RecordDescriptor
-from ..record.descriptor import RecordKind
-from ..secrets import put_secret
-from .loader import EntryLoader
-from .loader import ModelType
-from .loader import PythonTarget
+from agent_catalog_libs.core.annotation import AnnotationPredicate
+from agent_catalog_libs.core.catalog import CatalogBase
+from agent_catalog_libs.core.catalog import SearchResult
+from agent_catalog_libs.core.prompt.models import JinjaPromptDescriptor
+from agent_catalog_libs.core.prompt.models import RawPromptDescriptor
+from agent_catalog_libs.core.provider.loader import EntryLoader
+from agent_catalog_libs.core.provider.loader import ModelType
+from agent_catalog_libs.core.provider.loader import PythonTarget
+from agent_catalog_libs.core.record.descriptor import RecordDescriptor
+from agent_catalog_libs.core.record.descriptor import RecordKind
+from agent_catalog_libs.core.secrets import put_secret
 
 logger = logging.getLogger(__name__)
 

@@ -9,14 +9,14 @@ import types
 import typing
 import uuid
 
-from ..record.descriptor import RecordDescriptor
-from ..record.descriptor import RecordKind
-from ..tool.decorator import is_tool
-from ..tool.generate import HTTPRequestCodeGenerator
-from ..tool.generate import SemanticSearchCodeGenerator
-from ..tool.generate import SQLPPCodeGenerator
-from ..tool.generate.generator import ModelType
-from ..tool.generate.generator import PythonTarget
+from agent_catalog_libs.core.record.descriptor import RecordDescriptor
+from agent_catalog_libs.core.record.descriptor import RecordKind
+from agent_catalog_libs.core.tool.decorator import is_tool
+from agent_catalog_libs.core.tool.generate import HTTPRequestCodeGenerator
+from agent_catalog_libs.core.tool.generate import SemanticSearchCodeGenerator
+from agent_catalog_libs.core.tool.generate import SQLPPCodeGenerator
+from agent_catalog_libs.core.tool.generate.generator import ModelType
+from agent_catalog_libs.core.tool.generate.generator import PythonTarget
 
 logger = logging.getLogger(__name__)
 
