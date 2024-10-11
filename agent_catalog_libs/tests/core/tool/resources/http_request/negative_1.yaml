@@ -1,9 +1,0 @@
-record_kind: python_function
-
-open_api:
-  filename: agent_catalog_libs/tests/core/tool/resources/_good_spec.json
-  operations:
-    - path: /create
-      method: post
-    - path: /rewards/{member_id}
-      method: get

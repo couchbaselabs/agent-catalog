@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "agent_catalog"
+name = "libs"
 version = "0.1.0"
 description = "User facing repository for agent-catalog."
 repository = "https://github.com/couchbaselabs/agent-catalog"
@@ -13,14 +13,14 @@ Documentation = "https://docs.couchbase.com"
 Repository = "https://github.com/couchbaselabs/agent-catalog"
 
 [tool.poetry.scripts]
-agentc = "agent_catalog.__main__:main"
+agentc = "libs.agent_catalog_libs.cmd.main:main"
 
 [tool.poetry.dependencies]
 python = "^3.12"
 pytest = "^8.3.2"
 
-agent_catalog_libs = { path = "agent_catalog_libs/" , develop = true }
-agent-catalog-lc = { path = "lc/" , develop = true }
+agent_catalog_libs = { path = "libs/agent_catalog_libs/" , develop = true }
+agent-catalog-lc = { path = "libs/lc/" , develop = true }
 
 # For developers that wish to make changes
 #agent-catalog-agent_catalog_libs = { path = "./agent_catalog_libs", develop=true }
