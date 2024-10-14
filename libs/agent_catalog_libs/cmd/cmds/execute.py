@@ -12,12 +12,23 @@ from pydantic import TypeAdapter
 types_mapping = {"array": list, "integer": int, "number": float, "string": str}
 
 
-def cmd_execute(ctx: Context, name: str):
+def cmd_execute(ctx: Context, name: str | None, query: str | None):
     catalog_path = pathlib.Path(ctx.catalog) / DEFAULT_TOOL_CATALOG_NAME
     catalog = CatalogMem.load(catalog_path)
 
     provider = ToolProvider(catalog, output=pathlib.Path(os.path.join(os.getcwd(), "codes")))
-    tool = provider.get(name)
+    tool = None
+    if name is not None:
+        tool = provider.get(name)
+        if tool is None:
+            raise ValueError(f"Tool {name} not found!") from None
+    else:
+        tools = provider.search(query, limit=1)
+        if len(tools) == 0:
+            raise ValueError(f"No tool available for query {query}!") from None
+        else:
+            tool = tools[0]
+
     try:
         parameters = TypeAdapter(tool).json_schema()
         class_types = dict()

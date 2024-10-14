@@ -553,10 +553,20 @@ def version(ctx):
     help="The name of the tool to execute.",
     show_default=True,
 )
+@click.option(
+    "--query",
+    default=None,
+    type=str,
+    help="Natural language query for which tool needs to be executed.",
+    show_default=True,
+)
 @click.pass_context
-def execute(ctx, name):
-    """Execute specific tool to test it with an agent."""
-    cmd_execute(ctx.obj, name)
+def execute(ctx, name, query):
+    """Execute specific tool to test it."""
+    if name is not None and query is not None:
+        raise ValueError("Provide either name of the tool or query, giving both is not allowed!") from None
+
+    cmd_execute(ctx.obj, name, query)
 
 
 # @click_main.command()
