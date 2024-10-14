@@ -1,58 +1,43 @@
-# agent-catalog-core
+# agent-catalog-libs
 
 The core for a Couchbase-backed agentic workflow SDK.
 
 ## Building From Source
 
-1. Ensure that you have `python3.11` and `poetry` installed.
-   ```bash
-   python3 -m pip install poetry
-   ```
-2. Clone this repository -- make sure that you have an SSH key setup!
-   ```bash
-   git clone git@github.com:couchbaselabs/rosetta-core.git
-   ```
-3. Install the dependencies from `pyproject.toml`.
-   ```bash
-   poetry install
-   ```
-4. You should now have the `agentc` command line tool installed.
+Ensure that you have installed dependencies as mentioned in the [agent-catalog README.md](../../README.md).
+
+You should now have the `agentc` command line tool installed.
    Run the `agentc` command to test your installation.
    ```bash
    agentc
+   # or agentc --help
    ```
    ```
    Usage: agentc [OPTIONS] COMMAND [ARGS]...
 
-   A command line tool for Rosetta.
+     A command line tool for AGENT_CATALOG.
 
    Options:
-     -c, --catalog DIRECTORY   Directory of local catalog files. The local
-                               catalog DIRECTORY should be checked into git.
-                               [default: .agent-catalog]
-     -a, --activity DIRECTORY  Directory of local activity files (runtime data).
-                               The local activity DIRECTORY should NOT be checked
-                               into git, as it holds runtime activity data like
-                               logs, call histories, etc.  [default: .agent-
-                               activity]
+     -c, --catalog DIRECTORY   Directory of local catalog files. The local catalog DIRECTORY should be checked into git.  [default: .agent-catalog]
+     -a, --activity DIRECTORY  Directory of local activity files (runtime data). The local activity DIRECTORY should NOT be checked into git, as it holds runtime activity data like logs, etc.  [default: .agent-activity]
      -v, --verbose             Enable verbose output.
      --help                    Show this message and exit.
 
    Commands:
-     clean    Clean up catalog, activity, generated files, etc.
-     env      Show this program's env or configuration parameters as JSON.
-     find     Find tools, prompts, etc.
-     index    Walk source directory trees for indexing source files into the...
-     publish  Publish the local catalog to a database.
+     clean    Clean up the catalog folder, the activity folder, any generated files, etc.
+     env      Show agentc's environment or configuration parameters as a JSON object.
+     execute  Execute specific tool to test it with an agent.
+     find     Find items from the catalog based on a natural language QUERY string.
+     index    Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
+     publish  Publish the local catalog to Couchbase DB.
      status   Show the status of the local catalog.
-     version  Show the version of this tool.
-     web      Start local web server.
+     version  Show the current version of agentc.
+
+     See: https://docs.couchbase.com for more information.
    ```
 
 For examples on what an agentic workflow with Rosetta looks like, see
 the [rosetta-example](https://github.com/couchbaselabs/rosetta-example) repository.
-
-## For Contributors / Developers
 
 ### Setting up Pre-Commit
 
@@ -92,26 +77,21 @@ README.md
 pyproject.toml
 
 cmd/
-   main.py       -- Main entry point for agent command-line tool (CLI).
-   defaults.py   -- All command-line-tool defaults belong in here.
-   cmds/         -- Each "agentc SUBCMD" has its own cmds/SUBCMD.py file.
+   cmds/                    -- Each "agentc SUBCMD" has its own cmds/SUBCMD.py file.
+      clean.py
+      env.py
       ...
-      find.py
-      index.py
-      publish.py
-      version.py
-      web.py      -- Provides an HTML/REST interface for the SUBCMD's.
-   models/
+   defaults.py              -- All command-line-tool defaults belong in here.
+   main.py                  -- Main entry point for agent command-line tool (CLI).
+   models/                  -- Pydantic models used by the command-line-tool
 
-core/     -- The core agentc library used by applications and by the agentc CLI.
-   catalog/
-   provider/
-   record/
-   secrets/
-   tool/
-   version/
+core/                       -- The core agentc library used by applications and by the agentc CLI.
+   activity/
+   analytics/
+   ...
 
-tests/            -- Test cases.
+tests/                      -- Test cases.
 
-VERSION.txt       -- To be generated or updated at build or packaging time.
+util/                       -- All util functions used by core and cli commands
+
 ```

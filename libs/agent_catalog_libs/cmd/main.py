@@ -64,7 +64,11 @@ class AliasedGroup(click.Group):
         return cmd.name, cmd, args
 
 
-@click.group(cls=AliasedGroup, epilog="See: https://docs.couchbase.com for more information.")
+@click.group(
+    cls=AliasedGroup,
+    epilog="See: https://docs.couchbase.com for more information.",
+    context_settings=dict(max_content_width=800),
+)
 @click.option(
     "-c",
     "--catalog",
@@ -120,7 +124,7 @@ def click_main(ctx, catalog, activity, verbose):
 )
 @click.pass_context
 def clean(ctx, env_type, bucket, skip_prompt):
-    """Clean up the catalog folder, the activity folder, any generated files, etc..."""
+    """Clean up the catalog folder, the activity folder, any generated files, etc."""
     clean_db = False
     clean_local = False
 
@@ -179,7 +183,7 @@ def clean(ctx, env_type, bucket, skip_prompt):
 @click_main.command()
 @click.pass_context
 def env(ctx):
-    """Show this program's environment or configuration parameters as a JSON object."""
+    """Show agentc's environment or configuration parameters as a JSON object."""
     cmd_env(ctx.obj)
 
 
@@ -283,7 +287,7 @@ def find(
     embedding_model,
     catalog_version,
 ):
-    """Find tools, prompts, etc. from the catalog based on a natural language QUERY string."""
+    """Find items from the catalog based on a natural language QUERY string."""
 
     if search_db:
         # Load all Couchbase connection related data from env
@@ -416,7 +420,7 @@ def index(ctx, source_dirs, kind, embedding_model, dry_run):
 )
 @click.pass_context
 def publish(ctx, kind, bucket, annotations):
-    """Publish the local catalog to Couchbase DB"""
+    """Publish the local catalog to Couchbase DB."""
 
     # Get keyspace and connection details
     keyspace_details = Keyspace(bucket="", scope=DEFAULT_CATALOG_SCOPE)
@@ -537,7 +541,7 @@ def status(ctx, kind, include_dirty, status_db, bucket, compare):
 @click_main.command()
 @click.pass_context
 def version(ctx):
-    """Show the version of this tool."""
+    """Show the current version of agentc."""
     cmd_version(ctx.obj)
 
 
@@ -551,7 +555,7 @@ def version(ctx):
 )
 @click.pass_context
 def execute(ctx, name):
-    """Execute the given tool to test it."""
+    """Execute specific tool to test it with an agent."""
     cmd_execute(ctx.obj, name)
 
 
