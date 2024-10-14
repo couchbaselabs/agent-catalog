@@ -27,8 +27,6 @@ python-dotenv = "^1.0.1"
 
 agent_catalog_libs = { path = "../agent_catalog_libs" }
 
-# For developers that want to use a local version
-# agent_catalog_libs = { path = "../agent_catalog_libs", develop = true }
 
 [tool.ruff]
 line-length = 120
@@ -44,7 +42,6 @@ split-on-trailing-comma = false
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
-# pytest = "^8.3.2"
 
 [build-system]
 requires = ["poetry-core"]
