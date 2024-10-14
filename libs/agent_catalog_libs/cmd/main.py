@@ -549,16 +549,10 @@ def version(ctx):
     help="The name of the tool to execute.",
     show_default=True,
 )
-@click.option(
-    "--model",
-    default=None,
-    type=str,
-    help="Name of the LLM to be used for the tool execution. Format: {provider}/{model_name}. Example: openai/gpt-4o-mini",
-    show_default=True,
-)
 @click.pass_context
-def execute(ctx, name, model):
-    cmd_execute(ctx.obj, name, model)
+def execute(ctx, name):
+    """Execute the given tool to test it."""
+    cmd_execute(ctx.obj, name)
 
 
 # @click_main.command()
