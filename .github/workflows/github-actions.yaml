@@ -33,7 +33,8 @@ jobs:
 
       - run: echo "🔥 Starting the core smoke tests (🤞 please don't break!)."
       - name: Run agentc-core smoke tests
-        working-directory: ./libs/agentc_core
         run: |
-          poetry run pytest -m smoke -v libs/agentc_core/tests
+          poetry shell
+          cd libs/agentc_core
+          pytest -m smoke -v
       - run: echo "🍏 This job's status is ${{ job.status }}."
