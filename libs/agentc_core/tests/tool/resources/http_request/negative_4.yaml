@@ -1,0 +1,7 @@
+record_kind: http_request
+
+open_api:
+  filename: tests/tool/resources/_bad_spec.json
+  operations:
+    - path: /create
+      method: post

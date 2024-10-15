@@ -1,7 +1,0 @@
-record_kind: http_request
-
-open_api:
-  filename: libs/agent_catalog_libs/tests/core/tool/resources/_bad_spec.json
-  operations:
-    - path: /rewards/{member_id}
-      method: get
