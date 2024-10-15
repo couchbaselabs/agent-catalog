@@ -1,4 +1,4 @@
-name: Agent Catalog GitHub Actions
+name: Couchbase Agent Catalog GitHub Actions
 run-name: 👁️ ${{ github.actor }} has pushed a new commit!
 on: [ push ]
 jobs:
@@ -14,8 +14,11 @@ jobs:
       - name: Verify toml files exist
         uses: thebinaryfelix/check-file-existence-action@1.0.0
         with:
-          files: 'pyproject.toml, libs/agentc/pyproject.toml, libs/agentc_core/pyproject.toml,
-                  libs/agentc_cli/pyproject.toml, libs/agentc_langchain/pyproject.toml'
+          files: "pyproject.toml,\
+            libs/agentc/pyproject.toml,\
+            libs/agentc_core/pyproject.toml,\
+            libs/agentc_cli/pyproject.toml,\
+            libs/agentc_langchain/pyproject.toml"
 
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - name: Set up Python Poetry
@@ -30,6 +33,7 @@ jobs:
 
       - run: echo "🔥 Starting the core smoke tests (🤞 please don't break!)."
       - name: Run agentc-core smoke tests
+        working-directory: ./libs/agentc_core
         run: |
           poetry run pytest -m smoke -v libs/agentc_core/tests
       - run: echo "🍏 This job's status is ${{ job.status }}."
