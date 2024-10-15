@@ -2,58 +2,39 @@
 
 The mono-repo for the Couchbase Agent Catalog project.
 
-## Building From Source
+## Docs and Templates
 
-1. Ensure that you have `python3.12` and `poetry` installed.
-   ```bash
-   python3 -m pip install poetry
-   ```
-2. Clone this repository -- make sure that you have an SSH key setup!
-   ```bash
-   git clone git@github.com:couchbaselabs/agent-catalog.git
-   ```
-3. Create a virtual environment to manage dependencies
-   ```bash
-   conda create -n <venv_name> python=3.12
-   conda activate <venv_name>
-   # conda deactivate <venv_name> # to deactivate the virtual env after use
-   ```
-4. Install the dependencies from `pyproject.toml`.
-   ```bash
-   poetry install
-   ```
-5. To install the LangChain extra package, add `-E langchain` after `install`.
-   ```bash
-   poetry install -E langchain
-   ```
-
-For examples on what an agentic workflow with Agent Catalog looks like, see
-the [rosetta-example](https://github.com/couchbaselabs/rosetta-example) repository.
-
-## Docs and templates
-
-Refer to [`docs/`](docs) to explore templates and other references while writing your agent workflow with agent_catalog.
+Refer to [`docs/`](docs) to explore templates and other references while writing your agent workflow with Couchbase
+Agent Catalog.
 
 ## For Contributors / Developers
 
-### On Sub folders
+### On Packages (inside `libs`)
 
-All sdk code is wrapped under [`libs`](libs). Following are sub-folders that you can explore:
+Every project package is wrapped under [`libs`](libs). The following are sub-folders that you can explore:
 
-1. [`agent_catalog`](libs/agentc), which contains the classes to use with your agent development frameworks,
-2. [`agent_catalog_libs`](libs/agentc_core), which implements the core functionality of
-   `agentc` in an "un-opinionated" manner,
-3. [`lc`](libs/agentc_langchain), which supplies additional tooling around building
-   LangChain-specific agents.
+1. [`agentc`](libs/agentc), which contains the front-facing package for the Couchbase Agent Catalog project.
+2. [`agentc-cli`](libs/agentc_cli), which contains the command line interface for the Couchbase Agent Catalog project.
+3. [`agentc-core`](libs/agentc_core), which contains the core SDK package for the Couchbase Agent Catalog project.
+4. [`agentc-langchain`](libs/agentc_langchain), which contains additional tooling around building LangChain-specific
+   agents.
 
-This repository (`agent-catalog`) is meant to serve as a "front-desk", where we focus on _setting defaults_
-(i.e., being opinionated) for the sake of a simpler / more-user-friendly out-of-the-box experience.
-Keep this in mind when contributing to these repositories: libs should be minimal and extensible, and this
-repository should leverage the libs' extensibility.
+### Working with Poetry
+
+Below, we list out some notes that developers might find useful w.r.t. Poetry:
+
+1. Before committing, always use `poetry update; poetry lock`!
+   This will check if the dependencies laid out in the `pyproject.toml` file are satisfiable and will repopulate the
+   lock file appropriately.
+2. `poetry install` vs. `poetry update`: in the presence of a `poetry.lock` file (which we do have), the former will
+   only consider installing packages specified in the lock file.
+   The latter (`poetry update`) will read from the `pyproject.toml` file and try to resolve dependencies from there.
+3. Because these are a collection of libraries, we do not commit individual lock files for each sub-package. **Do not
+   commit `poetry.lock` files.**
 
 ### Setting up Pre-Commit
 
-To set up `pre-commit` and reap all the benefits of code formatting, linting, automatic `poetry` lock generation, etc...
+To set up `pre-commit` and reap all the benefits of code formatting, linting, etc...
 execute the following command:
 
 ```bash

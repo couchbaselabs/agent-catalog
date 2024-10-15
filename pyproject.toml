@@ -1,15 +1,30 @@
-[project]
+[tool.poetry]
 name = "agent-catalog"
 version = "0.1.0"
 description = "The mono-repo for the Couchbase Agent Catalog project."
 repository = "https://github.com/couchbaselabs/agent-catalog"
 authors = [
-    { name = "Glenn Galvizo", email = "glenn.galvizo@couchbase.com" },
-    { name = "Tanvi Johari", email = "tanvi.johari@couchbase.com" },
-    { name = "Steve Yen", email = "steve.yen@couchbase.com" },
-    { name = "Thejas N U", email = "thejas.nu@couchbase.com" }
+    "Glenn Galvizo <glenn.galvizo@couchbase.com>",
+    "Tanvi Johari <tanvi.johari@couchbase.com>",
+    "Steve Yen <steve.yen@couchbase.com>",
+    "Thejas N U <thejas.nu@couchbase.com>"
 ]
+license = "MIT"
 readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.0.0"
+pytest = "^7.4.4"
+
+# All of our Agent Catalog packages.
+agentc = { path = "libs/agentc", develop = true }
+agentc-core = { path = "libs/agentc_core", develop = true }
+agentc-cli = { path = "libs/agentc_cli", develop = true }
+agentc-langchain = { path = "libs/agentc_langchain", develop = true }
 
 [tool.ruff]
 line-length = 120
@@ -22,3 +37,12 @@ force-single-line = true
 lines-between-types = 1
 force-wrap-aliases = true
 split-on-trailing-comma = false
+
+[tool.pytest.ini_options]
+markers = [
+    "smoke: marks tests for running on each git-push"
+]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
