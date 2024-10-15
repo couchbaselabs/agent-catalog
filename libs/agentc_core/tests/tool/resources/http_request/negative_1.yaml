@@ -1,0 +1,9 @@
+record_kind: python_function
+
+open_api:
+  filename: tests/tool/resources/_good_spec.json
+  operations:
+    - path: /create
+      method: post
+    - path: /rewards/{member_id}
+      method: get

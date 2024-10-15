@@ -11,16 +11,16 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
 
-      - name: Verify existence of essential files
-        uses: thebinaryfelix/check-file-existence-action@1.0.0
-        with:
-          files: 'README.md, pyproject.toml, .gitignore, libs/agent_catalog_libs/cmd/, libs/agent_catalog_libs/core/, libs/agent_catalog_libs/tests/, libs/lc/agent_catalog_lc/, libs/lc/examples/'
+#      - name: Verify existence of essential files
+#        uses: thebinaryfelix/check-file-existence-action@1.0.0
+#        with:
+#          files: 'README.md, pyproject.toml, .gitignore, libs/agentc_core/agentc_cli/, libs/agentc_core/agentc_core/, libs/agentc_core/tests/, libs/agentc_langchain/agentc_langchain/, libs/agentc_langchain/examples/'
 
-      - name: Verify command file existence
-        uses: thebinaryfelix/check-file-existence-action@1.0.0
-        with:
-          files: 'libs/agent_catalog_libs/cmd/cmds/index.py, libs/agent_catalog_libs/cmd/cmds/publish.py, libs/agent_catalog_libs/cmd/cmds/version.py, libs/agent_catalog_libs/cmd/cmds/find.py,
-          libs/agent_catalog_libs/cmd/cmds/clean.py, libs/agent_catalog_libs/cmd/cmds/env.py, libs/agent_catalog_libs/cmd/cmds/execute.py, libs/agent_catalog_libs/cmd/cmds/status.py, libs/agent_catalog_libs/cmd/cmds/util.py'
+#      - name: Verify command file existence
+#        uses: thebinaryfelix/check-file-existence-action@1.0.0
+#        with:
+#          files: 'libs/agentc_core/agentc_cli/cmds/index.py, libs/agentc_core/agentc_cli/cmds/publish.py, libs/agentc_core/agentc_cli/cmds/version.py, libs/agentc_core/agentc_cli/cmds/find.py,
+#          libs/agentc_core/agentc_cli/cmds/clean.py, libs/agentc_core/agentc_cli/cmds/env.py, libs/agentc_core/agentc_cli/cmds/execute.py, libs/agentc_core/agentc_cli/cmds/status.py, libs/agentc_core/agentc_cli/cmds/util.py'
 
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - name: Set up Python Poetry

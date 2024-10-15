@@ -1,32 +1,15 @@
-[tool.poetry]
-name = "libs"
+[project]
+name = "agent-catalog"
 version = "0.1.0"
-description = "User facing repository for agent-catalog."
+description = "The mono-repo for the Couchbase Agent Catalog project."
 repository = "https://github.com/couchbaselabs/agent-catalog"
-authors = ["Tanvi Johari <tanvi.johari@couchbase.com>"]
+authors = [
+    { name = "Glenn Galvizo", email = "glenn.galvizo@couchbase.com" },
+    { name = "Tanvi Johari", email = "tanvi.johari@couchbase.com" },
+    { name = "Steve Yen", email = "steve.yen@couchbase.com" },
+    { name = "Thejas N U", email = "thejas.nu@couchbase.com" }
+]
 readme = "README.md"
-
-[tool.poetry.urls]
-Homepage = "https://couchbase.com"
-Documentation = "https://docs.couchbase.com"
-Repository = "https://github.com/couchbaselabs/agent-catalog"
-
-[tool.poetry.scripts]
-agentc = "libs.agent_catalog_libs.cmd.main:main"
-
-[tool.poetry.dependencies]
-python = "^3.12"
-pytest = "^8.3.2"
-
-agent_catalog_libs = { path = "libs/agent_catalog_libs/" , develop = true }
-agent-catalog-lc = { path = "libs/lc/" , develop = true }
-
-[tool.poetry.extras]
-langchain = ["agent-catalog-lc"]
-
-# Group dependencies for development tools (optional)
-[tool.poetry.group.dev.dependencies]
-pre-commit = "^3.2.2"
 
 [tool.ruff]
 line-length = 120
@@ -39,7 +22,3 @@ force-single-line = true
 lines-between-types = 1
 force-wrap-aliases = true
 split-on-trailing-comma = false
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"

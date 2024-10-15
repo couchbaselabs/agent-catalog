@@ -1,6 +1,6 @@
 # agent-catalog
 
-User facing repository for all things agent-catalog (tooling around agent workflows).
+The mono-repo for the Couchbase Agent Catalog project.
 
 ## Building From Source
 
@@ -40,10 +40,10 @@ Refer to [`docs/`](docs) to explore templates and other references while writing
 
 All sdk code is wrapped under [`libs`](libs). Following are sub-folders that you can explore:
 
-1. [`agent_catalog`](libs/agent_catalog), which contains the classes to use with your agent development frameworks,
-2. [`agent_catalog_libs`](libs/agent_catalog_libs), which implements the core functionality of
+1. [`agent_catalog`](libs/agentc), which contains the classes to use with your agent development frameworks,
+2. [`agent_catalog_libs`](libs/agentc_core), which implements the core functionality of
    `agentc` in an "un-opinionated" manner,
-3. [`lc`](libs/lc), which supplies additional tooling around building
+3. [`lc`](libs/agentc_langchain), which supplies additional tooling around building
    LangChain-specific agents.
 
 This repository (`agent-catalog`) is meant to serve as a "front-desk", where we focus on _setting defaults_
