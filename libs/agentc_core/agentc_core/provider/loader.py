@@ -66,12 +66,16 @@ class EntryLoader:
         self.python_version = python_version
         self.model_type = model_type
 
-        # Our output should be a path object.
-        if output is None:
+        # TODO (GLENN): We should close this somewhere (need to add a close method).
+        if isinstance(output, pathlib.Path):
             self.output = output
         elif isinstance(output, tempfile.TemporaryDirectory):
             self.output = pathlib.Path(output.__enter__())
-            # TODO (GLENN): We should close this somewhere (need to add a close method).
+        elif output is None:
+            self.output = None
+        else:
+            logger.warning("Unexpected output type given! Attempting to convert to a pathlib.Path.")
+            self.output = pathlib.Path(output)
 
         # Signal to Python that it should also search for modules in our _ModuleFinder.
         self._modules = dict()
