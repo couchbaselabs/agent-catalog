@@ -377,13 +377,12 @@ def find(
 @click.pass_context
 def index(ctx, source_dirs, kind, embedding_model, dry_run):
     """Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
-    SOURCE_DIRS defaults to ".", the current working directory.
     Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc."""
 
     if not source_dirs:
-        source_dirs = ["."]
-
-    # TODO: The index command should default to the '.' directory / current directory.
+        raise ValueError(
+            "Source directories to index not provided!!\nPlease use command 'agentc index --help' for more information."
+        )
 
     cmd_index(
         ctx.obj,
