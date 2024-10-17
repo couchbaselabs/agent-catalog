@@ -28,13 +28,14 @@ jobs:
           python-version: "3.12"
           poetry-version: "latest"
           shell: "bash"
+
       - name: Install repository with Poetry
         run: |
           poetry install --with dev
-
-#      - run: echo "🔥 Starting the core smoke tests (🤞 please don't break!)."
-#      - name: Run agentc-core smoke tests
-#        run: |
-#          cd libs/agentc_core
-#          poetry run pytest -m smoke -v
-#      - run: echo "🍏 This job's status is ${{ job.status }}."
+      - run: echo "🔥 Starting the core smoke tests (🤞 please don't break!)."
+      - name: Verify pytest installation
+        run: poetry show pytest
+      - name: Run agentc-core smoke tests
+        run: |
+           poetry run bash -c "cd libs/agentc_core && pytest -m smoke -v"
+      - run: echo "🍏 This job's status is ${{ job.status }}."
