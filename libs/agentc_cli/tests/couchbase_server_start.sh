@@ -1,3 +1,4 @@
+#!/bin/bash
 # This is a script to spin up a couchbase server
 # and create a cluster for unit tests
 

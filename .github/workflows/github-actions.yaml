@@ -40,6 +40,7 @@ jobs:
            poetry run bash -c "cd libs/agentc_core && pytest -m smoke -v"
       - name: Run agentc-cli smoke tests
         run: |
-           /bin/zsh libs/agentc_cli/tests/couchbase_server_start.sh
+           chmod +x ./libs/agentc_cli/tests/couchbase_server_start.sh
+           ./libs/agentc_cli/tests/couchbase_server_start.sh
            poetry run bash -c "cd libs/agentc_cli && pytest -m smoke -v"
       - run: echo "🍏 This job's status is ${{ job.status }}."
