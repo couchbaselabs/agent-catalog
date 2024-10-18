@@ -51,7 +51,7 @@ def cmd_execute(ctx: Context, name: str | None, query: str | None, embedding_mod
                     input_types[param] = class_types[param_def["$ref"].split("/")[-1]]
                 # list type
                 elif param_def["type"] == "array":
-                    input_types[param] = list(types_mapping[param_def["items"]["type"]])
+                    input_types[param] = list[types_mapping[param_def["items"]["type"]]]
                 # other types like str, int, float
                 else:
                     input_types[param] = types_mapping[param_def["type"]]
@@ -67,6 +67,9 @@ def cmd_execute(ctx: Context, name: str | None, query: str | None, embedding_mod
 
         # TODO: import similarly to python tool for others from the temp directory
 
+        click.echo(
+            "Provide inputs for the prompted variables, types are shown for reference in parenthesis\nIf input is of type list then provide values separated by a comma.\n"
+        )
         # prompt user for inputs
         user_inputs = take_input_from_user(input_types)
 
@@ -82,7 +85,7 @@ def cmd_execute(ctx: Context, name: str | None, query: str | None, embedding_mod
 
         # call tool function
         res = tool.func(**modified_user_inputs)
-        click.secho("Result:", fg="green")
+        click.secho("\nResult:", fg="green")
         click.echo(res)
 
 
@@ -107,50 +110,41 @@ def take_input_from_user(input_types: dict) -> dict:
             user_inputs[inp] = dict()
             for inp_member, inp_member_type in inp_type.items():
                 # if list ask user to provide inputs separated by commas and process later
-                is_list = inp_member_type in [list[str], list[int], list[float]]
+                is_list = inp_member_type in [list[str], list[int], list[float], list]
                 inp_type_to_show_user = (
                     f"{inp_member_type.__origin__.__name__} [{', '.join(arg.__name__ for arg in inp_member_type.__args__)}]"
                     if is_list
                     else inp_member_type.__name__
                 )
+
                 entered_val = click.prompt(
-                    f"{inp_member} ({inp_type_to_show_user})", type=str if is_list else inp_member_type
+                    click.style(f"{inp_member} ({inp_type_to_show_user})", fg="blue"),
+                    type=str if is_list else inp_member_type,
                 )
+
                 if not is_list:
                     user_inputs[inp][inp_member] = entered_val
-                    continue
-
-                list_type = "string"
-                if inp_member_type == list[int]:
-                    list_type = "integer"
-                elif inp_member_type == list[float]:
-                    list_type = "number"
-
-                # check if all comma separated values are of desired type
-                # else keep asking in the loop till correct values are given
-                is_correct = True
-                try:
-                    conv_inps = split_and_convert(entered_val, types_mapping[list_type])
-                    user_inputs[inp][inp_member] = conv_inps
-                    continue
-                except ValueError:
-                    is_correct = False
-
-                while not is_correct:
-                    click.echo(f"All entered values are not of type {list_type}! Enter correct values")
-                    entered_val = click.prompt(
-                        f"{inp_member} ({inp_type_to_show_user})", type=str if is_list else inp_member_type
+                else:
+                    user_inputs[inp][inp_member] = take_verify_list_inputs(
+                        entered_val, inp_member, inp_member_type, inp_type_to_show_user
                     )
-                    try:
-                        conv_inps = split_and_convert(entered_val, types_mapping[list_type])
-                        is_correct = True
-                        user_inputs[inp][inp_member] = conv_inps
-                        break
-                    except ValueError:
-                        is_correct = False
         else:
-            entered_val = click.prompt(f"{inp} ({inp_type.__name__})", type=inp_type)
-            user_inputs[inp] = entered_val
+            is_list = inp_type in [list[str], list[int], list[float], list]
+            inp_type_to_show_user = (
+                f"{inp_type.__origin__.__name__} [{', '.join(arg.__name__ for arg in inp_type.__args__)}]"
+                if is_list
+                else inp_type.__name__
+            )
+
+            entered_val = click.prompt(
+                click.style(f"{inp} ({inp_type_to_show_user})", fg="blue"), type=str if is_list else inp_type
+            )
+
+            if not is_list:
+                user_inputs[inp] = entered_val
+            else:
+                user_inputs[inp] = take_verify_list_inputs(entered_val, inp, inp_type, inp_type_to_show_user)
+
     return user_inputs
 
 
@@ -161,3 +155,31 @@ def split_and_convert(entered_val: str, target_type):
         element = element.strip()
         conv_inps.append(target_type(element))
     return conv_inps
+
+
+# when initial comma separated values are given, they are verified and prompted again if they are not correct
+def take_verify_list_inputs(entered_val, input_name, input_type, inp_type_to_show_user):
+    list_type = "string"
+    if input_type == list[int]:
+        list_type = "integer"
+    elif input_type == list[float]:
+        list_type = "number"
+
+    # check if all comma separated values are of desired type
+    # else keep asking in the loop till correct values are given
+    is_correct = True
+    try:
+        conv_inps = split_and_convert(entered_val, types_mapping[list_type])
+        return conv_inps
+    except ValueError:
+        is_correct = False
+
+    while not is_correct:
+        click.secho(f"All entered values are not of type {list_type}! Enter correct values", fg="red")
+        entered_val = click.prompt(click.style(f"{input_name} ({inp_type_to_show_user})", fg="blue"), type=str)
+        try:
+            conv_inps = split_and_convert(entered_val, types_mapping[list_type])
+            is_correct = True
+            return conv_inps
+        except ValueError:
+            is_correct = False
