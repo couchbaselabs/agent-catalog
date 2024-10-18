@@ -27,7 +27,6 @@ def cmd_publish(
     annotations: list[dict],
     cluster: couchbase.cluster.Cluster,
     keyspace: Keyspace,
-    printer: typing.Callable[..., None],
     connection_details_env: CouchbaseConnect,
 ):
     """Command to publish catalog items to user's Couchbase cluster"""
@@ -52,7 +51,6 @@ def cmd_publish(
             # If only one type of catalog is present
             continue
         catalog = catalog.catalog_descriptor
-        # embedding_model = catalog.embedding_model.replace("/", "_")
 
         # Check to ensure a dirty catalog is not published
         if catalog.version.is_dirty:
