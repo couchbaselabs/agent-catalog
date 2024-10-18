@@ -107,27 +107,30 @@ class Provider(pydantic_settings.BaseSettings):
     """
 
     secrets: typing.Optional[dict[str, pydantic.SecretStr]] = pydantic.Field(default_factory=dict, frozen=True)
-    """ A map of identifiers to secret values (e.g., Couchbase usernames, passwords, etc...).
+    """
+    A map of identifiers to secret values (e.g., Couchbase usernames, passwords, etc...).
 
-    Some tools require access to values that cannot be hard-coded into the tool themselves (for security reasons). As
-    an example, SQL++ tools require a connection string, username, and password. Instead of capturing these raw values
-    in the tool metadata, tool descriptors mandate the specification of a map whose values are secret keys.
-    ```yaml
-    secrets:
-        - couchbase:
-            conn_string: MY_CB_CONN_STRING
-            username: MY_CB_USERNAME
-            password: MY_CB_PASSWORD
-    ```
+    Some tools require access to values that cannot be hard-coded into the tool themselves (for security reasons).
+    As an example, SQL++ tools require a connection string, username, and password. Instead of capturing these raw
+    values in the tool metadata, tool descriptors mandate the specification of a map whose values are secret keys.
+
+    .. code-block:: yaml
+
+        secrets:
+            - couchbase:
+                conn_string: MY_CB_CONN_STRING
+                username: MY_CB_USERNAME
+                password: MY_CB_PASSWORD
 
     To map the secret keys to values, users will specify their secrets using this field (secrets).
-    ```python
-    provider = agentc.Provider(secrets={
-        "MY_CB_CONN_STRING": "couchbase//23.52.12.254",
-        "MY_CB_USERNAME": "admin_7823",
-        "MY_CB_PASSWORD": os.getenv("THE_CB_PASSWORD")
-    })
-    ```
+
+    .. code-block:: python
+
+        provider = agentc.Provider(secrets={
+            "MY_CB_CONN_STRING": "couchbase//23.52.12.254",
+            "MY_CB_USERNAME": "admin_7823",
+            "MY_CB_PASSWORD": os.getenv("THE_CB_PASSWORD")
+        })
     """
 
     embedding_model: typing.Optional[typing.AnyStr] = pydantic.Field(default="sentence-transformers/all-MiniLM-L12-v2")
@@ -317,7 +320,7 @@ class Provider(pydantic_settings.BaseSettings):
         if query is not None:
             return self._tool_provider.search(query=query, annotations=annotations, limit=limit)
         else:
-            return self._tool_provider.get(name=name, annotations=annotations, limit=limit)
+            return self._tool_provider.get(name=name, annotations=annotations)
 
     def get_prompt_for(self, query: str = None, name: str = None, annotations: str = None) -> Prompt | None:
         """

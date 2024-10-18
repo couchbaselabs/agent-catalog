@@ -2,7 +2,7 @@ name: Couchbase Agent Catalog GitHub Actions
 run-name: 👁️ ${{ github.actor }} has pushed a new commit!
 on: [ push ]
 jobs:
-  Explore-GitHub-Actions:
+  Tests:
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -44,3 +44,14 @@ jobs:
            ./libs/agentc_cli/tests/couchbase_server_start.sh
            poetry run bash -c "cd libs/agentc_cli && pytest -m smoke -v"
       - run: echo "🍏 This job's status is ${{ job.status }}."
+  Pages:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - id: deployment
+        uses: sphinx-notes/pages@v3

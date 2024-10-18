@@ -22,6 +22,7 @@ if importlib.util.find_spec("agentc_langchain") is not None:
     audit: AuditType = mod.audit.audit
 
 else:
+    logger.warning("The package 'agentc_langchain' is not found! Use 'pip install agentc[langchain]' to install it.")
 
     def audit(
         chat_model: langchain_core.language_models.chat_models.BaseChatModel,

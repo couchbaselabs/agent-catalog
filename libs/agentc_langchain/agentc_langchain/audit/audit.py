@@ -76,7 +76,15 @@ def audit(
     session: typing.AnyStr,
     auditor: AuditorType,
 ) -> BaseChatModel:
-    """A method to (dynamically) dispatch the '_generate' & '_stream' methods to methods that log LLM calls."""
+    """
+    A method to (dynamically) dispatch the '_generate' and '_stream' methods (as well as their asynchronous variants)
+    to methods that log LLM calls.
+
+    :param chat_model: The LangChain chat model to audit.
+    :param session: The session associated with all messages we will audit.
+    :param auditor: The auditor to bind to the chat model.
+    :return: The same LangChain chat model with decorated `_generate` and `_stream` methods.
+    """
     generate_dispatch = chat_model._generate
     agenerate_dispatch = chat_model._agenerate
     stream_dispatch = chat_model._stream

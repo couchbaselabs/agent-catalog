@@ -1,101 +1,21 @@
-# Agent Catalog User Guide
+# Agent Catalog Documentation
 
-Agent Catalog targets three (non-mutually-exclusive) types of users:
+Below are instructions for building the Agent Catalog documentation.
 
-- **Agent Builders**: those responsible for creating prompts and agents.
-- **Tool Builders**: those responsible for creating tools.
-- **Agent Analysts**: those responsible for analyzing agent performance.
+1. Install the top-level project with `poetry install`.
+2. Navigate to this directory (`cd docs`).
+3. Run `make html` to populate the `build` directory.
+4. Serve the `build` directory with Python's built-in HTTP server:
 
-In this guide, we detail the workflow each type of user follows when using Agent Catalog.
-We assume that you have already installed the Agent Catalog package. If you have not, please refer to the main
-(top-level) README file.
+   ```bash
+   cd build
+   python -m http.server
+   ```
 
-## Using Agent Catalog for Metrics-Driven Development
+   Or (if you are making active documentation changes), use `sphinx-autobuild`:
 
-The Agent Catalog package is not just a tool/prompt catalog, it's a foundation for building agents using metrics-driven
-development. Agent builders will follow this workflow:
+   ```bash
+   sphinx-autobuild source build
+   ```
 
-1. **Sample Downloading**: Download the starter agent from the `recipes/starter_agent` directory.
-2. **Agent Building**: The sample agent is meant to be a reference for building your own agents. You will need to
-   modify the agent to fit your use case.
-    - Agent Catalog integrates with agent applications in two main areas: i) by providing tools and prompts to the agent
-      _framework_ via `agentc.Provider` instances, and ii) by providing auditing capabilities to the agent
-      application via `agentc.Auditor` instances. The sample agent demonstrates how to use both of these classes.
-    - Agent Catalog providers will always return plain ol' Python functions. SQL++ tools, semantic search tools,
-      and HTTP request tools undergo some code _generation_ (in the traditional sense, not using LLMs) to yield Python
-      functions that will easily slot into any agent framework.
-    - Python tools indexed by `agentc` will be returned as-is. _Users must ensure that these tools already exist in the
-      agent application's Git repository, or that the Python source code tied to the tool can be easily imported using
-      Python's `import` statement._
-3. **Prompt Building**: Follow the steps outlined in the "Publishing to the Catalog" section above to create prompts.
-    - In a multi-team setting, you can also use `agentc find --kind prompt` to see if other team members have already
-      created prompts that address your use case.
-    - To accelerate prompt building, you can specify your tool requirements in the prompt. This will allow Agent Catalog
-      to automatically fetch the tools you need when the prompt is executed.
-4. **Agent Execution**: Run your agent! Depending on how your `agentc.Auditor` instances are configured, you should
-   see logs in the `./agent-activity` directory and/or in the `agent_activity` scope of your Couchbase instance.
-
-## Publishing to the Catalog
-
-The catalog (currently) versions two types of items: tools and prompts.
-Both tool builders and prompt builders (i.e., agent builders) will follow this workflow:
-
-1. **Template Downloading**: Download the appropriate template from the `templates` directory.
-2. **Tool/Prompt Creation**: Fill out the template with the necessary information.
-3. **Versioning**: All tools and all prompts must be versioned. Agent Catalog currently integrates with Git (using the
-   working Git SHA) to version each item. **You must be in a Git repository to use Agent Catalog.**
-4. **Indexing**: Use the command `agentc index [DIRECTORY] --kind [tool|prompt]` to index your tools/prompts, where
-   `[DIRECTORY]` refers to the directory containing your tools/prompts. This will create a local catalog and your items
-   will be in the newly created `./agent-catalog` folder.
-5. **Publishing**: By default, the `agentc index` command will allow you index tools / prompts associated with a dirty
-   Git repository.
-    1. To publish your items to a Couchbase instance, you must first commit your changes (to Git) and run the
-       `agentc index` command on a clean Git repository. `git status` should reveal no tracked changes.
-    2. Next, you must add your Couchbase connection string, username, and password to the environment. The most
-       straightforward way to do this is by running the following commands:
-       ```bash
-       export AGENT_CATALOG_CONN_STRING=couchbase://localhost
-       export AGENT_CATALOG_USERNAME=Administrator
-       export AGENT_CATALOG_PASSWORD=password
-       ```
-    3. Use the command `agentc publish --kind [tool|prompt|all] --bucket [BUCKET_NAME]` to publish your items to your
-       Couchbase instance. This will create a new scope in the specified bucket called `agent_catalog`, which will
-       contain all of your items.
-    4. Note that Agent Catalog isn't meant for the "publish once and forget" case. You are encouraged to run the
-       `agentc publish` command as often as you like to keep your items up-to-date.
-
-## Using Agent Catalog for Agent Analysis
-
-The Agent Catalog package also provides a foundation for analyzing agent performance. Agent analysts will follow this
-workflow:
-
-1. **Log Access**: Your first step is to get access to the `agentc.Auditor` captured logs. For logs sent to Couchbase,
-   you can find them in the `agent_activity.raw_logs` collection of your Couchbase instance. For logs stored locally,
-   you can find them in the `./agent-activity` directory. _We recommend the former, as it allows for easy ad-hoc
-   analysis through Couchbase Query and/or Couchbase Analytics._
-2. **Log Transformations**: For users with Couchbase Analytics enabled, we provide four views to help you get
-   started with conversational-based agents:
-    1. `Sessions (sid, start_t, vid, msgs)`, which provides one record per session (alt. conversation). Each session
-       record contains the session ID `sid`, the start time `start_t`, the catalog version `vid`, and a list of messages
-       `msgs`. The `msgs` field details all events that occurred during the session (e.g., the user's messages, the
-       response to the user, the internal "thinking" performed by the agent, the agent's transitions between tasks,
-       etc...).
-    2. `Exchanges (sid, question, answer, walk)`, which provides one record per exchange (i.e., the period between a
-       user question and an assistant response) in a given session. Each exchange record contains the session ID `sid`,
-       the user's question `question`, the agent's answer `answer`, and the agent's walk `walk` (e.g., the messages sent
-       to the LLMs, the tools executed, etc...). This view is commonly used as input into frameworks like Ragas.
-    3. `ToolCalls (sid, vid, tool_calls)`, which provides one record per session (alt. conversation). Each tool call
-       record contains the session ID `sid`, the catalog version `vid`, and a list of tool calls `tool_calls`. The
-       `tool_calls` field details all information around an LLM tool call (e.g., the tool name, the tool-call arguments,
-       and the tool result).
-    4. `Walks (vid, msgs, sid)`, which provides one record per session (alt. conversation). This view is essentially the
-       `Sessions` view where all `msgs` only contain task transitions.
-
-_The next two steps are under active development!_
-
-3. **Log Analysis**: Once you have a grasp how your agent is working, you'll want to move into the realm of
-   "quantitative". A good starting point is [Ragas](https://docs.ragas.io/en/latest/getstarted/index.html), where you
-   can use the Analytics service to serve "datasets" to the Ragas `evaluate` function.
-4. **Log Visualization**: Users are free to define their own views from the steps above and visualize their results
-   using dashboards like [Tableau](https://exchange.tableau.com/en-us/products/627) or
-   [Grafana](https://developer.couchbase.com/grafana-dashboards).
+   In both cases, you can now navigate to http://localhost:8000 and navigate the docs!

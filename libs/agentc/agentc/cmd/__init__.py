@@ -1,11 +1,11 @@
-import cmd.cmds
+import agentc_cli.cmds
 
-clean = cmd.cmds.cmd_clean
-env = cmd.cmds.cmd_env
-find = cmd.cmds.cmd_find
-index = cmd.cmds.cmd_index
-publish = cmd.cmds.cmd_publish
-status = cmd.cmds.cmd_status
-version = cmd.cmds.cmd_version
+clean = agentc_cli.cmds.cmd_clean
+env = agentc_cli.cmds.cmd_env
+find = agentc_cli.cmds.cmd_find
+index = agentc_cli.cmds.cmd_index
+publish = agentc_cli.cmds.cmd_publish
+status = agentc_cli.cmds.cmd_status
+version = agentc_cli.cmds.cmd_version
 
 __all__ = ["clean", "env", "find", "index", "publish", "status", "version"]
