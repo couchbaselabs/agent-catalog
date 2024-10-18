@@ -54,6 +54,7 @@ def test_index(tmp_path):
         # output = runner.invoke(click_main, ["index", "--include-dirty", str(tool_folder.absolute())])
 
 
+@pytest.mark.smoke
 def test_publish(tmp_path):
     """
     This test performs the following checks:
@@ -65,7 +66,7 @@ def test_publish(tmp_path):
     """
     runner = click.testing.CliRunner()
     # Set env variables
-    os.environ["CB_CONN_STRING"] = "localhost"
+    os.environ["CB_CONN_STRING"] = "couchbase://localhost"
     os.environ["CB_USERNAME"] = "Administrator"
     os.environ["CB_PASSWORD"] = "password"
 
