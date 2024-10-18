@@ -7,34 +7,33 @@ Agent Catalog targets three (non-mutually-exclusive) types of users:
 - **Agent Analysts**: those responsible for analyzing agent performance.
 
 In this guide, we detail the workflow each type of user follows when using Agent Catalog.
-We assume that you have already installed the Agent Catalog package. If you have not, please refer to the main (top-level)
-README file.
+We assume that you have already installed the Agent Catalog package. If you have not, please refer to the main
+(top-level) README file.
 
 ## Using Agent Catalog for Metrics-Driven Development
 
 The Agent Catalog package is not just a tool/prompt catalog, it's a foundation for building agents using metrics-driven
 development. Agent builders will follow this workflow:
 
-1. **Sample Downloading**: Download the sample agent from the `rosetta-example` repository.
+1. **Sample Downloading**: Download the starter agent from the `recipes/starter_agent` directory.
 2. **Agent Building**: The sample agent is meant to be a reference for building your own agents. You will need to
    modify the agent to fit your use case.
     - Agent Catalog integrates with agent applications in two main areas: i) by providing tools and prompts to the agent
-      _framework_ via `agent_catalog.Provider` instances, and ii) by providing auditing capabilities to the agent application
-      via `agent_catalog.Auditor` instances. The sample agent demonstrates how to use both of these classes.
-    - Agent Catalog catalog providers will always return plain ol' Python functions. SQL++ tools, semantic search tools, and
-      HTTP request tools undergo some code _generation_ (in the traditional sense, not using LLMs) to yield Python
+      _framework_ via `agentc.Provider` instances, and ii) by providing auditing capabilities to the agent
+      application via `agentc.Auditor` instances. The sample agent demonstrates how to use both of these classes.
+    - Agent Catalog providers will always return plain ol' Python functions. SQL++ tools, semantic search tools,
+      and HTTP request tools undergo some code _generation_ (in the traditional sense, not using LLMs) to yield Python
       functions that will easily slot into any agent framework.
-    - Python tools indexed by Agent Catalog will be returned as-is. _Users must ensure that these tools already exist in the
+    - Python tools indexed by `agentc` will be returned as-is. _Users must ensure that these tools already exist in the
       agent application's Git repository, or that the Python source code tied to the tool can be easily imported using
-      Python's `import ___` statement._
+      Python's `import` statement._
 3. **Prompt Building**: Follow the steps outlined in the "Publishing to the Catalog" section above to create prompts.
     - In a multi-team setting, you can also use `agentc find --kind prompt` to see if other team members have already
       created prompts that address your use case.
-    - To accelerate prompt building, you can specify your tool requirements in the prompt. This will allow Agent Catalog to
-      automatically fetch the tools you need when the prompt is executed.
-4. **Agent Execution**: Run your agent! Depending on how your `agent_catalog.Auditor` instances are configured, you should
-   see logs in the `./agent-activity` directory and/or in the `agent_catalog_logs` scope of your Couchbase instance.
-
+    - To accelerate prompt building, you can specify your tool requirements in the prompt. This will allow Agent Catalog
+      to automatically fetch the tools you need when the prompt is executed.
+4. **Agent Execution**: Run your agent! Depending on how your `agentc.Auditor` instances are configured, you should
+   see logs in the `./agent-activity` directory and/or in the `agent_activity` scope of your Couchbase instance.
 
 ## Publishing to the Catalog
 
@@ -51,7 +50,7 @@ Both tool builders and prompt builders (i.e., agent builders) will follow this w
 5. **Publishing**: By default, the `agentc index` command will allow you index tools / prompts associated with a dirty
    Git repository.
     1. To publish your items to a Couchbase instance, you must first commit your changes (to Git) and run the
-       `agentc index` command on a clean Git repository.
+       `agentc index` command on a clean Git repository. `git status` should reveal no tracked changes.
     2. Next, you must add your Couchbase connection string, username, and password to the environment. The most
        straightforward way to do this is by running the following commands:
        ```bash
@@ -70,13 +69,13 @@ Both tool builders and prompt builders (i.e., agent builders) will follow this w
 The Agent Catalog package also provides a foundation for analyzing agent performance. Agent analysts will follow this
 workflow:
 
-1. **Log Access**: Your first step is to get access to the `agent_catalog.Auditor` captured logs. For logs sent to Couchbase,
-   you can find them in the `agent_catalog_logs` scope of your Couchbase instance. For logs stored locally, you can find them
-   in the `./agent-activity` directory. _We recommend the former, as it allows for easy ad-hoc analysis through
-   Couchbase Query and/or Couchbase Analytics._
-2. **Log Analysis**: For users with Couchbase Analytics enabled, we provide three views to help you get started with
-   conversational-based agents:
-    1. `Sessions (sid, start_t, vid, msgs)`, which provides one record per session (alt. trajectory). Each session
+1. **Log Access**: Your first step is to get access to the `agentc.Auditor` captured logs. For logs sent to Couchbase,
+   you can find them in the `agent_activity.raw_logs` collection of your Couchbase instance. For logs stored locally,
+   you can find them in the `./agent-activity` directory. _We recommend the former, as it allows for easy ad-hoc
+   analysis through Couchbase Query and/or Couchbase Analytics._
+2. **Log Transformations**: For users with Couchbase Analytics enabled, we provide four views to help you get
+   started with conversational-based agents:
+    1. `Sessions (sid, start_t, vid, msgs)`, which provides one record per session (alt. conversation). Each session
        record contains the session ID `sid`, the start time `start_t`, the catalog version `vid`, and a list of messages
        `msgs`. The `msgs` field details all events that occurred during the session (e.g., the user's messages, the
        response to the user, the internal "thinking" performed by the agent, the agent's transitions between tasks,
@@ -84,11 +83,19 @@ workflow:
     2. `Exchanges (sid, question, answer, walk)`, which provides one record per exchange (i.e., the period between a
        user question and an assistant response) in a given session. Each exchange record contains the session ID `sid`,
        the user's question `question`, the agent's answer `answer`, and the agent's walk `walk` (e.g., the messages sent
-       to the LLMs, the tools executed, etc...).
-   3. `ToolCalls (sid, vid, tool_calls)`, which provides one record per session (alt. trajectory). Each tool call
-      record contains the session ID `sid`, the catalog version `vid`, and a list of tool calls `tool_calls`. The
-      `tool_calls` field details all information around an LLM tool call (e.g., the tool name, the tool-call arguments,
-      and the tool result).
-3. **Log Visualization**: Users are free to define their own views from the steps above and visualize their results
+       to the LLMs, the tools executed, etc...). This view is commonly used as input into frameworks like Ragas.
+    3. `ToolCalls (sid, vid, tool_calls)`, which provides one record per session (alt. conversation). Each tool call
+       record contains the session ID `sid`, the catalog version `vid`, and a list of tool calls `tool_calls`. The
+       `tool_calls` field details all information around an LLM tool call (e.g., the tool name, the tool-call arguments,
+       and the tool result).
+    4. `Walks (vid, msgs, sid)`, which provides one record per session (alt. conversation). This view is essentially the
+       `Sessions` view where all `msgs` only contain task transitions.
+
+_The next two steps are under active development!_
+
+3. **Log Analysis**: Once you have a grasp how your agent is working, you'll want to move into the realm of
+   "quantitative". A good starting point is [Ragas](https://docs.ragas.io/en/latest/getstarted/index.html), where you
+   can use the Analytics service to serve "datasets" to the Ragas `evaluate` function.
+4. **Log Visualization**: Users are free to define their own views from the steps above and visualize their results
    using dashboards like [Tableau](https://exchange.tableau.com/en-us/products/627) or
    [Grafana](https://developer.couchbase.com/grafana-dashboards).

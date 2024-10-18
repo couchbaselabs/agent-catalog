@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "agentc-langchain"
-version = "0.1.0"
+version = "0.0.1"
 description = "Collection of LangChain-specific classes and functions used with the Couchbase Agent Catalog project."
 authors = [
   "Kush Khanna <kush.khanna@couchbase.com>",
@@ -27,7 +27,6 @@ pydantic = "2.8.2"
 requests = "^2.32.3"
 python-dotenv = "^1.0.1"
 
-# TODO (GLENN): When we publish to PyPI, we'll use a non-local reference.
 agentc-core = { path = "../agentc_core", develop = true }
 
 [tool.poetry.group.dev.dependencies]

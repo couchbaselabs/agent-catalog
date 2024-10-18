@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "agentc-core"
-version = "0.1.0"
+version = "0.0.1"
 description = "The core for the Couchbase Agent Catalog project."
 repository = "https://github.com/couchbaselabs/agent-catalog"
 authors = [

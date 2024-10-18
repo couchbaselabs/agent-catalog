@@ -164,6 +164,7 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
-# Rosetta's catalog + activity subdirectories.
+# Agent Catalog's generated subdirectories.
 *.agent-catalog/
 *.agent-activity/
+*.model-cache/

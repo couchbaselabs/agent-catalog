@@ -1,0 +1,20 @@
+---
+# The content in between the '---' lines must be valid YAML.
+record_kind: raw_prompt
+
+# The name of the prompt must be a valid Python identifier (e.g., no spaces).
+# This field is mandatory, and will be used when searching for prompts by name.
+name: find_source_and_dest
+
+# A description of the prompt's purpose (e.g., where this prompt will be used).
+# This field is mandatory, and will be used (indirectly) when performing semantic search for prompts.
+description: Instructions on how to ask for source and destination airports.
+
+# As a supplement to the description similarity search, users can optionally specify search annotations.
+# The values of these annotations MUST be strings (e.g., not 'true', but '"true"').
+# This field is optional, and does not have to be present.
+annotations:
+  framework: "controlflow"
+---
+Your goal is to ask the user for a source airport and a destination airport.
+You must return the IATA codes for both airports.
