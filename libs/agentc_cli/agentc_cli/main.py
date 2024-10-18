@@ -559,13 +559,20 @@ def version(ctx):
     help="Natural language query for which tool needs to be executed.",
     show_default=True,
 )
+@click.option(
+    "-em",
+    "--embedding-model",
+    default=DEFAULT_EMBEDDING_MODEL,
+    help="Embedding model used when indexing source files into the local catalog.",
+    show_default=True,
+)
 @click.pass_context
-def execute(ctx, name, query):
+def execute(ctx, name, query, embedding_model):
     """Execute specific tool to test it."""
     if name is not None and query is not None:
         raise ValueError("Provide either name of the tool or query, giving both is not allowed!") from None
 
-    cmd_execute(ctx.obj, name, query)
+    cmd_execute(ctx.obj, name, query, embedding_model)
 
 
 # @click_main.command()
