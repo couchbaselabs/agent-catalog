@@ -1,7 +1,8 @@
-# lc
+# Couchbase Agent Catalog LangChain
 
-A collection of LangChain-specific classes and functions to be used with Agent Catalog.
-This package currently includes a LangChain agent that interfaces with Capella for its LLM calls.
+This package holds a collection of LangChain-specific classes and functions to be used with Agent Catalog.
+This package currently includes i) a LangChain agent that interfaces with Capella for its LLM calls and ii) a LangChain
+hook for the Couchbase Agent Catalog auditor.
 
 ## Examples with LangChain
 

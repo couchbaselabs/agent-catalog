@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "agentc"
-version = "0.1.0"
+version = "0.0.1"
 description = "The front-facing package for the Couchbase Agent Catalog project."
 repository = "https://github.com/couchbaselabs/agent-catalog"
 authors = [
@@ -23,7 +23,6 @@ agentc = "agentc.__main__:main"
 python = "^3.12"
 pydantic-settings = "^2.4.0"
 
-# TODO (GLENN): When we publish to PyPI, we'll use non-local references.
 agentc-core = { path = "../agentc_core", develop = true }
 agentc-cli = { path = "../agentc_cli", develop = true }
 agentc-langchain = { path = "../agentc_langchain", develop = true, optional = true }

@@ -35,7 +35,12 @@ def generate_model_from_json_schema(
     python_version: datamodel_code_generator.PythonVersion,
     model_type: datamodel_code_generator.DataModelType,
 ) -> GeneratedCode:
-    model_types = datamodel_code_generator.model.get_data_model_types(model_type, python_version)
+    model_types = datamodel_code_generator.model.get_data_model_types(
+        data_model_type=model_type,
+        target_python_version=python_version,
+        # TODO (GLENN): We might need to expose this as a parameter in the future.
+        target_datetime_class=datamodel_code_generator.DatetimeClassType.Datetime,
+    )
 
     # If we have a list-valued field, first extract the fields involved.
     parsed_json_schema = json.loads(json_schema)
