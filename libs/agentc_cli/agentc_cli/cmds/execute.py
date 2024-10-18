@@ -51,7 +51,7 @@ def cmd_execute(ctx: Context, name: str | None, query: str | None, embedding_mod
                     input_types[param] = class_types[param_def["$ref"].split("/")[-1]]
                 # list type
                 elif param_def["type"] == "array":
-                    input_types[param] = list[types_mapping[param_def["items"]["type"]]]
+                    input_types[param] = list(types_mapping[param_def["items"]["type"]])
                 # other types like str, int, float
                 else:
                     input_types[param] = types_mapping[param_def["type"]]
@@ -68,7 +68,8 @@ def cmd_execute(ctx: Context, name: str | None, query: str | None, embedding_mod
         # TODO: import similarly to python tool for others from the temp directory
 
         click.echo(
-            "Provide inputs for the prompted variables, types are shown for reference in parenthesis\nIf input is of type list then provide values separated by a comma.\n"
+            "Provide inputs for the prompted variables, types are shown for reference in parenthesis\n"
+            "If input is of type list then provide values separated by a comma.\n"
         )
         # prompt user for inputs
         user_inputs = take_input_from_user(input_types)

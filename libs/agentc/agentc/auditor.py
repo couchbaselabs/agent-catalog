@@ -22,58 +22,59 @@ Kind = Kind
 class Auditor(pydantic_settings.BaseSettings):
     """An auditor of various events (e.g., LLM completions) given a catalog."""
 
-    model_config = pydantic_settings.SettingsConfigDict(env_prefix="AGENT_CATALOG_", use_attribute_docstrings=True)
+    model_config = pydantic_settings.SettingsConfigDict(env_prefix="AGENT_CATALOG_")
 
     llm_name: str = None
     """ Name of the LLM model used to generate the chat messages to-be-audited.
 
-    This field can be specified on instantiation or on accept(). A model specified in accept() overrides a model
-    specified on instantiation.
+    This field can be specified on instantiation or on :py:meth:`accept()`.
+    A model specified in :py:meth:`accept()` overrides a model specified on instantiation.
     """
 
     conn_string: typing.Optional[str] = None
     """ Couchbase connection string that points to the audit logs.
 
-    This Couchbase instance refers to a CB instance that possesses the audit log collection. This collection is
-    automatically generated on `agentc index`, so this field is most likely the same instance as the CB instance
-    possessing the catalog. If there exists no local audit log location (e.g., this is deployed in a standalone
-    environment) OR if $AGENT_CATALOG_CATALOG is not explicitly set, we will perform all "accept" commands directly on
+    This Couchbase instance refers to a CB instance that possesses the audit log collection.
+    This collection is automatically generated on :command:`agentc index`, so this field is most likely the same
+    instance as the CB instance possessing the catalog.
+    If there exists no local audit log location (e.g., this is deployed in a standalone environment) OR if
+    ``$AGENT_CATALOG_CATALOG`` is not explicitly set, we will perform all :py:meth:`accept` commands directly on
     the remote audit log collection.
 
-    This field must be specified with username, password, and bucket.
+    This field **must** be specified with :py:attr:`username`, :py:attr:`password`, and  :py:attr:`bucket`.
     """
 
     username: typing.Optional[pydantic.SecretStr] = None
     """ Username associated with the Couchbase instance possessing the audit logs.
 
-    This field must be specified with conn_string, password, and bucket.
+    This field **must** be specified with :py:attr:`conn_string`, :py:attr:`password`, and :py:attr:`bucket`.
     """
 
     password: typing.Optional[pydantic.SecretStr] = None
     """ Password associated with the Couchbase instance possessing the audit logs.
 
-    This field must be specified with conn_string, username, and bucket.
+    This field **must** be specified with :py:attr:`conn_string`, :py:attr:`username`, and :py:attr:`bucket`.
     """
 
     bucket: typing.Optional[str] = None
     """ The name of the Couchbase bucket possessing the audit logs.
 
-    This field must be specified with conn_string, username, and password.
+    This field **must** be specified with :py:attr:`conn_string`, :py:attr:`username`, and :py:attr:`password`.
     """
 
     catalog: typing.Optional[pathlib.Path] = None
     """ Location of the catalog path.
 
-    This field is used to search for the catalog version. If this field is not set, we will defer to the default
-    behavior of agentc.Provider.
+    This field is used to search for the catalog version.
+    If this field is not set, we will defer to the default behavior of :py:class:`agentc.Provider`.
     """
 
     local_log: typing.Optional[pathlib.Path] = None
     """ Local audit log file to write to.
 
-    If this field and $AGENT_CATALOG_CONN_STRING are not set, we will perform a best-effort search by walking upward
-    from the current working directory until we find the 'agentc_core.defaults.DEFAULT_ACTIVITY_FOLDER' folder and
-    subsequently generate an audit log here.
+    If this field and ``$AGENT_CATALOG_CONN_STRING`` are not set, we will perform a best-effort search by walking upward
+    from the current working directory until we find the :py:data:`agentc_core.defaults.DEFAULT_ACTIVITY_FOLDER` folder
+    and subsequently generate an audit log here.
 
     Audit log files will reach a maximum of 128MB (by default) before they are rotated and compressed.
     """

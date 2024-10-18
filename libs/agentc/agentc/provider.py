@@ -40,94 +40,101 @@ Tool = ToolProvider.ToolResult
 class Provider(pydantic_settings.BaseSettings):
     """A provider of indexed "agent building blocks" (e.g., tools)."""
 
-    model_config = pydantic_settings.SettingsConfigDict(env_prefix="AGENT_CATALOG_", use_attribute_docstrings=True)
+    model_config = pydantic_settings.SettingsConfigDict(env_prefix="AGENT_CATALOG_")
 
     conn_string: typing.Optional[str] = None
     """ Couchbase connection string that points to the catalog.
 
-    This Couchbase instance refers to the CB instance used with the publish command. If there exists no local catalog
-    (e.g., this is deployed in a standalone environment), we will perform all "find" commands directly on the remote
-    catalog. If this field AND $AGENT_CATALOG_CATALOG are specified, we will issue "find" on both the remote and local
-    catalog.
+    This Couchbase instance refers to the CB instance used with the :command:`publish` command.
+    If there exists no local catalog (e.g., this is deployed in a standalone environment), we will perform all
+    :command:`find` commands directly on the remote catalog.
+    If this field AND ``$AGENT_CATALOG_CATALOG`` are specified, we will issue :command:`find` on both the remote and
+    local catalog (with local catalog entries taking precedence).
 
-    This field must be specified with username, password, and bucket.
+    This field must be specified with :py:attr:`username`, :py:attr:`password`, and  :py:attr:`bucket`.
     """
 
     username: typing.Optional[pydantic.SecretStr] = None
     """ Username associated with the Couchbase instance possessing the catalog.
 
-    This field must be specified with conn_string, password, and bucket.
+    This field must be specified with :py:attr:`conn_string`, :py:attr:`password`, and :py:attr:`bucket`.
     """
 
     password: typing.Optional[pydantic.SecretStr] = None
     """ Password associated with the Couchbase instance possessing the catalog.
 
-    This field must be specified with conn_string, username, and bucket.
+    This field must be specified with :py:attr:`conn_string`, :py:attr:`username`, and :py:attr:`bucket`.
     """
 
     bucket: typing.Optional[str] = None
     """ The name of the Couchbase bucket possessing the catalog.
 
-    This field must be specified with conn_string, username, and password.
+    This field must be specified with :py:attr:`conn_string`, :py:attr:`username`, and :py:attr:`password`.
     """
 
     catalog: typing.Optional[pathlib.Path] = None
     """ Location of the catalog path.
 
-    If this field and $AGENT_CATALOG_CONN_STRING are not set, we will perform a best-effort search by walking upward
-    from the current working directory until we find the 'agentc_core.defaults.DEFAULT_CATALOG_FOLDER' folder.
+    If this field and ``$AGENT_CATALOG_CONN_STRING`` are not set, we will perform a best-effort search by walking upward
+    from the current working directory until we find the :py:data:`agentc_core.defaults.DEFAULT_ACTIVITY_FOLDER` folder.
     """
 
     output: typing.Optional[pathlib.Path | tempfile.TemporaryDirectory] = None
     """ Location to save generated Python stubs to, if desired.
 
-    On 'get_tools_for', tools are dynamically generated and served as annotated Python callables. By default, this
-    code is never written to disk. If this field is specified, we will write all generated files to the given output
-    directory and serve the generated Python callables from these files with a "standard import".
+    On :py:meth:`get_tools_for`, tools are dynamically generated and served as annotated Python callables.
+    By default, this code is never written to disk.
+    If this field is specified, we will write all generated files to the given output directory and serve the generated
+    Python callables from these files with a "standard import".
     """
 
     decorator: typing.Optional[typing.Callable[[Tool], typing.Any]] = lambda record: record.func
-    """ A Python decorator (function) to apply to each result yielded by 'get_tools_for'.
+    """ A Python decorator (function) to apply to each result yielded by :py:meth:`get_tools_for`.
 
     By default, yielded results are callable and possess type annotations + documentation strings, but some agent
-    frameworks may ask for tools whose type is tailored to their own framework. As an example, in LangChain, vanilla
-    Python functions must be converted to langchain_core.tools.BaseTool instances. To avoid having to "box" these tools
-    yourself, we accept a callback to perform this boxing on your behalf.
+    frameworks may ask for tools whose type is tailored to their own framework.
+    As an example, in LangChain, vanilla Python functions must be converted to langchain_core.tools.BaseTool instances.
+    To avoid having to "box" these tools yourself, we accept a callback to perform this boxing on your behalf.
     """
 
     refiner: typing.Optional[typing.Callable[[list[SearchResult]], list[SearchResult]]] = lambda results: results
     """ A Python function to post-process results (reranking, pruning, etc...) yielded by the catalog.
 
-    By default, we perform a strict top-K nearest neighbor search for relevant results. This function serves to perform
-    any additional reranking and **pruning** before the code generation occurs. This function should accept a list of
-    SearchResult instances (a model with the fields "entry" and "delta") and return a list of SearchResult instances.
+    By default, we perform a strict top-K nearest neighbor search for relevant results.
+    This function serves to perform any additional reranking and **pruning** before the code generation occurs.
+    This function should accept a list of :py:class:`SearchResult` instances (a model with the fields ``entry`` and
+    ``delta``) and return a list of :py:class:`SearchResult` instances.
 
     We offer an experimental post-processor to cluster closely related results (using delta as the loss function) and
-    subsequently yield the closest cluster (see agentc_core.provider.refiner.ClosestClusterRefiner).
+    subsequently yield the closest cluster (see :py:class:`agentc_core.provider.refiner.ClosestClusterRefiner`).
     """
 
     secrets: typing.Optional[dict[str, pydantic.SecretStr]] = pydantic.Field(default_factory=dict, frozen=True)
-    """ A map of identifiers to secret values (e.g., Couchbase usernames, passwords, etc...).
+    """
+    A map of identifiers to secret values (e.g., Couchbase usernames, passwords, etc...).
 
-    Some tools require access to values that cannot be hard-coded into the tool themselves (for security reasons). As
-    an example, SQL++ tools require a connection string, username, and password. Instead of capturing these raw values
-    in the tool metadata, tool descriptors mandate the specification of a map whose values are secret keys.
-    ```yaml
-    secrets:
-        - couchbase:
-            conn_string: MY_CB_CONN_STRING
-            username: MY_CB_USERNAME
-            password: MY_CB_PASSWORD
-    ```
+    Some tools require access to values that cannot be hard-coded into the tool themselves (for security reasons).
+    As an example, SQL++ tools require a connection string, username, and password.
+    Instead of capturing these raw values in the tool metadata, tool descriptors mandate the specification of a
+    map whose values are secret keys.
+
+    .. code-block:: yaml
+
+        secrets:
+            - couchbase:
+                conn_string: MY_CB_CONN_STRING
+                username: MY_CB_USERNAME
+                password: MY_CB_PASSWORD
 
     To map the secret keys to values, users will specify their secrets using this field (secrets).
-    ```python
-    provider = agentc.Provider(secrets={
-        "MY_CB_CONN_STRING": "couchbase//23.52.12.254",
-        "MY_CB_USERNAME": "admin_7823",
-        "MY_CB_PASSWORD": os.getenv("THE_CB_PASSWORD")
-    })
-    ```
+
+    .. code-block:: python
+
+        provider = agentc.Provider(secrets={
+            "MY_CB_CONN_STRING": "couchbase//23.52.12.254",
+            "MY_CB_USERNAME": "admin_7823",
+            "MY_CB_PASSWORD": os.getenv("THE_CB_PASSWORD")
+        })
     """
 
     embedding_model: typing.Optional[typing.AnyStr] = pydantic.Field(default="sentence-transformers/all-MiniLM-L12-v2")
@@ -139,8 +146,9 @@ class Provider(pydantic_settings.BaseSettings):
     tool_model: SchemaModel = SchemaModel.TypingTypedDict
     """ The target model type for the generated (schema) code for tools.
 
-    By default, we generate TypedDict models and attach these as type hints to the generated Python functions. Other
-    options include Pydantic (V2 and V1) models and dataclasses, though these may not be supported by all agent
+    By default, we generate :py:type:`TypedDict` models and attach these as type hints to the generated Python
+    functions.
+    Other options include Pydantic (V2 and V1) models and dataclasses, though these may not be supported by all agent
     frameworks.
     """
 
@@ -310,20 +318,20 @@ class Provider(pydantic_settings.BaseSettings):
         """
         :param query: A query string (natural language) to search the catalog with.
         :param name: The specific name of the catalog entry to search for.
-        :param annotations: An annotation query string in the form of KEY="VALUE" (AND|OR KEY="VALUE")*.
+        :param annotations: An annotation query string in the form of ``KEY="VALUE" (AND|OR KEY="VALUE")*``.
         :param limit: The maximum number of results to return.
         :return: A list of tools (Python functions).
         """
         if query is not None:
             return self._tool_provider.search(query=query, annotations=annotations, limit=limit)
         else:
-            return self._tool_provider.get(name=name, annotations=annotations, limit=limit)
+            return self._tool_provider.get(name=name, annotations=annotations)
 
     def get_prompt_for(self, query: str = None, name: str = None, annotations: str = None) -> Prompt | None:
         """
         :param query: A query string (natural language) to search the catalog with.
         :param name: The specific name of the catalog entry to search for.
-        :param annotations: An annotation query string in the form of KEY="VALUE" (AND|OR KEY="VALUE")*.
+        :param annotations: An annotation query string in the form of ``KEY="VALUE" (AND|OR KEY="VALUE")*``.
         :return: A single prompt as well any tools attached to the prompt.
         """
         if query is not None:
