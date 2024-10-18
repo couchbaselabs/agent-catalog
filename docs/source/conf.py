@@ -25,6 +25,7 @@ extensions = [
     "sphinxcontrib.autodoc_pydantic",
     "sphinx_copybutton",
     "sphinx_click",
+    "sphinx.ext.githubpages",
 ]
 pygments_style = "sphinx"
 templates_path = ["_templates"]
