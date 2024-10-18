@@ -6,11 +6,11 @@ import re
 import shutil
 import uuid
 
-from libs.agentc_cli.agentc_cli.main import click_main
-from libs.agentc_core.agentc_core.defaults import DEFAULT_ACTIVITY_FOLDER
-from libs.agentc_core.agentc_core.defaults import DEFAULT_CATALOG_FOLDER
-from libs.agentc_core.agentc_core.defaults import DEFAULT_PROMPT_CATALOG_NAME
-from libs.agentc_core.agentc_core.defaults import DEFAULT_TOOL_CATALOG_NAME
+from agentc_cli.main import click_main
+from agentc_core.defaults import DEFAULT_ACTIVITY_FOLDER
+from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
+from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_NAME
+from agentc_core.defaults import DEFAULT_TOOL_CATALOG_NAME
 
 
 @pytest.mark.smoke
