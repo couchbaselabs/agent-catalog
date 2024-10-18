@@ -450,7 +450,7 @@ def publish(ctx, kind, bucket, annotations):
         return
 
     keyspace_details.bucket = bucket
-    cmd_publish(ctx.obj, kind, annotations, cluster, keyspace_details, click.echo, connection_details_env)
+    cmd_publish(ctx.obj, kind, annotations, cluster, keyspace_details, connection_details_env)
     cluster.close()
 
 
