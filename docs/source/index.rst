@@ -15,7 +15,7 @@ Table of Contents
 .. toctree::
    :titlesonly:
 
-   Getting Started <start>
+   Getting Agent Catalog <install>
    Agent Catalog User Guide <guide>
    Command Line Tool <cli>
    Agent Catalog API <api>

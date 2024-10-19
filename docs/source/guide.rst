@@ -16,7 +16,7 @@ Agent Catalog targets three (non-mutually-exclusive) types of users:
     Those responsible for analyzing agent performance.
 
 In this short guide, we detail the workflow each type of user follows when using Agent Catalog.
-We assume that you have already installed the `agentc` package.
+We assume that you have already installed the ``agentc`` package.
 If you have not, please refer to the :doc:`Getting Started <start>` page.
 
 Metrics Driven Development
@@ -31,32 +31,32 @@ Agent builders will follow this workflow:
 2. **Agent Building**: The sample agent is meant to be a reference for building your own agents.
    You will need to modify the agent to fit your use case.
 
-    - Agent Catalog integrates with agent applications in two main areas:
-      i) by providing tools and prompts to the agent *framework* via :python:`agentc.Provider` instances, and ii) by
-      providing auditing capabilities to the agent via :python:`agentc.Auditor` instances.
-      The sample agent demonstrates how to use both of these classes.
+   - Agent Catalog integrates with agent applications in two main areas:
+     i) by providing tools and prompts to the agent *framework* via :python:`agentc.Provider` instances, and ii) by
+     providing auditing capabilities to the agent via :python:`agentc.Auditor` instances.
+     The sample agent demonstrates how to use both of these classes.
 
-    - Agent Catalog providers will always return plain ol' Python functions.
-      SQL++ tools, semantic search tools, and HTTP request tools undergo some code *generation* (in the traditional
-      sense, not using LLMs) to yield Python functions that will easily slot into any agent framework.
-      Python tools indexed by :command:`agentc` will be returned as-is.
+   - Agent Catalog providers will always return plain ol' Python functions.
+     SQL++ tools, semantic search tools, and HTTP request tools undergo some code *generation* (in the traditional
+     sense, not using LLMs) to yield Python functions that will easily slot into any agent framework.
+     Python tools indexed by :command:`agentc` will be returned as-is.
 
-      .. note::
+     .. note::
 
         Users must ensure that these tools already exist in the agent application's Git repository, or that the Python
         source code tied to the tool can be easily imported using Python's :python:`import` statement.
 
 3. **Prompt Building**: Follow the steps outlined in the `Couchbase-Backed Agent Catalogs`_ section to create prompts.
 
-    - In a multi-team setting, you can also use :command:`agentc find --kind prompt` to see if other team members have
-      already created prompts that address your use case.
+   - In a multi-team setting, you can also use :command:`agentc find --kind prompt` to see if other team members have
+     already created prompts that address your use case.
 
-    - To accelerate prompt building, you can specify your tool requirements in the prompt.
-      This will allow Agent Catalog to automatically fetch the tools you need when the prompt is executed.
+   - To accelerate prompt building, you can specify your tool requirements in the prompt.
+     This will allow Agent Catalog to automatically fetch the tools you need when the prompt is executed.
 
 4. **Agent Execution**: Run your agent!
    Depending on how your :python:`agentc.Auditor` instances are configured, you should see logs in the
-   :file:`./agent-activity` directory and/or in the `agent_activity` scope of your Couchbase instance.
+   :file:`./agent-activity` directory and/or in the ``agent_activity`` scope of your Couchbase instance.
 
 Couchbase-Backed Agent Catalogs
 -------------------------------
@@ -76,39 +76,39 @@ Both tool builders and prompt builders (i.e., agent builders) will follow this w
 
    .. code-block:: bash
 
-       agentc index [DIRECTORY] --kind [tool|prompt]
+    agentc index [DIRECTORY] --kind [tool|prompt]
 
-   `[DIRECTORY]` refers to the directory containing your tools/prompts.
+   ``[DIRECTORY]`` refers to the directory containing your tools/prompts.
    This command will create a local catalog and your items will be in the newly created :file:`./agent-catalog` folder.
 
 5. **Publishing**: By default, the :command:`agentc index` command will allow you index tools / prompts associated with
    a dirty Git repository.
 
-    1. To publish your items to a Couchbase instance, you must first commit your changes (to Git) and run the
-       :command:`agentc index` command on a clean Git repository.
-       :command:`git status` should reveal no tracked changes.
+   1. To publish your items to a Couchbase instance, you must first commit your changes (to Git) and run the
+      :command:`agentc index` command on a clean Git repository.
+      :command:`git status` should reveal no tracked changes.
 
-    2. Next, you must add your Couchbase connection string, username, and password to the environment.
-       The most straightforward way to do this is by running the following commands:
+   2. Next, you must add your Couchbase connection string, username, and password to the environment.
+      The most straightforward way to do this is by running the following commands:
 
-       .. code-block:: bash
+      .. code-block:: bash
 
-           export AGENT_CATALOG_CONN_STRING=couchbase://localhost
-           export AGENT_CATALOG_USERNAME=Administrator
-           export AGENT_CATALOG_PASSWORD=password
+        export AGENT_CATALOG_CONN_STRING=couchbase://localhost
+        export AGENT_CATALOG_USERNAME=Administrator
+        export AGENT_CATALOG_PASSWORD=password
 
-    3. Use the command to publish your items to your Couchbase instance.
+   3. Use the command to publish your items to your Couchbase instance.
 
-       .. code-block:: bash
+      .. code-block:: bash
 
-           agentc publish --kind [tool|prompt|all] --bucket [BUCKET_NAME]
+        agentc publish --kind [tool|prompt|all] --bucket [BUCKET_NAME]
 
-       This will create a new scope in the specified bucket called `agent_catalog`, which will contain all of your
-       items.
+      This will create a new scope in the specified bucket called ``agent_catalog``, which will contain all of your
+      items.
 
-    4. Note that Agent Catalog isn't meant for the "publish once and forget" case.
-       You are encouraged to run the :command:`agentc publish` command as often as you like to keep your items
-       up-to-date.
+   4. Note that Agent Catalog isn't meant for the "publish once and forget" case.
+      You are encouraged to run the :command:`agentc publish` command as often as you like to keep your items
+      up-to-date.
 
 Assessing Agent Quality
 -----------------------
@@ -125,56 +125,56 @@ Agent analysts will follow this workflow:
 2. **Log Transformations**: For users with Couchbase Analytics enabled, we provide four views to help you get
    started with conversational-based agents:
 
-    .. admonition:: `Sessions (sid, start_t, vid, msgs)`
+   .. admonition:: Sessions ``(sid, start_t, vid, msgs)``
 
-        The `Sessions` view provides one record per session (alt. conversation).
+        The ``Sessions`` view provides one record per session (alt. conversation).
         Each session record contains:
 
-        i) the session ID `sid`,
+        i) the session ID ``sid``,
 
-        ii) the session start time `start_t`,
+        ii) the session start time ``start_t``,
 
-        iii) the catalog version `vid`, and
+        iii) the catalog version ``vid``, and
 
-        iv) a list of messages `msgs`.
+        iv) a list of messages ``msgs``.
 
-        The `msgs` field details all events that occurred during the session (e.g., the user's messages, the response
+        The ``msgs`` field details all events that occurred during the session (e.g., the user's messages, the response
         to the user, the internal "thinking" performed by the agent, the agent's transitions between tasks, etc...).
 
-    .. admonition:: `Exchanges (sid, question, answer, walk)`
+   .. admonition:: Exchanges ``(sid, question, answer, walk)``
 
-        The `Exchanges` view provides one record per exchange (i.e., the period between a user question and an assistant
-        response) in a given session.
+        The ``Exchanges`` view provides one record per exchange (i.e., the period between a user question and an
+        assistant response) in a given session.
         Each exchange record contains:
 
-        i) the session ID `sid`,
+        i) the session ID ``sid``,
 
-        ii) the user's question `question`,
+        ii) the user's question ``question``,
 
-        iii) the agent's answer `answer`, and
+        iii) the agent's answer ``answer``, and
 
-        iv) the agent's walk `walk` (e.g., the messages sent to the LLMs, the tools executed, etc...).
+        iv) the agent's walk ``walk`` (e.g., the messages sent to the LLMs, the tools executed, etc...).
 
         This view is commonly used as input into frameworks like Ragas.
 
-    .. admonition:: `ToolCalls (sid, vid, tool_calls)`
+   .. admonition:: ToolCalls ``(sid, vid, tool_calls)``
 
-        The `ToolCalls` view provides one record per session (alt. conversation).
+        The ``ToolCalls`` view provides one record per session (alt. conversation).
         Each tool call record contains:
 
-        i) the session ID `sid`,
+        i) the session ID ``sid``,
 
-        ii) the catalog version `vid`, and
+        ii) the catalog version ``vid``, and
 
-        iii) a list of tool calls `tool_calls`.
+        iii) a list of tool calls ``tool_calls``.
 
-        The `tool_calls` field details all information around an LLM tool call (e.g., the tool name, the tool-call
+        The ``tool_calls`` field details all information around an LLM tool call (e.g., the tool name, the tool-call
         arguments, and the tool result).
 
-    .. admonition:: `Walks (vid, msgs, sid)`
+   .. admonition:: Walks ``(vid, msgs, sid)``
 
-        The `Walks` view provides one record per session (alt. conversation).
-        This view is essentially the `Sessions` view where all `msgs` only contain task transitions.
+        The ``Walks`` view provides one record per session (alt. conversation).
+        This view is essentially the ``Sessions`` view where all ``msgs`` only contain task transitions.
 
 
 *The next two steps are under active development!*
