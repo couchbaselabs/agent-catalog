@@ -90,7 +90,7 @@ def test_publish(tmp_path):
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
         catalog_folder.mkdir()
-        catalog_local_folder = pathlib.Path(__file__).parent / "resources" / "catalogs"
+        catalog_local_folder = pathlib.Path(__file__).parent / "resources" / "publish_catalog"
         print("\n\n")
 
         for catalog in catalog_local_folder.rglob("*"):
