@@ -18,7 +18,7 @@ from agentc_core.defaults import DEFAULT_TOOL_CATALOG_NAME
 def assert_text_in_output(text, output):
     """Assert that text is present in output, with a descriptive message."""
     present = text in output
-    assert present, f"Expected number of items not found : '{text}' vs. actual number: '{output}'"
+    assert present, f"Expected: '{text}' vs. actual : '{output}'"
 
 
 def assert_output_matches(expected, output, catalog_name):
@@ -188,6 +188,58 @@ def test_find(tmp_path):
 
 
 @pytest.mark.smoke
+def test_status(tmp_path):
+    runner = click.testing.CliRunner()
+    print("\n\n")
+
+    # Case 1 - catalog does not exist locally
+    output = runner.invoke(click_main, ["status"]).stdout
+    expected_response_tool = "local catalog of kind tool does not exist yet"
+    expected_response_prompt = "local catalog of kind prompt does not exist yet"
+    print("Ran assertion for local status when no catalog exists")
+    assert_text_in_output(expected_response_tool, output)
+    assert_text_in_output(expected_response_prompt, output)
+
+    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        # Mock .agent-catalog dir in a temp file system
+        catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
+        catalog_folder.mkdir()
+        # Example tool-catalog.json
+        catalog_local_folder = pathlib.Path(__file__).parent / "resources" / "find_catalog"
+        # Copy file to temp dir under same name
+        shutil.copy(catalog_local_folder / DEFAULT_TOOL_CATALOG_NAME, catalog_folder / DEFAULT_TOOL_CATALOG_NAME)
+
+        # Case 2 - tool catalog exists locally (testing for only one kind of catalog)
+        output = runner.invoke(click_main, ["status", "--include-dirty", "--kind", "tool"]).stdout
+        print("Ran assertion for local status when tool catalog exists")
+        expected_response_local = "local catalog info:\n	path            : .agent-catalog/tool-catalog.json"
+        assert_text_in_output(expected_response_local, output)
+
+        # Case 3 - tool catalog exists in db (this test runs after publish test)
+        # Set env variables
+        os.environ["CB_CONN_STRING"] = "couchbase://localhost"
+        os.environ["CB_USERNAME"] = "Administrator"
+        os.environ["CB_PASSWORD"] = "password"
+
+        output = runner.invoke(
+            click_main, ["status", "--include-dirty", "--kind", "tool", "--status-db", "--bucket", "travel-sample"]
+        ).stdout
+        expected_response = "db catalog info"
+        print("Ran assertion for db status when tool catalog exists")
+        assert_text_in_output(expected_response, output)
+
+        # Case 4 - compare the two catalogs
+        output = runner.invoke(
+            click_main, ["status", "--compare", "--kind", "tool", "--bucket", "travel-sample", "--include-dirty"]
+        ).stdout
+        expected_response_db_path = "path            : travel-sample.agentc.tool"
+        print("Ran assertion for compare status when tool catalog exists both locally and in db")
+        assert_text_in_output(expected_response_db_path, output)
+        assert_text_in_output(expected_response, output)
+        assert_text_in_output(expected_response_local, output)
+
+
+@pytest.mark.smoke
 def test_clean(tmp_path):
     runner = click.testing.CliRunner()
     # Set env variables
@@ -211,7 +263,7 @@ def test_clean(tmp_path):
 
         runner.invoke(click_main, ["clean", "-y"])
 
-        print("\n\nRunning assertion for local clean")
+        print("\n\nRan assertion for local clean")
         assert not dummy_file_1.exists()
         assert not dummy_file_2.exists()
 
@@ -234,5 +286,5 @@ def test_clean(tmp_path):
             is_scope_present = True
             break
 
-    print("Running assertion for db clean")
+    print("Ran assertion for db clean")
     assert not is_scope_present, f"Clean DB failed as scope {DEFAULT_CATALOG_SCOPE} is present in DB."
