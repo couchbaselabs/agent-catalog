@@ -1,5 +1,6 @@
 import click
 import importlib
+import os
 import pathlib
 import tempfile
 
@@ -19,7 +20,8 @@ def cmd_execute(ctx: Context, name: str | None, query: str | None, embedding_mod
     catalog = CatalogMem.load(catalog_path=catalog_path, embedding_model=embedding_model)
 
     # create temp directory for code dump
-    with tempfile.TemporaryDirectory() as tmp_dir:
+    with tempfile.TemporaryDirectory(dir=os.getcwd()) as tmp_dir:
+        tmp_dir_name = tmp_dir.split("/")[-1]
         provider = ToolProvider(catalog, output=pathlib.Path(tmp_dir), decorator=lambda x: x)
 
         # based on name or query get appropriate tool
@@ -62,11 +64,22 @@ def cmd_execute(ctx: Context, name: str | None, query: str | None, embedding_mod
                 "Tool functions must have type hints that are compatible with Pydantic."
             ) from None
 
-        # import directly from python file if it is python tool
+        # if it is python tool get code from tool metadata and dump it into a file and import modules
         if ".py" in str(tool_metadata.source):
-            gen_code_modules = importlib.import_module(str(tool_metadata.source).split(".py")[0])
-
-        # TODO: import similarly to python tool for others from the temp directory
+            # create a file and dump python tool code into it
+            file_name = f"{name}.py"
+            file_path = os.path.join(tmp_dir, file_name)
+            with open(file_path, "w") as f:
+                f.write(tool_metadata.contents)
+            # import modules from the created file
+            gen_code_modules = importlib.import_module(f"{tmp_dir_name}.{name}")
+        # if it is sqlpp, yaml, jinja tools, provider dumps codes into a file by default, import that
+        else:
+            # get file name of template generated code
+            file_name = os.listdir(tmp_dir)[0]
+            file_module_name = file_name.split(".")[0]
+            # import modules from provider created file
+            gen_code_modules = importlib.import_module(f"{tmp_dir_name}.{file_module_name}")
 
         click.echo(
             "Provide inputs for the prompted variables, types are shown for reference in parenthesis\n"
