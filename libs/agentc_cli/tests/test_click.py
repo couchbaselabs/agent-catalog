@@ -141,7 +141,7 @@ def test_find(tmp_path):
         # Copy file to temp dir under same name
         shutil.copy(catalog_local_folder / DEFAULT_TOOL_CATALOG_NAME, catalog_folder / DEFAULT_TOOL_CATALOG_NAME)
 
-        # Execute the command
+        # DB find
         output = runner.invoke(
             click_main,
             [
@@ -155,7 +155,7 @@ def test_find(tmp_path):
                 "--include-dirty",
             ],
         ).stdout
-        print("\nRan assertion for find without limit clause (default 1 item is returned)")
+        print("\nRan assertion for db find without limit clause (default 1 item is returned)")
         assert_text_in_output("1 result(s) returned from the catalog.", output)
 
         output = runner.invoke(
@@ -173,5 +173,36 @@ def test_find(tmp_path):
                 "3",
             ],
         ).stdout
-        print("Ran assertion for find with limit=3")
+        print("Ran assertion for db find with limit=3")
+        assert_text_in_output("3 result(s) returned from the catalog.", output)
+
+        # Local find
+        output = runner.invoke(
+            click_main,
+            [
+                "find",
+                "--kind",
+                "tool",
+                "--query",
+                "'get blogs of interest'",
+                "--include-dirty",
+            ],
+        ).stdout
+        print("\nRan assertion for local find without limit clause (default 1 item is returned)")
+        assert_text_in_output("1 result(s) returned from the catalog.", output)
+
+        output = runner.invoke(
+            click_main,
+            [
+                "find",
+                "--kind",
+                "tool",
+                "--query",
+                "'get blogs of interest'",
+                "--include-dirty",
+                "--limit",
+                "3",
+            ],
+        ).stdout
+        print("Ran assertion for local find with limit=3")
         assert_text_in_output("3 result(s) returned from the catalog.", output)
