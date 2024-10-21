@@ -325,7 +325,9 @@ class Provider(pydantic_settings.BaseSettings):
         if query is not None:
             return self._tool_provider.search(query=query, annotations=annotations, limit=limit)
         else:
-            return self._tool_provider.get(name=name, annotations=annotations)
+            # AV-88220 agentic workflows need list of tools, but get() function return only 1 tool, so wrapping it
+            # around [] to make list
+            return [self._tool_provider.get(name=name, annotations=annotations)]
 
     def get_prompt_for(self, query: str = None, name: str = None, annotations: str = None) -> Prompt | None:
         """
