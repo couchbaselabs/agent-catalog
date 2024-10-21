@@ -51,7 +51,8 @@ def cmd_execute(ctx: Context, name: str | None, query: str | None, embedding_mod
                     input_types[param] = class_types[param_def["$ref"].split("/")[-1]]
                 # list type
                 elif param_def["type"] == "array":
-                    input_types[param] = list(types_mapping[param_def["items"]["type"]])
+                    param_def_items = param_def["items"]
+                    input_types[param] = list[types_mapping[param_def_items["type"]]]
                 # other types like str, int, float
                 else:
                     input_types[param] = types_mapping[param_def["type"]]
@@ -108,27 +109,7 @@ def take_input_from_user(input_types: dict) -> dict:
     user_inputs = dict()
     for inp, inp_type in input_types.items():
         if isinstance(inp_type, dict):
-            user_inputs[inp] = dict()
-            for inp_member, inp_member_type in inp_type.items():
-                # if list ask user to provide inputs separated by commas and process later
-                is_list = inp_member_type in [list[str], list[int], list[float], list]
-                inp_type_to_show_user = (
-                    f"{inp_member_type.__origin__.__name__} [{', '.join(arg.__name__ for arg in inp_member_type.__args__)}]"
-                    if is_list
-                    else inp_member_type.__name__
-                )
-
-                entered_val = click.prompt(
-                    click.style(f"{inp_member} ({inp_type_to_show_user})", fg="blue"),
-                    type=str if is_list else inp_member_type,
-                )
-
-                if not is_list:
-                    user_inputs[inp][inp_member] = entered_val
-                else:
-                    user_inputs[inp][inp_member] = take_verify_list_inputs(
-                        entered_val, inp_member, inp_member_type, inp_type_to_show_user
-                    )
+            user_inputs[inp] = take_input_from_user(inp_type)
         else:
             is_list = inp_type in [list[str], list[int], list[float], list]
             inp_type_to_show_user = (
