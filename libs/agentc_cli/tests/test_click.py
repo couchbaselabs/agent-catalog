@@ -9,6 +9,7 @@ import uuid
 from agentc_cli.main import click_main
 from agentc_core.defaults import DEFAULT_ACTIVITY_FOLDER
 from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
+from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_NAME
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_NAME
 
@@ -28,28 +29,6 @@ def assert_output_matches(expected, output, catalog_name):
 
 
 # ------------------------------------------------------
-
-
-@pytest.mark.smoke
-def test_clean(tmp_path):
-    runner = click.testing.CliRunner()
-    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
-        activity_folder = pathlib.Path(td) / DEFAULT_ACTIVITY_FOLDER
-        catalog_folder.mkdir()
-        activity_folder.mkdir()
-
-        dummy_file_1 = catalog_folder / DEFAULT_PROMPT_CATALOG_NAME
-        dummy_file_2 = catalog_folder / DEFAULT_TOOL_CATALOG_NAME
-        with dummy_file_1.open("w") as fp:
-            fp.write("dummy content")
-        with dummy_file_2.open("w") as fp:
-            fp.write("more dummy content")
-        # TODO: might need to test for clean db as well
-        runner.invoke(click_main, ["clean", "-y"])
-
-        assert not dummy_file_1.exists()
-        assert not dummy_file_2.exists()
 
 
 def test_index(tmp_path):
@@ -206,3 +185,54 @@ def test_find(tmp_path):
         ).stdout
         print("Ran assertion for local find with limit=3")
         assert_text_in_output("3 result(s) returned from the catalog.", output)
+
+
+@pytest.mark.smoke
+def test_clean(tmp_path):
+    runner = click.testing.CliRunner()
+    # Set env variables
+    os.environ["CB_CONN_STRING"] = "couchbase://localhost"
+    os.environ["CB_USERNAME"] = "Administrator"
+    os.environ["CB_PASSWORD"] = "password"
+
+    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
+        activity_folder = pathlib.Path(td) / DEFAULT_ACTIVITY_FOLDER
+        catalog_folder.mkdir()
+        activity_folder.mkdir()
+
+        # Local clean
+        dummy_file_1 = catalog_folder / DEFAULT_PROMPT_CATALOG_NAME
+        dummy_file_2 = catalog_folder / DEFAULT_TOOL_CATALOG_NAME
+        with dummy_file_1.open("w") as fp:
+            fp.write("dummy content")
+        with dummy_file_2.open("w") as fp:
+            fp.write("more dummy content")
+
+        runner.invoke(click_main, ["clean", "-y"])
+
+        print("\n\nRunning assertion for local clean")
+        assert not dummy_file_1.exists()
+        assert not dummy_file_2.exists()
+
+    # DB clean
+    runner.invoke(click_main, ["clean", "-y", "-etype", "db", "--bucket", "travel-sample"])
+
+    import json
+    import requests
+
+    # Get all scopes in bucket
+    url = "http://localhost:8091/pools/default/buckets/travel-sample/scopes"
+    auth = ("Administrator", "password")
+    response = requests.request("GET", url, auth=auth, verify=False)
+    scopes = json.loads(response.text)["scopes"]
+
+    # Verify DEFAULT_CATALOG_SCOPE is deleted
+    is_scope_present = False
+    for scope in scopes:
+        if scope["name"] == DEFAULT_CATALOG_SCOPE:
+            is_scope_present = True
+            break
+
+    print("Running assertion for db clean")
+    assert not is_scope_present, f"Clean DB failed as scope {DEFAULT_CATALOG_SCOPE} is present in DB."
