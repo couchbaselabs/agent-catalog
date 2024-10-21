@@ -13,6 +13,23 @@ from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_NAME
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_NAME
 
 
+# ------------------ Helper functions ------------------
+def assert_text_in_output(text, output):
+    """Assert that text is present in output, with a descriptive message."""
+    present = text in output
+    assert present, f"Expected number of items not found : '{text}' vs. actual number: '{output}'"
+
+
+def assert_output_matches(expected, output, catalog_name):
+    """Assert that the output matches the expected output, with a descriptive message."""
+    pattern = re.compile(expected)
+    match = re.search(pattern, output)
+    assert match, f"Expected output not found for {catalog_name}: '{expected}' vs. actual output: '{output}'"
+
+
+# ------------------------------------------------------
+
+
 @pytest.mark.smoke
 def test_clean(tmp_path):
     runner = click.testing.CliRunner()
@@ -101,8 +118,60 @@ def test_publish(tmp_path):
                 assert_output_matches(expected_output, output, catalog.name)
 
 
-def assert_output_matches(expected, output, catalog_name):
-    """Assert that the output matches the expected output, with a descriptive message."""
-    pattern = re.compile(expected)
-    match = re.search(pattern, output)
-    assert match, f"Expected output not found for {catalog_name}: '{expected}' vs. actual output: '{output}'"
+@pytest.mark.smoke
+def test_find(tmp_path):
+    """
+    This test performs the following checks:
+    1. command executes only for kind=tool assuming same behaviour for prompt
+    2. command includes search for dirty versions of tool
+    3. command tests the find capability and not recall/accuracy
+    """
+    runner = click.testing.CliRunner()
+    # Set env variables
+    os.environ["CB_CONN_STRING"] = "couchbase://localhost"
+    os.environ["CB_USERNAME"] = "Administrator"
+    os.environ["CB_PASSWORD"] = "password"
+
+    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        # Mock .agent-catalog dir in a temp file system
+        catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
+        catalog_folder.mkdir()
+        # Example tool-catalog.json
+        catalog_local_folder = pathlib.Path(__file__).parent / "resources" / "find_catalog"
+        # Copy file to temp dir under same name
+        shutil.copy(catalog_local_folder / DEFAULT_TOOL_CATALOG_NAME, catalog_folder / DEFAULT_TOOL_CATALOG_NAME)
+
+        # Execute the command
+        output = runner.invoke(
+            click_main,
+            [
+                "find",
+                "--bucket",
+                "travel-sample",
+                "--kind",
+                "tool",
+                "--query",
+                "'get blogs of interest'",
+                "--include-dirty",
+            ],
+        ).stdout
+        print("\nRan assertion for find without limit clause (default 1 item is returned)")
+        assert_text_in_output("1 result(s) returned from the catalog.", output)
+
+        output = runner.invoke(
+            click_main,
+            [
+                "find",
+                "--bucket",
+                "travel-sample",
+                "--kind",
+                "tool",
+                "--query",
+                "'get blogs of interest'",
+                "--include-dirty",
+                "--limit",
+                "3",
+            ],
+        ).stdout
+        print("Ran assertion for find with limit=3")
+        assert_text_in_output("3 result(s) returned from the catalog.", output)

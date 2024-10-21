@@ -86,7 +86,6 @@ def cmd_publish(
         try:
             key = metadata["version"]["identifier"]
             cb_coll.upsert(key, metadata)
-        # TODO (GLENN): Should use the specific exception here instead of 'Exception'.
         except CouchbaseException as e:
             click.secho(f"Couldn't insert metadata!\n{e.message}", fg="red")
             return e
