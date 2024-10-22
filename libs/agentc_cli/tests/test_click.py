@@ -297,3 +297,20 @@ def test_clean(tmp_path):
 
     print("Ran assertion for db clean")
     assert not is_scope_present, f"Clean DB failed as scope {DEFAULT_CATALOG_SCOPE} is present in DB."
+
+
+@pytest.mark.smoke
+def test_status_after_clean(tmp_path):
+    runner = click.testing.CliRunner()
+    os.environ["CB_CONN_STRING"] = "couchbase://localhost"
+    os.environ["CB_USERNAME"] = "Administrator"
+    os.environ["CB_PASSWORD"] = "password"
+
+    output = runner.invoke(
+        click_main, ["status", "--include-dirty", "--kind", "tool", "--status-db", "--bucket", "travel-sample"]
+    ).stdout
+    expected_response_db = (
+        "ERROR: db catalog of kind tool does not exist yet: please use the publish command by specifying the kind."
+    )
+    print("\n\nRan assertion for db status when tool catalog does not exist in db")
+    assert_text_in_output(expected_response_db, output)
