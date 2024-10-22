@@ -112,7 +112,8 @@ def get_types_for_classes(class_defs: dict) -> dict:
         class_types[class_name] = dict()
         for member_name, member_def in class_def["properties"].items():
             if member_def["type"] == "array":
-                class_types[class_name][member_name] = list(types_mapping[member_def["items"]["type"]])
+                member_def_items = member_def["items"]
+                class_types[class_name][member_name] = list[types_mapping[member_def_items["type"]]]
             else:
                 class_types[class_name][member_name] = types_mapping[member_def["type"]]
     return class_types
