@@ -78,6 +78,7 @@ jobs:
       - name: Build the documentation
         working-directory: docs
         run: |
+          source $HOME/.poetry/env
           make html
 
       - name: Setup Pages
