@@ -57,6 +57,7 @@ def create_scope_and_collection(bucket_manager, scope, collection):
     try:
         scopes = bucket_manager.get_all_scopes()
         scope_exists = any(s.name == scope for s in scopes)
+        print(scope_exists)
         if not scope_exists:
             logger.debug(f"Scope {scope} not found. Attempting to create scope now.")
             bucket_manager.create_scope(scope)
