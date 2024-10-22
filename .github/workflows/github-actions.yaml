@@ -86,19 +86,18 @@ jobs:
 
       # https://github.com/actions/deploy-pages/issues/188
       - name: Fix file permissions
+        working-directory: docs
         shell: sh
         run: |
-          chmod -c -R +rX "$INPUT_PATH" |
+          chmod -c -R +rX build |
           while read line; do
              echo "::warning title=Invalid file permissions automatically fixed::$line"
           done
-        env:
-          INPUT_PATH: $GITHUB_WORKSPACE/docs/build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: $GITHUB_WORKSPACE/docs/build
+          path: docs/build
 
       - id: deployment
         name: Deploy to GitHub Pages
