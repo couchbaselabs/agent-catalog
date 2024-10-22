@@ -93,12 +93,12 @@ jobs:
              echo "::warning title=Invalid file permissions automatically fixed::$line"
           done
         env:
-          INPUT_PATH: "./docs/build"
+          INPUT_PATH: $GITHUB_WORKSPACE/docs/build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "./docs/build"
+          path: $GITHUB_WORKSPACE/docs/build
 
       - id: deployment
         name: Deploy to GitHub Pages
