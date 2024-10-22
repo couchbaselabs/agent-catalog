@@ -13,9 +13,9 @@ from .cmds import cmd_publish
 from .cmds import cmd_status
 from .cmds import cmd_version
 from .models import Context
+from agentc_core.catalog import LATEST_SNAPSHOT_VERSION
 from agentc_core.defaults import DEFAULT_ACTIVITY_FOLDER
 from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
-from agentc_core.defaults import DEFAULT_CATALOG_SCHEMA_VERSION
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_EMBEDDING_MODEL
 from agentc_core.util.connection import get_host_name
@@ -95,7 +95,6 @@ class AliasedGroup(click.Group):
 def click_main(ctx, catalog, activity, verbose):
     """A command line tool for AGENT_CATALOG."""
     ctx.obj = Context(activity=activity, catalog=catalog, verbose=verbose)
-    # ctx.obj = ctx.obj or {"catalog": catalog, "activity": activity, "verbose": verbose}
 
 
 @click_main.command()
@@ -246,7 +245,7 @@ def env(ctx):
     "-cid",
     "--catalog-id",
     type=str,
-    default=None,
+    default=LATEST_SNAPSHOT_VERSION,
     help="Catalog identifier that uniquely specifies a catalog version (git commit id).",
     show_default=True,
 )
@@ -264,13 +263,6 @@ def env(ctx):
     help="Embedding model to generate embeddings for query.",
     show_default=True,
 )
-@click.option(
-    "-cver",
-    "--catalog_version",
-    default=DEFAULT_CATALOG_SCHEMA_VERSION,
-    help="Catalog schema version that your catalog is in.",
-    show_default=True,
-)
 @click.pass_context
 def find(
     ctx,
@@ -285,7 +277,6 @@ def find(
     catalog_id,
     search_db,
     embedding_model,
-    catalog_version,
 ):
     """Find items from the catalog based on a natural language QUERY string."""
 
@@ -330,8 +321,7 @@ def find(
             catalog_id=catalog_id,
             bucket=bucket,
             cluster=cluster,
-            embedding_model=embedding_model,
-            catalog_schema_version=catalog_version,
+            embedding_model_name=embedding_model,
         )
         cluster.close()
 
@@ -346,8 +336,7 @@ def find(
             refiner=refiner,
             annotations=annotations,
             catalog_id=catalog_id,
-            embedding_model=embedding_model,
-            catalog_schema_version=catalog_version,
+            embedding_model_name=embedding_model,
         )
 
 
@@ -388,7 +377,7 @@ def index(ctx, source_dirs, kind, embedding_model, dry_run):
         ctx.obj,
         source_dirs=source_dirs,
         kind=kind,
-        embedding_model=embedding_model,
+        embedding_model_name=embedding_model,
         dry_run=dry_run,
     )
 
@@ -446,7 +435,9 @@ def publish(ctx, kind, bucket, annotations):
         bucket = click.prompt("Please select a bucket: ", type=click.Choice(buckets), show_choices=True)
     elif bucket not in buckets:
         click.secho("ERROR: Bucket does not exist!", fg="red")
-        click.echo(f"Available buckets from cluster are: {','.join(buckets)}\nRun agentc --help for more information.")
+        click.echo(
+            f"Available buckets from cluster are: {','.join(buckets)}\n" f"Run agentc --help for more information."
+        )
         return
 
     keyspace_details.bucket = bucket

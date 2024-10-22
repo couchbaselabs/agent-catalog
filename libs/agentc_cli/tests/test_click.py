@@ -1,4 +1,5 @@
 import click.testing
+import git
 import os
 import pathlib
 import pytest
@@ -34,6 +35,7 @@ def assert_output_matches(expected, output, catalog_name):
 def test_index(tmp_path):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        git.Repo.init(td)
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
         activity_folder = pathlib.Path(td) / DEFAULT_ACTIVITY_FOLDER
         tool_folder = pathlib.Path(td) / "tools"
@@ -67,6 +69,7 @@ def test_publish(tmp_path):
     os.environ["CB_PASSWORD"] = "password"
 
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        git.Repo.init(td)
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
         catalog_folder.mkdir()
         catalog_local_folder = pathlib.Path(__file__).parent / "resources" / "publish_catalog"
@@ -90,8 +93,9 @@ def test_publish(tmp_path):
                 assert_output_matches(expected_output, output, catalog.name)
             elif "positive" in catalog.name:
                 expected_output = (
-                    "Inserting metadata...\nSuccessfully inserted metadata.\nInserting catalog items..."
-                    "\nSuccessfully inserted catalog items.\nCreating GSI indexes...\nSuccessfully created GSI indexes.\nCreating vector index...\nSuccessfully created vector index."
+                    "Inserting metadata...\nSuccessfully inserted metadata.\nInserting catalog items...\n"
+                    "Successfully inserted catalog items.\nCreating GSI indexes...\n"
+                    "Successfully created GSI indexes.\nCreating vector index...\nSuccessfully created vector index."
                 )
                 print(f"Ran assertion for positive catalog: {catalog.name}")
                 assert_output_matches(expected_output, output, catalog.name)
@@ -112,6 +116,8 @@ def test_find(tmp_path):
     os.environ["CB_PASSWORD"] = "password"
 
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        git.Repo.init(td)
+
         # Mock .agent-catalog dir in a temp file system
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
         catalog_folder.mkdir()
@@ -201,6 +207,8 @@ def test_status(tmp_path):
     assert_text_in_output(expected_response_prompt, output)
 
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        git.Repo.init(td)
+
         # Mock .agent-catalog dir in a temp file system
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
         catalog_folder.mkdir()
@@ -232,7 +240,7 @@ def test_status(tmp_path):
         output = runner.invoke(
             click_main, ["status", "--compare", "--kind", "tool", "--bucket", "travel-sample", "--include-dirty"]
         ).stdout
-        expected_response_db_path = "path            : travel-sample.agentc.tool"
+        expected_response_db_path = "path            : travel-sample.agent_catalog.tool"
         print("Ran assertion for compare status when tool catalog exists both locally and in db")
         assert_text_in_output(expected_response_db_path, output)
         assert_text_in_output(expected_response, output)
@@ -248,6 +256,7 @@ def test_clean(tmp_path):
     os.environ["CB_PASSWORD"] = "password"
 
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        git.Repo.init(td)
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
         activity_folder = pathlib.Path(td) / DEFAULT_ACTIVITY_FOLDER
         catalog_folder.mkdir()

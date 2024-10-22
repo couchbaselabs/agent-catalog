@@ -33,12 +33,16 @@ RecordDescriptorUnionType = typing.Annotated[
 
 
 class CatalogDescriptor(pydantic.BaseModel):
-    """This model represents a persistable tool catalog,  especially for local and/or in-memory representations."""
+    """This model represents a persistable tool catalog for local and in-memory catalog representations."""
 
     model_config = pydantic.ConfigDict(use_enum_values=True)
 
-    catalog_schema_version: str = pydantic.Field(
+    schema_version: str = pydantic.Field(
         description="The version of the catalog schema. This field is used across agentc SDK versions."
+    )
+
+    library_version: str = pydantic.Field(
+        description="The version of the agentc SDK library that last wrote the catalog data."
     )
 
     kind: CatalogKind = pydantic.Field(description="The type of items within the catalog.")

@@ -6,7 +6,7 @@ import pathlib
 import typing
 
 from ..models import Context
-from agentc_core.catalog import CatalogMem
+from agentc_core.catalog.descriptor import CatalogDescriptor
 from agentc_core.defaults import DEFAULT_CATALOG_COLLECTION_NAME
 from agentc_core.defaults import DEFAULT_CATALOG_NAME
 from agentc_core.defaults import DEFAULT_META_COLLECTION_NAME
@@ -46,14 +46,14 @@ def cmd_publish(
     for kind in kind_list:
         catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)
         try:
-            catalog = CatalogMem.load(catalog_path)
+            with catalog_path.open("r") as fp:
+                catalog_desc = CatalogDescriptor.model_validate_json(fp.read())
         except FileNotFoundError:
             # If only one type of catalog is present
             continue
-        catalog = catalog.catalog_descriptor
 
         # Check to ensure a dirty catalog is not published
-        if catalog.version.is_dirty:
+        if catalog_desc.version.is_dirty:
             click.secho("Cannot publish catalog to DB if dirty!", fg="red")
             click.secho("Please index catalog with a clean repo!", fg="yellow")
             continue
@@ -75,7 +75,7 @@ def cmd_publish(
         cb_coll = cb.scope(meta_scope).collection(meta_col)
 
         # dict to store all the metadata - snapshot related data
-        metadata = {el: catalog.model_dump()[el] for el in catalog.model_dump() if el != "items"}
+        metadata = {el: catalog_desc.model_dump()[el] for el in catalog_desc.model_dump() if el != "items"}
 
         # add annotations to metadata
         annotations_list = {an[0]: an[1].split("+") if "+" in an[1] else an[1] for an in annotations}
@@ -106,7 +106,7 @@ def cmd_publish(
 
         click.secho("Inserting catalog items...", fg="yellow")
         # iterate over individual catalog items
-        for item in catalog.items:
+        for item in catalog_desc.items:
             try:
                 key = item.identifier
 
@@ -129,8 +129,7 @@ def cmd_publish(
         #                               GSI and Vector Indexes                                     #
         # ---------------------------------------------------------------------------------------- #
         click.secho("Creating GSI indexes...", fg="yellow")
-        catalog_schema_version = metadata["catalog_schema_version"].replace(".", "_")
-        s, err = create_gsi_indexes(bucket, cluster, kind, catalog_schema_version)
+        s, err = create_gsi_indexes(bucket, cluster, kind)
         if not s:
             click.secho(f"ERROR: GSI indexes could not be created \n{err}", fg="red")
             return
@@ -139,8 +138,8 @@ def cmd_publish(
             click.secho("Successfully created GSI indexes.", fg="green")
 
         click.secho("Creating vector index...", fg="yellow")
-        dims = len(catalog.items[0].embedding)
-        _, err = create_vector_index(bucket, kind, connection_details_env, dims, catalog_schema_version)
+        dims = len(catalog_desc.items[0].embedding)
+        _, err = create_vector_index(bucket, kind, connection_details_env, dims)
         if err is not None:
             click.secho(f"ERROR: Vector index could not be created \n{err}", fg="red")
             return

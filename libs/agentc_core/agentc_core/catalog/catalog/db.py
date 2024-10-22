@@ -4,10 +4,11 @@ import pydantic
 import typing
 
 from agentc_core.annotation import AnnotationPredicate
+from agentc_core.catalog.catalog.base import LATEST_SNAPSHOT_VERSION
 from agentc_core.catalog.catalog.base import CatalogBase
 from agentc_core.catalog.catalog.base import SearchResult
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
-from agentc_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
+from agentc_core.embedding.embedding import EmbeddingModel
 from agentc_core.prompt.models import JinjaPromptDescriptor
 from agentc_core.prompt.models import RawPromptDescriptor
 from agentc_core.record.descriptor import RecordKind
@@ -28,13 +29,13 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
 
     model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
 
+    embedding_model: EmbeddingModel
     cluster: couchbase.cluster.Cluster
     bucket: str
     kind: typing.Literal["tool", "prompt"]
-    embedding_model: str
 
-    # TODO (GLENN): Might need to add this to mem as well.
-    snapshot_id: typing.Union[str | None] = "all"
+    # Note: If latest_version is None and a user does not specify a snapshot, we will raise an error.
+    latest_version: typing.Optional[VersionDescriptor] = None
 
     @pydantic.model_validator(mode="after")
     def cluster_should_be_reachable(self) -> "CatalogDB":
@@ -56,33 +57,40 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
         self,
         query: str = None,
         name: str = None,
+        snapshot: str = None,
         limit: typing.Union[int | None] = 1,
         annotations: AnnotationPredicate = None,
-        catalog_schema_version: str = None,
     ) -> list[SearchResult]:
         """Returns the catalog items that best match a query."""
 
         # Catalog item has to be queried directly
-        if name is not None:
+        if name is not None and snapshot is not None:
             # TODO (GLENN): Need to add some validation around bucket (to prevent injection)
             # TODO (GLENN): Need to add some validation around name (to prevent injection)
-            item_query = f"SELECT a.* from `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{self.kind}_catalog` as a WHERE a.name = $name;"
+            item_query = f"""
+                FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{self.kind}_catalog` AS a
+                WHERE a.name = $name AND a.catalog_identifier = $snapshot
+                SELECT a.*;
+            """
+            res, err = execute_query_with_parameters(self.cluster, item_query, {"name": name, "snapshot": snapshot})
+            if err is not None:
+                logger.error(err)
+                return []
 
+        elif name is not None:
+            item_query = f"""
+                FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{self.kind}_catalog` AS a
+                WHERE a.name = $name
+                SELECT a.*;
+            """
             res, err = execute_query_with_parameters(self.cluster, item_query, {"name": name})
             if err is not None:
                 logger.error(err)
                 return []
+
         else:
             # Generate embeddings for user query
-            import sentence_transformers
-
-            embedding_model_obj = sentence_transformers.SentenceTransformer(
-                self.embedding_model,
-                tokenizer_kwargs={"clean_up_tokenization_spaces": True},
-                cache_folder=DEFAULT_MODEL_CACHE_FOLDER,
-                local_files_only=True,
-            )
-            query_embeddings = embedding_model_obj.encode(query).tolist()
+            query_embeddings = self.embedding_model.encode(query)
             dim = len(query_embeddings)
 
             # ---------------------------------------------------------------------------------------- #
@@ -92,11 +100,16 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             # Get annotations condition
             annotation_condition = annotations.__catalog_query_str__() if annotations is not None else "1==1"
 
-            # Index used
-            idx = f"agent_catalog_{self.kind}_index_{catalog_schema_version}"
+            # Index used (in the future, we may need to condition on the catalog schema version).
+            idx = f"v1_agent_catalog_{self.kind}_index"
 
             # User has specified a snapshot id
-            if self.snapshot_id != "all":
+            if snapshot is not None:
+                if snapshot == LATEST_SNAPSHOT_VERSION and self.latest_version is None:
+                    raise ValueError("No latest version found for the catalog!")
+                elif snapshot == LATEST_SNAPSHOT_VERSION:
+                    snapshot = self.latest_version.identifier
+
                 filter_records_query = f"""
                     SELECT a.* FROM (
                         SELECT t.*, SEARCH_META() as metadata
@@ -121,7 +134,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                         )
                         ORDER BY metadata.score DESC
                     ) AS a
-                    WHERE {annotation_condition} AND catalog_identifier='{self.snapshot_id}'
+                    WHERE {annotation_condition} AND catalog_identifier='{snapshot}'
                     LIMIT {limit};
                 """
 
@@ -197,7 +210,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
 
     @property
     def version(self) -> VersionDescriptor:
-        """Returns the lates version of the kind catalog"""
+        """Returns the latest version of the kind catalog"""
         ts_query = f"""
             FROM     `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{self.kind}_catalog` AS t
             SELECT   VALUE  t.version

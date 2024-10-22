@@ -42,24 +42,39 @@ jobs:
       - name: Run agentc-cli smoke tests
         run: |
           chmod +x ./libs/agentc_cli/tests/couchbase_server_start.sh
-          ./libs/agentc_cli/tests/couchbase_server_start.sh
+          ./libs/agentc_cli/tests/scripts/couchbase_server_start.sh
           poetry run bash -c "cd libs/agentc_cli && pytest -m smoke -v"
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
-# TODO (GLENN): Disabling this for now, we need to make the repo public for this to build.
-#  Pages:
-#    runs-on: ubuntu-latest
-#    environment:
-#      name: github-pages
-#      url: ${{ steps.deployment.outputs.page_url }}
-#    permissions:
-#      pages: write
-#      id-token: write
-#    steps:
-#      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-#
-#      - id: deployment
-#        uses: sphinx-notes/pages@v3
-#        with:
-#          python_version: '3.12'
+  Pages:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+
+      - name: Set up Python Poetry
+        uses: mishaga/action-poetry@1
+        with:
+          python-version: "3.12"
+          poetry-version: "latest"
+          shell: "bash"
+
+      - name: Install repository with Poetry
+        run: |
+          poetry install --with dev
+
+      - id: deployment
+        uses: sphinx-notes/pages@v3
+        with:
+          checkout: 'false'
+          python_version: '3.12'

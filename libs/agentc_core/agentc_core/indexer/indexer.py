@@ -5,6 +5,7 @@ import pydantic
 import typing
 import yaml
 
+from ..embedding.embedding import EmbeddingModel
 from ..prompt.models import JinjaPromptDescriptor
 from ..prompt.models import RawPromptDescriptor
 from ..record.descriptor import RecordDescriptor
@@ -135,7 +136,7 @@ def augment_descriptor(descriptor: RecordDescriptor) -> list[ValueError]:
     return None
 
 
-def vectorize_descriptor(descriptor: RecordDescriptor, embedding_model_obj) -> list[ValueError]:
+def vectorize_descriptor(descriptor: RecordDescriptor, embedding_model: EmbeddingModel) -> list[ValueError]:
     """Adds vector embeddings to a single catalog item descriptor (in-place,
     destructive), and/or return 'keep-on-going' errors if any encountered.
     """
@@ -144,6 +145,6 @@ def vectorize_descriptor(descriptor: RecordDescriptor, embedding_model_obj) -> l
     # to compute & add vector embedding(s), perhaps by using additional
     # fields besides description?
 
-    descriptor.embedding = embedding_model_obj.encode(descriptor.description).tolist()
+    descriptor.embedding = embedding_model.encode(descriptor.description)
 
     return None

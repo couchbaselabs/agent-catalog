@@ -7,6 +7,7 @@ import tempfile
 from ..models import Context
 from agentc_core.catalog import CatalogMem
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_NAME
+from agentc_core.embedding.embedding import EmbeddingModel
 from agentc_core.provider import ToolProvider
 from pydantic import PydanticSchemaGenerationError
 from pydantic import TypeAdapter
@@ -14,10 +15,10 @@ from pydantic import TypeAdapter
 types_mapping = {"array": list, "integer": int, "number": float, "string": str}
 
 
-def cmd_execute(ctx: Context, name: str | None, query: str | None, embedding_model: str):
+def cmd_execute(ctx: Context, name: str | None, query: str | None, embedding_model: EmbeddingModel):
     # get local catalog
     catalog_path = pathlib.Path(ctx.catalog) / DEFAULT_TOOL_CATALOG_NAME
-    catalog = CatalogMem.load(catalog_path=catalog_path, embedding_model=embedding_model)
+    catalog = CatalogMem(catalog_path=catalog_path, embedding_model=embedding_model)
 
     # create temp directory for code dump
     with tempfile.TemporaryDirectory(dir=os.getcwd()) as tmp_dir:

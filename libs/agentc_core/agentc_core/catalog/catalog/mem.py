@@ -6,8 +6,9 @@ import typing
 
 from ...annotation import AnnotationPredicate
 from ...catalog.descriptor import CatalogDescriptor
-from ...defaults import DEFAULT_MODEL_CACHE_FOLDER
+from ...embedding.embedding import EmbeddingModel
 from ...version import VersionDescriptor
+from .base import LATEST_SNAPSHOT_VERSION
 from .base import CatalogBase
 from .base import SearchResult
 
@@ -17,16 +18,25 @@ logger = logging.getLogger(__name__)
 class CatalogMem(pydantic.BaseModel, CatalogBase):
     """Represents an in-memory catalog."""
 
-    catalog_descriptor: CatalogDescriptor
-    embedding_model: typing.Optional[str] = None
+    embedding_model: EmbeddingModel
+    catalog_path: typing.Optional[pathlib.Path] = None
+    catalog_descriptor: typing.Optional[CatalogDescriptor] = None
 
-    # TODO (GLENN): it might be better to refactor this into the constructor.
-    @staticmethod
-    def load(catalog_path: pathlib.Path, embedding_model: str = None) -> "CatalogMem":
-        """Load from a catalog_path JSON file."""
-        with catalog_path.open("r") as fp:
-            catalog_descriptor = CatalogDescriptor.model_validate_json(fp.read())
-        return CatalogMem(catalog_descriptor=catalog_descriptor, embedding_model=embedding_model)
+    @pydantic.model_validator(mode="after")
+    def catalog_path_or_descriptor_should_exist(self) -> "CatalogMem":
+        if self.catalog_descriptor is not None:
+            return self
+
+        if self.catalog_path is None:
+            raise ValueError("CatalogMem must be initialized with a catalog path or a descriptor.")
+        elif not self.catalog_path.exists():
+            raise ValueError(f"Catalog path '{self.catalog_path}' does not exist.")
+
+        # If there are any validation errors in the local catalog, we'll catch them here.
+        with self.catalog_path.open("r") as fp:
+            self.catalog_descriptor = CatalogDescriptor.model_validate_json(fp.read())
+
+        return self
 
     def dump(self, catalog_path: pathlib.Path):
         """Save to a catalog_path JSON file."""
@@ -39,10 +49,15 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
         self,
         query: str = None,
         name: str = None,
+        snapshot: str = None,
         limit: typing.Union[int | None] = 1,
         annotations: AnnotationPredicate = None,
     ) -> list[SearchResult]:
         """Returns the catalog items that best match a query."""
+        if snapshot != LATEST_SNAPSHOT_VERSION:
+            # We cannot return anything other than the latest snapshot.
+            logger.debug("Specific snapshot has been specified. Returning empty list (for in-memory catalog).")
+            return []
 
         # Return the exact tool instead of doing vector search in case name is provided
         if name is not None:
@@ -53,10 +68,6 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
                 click.secho(f"No catalog items found with name '{name}'", fg="yellow")
                 return []
 
-        if self.embedding_model is None:
-            raise RuntimeError("Embedding model not set!")
-
-        import sentence_transformers
         import sklearn
 
         # If annotations have been specified, prune all tools that do not possess these annotations.
@@ -85,13 +96,7 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
             return list()
 
         # Compute the distance of each tool in the catalog to the query.
-        embedding_model_obj = sentence_transformers.SentenceTransformer(
-            self.embedding_model,
-            tokenizer_kwargs={"clean_up_tokenization_spaces": True},
-            cache_folder=DEFAULT_MODEL_CACHE_FOLDER,
-            local_files_only=True,
-        )
-        query_embedding = embedding_model_obj.encode(query)
+        query_embedding = self.embedding_model.encode(query)
         deltas = sklearn.metrics.pairwise.cosine_similarity(
             X=[t.embedding for t in candidate_tools], Y=[query_embedding]
         )

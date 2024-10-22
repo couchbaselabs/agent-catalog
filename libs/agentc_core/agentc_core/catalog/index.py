@@ -1,14 +1,18 @@
 import click
+import dataclasses
 import fnmatch
 import logging
+import typing
 
+from ..embedding.embedding import EmbeddingModel
 from ..record.descriptor import RecordDescriptor
 from .catalog.mem import CatalogMem
 from .descriptor import CatalogDescriptor
 from .directory import ScanDirectoryOpts
 from .directory import scan_directory
+from .version import catalog_schema_version_compare
+from .version import lib_version_compare
 from agentc_core.defaults import DEFAULT_ITEM_DESCRIPTION_MAX_LEN
-from agentc_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
 from agentc_core.indexer import augment_descriptor
 from agentc_core.indexer import source_indexers
 from agentc_core.indexer import vectorize_descriptor
@@ -18,10 +22,17 @@ logger = logging.getLogger(__name__)
 source_globs = list(source_indexers.keys())
 
 
+@dataclasses.dataclass
+class MetaVersion:
+    schema_version: str
+    library_version: str
+
+
 def index_catalog(
-    meta,
-    version,
-    get_path_version,
+    embedding_model: EmbeddingModel,
+    meta_version: MetaVersion,
+    catalog_version: str,
+    get_path_version: typing.Callable[[str], str],
     kind,
     catalog_path,
     source_dirs,
@@ -31,12 +42,13 @@ def index_catalog(
     max_errs=1,
 ):
     all_errs, next_catalog, uninitialized_items = index_catalog_start(
-        meta,
-        version,
-        get_path_version,
-        kind,
-        catalog_path,
-        source_dirs,
+        embedding_model=embedding_model,
+        meta_version=meta_version,
+        catalog_version=catalog_version,
+        get_path_version=get_path_version,
+        kind=kind,
+        catalog_path=catalog_path,
+        source_dirs=source_dirs,
         scan_directory_opts=scan_directory_opts,
         printer=printer,
         progress=progress,
@@ -46,7 +58,7 @@ def index_catalog(
     printer("Augmenting descriptor metadata.")
     logger.debug("Now augmenting descriptor metadata.")
     for descriptor in progress(uninitialized_items):
-        if max_errs > 0 and len(all_errs) >= max_errs:
+        if 0 < max_errs <= len(all_errs):
             break
         printer(f"- {descriptor.name}")
         logger.debug(f"Augmenting {descriptor.name}.")
@@ -57,23 +69,14 @@ def index_catalog(
         logger.error("Encountered error(s) during augmenting: " + "\n".join([str(e) for e in all_errs]))
         raise all_errs[0]
 
-    import sentence_transformers
-
-    embedding_model_obj = sentence_transformers.SentenceTransformer(
-        meta["embedding_model"],
-        tokenizer_kwargs={"clean_up_tokenization_spaces": True},
-        cache_folder=DEFAULT_MODEL_CACHE_FOLDER,
-        local_files_only=True,
-    )
-
     printer("Generating embeddings for descriptors.")
     logger.debug("Now generating embeddings for descriptors.")
     for descriptor in progress(uninitialized_items):
-        if max_errs > 0 and len(all_errs) >= max_errs:
+        if 0 < max_errs <= len(all_errs):
             break
         printer(f"- {descriptor.name}")
         logger.debug(f"Generating embedding for {descriptor.name}.")
-        errs = vectorize_descriptor(descriptor, embedding_model_obj)
+        errs = vectorize_descriptor(descriptor, embedding_model)
         all_errs += errs or []
 
     if all_errs:
@@ -84,9 +87,10 @@ def index_catalog(
 
 
 def index_catalog_start(
-    meta,
-    version,
-    get_path_version,
+    embedding_model: EmbeddingModel,
+    meta_version: MetaVersion,
+    catalog_version: str,
+    get_path_version: typing.Callable[[str], str],
     kind,
     catalog_path,
     source_dirs,
@@ -99,7 +103,7 @@ def index_catalog_start(
 
     # Load the old / previous local catalog if our catalog path exists.
     curr_catalog = (
-        CatalogMem.load(catalog_path, embedding_model=meta["embedding_model"]) if catalog_path.exists() else None
+        CatalogMem(catalog_path=catalog_path, embedding_model=embedding_model) if catalog_path.exists() else None
     )
 
     source_files = []
@@ -128,12 +132,14 @@ def index_catalog_start(
                 for descriptor in descriptors:
                     # Validate description lengths
                     if len(descriptor.description) == 0:
+                        # TODO (GLENN): Use printer (or give secho as a callback).
                         click.secho(f"WARNING: Catalog item {descriptor.name} has an empty description.", fg="yellow")
                         is_description_empty = True
                         break
                     if len(descriptor.description.split()) > DEFAULT_ITEM_DESCRIPTION_MAX_LEN:
                         click.secho(
-                            f"WARNING: Catalog item {descriptor.name} has a description with token size more than the allowed limit.",
+                            f"WARNING: Catalog item {descriptor.name} has a description with token size more"
+                            f" than the allowed limit.",
                             fg="yellow",
                         )
                         is_description_length_valid = False
@@ -145,7 +151,8 @@ def index_catalog_start(
                     )
                 if not is_description_length_valid:
                     raise ValueError(
-                        f"Catalog contains item(s) with description length more than the allowed limit of {DEFAULT_ITEM_DESCRIPTION_MAX_LEN}! Please provide a valid description and index again."
+                        f"Catalog contains item(s) with description length more than the allowed limit of "
+                        f"{DEFAULT_ITEM_DESCRIPTION_MAX_LEN}! Please provide a valid description and index again."
                     )
                 all_errs += errs or []
                 all_descriptors += descriptors or []
@@ -156,14 +163,16 @@ def index_catalog_start(
         raise all_errs[0]
 
     next_catalog = CatalogMem(
+        embedding_model=embedding_model,
         catalog_descriptor=CatalogDescriptor(
-            catalog_schema_version=meta["catalog_schema_version"],
-            embedding_model=meta["embedding_model"],
+            schema_version=meta_version.schema_version,
+            library_version=meta_version.library_version,
+            version=catalog_version,
+            embedding_model=embedding_model.name,
             kind=kind,
-            version=version,
             source_dirs=source_dirs,
             items=all_descriptors,
-        )
+        ),
     )
 
     uninitialized_items = init_from_catalog(next_catalog, curr_catalog)
@@ -179,6 +188,19 @@ def init_from_catalog(working: CatalogMem, other: CatalogMem) -> list[RecordDesc
 
     uninitialized_items = []
     if other and other.catalog_descriptor:
+        # Perform catalog schema checking + library version checking here.
+        schema_version_s1 = working.catalog_descriptor.schema_version
+        schema_version_s2 = other.catalog_descriptor.schema_version
+        if catalog_schema_version_compare(schema_version_s1, schema_version_s2) > 0:
+            # TODO: Perhaps we're too strict here and should allow micro versions that get ahead.
+            raise ValueError("Version of local catalog's catalog_schema_version is ahead.")
+
+        lib_version_s1 = working.catalog_descriptor.library_version
+        lib_version_s2 = other.catalog_descriptor.library_version
+        if lib_version_compare(lib_version_s1, lib_version_s2) > 0:
+            # TODO: Perhaps we're too strict here and should allow micro versions that get ahead.
+            raise ValueError("Version of local catalog's lib_version is ahead.")
+
         # A lookup dict of items keyed by "source:name".
         other_items = {str(o.source) + ":" + o.name: o for o in other.catalog_descriptor.items or []}
 
