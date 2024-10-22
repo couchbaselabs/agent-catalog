@@ -68,16 +68,21 @@ def is_index_present(
 
 
 def create_vector_index(
-    bucket: str = "", kind: str = "tool", conn: CouchbaseConnect = "", dim: int = None, catalog_schema_ver: str = None
+    bucket: str = "",
+    kind: str = "tool",
+    conn: CouchbaseConnect = "",
+    dim: int = None,
 ) -> tuple[str | None, Exception | None]:
     """Creates required vector index at publish"""
 
-    index_to_create = f"{bucket}.{DEFAULT_CATALOG_SCOPE}.agent_catalog_{kind}_index_{catalog_schema_ver}"
-    (index_present, err) = is_index_present(bucket, index_to_create, conn)
+    non_qualified_index_name = f"v1_agent_catalog_{kind}_index"
+    qualified_index_name = f"{bucket}.{DEFAULT_CATALOG_SCOPE}.{non_qualified_index_name}"
+
+    (index_present, err) = is_index_present(bucket, qualified_index_name, conn)
     if err is None and isinstance(index_present, bool) and not index_present:
         # Create the index for the first time
-        create_vector_index_https_url = f"https://{conn.host}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/agent_catalog_{kind}_index_{catalog_schema_ver}"
-        create_vector_index_http_url = f"http://{conn.host}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/agent_catalog_{kind}_index_{catalog_schema_ver}"
+        create_vector_index_https_url = f"https://{conn.host}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}x"
+        create_vector_index_http_url = f"http://{conn.host}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
 
         headers = {
             "Content-Type": "application/json",
@@ -87,7 +92,7 @@ def create_vector_index(
         payload = json.dumps(
             {
                 "type": "fulltext-index",
-                "name": index_to_create,
+                "name": qualified_index_name,
                 "sourceType": "gocbcore",
                 "sourceName": bucket,
                 "planParams": {"maxPartitionsPerPIndex": 1024, "indexPartitions": 1},
@@ -147,7 +152,7 @@ def create_vector_index(
             )
             if json.loads(response.text)["status"] == "ok":
                 logger.info("Created vector index!!")
-                return index_to_create, None
+                return qualified_index_name, None
             elif json.loads(response.text)["status"] == "fail":
                 raise Exception(json.loads(response.text)["error"])
         except Exception:
@@ -158,7 +163,7 @@ def create_vector_index(
             response = requests.request("PUT", create_vector_index_http_url, headers=headers, auth=auth, data=payload)
             if json.loads(response.text)["status"] == "ok":
                 logger.info("Created vector index!!")
-                return index_to_create, None
+                return qualified_index_name, None
             elif json.loads(response.text)["status"] == "fail":
                 raise Exception(json.loads(response.text)["error"])
         except Exception as e:
@@ -194,8 +199,8 @@ def create_vector_index(
             "embedding"
         ]["fields"] = field_mappings
 
-        update_vector_index_https_url = f"https://{conn.host}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/agent_catalog_{kind}_index_{catalog_schema_ver}"
-        update_vector_index_http_url = f"http://{conn.host}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/agent_catalog_{kind}_index_{catalog_schema_ver}"
+        update_vector_index_https_url = f"https://{conn.host}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
+        update_vector_index_http_url = f"http://{conn.host}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
         headers = {
             "Content-Type": "application/json",
         }
@@ -229,17 +234,17 @@ def create_vector_index(
             return None, e
 
     else:
-        return index_to_create, None
+        return qualified_index_name, None
 
 
-def create_gsi_indexes(bucket, cluster, kind, catalog_schema_version):
+def create_gsi_indexes(bucket, cluster, kind):
     """Creates required indexes at publish"""
 
     completion_status = True
     all_errs = ""
 
     # Primary index on kind_catalog
-    primary_idx = f"CREATE PRIMARY INDEX IF NOT EXISTS `agent_catalog_primary_{kind}cat_{catalog_schema_version}` ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog` USING GSI;"
+    primary_idx = f"CREATE PRIMARY INDEX IF NOT EXISTS `v1_agent_catalog_primary_{kind}` ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog` USING GSI;"
     res, err = execute_query(cluster, primary_idx)
     for r in res.rows():
         logger.debug(r)
@@ -248,7 +253,7 @@ def create_gsi_indexes(bucket, cluster, kind, catalog_schema_version):
         completion_status = False
 
     # Secondary index on catalog_identifier
-    cat_idx = f"CREATE INDEX IF NOT EXISTS `agent_catalog_{kind}cat_catalog_identifier_{catalog_schema_version}` ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog`(`catalog_identifier`);"
+    cat_idx = f"CREATE INDEX IF NOT EXISTS `v1_agent_catalog_{kind}cat_version_identifier` ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog`(catalog_identifier);"
     res, err = execute_query(cluster, cat_idx)
     for r in res.rows():
         logger.debug(r)
@@ -257,7 +262,7 @@ def create_gsi_indexes(bucket, cluster, kind, catalog_schema_version):
         completion_status = False
 
     # Secondary index on catalog_identifier + annotations
-    cat_ann_idx = f"CREATE INDEX IF NOT EXISTS `agent_catalog_{kind}cat_catalog_identifier_annotations_{catalog_schema_version}` ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog`(`catalog_identifier`,`annotations`);"
+    cat_ann_idx = f"CREATE INDEX IF NOT EXISTS `v1_agent_catalog_{kind}cat_catalog_identifier_annotations` ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog`(catalog_identifier,annotations);"
     res, err = execute_query(cluster, cat_ann_idx)
     for r in res.rows():
         logger.debug(r)
@@ -266,7 +271,7 @@ def create_gsi_indexes(bucket, cluster, kind, catalog_schema_version):
         completion_status = False
 
     # Secondary index on annotations
-    ann_idx = f"CREATE INDEX IF NOT EXISTS `agent_catalog_{kind}cat_annotations_{catalog_schema_version}` ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog`(`annotations`);"
+    ann_idx = f"CREATE INDEX IF NOT EXISTS `v1_agent_catalog_{kind}cat_annotations` ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog`(`annotations`);"
     res, err = execute_query(cluster, ann_idx)
     for r in res.rows():
         logger.debug(r)

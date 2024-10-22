@@ -6,6 +6,9 @@ from ...annotation import AnnotationPredicate
 from ...record.descriptor import RecordDescriptor
 from ...version import VersionDescriptor
 
+# Constant to represent the latest snapshot version.
+LATEST_SNAPSHOT_VERSION = "__LATEST__"
+
 
 class SearchResult(pydantic.BaseModel):
     """A result item in the results from a CatalogBase.find()."""
@@ -27,6 +30,7 @@ class CatalogBase(abc.ABC):
         self,
         query: str = None,
         name: str = None,
+        snapshot: str = None,
         limit: typing.Union[int | None] = 1,
         annotations: AnnotationPredicate = None,
     ) -> list[SearchResult]:

@@ -10,6 +10,7 @@ import tempfile
 import textwrap
 import typing
 
+from agentc_core.catalog import LATEST_SNAPSHOT_VERSION
 from agentc_core.catalog import CatalogBase
 from agentc_core.catalog import CatalogChain
 from agentc_core.catalog import CatalogDB
@@ -18,6 +19,7 @@ from agentc_core.catalog import SearchResult
 from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
 from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_NAME
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_NAME
+from agentc_core.embedding.embedding import EmbeddingModel
 from agentc_core.provider import ModelType
 from agentc_core.provider import PromptProvider
 from agentc_core.provider import PythonTarget
@@ -77,6 +79,16 @@ class Provider(pydantic_settings.BaseSettings):
 
     If this field and ``$AGENT_CATALOG_CONN_STRING`` are not set, we will perform a best-effort search by walking upward
     from the current working directory until we find the :py:data:`agentc_core.defaults.DEFAULT_ACTIVITY_FOLDER` folder.
+    """
+
+    snapshot: typing.Optional[str] = LATEST_SNAPSHOT_VERSION
+    """ The snapshot version to find the tools and prompts for.
+
+    By default, we use the latest snapshot version if the repo is clean.
+    This snapshot version is retrieved directly from Git (if the repo is clean).
+    If the repo is dirty, we will fetch all tools and prompts from the local catalog (by default).
+    If snapshot is specified at search time (i.e., with :py:meth:`get_tools_for` or :py:meth:`get_prompt_for`), we will
+    use that snapshot version instead.
     """
 
     output: typing.Optional[pathlib.Path | tempfile.TemporaryDirectory] = None
@@ -178,15 +190,21 @@ class Provider(pydantic_settings.BaseSettings):
                 working_path = working_path.parent
             self.catalog = working_path / DEFAULT_CATALOG_FOLDER
 
+        # Note: we will defer embedding model mismatches to the remote catalog validator.
+        embedding_model = EmbeddingModel(
+            embedding_model_name=self.embedding_model,
+            catalog_path=self.catalog,
+        )
+
         # Set our local catalog if it exists.
         tool_catalog_path = self.catalog / DEFAULT_TOOL_CATALOG_NAME
         if tool_catalog_path.exists():
             logger.debug("Loading local tool catalog at %s.", str(tool_catalog_path.absolute()))
-            self._local_tool_catalog = CatalogMem.load(tool_catalog_path, self.embedding_model)
+            self._local_tool_catalog = CatalogMem(catalog_path=tool_catalog_path, embedding_model=embedding_model)
         prompt_catalog_path = self.catalog / DEFAULT_PROMPT_CATALOG_NAME
         if prompt_catalog_path.exists():
             logger.debug("Loading local prompt catalog at %s.", str(prompt_catalog_path.absolute()))
-            self._local_prompt_catalog = CatalogMem.load(prompt_catalog_path, self.embedding_model)
+            self._local_prompt_catalog = CatalogMem(catalog_path=prompt_catalog_path, embedding_model=embedding_model)
         return self
 
     @pydantic.model_validator(mode="after")
@@ -215,19 +233,29 @@ class Provider(pydantic_settings.BaseSettings):
                 )
             ),
         )
+        if self._local_tool_catalog is not None or self._local_prompt_catalog is not None:
+            catalog_path = self.catalog
+        else:
+            catalog_path = None
+        embedding_model = EmbeddingModel(
+            embedding_model_name=self.embedding_model,
+            cb_bucket=self.bucket,
+            cb_cluster=cluster,
+            catalog_path=catalog_path,
+        )
         cluster.close()
 
         # TODO (GLENN): Add support for passing an already open connection to CatalogDB.
         try:
             self._remote_tool_catalog = CatalogDB(
-                cluster=cluster, bucket=self.bucket, kind="tool", embedding_model=self.embedding_model
+                cluster=cluster, bucket=self.bucket, kind="tool", embedding_model=embedding_model
             )
         except pydantic.ValidationError:
             logger.debug("'agentc publish --kind tool' has not been run. Skipping remote tool catalog.")
             self._remote_tool_catalog = None
         try:
             self._remote_prompt_catalog = CatalogDB(
-                cluster=cluster, bucket=self.bucket, kind="prompt", embedding_model=self.embedding_model
+                cluster=cluster, bucket=self.bucket, kind="prompt", embedding_model=embedding_model
             )
         except pydantic.ValidationError:
             logger.debug("'agentc publish --kind prompt' has not been run. Skipping remote prompt catalog.")
@@ -247,9 +275,9 @@ class Provider(pydantic_settings.BaseSettings):
             local_catalog, remote_catalog, set_catalog = catalog_tuple
             if local_catalog is None and remote_catalog is None:
                 error_message = textwrap.dedent("""
-                    Could not find $AGENT_CATALOG_CATALOG nor $AGENT_CATALOG_CONN_STRING! If this is a new project, please run the
-                    command `agentc index` before instantiating a provider. Otherwise, please set either of these
-                    variables.
+                    Could not find $AGENT_CATALOG_CATALOG nor $AGENT_CATALOG_CONN_STRING! If this is a new project,
+                    please run the command `agentc index` before instantiating a provider. Otherwise, please set either
+                    of these variables.
                 """)
                 logger.error(error_message)
                 raise ValueError(error_message)
@@ -313,31 +341,44 @@ class Provider(pydantic_settings.BaseSettings):
             return self._remote_tool_catalog.version
 
     def get_tools_for(
-        self, query: str = None, name: str = None, annotations: str = None, limit: typing.Union[int | None] = 1
+        self,
+        query: str = None,
+        name: str = None,
+        annotations: str = None,
+        snapshot: str = LATEST_SNAPSHOT_VERSION,
+        limit: typing.Union[int | None] = 1,
     ) -> list[typing.Any]:
         """
         :param query: A query string (natural language) to search the catalog with.
         :param name: The specific name of the catalog entry to search for.
         :param annotations: An annotation query string in the form of ``KEY="VALUE" (AND|OR KEY="VALUE")*``.
+        :param snapshot: The snapshot version to find the tools for. By default, we use the latest snapshot.
         :param limit: The maximum number of results to return.
         :return: A list of tools (Python functions).
         """
         if query is not None:
-            return self._tool_provider.search(query=query, annotations=annotations, limit=limit)
+            return self._tool_provider.search(query=query, annotations=annotations, snapshot=snapshot, limit=limit)
         else:
             # AV-88220 agentic workflows need list of tools, but get() function return only 1 tool, so wrapping it
             # around [] to make list
-            return [self._tool_provider.get(name=name, annotations=annotations)]
+            return [self._tool_provider.get(name=name, annotations=annotations, snapshot=snapshot)]
 
-    def get_prompt_for(self, query: str = None, name: str = None, annotations: str = None) -> Prompt | None:
+    def get_prompt_for(
+        self,
+        query: str = None,
+        name: str = None,
+        annotations: str = None,
+        snapshot: str = LATEST_SNAPSHOT_VERSION,
+    ) -> Prompt | None:
         """
         :param query: A query string (natural language) to search the catalog with.
         :param name: The specific name of the catalog entry to search for.
         :param annotations: An annotation query string in the form of ``KEY="VALUE" (AND|OR KEY="VALUE")*``.
+        :param snapshot: The snapshot version to find the tools for. By default, we use the latest snapshot.
         :return: A single prompt as well any tools attached to the prompt.
         """
         if query is not None:
-            results = self._prompt_provider.search(query=query, annotations=annotations, limit=1)
+            results = self._prompt_provider.search(query=query, annotations=annotations, snapshot=snapshot, limit=1)
             return results[0] if len(results) != 0 else None
         else:
-            return self._prompt_provider.get(name=name, annotations=annotations)
+            return self._prompt_provider.get(name=name, annotations=annotations, snapshot=snapshot)

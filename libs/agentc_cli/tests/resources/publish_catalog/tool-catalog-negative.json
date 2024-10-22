@@ -1,5 +1,6 @@
 {
-  "catalog_schema_version": "0.0.0",
+  "schema_version": "0.0.0",
+  "library_version": "v0.0.0-0-g0",
   "embedding_model": "sentence-transformers/all-MiniLM-L12-v2",
   "items": [
   {

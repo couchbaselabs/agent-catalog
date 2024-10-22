@@ -10,16 +10,19 @@ import typing
 
 from ..models import Context
 from ..models.find import SearchOptions
-from .util import init_local
 from .util import load_repository
 from agentc_core.annotation import AnnotationPredicate
 from agentc_core.catalog import CatalogDB
 from agentc_core.catalog import CatalogMem
 from agentc_core.catalog import SearchResult
+from agentc_core.catalog import __version__ as CATALOG_SCHEMA_VERSION
+from agentc_core.catalog.index import MetaVersion
 from agentc_core.catalog.index import index_catalog
+from agentc_core.catalog.version import lib_version
 from agentc_core.defaults import DEFAULT_CATALOG_NAME
 from agentc_core.defaults import DEFAULT_MAX_ERRS
 from agentc_core.defaults import DEFAULT_SCAN_DIRECTORY_OPTS
+from agentc_core.embedding.embedding import EmbeddingModel
 from agentc_core.provider.refiner import ClosestClusterRefiner
 from agentc_core.version import VersionDescriptor
 
@@ -32,7 +35,6 @@ refiners = {
 logger = logging.getLogger(__name__)
 
 
-# TODO (GLENN): Use an enum for kind instead of a string
 def cmd_find(
     ctx: Context,
     query: str = None,
@@ -45,8 +47,7 @@ def cmd_find(
     annotations: str = None,
     catalog_id: str = None,
     cluster: couchbase.cluster.Cluster = None,
-    embedding_model: str = None,
-    catalog_schema_version: str = None,
+    embedding_model_name: str = None,
 ):
     # TODO: One day, also handle DBCatalogRef?
     # TODO: If DB is outdated and the local catalog has newer info,
@@ -69,10 +70,21 @@ def cmd_find(
         raise ValueError(f"ERROR: unknown refiner, valid refiners: {valid_refiners}")
 
     # DB level find
-    meta = init_local(ctx, embedding_model, read_only=True)
+    _, get_path_version = load_repository(pathlib.Path(os.getcwd()))
     if bucket is not None and cluster is not None:
-        catalog = CatalogDB(cluster=cluster, bucket=bucket, kind=kind, embedding_model=meta["embedding_model"])
-        catalog.snapshot_id = catalog_id if catalog_id is not None else "all"
+        embedding_model = EmbeddingModel(
+            embedding_model_name=embedding_model_name,
+            catalog_path=pathlib.Path(ctx.catalog),
+            cb_bucket=bucket,
+            cb_cluster=cluster,
+        )
+        catalog = CatalogDB(
+            cluster=cluster,
+            bucket=bucket,
+            kind=kind,
+            embedding_model=embedding_model,
+            latest_version=get_path_version(pathlib.Path(os.getcwd())),
+        )
         click.secho("Searching db...")
 
         annotations_predicate = AnnotationPredicate(annotations) if annotations is not None else None
@@ -82,14 +94,18 @@ def cmd_find(
                 query=query,
                 name=name,
                 limit=limit,
+                snapshot=catalog_id,
                 annotations=annotations_predicate,
-                catalog_schema_version=catalog_schema_version.replace(".", "/"),
             )
         ]
     # Local catalog find
     else:
         catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)
-        catalog = CatalogMem.load(catalog_path, embedding_model=meta["embedding_model"])
+        embedding_model = EmbeddingModel(
+            embedding_model_name=embedding_model_name,
+            catalog_path=pathlib.Path(ctx.catalog),
+        )
+        catalog = CatalogMem(catalog_path=catalog_path, embedding_model=embedding_model)
 
         if include_dirty:
             repo, get_path_version = load_repository(pathlib.Path(os.getcwd()))
@@ -102,8 +118,10 @@ def cmd_find(
 
                 # Create a CatalogMem on-the-fly that incorporates the dirty
                 # source file items which we'll use instead of the local catalog file.
+                meta_version = MetaVersion(schema_version=CATALOG_SCHEMA_VERSION, library_version=lib_version())
                 catalog = index_catalog(
-                    meta,
+                    embedding_model,
+                    meta_version,
                     version,
                     get_path_version,
                     kind,
@@ -119,7 +137,7 @@ def cmd_find(
         annotations_predicate = AnnotationPredicate(annotations) if annotations is not None else None
         search_results = [
             SearchResult(entry=x.entry, delta=x.delta)
-            for x in catalog.find(query, limit=limit, annotations=annotations_predicate, name=name)
+            for x in catalog.find(query, limit=limit, annotations=annotations_predicate, snapshot=catalog_id, name=name)
         ]
 
     if refiner is not None:

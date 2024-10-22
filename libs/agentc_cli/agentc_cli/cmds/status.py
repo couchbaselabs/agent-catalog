@@ -7,13 +7,14 @@ import os
 import pathlib
 import typing
 
-from ..cmds.util import init_local
 from ..cmds.util import load_repository
 from ..models.context import Context
-from agentc_core.catalog import CatalogMem
+from agentc_core.catalog.descriptor import CatalogDescriptor
+from agentc_core.catalog.index import MetaVersion
 from agentc_core.catalog.index import index_catalog_start
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_SCAN_DIRECTORY_OPTS
+from agentc_core.embedding.embedding import EmbeddingModel
 from agentc_core.util.query import execute_query
 from agentc_core.version import VersionDescriptor
 from couchbase.exceptions import KeyspaceNotFoundException
@@ -149,7 +150,7 @@ def db_catalog_status(kind, bucket, cluster, compare):
             click.secho(
                 f"""\tcatalog id: {row["version"]["identifier"]}
      \t\tpath            : {bucket}.{DEFAULT_CATALOG_SCOPE}.{kind}
-     \t\tschema version  : {row['catalog_schema_version']}
+     \t\tschema version  : {row['schema_version']}
      \t\tkind of catalog : {kind}
      \t\trepo version    : \n\t\t\ttime of publish: {row['version']['timestamp']}\n\t\t\tcatalog identifier: {row['version']['identifier']}
      \t\tembedding model : {row['embedding_model']}
@@ -181,7 +182,7 @@ def catalog_status(ctx, kind, include_dirty=True):
 
     # TODO: Validate schema versions -- if they're ahead, far behind, etc?
 
-    catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")
+    catalog_path = pathlib.Path(ctx.catalog) / (kind + "-catalog.json")
 
     if not catalog_path.exists():
         return [
@@ -198,7 +199,8 @@ def catalog_status(ctx, kind, include_dirty=True):
 
     sections = []
 
-    catalog = CatalogMem.load(catalog_path)
+    with catalog_path.open("r") as fp:
+        catalog_desc = CatalogDescriptor.model_validate_json(fp.read())
 
     if include_dirty:
         repo, get_path_version = load_repository(pathlib.Path(os.getcwd()))
@@ -236,17 +238,16 @@ def catalog_status(ctx, kind, include_dirty=True):
         if repo.is_dirty():
             section_parts = []
 
-            meta = init_local(ctx, catalog.catalog_descriptor.embedding_model, read_only=True)
-
             version = VersionDescriptor(is_dirty=True, timestamp=datetime.datetime.now(tz=datetime.timezone.utc))
 
             # Scan the same source_dirs that were used in the last "agentc index".
-            source_dirs = catalog.catalog_descriptor.source_dirs
+            source_dirs = catalog_desc.source_dirs
 
             # Start a CatalogMem on-the-fly that incorporates the dirty
             # source file items which we'll use instead of the local catalog file.
             errs, catalog, uninitialized_items = index_catalog_start(
-                meta,
+                EmbeddingModel(embedding_model_name=catalog_desc.embedding_model),
+                MetaVersion(schema_version=catalog_desc.schema_version, library_version=catalog_desc.library_version),
                 version,
                 get_path_version,
                 kind,
@@ -255,6 +256,7 @@ def catalog_status(ctx, kind, include_dirty=True):
                 scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
                 max_errs=0,
             )
+            catalog_desc = catalog.catalog_descriptor
 
             for err in errs:
                 section_parts.append(("error", f"ERROR: {err}"))
@@ -276,12 +278,12 @@ def catalog_status(ctx, kind, include_dirty=True):
             "local catalog info",
             [
                 (None, f"path            : {catalog_path}"),
-                (None, f"schema version  : {catalog.catalog_descriptor.catalog_schema_version}"),
-                (None, f"kind of catalog : {catalog.catalog_descriptor.kind}"),
-                (None, f"repo version    : {catalog.catalog_descriptor.version.identifier}"),
-                (None, f"embedding model : {catalog.catalog_descriptor.embedding_model}"),
-                (None, f"source dirs     : {catalog.catalog_descriptor.source_dirs}"),
-                (None, f"number of items : {len(catalog.catalog_descriptor.items or [])}"),
+                (None, f"schema version  : {catalog_desc.schema_version}"),
+                (None, f"kind of catalog : {catalog_desc.kind}"),
+                (None, f"repo version    : {catalog_desc.version.identifier}"),
+                (None, f"embedding model : {catalog_desc.embedding_model}"),
+                (None, f"source dirs     : {catalog_desc.source_dirs}"),
+                (None, f"number of items : {len(catalog_desc.items or [])}"),
             ],
         )
     )
@@ -290,9 +292,10 @@ def catalog_status(ctx, kind, include_dirty=True):
 
 
 def show_diff_between_commits(commit_hash_2, ctx, kind):
-    catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")
-    catalog = CatalogMem.load(catalog_path)
-    commit_hash_1 = catalog.version.identifier
+    catalog_path = pathlib.Path(ctx.catalog) / (kind + "-catalog.json")
+    with catalog_path.open("r") as fp:
+        catalog_desc = CatalogDescriptor.model_validate_json(fp.read())
+    commit_hash_1 = catalog_desc.version.identifier
 
     # Automatically determine the repository path from the current working directory
     repo = git.Repo(os.getcwd(), search_parent_directories=True)

@@ -6,6 +6,7 @@ import os
 import typing
 
 from agentc_core.annotation import AnnotationPredicate
+from agentc_core.catalog import LATEST_SNAPSHOT_VERSION
 from agentc_core.catalog import CatalogBase
 from agentc_core.catalog import SearchResult
 from agentc_core.prompt.models import JinjaPromptDescriptor
@@ -77,15 +78,24 @@ class ToolProvider(BaseProvider):
     def _generate_result(self, tool_descriptor: RecordDescriptor) -> typing.Any:
         return self.decorator(ToolProvider.ToolResult(func=self._tool_cache[tool_descriptor], meta=tool_descriptor))
 
-    def search(self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1) -> list[typing.Any]:
+    def search(
+        self,
+        query: str,
+        annotations: str = None,
+        snapshot: str = LATEST_SNAPSHOT_VERSION,
+        limit: typing.Union[int | None] = 1,
+    ) -> list[typing.Any]:
         """
         :param query: A string to search the catalog with.
         :param annotations: An annotation query string in the form of KEY=VALUE (AND|OR KEY=VALUE)*.
+        :param snapshot: The snapshot version to search.
         :param limit: The maximum number of results to return.
         :return: A list of tools (Python functions).
         """
         annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
-        results = self.refiner(self.catalog.find(query=query, annotations=annotation_predicate, limit=limit))
+        results = self.refiner(
+            self.catalog.find(query=query, snapshot=snapshot, annotations=annotation_predicate, limit=limit)
+        )
 
         # Load all tools that we have not already cached.
         non_cached_results = [f.entry for f in results if f.entry not in self._tool_cache]
@@ -95,9 +105,9 @@ class ToolProvider(BaseProvider):
         # Return the tools from the cache.
         return [self._generate_result(x.entry) for x in results]
 
-    def get(self, name: str, annotations: str = None) -> typing.Any | None:
+    def get(self, name: str, snapshot: str = LATEST_SNAPSHOT_VERSION, annotations: str = None) -> typing.Any | None:
         annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
-        results = self.catalog.find(name=name, annotations=annotation_predicate, limit=1)
+        results = self.catalog.find(name=name, snapshot=snapshot, annotations=annotation_predicate, limit=1)
 
         # Load all tools that we have not already cached.
         non_cached_results = [f.entry for f in results if f.entry not in self._tool_cache]
@@ -147,13 +157,21 @@ class PromptProvider(BaseProvider):
         return PromptProvider.PromptResult(prompt=prompt, tools=tools, meta=prompt_descriptor)
 
     def search(
-        self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1
+        self,
+        query: str,
+        annotations: str = None,
+        snapshot: str = LATEST_SNAPSHOT_VERSION,
+        limit: typing.Union[int | None] = 1,
     ) -> list["PromptProvider.PromptResult"]:
         annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
-        results = self.refiner(self.catalog.find(query=query, annotations=annotation_predicate, limit=limit))
+        results = self.refiner(
+            self.catalog.find(query=query, snapshot=snapshot, annotations=annotation_predicate, limit=limit)
+        )
         return [self._generate_result(r.entry) for r in results]
 
-    def get(self, name: str, annotations: str = None) -> typing.Optional["PromptProvider.PromptResult"]:
+    def get(
+        self, name: str, snapshot: str = LATEST_SNAPSHOT_VERSION, annotations: str = None
+    ) -> typing.Optional["PromptProvider.PromptResult"]:
         annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
-        results = self.catalog.find(name=name, annotations=annotation_predicate, limit=1)
+        results = self.catalog.find(name=name, snapshot=snapshot, annotations=annotation_predicate, limit=1)
         return [self._generate_result(r.entry) for r in results][0] if len(results) != 0 else None
