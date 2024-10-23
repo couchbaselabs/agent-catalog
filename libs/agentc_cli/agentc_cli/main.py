@@ -111,7 +111,16 @@ def click_main(ctx, catalog, activity, verbose):
     "--bucket",
     default=None,
     type=str,
-    help="The name of the Couchbase bucket to search.",
+    help="The name of the Couchbase bucket to remove agent-catalog from.",
+    show_default=False,
+)
+@click.option(
+    "-cid",
+    "--catalog-id",
+    multiple=True,
+    default=None,
+    type=str,
+    help="Catalog id to remove a specific catalog version from the DB.",
     show_default=False,
 )
 @click.option(
@@ -122,8 +131,15 @@ def click_main(ctx, catalog, activity, verbose):
     help="Enable this flag to delete catalogs without confirm prompting.",
     show_default=False,
 )
+@click.option(
+    "--kind",
+    default=None,
+    type=click.Choice(["tool", "prompt"], case_sensitive=True),
+    help="Kind of catalog to remove versions from.",
+    show_default=True,
+)
 @click.pass_context
-def clean(ctx, env_type, bucket, skip_prompt):
+def clean(ctx, env_type, bucket, catalog_id, skip_prompt, kind):
     """Clean up the catalog folder, the activity folder, any generated files, etc."""
     clean_db = False
     clean_local = False
@@ -140,12 +156,12 @@ def clean(ctx, env_type, bucket, skip_prompt):
     env_string_to_delete = "both local and db" if env_type == "all" else env_type
     if not skip_prompt:
         click.confirm(
-            f"Are you sure you want to delete all catalogs and audit logs from {env_string_to_delete} catalog?",
+            f"Are you sure you want to delete catalogs and/or audit logs from {env_string_to_delete} catalog?",
             abort=True,
         )
 
     if clean_local:
-        cmd_clean(ctx.obj, True, False, None, None)
+        cmd_clean(ctx.obj, True, False, None, None, None, None)
 
     if clean_db:
         # Load all Couchbase connection related data from env
@@ -176,7 +192,13 @@ def clean(ctx, env_type, bucket, skip_prompt):
             )
             return
 
-        cmd_clean(ctx.obj, False, True, bucket, cluster)
+        if catalog_id is not None and kind is None:
+            kind = click.prompt(
+                "Please select the kind of catalog to delete versions from (tool/prompt): ",
+                type=click.Choice(["tool", "prompt"], case_sensitive=True),
+            )
+
+        cmd_clean(ctx.obj, False, True, bucket, cluster, catalog_id, kind)
         cluster.close()
 
 
