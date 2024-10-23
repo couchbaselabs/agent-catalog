@@ -15,9 +15,13 @@ from pydantic import TypeAdapter
 types_mapping = {"array": list, "integer": int, "number": float, "string": str}
 
 
-def cmd_execute(ctx: Context, name: str | None, query: str | None, embedding_model: EmbeddingModel):
-    # get local catalog
+def cmd_execute(ctx: Context, name: str | None, query: str | None, embedding_model_name: str):
+    # get local catalog and set embedding model for query
     catalog_path = pathlib.Path(ctx.catalog) / DEFAULT_TOOL_CATALOG_NAME
+    embedding_model = EmbeddingModel(
+        embedding_model_name=embedding_model_name,
+        catalog_path=pathlib.Path(ctx.catalog),
+    )
     catalog = CatalogMem(catalog_path=catalog_path, embedding_model=embedding_model)
 
     # create temp directory for code dump
