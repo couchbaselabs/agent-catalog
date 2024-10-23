@@ -23,6 +23,7 @@ from agentc_core.util.models import CouchbaseConnect
 from agentc_core.util.models import Keyspace
 from agentc_core.util.publish import get_buckets
 from agentc_core.util.publish import get_connection
+from pydantic import ValidationError
 
 # Configure all logging here before we continue with our imports.
 # By default, we won't print any log messages below WARNING.
@@ -591,7 +592,12 @@ def main():
     try:
         click_main()
     except Exception as e:
-        click.secho(f"ERROR: {e}", fg="red", err=True)
+        if isinstance(e, ValidationError):
+            for err in e.errors():
+                click.secho(f"ERROR: {err["msg"]}", fg="red", err=True)
+
+        else:
+            click.secho(f"ERROR: {e}", fg="red", err=True)
 
         if os.getenv("AGENT_CATALOG_DEBUG") is not None:
             # Set AGENT_CATALOG_DEBUG so standard python stack trace is emitted.
