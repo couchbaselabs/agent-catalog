@@ -87,7 +87,7 @@ def cmd_execute(ctx: Context, name: str | None, query: str | None, embedding_mod
             gen_code_modules = importlib.import_module(f"{tmp_dir_name}.{file_module_name}")
 
         click.echo(
-            "Provide inputs for the prompted variables, types are shown for reference in parenthesis\n"
+            "\nProvide inputs for the prompted variables, types are shown for reference in parenthesis\n"
             "If input is of type list then provide values separated by a comma.\n"
         )
         # prompt user for inputs
