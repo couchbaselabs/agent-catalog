@@ -40,3 +40,4 @@ autodoc_default_options = {"exclude-members": "model_post_init"}
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 html_theme = "furo"
 html_static_path = ["_static"]
+html_css_files = ["custom.css"]

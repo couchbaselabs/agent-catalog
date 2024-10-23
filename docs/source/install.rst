@@ -51,7 +51,9 @@ Building From Source
       pip install "$AGENT_CATALOG_WHEEL_FILE""[langchain]"
 
 5. You should now have the :command:``agentc`` command line tool. Run :command:``agentc --help`` to verify your
-   installation (note that your first run will take a couple of seconds, subsequent runs will be faster).::
+   installation (note that your first run will take a couple of seconds, subsequent runs will be faster).
+
+   .. code-block:: console
 
        Usage: agentc [OPTIONS] COMMAND [ARGS]...
 
