@@ -554,7 +554,8 @@ def version(ctx):
 @click.option(
     "-em",
     "--embedding-model",
-    default=DEFAULT_EMBEDDING_MODEL,
+    default=None,
+    type=str,
     help="Embedding model used when indexing source files into the local catalog.",
     show_default=True,
 )
@@ -563,6 +564,20 @@ def execute(ctx, name, query, embedding_model):
     """Execute specific tool to test it."""
     if name is not None and query is not None:
         raise ValueError("Provide either name of the tool or query, giving both is not allowed!") from None
+
+    if query is not None and embedding_model is None:
+        click.secho(
+            "Embedding model name used for indexing source files into the local catalog not provided!", fg="yellow"
+        )
+        user_response = click.confirm(
+            f"Do you want to proceed with the default embedding model {DEFAULT_EMBEDDING_MODEL}?"
+        )
+        if not user_response:
+            embedding_model = click.prompt("Enter the embedding model name that you want to use", type=str)
+            click.echo(f"Proceeding with the embedding model {embedding_model}.......")
+        else:
+            click.echo(f"Proceeding with the default embedding model {DEFAULT_EMBEDDING_MODEL}.......")
+            embedding_model = DEFAULT_EMBEDDING_MODEL
 
     cmd_execute(ctx.obj, name, query, embedding_model)
 
