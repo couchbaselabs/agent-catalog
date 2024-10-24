@@ -10,7 +10,11 @@ logger = logging.getLogger(__name__)
 
 def create_analytics_views(cluster: couchbase.cluster.Cluster, bucket: str) -> None:
     ddls_folder = pathlib.Path(__file__).parent / "ddls"
-    for ddl_file in ddls_folder.iterdir():
+
+    # sort files by name inorder to follow the execution sequence
+    ddl_files = sorted(file for file in ddls_folder.iterdir())
+
+    for ddl_file in ddl_files:
         with open(ddl_file, "r") as fp:
             raw_ddl_string = fp.read()
             ddl_string = (
