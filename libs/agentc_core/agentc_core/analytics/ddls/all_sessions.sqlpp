@@ -1,70 +1,73 @@
-CREATE OR REPLACE ANALYTICS VIEW
-    `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions AS
-    WITH
-        DeDuplicatedLogs AS (
-            FROM
-                `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]` AS rsli
-            LET
-                _id =
-                    -- Note: this is LangChain specific! We need to factor this out later.
-                    CASE
-                        WHEN rsli.kwargs IS NOT MISSING
-                        THEN rsli.kwargs.id
-                        ELSE rsli.content
-                    END
-            SELECT
-                rsli.*,
-                ROW_NUMBER()
-                    OVER (
-                        PARTITION BY
-                            _id
-                        ORDER BY
-                            rsli.timestamp ASC
-                    ) AS rn
-        )
-    FROM
-        DeDuplicatedLogs AS rsl
-    WHERE
-        -- We want the first instance of a message (we may record duplicates due to different completion calls).
-        rsl.rn = 1
-    GROUP BY
-        -- ver is (functionally) dependent on the session.
-        rsl.session AS sid,
-        rsl.catalog_version AS ver
-        GROUP AS g
-    LETTING
-        msgs = (
-            FROM (
+CREATE OR REPLACE [ANALYTICS?] FUNCTION
+    `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions() {
+    (
+        WITH
+            DeDuplicatedLogs AS (
                 FROM
-                    g AS gii
+                    `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]` AS rsli
+                LET
+                    _id =
+                        -- Note: this is LangChain specific! We need to factor this out later.
+                        CASE
+                            WHEN rsli.kwargs IS NOT MISSING
+                            THEN rsli.kwargs.id
+                            ELSE rsli.content
+                        END
+                SELECT
+                    rsli.*,
+                    ROW_NUMBER()
+                        OVER (
+                            PARTITION BY
+                                _id
+                            ORDER BY
+                                rsli.timestamp ASC
+                        ) AS rn
+            )
+        FROM
+            DeDuplicatedLogs AS rsl
+        WHERE
+            -- We want the first instance of a message (we may record duplicates due to different completion calls).
+            rsl.rn = 1
+        GROUP BY
+            -- ver is (functionally) dependent on the session.
+            rsl.session AS sid,
+            rsl.catalog_version AS ver
+            GROUP AS g
+        LETTING
+            msgs = (
+                FROM (
+                    FROM
+                        g AS gii
+                    SELECT VALUE
+                        gii
+                    ORDER BY
+                        gii.rsl.timestamp ASC
+                ) AS gi
+                SELECT
+                    gi.rsl.content AS content,
+                    gi.rsl.timestamp AS timestamp,
+                    gi.rsl.kind AS kind,
+                    ROW_NUMBER() OVER() AS msg_num
+            ),
+            vid = {
+                "identifier": ver.identifier,
+                "timestamp": ver.timestamp
+            }
+        SELECT
+            sid,
+            (
+                FROM
+                    g AS gi
                 SELECT VALUE
-                    gii
+                    gi.rsl.timestamp
                 ORDER BY
-                    gii.rsl.timestamp ASC
-            ) AS gi
-            SELECT
-                gi.rsl.content AS content,
-                gi.rsl.timestamp AS timestamp,
-                gi.rsl.kind AS kind,
-                ROW_NUMBER() OVER() AS msg_num
-        ),
-        vid = {
-            "identifier": ver.identifier,
-            "timestamp": ver.timestamp
-        }
-    SELECT
-        sid,
-        (
-            FROM
-                g AS gi
-            SELECT VALUE
-                gi.rsl.timestamp
-            ORDER BY
-                gi.rsl.timestamp ASC
-            LIMIT 1
-        )[0] AS start_t,
-        vid,
-        msgs
-    ORDER BY
-        -- The last sessions will appear first.
-        start_t DESC;
+                    gi.rsl.timestamp ASC
+                LIMIT 1
+            )[0] AS start_t,
+            vid,
+            msgs
+        ORDER BY
+            -- The last sessions will appear first.
+            start_t DESC
+    )
+};

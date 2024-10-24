@@ -1,83 +1,87 @@
-CREATE OR REPLACE ANALYTICS VIEW
-    `[BUCKET_NAME]`.`[SCOPE_NAME]`.Exchanges AS
-    WITH
-        HumanAssistantWindows AS (
-            FROM
-               `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions AS s,
-               s.msgs AS m
-            LETTING
-                is_human =
-                    CASE m.kind
-                        WHEN "human" THEN 1
-                        ELSE 0
-                    END
-            SELECT
-                SUM(is_human) OVER (
-                    PARTITION BY
-                        s.sid
-                    ORDER BY
-                        m.timestamp
-                ) AS h_count,
-                s.sid AS sid,
-                m AS msg
-        ),
-        HumanAssistantGroups AS (
-            FROM
-                HumanAssistantWindows AS haw
-            WHERE
-                -- Only consider threads with at least one human message.
-                haw.h_count > 0
-            GROUP BY
-                haw.h_count AS thread,
-                haw.sid AS sid
-                GROUP AS g
-            LETTING
-                msgs = (
-                    FROM
-                        g AS gi
-                    SELECT VALUE
-                        gi.haw.msg
-                )
-            SELECT
-                thread,
-                sid,
-                msgs
-        )
-    FROM
-        HumanAssistantGroups AS hag
-    LETTING
-        question = (
-            FROM
-                hag.msgs m
-            WHERE
-                m.kind = "human"
-            SELECT VALUE
-                m
-        )[0],
-        answer = (
-            FROM
-                hag.msgs AS m
-            WHERE
-                m.kind = "assistant"
-            SELECT VALUE
-                m
-            ORDER BY
-                m.timestamp DESC
-        )[0],
-        walk = (
-            FROM
-                hag.msgs AS m
-            WHERE
-                m.kind != "human" AND
-                m.kind != "assistant"
-            SELECT VALUE
-                m
-        )
-    SELECT
-        question,
-        answer,
-        walk,
-        hag.sid,
-        ROW_NUMBER() OVER(
-            PARTITION BY hag.sid
-        ) AS exchange_num;
+-- Note: all_sessions.sqlpp should be run before this script.
+CREATE OR REPLACE [ANALYTICS?] FUNCTION
+    `[BUCKET_NAME]`.`[SCOPE_NAME]`.Exchanges() {
+    (
+        WITH
+            HumanAssistantWindows AS (
+                FROM
+                   `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions() AS s,
+                   s.msgs AS m
+                LETTING
+                    is_human =
+                        CASE m.kind
+                            WHEN "human" THEN 1
+                            ELSE 0
+                        END
+                SELECT
+                    SUM(is_human) OVER (
+                        PARTITION BY
+                            s.sid
+                        ORDER BY
+                            m.timestamp
+                    ) AS h_count,
+                    s.sid AS sid,
+                    m AS msg
+            ),
+            HumanAssistantGroups AS (
+                FROM
+                    HumanAssistantWindows AS haw
+                WHERE
+                    -- Only consider threads with at least one human message.
+                    haw.h_count > 0
+                GROUP BY
+                    haw.h_count AS thread,
+                    haw.sid AS sid
+                    GROUP AS g
+                LETTING
+                    msgs = (
+                        FROM
+                            g AS gi
+                        SELECT VALUE
+                            gi.haw.msg
+                    )
+                SELECT
+                    thread,
+                    sid,
+                    msgs
+            )
+        FROM
+            HumanAssistantGroups AS hag
+        LETTING
+            question = (
+                FROM
+                    hag.msgs m
+                WHERE
+                    m.kind = "human"
+                SELECT VALUE
+                    m
+            )[0],
+            answer = (
+                FROM
+                    hag.msgs AS m
+                WHERE
+                    m.kind = "assistant"
+                SELECT VALUE
+                    m
+                ORDER BY
+                    m.timestamp DESC
+            )[0],
+            walk = (
+                FROM
+                    hag.msgs AS m
+                WHERE
+                    m.kind != "human" AND
+                    m.kind != "assistant"
+                SELECT VALUE
+                    m
+            )
+        SELECT
+            question,
+            answer,
+            walk,
+            hag.sid,
+            ROW_NUMBER() OVER(
+                PARTITION BY hag.sid
+            ) AS exchange_num
+    )
+};

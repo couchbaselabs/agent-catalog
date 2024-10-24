@@ -49,7 +49,7 @@ class ToolProvider(BaseProvider):
         self,
         catalog: CatalogBase,
         output: os.PathLike = None,
-        decorator: typing.Callable[["ToolProvider.ToolResult"], typing.Any] = None,
+        decorator: typing.Callable[["ToolProvider.ToolResult"], typing.Any] = lambda x: x,
         refiner: typing.Callable[[list[SearchResult]], list[SearchResult]] = None,
         secrets: typing.Optional[dict[str, str]] = None,
         python_version: PythonTarget = PythonTarget.PY_312,

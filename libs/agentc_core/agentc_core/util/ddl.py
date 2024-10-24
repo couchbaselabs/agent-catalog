@@ -1,7 +1,8 @@
-import click
+import contextlib
 import json
 import logging
 import requests
+import tqdm
 import warnings
 
 from .models import CouchbaseConnect
@@ -81,7 +82,7 @@ def create_vector_index(
     (index_present, err) = is_index_present(bucket, qualified_index_name, conn)
     if err is None and isinstance(index_present, bool) and not index_present:
         # Create the index for the first time
-        create_vector_index_https_url = f"https://{conn.host}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}x"
+        create_vector_index_https_url = f"https://{conn.host}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
         create_vector_index_http_url = f"http://{conn.host}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
 
         headers = {
@@ -179,7 +180,7 @@ def create_vector_index(
             return None, None
 
         # If it doesn't, create it
-        click.echo("\nUpdating the index....")
+        logger.debug("Updating the index...")
         # Update the index
         new_field_mapping = {
             "dims": dim,
@@ -237,14 +238,23 @@ def create_vector_index(
         return qualified_index_name, None
 
 
-def create_gsi_indexes(bucket, cluster, kind):
+def create_gsi_indexes(bucket, cluster, kind, print_progress):
     """Creates required indexes at publish"""
+    progress_bar = tqdm.tqdm(range(4))
+    progress_bar_it = iter(progress_bar)
 
     completion_status = True
     all_errs = ""
 
     # Primary index on kind_catalog
-    primary_idx = f"CREATE PRIMARY INDEX IF NOT EXISTS `v1_agent_catalog_primary_{kind}` ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog` USING GSI;"
+    primary_idx_name = f"v1_agent_catalog_primary_{kind}"
+    primary_idx = f"""
+        CREATE PRIMARY INDEX IF NOT EXISTS `{primary_idx_name}`
+        ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog` USING GSI;
+"""
+    if print_progress:
+        next(progress_bar_it)
+        progress_bar.set_description(primary_idx_name)
     res, err = execute_query(cluster, primary_idx)
     for r in res.rows():
         logger.debug(r)
@@ -253,7 +263,14 @@ def create_gsi_indexes(bucket, cluster, kind):
         completion_status = False
 
     # Secondary index on catalog_identifier
-    cat_idx = f"CREATE INDEX IF NOT EXISTS `v1_agent_catalog_{kind}cat_version_identifier` ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog`(catalog_identifier);"
+    cat_idx_name = f"v1_agent_catalog_{kind}cat_version_identifier"
+    cat_idx = f"""
+        CREATE INDEX IF NOT EXISTS `{cat_idx_name}`
+        ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog`(catalog_identifier);
+    """
+    if print_progress:
+        next(progress_bar_it)
+        progress_bar.set_description(cat_idx_name)
     res, err = execute_query(cluster, cat_idx)
     for r in res.rows():
         logger.debug(r)
@@ -262,7 +279,14 @@ def create_gsi_indexes(bucket, cluster, kind):
         completion_status = False
 
     # Secondary index on catalog_identifier + annotations
-    cat_ann_idx = f"CREATE INDEX IF NOT EXISTS `v1_agent_catalog_{kind}cat_catalog_identifier_annotations` ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog`(catalog_identifier,annotations);"
+    cat_ann_idx_name = f"v1_agent_catalog_{kind}cat_catalog_identifier_annotations"
+    cat_ann_idx = f"""
+        CREATE INDEX IF NOT EXISTS `{cat_ann_idx_name}`
+        ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog`(catalog_identifier,annotations);
+    """
+    if print_progress:
+        next(progress_bar_it)
+        progress_bar.set_description(cat_ann_idx_name)
     res, err = execute_query(cluster, cat_ann_idx)
     for r in res.rows():
         logger.debug(r)
@@ -271,7 +295,14 @@ def create_gsi_indexes(bucket, cluster, kind):
         completion_status = False
 
     # Secondary index on annotations
-    ann_idx = f"CREATE INDEX IF NOT EXISTS `v1_agent_catalog_{kind}cat_annotations` ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog`(`annotations`);"
+    ann_idx_name = f"v1_agent_catalog_{kind}cat_annotations"
+    ann_idx = f"""
+        CREATE INDEX IF NOT EXISTS `{ann_idx_name}`
+        ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog`(`annotations`);
+    """
+    if print_progress:
+        next(progress_bar_it)
+        progress_bar.set_description(ann_idx_name)
     res, err = execute_query(cluster, ann_idx)
     for r in res.rows():
         logger.debug(r)
@@ -279,4 +310,7 @@ def create_gsi_indexes(bucket, cluster, kind):
         all_errs += err
         completion_status = False
 
+    # This is to ensure that the progress bar reaches 100% even if there are no errors.
+    with contextlib.suppress(StopIteration):
+        next(progress_bar_it)
     return completion_status, all_errs

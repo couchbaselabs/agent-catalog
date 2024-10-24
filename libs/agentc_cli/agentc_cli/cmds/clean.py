@@ -5,6 +5,7 @@ import logging
 import os
 import pathlib
 import shutil
+import typing
 
 from ..models.context import Context
 from agentc_core.defaults import DEFAULT_ACTIVITY_FOLDER
@@ -33,70 +34,85 @@ def clean_local(ctx: Context):
             shutil.rmtree(x_path.absolute())
 
 
-def clean_db(ctx, bucket, cluster, catalog_id, kind) -> int:
+def clean_db(
+    ctx: Context,
+    bucket: str,
+    cluster: couchbase.cluster.Cluster,
+    catalog_ids: list[str],
+    kind_list: list[typing.Literal["tool", "prompt"]],
+) -> int:
     all_errs = []
 
-    if catalog_id is not None:
-        click.secho(f"Removing catalog(s): {[catalog for catalog in catalog_id]}", fg="yellow")
+    for kind in kind_list:
+        if len(catalog_ids) > 0:
+            click.secho(f"Removing catalog(s): {[catalog for catalog in catalog_ids]}", fg="yellow")
 
-        catalog_condition = ""
-        meta_catalog_condition = ""
-        for catalog in range(len(catalog_id) - 1):
-            catalog_condition += f"catalog_identifier = '{catalog_id[catalog]}' AND "
-            meta_catalog_condition += f"version.identifier = '{catalog_id[catalog]}' AND "
-        catalog_condition += f"catalog_identifier = '{catalog_id[-1]}'"
-        meta_catalog_condition += f"version.identifier = '{catalog_id[-1]}'"
+            catalog_condition = " AND ".join([f"catalog_identifier = '{catalog}'" for catalog in catalog_ids])
+            meta_catalog_condition = " AND ".join([f"version.identifier = '{catalog}'" for catalog in catalog_ids])
+            remove_catalogs_query = f"""
+                DELETE FROM
+                    `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.{kind}{DEFAULT_CATALOG_COLLECTION_NAME}
+                WHERE
+                    {catalog_condition};
+            """
+            remove_metadata_query = f"""
+                DELETE FROM
+                    `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.{kind}{DEFAULT_META_COLLECTION_NAME}
+                WHERE
+                    {meta_catalog_condition};
+            """
 
-        remove_catalogs_query = f"DELETE FROM `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.{kind}{DEFAULT_CATALOG_COLLECTION_NAME} WHERE {catalog_condition};"
-        remove_metadata_query = f"DELETE FROM `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.{kind}{DEFAULT_META_COLLECTION_NAME} WHERE {meta_catalog_condition};"
+            res, err = execute_query(cluster, remove_catalogs_query)
+            for r in res.rows():
+                logger.debug(r)
+            if err is not None:
+                all_errs.append(err)
 
-        res, err = execute_query(cluster, remove_catalogs_query)
-        for r in res.rows():
-            logger.debug(r)
-        if err is not None:
-            all_errs.append(err)
+            res, err = execute_query(cluster, remove_metadata_query)
+            for r in res.rows():
+                logger.debug(r)
+            if err is not None:
+                all_errs.append(err)
+        else:
+            drop_scope_query = f"DROP SCOPE `{bucket}`.`{DEFAULT_CATALOG_SCOPE}` IF EXISTS;"
+            res, err = execute_query(cluster, drop_scope_query)
+            for r in res.rows():
+                logger.debug(r)
+            if err is not None:
+                all_errs.append(err)
 
-        res, err = execute_query(cluster, remove_metadata_query)
-        for r in res.rows():
-            logger.debug(r)
-        if err is not None:
-            all_errs.append(err)
-    else:
-        drop_scope_query = f"DROP SCOPE `{bucket}`.`{DEFAULT_CATALOG_SCOPE}` IF EXISTS;"
-        res, err = execute_query(cluster, drop_scope_query)
-        for r in res.rows():
-            logger.debug(r)
-        if err is not None:
-            all_errs.append(err)
+            drop_scope_query = f"DROP SCOPE `{bucket}`.`{DEFAULT_AUDIT_SCOPE}` IF EXISTS;"
+            res, err = execute_query(cluster, drop_scope_query)
+            for r in res.rows():
+                logger.debug(r)
+            if err is not None:
+                all_errs.append(err)
 
-        drop_scope_query = f"DROP SCOPE `{bucket}`.`{DEFAULT_AUDIT_SCOPE}` IF EXISTS;"
-        res, err = execute_query(cluster, drop_scope_query)
-        for r in res.rows():
-            logger.debug(r)
-        if err is not None:
-            all_errs.append(err)
-
-        if len(all_errs) > 0:
-            logger.error(all_errs)
+            if len(all_errs) > 0:
+                logger.error(all_errs)
 
     return len(all_errs)
 
 
 def cmd_clean(
-    ctx: Context, is_local: bool, is_db: bool, bucket: str, cluster: couchbase.cluster, catalog_id: tuple, kind: str
+    ctx: Context,
+    is_local: bool,
+    is_db: bool,
+    bucket: str,
+    cluster: couchbase.cluster,
+    catalog_id: tuple,
+    kind: list[typing.Literal["tool", "prompt"]],
 ):
     if is_local:
-        click.secho("Started cleaning local catalog....", fg="yellow")
         clean_local(ctx)
-        click.secho("Successfully cleaned up local catalog!", fg="green")
+        click.secho("Local catalog has been deleted!", fg="green")
 
     if is_db:
-        click.secho("Started cleaning db catalog....", fg="yellow")
         num_errs = clean_db(ctx, bucket, cluster, catalog_id, kind)
         if num_errs > 0:
-            click.secho("ERROR: Failed to cleanup db catalog!", fg="red")
+            raise ValueError("Failed to cleanup db catalog!")
         else:
-            click.secho("Successfully cleaned up db catalog!", fg="green")
+            click.secho("Database catalog has been deleted!", fg="green")
 
 
 # Note: flask is an optional dependency.

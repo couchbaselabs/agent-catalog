@@ -12,7 +12,7 @@ class CatalogChain(CatalogBase):
 
     chain: list[CatalogBase]
 
-    def __init__(self, chain=None):
+    def __init__(self, *chain: CatalogBase):
         self.chain = chain if chain is not None else []
 
     def find(

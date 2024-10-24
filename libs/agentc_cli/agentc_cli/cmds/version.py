@@ -1,3 +1,4 @@
+import click
 import importlib.util
 
 from ..models.context import Context
@@ -5,7 +6,7 @@ from agentc_core.catalog import version as core_version
 
 
 def cmd_version(ctx: Context):
-    print(core_version.lib_version())
+    click.secho(core_version.lib_version(), bold=True)
 
 
 # Note: flask is an optional dependency.

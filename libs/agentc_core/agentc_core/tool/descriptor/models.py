@@ -242,23 +242,32 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
     record_kind: typing.Literal[RecordKind.HTTPRequest]
 
     @staticmethod
-    def validate_operation(filename: pathlib.Path | None, url: str | None, operation: OperationMetadata):
+    def validate_operation(
+        source_filename: pathlib.Path | None,
+        spec_filename: pathlib.Path | None,
+        url: str | None,
+        operation: OperationMetadata,
+    ):
         # We need the filename or the URL. Also, both cannot exist at the same time.
-        if filename is None and url is None:
+        if spec_filename is None and url is None:
             raise ValueError("Either filename or url must be specified.")
-        if filename is not None and url is not None:
+        if spec_filename is not None and url is not None:
             raise ValueError("Both filename and url cannot be specified at the same time.")
 
         # We should be able to access the specification file here (validation is done internally here).
-        if filename is not None:
-            open_api_spec = openapi_parser.parse(filename.absolute().as_uri(), strict_enum=False)
+        if spec_filename is not None:
+            if not spec_filename.exists():
+                spec_filename = source_filename.parent / spec_filename
+            if not spec_filename.exists():
+                raise ValueError(f"Specification file {spec_filename} does not exist.")
+            open_api_spec = openapi_parser.parse(spec_filename.absolute().as_uri(), strict_enum=False)
         else:
             open_api_spec = openapi_parser.parse(url, strict_enum=False)
 
         # Determine our servers.
         if len(open_api_spec.servers) > 0:
             servers = open_api_spec.servers
-        elif filename is not None:
+        elif spec_filename is not None:
             servers = [
                 openapi_parser.parser.Server(url="https://localhost/"),
                 openapi_parser.parser.Server(url="http://localhost/"),
@@ -301,8 +310,10 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
 
     @property
     def handle(self) -> OperationHandle:
+        spec_filename = pathlib.Path(self.specification.filename) if self.specification.filename is not None else None
         return HTTPRequestToolDescriptor.validate_operation(
-            filename=pathlib.Path(self.specification.filename) if self.specification.filename is not None else None,
+            source_filename=self.source,
+            spec_filename=spec_filename,
             url=self.specification.url,
             operation=self.operation,
         )
@@ -328,18 +339,11 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
         class Metadata(pydantic.BaseModel):
             model_config = pydantic.ConfigDict(frozen=True, use_enum_values=True)
 
+            # Note: we cannot validate this model in isolation (we need the referencing descriptor as well).
             class OpenAPIMetadata(pydantic.BaseModel):
                 filename: typing.Optional[str | None] = None
                 url: typing.Optional[str | None] = None
                 operations: list["HTTPRequestToolDescriptor.OperationMetadata"]
-
-                @pydantic.model_validator(mode="after")
-                def operations_must_be_valid(self) -> typing.Self:
-                    for operation in self.operations:
-                        HTTPRequestToolDescriptor.validate_operation(
-                            filename=pathlib.Path(self.filename), url=self.url, operation=operation
-                        )
-                    return self
 
             # Below, we enumerate all fields that appear in a .yaml file for http requests.
             record_kind: typing.Literal[RecordKind.HTTPRequest]
@@ -351,7 +355,8 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
                 metadata = HTTPRequestToolDescriptor.Factory.Metadata.model_validate(yaml.safe_load(fp))
                 for operation in metadata.open_api.operations:
                     operation_handle = HTTPRequestToolDescriptor.validate_operation(
-                        filename=pathlib.Path(metadata.open_api.filename),
+                        source_filename=self.filename,
+                        spec_filename=pathlib.Path(metadata.open_api.filename),
                         url=metadata.open_api.url,
                         operation=operation,
                     )

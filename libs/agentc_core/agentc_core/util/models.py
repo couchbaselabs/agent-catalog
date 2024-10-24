@@ -27,13 +27,19 @@ class CouchbaseConnect(BaseModel):
     def must_follow_supported_url_pattern(cls, url: str) -> str:
         if url is None:
             raise ValueError(
-                "Could not find CB_CONN_STRING in the environment variables file!\nAdd Couchbase connection string to environment variables file and try again."
+                "Could not find the environment variable $AGENT_CATALOG_CONN_STRING!\n"
+                "Please run 'export AGENT_CATALOG_CONN_STRING=...' or add "
+                "$AGENT_CATALOG_CONN_STRING to your .env file and try again."
             )
         url = url.strip()
         parsed_url = urlparse(url)
         if parsed_url.scheme == "" or parsed_url.netloc == "":
             raise ValueError(
-                "CB_CONN_STRING specified in the environment variables file doesn't follow the desired URL pattern!\nExamples of accepted format:\n\tcouchbase://localhost\n\tcouchbases://asdgfjgjkasdfghjkasdfghjk.cloud.couchbase.com"
+                "Malformed $AGENT_CATALOG_CONN_STRING recieved.\n"
+                "Please edit your $AGENT_CATALOG_CONN_STRING and try again.\n"
+                "Examples of accepted formats are:\n"
+                "\tcouchbase://localhost\n"
+                "\tcouchbases://my_capella.cloud.couchbase.com"
             )
 
         return url
@@ -43,12 +49,17 @@ class CouchbaseConnect(BaseModel):
     def username_must_not_be_empty(cls, uname: str) -> str:
         if uname is None:
             raise ValueError(
-                "Could not find CB_USERNAME in the environment variables file!\nAdd Couchbase cluster access username to environment variables file and try again."
+                "Could not find the environment variable $AGENT_CATALOG_USERNAME!\n"
+                "Please run 'export AGENT_CATALOG_USERNAME=...' or add "
+                "$AGENT_CATALOG_USERNAME to your .env file and try again."
             )
 
         uname = uname.strip()
         if not uname:
-            raise ValueError("CB_USERNAME environment variable should not be empty!")
+            raise ValueError(
+                "The $AGENT_CATALOG_USERNAME environment variable should not be empty.\n"
+                "Please set the $AGENT_CATALOG_USERNAME variable appropriately."
+            )
 
         return uname
 
@@ -57,12 +68,17 @@ class CouchbaseConnect(BaseModel):
     def password_must_not_be_empty(cls, pwd: str) -> str:
         if pwd is None:
             raise ValueError(
-                "Could not find CB_PASSWORD in the environment variables file!\nAdd Couchbase cluster access password for the specified username to environment variables file and try again."
+                "Could not find the environment variable $AGENT_CATALOG_PASSWORD!\n"
+                "Please run 'export AGENT_CATALOG_PASSWORD=...' or add "
+                "$AGENT_CATALOG_PASSWORD to your .env file and try again."
             )
 
         pwd = pwd.strip()
         if not pwd:
-            raise ValueError("CB_PASSWORD environment variable should not be empty!")
+            raise ValueError(
+                "The $AGENT_CATALOG_PASSWORD environment variable should not be empty.\n"
+                "Please set the $AGENT_CATALOG_PASSWORD variable appropriately."
+            )
 
         return pwd
 

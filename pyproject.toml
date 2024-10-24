@@ -50,7 +50,7 @@ split-on-trailing-comma = false
 
 [tool.pytest.ini_options]
 markers = [
-    "smoke: marks tests for running on each git-push"
+    "smoke: marks smoke tests for running on each git-push"
 ]
 testpaths = [
     "libs/agentc_core/tests"

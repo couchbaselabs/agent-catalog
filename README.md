@@ -8,7 +8,18 @@ The mono-repo for the Couchbase Agent Catalog project.
 
 (in the works!)
 
-### Installing from Source
+### Installing from Git (with Poetry)
+
+1. Make sure you have Python 3.12 and [Poetry](https://python-poetry.org/docs/#installation) installed!
+2. In your `pyproject.toml` file, add the following line in the `[tool.poetry.dependencies]` section:
+
+   ```toml
+   agentc = { git = "git@github.com:couchbaselabs/agent-catalog.git", subdirectory = "libs/agentc", extras = ["langchain"] }
+   ```
+
+3. Now run `poetry update` to automatically download the `agentc` package into your Poetry environment.
+
+### Installing from Source (with Poetry + Pip)
 
 1. Make sure you have Python 3.12 and [Poetry](https://python-poetry.org/docs/#installation) installed!
 2. Clone this repository. Make sure you have your SSH key setup!
@@ -43,38 +54,41 @@ The mono-repo for the Couchbase Agent Catalog project.
    pip install "$AGENT_CATALOG_WHEEL_FILE""[langchain]"
    ```
 
-5. You should now have the `agentc` command line tool. Run `agentc --help` to verify your installation (note that your
-   first run will take a couple of seconds, subsequent runs will be faster).
+### Verifying Your Installation
 
-   ```bash
-   Usage: agentc [OPTIONS] COMMAND [ARGS]...
+If you've followed the steps above, you should now have the `agentc` command line tool.
+Run `agentc --help` to verify your installation (note that your first run will take a couple of seconds, subsequent
+runs will be faster).
 
-     A command line tool for AGENT_CATALOG.
+```bash
+Usage: agentc [OPTIONS] COMMAND [ARGS]...
 
-   Options:
-     -c, --catalog DIRECTORY   Directory of local catalog files. The local catalog DIRECTORY should be checked into
-                               git.  [default: .agent-catalog]
-     -a, --activity DIRECTORY  Directory of local activity files (runtime data). The local activity DIRECTORY should
-                               NOT be checked into git, as it holds runtime activity data like logs, etc.  [default:
-                               .agent-activity]
-     -v, --verbose             Enable verbose output.
-     --help                    Show this message and exit.
+  The Couchbase Agent Catalog command line tool.
 
-   Commands:
-     clean    Clean up the catalog folder, the activity folder, any generated files, etc.
-     env      Show agentc's environment or configuration parameters as a JSON object.
-     execute  Execute specific tool to test it.
-     find     Find items from the catalog based on a natural language QUERY string.
-     index    Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
-     publish  Publish the local catalog to Couchbase DB.
-     status   Show the status of the local catalog.
-     version  Show the current version of agentc.
+Options:
+  -c, --catalog DIRECTORY         Directory of the local catalog files.  [default: .agent-catalog]
+  -a, --activity DIRECTORY        Directory of the local activity files (runtime data).  [default: .agent-activity]
+  -v, --verbose                   Flag to enable verbose output.  [default: 0; 0<=x<=2]
+  -i, --interactive / -ni, --no-interactive
+                                  Flag to enable interactive mode.  [default: i]
+  --help                          Show this message and exit.
 
-     See: https://docs.couchbase.com for more information.
-   ```
+Commands:
+  add      Interactively create a new tool or prompt and save it to the filesystem (output).
+  clean    Delete all agent catalog related files / collections.
+  env      Return all agentc related environment and configuration parameters as a JSON object.
+  execute  Search and execute a specific tool.
+  find     Find items from the catalog based on a natural language QUERY string or by name.
+  index    Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
+  publish  Upload the local catalog to a Couchbase instance.
+  status   Show the status of the local catalog.
+  version  Show the current version of agentc.
 
-   If you see the output above, you are all set! Head on over to our [docs](docs) or our [recipes](recipes) to start
-   developing your agent with Agent Catalog.
+  See: https://docs.couchbase.com for more information.
+```
+
+If you see the output above, you are all set! Head on over to our [docs](docs) or our [recipes](recipes) to start
+developing your agent with Agent Catalog.
 
 ## Building From Source
 
