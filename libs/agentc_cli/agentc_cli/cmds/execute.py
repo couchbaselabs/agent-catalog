@@ -2,7 +2,9 @@ import click
 import importlib
 import os
 import pathlib
+import sys
 import tempfile
+import uuid
 
 from ..models import Context
 from agentc_core.catalog import CatalogMem
@@ -25,8 +27,11 @@ def cmd_execute(ctx: Context, name: str | None, query: str | None, embedding_mod
     catalog = CatalogMem(catalog_path=catalog_path, embedding_model=embedding_model)
 
     # create temp directory for code dump
-    with tempfile.TemporaryDirectory(dir=os.getcwd()) as tmp_dir:
-        tmp_dir_name = tmp_dir.split("/")[-1]
+    with tempfile.TemporaryDirectory(prefix="exec_code", dir=os.getcwd()) as tmp_dir:
+        # add temp directory and it's content as modules
+        sys.path.append(tmp_dir)
+
+        # initialize tool provider
         provider = ToolProvider(catalog, output=pathlib.Path(tmp_dir), decorator=lambda x: x)
 
         # based on name or query get appropriate tool
@@ -72,19 +77,19 @@ def cmd_execute(ctx: Context, name: str | None, query: str | None, embedding_mod
         # if it is python tool get code from tool metadata and dump it into a file and import modules
         if ".py" in str(tool_metadata.source):
             # create a file and dump python tool code into it
-            file_name = f"{name}.py"
+            file_name = f"{uuid.uuid4().hex.replace("-", "")}.py"
             file_path = os.path.join(tmp_dir, file_name)
             with open(file_path, "w") as f:
                 f.write(tool_metadata.contents)
-            # import modules from the created file
-            gen_code_modules = importlib.import_module(f"{tmp_dir_name}.{name}")
         # if it is sqlpp, yaml, jinja tools, provider dumps codes into a file by default, import that
         else:
+            all_files = os.listdir(tmp_dir)
             # get file name of template generated code
-            file_name = os.listdir(tmp_dir)[0]
-            file_module_name = file_name.split(".")[0]
-            # import modules from provider created file
-            gen_code_modules = importlib.import_module(f"{tmp_dir_name}.{file_module_name}")
+            # ignore __pycache__ directory
+            file_name = all_files[0] if all_files[0].endswith(".py") else all_files[1]
+
+        # import modules from provider created file
+        gen_code_modules = importlib.import_module(f"{file_name.split('.')[0]}")
 
         click.echo(
             "\nProvide inputs for the prompted variables, types are shown for reference in parenthesis\n"
