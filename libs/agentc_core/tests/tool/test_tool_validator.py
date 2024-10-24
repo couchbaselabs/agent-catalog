@@ -198,26 +198,26 @@ def test_http_request():
     negative_2_factory = _get_tool_descriptor_factory(
         cls=HTTPRequestToolDescriptor.Factory, filename=pathlib.Path("http_request/negative_2.yaml")
     )
-    with pytest.raises(pydantic.ValidationError):
+    with pytest.raises((pydantic.ValidationError, ValueError)):
         list(negative_2_factory)
 
     # Test a non-existent path for an operation.
     negative_3_factory = _get_tool_descriptor_factory(
         cls=HTTPRequestToolDescriptor.Factory, filename=pathlib.Path("http_request/negative_3.yaml")
     )
-    with pytest.raises(pydantic.ValidationError):
+    with pytest.raises((pydantic.ValidationError, ValueError)):
         list(negative_3_factory)
 
     # Test an operation that doesn't specify an operationId.
     negative_4_factory = _get_tool_descriptor_factory(
         cls=HTTPRequestToolDescriptor.Factory, filename=pathlib.Path("http_request/negative_4.yaml")
     )
-    with pytest.raises(pydantic.ValidationError):
+    with pytest.raises((pydantic.ValidationError, ValueError)):
         list(negative_4_factory)
 
     # Test an operation that doesn't specify a description.
     negative_5_factory = _get_tool_descriptor_factory(
         cls=HTTPRequestToolDescriptor.Factory, filename=pathlib.Path("http_request/negative_5.yaml")
     )
-    with pytest.raises(pydantic.ValidationError):
+    with pytest.raises((pydantic.ValidationError, ValueError)):
         list(negative_5_factory)

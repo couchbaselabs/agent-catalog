@@ -105,7 +105,9 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
 
             # User has specified a snapshot id
             if snapshot is not None:
-                if snapshot == LATEST_SNAPSHOT_VERSION and self.latest_version is None:
+                if snapshot == LATEST_SNAPSHOT_VERSION and (
+                    self.latest_version is None or self.latest_version.identifier is None
+                ):
                     raise ValueError("No latest version found for the catalog!")
                 elif snapshot == LATEST_SNAPSHOT_VERSION:
                     snapshot = self.latest_version.identifier
@@ -134,7 +136,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                         )
                         ORDER BY metadata.score DESC
                     ) AS a
-                    WHERE {annotation_condition} AND catalog_identifier='{snapshot}'
+                    WHERE {annotation_condition} AND a.catalog_identifier="{snapshot}"
                     LIMIT {limit};
                 """
 
@@ -178,7 +180,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
 
         # If result set is empty
         if len(resp) == 0:
-            logger.warning("No catalog items found with given conditions...")
+            logger.debug("No catalog items found with given conditions...")
             return []
 
         # ---------------------------------------------------------------------------------------- #

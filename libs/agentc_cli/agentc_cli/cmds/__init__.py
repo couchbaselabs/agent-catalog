@@ -1,3 +1,4 @@
+from .add import cmd_add
 from .clean import cmd_clean
 from .env import cmd_env
 from .execute import cmd_execute
@@ -9,6 +10,7 @@ from .version import cmd_version
 from .web import cmd_web
 
 __all__ = [
+    "cmd_add",
     "cmd_clean",
     "cmd_env",
     "cmd_find",

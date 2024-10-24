@@ -3,9 +3,12 @@ import couchbase.cluster
 import json
 import logging
 import pathlib
+import tqdm
 import typing
 
 from ..models import Context
+from .util import DASHES
+from .util import KIND_COLORS
 from agentc_core.catalog.descriptor import CatalogDescriptor
 from agentc_core.defaults import DEFAULT_CATALOG_COLLECTION_NAME
 from agentc_core.defaults import DEFAULT_CATALOG_NAME
@@ -23,28 +26,24 @@ logger = logging.getLogger(__name__)
 
 def cmd_publish(
     ctx: Context,
-    kind: typing.Literal["tool", "prompt", "all"],
+    kind: list[typing.Literal["tool", "prompt"]],
     annotations: list[dict],
     cluster: couchbase.cluster.Cluster,
     keyspace: Keyspace,
     connection_details_env: CouchbaseConnect,
 ):
     """Command to publish catalog items to user's Couchbase cluster"""
-
-    if kind == "all":
-        kind_list = ["tool", "prompt"]
-        logger.info("Inserting all catalogs...")
-    else:
-        kind_list = [kind]
-
     bucket = keyspace.bucket
     scope = keyspace.scope
 
     # Get bucket ref
     cb = cluster.bucket(bucket)
 
-    for kind in kind_list:
-        catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)
+    for k in kind:
+        click.secho(DASHES, fg=KIND_COLORS[k])
+        click.secho(k.upper(), bold=True, fg=KIND_COLORS[k])
+        click.secho(DASHES, fg=KIND_COLORS[k])
+        catalog_path = pathlib.Path(ctx.catalog) / (k + DEFAULT_CATALOG_NAME)
         try:
             with catalog_path.open("r") as fp:
                 catalog_desc = CatalogDescriptor.model_validate_json(fp.read())
@@ -54,9 +53,11 @@ def cmd_publish(
 
         # Check to ensure a dirty catalog is not published
         if catalog_desc.version.is_dirty:
-            click.secho("Cannot publish catalog to DB if dirty!", fg="red")
-            click.secho("Please index catalog with a clean repo!", fg="yellow")
-            continue
+            raise ValueError(
+                "Cannot publish a dirty catalog to the DB!\n"
+                "Please index your catalog with a clean repo by using 'git commit' and then 'agentc index'.\n"
+                "'git status' should show no changes before you run 'agentc index'."
+            )
 
         # Get the bucket manager
         bucket_manager = cb.collections()
@@ -64,12 +65,11 @@ def cmd_publish(
         # ---------------------------------------------------------------------------------------- #
         #                                  Metadata collection                                     #
         # ---------------------------------------------------------------------------------------- #
-        meta_col = kind + DEFAULT_META_COLLECTION_NAME
+        meta_col = k + DEFAULT_META_COLLECTION_NAME
         meta_scope = scope
         (msg, err) = create_scope_and_collection(bucket_manager, scope=meta_scope, collection=meta_col)
         if err is not None:
-            click.secho(msg, fg="red")
-            return
+            raise ValueError(msg)
 
         # get collection ref
         cb_coll = cb.scope(meta_scope).collection(meta_col)
@@ -82,33 +82,34 @@ def cmd_publish(
         metadata.update({"snapshot_annotations": annotations_list})
         metadata["version"]["timestamp"] = str(metadata["version"]["timestamp"])
 
-        click.secho("Inserting metadata...", fg="yellow")
+        logger.debug(f"Now processing the metadata for the {k} catalog.")
         try:
             key = metadata["version"]["identifier"]
             cb_coll.upsert(key, metadata)
         except CouchbaseException as e:
-            click.secho(f"Couldn't insert metadata!\n{e.message}", fg="red")
-            return e
-        click.secho("Successfully inserted metadata.", fg="green")
+            raise ValueError(f"Couldn't insert metadata!\n{e.message}") from e
+        click.secho("Using the catalog identifier: ", nl=False)
+        click.secho(metadata["version"]["identifier"] + "\n", bold=True, fg=KIND_COLORS[k])
 
         # ---------------------------------------------------------------------------------------- #
         #                               Catalog items collection                                   #
         # ---------------------------------------------------------------------------------------- #
-        catalog_col = kind + DEFAULT_CATALOG_COLLECTION_NAME
+        catalog_col = k + DEFAULT_CATALOG_COLLECTION_NAME
         catalog_scope = scope
         (msg, err) = create_scope_and_collection(bucket_manager, scope=catalog_scope, collection=catalog_col)
         if err is not None:
-            click.secho(msg, fg="red")
-            return
+            raise ValueError(msg)
 
         # get collection ref
         cb_coll = cb.scope(catalog_scope).collection(catalog_col)
 
-        click.secho("Inserting catalog items...", fg="yellow")
-        # iterate over individual catalog items
-        for item in catalog_desc.items:
+        click.secho(f"Uploading the {k} catalog items to Couchbase.", fg="yellow")
+        logger.debug("Inserting catalog items...")
+        progress_bar = tqdm.tqdm(catalog_desc.items)
+        for item in progress_bar:
             try:
                 key = item.identifier
+                progress_bar.set_description(item.name)
 
                 # serialise object to str
                 item = json.dumps(item.model_dump(), cls=CustomPublishEncoder)
@@ -122,27 +123,25 @@ def cmd_publish(
             except CouchbaseException as e:
                 click.secho(f"Couldn't insert catalog items!\n{e.message}", fg="red")
                 return e
-
-        click.secho("Successfully inserted catalog items.", fg="green")
+        click.secho(f"{k.capitalize()} catalog items successfully uploaded to Couchbase!\n", fg="green")
 
         # ---------------------------------------------------------------------------------------- #
         #                               GSI and Vector Indexes                                     #
         # ---------------------------------------------------------------------------------------- #
-        click.secho("Creating GSI indexes...", fg="yellow")
-        s, err = create_gsi_indexes(bucket, cluster, kind)
+        click.secho(f"Now building the GSI indexes for the {k} catalog.", fg="yellow")
+        s, err = create_gsi_indexes(bucket, cluster, k, True)
         if not s:
-            click.secho(f"ERROR: GSI indexes could not be created \n{err}", fg="red")
-            return
+            raise ValueError(f"GSI indexes could not be created \n{err}")
         else:
-            logger.info("Indexes created successfully!")
-            click.secho("Successfully created GSI indexes.", fg="green")
+            click.secho(f"All GSI indexes for the {k} catalog have been successfully created!\n", fg="green")
+            logger.debug("Indexes created successfully!")
 
-        click.secho("Creating vector index...", fg="yellow")
+        click.secho(f"Now building the vector index for the {k} catalog.", fg="yellow")
         dims = len(catalog_desc.items[0].embedding)
-        _, err = create_vector_index(bucket, kind, connection_details_env, dims)
+        _, err = create_vector_index(bucket, k, connection_details_env, dims)
         if err is not None:
-            click.secho(f"ERROR: Vector index could not be created \n{err}", fg="red")
-            return
+            raise ValueError(f"Vector index could not be created \n{err}")
         else:
-            logger.info("Vector index created successfully!")
-            click.secho("Successfully created vector index.", fg="green")
+            click.secho(f"Vector index for the {k} catalog has been successfully created!", fg="green")
+            logger.debug("Vector index created successfully!")
+        click.secho(DASHES, fg=KIND_COLORS[k])

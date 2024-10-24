@@ -1,4 +1,5 @@
 import couchbase.cluster
+import couchbase.exceptions
 import logging
 import pathlib
 import pydantic
@@ -74,27 +75,41 @@ class EmbeddingModel(pydantic.BaseModel):
         if self.cb_cluster is not None:
             collected_embedding_model_names = set()
 
-            metadata_query = self.cb_cluster.query(f"""
-                (
-                    FROM
-                        `{self.cb_bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`tool{DEFAULT_META_COLLECTION_NAME}` AS tc
-                    SELECT
-                        VALUE tc.embedding_model
-                    ORDER BY
-                        tc.version.timestamp DESC
-                    LIMIT 1
-                )
-                UNION ALL
-                (
-                    FROM
-                        `{self.cb_bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`prompt{DEFAULT_META_COLLECTION_NAME}` AS pc
-                    SELECT
-                        VALUE pc.embedding_model
-                    ORDER BY
-                        tc.version.timestamp DESC
-                    LIMIT 1
-                )
-            """)
+            # TODO (GLENN): There is probably a cleaner way to do this (but this is Pythonic, so...).
+            union_subqueries = []
+            for kind in ["tool", "prompt"]:
+                try:
+                    qualified_collection_name = (
+                        f"`{self.cb_bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}{DEFAULT_META_COLLECTION_NAME}`"
+                    )
+                    self.cb_cluster.query(f"""
+                        FROM {qualified_collection_name} AS mc
+                        SELECT *
+                        LIMIT 1
+                    """).execute()
+                    union_subqueries += [
+                        f"""
+                            FROM
+                                {qualified_collection_name} AS mc
+                            SELECT
+                                VALUE mc.embedding_model
+                            ORDER BY
+                                mc.version.timestamp DESC
+                            LIMIT 1
+                        """
+                    ]
+                except couchbase.exceptions.KeyspaceNotFoundException:
+                    continue
+
+            # Gather our embedding models.
+            match len(union_subqueries):
+                case 1:
+                    metadata_query = self.cb_cluster.query(union_subqueries[0])
+                case 2:
+                    wrapped_queries = [f"({query})" for query in union_subqueries]
+                    metadata_query = self.cb_cluster.query(" UNION ALL ".join(wrapped_queries))
+                case _:
+                    raise ValueError("No metadata collections found in remote catalogs!")
             for row in metadata_query:
                 collected_embedding_model_names.add(row)
 
@@ -123,15 +138,8 @@ class EmbeddingModel(pydantic.BaseModel):
                 f"specified embedding model {self.embedding_model_name}!"
             )
 
-        # Make sure that the embedding model is valid (we'll rely on SentenceTransformers to raise errors here).
-        import sentence_transformers
-
-        self._embedding_model = sentence_transformers.SentenceTransformer(
-            self.embedding_model_name,
-            tokenizer_kwargs={"clean_up_tokenization_spaces": True},
-            cache_folder=DEFAULT_MODEL_CACHE_FOLDER,
-            local_files_only=False,
-        )
+        # Note: we won't validate the embedding model name because sentence_transformers takes a while to import.
+        self._embedding_model = None
         return self
 
     @property
@@ -139,4 +147,14 @@ class EmbeddingModel(pydantic.BaseModel):
         return self.embedding_model_name
 
     def encode(self, text: str) -> list[float]:
+        if self._embedding_model is None:
+            import sentence_transformers
+
+            self._embedding_model = sentence_transformers.SentenceTransformer(
+                self.embedding_model_name,
+                tokenizer_kwargs={"clean_up_tokenization_spaces": True},
+                cache_folder=DEFAULT_MODEL_CACHE_FOLDER,
+                local_files_only=False,
+            )
+
         return self._embedding_model.encode(text).tolist()

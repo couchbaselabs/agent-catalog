@@ -1,7 +1,7 @@
 record_kind: http_request
 
 open_api:
-  filename: tests/tool/resources/_good_spec.json
+  filename: ../_good_spec.json
   operations:
     - path: /create
       method: get

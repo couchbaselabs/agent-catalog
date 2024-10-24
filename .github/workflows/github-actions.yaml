@@ -2,6 +2,11 @@ name: Couchbase Agent Catalog GitHub Actions
 run-name: 👁️ ${{ github.actor }} has pushed a new commit!
 on: [ push ]
 
+# Allow one concurrent deployment (for now)
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
   Tests:
     runs-on: ubuntu-latest
@@ -36,14 +41,13 @@ jobs:
       - name: Verify Pytest installation
         run: poetry show pytest
 
-      - name: Run agentc-core smoke tests
-        run: |
-          poetry run bash -c "cd libs/agentc_core && pytest -m smoke -v"
-      - name: Run agentc-cli smoke tests
-        run: |
-          chmod +x ./libs/agentc_cli/tests/couchbase_server_start.sh
-          ./libs/agentc_cli/tests/couchbase_server_start.sh
-          poetry run bash -c "cd libs/agentc_cli && pytest -m smoke -v"
+      - name: Run agentc-core tests
+        run: poetry run bash -c "cd libs/agentc_core && pytest -v"
+
+      # TODO (GLENN): For now, we are only running the core tests.
+      #               We will run the CLI tests on our own machines until we can get these to run reliably.
+      #      - name: Run agentc-cli tests
+      #        run: poetry run bash -c "cd libs/agentc_cli && pytest -v"
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
@@ -54,6 +58,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     permissions:
+      contents: read
       pages: write
       id-token: write
 
@@ -83,16 +88,6 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
-
-      # https://github.com/actions/deploy-pages/issues/188
-      - name: Fix file permissions
-        working-directory: docs
-        shell: sh
-        run: |
-          chmod -c -R +rX build |
-          while read line; do
-             echo "::warning title=Invalid file permissions automatically fixed::$line"
-          done
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

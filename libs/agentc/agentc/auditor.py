@@ -69,7 +69,7 @@ class Auditor(pydantic_settings.BaseSettings):
     If this field is not set, we will defer to the default behavior of :py:class:`agentc.Provider`.
     """
 
-    local_log: typing.Optional[pathlib.Path] = None
+    auditor_output: typing.Optional[pathlib.Path] = None
     """ Local audit log file to write to.
 
     If this field and ``$AGENT_CATALOG_CONN_STRING`` are not set, we will perform a best-effort search by walking upward
@@ -93,7 +93,7 @@ class Auditor(pydantic_settings.BaseSettings):
 
     @pydantic.model_validator(mode="after")
     def _find_local_log(self) -> typing.Self:
-        if self.local_log is None:
+        if self.auditor_output is None:
             working_path = pathlib.Path.cwd()
             logger.debug(
                 'Starting best effort search for the activity folder. Searching for "%s".',
@@ -105,7 +105,7 @@ class Auditor(pydantic_settings.BaseSettings):
                 if working_path.parent == working_path:
                     return self
                 working_path = working_path.parent
-            self.local_log = working_path / DEFAULT_ACTIVITY_FOLDER / DEFAULT_LLM_ACTIVITY_NAME
+            self.auditor_output = working_path / DEFAULT_ACTIVITY_FOLDER / DEFAULT_LLM_ACTIVITY_NAME
 
         return self
 
@@ -129,7 +129,7 @@ class Auditor(pydantic_settings.BaseSettings):
 
     @pydantic.model_validator(mode="after")
     def _initialize_auditor(self) -> typing.Self:
-        if self.local_log is None and self.conn_string is None:
+        if self.auditor_output is None and self.conn_string is None:
             error_message = textwrap.dedent("""
                 Could not find $AGENT_CATALOG_ACTIVITY nor $AGENT_CATALOG_CONN_STRING! If this is a new project, please
                 run the command `agentc index` before instantiating an auditor. Otherwise, please set either of these
@@ -148,9 +148,9 @@ class Auditor(pydantic_settings.BaseSettings):
         )
 
         # Finally, instantiate our auditors.
-        if self.local_log is not None:
+        if self.auditor_output is not None:
             self._local_auditor = LocalAuditor(
-                output=self.local_log, catalog_version=provider.version, model=self.llm_name
+                output=self.auditor_output, catalog_version=provider.version, model=self.llm_name
             )
         if self.conn_string is not None:
             self._db_auditor = DBAuditor(

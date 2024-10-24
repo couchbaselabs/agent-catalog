@@ -17,6 +17,7 @@ from agentc_core.catalog import CatalogDB
 from agentc_core.catalog import CatalogMem
 from agentc_core.catalog import SearchResult
 from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
+from agentc_core.defaults import DEFAULT_EMBEDDING_MODEL
 from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_NAME
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_NAME
 from agentc_core.embedding.embedding import EmbeddingModel
@@ -91,7 +92,7 @@ class Provider(pydantic_settings.BaseSettings):
     use that snapshot version instead.
     """
 
-    output: typing.Optional[pathlib.Path | tempfile.TemporaryDirectory] = None
+    provider_output: typing.Optional[pathlib.Path | tempfile.TemporaryDirectory] = None
     """ Location to save generated Python stubs to, if desired.
 
     On :py:meth:`get_tools_for`, tools are dynamically generated and served as annotated Python callables.
@@ -149,7 +150,7 @@ class Provider(pydantic_settings.BaseSettings):
         })
     """
 
-    embedding_model: typing.Optional[typing.AnyStr] = pydantic.Field(default="sentence-transformers/all-MiniLM-L12-v2")
+    embedding_model: typing.Optional[typing.AnyStr] = pydantic.Field(default=DEFAULT_EMBEDDING_MODEL)
     """ The embedding model used when performing a semantic search for tools / prompts.
 
     Currently, only models that can specified with sentence-transformers through its string constructor are supported.
@@ -283,7 +284,7 @@ class Provider(pydantic_settings.BaseSettings):
                 raise ValueError(error_message)
             if local_catalog is not None and remote_catalog is not None:
                 logger.info("A local catalog and a remote catalog have been found. Building a chained catalog.")
-                set_catalog(CatalogChain(chain=[local_catalog, remote_catalog]))
+                set_catalog(CatalogChain(local_catalog, remote_catalog))
             elif local_catalog is not None:
                 logger.info("Only a local catalog has been found. Using the local catalog.")
                 set_catalog(local_catalog)
@@ -317,7 +318,7 @@ class Provider(pydantic_settings.BaseSettings):
         # Finally, initialize our provider.
         self._tool_provider = ToolProvider(
             catalog=self._tool_catalog,
-            output=self.output,
+            output=self.provider_output,
             decorator=self.decorator,
             refiner=self.refiner,
             secrets=self.secrets,

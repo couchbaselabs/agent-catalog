@@ -7,6 +7,9 @@ import os
 import pathlib
 import typing
 
+from ..cmds.util import DASHES
+from ..cmds.util import KIND_COLORS
+from ..cmds.util import LEVEL_COLORS
 from ..cmds.util import load_repository
 from ..models.context import Context
 from agentc_core.catalog.descriptor import CatalogDescriptor
@@ -19,10 +22,6 @@ from agentc_core.util.query import execute_query
 from agentc_core.version import VersionDescriptor
 from couchbase.exceptions import KeyspaceNotFoundException
 from couchbase.exceptions import ScopeNotFoundException
-
-level_colors = {"good": "green", "warn": "yellow", "error": "red"}
-kind_colors = {"tool": "bright_magenta", "prompt": "blue"}
-dashes = "-----------------------------------------------------------------"
 
 logger = logging.getLogger(__name__)
 
@@ -40,21 +39,21 @@ def cmd_status(
 
     for catalog_kind in catalog_kinds:
         if status_db:
-            click.secho(dashes, fg=kind_colors[catalog_kind])
-            click.secho(catalog_kind.upper(), fg=kind_colors[catalog_kind], bold=True)
+            click.secho(DASHES, fg=KIND_COLORS[catalog_kind])
+            click.secho(catalog_kind.upper(), fg=KIND_COLORS[catalog_kind], bold=True)
             db_catalog_status(catalog_kind, bucket, cluster, compare)
-            click.secho(dashes, fg=kind_colors[catalog_kind])
+            click.secho(DASHES, fg=KIND_COLORS[catalog_kind])
         elif compare:
-            click.secho(dashes, fg=kind_colors[catalog_kind])
-            click.secho(catalog_kind.upper(), fg=kind_colors[catalog_kind], bold=True)
+            click.secho(DASHES, fg=KIND_COLORS[catalog_kind])
+            click.secho(catalog_kind.upper(), fg=KIND_COLORS[catalog_kind], bold=True)
             commit_hash_db = db_catalog_status(catalog_kind, bucket, cluster, compare)
-            click.secho(dashes, fg=kind_colors[catalog_kind])
+            click.secho(DASHES, fg=KIND_COLORS[catalog_kind])
 
             sections = catalog_status(ctx, catalog_kind, include_dirty=include_dirty)
 
             for section in sections:
                 name, parts = section
-                click.secho(dashes, fg=kind_colors[catalog_kind])
+                click.secho(DASHES, fg=KIND_COLORS[catalog_kind])
                 if name:
                     click.echo(name + ":")
                     indent = "\t"
@@ -63,28 +62,28 @@ def cmd_status(
 
                 for part in parts:
                     level, msg = part
-                    if level in level_colors:
-                        click.secho(indent + msg, fg=level_colors[level])
+                    if level in LEVEL_COLORS:
+                        click.secho(indent + msg, fg=LEVEL_COLORS[level])
                     else:
                         click.echo(indent + msg)
-            click.secho(dashes, fg=kind_colors[catalog_kind])
+            click.secho(DASHES, fg=KIND_COLORS[catalog_kind])
             if commit_hash_db:
                 show_diff_between_commits(commit_hash_db, ctx, catalog_kind)
             else:
-                click.secho(dashes, fg=kind_colors[catalog_kind])
+                click.secho(DASHES, fg=KIND_COLORS[catalog_kind])
                 click.secho(
                     "DB catalog missing! To compare local and db catalogs, please publish your catalog!", fg="yellow"
                 )
-                click.secho(dashes, fg=kind_colors[catalog_kind])
+                click.secho(DASHES, fg=KIND_COLORS[catalog_kind])
         else:
             sections = catalog_status(ctx, catalog_kind, include_dirty=include_dirty)
 
-            click.secho(dashes, fg=kind_colors[catalog_kind])
-            click.secho(catalog_kind.upper(), fg=kind_colors[catalog_kind], bold=True)
+            click.secho(DASHES, fg=KIND_COLORS[catalog_kind])
+            click.secho(catalog_kind.upper(), fg=KIND_COLORS[catalog_kind], bold=True)
 
             for section in sections:
                 name, parts = section
-                click.secho(dashes, fg=kind_colors[catalog_kind])
+                click.secho(DASHES, fg=KIND_COLORS[catalog_kind])
                 if name:
                     click.echo(name + ":")
                     indent = "\t"
@@ -93,11 +92,11 @@ def cmd_status(
 
                 for part in parts:
                     level, msg = part
-                    if level in level_colors:
-                        click.secho(indent + msg, fg=level_colors[level])
+                    if level in LEVEL_COLORS:
+                        click.secho(indent + msg, fg=LEVEL_COLORS[level])
                     else:
                         click.echo(indent + msg)
-            click.secho(dashes, fg=kind_colors[catalog_kind])
+            click.secho(DASHES, fg=KIND_COLORS[catalog_kind])
 
 
 def db_catalog_status(kind, bucket, cluster, compare):
@@ -144,7 +143,7 @@ def db_catalog_status(kind, bucket, cluster, compare):
             logger.error("No catalogs published...")
             return []
 
-        click.secho(dashes, fg=kind_colors[kind])
+        click.secho(DASHES, fg=KIND_COLORS[kind])
         click.secho("db catalog info:")
         for row in resp:
             click.secho(
@@ -162,13 +161,13 @@ def db_catalog_status(kind, bucket, cluster, compare):
                 return row["version"]["identifier"]
         return None
     except KeyspaceNotFoundException:
-        click.secho(dashes, fg=kind_colors[kind])
+        click.secho(DASHES, fg=KIND_COLORS[kind])
         click.secho(
             f"ERROR: db catalog of kind {kind} does not exist yet: please use the publish command by specifying the kind.",
             fg="red",
         )
     except ScopeNotFoundException:
-        click.secho(dashes, fg=kind_colors[kind])
+        click.secho(DASHES, fg=KIND_COLORS[kind])
         click.secho(
             f"ERROR: db catalog of kind {kind} does not exist yet: please use the publish command by specifying the kind.",
             fg="red",
@@ -254,7 +253,9 @@ def catalog_status(ctx, kind, include_dirty=True):
                 catalog_path,
                 source_dirs,
                 scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
+                printer=lambda *args, **kwargs: None,
                 max_errs=0,
+                print_progress=False,
             )
             catalog_desc = catalog.catalog_descriptor
 
@@ -304,7 +305,7 @@ def show_diff_between_commits(commit_hash_2, ctx, kind):
     commit1 = repo.commit(commit_hash_1)
     commit2 = repo.commit(commit_hash_2)
 
-    click.secho(dashes, fg=kind_colors[kind])
+    click.secho(DASHES, fg=KIND_COLORS[kind])
     # Get the diff between the two commits
     diff = commit1.diff(commit2)
     if len(diff) > 0:
@@ -322,7 +323,7 @@ def show_diff_between_commits(commit_hash_2, ctx, kind):
                 click.secho(f"{change.a_path} was modified.", fg="yellow")
     else:
         click.secho(f"No changes to {kind} catalog from last commit..")
-    click.secho(dashes, fg=kind_colors[kind])
+    click.secho(DASHES, fg=KIND_COLORS[kind])
 
 
 # Note: flask is an optional dependency.

@@ -25,6 +25,7 @@ agentc-langchain = { path = "libs/agentc_langchain", develop = true }
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
 pytest = "^8.3.2"
+docker = "^7.1.0"
 
 [tool.poetry.group.docs.dependencies]
 sphinx = "^8.1.3"
@@ -50,7 +51,7 @@ split-on-trailing-comma = false
 
 [tool.pytest.ini_options]
 markers = [
-    "smoke: marks tests for running on each git-push"
+    "smoke: marks smoke tests for running on each git-push"
 ]
 testpaths = [
     "libs/agentc_core/tests"

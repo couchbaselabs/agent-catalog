@@ -101,7 +101,7 @@ Both tool builders and prompt builders (i.e., agent builders) will follow this w
 
       .. code-block:: bash
 
-        agentc publish --kind [tool|prompt|all] --bucket [BUCKET_NAME]
+        agentc publish [[tool|prompt]] --bucket [BUCKET_NAME]
 
       This will create a new scope in the specified bucket called ``agent_catalog``, which will contain all of your
       items.

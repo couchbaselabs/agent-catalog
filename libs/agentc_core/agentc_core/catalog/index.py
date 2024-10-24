@@ -1,7 +1,7 @@
-import click
 import dataclasses
 import fnmatch
 import logging
+import tqdm
 import typing
 
 from ..embedding.embedding import EmbeddingModel
@@ -13,7 +13,6 @@ from .directory import scan_directory
 from .version import catalog_schema_version_compare
 from .version import lib_version_compare
 from agentc_core.defaults import DEFAULT_ITEM_DESCRIPTION_MAX_LEN
-from agentc_core.indexer import augment_descriptor
 from agentc_core.indexer import source_indexers
 from agentc_core.indexer import vectorize_descriptor
 
@@ -37,8 +36,8 @@ def index_catalog(
     catalog_path,
     source_dirs,
     scan_directory_opts: ScanDirectoryOpts = None,
-    printer=lambda x: None,
-    progress=lambda x: x,
+    printer: typing.Callable = lambda x, *args, **kwargs: print(x),
+    print_progress: bool = True,
     max_errs=1,
 ):
     all_errs, next_catalog, uninitialized_items = index_catalog_start(
@@ -51,30 +50,33 @@ def index_catalog(
         source_dirs=source_dirs,
         scan_directory_opts=scan_directory_opts,
         printer=printer,
-        progress=progress,
+        print_progress=print_progress,
         max_errs=max_errs,
     )
 
-    printer("Augmenting descriptor metadata.")
-    logger.debug("Now augmenting descriptor metadata.")
-    for descriptor in progress(uninitialized_items):
-        if 0 < max_errs <= len(all_errs):
-            break
-        printer(f"- {descriptor.name}")
-        logger.debug(f"Augmenting {descriptor.name}.")
-        errs = augment_descriptor(descriptor)
-        all_errs += errs or []
+    # For now, we do no augmentation so we'll comment this out.
+    # printer("Augmenting descriptor metadata.")
+    # logger.debug("Now augmenting descriptor metadata.")
+    # for descriptor in progress(uninitialized_items):
+    #     if 0 < max_errs <= len(all_errs):
+    #         break
+    #     printer(f"- {descriptor.name}")
+    #     logger.debug(f"Augmenting {descriptor.name}.")
+    #     errs = augment_descriptor(descriptor)
+    #     all_errs += errs or []
+    #
+    # if all_errs:
+    #     logger.error("Encountered error(s) during augmenting: " + "\n".join([str(e) for e in all_errs]))
+    #     raise all_errs[0]
 
-    if all_errs:
-        logger.error("Encountered error(s) during augmenting: " + "\n".join([str(e) for e in all_errs]))
-        raise all_errs[0]
-
-    printer("Generating embeddings for descriptors.")
     logger.debug("Now generating embeddings for descriptors.")
-    for descriptor in progress(uninitialized_items):
+    printer("\nGenerating embeddings:")
+    item_iterator = tqdm.tqdm(uninitialized_items) if print_progress else uninitialized_items
+    for descriptor in item_iterator:
         if 0 < max_errs <= len(all_errs):
             break
-        printer(f"- {descriptor.name}")
+        if print_progress:
+            item_iterator.set_description(f"{descriptor.name}")
         logger.debug(f"Generating embedding for {descriptor.name}.")
         errs = vectorize_descriptor(descriptor, embedding_model)
         all_errs += errs or []
@@ -95,8 +97,8 @@ def index_catalog_start(
     catalog_path,
     source_dirs,
     scan_directory_opts: ScanDirectoryOpts = None,
-    printer=lambda x: None,
-    progress=lambda x: x,
+    printer: typing.Callable = lambda x, *args, **kwargs: print(x),
+    print_progress: bool = True,
     max_errs=1,
 ):
     # TODO: We should use different source_indexers & source_globs based on the kind?
@@ -106,22 +108,22 @@ def index_catalog_start(
         CatalogMem(catalog_path=catalog_path, embedding_model=embedding_model) if catalog_path.exists() else None
     )
 
+    logger.debug(f"Now crawling source directories. [{','.join(d for d in source_dirs)}]")
+    printer(f"Crawling {','.join(d for d in source_dirs)}:")
     source_files = []
     for source_dir in source_dirs:
         source_files += scan_directory(source_dir, source_globs, opts=scan_directory_opts)
 
     all_errs = []
     all_descriptors = []
-
-    printer("Crawling source directories.")
-    logger.debug("Now crawling source directories.")
-    for source_file in progress(source_files):
+    source_iterable = tqdm.tqdm(source_files) if print_progress else source_files
+    for source_file in source_iterable:
         if 0 < max_errs <= len(all_errs):
             break
-
+        if print_progress:
+            source_iterable.set_description(f"{source_file.name}")
         for glob, indexer in source_indexers.items():
             if fnmatch.fnmatch(source_file.name, glob):
-                printer(f"- {source_file.name}")
                 logger.debug(f"Indexing file {source_file.name}.")
 
                 # Flags to validate catalog item description
@@ -132,12 +134,11 @@ def index_catalog_start(
                 for descriptor in descriptors:
                     # Validate description lengths
                     if len(descriptor.description) == 0:
-                        # TODO (GLENN): Use printer (or give secho as a callback).
-                        click.secho(f"WARNING: Catalog item {descriptor.name} has an empty description.", fg="yellow")
+                        printer(f"WARNING: Catalog item {descriptor.name} has an empty description.", fg="yellow")
                         is_description_empty = True
                         break
                     if len(descriptor.description.split()) > DEFAULT_ITEM_DESCRIPTION_MAX_LEN:
-                        click.secho(
+                        printer(
                             f"WARNING: Catalog item {descriptor.name} has a description with token size more"
                             f" than the allowed limit.",
                             fg="yellow",
@@ -176,7 +177,6 @@ def index_catalog_start(
     )
 
     uninitialized_items = init_from_catalog(next_catalog, curr_catalog)
-
     return all_errs, next_catalog, uninitialized_items
 
 

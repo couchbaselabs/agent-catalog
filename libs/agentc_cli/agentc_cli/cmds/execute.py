@@ -1,53 +1,78 @@
 import click
+import couchbase.cluster
 import importlib
+import logging
 import os
 import pathlib
 import sys
 import tempfile
-import uuid
 
 from ..models import Context
-from agentc_core.catalog import CatalogMem
-from agentc_core.defaults import DEFAULT_TOOL_CATALOG_NAME
-from agentc_core.embedding.embedding import EmbeddingModel
+from ..models.find import SearchOptions
+from .util import DASHES
+from .util import KIND_COLORS
+from .util import get_catalog
 from agentc_core.provider import ToolProvider
+from agentc_core.record.descriptor import RecordDescriptor
+from agentc_core.record.descriptor import RecordKind
+from agentc_core.secrets import put_secret
+from agentc_core.tool.descriptor import PythonToolDescriptor
+from agentc_core.tool.descriptor import SemanticSearchToolDescriptor
+from agentc_core.tool.descriptor import SQLPPQueryToolDescriptor
+from agentc_core.tool.descriptor.secrets import CouchbaseSecrets
 from pydantic import PydanticSchemaGenerationError
 from pydantic import TypeAdapter
 
 types_mapping = {"array": list, "integer": int, "number": float, "string": str}
 
+logger = logging.getLogger(__name__)
 
-def cmd_execute(ctx: Context, name: str | None, query: str | None, embedding_model_name: str):
-    # get local catalog and set embedding model for query
-    catalog_path = pathlib.Path(ctx.catalog) / DEFAULT_TOOL_CATALOG_NAME
-    embedding_model = EmbeddingModel(
-        embedding_model_name=embedding_model_name,
-        catalog_path=pathlib.Path(ctx.catalog),
-    )
-    catalog = CatalogMem(catalog_path=catalog_path, embedding_model=embedding_model)
+
+def cmd_execute(
+    ctx: Context,
+    query: str = None,
+    name: str = None,
+    bucket: str = None,
+    include_dirty: bool = True,
+    refiner: str = None,
+    annotations: str = None,
+    catalog_id: str = None,
+    cluster: couchbase.cluster.Cluster = None,
+    force_db=False,
+):
+    search_opt = SearchOptions(query=query, name=name)
+    query, name = search_opt.query, search_opt.name
+    click.secho(DASHES, fg=KIND_COLORS["tool"])
+    catalog = get_catalog(ctx.catalog, bucket, cluster, force_db, include_dirty, "tool")
 
     # create temp directory for code dump
     with tempfile.TemporaryDirectory(prefix="exec_code", dir=os.getcwd()) as tmp_dir:
-        # add temp directory and it's content as modules
-        sys.path.append(tmp_dir)
+        tmp_dir_path = pathlib.Path(tmp_dir)
 
         # initialize tool provider
-        provider = ToolProvider(catalog, output=pathlib.Path(tmp_dir), decorator=lambda x: x)
+        provider = ToolProvider(
+            catalog=catalog,
+            output=tmp_dir_path,
+            decorator=lambda x: x,
+            refiner=refiner,
+        )
 
         # based on name or query get appropriate tool
         if name is not None:
-            tool = provider.get(name)
+            tool = provider.get(name, snapshot=catalog_id, annotations=annotations)
             if tool is None:
                 raise ValueError(f"Tool {name} not found!") from None
         else:
-            tools = provider.search(query, limit=1)
+            tools = provider.search(query, snapshot=catalog_id, annotations=annotations, limit=1)
             if len(tools) == 0:
-                raise ValueError(f"No tool available for query {query}!") from None
+                raise ValueError(f"No tool available for query {query}!")
+            elif len(tools) > 1:
+                logger.debug(f"Multiple tools found for query {query}. Using the first one.")
             else:
                 tool = tools[0]
 
         # get tool metadata
-        tool_metadata = tool.meta
+        tool_metadata: RecordDescriptor = tool.meta
 
         # extract all variables that user needs to provide as input for tool
         try:
@@ -68,33 +93,61 @@ def cmd_execute(ctx: Context, name: str | None, query: str | None, embedding_mod
                 # other types like str, int, float
                 else:
                     input_types[param] = types_mapping[param_def["type"]]
-        except PydanticSchemaGenerationError:
+        except PydanticSchemaGenerationError as e:
             raise ValueError(
                 f'Could not generate a schema for tool "{name}". '
                 "Tool functions must have type hints that are compatible with Pydantic."
-            ) from None
+            ) from e
 
+        # TODO (GLENN): We should try to directly import from the source first before writing the content.
         # if it is python tool get code from tool metadata and dump it into a file and import modules
-        if ".py" in str(tool_metadata.source):
+        if tool_metadata.record_kind == RecordKind.PythonFunction:
             # create a file and dump python tool code into it
-            file_name = f"{uuid.uuid4().hex.replace("-", "")}.py"
-            file_path = os.path.join(tmp_dir, file_name)
-            with open(file_path, "w") as f:
-                f.write(tool_metadata.contents)
+            python_tool_metadata: PythonToolDescriptor = tool_metadata
+            file_name = python_tool_metadata.source.name
+            with (tmp_dir_path / file_name).open("w") as f:
+                f.write(python_tool_metadata.contents)
+
+            # add temp directory and it's content as modules
+            if str(tmp_dir_path.absolute()) not in sys.path:
+                sys.path.append(str(tmp_dir_path.absolute()))
+            gen_code_modules = importlib.import_module(python_tool_metadata.source.stem)
+
         # if it is sqlpp, yaml, jinja tools, provider dumps codes into a file by default, import that
         else:
-            all_files = os.listdir(tmp_dir)
-            # get file name of template generated code
-            # ignore __pycache__ directory
-            file_name = all_files[0] if all_files[0].endswith(".py") else all_files[1]
+            # add temp directory and it's content as modules
+            if str(tmp_dir_path.absolute()) not in sys.path:
+                sys.path.append(str(tmp_dir_path.absolute()))
 
-        # import modules from provider created file
-        gen_code_modules = importlib.import_module(f"{file_name.split('.')[0]}")
+            file_stem = [x.stem for x in (tmp_dir_path.iterdir()) if x.stem != "__init__"][0]
+            gen_code_modules = importlib.import_module(file_stem)
 
-        click.echo(
-            "\nProvide inputs for the prompted variables, types are shown for reference in parenthesis\n"
-            "If input is of type list then provide values separated by a comma.\n"
+        click.secho(DASHES, fg="yellow")
+        click.secho("Instructions:", fg="blue")
+        click.secho(
+            message="\tPlease provide inputs for the prompted variables.\n"
+            "\tThe types are shown for reference in parentheses.\n"
+            "\tIf the input is of type list, please provide your list values in a comma-separated format.\n",
+            fg="blue",
         )
+
+        if tool_metadata.record_kind in [RecordKind.SQLPPQuery, RecordKind.SemanticSearch]:
+            cb_tool_metadata: SQLPPQueryToolDescriptor | SemanticSearchToolDescriptor = tool_metadata
+            cb_secrets: CouchbaseSecrets = cb_tool_metadata.secrets[0]
+            cb_secrets_map = {
+                cb_secrets.couchbase.conn_string: click.prompt(
+                    click.style(cb_secrets.couchbase.conn_string + " (str)", fg="blue")
+                ),
+                cb_secrets.couchbase.username: click.prompt(
+                    click.style(cb_secrets.couchbase.username + " (str)", fg="blue")
+                ),
+                cb_secrets.couchbase.password: click.prompt(
+                    click.style(cb_secrets.couchbase.password + " (secret str)", fg="blue"), hide_input=True
+                ),
+            }
+            for k, v in cb_secrets_map.items():
+                put_secret(k, v)
+
         # prompt user for inputs
         user_inputs = take_input_from_user(input_types)
 
@@ -110,8 +163,10 @@ def cmd_execute(ctx: Context, name: str | None, query: str | None, embedding_mod
 
         # call tool function
         res = tool.func(**modified_user_inputs)
-        click.secho("\nResult:", fg="green")
+        click.secho(DASHES, fg="yellow")
+        click.secho("Result:", fg="green")
         click.echo(res)
+        click.secho(DASHES, fg=KIND_COLORS["tool"])
 
 
 # gets all class variable types present in all custom defined classes in code
@@ -181,7 +236,7 @@ def take_verify_list_inputs(entered_val, input_name, input_type, inp_type_to_sho
         is_correct = False
 
     while not is_correct:
-        click.secho(f"All entered values are not of type {list_type}! Enter correct values", fg="red")
+        click.secho(f"Given value is not of type {list_type}. Please enter the correct values", fg="red")
         entered_val = click.prompt(click.style(f"{input_name} ({inp_type_to_show_user})", fg="blue"), type=str)
         try:
             conv_inps = split_and_convert(entered_val, types_mapping[list_type])

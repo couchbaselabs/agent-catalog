@@ -1,8 +1,9 @@
+import couchbase.exceptions
 import json
 import logging
 
 from ...analytics import Log
-from ...analytics.create import create_analytics_views
+from ...analytics.create import create_analytics_udfs
 from ...defaults import DEFAULT_AUDIT_COLLECTION
 from ...defaults import DEFAULT_AUDIT_SCOPE
 from ...version import VersionDescriptor
@@ -48,7 +49,11 @@ class DBAuditor(BaseAuditor):
             logger.error(err)
             return
 
-        create_analytics_views(cluster, bucket)
+        try:
+            create_analytics_udfs(cluster, bucket)
+        except couchbase.exceptions.CouchbaseException as e:
+            logger.warning("Analytics views could not be created: %s", e)
+            pass
 
         # get collection ref
         cb_coll = cb.scope(DEFAULT_AUDIT_SCOPE).collection(DEFAULT_AUDIT_COLLECTION)

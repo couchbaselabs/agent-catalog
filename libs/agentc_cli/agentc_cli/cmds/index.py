@@ -3,16 +3,18 @@ import datetime
 import logging
 import os
 import pathlib
-import tqdm
 import typing
 
 from ..cmds.util import load_repository
 from ..models.context import Context
+from .util import DASHES
+from .util import KIND_COLORS
 from .util import init_local
 from agentc_core.catalog import __version__ as CATALOG_SCHEMA_VERSION
 from agentc_core.catalog.index import MetaVersion
 from agentc_core.catalog.index import index_catalog
 from agentc_core.catalog.version import lib_version
+from agentc_core.defaults import DEFAULT_CATALOG_NAME
 from agentc_core.defaults import DEFAULT_MAX_ERRS
 from agentc_core.defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from agentc_core.embedding.embedding import EmbeddingModel
@@ -57,12 +59,26 @@ def cmd_index(
     )
 
     # TODO: The kind needs a security check as it's part of the path?
-    catalog_path = pathlib.Path(ctx.catalog + "/" + kind + "-catalog.json")
+    catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)
 
     meta_version = MetaVersion(
         schema_version=CATALOG_SCHEMA_VERSION,
         library_version=lib_version(),
     )
+
+    if logger.getEffectiveLevel() == logging.DEBUG:
+
+        def logging_printer(content: str, *args, **kwargs):
+            logger.debug(content)
+            click.secho(content, *args, **kwargs)
+
+        printer = logging_printer
+    else:
+        printer = click.secho
+
+    printer(DASHES, fg=KIND_COLORS[kind])
+    printer(kind.upper(), bold=True, fg=KIND_COLORS[kind])
+    printer(DASHES, fg=KIND_COLORS[kind])
     next_catalog = index_catalog(
         embedding_model,
         meta_version,
@@ -72,16 +88,12 @@ def cmd_index(
         catalog_path,
         source_dirs,
         scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
-        printer=click.echo,
-        progress=tqdm.tqdm,
+        printer=printer,
+        print_progress=True,
         max_errs=DEFAULT_MAX_ERRS,
     )
 
-    click.echo("==================")
-    click.secho("Saving local catalog...", fg="yellow")
-
     if not dry_run:
         next_catalog.dump(catalog_path)
-        click.secho("Successfully saved local catalog.", fg="green")
-    else:
-        click.secho("Skipping local catalog saving due to --dry-run", fg="yellow")
+        click.secho("\nCatalog successfully indexed!", fg="green")
+    click.secho(DASHES, fg=KIND_COLORS[kind])
