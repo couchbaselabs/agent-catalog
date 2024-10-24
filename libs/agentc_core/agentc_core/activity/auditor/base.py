@@ -37,6 +37,7 @@ class BaseAuditor(abc.ABC):
         grouping: typing.AnyStr = None,
         timestamp: datetime.datetime = None,
         model: str = None,
+        agent_name: str = None,
         **kwargs,
     ):
         if self.model is None and model is None:
@@ -55,6 +56,7 @@ class BaseAuditor(abc.ABC):
             model=model or self.model,
             catalog_version=self.catalog_version,
             annotations=kwargs,
+            agent_name=agent_name,
         )
         self._accept(message)
 

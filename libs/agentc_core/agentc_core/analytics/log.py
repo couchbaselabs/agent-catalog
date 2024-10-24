@@ -71,3 +71,8 @@ class Log(pydantic.BaseModel):
     catalog_version: VersionDescriptor = pydantic.Field(
         description="A unique identifier that defines a catalog version / snapshot / commit."
     )
+
+    agent_name: typing.Optional[str] = pydantic.Field(
+        description="The name of the agent that this message is associated with.",
+        default=None,
+    )

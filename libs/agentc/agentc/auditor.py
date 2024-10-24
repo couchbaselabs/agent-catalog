@@ -79,6 +79,14 @@ class Auditor(pydantic_settings.BaseSettings):
     Audit log files will reach a maximum of 128MB (by default) before they are rotated and compressed.
     """
 
+    agent_name: typing.Optional[str] = None
+    """ Name of the agent for which this auditor was instantiated.
+
+    This helps user to know query logs by Agent Name
+    This field can be specified on instantiation or on :py:meth:`accept()`.
+    Agent name specified in :py:meth:`accept()` overrides a model specified on instantiation.
+    """
+
     _local_auditor: LocalAuditor = None
     _db_auditor: DBAuditor = None
     _audit: typing.Callable = None
@@ -183,6 +191,7 @@ class Auditor(pydantic_settings.BaseSettings):
         grouping: typing.AnyStr = None,
         timestamp: datetime.datetime = None,
         model: str = None,
+        agent_name: str = None,
         **kwargs,
     ) -> None:
         """
@@ -193,10 +202,20 @@ class Auditor(pydantic_settings.BaseSettings):
         :param timestamp: The time associated with the message production. This must have time-zone information.
         :param model: LLM model used with this audit instance. This field can be specified on instantiation
                       or on accept(). A model specified in accept() overrides a model specified on instantiation.
+        :param agent_name: Name of the Agent associated with this audit instance.
         """
         model = model if model is not None else self.llm_name
+        agent_name = agent_name if agent_name is not None else self.agent_name
+
         self._audit(
-            kind=kind, content=content, session=session, grouping=grouping, timestamp=timestamp, model=model, **kwargs
+            kind=kind,
+            content=content,
+            session=session,
+            grouping=grouping,
+            timestamp=timestamp,
+            model=model,
+            agent_name=agent_name,
+            **kwargs,
         )
 
     def move(
@@ -207,6 +226,7 @@ class Auditor(pydantic_settings.BaseSettings):
         content: typing.Any = None,
         timestamp: datetime.datetime = None,
         model: str = None,
+        agent_name: str = None,
         **kwargs,
     ):
         """
@@ -217,19 +237,24 @@ class Auditor(pydantic_settings.BaseSettings):
         :param timestamp: The time associated with the message production. This must have time-zone information.
         :param model: LLM model used with this audit instance. This field can be specified on instantiation
                       or on enter(). A model specified in enter() overrides a model specified on instantiation.
+        :param agent_name: Name of the Agent associated with this audit instance.
         """
         model = model if model is not None else self.llm_name
+        agent_name = agent_name if agent_name is not None else self.agent_name
+
         if direction == "enter":
             content = dict(to_node=node_name, extra=content)
         elif direction == "exit":
             content = dict(from_node=node_name, extra=content)
         else:
             raise ValueError('Direction must be either "enter" or "exit".')
+
         self._audit(
             kind=Kind.Transition,
             content=content,
             session=session,
             timestamp=timestamp,
             model=model,
+            agent_name=agent_name,
             **kwargs,
         )
