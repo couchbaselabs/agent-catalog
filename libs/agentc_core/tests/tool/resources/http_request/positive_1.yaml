@@ -1,9 +1,0 @@
-record_kind: http_request
-
-open_api:
-  filename: ../_good_spec.json
-  operations:
-    - path: /create
-      method: post
-    - path: /rewards/{member_id}
-      method: get
