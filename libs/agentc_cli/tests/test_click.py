@@ -57,6 +57,9 @@ def cb_server_instance() -> None:
     )
     assert response_2.status_code == http.HTTPStatus.ACCEPTED
 
+    # TODO (GLENN): This check should be more robust...
+    time.sleep(30)
+
     # Enter our test.
     yield None
 
