@@ -2,6 +2,11 @@ name: Couchbase Agent Catalog GitHub Actions
 run-name: 👁️ ${{ github.actor }} has pushed a new commit!
 on: [ push ]
 
+# Allow one concurrent deployment (for now)
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
   Tests:
     runs-on: ubuntu-latest
@@ -50,6 +55,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     permissions:
+      contents: read
       pages: write
       id-token: write
 
