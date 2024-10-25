@@ -1,0 +1,677 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
+
+    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
+        <title>agentc.provider - Agent Catalog 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=523d18d6" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">Agent Catalog 0.0.1 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  
+  <span class="sidebar-brand-text">Agent Catalog 0.0.1 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Getting Agent Catalog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guide.html">Agent Catalog User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command Line Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">Agent Catalog API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faqs.html">FAQs</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <h1>Source code for agentc.provider</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">couchbase.auth</span>
+<span class="kn">import</span> <span class="nn">couchbase.cluster</span>
+<span class="kn">import</span> <span class="nn">couchbase.options</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">import</span> <span class="nn">pydantic</span>
+<span class="kn">import</span> <span class="nn">pydantic_settings</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+
+<span class="kn">from</span> <span class="nn">agentc_core.catalog</span> <span class="kn">import</span> <span class="n">LATEST_SNAPSHOT_VERSION</span>
+<span class="kn">from</span> <span class="nn">agentc_core.catalog</span> <span class="kn">import</span> <span class="n">CatalogBase</span>
+<span class="kn">from</span> <span class="nn">agentc_core.catalog</span> <span class="kn">import</span> <span class="n">CatalogChain</span>
+<span class="kn">from</span> <span class="nn">agentc_core.catalog</span> <span class="kn">import</span> <span class="n">CatalogDB</span>
+<span class="kn">from</span> <span class="nn">agentc_core.catalog</span> <span class="kn">import</span> <span class="n">CatalogMem</span>
+<span class="kn">from</span> <span class="nn">agentc_core.catalog</span> <span class="kn">import</span> <span class="n">SearchResult</span>
+<span class="kn">from</span> <span class="nn">agentc_core.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_CATALOG_FOLDER</span>
+<span class="kn">from</span> <span class="nn">agentc_core.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_EMBEDDING_MODEL</span>
+<span class="kn">from</span> <span class="nn">agentc_core.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_PROMPT_CATALOG_NAME</span>
+<span class="kn">from</span> <span class="nn">agentc_core.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_TOOL_CATALOG_NAME</span>
+<span class="kn">from</span> <span class="nn">agentc_core.embedding.embedding</span> <span class="kn">import</span> <span class="n">EmbeddingModel</span>
+<span class="kn">from</span> <span class="nn">agentc_core.provider</span> <span class="kn">import</span> <span class="n">ModelType</span>
+<span class="kn">from</span> <span class="nn">agentc_core.provider</span> <span class="kn">import</span> <span class="n">PromptProvider</span>
+<span class="kn">from</span> <span class="nn">agentc_core.provider</span> <span class="kn">import</span> <span class="n">PythonTarget</span>
+<span class="kn">from</span> <span class="nn">agentc_core.provider</span> <span class="kn">import</span> <span class="n">ToolProvider</span>
+<span class="kn">from</span> <span class="nn">agentc_core.version</span> <span class="kn">import</span> <span class="n">VersionDescriptor</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1"># To support custom refiners, we must export this model.</span>
+<span class="n">SearchResult</span> <span class="o">=</span> <span class="n">SearchResult</span>
+
+<span class="c1"># To support the generation of different (schema) models, we export this model.</span>
+<span class="n">SchemaModel</span> <span class="o">=</span> <span class="n">ModelType</span>
+
+<span class="c1"># To support returning prompts with defined tools + the ability to utilize the tool schema, we export this model.</span>
+<span class="n">Prompt</span> <span class="o">=</span> <span class="n">PromptProvider</span><span class="o">.</span><span class="n">PromptResult</span>
+<span class="n">Tool</span> <span class="o">=</span> <span class="n">ToolProvider</span><span class="o">.</span><span class="n">ToolResult</span>
+
+
+<div class="viewcode-block" id="Provider">
+<a class="viewcode-back" href="../../api.html#agentc.Provider">[docs]</a>
+<span class="k">class</span> <span class="nc">Provider</span><span class="p">(</span><span class="n">pydantic_settings</span><span class="o">.</span><span class="n">BaseSettings</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A provider of indexed &quot;agent building blocks&quot; (e.g., tools).&quot;&quot;&quot;</span>
+
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic_settings</span><span class="o">.</span><span class="n">SettingsConfigDict</span><span class="p">(</span><span class="n">env_prefix</span><span class="o">=</span><span class="s2">&quot;AGENT_CATALOG_&quot;</span><span class="p">)</span>
+
+    <span class="n">conn_string</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Couchbase connection string that points to the catalog.</span>
+
+<span class="sd">    This Couchbase instance refers to the CB instance used with the :command:`publish` command.</span>
+<span class="sd">    If there exists no local catalog (e.g., this is deployed in a standalone environment), we will perform all</span>
+<span class="sd">    :command:`find` commands directly on the remote catalog.</span>
+<span class="sd">    If this field AND ``$AGENT_CATALOG_CATALOG`` are specified, we will issue :command:`find` on both the remote and</span>
+<span class="sd">    local catalog (with local catalog entries taking precedence).</span>
+
+<span class="sd">    This field must be specified with :py:attr:`username`, :py:attr:`password`, and  :py:attr:`bucket`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">username</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">pydantic</span><span class="o">.</span><span class="n">SecretStr</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Username associated with the Couchbase instance possessing the catalog.</span>
+
+<span class="sd">    This field must be specified with :py:attr:`conn_string`, :py:attr:`password`, and :py:attr:`bucket`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">password</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">pydantic</span><span class="o">.</span><span class="n">SecretStr</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Password associated with the Couchbase instance possessing the catalog.</span>
+
+<span class="sd">    This field must be specified with :py:attr:`conn_string`, :py:attr:`username`, and :py:attr:`bucket`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">bucket</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The name of the Couchbase bucket possessing the catalog.</span>
+
+<span class="sd">    This field must be specified with :py:attr:`conn_string`, :py:attr:`username`, and :py:attr:`password`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">catalog</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Location of the catalog path.</span>
+
+<span class="sd">    If this field and ``$AGENT_CATALOG_CONN_STRING`` are not set, we will perform a best-effort search by walking upward</span>
+<span class="sd">    from the current working directory until we find the :py:data:`agentc_core.defaults.DEFAULT_ACTIVITY_FOLDER` folder.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">snapshot</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">LATEST_SNAPSHOT_VERSION</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The snapshot version to find the tools and prompts for.</span>
+
+<span class="sd">    By default, we use the latest snapshot version if the repo is clean.</span>
+<span class="sd">    This snapshot version is retrieved directly from Git (if the repo is clean).</span>
+<span class="sd">    If the repo is dirty, we will fetch all tools and prompts from the local catalog (by default).</span>
+<span class="sd">    If snapshot is specified at search time (i.e., with :py:meth:`get_tools_for` or :py:meth:`get_prompt_for`), we will</span>
+<span class="sd">    use that snapshot version instead.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">provider_output</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Location to save generated Python stubs to, if desired.</span>
+
+<span class="sd">    On :py:meth:`get_tools_for`, tools are dynamically generated and served as annotated Python callables.</span>
+<span class="sd">    By default, this code is never written to disk.</span>
+<span class="sd">    If this field is specified, we will write all generated files to the given output directory and serve the generated</span>
+<span class="sd">    Python callables from these files with a &quot;standard import&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">decorator</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Tool</span><span class="p">],</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">record</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">func</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A Python decorator (function) to apply to each result yielded by :py:meth:`get_tools_for`.</span>
+
+<span class="sd">    By default, yielded results are callable and possess type annotations + documentation strings, but some agent</span>
+<span class="sd">    frameworks may ask for tools whose type is tailored to their own framework.</span>
+<span class="sd">    As an example, in LangChain, vanilla Python functions must be converted to langchain_core.tools.BaseTool instances.</span>
+<span class="sd">    To avoid having to &quot;box&quot; these tools yourself, we accept a callback to perform this boxing on your behalf.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">refiner</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">list</span><span class="p">[</span><span class="n">SearchResult</span><span class="p">]],</span> <span class="nb">list</span><span class="p">[</span><span class="n">SearchResult</span><span class="p">]]]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">results</span><span class="p">:</span> <span class="n">results</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A Python function to post-process results (reranking, pruning, etc...) yielded by the catalog.</span>
+
+<span class="sd">    By default, we perform a strict top-K nearest neighbor search for relevant results.</span>
+<span class="sd">    This function serves to perform any additional reranking and **pruning** before the code generation occurs.</span>
+<span class="sd">    This function should accept a list of :py:class:`SearchResult` instances (a model with the fields ``entry`` and</span>
+<span class="sd">    ``delta``) and return a list of :py:class:`SearchResult` instances.</span>
+
+<span class="sd">    We offer an experimental post-processor to cluster closely related results (using delta as the loss function) and</span>
+<span class="sd">    subsequently yield the closest cluster (see :py:class:`agentc_core.provider.refiner.ClosestClusterRefiner`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">secrets</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">SecretStr</span><span class="p">]]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A map of identifiers to secret values (e.g., Couchbase usernames, passwords, etc...).</span>
+
+<span class="sd">    Some tools require access to values that cannot be hard-coded into the tool themselves (for security reasons).</span>
+<span class="sd">    As an example, SQL++ tools require a connection string, username, and password.</span>
+<span class="sd">    Instead of capturing these raw values in the tool metadata, tool descriptors mandate the specification of a</span>
+<span class="sd">    map whose values are secret keys.</span>
+
+<span class="sd">    .. code-block:: yaml</span>
+
+<span class="sd">        secrets:</span>
+<span class="sd">            - couchbase:</span>
+<span class="sd">                conn_string: MY_CB_CONN_STRING</span>
+<span class="sd">                username: MY_CB_USERNAME</span>
+<span class="sd">                password: MY_CB_PASSWORD</span>
+
+<span class="sd">    To map the secret keys to values, users will specify their secrets using this field (secrets).</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        provider = agentc.Provider(secrets={</span>
+<span class="sd">            &quot;MY_CB_CONN_STRING&quot;: &quot;couchbase//23.52.12.254&quot;,</span>
+<span class="sd">            &quot;MY_CB_USERNAME&quot;: &quot;admin_7823&quot;,</span>
+<span class="sd">            &quot;MY_CB_PASSWORD&quot;: os.getenv(&quot;THE_CB_PASSWORD&quot;)</span>
+<span class="sd">        })</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">embedding_model</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">AnyStr</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_EMBEDDING_MODEL</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The embedding model used when performing a semantic search for tools / prompts.</span>
+
+<span class="sd">    Currently, only models that can specified with sentence-transformers through its string constructor are supported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">tool_model</span><span class="p">:</span> <span class="n">SchemaModel</span> <span class="o">=</span> <span class="n">SchemaModel</span><span class="o">.</span><span class="n">TypingTypedDict</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The target model type for the generated (schema) code for tools.</span>
+
+<span class="sd">    By default, we generate :py:type:`TypedDict` models and attach these as type hints to the generated Python</span>
+<span class="sd">    functions.</span>
+<span class="sd">    Other options include Pydantic (V2 and V1) models and dataclasses, though these may not be supported by all agent</span>
+<span class="sd">    frameworks.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_local_tool_catalog</span><span class="p">:</span> <span class="n">CatalogMem</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_remote_tool_catalog</span><span class="p">:</span> <span class="n">CatalogDB</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_tool_catalog</span><span class="p">:</span> <span class="n">CatalogBase</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_tool_provider</span><span class="p">:</span> <span class="n">ToolProvider</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">_local_prompt_catalog</span><span class="p">:</span> <span class="n">CatalogMem</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_remote_prompt_catalog</span><span class="p">:</span> <span class="n">CatalogDB</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_prompt_catalog</span><span class="p">:</span> <span class="n">CatalogBase</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_prompt_provider</span><span class="p">:</span> <span class="n">PromptProvider</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_find_local_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">working_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s1">&#39;Starting best effort search for the catalog folder. Searching for &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span><span class="p">,</span>
+                <span class="n">DEFAULT_CATALOG_FOLDER</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Iteratively ascend our starting path until we find the catalog folder.</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="p">(</span><span class="n">working_path</span> <span class="o">/</span> <span class="n">DEFAULT_CATALOG_FOLDER</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">working_path</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">working_path</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">self</span>
+                <span class="n">working_path</span> <span class="o">=</span> <span class="n">working_path</span><span class="o">.</span><span class="n">parent</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">catalog</span> <span class="o">=</span> <span class="n">working_path</span> <span class="o">/</span> <span class="n">DEFAULT_CATALOG_FOLDER</span>
+
+        <span class="c1"># Note: we will defer embedding model mismatches to the remote catalog validator.</span>
+        <span class="n">embedding_model</span> <span class="o">=</span> <span class="n">EmbeddingModel</span><span class="p">(</span>
+            <span class="n">embedding_model_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_model</span><span class="p">,</span>
+            <span class="n">catalog_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">catalog</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Set our local catalog if it exists.</span>
+        <span class="n">tool_catalog_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog</span> <span class="o">/</span> <span class="n">DEFAULT_TOOL_CATALOG_NAME</span>
+        <span class="k">if</span> <span class="n">tool_catalog_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Loading local tool catalog at </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">tool_catalog_path</span><span class="o">.</span><span class="n">absolute</span><span class="p">()))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_local_tool_catalog</span> <span class="o">=</span> <span class="n">CatalogMem</span><span class="p">(</span><span class="n">catalog_path</span><span class="o">=</span><span class="n">tool_catalog_path</span><span class="p">,</span> <span class="n">embedding_model</span><span class="o">=</span><span class="n">embedding_model</span><span class="p">)</span>
+        <span class="n">prompt_catalog_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog</span> <span class="o">/</span> <span class="n">DEFAULT_PROMPT_CATALOG_NAME</span>
+        <span class="k">if</span> <span class="n">prompt_catalog_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Loading local prompt catalog at </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">prompt_catalog_path</span><span class="o">.</span><span class="n">absolute</span><span class="p">()))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_local_prompt_catalog</span> <span class="o">=</span> <span class="n">CatalogMem</span><span class="p">(</span><span class="n">catalog_path</span><span class="o">=</span><span class="n">prompt_catalog_path</span><span class="p">,</span> <span class="n">embedding_model</span><span class="o">=</span><span class="n">embedding_model</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_find_remote_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn_string</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="c1"># Make sure we have {username, password, bucket}.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;$AGENT_CATALOG_CONN_STRING is specified but $AGENT_CATALOG_USERNAME is missing.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;$AGENT_CATALOG_CONN_STRING is specified but $AGENT_CATALOG_PASSWORD is missing.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bucket</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;$AGENT_CATALOG_CONN_STRING is specified but $AGENT_CATALOG_BUCKET is missing.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="c1"># Try to connect to our cluster.</span>
+        <span class="n">cluster</span> <span class="o">=</span> <span class="n">couchbase</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">Cluster</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn_string</span><span class="p">,</span>
+            <span class="n">couchbase</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">ClusterOptions</span><span class="p">(</span>
+                <span class="n">couchbase</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">PasswordAuthenticator</span><span class="p">(</span>
+                    <span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">(),</span>
+                    <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">(),</span>
+                <span class="p">)</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_tool_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_prompt_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">catalog_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">catalog_path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">embedding_model</span> <span class="o">=</span> <span class="n">EmbeddingModel</span><span class="p">(</span>
+            <span class="n">embedding_model_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_model</span><span class="p">,</span>
+            <span class="n">cb_bucket</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span>
+            <span class="n">cb_cluster</span><span class="o">=</span><span class="n">cluster</span><span class="p">,</span>
+            <span class="n">catalog_path</span><span class="o">=</span><span class="n">catalog_path</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">cluster</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="c1"># TODO (GLENN): Add support for passing an already open connection to CatalogDB.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_remote_tool_catalog</span> <span class="o">=</span> <span class="n">CatalogDB</span><span class="p">(</span>
+                <span class="n">cluster</span><span class="o">=</span><span class="n">cluster</span><span class="p">,</span> <span class="n">bucket</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="n">embedding_model</span><span class="o">=</span><span class="n">embedding_model</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;&#39;agentc publish --kind tool&#39; has not been run. Skipping remote tool catalog.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_remote_tool_catalog</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_remote_prompt_catalog</span> <span class="o">=</span> <span class="n">CatalogDB</span><span class="p">(</span>
+                <span class="n">cluster</span><span class="o">=</span><span class="n">cluster</span><span class="p">,</span> <span class="n">bucket</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;prompt&quot;</span><span class="p">,</span> <span class="n">embedding_model</span><span class="o">=</span><span class="n">embedding_model</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;&#39;agentc publish --kind prompt&#39; has not been run. Skipping remote prompt catalog.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_remote_prompt_catalog</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="c1"># Note: this must be placed **after** _find_local_catalog and _find_remote_catalog.</span>
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_initialize_provider</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
+        <span class="n">local_catalogs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_tool_catalog</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_prompt_catalog</span>
+        <span class="n">remote_catalogs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_tool_catalog</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_prompt_catalog</span>
+        <span class="n">catalog_mutators</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="s2">&quot;_tool_catalog&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">),</span>
+            <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="s2">&quot;_prompt_catalog&quot;</span><span class="p">,</span> <span class="n">p</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">catalog_tuple</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">local_catalogs</span><span class="p">,</span> <span class="n">remote_catalogs</span><span class="p">,</span> <span class="n">catalog_mutators</span><span class="p">):</span>
+            <span class="n">local_catalog</span><span class="p">,</span> <span class="n">remote_catalog</span><span class="p">,</span> <span class="n">set_catalog</span> <span class="o">=</span> <span class="n">catalog_tuple</span>
+            <span class="k">if</span> <span class="n">local_catalog</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">remote_catalog</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">error_message</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                    Could not find $AGENT_CATALOG_CATALOG nor $AGENT_CATALOG_CONN_STRING! If this is a new project,</span>
+<span class="s2">                    please run the command `agentc index` before instantiating a provider. Otherwise, please set either</span>
+<span class="s2">                    of these variables.</span>
+<span class="s2">                &quot;&quot;&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">local_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">remote_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;A local catalog and a remote catalog have been found. Building a chained catalog.&quot;</span><span class="p">)</span>
+                <span class="n">set_catalog</span><span class="p">(</span><span class="n">CatalogChain</span><span class="p">(</span><span class="n">local_catalog</span><span class="p">,</span> <span class="n">remote_catalog</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">local_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Only a local catalog has been found. Using the local catalog.&quot;</span><span class="p">)</span>
+                <span class="n">set_catalog</span><span class="p">(</span><span class="n">local_catalog</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># remote_catalog is not None:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Only a remote catalog has been found. Using the remote catalog.&quot;</span><span class="p">)</span>
+                <span class="n">set_catalog</span><span class="p">(</span><span class="n">remote_catalog</span><span class="p">)</span>
+
+        <span class="c1"># Check the version of Python (this is needed for the code-generator).</span>
+        <span class="k">match</span> <span class="n">version_tuple</span> <span class="o">:=</span> <span class="n">platform</span><span class="o">.</span><span class="n">python_version_tuple</span><span class="p">():</span>
+            <span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;6&quot;</span><span class="p">,</span> <span class="k">_</span><span class="p">):</span>
+                <span class="n">target_python_version</span> <span class="o">=</span> <span class="n">PythonTarget</span><span class="o">.</span><span class="n">PY_36</span>
+            <span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;7&quot;</span><span class="p">,</span> <span class="k">_</span><span class="p">):</span>
+                <span class="n">target_python_version</span> <span class="o">=</span> <span class="n">PythonTarget</span><span class="o">.</span><span class="n">PY_37</span>
+            <span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;8&quot;</span><span class="p">,</span> <span class="k">_</span><span class="p">):</span>
+                <span class="n">target_python_version</span> <span class="o">=</span> <span class="n">PythonTarget</span><span class="o">.</span><span class="n">PY_38</span>
+            <span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;9&quot;</span><span class="p">,</span> <span class="k">_</span><span class="p">):</span>
+                <span class="n">target_python_version</span> <span class="o">=</span> <span class="n">PythonTarget</span><span class="o">.</span><span class="n">PY_39</span>
+            <span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;10&quot;</span><span class="p">,</span> <span class="k">_</span><span class="p">):</span>
+                <span class="n">target_python_version</span> <span class="o">=</span> <span class="n">PythonTarget</span><span class="o">.</span><span class="n">PY_310</span>
+            <span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;11&quot;</span><span class="p">,</span> <span class="k">_</span><span class="p">):</span>
+                <span class="n">target_python_version</span> <span class="o">=</span> <span class="n">PythonTarget</span><span class="o">.</span><span class="n">PY_311</span>
+            <span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;12&quot;</span><span class="p">,</span> <span class="k">_</span><span class="p">):</span>
+                <span class="n">target_python_version</span> <span class="o">=</span> <span class="n">PythonTarget</span><span class="o">.</span><span class="n">PY_312</span>
+            <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">version_tuple</span><span class="p">,</span> <span class="s2">&quot;__getitem__&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">version_tuple</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">12</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Python version not recognized. Defaulting to Python 3.11.&quot;</span><span class="p">)</span>
+                    <span class="n">target_python_version</span> <span class="o">=</span> <span class="n">PythonTarget</span><span class="o">.</span><span class="n">PY_311</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Python version </span><span class="si">{</span><span class="n">platform</span><span class="o">.</span><span class="n">python_version</span><span class="p">()</span><span class="si">}</span><span class="s2"> not supported.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Finally, initialize our provider.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tool_provider</span> <span class="o">=</span> <span class="n">ToolProvider</span><span class="p">(</span>
+            <span class="n">catalog</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tool_catalog</span><span class="p">,</span>
+            <span class="n">output</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">provider_output</span><span class="p">,</span>
+            <span class="n">decorator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">decorator</span><span class="p">,</span>
+            <span class="n">refiner</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">refiner</span><span class="p">,</span>
+            <span class="n">secrets</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">secrets</span><span class="p">,</span>
+            <span class="n">python_version</span><span class="o">=</span><span class="n">target_python_version</span><span class="p">,</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tool_model</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_provider</span> <span class="o">=</span> <span class="n">PromptProvider</span><span class="p">(</span>
+            <span class="n">tool_provider</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tool_provider</span><span class="p">,</span>
+            <span class="n">catalog</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_prompt_catalog</span><span class="p">,</span>
+            <span class="n">refiner</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">refiner</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">computed_field</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VersionDescriptor</span><span class="p">:</span>
+        <span class="c1"># TODO (GLENN): How should we factor the prompt catalog version into all of this?</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_tool_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tool_catalog</span><span class="o">.</span><span class="n">version</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_tool_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_tool_catalog</span><span class="o">.</span><span class="n">version</span>
+
+<div class="viewcode-block" id="Provider.get_tools_for">
+<a class="viewcode-back" href="../../api.html#agentc.Provider.get_tools_for">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_tools_for</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">annotations</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">snapshot</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">LATEST_SNAPSHOT_VERSION</span><span class="p">,</span>
+        <span class="n">limit</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param query: A query string (natural language) to search the catalog with.</span>
+<span class="sd">        :param name: The specific name of the catalog entry to search for.</span>
+<span class="sd">        :param annotations: An annotation query string in the form of ``KEY=&quot;VALUE&quot; (AND|OR KEY=&quot;VALUE&quot;)*``.</span>
+<span class="sd">        :param snapshot: The snapshot version to find the tools for. By default, we use the latest snapshot.</span>
+<span class="sd">        :param limit: The maximum number of results to return.</span>
+<span class="sd">        :return: A list of tools (Python functions).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tool_provider</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="n">annotations</span><span class="p">,</span> <span class="n">snapshot</span><span class="o">=</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># AV-88220 agentic workflows need list of tools, but get() function return only 1 tool, so wrapping it</span>
+            <span class="c1"># around [] to make list</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_tool_provider</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="n">annotations</span><span class="p">,</span> <span class="n">snapshot</span><span class="o">=</span><span class="n">snapshot</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="Provider.get_prompt_for">
+<a class="viewcode-back" href="../../api.html#agentc.Provider.get_prompt_for">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_prompt_for</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">annotations</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">snapshot</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">LATEST_SNAPSHOT_VERSION</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Prompt</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param query: A query string (natural language) to search the catalog with.</span>
+<span class="sd">        :param name: The specific name of the catalog entry to search for.</span>
+<span class="sd">        :param annotations: An annotation query string in the form of ``KEY=&quot;VALUE&quot; (AND|OR KEY=&quot;VALUE&quot;)*``.</span>
+<span class="sd">        :param snapshot: The snapshot version to find the tools for. By default, we use the latest snapshot.</span>
+<span class="sd">        :return: A single prompt as well any tools attached to the prompt.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_provider</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="n">annotations</span><span class="p">,</span> <span class="n">snapshot</span><span class="o">=</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_provider</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="n">annotations</span><span class="p">,</span> <span class="n">snapshot</span><span class="o">=</span><span class="n">snapshot</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Couchbase
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>
