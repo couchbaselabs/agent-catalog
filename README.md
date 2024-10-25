@@ -1,5 +1,5 @@
 # agent-catalog (Couchbase Agent Catalog)
-[![Couchbase Agent Catalog GitHub Actions](https://github.com/couchbaselabs/agent-catalog/actions/workflows/github-actions.yaml/badge.svg)](https://github.com/couchbaselabs/agent-catalog/actions/workflows/github-actions.yaml)
+[![CI/CD Tests](https://github.com/couchbaselabs/agent-catalog/actions/workflows/tests.yaml/badge.svg)](https://github.com/couchbaselabs/agent-catalog/actions/workflows/tests.yaml)
 
 The mono-repo for the Couchbase Agent Catalog project.
 

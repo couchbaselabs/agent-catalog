@@ -1,0 +1,40 @@
+name: Docs
+run-name: 👁️ ${{ github.actor }} has pushed a new commit!
+on: [ push ]
+
+# Note: this doesn't deploy anything for now! It just pushes to the gh-pages branch.
+jobs:
+  Pages:
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+
+      - name: Set up Python Poetry
+        uses: mishaga/action-poetry@1
+        with:
+          python-version: "3.12"
+          poetry-version: "latest"
+          shell: "bash"
+
+      - name: Install repository with Poetry
+        run: |
+          poetry install --with docs
+
+      - name: Build the documentation
+        working-directory: docs
+        run: |
+          source $(poetry env info --path)/bin/activate
+          make html
+
+      - name: Deploy build/html to gh-pages
+        uses: s0/git-publish-subdir-action@develop
+        env:
+          REPO: self
+          BRANCH: gh-pages
+          FOLDER: docs/build/html
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
