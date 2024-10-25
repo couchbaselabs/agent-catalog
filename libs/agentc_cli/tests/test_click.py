@@ -241,7 +241,7 @@ def test_find(tmp_path, cb_server_instance):
         assert "3 result(s) returned from the catalog." in output
 
 
-@pytest.mark.skip(reason="Currently kind of flaky? Other tests seem to work.")
+@pytest.mark.smoke
 def test_status(tmp_path, cb_server_instance):
     runner = click.testing.CliRunner()
     print("\n\n")

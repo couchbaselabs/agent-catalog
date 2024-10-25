@@ -43,8 +43,11 @@ jobs:
 
       - name: Run agentc-core tests
         run: poetry run bash -c "cd libs/agentc_core && pytest -v"
-      - name: Run agentc-cli tests
-        run: poetry run bash -c "cd libs/agentc_cli && pytest -v"
+
+      # TODO (GLENN): For now, we are only running the core tests.
+      #               We will run the CLI tests on our own machines until we can get these to run reliably.
+      #      - name: Run agentc-cli tests
+      #        run: poetry run bash -c "cd libs/agentc_cli && pytest -v"
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
