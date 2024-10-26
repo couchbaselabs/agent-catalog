@@ -19,7 +19,7 @@ Table of Contents
    Agent Catalog User Guide <guide>
    Command Line Tool <cli>
    Agent Catalog API <api>
-   FAQs <faqs>
+   Frequently Asked Questions <faqs>
 
 Indices and Tables
 ------------------

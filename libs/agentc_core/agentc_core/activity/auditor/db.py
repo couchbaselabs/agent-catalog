@@ -24,9 +24,10 @@ class DBAuditor(BaseAuditor):
         password: str,
         bucket: str,
         catalog_version: VersionDescriptor,
-        model: str,
+        model_name: str,
+        agent_name: str,
     ):
-        super().__init__(catalog_version, model)
+        super().__init__(catalog_version, model_name, agent_name)
         conn = CouchbaseConnect(
             connection_url=conn_string,
             username=username,

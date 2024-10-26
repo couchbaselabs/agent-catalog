@@ -38,7 +38,7 @@ provider = agentc.Provider(
 # 1. a specific catalog snapshot (i.e., the version of the catalog when the agent was started), and
 # 2. a specific conversation thread / session (passed in via session=thread_id).
 # Note: similar to a Rosetta provider, the parameters of a Rosetta auditor can be set with environment variables.
-auditor = agentc.Auditor(llm_name="gpt-4o")
+auditor = agentc.Auditor(agent_name="Starter Agent")
 chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o", temperature=0)
 
 

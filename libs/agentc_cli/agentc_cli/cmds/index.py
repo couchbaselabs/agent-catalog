@@ -17,7 +17,7 @@ from agentc_core.catalog.version import lib_version
 from agentc_core.defaults import DEFAULT_CATALOG_NAME
 from agentc_core.defaults import DEFAULT_MAX_ERRS
 from agentc_core.defaults import DEFAULT_SCAN_DIRECTORY_OPTS
-from agentc_core.embedding.embedding import EmbeddingModel
+from agentc_core.learned.embedding import EmbeddingModel
 from agentc_core.version import VersionDescriptor
 
 logger = logging.getLogger(__name__)

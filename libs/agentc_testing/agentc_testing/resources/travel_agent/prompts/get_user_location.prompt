@@ -1,0 +1,11 @@
+---
+record_kind: raw_prompt
+
+name: get_user_location
+
+description: Instructions on how to ask a user for their current location.
+
+annotations:
+  framework: "controlflow"
+---
+Ask the user for their location.

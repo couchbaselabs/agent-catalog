@@ -24,7 +24,6 @@ from langchain_core.outputs import ChatResult
 
 logger = logging.getLogger(__name__)
 
-
 _TYPE_TO_KIND_MAPPING = {
     HumanMessage.__name__: Kind.Human,
     HumanMessageChunk.__name__: Kind.Human,
@@ -66,6 +65,15 @@ def _content_from_message(message: BaseMessage) -> dict[str, typing.Any]:
     return content_dict
 
 
+def _model_from_message(message: BaseMessage, chat_model: BaseChatModel) -> str | None:
+    if isinstance(message, AIMessage):
+        if message.response_metadata is not None:
+            return message.response_metadata.get("model_name", None)
+        else:
+            return chat_model.name
+    return None
+
+
 def _accept_messages(messages: typing.List[BaseMessage], auditor: AuditorType, **kwargs) -> None:
     for message in messages:
         auditor.accept(kind=_determine_kind_from_type(message), content=_content_from_message(message), **kwargs)
@@ -105,6 +113,7 @@ def audit(
             auditor.accept(
                 kind=Kind.LLM,
                 content=_content_from_message(result.message),
+                model_name=_model_from_message(result.message, chat_model),
                 session=session,
                 grouping=grouping_id,
             )
@@ -135,6 +144,7 @@ def audit(
         auditor.accept(
             kind=Kind.LLM,
             content=_content_from_message(result_chunk.message),
+            model_name=_model_from_message(result_chunk.message, chat_model),
             session=session,
             grouping=grouping_id,
         )
@@ -154,6 +164,7 @@ def audit(
             auditor.accept(
                 kind=Kind.LLM,
                 content=_content_from_message(result.message),
+                model_name=_model_from_message(result.message, chat_model),
                 session=session,
                 grouping=grouping_id,
             )
@@ -184,6 +195,7 @@ def audit(
         auditor.accept(
             kind=Kind.LLM,
             content=_content_from_message(result_chunk.message),
+            model_name=_model_from_message(result_chunk.message, chat_model),
             session=session,
             grouping=grouping_id,
         )

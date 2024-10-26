@@ -1,0 +1,50 @@
+/*
+name: find_direct_routes_between_airports
+
+description: >
+    Find a list of direct routes between two airports using source_airport and destination_airport.
+
+input: >
+    {
+      "type": "object",
+      "properties": {
+        "source_airport": { "type": "string" },
+        "destination_airport": { "type": "string" }
+      }
+    }
+
+output: >
+    {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "airlines": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "layovers": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "from_airport": { "type": "string" },
+          "to_airport": { "type": "string" }
+        }
+      }
+    }
+
+secrets:
+    - couchbase:
+        conn_string: CB_CONN_STRING
+        username: CB_USERNAME
+        password: CB_PASSWORD
+*/
+
+FROM   `travel-sample`.inventory.route r
+WHERE  r.sourceairport = $source_airport AND
+       r.destinationairport = $destination_airport
+SELECT VALUE { "airlines"     : [ r.airline ],
+               "layovers"     : [],
+               "from_airport" : r.sourceairport,
+               "to_airport"   : r.destinationairport }
+LIMIT  10;

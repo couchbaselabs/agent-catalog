@@ -31,6 +31,8 @@ agentc-langchain = { path = "../agentc_langchain", develop = true, optional = tr
 pre-commit = "^3.2.2"
 pytest = "^8.3.2"
 
+agentc-testing = { path = "../agentc_testing", develop = true }
+
 [tool.poetry.extras]
 langchain = ["agentc-langchain"]
 

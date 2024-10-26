@@ -5,6 +5,7 @@ import git
 import logging
 import os
 import pathlib
+import pydantic
 import typing
 
 from ..models.context import Context
@@ -18,7 +19,7 @@ from agentc_core.catalog.version import lib_version
 from agentc_core.defaults import DEFAULT_CATALOG_NAME
 from agentc_core.defaults import DEFAULT_MAX_ERRS
 from agentc_core.defaults import DEFAULT_SCAN_DIRECTORY_OPTS
-from agentc_core.embedding.embedding import EmbeddingModel
+from agentc_core.learned.embedding import EmbeddingModel
 from agentc_core.version import VersionDescriptor
 
 # The following are used for colorizing output.
@@ -89,18 +90,16 @@ def get_catalog(
     db_catalog, local_catalog = None, None
     if bucket is not None and cluster is not None:
         # Path #1: Search our DB catalog.
-        embedding_model = EmbeddingModel(
-            catalog_path=pathlib.Path(catalog_path),
-            cb_bucket=bucket,
-            cb_cluster=cluster,
-        )
-        db_catalog = CatalogDB(
-            cluster=cluster,
-            bucket=bucket,
-            kind=kind,
-            embedding_model=embedding_model,
-            latest_version=get_path_version(pathlib.Path(os.getcwd())),
-        )
+        try:
+            embedding_model = EmbeddingModel(
+                catalog_path=pathlib.Path(catalog_path),
+                cb_bucket=bucket,
+                cb_cluster=cluster,
+            )
+            db_catalog = CatalogDB(cluster=cluster, bucket=bucket, kind=kind, embedding_model=embedding_model)
+        except pydantic.ValidationError as e:
+            if force_db:
+                raise e
     if catalog_file.exists() and not force_db:
         # Path #2: Search our local catalog.
         catalog_path = pathlib.Path(catalog_path) / (kind + DEFAULT_CATALOG_NAME)

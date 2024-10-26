@@ -127,13 +127,15 @@ class PromptProvider(BaseProvider):
 
     def __init__(
         self,
-        tool_provider: ToolProvider,
         catalog: CatalogBase,
+        tool_provider: ToolProvider = None,
         refiner: typing.Callable[[list[SearchResult]], list[SearchResult]] = None,
         jinja2_environment: jinja2.Environment = None,
     ):
         super(PromptProvider, self).__init__(catalog, refiner)
         self.tool_provider = tool_provider
+        if self.tool_provider is None:
+            logger.warning("PromptProvider has been instantiated without a ToolProvider.")
         self.jinja2_environment = (
             jinja2_environment if jinja2_environment is not None else jinja2.Environment(loader=jinja2.BaseLoader)
         )
@@ -142,6 +144,11 @@ class PromptProvider(BaseProvider):
         # If our prompt has defined tools, fetch them here.
         tools = None
         if prompt_descriptor.tools is not None:
+            if self.tool_provider is None:
+                raise ValueError(
+                    "Tool(s) have been defined in the prompt, but no ToolProvider has been provided. "
+                    "If this is a new repo, please run `agentc index tool` to first index your tools."
+                )
             tools = list()
             for tool in prompt_descriptor.tools:
                 if tool.query is not None:

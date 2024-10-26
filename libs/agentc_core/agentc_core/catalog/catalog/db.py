@@ -8,9 +8,11 @@ from agentc_core.catalog.catalog.base import LATEST_SNAPSHOT_VERSION
 from agentc_core.catalog.catalog.base import CatalogBase
 from agentc_core.catalog.catalog.base import SearchResult
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
-from agentc_core.embedding.embedding import EmbeddingModel
+from agentc_core.defaults import DEFAULT_META_COLLECTION_NAME
+from agentc_core.learned.embedding import EmbeddingModel
 from agentc_core.prompt.models import JinjaPromptDescriptor
 from agentc_core.prompt.models import RawPromptDescriptor
+from agentc_core.record.descriptor import RecordDescriptor
 from agentc_core.record.descriptor import RecordKind
 from agentc_core.tool.descriptor import HTTPRequestToolDescriptor
 from agentc_core.tool.descriptor import PythonToolDescriptor
@@ -19,6 +21,7 @@ from agentc_core.tool.descriptor import SQLPPQueryToolDescriptor
 from agentc_core.util.query import execute_query
 from agentc_core.util.query import execute_query_with_parameters
 from agentc_core.version import VersionDescriptor
+from couchbase.exceptions import KeyspaceNotFoundException
 from couchbase.exceptions import ScopeNotFoundException
 
 logger = logging.getLogger(__name__)
@@ -34,13 +37,9 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
     bucket: str
     kind: typing.Literal["tool", "prompt"]
 
-    # Note: If latest_version is None and a user does not specify a snapshot, we will raise an error.
-    latest_version: typing.Optional[VersionDescriptor] = None
-
     @pydantic.model_validator(mode="after")
     def cluster_should_be_reachable(self) -> "CatalogDB":
         try:
-            # TODO (GLENN): Factor our embedding model here
             collection_name = f"{self.kind}_catalog"
             self.cluster.query(
                 f"""
@@ -50,7 +49,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             """,
             ).execute()
             return self
-        except ScopeNotFoundException as e:
+        except (ScopeNotFoundException, KeyspaceNotFoundException) as e:
             raise ValueError("Catalog does not exist! Please run 'agentc publish' first.") from e
 
     def find(
@@ -76,6 +75,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             if err is not None:
                 logger.error(err)
                 return []
+            query_embeddings = None
 
         elif name is not None:
             item_query = f"""
@@ -87,6 +87,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             if err is not None:
                 logger.error(err)
                 return []
+            query_embeddings = None
 
         else:
             # Generate embeddings for user query
@@ -105,17 +106,13 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
 
             # User has specified a snapshot id
             if snapshot is not None:
-                if snapshot == LATEST_SNAPSHOT_VERSION and (
-                    self.latest_version is None or self.latest_version.identifier is None
-                ):
-                    raise ValueError("No latest version found for the catalog!")
-                elif snapshot == LATEST_SNAPSHOT_VERSION:
-                    snapshot = self.latest_version.identifier
+                if snapshot == LATEST_SNAPSHOT_VERSION:
+                    snapshot = self.version.identifier
 
                 filter_records_query = f"""
                     SELECT a.* FROM (
-                        SELECT t.*, SEARCH_META() as metadata
-                        FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{self.kind}_catalog` as t
+                        SELECT t.*, SEARCH_SCORE() AS score
+                        FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{self.kind}_catalog` AS t
                         WHERE SEARCH(
                             t,
                             {{
@@ -126,17 +123,15 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                                         'vector': {query_embeddings},
                                         'k': 10
                                     }}
-                                ],
-                                'size': 10,
-                                'ctl': {{ 'timeout': 10 }}
+                                ]
                             }},
                             {{
                                 'index': '{self.bucket}.{DEFAULT_CATALOG_SCOPE}.{idx}'
                             }}
                         )
-                        ORDER BY metadata.score DESC
                     ) AS a
                     WHERE {annotation_condition} AND a.catalog_identifier="{snapshot}"
+                    ORDER BY a.score DESC
                     LIMIT {limit};
                 """
 
@@ -144,7 +139,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             else:
                 filter_records_query = f"""
                     SELECT a.* FROM (
-                        SELECT t.*, SEARCH_META() as metadata
+                        SELECT t.*, SEARCH_SCORE() AS score
                         FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{self.kind}_catalog` as t
                         WHERE SEARCH(
                             t,
@@ -156,17 +151,15 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                                         'vector': {query_embeddings},
                                         'k': 10
                                     }}
-                                ],
-                                'size': 10,
-                                'ctl': {{ 'timeout': 10 }}
+                                ]
                             }},
                             {{
                                 'index': '{self.bucket}.{DEFAULT_CATALOG_SCOPE}.{idx}'
                             }}
                         )
-                        ORDER BY metadata.score DESC
                     ) AS a
                     WHERE {annotation_condition}
+                    ORDER BY a.score DESC
                     LIMIT {limit};
                 """
 
@@ -188,9 +181,8 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
         # ---------------------------------------------------------------------------------------- #
 
         # List of catalog items from query
-        results = []
+        descriptors: list[RecordDescriptor] = []
         for row in resp:
-            delta = row["metadata"]["score"] if name is None else 1
             match row["record_kind"]:
                 case RecordKind.SemanticSearch.value:
                     descriptor = SemanticSearchToolDescriptor.model_validate(row)
@@ -207,21 +199,25 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                 case _:
                     kind = row["record_kind"]
                     raise LookupError(f"Unknown record encountered of kind = '{kind}'!")
-            results.append(SearchResult(entry=descriptor, delta=delta))
-        return results
+            descriptors.append(descriptor)
+
+        # We compute the true cosine distance here (Couchbase uses a different score :-)).
+        deltas = self.get_deltas(query_embeddings, [t.embedding for t in descriptors])
+        results = [SearchResult(entry=descriptors[i], delta=deltas[i]) for i in range(len(deltas))]
+        return sorted(results, key=lambda t: t.delta, reverse=True)
 
     @property
     def version(self) -> VersionDescriptor:
         """Returns the latest version of the kind catalog"""
         ts_query = f"""
-            FROM     `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{self.kind}_catalog` AS t
+            FROM     `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{self.kind}{DEFAULT_META_COLLECTION_NAME}` AS t
             SELECT   VALUE  t.version
-            ORDER BY META().cas DESC
+            ORDER BY t.version.timestamp DESC
             LIMIT    1
         """
-
         res, err = execute_query(self.cluster, ts_query)
         if err is not None:
             logger.error(err)
             raise LookupError(f"No results found? -- Error: {err}")
-        return VersionDescriptor.model_validate(next(iter(res)))
+        for row in res:
+            return VersionDescriptor.model_validate(row)

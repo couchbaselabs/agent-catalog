@@ -17,7 +17,7 @@ from agentc_core.catalog.index import MetaVersion
 from agentc_core.catalog.index import index_catalog_start
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_SCAN_DIRECTORY_OPTS
-from agentc_core.embedding.embedding import EmbeddingModel
+from agentc_core.learned.embedding import EmbeddingModel
 from agentc_core.util.query import execute_query
 from agentc_core.version import VersionDescriptor
 from couchbase.exceptions import KeyspaceNotFoundException

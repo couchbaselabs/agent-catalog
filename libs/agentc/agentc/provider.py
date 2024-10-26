@@ -7,7 +7,6 @@ import platform
 import pydantic
 import pydantic_settings
 import tempfile
-import textwrap
 import typing
 
 from agentc_core.catalog import LATEST_SNAPSHOT_VERSION
@@ -17,10 +16,9 @@ from agentc_core.catalog import CatalogDB
 from agentc_core.catalog import CatalogMem
 from agentc_core.catalog import SearchResult
 from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
-from agentc_core.defaults import DEFAULT_EMBEDDING_MODEL
 from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_NAME
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_NAME
-from agentc_core.embedding.embedding import EmbeddingModel
+from agentc_core.learned.embedding import EmbeddingModel
 from agentc_core.provider import ModelType
 from agentc_core.provider import PromptProvider
 from agentc_core.provider import PythonTarget
@@ -150,12 +148,6 @@ class Provider(pydantic_settings.BaseSettings):
         })
     """
 
-    embedding_model: typing.Optional[typing.AnyStr] = pydantic.Field(default=DEFAULT_EMBEDDING_MODEL)
-    """ The embedding model used when performing a semantic search for tools / prompts.
-
-    Currently, only models that can specified with sentence-transformers through its string constructor are supported.
-    """
-
     tool_model: SchemaModel = SchemaModel.TypingTypedDict
     """ The target model type for the generated (schema) code for tools.
 
@@ -192,10 +184,7 @@ class Provider(pydantic_settings.BaseSettings):
             self.catalog = working_path / DEFAULT_CATALOG_FOLDER
 
         # Note: we will defer embedding model mismatches to the remote catalog validator.
-        embedding_model = EmbeddingModel(
-            embedding_model_name=self.embedding_model,
-            catalog_path=self.catalog,
-        )
+        embedding_model = EmbeddingModel(catalog_path=self.catalog)
 
         # Set our local catalog if it exists.
         tool_catalog_path = self.catalog / DEFAULT_TOOL_CATALOG_NAME
@@ -235,62 +224,49 @@ class Provider(pydantic_settings.BaseSettings):
             ),
         )
         if self._local_tool_catalog is not None or self._local_prompt_catalog is not None:
-            catalog_path = self.catalog
+            embedding_model = EmbeddingModel(
+                cb_bucket=self.bucket,
+                cb_cluster=cluster,
+                catalog_path=self.catalog,
+            )
         else:
-            catalog_path = None
-        embedding_model = EmbeddingModel(
-            embedding_model_name=self.embedding_model,
-            cb_bucket=self.bucket,
-            cb_cluster=cluster,
-            catalog_path=catalog_path,
-        )
-        cluster.close()
+            embedding_model = EmbeddingModel(
+                cb_bucket=self.bucket,
+                cb_cluster=cluster,
+            )
 
-        # TODO (GLENN): Add support for passing an already open connection to CatalogDB.
         try:
             self._remote_tool_catalog = CatalogDB(
                 cluster=cluster, bucket=self.bucket, kind="tool", embedding_model=embedding_model
             )
         except pydantic.ValidationError:
-            logger.debug("'agentc publish --kind tool' has not been run. Skipping remote tool catalog.")
+            logger.debug("'agentc publish tool' has not been run. Skipping remote tool catalog.")
             self._remote_tool_catalog = None
         try:
             self._remote_prompt_catalog = CatalogDB(
                 cluster=cluster, bucket=self.bucket, kind="prompt", embedding_model=embedding_model
             )
         except pydantic.ValidationError:
-            logger.debug("'agentc publish --kind prompt' has not been run. Skipping remote prompt catalog.")
+            logger.debug("'agentc publish prompt' has not been run. Skipping remote prompt catalog.")
             self._remote_prompt_catalog = None
         return self
 
     # Note: this must be placed **after** _find_local_catalog and _find_remote_catalog.
     @pydantic.model_validator(mode="after")
-    def _initialize_provider(self) -> typing.Self:
-        local_catalogs = self._local_tool_catalog, self._local_prompt_catalog
-        remote_catalogs = self._remote_tool_catalog, self._remote_prompt_catalog
-        catalog_mutators = (
-            lambda t: self.__setattr__("_tool_catalog", t),
-            lambda p: self.__setattr__("_prompt_catalog", p),
-        )
-        for catalog_tuple in zip(local_catalogs, remote_catalogs, catalog_mutators):
-            local_catalog, remote_catalog, set_catalog = catalog_tuple
-            if local_catalog is None and remote_catalog is None:
-                error_message = textwrap.dedent("""
-                    Could not find $AGENT_CATALOG_CATALOG nor $AGENT_CATALOG_CONN_STRING! If this is a new project,
-                    please run the command `agentc index` before instantiating a provider. Otherwise, please set either
-                    of these variables.
-                """)
-                logger.error(error_message)
-                raise ValueError(error_message)
-            if local_catalog is not None and remote_catalog is not None:
-                logger.info("A local catalog and a remote catalog have been found. Building a chained catalog.")
-                set_catalog(CatalogChain(local_catalog, remote_catalog))
-            elif local_catalog is not None:
-                logger.info("Only a local catalog has been found. Using the local catalog.")
-                set_catalog(local_catalog)
-            else:  # remote_catalog is not None:
-                logger.info("Only a remote catalog has been found. Using the remote catalog.")
-                set_catalog(remote_catalog)
+    def _initialize_tool_provider(self) -> typing.Self:
+        # Set our catalog.
+        if self._local_tool_catalog is None and self._remote_tool_catalog is None:
+            logger.info("No local or remote catalog found. Skipping tool provider initialization.")
+            return self
+        if self._local_tool_catalog is not None and self._remote_tool_catalog is not None:
+            logger.info("A local catalog and a remote catalog have been found. Building a chained tool catalog.")
+            self._tool_catalog = CatalogChain(self._local_tool_catalog, self._remote_tool_catalog)
+        elif self._local_tool_catalog is not None:
+            logger.info("Only a local catalog has been found. Using the local tool catalog.")
+            self._tool_catalog = self._local_tool_catalog
+        else:  # self._remote_tool_catalog is not None:
+            logger.info("Only a remote catalog has been found. Using the remote tool tool catalog.")
+            self._tool_catalog = self._remote_tool_catalog
 
         # Check the version of Python (this is needed for the code-generator).
         match version_tuple := platform.python_version_tuple():
@@ -315,7 +291,7 @@ class Provider(pydantic_settings.BaseSettings):
                 else:
                     raise ValueError(f"Python version {platform.python_version()} not supported.")
 
-        # Finally, initialize our provider.
+        # Finally, initialize our provider(s).
         self._tool_provider = ToolProvider(
             catalog=self._tool_catalog,
             output=self.provider_output,
@@ -325,21 +301,58 @@ class Provider(pydantic_settings.BaseSettings):
             python_version=target_python_version,
             model_type=self.tool_model,
         )
+        return self
+
+    # Note: this must be placed **after** _find_local_catalog and _find_remote_catalog.
+    @pydantic.model_validator(mode="after")
+    def _initialize_prompt_provider(self) -> typing.Self:
+        # Set our catalog.
+        if self._local_prompt_catalog is None and self._remote_prompt_catalog is None:
+            logger.info("No local or remote catalog found. Skipping prompt provider initialization.")
+            return self
+        if self._local_prompt_catalog is not None and self._remote_prompt_catalog is not None:
+            logger.info("A local catalog and a remote catalog have been found. Building a chained prompt catalog.")
+            self._prompt_catalog = CatalogChain(self._local_prompt_catalog, self._remote_prompt_catalog)
+        elif self._local_prompt_catalog is not None:
+            logger.info("Only a local catalog has been found. Using the local prompt catalog.")
+            self._prompt_catalog = self._local_prompt_catalog
+        else:  # self._remote_prompt_catalog is not None:
+            logger.info("Only a remote catalog has been found. Using the remote prompt catalog.")
+            self._prompt_catalog = self._remote_prompt_catalog
+
+        # Initialize our prompt provider.
         self._prompt_provider = PromptProvider(
-            tool_provider=self._tool_provider,
             catalog=self._prompt_catalog,
+            tool_provider=self._tool_provider,
             refiner=self.refiner,
         )
+        return self
+
+    @pydantic.model_validator(mode="after")
+    def _one_provider_should_exist(self) -> typing.Self:
+        if self._tool_provider is None and self._prompt_provider is None:
+            raise ValueError(
+                "Could not initialize a tool or prompt provider! "
+                "If this is a new project, please run the command `agentc index` before instantiating a provider. "
+                "If you are intending to use a remote-only catalog, please ensure that all of the relevant variables "
+                "(i.e., conn_string, username, password, and bucket) are set."
+            )
         return self
 
     @pydantic.computed_field
     @property
     def version(self) -> VersionDescriptor:
-        # TODO (GLENN): How should we factor the prompt catalog version into all of this?
+        # We will take the latest version across all catalogs.
+        version_tuples = list()
         if self._local_tool_catalog is not None:
-            return self._tool_catalog.version
+            version_tuples.append(self._local_tool_catalog.version)
         if self._remote_tool_catalog is not None:
-            return self._remote_tool_catalog.version
+            version_tuples.append(self._remote_tool_catalog.version)
+        if self._local_prompt_catalog is not None:
+            version_tuples.append(self._local_prompt_catalog.version)
+        if self._remote_prompt_catalog is not None:
+            version_tuples.append(self._remote_prompt_catalog.version)
+        return sorted(version_tuples, key=lambda x: x.timestamp, reverse=True)[0]
 
     def get_tools_for(
         self,
@@ -357,11 +370,14 @@ class Provider(pydantic_settings.BaseSettings):
         :param limit: The maximum number of results to return.
         :return: A list of tools (Python functions).
         """
+        if self._tool_provider is None:
+            raise RuntimeError(
+                "Tool provider has not been initialized. "
+                "Please run 'agentc index tool' to first build a local tool catalog."
+            )
         if query is not None:
             return self._tool_provider.search(query=query, annotations=annotations, snapshot=snapshot, limit=limit)
         else:
-            # AV-88220 agentic workflows need list of tools, but get() function return only 1 tool, so wrapping it
-            # around [] to make list
             return [self._tool_provider.get(name=name, annotations=annotations, snapshot=snapshot)]
 
     def get_prompt_for(
@@ -378,6 +394,11 @@ class Provider(pydantic_settings.BaseSettings):
         :param snapshot: The snapshot version to find the tools for. By default, we use the latest snapshot.
         :return: A single prompt as well any tools attached to the prompt.
         """
+        if self._prompt_provider is None:
+            raise RuntimeError(
+                "Prompt provider has not been initialized. "
+                "Please run 'agentc index prompt' to first build a local prompt catalog."
+            )
         if query is not None:
             results = self._prompt_provider.search(query=query, annotations=annotations, snapshot=snapshot, limit=1)
             return results[0] if len(results) != 0 else None

@@ -14,16 +14,25 @@ logger = logging.getLogger(__name__)
 
 class LocalAuditor(BaseAuditor):
     def __init__(
-        self, output: pathlib.Path, catalog_version: VersionDescriptor, rollover: int = 128_000_000, model: str = None
+        self,
+        output: pathlib.Path,
+        catalog_version: VersionDescriptor,
+        rollover: int = 128_000_000,
+        model_name: str = None,
+        agent_name: str = None,
     ):
         """
         :param output: Output file to write the audit logs to.
         :param catalog_version: Catalog version associated with this audit instance.
         :param rollover: Maximum size (bytes) of a log-file before rollover. Set this field to 0 to never rollover.
-        :param model: LLM model used with this audit instance. This field can be specified on instantiation
-                      or on accept(). A model specified in accept() overrides a model specified on instantiation.
+        :param model_name: LLM model used with this audit instance. This field can be specified on instantiation
+               or on accept(). A model_name specified in accept() overrides a model specified on instantiation.
+        :param agent_name: Agent name used with this audit instance. This field can be specified on instantiation
+               or on accept(). An agent_name specified in accept() overrides a model specified on instantiation.
         """
-        super(LocalAuditor, self).__init__(model=model, catalog_version=catalog_version)
+        super(LocalAuditor, self).__init__(
+            model_name=model_name, catalog_version=catalog_version, agent_name=agent_name
+        )
         self.audit_logger = logging.getLogger("AGENT_CATALOG_" + LocalAuditor.__name__.upper())
         self.audit_logger.setLevel(logging.INFO)
         self.audit_logger.handlers.clear()

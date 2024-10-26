@@ -10,7 +10,7 @@ from ...version import VersionDescriptor
 logger = logging.getLogger(__name__)
 
 
-# We have this signature / prototype so the rosetta repo can mock a BaseAuditor instance w/o implementing _accept.
+# We have this signature / prototype so the agentc repo can mock a BaseAuditor instance w/o implementing _accept.
 class AuditorType(typing.Protocol):
     def accept(
         self,
@@ -19,15 +19,17 @@ class AuditorType(typing.Protocol):
         session: typing.AnyStr,
         grouping: typing.AnyStr = None,
         timestamp: datetime.datetime = None,
-        model: str = None,
+        model_name: str = None,
+        agent_name: str = None,
         **kwargs,
     ) -> None: ...
 
 
 class BaseAuditor(abc.ABC):
-    def __init__(self, catalog_version: VersionDescriptor, model: str):
+    def __init__(self, catalog_version: VersionDescriptor, model_name: str = None, agent_name: str = None):
         self.catalog_version = catalog_version
-        self.model = model
+        self.model_name = model_name
+        self.agent_name = agent_name
 
     def accept(
         self,
@@ -36,13 +38,10 @@ class BaseAuditor(abc.ABC):
         session: typing.AnyStr,
         grouping: typing.AnyStr = None,
         timestamp: datetime.datetime = None,
-        model: str = None,
+        model_name: str = None,
         agent_name: str = None,
         **kwargs,
     ):
-        if self.model is None and model is None:
-            raise ValueError('"model" must be specified either in accept() or on instantiation!')
-
         # If the timestamp is not given, generate this value ourselves.
         if timestamp is None:
             timestamp = datetime.datetime.now().astimezone()
@@ -53,10 +52,10 @@ class BaseAuditor(abc.ABC):
             kind=kind,
             content=content,
             grouping=grouping,
-            model=model or self.model,
             catalog_version=self.catalog_version,
             annotations=kwargs,
-            agent_name=agent_name,
+            llm_model_name=model_name or self.model_name,
+            agent_name=agent_name or self.agent_name,
         )
         self._accept(message)
 

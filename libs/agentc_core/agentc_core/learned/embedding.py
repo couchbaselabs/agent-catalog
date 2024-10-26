@@ -98,7 +98,7 @@ class EmbeddingModel(pydantic.BaseModel):
                             LIMIT 1
                         """
                     ]
-                except couchbase.exceptions.KeyspaceNotFoundException:
+                except (couchbase.exceptions.KeyspaceNotFoundException, couchbase.exceptions.ScopeNotFoundException):
                     continue
 
             # Gather our embedding models.
@@ -157,4 +157,5 @@ class EmbeddingModel(pydantic.BaseModel):
                 local_files_only=False,
             )
 
-        return self._embedding_model.encode(text).tolist()
+        # Normalize embeddings to unit length (only dot-product is computed with Couchbase, so...).
+        return self._embedding_model.encode(text, normalize_embeddings=True).tolist()

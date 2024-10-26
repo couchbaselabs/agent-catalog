@@ -5,7 +5,7 @@ import pydantic
 import typing
 import yaml
 
-from ..embedding.embedding import EmbeddingModel
+from ..learned.embedding import EmbeddingModel
 from ..prompt.models import JinjaPromptDescriptor
 from ..prompt.models import RawPromptDescriptor
 from ..record.descriptor import RecordDescriptor

@@ -14,7 +14,12 @@ class SearchResult(pydantic.BaseModel):
     """A result item in the results from a CatalogBase.find()."""
 
     entry: RecordDescriptor
-    delta: float
+    delta: float = pydantic.Field(
+        description="The cosine similarity between the query and the entry.",
+        # Note: this is a bit imprecise, but we need to account for floating point errors.
+        le=1.01,
+        ge=-1.01,
+    )
 
     # TODO: A FoundItem might one day also contain additional information --
     # such as to help with any further processing of results (e.g., reranking)
@@ -41,6 +46,13 @@ class CatalogBase(abc.ABC):
         # user credentials (for ACL's), etc.?
 
         raise NotImplementedError("CatalogBase.find()")
+
+    @classmethod
+    def get_deltas(cls, query: list[float], entries: list[list[float]]) -> list[float]:
+        """Returns the cosine similarity between the query and the entry."""
+        import sklearn
+
+        return [x[0] for x in sklearn.metrics.pairwise.cosine_similarity(X=entries, Y=[query])]
 
     @property
     @abc.abstractmethod

@@ -1,0 +1,17 @@
+---
+record_kind: raw_prompt
+
+name: get_closest_airport
+
+description: Instructions on how to locate an airport from a given location.
+
+tools:
+  - query: "checking AITA codes and whether they are valid"
+    limit: 1
+
+annotations:
+  framework: "controlflow"
+---
+Using the given location, return the closet airport's IATA code.
+You must use a tool to verify that the IATA code is valid.
+DO NOT continue until you can verify that the IATA code is valid.

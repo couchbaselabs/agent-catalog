@@ -11,6 +11,7 @@ from agentc_core.activity import DBAuditor
 from agentc_core.activity import LocalAuditor
 from agentc_core.analytics import Kind
 from agentc_core.defaults import DEFAULT_ACTIVITY_FOLDER
+from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
 from agentc_core.defaults import DEFAULT_LLM_ACTIVITY_NAME
 
 logger = logging.getLogger(__name__)
@@ -24,11 +25,18 @@ class Auditor(pydantic_settings.BaseSettings):
 
     model_config = pydantic_settings.SettingsConfigDict(env_prefix="AGENT_CATALOG_")
 
-    llm_name: str = None
+    llm_model_name: typing.Optional[str] = None
     """ Name of the LLM model used to generate the chat messages to-be-audited.
 
     This field can be specified on instantiation or on :py:meth:`accept()`.
     A model specified in :py:meth:`accept()` overrides a model specified on instantiation.
+    """
+
+    agent_name: typing.Optional[str] = None
+    """ Name of the agent tied to this auditor.
+
+    This field can be specified on instantiation or on :py:meth:`accept()`.
+    Agent name specified in :py:meth:`accept()` overrides a model specified on instantiation.
     """
 
     conn_string: typing.Optional[str] = None
@@ -79,14 +87,6 @@ class Auditor(pydantic_settings.BaseSettings):
     Audit log files will reach a maximum of 128MB (by default) before they are rotated and compressed.
     """
 
-    agent_name: typing.Optional[str] = None
-    """ Name of the agent for which this auditor was instantiated.
-
-    This helps user to know query logs by Agent Name
-    This field can be specified on instantiation or on :py:meth:`accept()`.
-    Agent name specified in :py:meth:`accept()` overrides a model specified on instantiation.
-    """
-
     _local_auditor: LocalAuditor = None
     _db_auditor: DBAuditor = None
     _audit: typing.Callable = None
@@ -96,15 +96,17 @@ class Auditor(pydantic_settings.BaseSettings):
         if self.auditor_output is None:
             working_path = pathlib.Path.cwd()
             logger.debug(
-                'Starting best effort search for the activity folder. Searching for "%s".',
-                DEFAULT_ACTIVITY_FOLDER,
+                'Starting best effort search for the agent catalog folder. Searching for "%s".',
+                DEFAULT_CATALOG_FOLDER,
             )
 
-            # Iteratively ascend our starting path until we find the activity folder.
-            while not (working_path / DEFAULT_ACTIVITY_FOLDER).exists():
+            # Iteratively ascend our starting path until we find the catalog folder.
+            while not (working_path / DEFAULT_CATALOG_FOLDER).exists():
                 if working_path.parent == working_path:
+                    # We have reached the root. We cannot find the catalog folder.
                     return self
                 working_path = working_path.parent
+            (working_path / DEFAULT_ACTIVITY_FOLDER).mkdir(exist_ok=True)
             self.auditor_output = working_path / DEFAULT_ACTIVITY_FOLDER / DEFAULT_LLM_ACTIVITY_NAME
 
         return self
@@ -131,13 +133,15 @@ class Auditor(pydantic_settings.BaseSettings):
     def _initialize_auditor(self) -> typing.Self:
         if self.auditor_output is None and self.conn_string is None:
             error_message = textwrap.dedent("""
-                Could not find $AGENT_CATALOG_ACTIVITY nor $AGENT_CATALOG_CONN_STRING! If this is a new project, please
-                run the command `agentc index` before instantiating an auditor. Otherwise, please set either of these
-                variables.
+                Could not initialize a local or remote auditor!
+                If this is a new project, please run the command `agentc index` before instantiating an auditor.
+                If you are intending to use a remote-only auditor, please ensure that all of the relevant variables
+                (i.e., conn_string, username, password, and bucket) are set.
             """)
             logger.error(error_message)
             raise ValueError(error_message)
 
+        # TODO (GLENN): We should also add support for specifying a catalog version directly (with validation).
         # To grab the catalog version, we'll instantiate a provider.
         provider = Provider(
             conn_string=self.conn_string,
@@ -150,14 +154,19 @@ class Auditor(pydantic_settings.BaseSettings):
         # Finally, instantiate our auditors.
         if self.auditor_output is not None:
             self._local_auditor = LocalAuditor(
-                output=self.auditor_output, catalog_version=provider.version, model=self.llm_name
+                output=self.auditor_output,
+                catalog_version=provider.version,
+                model_name=self.llm_model_name,
+                agent_name=self.agent_name,
             )
+
         if self.conn_string is not None:
             self._db_auditor = DBAuditor(
                 conn_string=self.conn_string,
                 username=self.username.get_secret_value(),
                 password=self.password.get_secret_value(),
-                model=self.llm_name,
+                model_name=self.llm_model_name,
+                agent_name=self.agent_name,
                 bucket=self.bucket,
                 catalog_version=provider.version,
             )
@@ -180,7 +189,6 @@ class Auditor(pydantic_settings.BaseSettings):
         else:
             # We should never reach this point (this error is handled above).
             raise ValueError("Could not instantiate an auditor.")
-
         return self
 
     def accept(
@@ -190,7 +198,7 @@ class Auditor(pydantic_settings.BaseSettings):
         session: typing.AnyStr,
         grouping: typing.AnyStr = None,
         timestamp: datetime.datetime = None,
-        model: str = None,
+        model_name: str = None,
         agent_name: str = None,
         **kwargs,
     ) -> None:
@@ -200,20 +208,20 @@ class Auditor(pydantic_settings.BaseSettings):
         :param session: A unique string associated with the current session / conversation / thread.
         :param grouping: A unique string associated with one "generate" invocation across a group of messages.
         :param timestamp: The time associated with the message production. This must have time-zone information.
-        :param model: LLM model used with this audit instance. This field can be specified on instantiation
-                      or on accept(). A model specified in accept() overrides a model specified on instantiation.
-        :param agent_name: Name of the Agent associated with this audit instance.
+        :param model_name: LLM model used with this audit instance. This field can be specified on instantiation
+               or on accept(). A model_name specified in accept() overrides a model specified on instantiation.
+        :param agent_name: Agent used with this audit instance. This field can be specified on instantiation
+               or on accept(). An agent_name specified in accept() overrides a model specified on instantiation.
         """
-        model = model if model is not None else self.llm_name
+        model_name = model_name if model_name is not None else self.llm_model_name
         agent_name = agent_name if agent_name is not None else self.agent_name
-
         self._audit(
             kind=kind,
             content=content,
             session=session,
             grouping=grouping,
             timestamp=timestamp,
-            model=model,
+            model_name=model_name,
             agent_name=agent_name,
             **kwargs,
         )
@@ -225,7 +233,7 @@ class Auditor(pydantic_settings.BaseSettings):
         session: typing.AnyStr,
         content: typing.Any = None,
         timestamp: datetime.datetime = None,
-        model: str = None,
+        model_name: str = None,
         agent_name: str = None,
         **kwargs,
     ):
@@ -235,11 +243,12 @@ class Auditor(pydantic_settings.BaseSettings):
         :param session: A unique string associated with the current session / conversation / thread.
         :param content: Any additional content that should be recorded with this message.
         :param timestamp: The time associated with the message production. This must have time-zone information.
-        :param model: LLM model used with this audit instance. This field can be specified on instantiation
-                      or on enter(). A model specified in enter() overrides a model specified on instantiation.
-        :param agent_name: Name of the Agent associated with this audit instance.
+        :param model_name: LLM model used with this audit instance. This field can be specified on instantiation
+               or on accept(). A model_name specified in accept() overrides a model specified on instantiation.
+        :param agent_name: Agent used with this audit instance. This field can be specified on instantiation
+               or on accept(). An agent_name specified in accept() overrides a model specified on instantiation.
         """
-        model = model if model is not None else self.llm_name
+        model_name = model_name if model_name is not None else self.llm_model_name
         agent_name = agent_name if agent_name is not None else self.agent_name
 
         if direction == "enter":
@@ -254,7 +263,7 @@ class Auditor(pydantic_settings.BaseSettings):
             content=content,
             session=session,
             timestamp=timestamp,
-            model=model,
+            model_name=model_name,
             agent_name=agent_name,
             **kwargs,
         )

@@ -1,13 +1,8 @@
 import click.testing
-import docker
 import git
-import http
-import os
 import pathlib
 import pytest
-import requests
 import shutil
-import time
 import uuid
 
 from agentc_cli.main import click_main
@@ -16,55 +11,12 @@ from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_NAME
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_NAME
+from agentc_testing.repo import ExampleRepoKind
+from agentc_testing.repo import initialize_repo
+from agentc_testing.server import get_isolated_server
 
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
-
-
-# Fixture to start a Couchbase server instance via Docker (and subsequently remove this instance).
-@pytest.fixture
-def cb_server_instance() -> None:
-    os.environ["AGENT_CATALOG_CONN_STRING"] = "couchbase://localhost"
-    os.environ["AGENT_CATALOG_USERNAME"] = "Administrator"
-    os.environ["AGENT_CATALOG_PASSWORD"] = "password"
-
-    client = docker.from_env()
-    ports = {f"{port}/tcp": port for port in range(8091, 8098)}
-    ports |= {f"{port}/tcp": port for port in range(18091, 18098)}
-    ports |= {
-        "9123/tcp": 9123,
-        "11207/tcp": 11207,
-        "11210/tcp": 11210,
-        "11280/tcp": 11280,
-    }
-    container = client.containers.run(
-        "couchbase", name="agentc", ports=ports, detach=True, auto_remove=True, remove=True
-    )
-    time.sleep(10)
-    response_1 = requests.post(
-        "http://localhost:8091/clusterInit",
-        data={
-            "username": "Administrator",
-            "password": "password",
-            "services": "kv,index,n1ql,fts,cbas",
-            "clusterName": "agentc",
-            "indexerStorageMode": "plasma",
-            "port": "SAME",
-        },
-    )
-    assert response_1.status_code == http.HTTPStatus.OK
-    response_2 = requests.post(
-        "http://localhost:8091/sampleBuckets/install", auth=("Administrator", "password"), data='["travel-sample"]'
-    )
-    assert response_2.status_code == http.HTTPStatus.ACCEPTED
-
-    # TODO (GLENN): This check should be more robust...
-    time.sleep(30)
-
-    # Enter our test.
-    yield None
-
-    # Execute our cleanup.
-    container.remove(force=True)
+# This is to keep ruff from falsely flagging this as unused.
+_ = get_isolated_server
 
 
 @pytest.mark.smoke
@@ -134,8 +86,8 @@ def publish_catalog(runner, input_catalog: pathlib.Path, output_catalog: pathlib
         assert f"Vector index for the {kind} catalog has been successfully created!" in invocation.stdout
 
 
-@pytest.mark.smoke
-def test_publish(tmp_path, cb_server_instance):
+@pytest.mark.regression
+def test_publish(tmp_path, get_isolated_server):
     """
     This test performs the following checks:
         1. command does not publish to kv when catalog is dirty
@@ -146,16 +98,20 @@ def test_publish(tmp_path, cb_server_instance):
     """
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        repo = git.Repo.init(td)
-        repo.index.commit("Initial commit")
+        initialize_repo(
+            directory=pathlib.Path(td),
+            repo_kind=ExampleRepoKind.EMPTY,
+            click_runner=runner,
+            click_command=click_main,
+        )
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
         catalog_folder.mkdir()
         for catalog in (pathlib.Path(__file__).parent / "resources" / "publish_catalog").rglob("*"):
             publish_catalog(runner, catalog, catalog_folder)
 
 
-@pytest.mark.smoke
-def test_find(tmp_path, cb_server_instance):
+@pytest.mark.regression
+def test_find(tmp_path, get_isolated_server):
     """
     This test performs the following checks:
     1. command executes only for kind=tool assuming same behaviour for prompt
@@ -164,8 +120,12 @@ def test_find(tmp_path, cb_server_instance):
     """
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        repo = git.Repo.init(td)
-        repo.index.commit("Initial commit")
+        initialize_repo(
+            directory=pathlib.Path(td),
+            repo_kind=ExampleRepoKind.EMPTY,
+            click_runner=runner,
+            click_command=click_main,
+        )
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
         catalog_folder.mkdir()
         catalog = pathlib.Path(__file__).parent / "resources" / "find_catalog" / "tool-catalog.json"
@@ -241,8 +201,8 @@ def test_find(tmp_path, cb_server_instance):
         assert "3 result(s) returned from the catalog." in output
 
 
-@pytest.mark.smoke
-def test_status(tmp_path, cb_server_instance):
+@pytest.mark.regression
+def test_status(tmp_path, get_isolated_server):
     runner = click.testing.CliRunner()
     print("\n\n")
 
@@ -255,8 +215,12 @@ def test_status(tmp_path, cb_server_instance):
     assert expected_response_prompt in output
 
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        repo = git.Repo.init(td)
-        repo.index.commit("Initial commit")
+        initialize_repo(
+            directory=pathlib.Path(td),
+            repo_kind=ExampleRepoKind.EMPTY,
+            click_runner=runner,
+            click_command=click_main,
+        )
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
         catalog_folder.mkdir()
         catalog = pathlib.Path(__file__).parent / "resources" / "find_catalog" / "tool-catalog.json"
@@ -287,12 +251,16 @@ def test_status(tmp_path, cb_server_instance):
         assert expected_response_local in output
 
 
-@pytest.mark.smoke
-def test_clean(tmp_path, cb_server_instance):
+@pytest.mark.regression
+def test_clean(tmp_path, get_isolated_server):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        repo = git.Repo.init(td)
-        repo.index.commit("Initial commit")
+        initialize_repo(
+            directory=pathlib.Path(td),
+            repo_kind=ExampleRepoKind.EMPTY,
+            click_runner=runner,
+            click_command=click_main,
+        )
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
         activity_folder = pathlib.Path(td) / DEFAULT_ACTIVITY_FOLDER
         catalog_folder.mkdir()

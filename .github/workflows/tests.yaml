@@ -19,7 +19,8 @@ jobs:
             libs/agentc/pyproject.toml,\
             libs/agentc_core/pyproject.toml,\
             libs/agentc_cli/pyproject.toml,\
-            libs/agentc_langchain/pyproject.toml"
+            libs/agentc_langchain/pyproject.toml,\
+            libs/agentc_testing/pyproject.toml"
 
       - name: Set up Python Poetry
         uses: mishaga/action-poetry@1
@@ -32,16 +33,15 @@ jobs:
         run: |
           poetry install --with dev
 
-      - run: echo "🔥 Starting the core smoke tests (🤞 please don't break!)."
+      - run: echo "🔥 Starting the core tests (🤞 please don't break!)."
       - name: Verify Pytest installation
         run: poetry show pytest
 
       - name: Run agentc-core tests
-        run: poetry run bash -c "cd libs/agentc_core && pytest -v"
-
-      # TODO (GLENN): For now, we are only running the core tests.
-      #               We will run the CLI tests on our own machines until we can get these to run reliably.
-      #      - name: Run agentc-cli tests
-      #        run: poetry run bash -c "cd libs/agentc_cli && pytest -v"
+        run: poetry run bash -c "cd libs/agentc_core && pytest -m smoke -v"
+      - name: Run agentc-cli tests
+        run: poetry run bash -c "cd libs/agentc_cli && pytest -m smoke -v"
+      - name: Run agentc tests
+        run: poetry run bash -c "cd libs/agentc && pytest -m smoke -v"
 
       - run: echo "🍏 This job's status is ${{ job.status }}."

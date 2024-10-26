@@ -6,7 +6,7 @@ import typing
 
 from ...annotation import AnnotationPredicate
 from ...catalog.descriptor import CatalogDescriptor
-from ...embedding.embedding import EmbeddingModel
+from ...learned.embedding import EmbeddingModel
 from ...version import VersionDescriptor
 from .base import LATEST_SNAPSHOT_VERSION
 from .base import CatalogBase
@@ -68,8 +68,6 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
                 click.secho(f"No catalog items found with name '{name}'", fg="yellow")
                 return []
 
-        import sklearn
-
         # If annotations have been specified, prune all tools that do not possess these annotations.
         candidate_tools = [x for x in self.catalog_descriptor.items]
         if annotations is not None:
@@ -96,9 +94,8 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
             return list()
 
         # Compute the distance of each tool in the catalog to the query.
-        query_embedding = self.embedding_model.encode(query)
-        deltas = sklearn.metrics.pairwise.cosine_similarity(
-            X=[t.embedding for t in candidate_tools], Y=[query_embedding]
+        deltas = self.get_deltas(
+            query=self.embedding_model.encode(query), entries=[t.embedding for t in candidate_tools]
         )
 
         # Order results by their distance to the query (larger is "closer").

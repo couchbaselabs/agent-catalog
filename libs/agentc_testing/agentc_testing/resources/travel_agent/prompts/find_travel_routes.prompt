@@ -1,0 +1,19 @@
+---
+record_kind: raw_prompt
+
+name: find_travel_routes
+
+description: Instructions on how to find routes between airports.
+
+tools:
+  - name: find_direct_routes_between_airports
+  - name: find_routes_with_one_layover
+
+annotations:
+  framework: "controlflow"
+---
+Find a sequence of routes between the source airport and the destination airport.
+
+Try to find a direct routes first between the source airport and the destination airport.
+If there are no direct routes, then find a one-layover route.
+If there are no such routes, then try another source airport that is close.

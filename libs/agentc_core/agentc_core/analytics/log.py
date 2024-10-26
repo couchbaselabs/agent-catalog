@@ -56,8 +56,6 @@ class Log(pydantic.BaseModel):
         description="The content of the record. This should be as close to the producer as possible.",
     )
 
-    model: typing.AnyStr = pydantic.Field(description="The specific model (LLM) that this message is associated with.")
-
     grouping: typing.Optional[typing.AnyStr] = pydantic.Field(
         description="A grouping identifier for this message. In the case of LangChain model audits, this is associated "
         "with a '_generate' invocation.",
@@ -72,7 +70,11 @@ class Log(pydantic.BaseModel):
         description="A unique identifier that defines a catalog version / snapshot / commit."
     )
 
-    agent_name: typing.Optional[str] = pydantic.Field(
+    llm_model_name: typing.Optional[typing.AnyStr] = pydantic.Field(
+        description="The specific model (LLM) that this message is associated with.", default=None
+    )
+
+    agent_name: typing.Optional[typing.AnyStr] = pydantic.Field(
         description="The name of the agent that this message is associated with.",
         default=None,
     )

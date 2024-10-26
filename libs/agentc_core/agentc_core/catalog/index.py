@@ -4,7 +4,7 @@ import logging
 import tqdm
 import typing
 
-from ..embedding.embedding import EmbeddingModel
+from ..learned.embedding import EmbeddingModel
 from ..record.descriptor import RecordDescriptor
 from .catalog.mem import CatalogMem
 from .descriptor import CatalogDescriptor
