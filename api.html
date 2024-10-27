@@ -206,7 +206,7 @@
 <li class="toctree-l1"><a class="reference internal" href="guide.html">Agent Catalog User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Tool</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Agent Catalog API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="faqs.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faqs.html">Frequently Asked Questions</a></li>
 </ul>
 
 </div>
@@ -259,10 +259,29 @@
 <span class="w">   </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;An auditor of various events (e.g., LLM completions) given a catalog.&quot;</span><span class="p">,</span>
 <span class="w">   </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span><span class="p">,</span>
 <span class="w">   </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;llm_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;llm_model_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">         </span><span class="p">],</span>
 <span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Llm Name&quot;</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Llm Model Name&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;agent_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">         </span><span class="p">],</span>
+<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Agent Name&quot;</span>
 <span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;conn_string&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
@@ -341,18 +360,6 @@
 <span class="w">         </span><span class="p">],</span>
 <span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Auditor Output&quot;</span>
-<span class="w">      </span><span class="p">},</span>
-<span class="w">      </span><span class="nt">&quot;agent_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
-<span class="w">            </span><span class="p">}</span>
-<span class="w">         </span><span class="p">],</span>
-<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Agent Name&quot;</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">   </span><span class="p">},</span>
 <span class="w">   </span><span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
@@ -372,7 +379,7 @@
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bucket</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">catalog</span> <span class="pre">(pathlib.Path</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">conn_string</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">llm_name</span> <span class="pre">(str)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">llm_model_name</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">password</span> <span class="pre">(pydantic.types.SecretStr</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">username</span> <span class="pre">(pydantic.types.SecretStr</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 </ul>
@@ -388,9 +395,8 @@
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="agentc.Auditor.agent_name">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">agent_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc.Auditor.agent_name" title="Link to this definition">¶</a></dt>
-<dd><p>Name of the agent for which this auditor was instantiated.</p>
-<p>This helps user to know query logs by Agent Name
-This field can be specified on instantiation or on <a class="reference internal" href="#agentc.Auditor.accept" title="agentc.Auditor.accept"><code class="xref py py-meth docutils literal notranslate"><span class="pre">accept()</span></code></a>.
+<dd><p>Name of the agent tied to this auditor.</p>
+<p>This field can be specified on instantiation or on <a class="reference internal" href="#agentc.Auditor.accept" title="agentc.Auditor.accept"><code class="xref py py-meth docutils literal notranslate"><span class="pre">accept()</span></code></a>.
 Agent name specified in <a class="reference internal" href="#agentc.Auditor.accept" title="agentc.Auditor.accept"><code class="xref py py-meth docutils literal notranslate"><span class="pre">accept()</span></code></a> overrides a model specified on instantiation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Validated by<span class="colon">:</span></dt>
@@ -478,8 +484,8 @@ the remote audit log collection.</p>
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
-<dt class="sig sig-object py" id="agentc.Auditor.llm_name">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">llm_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc.Auditor.llm_name" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="agentc.Auditor.llm_model_name">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">llm_model_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc.Auditor.llm_model_name" title="Link to this definition">¶</a></dt>
 <dd><p>Name of the LLM model used to generate the chat messages to-be-audited.</p>
 <p>This field can be specified on instantiation or on <a class="reference internal" href="#agentc.Auditor.accept" title="agentc.Auditor.accept"><code class="xref py py-meth docutils literal notranslate"><span class="pre">accept()</span></code></a>.
 A model specified in <a class="reference internal" href="#agentc.Auditor.accept" title="agentc.Auditor.accept"><code class="xref py py-meth docutils literal notranslate"><span class="pre">accept()</span></code></a> overrides a model specified on instantiation.</p>
@@ -528,7 +534,7 @@ A model specified in <a class="reference internal" href="#agentc.Auditor.accept"
 
 <dl class="py method">
 <dt class="sig sig-object py" id="agentc.Auditor.accept">
-<span class="sig-name descname"><span class="pre">accept</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnyStr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grouping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnyStr</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/agentc/auditor.html#Auditor.accept"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc.Auditor.accept" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">accept</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnyStr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grouping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnyStr</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/agentc/auditor.html#Auditor.accept"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc.Auditor.accept" title="Link to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -537,9 +543,10 @@ A model specified in <a class="reference internal" href="#agentc.Auditor.accept"
 <li><p><strong>session</strong> – A unique string associated with the current session / conversation / thread.</p></li>
 <li><p><strong>grouping</strong> – A unique string associated with one “generate” invocation across a group of messages.</p></li>
 <li><p><strong>timestamp</strong> – The time associated with the message production. This must have time-zone information.</p></li>
-<li><p><strong>model</strong> – LLM model used with this audit instance. This field can be specified on instantiation
-or on accept(). A model specified in accept() overrides a model specified on instantiation.</p></li>
-<li><p><strong>agent_name</strong> – Name of the Agent associated with this audit instance.</p></li>
+<li><p><strong>model_name</strong> – LLM model used with this audit instance. This field can be specified on instantiation
+or on accept(). A model_name specified in accept() overrides a model specified on instantiation.</p></li>
+<li><p><strong>agent_name</strong> – Agent used with this audit instance. This field can be specified on instantiation
+or on accept(). An agent_name specified in accept() overrides a model specified on instantiation.</p></li>
 </ul>
 </dd>
 </dl>
@@ -547,7 +554,7 @@ or on accept(). A model specified in accept() overrides a model specified on ins
 
 <dl class="py method">
 <dt class="sig sig-object py" id="agentc.Auditor.move">
-<span class="sig-name descname"><span class="pre">move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnyStr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'enter'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'exit'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnyStr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc/auditor.html#Auditor.move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc.Auditor.move" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnyStr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'enter'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'exit'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AnyStr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">datetime</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc/auditor.html#Auditor.move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc.Auditor.move" title="Link to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -556,9 +563,10 @@ or on accept(). A model specified in accept() overrides a model specified on ins
 <li><p><strong>session</strong> – A unique string associated with the current session / conversation / thread.</p></li>
 <li><p><strong>content</strong> – Any additional content that should be recorded with this message.</p></li>
 <li><p><strong>timestamp</strong> – The time associated with the message production. This must have time-zone information.</p></li>
-<li><p><strong>model</strong> – LLM model used with this audit instance. This field can be specified on instantiation
-or on enter(). A model specified in enter() overrides a model specified on instantiation.</p></li>
-<li><p><strong>agent_name</strong> – Name of the Agent associated with this audit instance.</p></li>
+<li><p><strong>model_name</strong> – LLM model used with this audit instance. This field can be specified on instantiation
+or on accept(). A model_name specified in accept() overrides a model specified on instantiation.</p></li>
+<li><p><strong>agent_name</strong> – Agent used with this audit instance. This field can be specified on instantiation
+or on accept(). An agent_name specified in accept() overrides a model specified on instantiation.</p></li>
 </ul>
 </dd>
 </dl>
@@ -689,22 +697,6 @@ or on enter(). A model specified in enter() overrides a model specified on insta
 <span class="w">         </span><span class="p">],</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Secrets&quot;</span>
 <span class="w">      </span><span class="p">},</span>
-<span class="w">      </span><span class="nt">&quot;embedding_model&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">               </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;binary&quot;</span><span class="p">,</span>
-<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
-<span class="w">            </span><span class="p">}</span>
-<span class="w">         </span><span class="p">],</span>
-<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sentence-transformers/all-MiniLM-L12-v2&quot;</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Embedding Model&quot;</span>
-<span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;tool_model&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="nt">&quot;allOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">            </span><span class="p">{</span>
@@ -743,7 +735,6 @@ or on enter(). A model specified in enter() overrides a model specified on insta
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">catalog</span> <span class="pre">(pathlib.Path</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">conn_string</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">decorator</span> <span class="pre">(Callable[[agentc_core.provider.provider.ToolProvider.ToolResult],</span> <span class="pre">Any]</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">embedding_model</span> <span class="pre">(AnyStr</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">password</span> <span class="pre">(pydantic.types.SecretStr</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">provider_output</span> <span class="pre">(pathlib.Path</span> <span class="pre">|</span> <span class="pre">tempfile.TemporaryDirectory</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">refiner</span> <span class="pre">(Callable[[list[agentc_core.catalog.catalog.base.SearchResult]],</span> <span class="pre">list[agentc_core.catalog.catalog.base.SearchResult]]</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
@@ -757,7 +748,9 @@ or on enter(). A model specified in enter() overrides a model specified on insta
 <dd class="field-odd"><ul class="simple">
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_local_catalog</span></code> » <code class="xref py py-obj docutils literal notranslate"><span class="pre">all</span> <span class="pre">fields</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_remote_catalog</span></code> » <code class="xref py py-obj docutils literal notranslate"><span class="pre">all</span> <span class="pre">fields</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_provider</span></code> » <code class="xref py py-obj docutils literal notranslate"><span class="pre">all</span> <span class="pre">fields</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_prompt_provider</span></code> » <code class="xref py py-obj docutils literal notranslate"><span class="pre">all</span> <span class="pre">fields</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_tool_provider</span></code> » <code class="xref py py-obj docutils literal notranslate"><span class="pre">all</span> <span class="pre">fields</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_one_provider_should_exist</span></code> » <code class="xref py py-obj docutils literal notranslate"><span class="pre">all</span> <span class="pre">fields</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -771,7 +764,9 @@ or on enter(). A model specified in enter() overrides a model specified on insta
 <dd class="field-odd"><ul class="simple">
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_local_catalog</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_remote_catalog</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_prompt_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_tool_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_one_provider_should_exist</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -788,7 +783,9 @@ from the current working directory until we find the <code class="xref py py-dat
 <dd class="field-odd"><ul class="simple">
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_local_catalog</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_remote_catalog</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_prompt_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_tool_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_one_provider_should_exist</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -809,7 +806,9 @@ local catalog (with local catalog entries taking precedence).</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_local_catalog</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_remote_catalog</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_prompt_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_tool_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_one_provider_should_exist</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -828,23 +827,9 @@ To avoid having to “box” these tools yourself, we accept a callback to perfo
 <dd class="field-odd"><ul class="simple">
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_local_catalog</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_remote_catalog</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_provider</span></code></p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute pydantic_field">
-<dt class="sig sig-object py" id="agentc.Provider.embedding_model">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">embedding_model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">AnyStr</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sentence-transformers/all-MiniLM-L12-v2'</span></em><a class="headerlink" href="#agentc.Provider.embedding_model" title="Link to this definition">¶</a></dt>
-<dd><p>The embedding model used when performing a semantic search for tools / prompts.</p>
-<p>Currently, only models that can specified with sentence-transformers through its string constructor are supported.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Validated by<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_local_catalog</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_remote_catalog</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_prompt_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_tool_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_one_provider_should_exist</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -860,7 +845,9 @@ To avoid having to “box” these tools yourself, we accept a callback to perfo
 <dd class="field-odd"><ul class="simple">
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_local_catalog</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_remote_catalog</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_prompt_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_tool_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_one_provider_should_exist</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -879,7 +866,9 @@ Python callables from these files with a “standard import”.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_local_catalog</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_remote_catalog</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_prompt_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_tool_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_one_provider_should_exist</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -900,7 +889,9 @@ subsequently yield the closest cluster (see <code class="xref py py-class docuti
 <dd class="field-odd"><ul class="simple">
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_local_catalog</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_remote_catalog</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_prompt_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_tool_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_one_provider_should_exist</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -934,7 +925,9 @@ map whose values are secret keys.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_local_catalog</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_remote_catalog</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_prompt_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_tool_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_one_provider_should_exist</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -954,7 +947,9 @@ use that snapshot version instead.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_local_catalog</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_remote_catalog</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_prompt_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_tool_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_one_provider_should_exist</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -973,7 +968,9 @@ frameworks.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_local_catalog</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_remote_catalog</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_prompt_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_tool_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_one_provider_should_exist</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -989,7 +986,9 @@ frameworks.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_local_catalog</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_remote_catalog</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_prompt_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_tool_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_one_provider_should_exist</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -1123,7 +1122,7 @@ methods (as well as their asynchronous variants <code class="xref py py-meth doc
 <li><a class="reference internal" href="#agentc.Auditor.bucket"><code class="docutils literal notranslate"><span class="pre">Auditor.bucket</span></code></a></li>
 <li><a class="reference internal" href="#agentc.Auditor.catalog"><code class="docutils literal notranslate"><span class="pre">Auditor.catalog</span></code></a></li>
 <li><a class="reference internal" href="#agentc.Auditor.conn_string"><code class="docutils literal notranslate"><span class="pre">Auditor.conn_string</span></code></a></li>
-<li><a class="reference internal" href="#agentc.Auditor.llm_name"><code class="docutils literal notranslate"><span class="pre">Auditor.llm_name</span></code></a></li>
+<li><a class="reference internal" href="#agentc.Auditor.llm_model_name"><code class="docutils literal notranslate"><span class="pre">Auditor.llm_model_name</span></code></a></li>
 <li><a class="reference internal" href="#agentc.Auditor.password"><code class="docutils literal notranslate"><span class="pre">Auditor.password</span></code></a></li>
 <li><a class="reference internal" href="#agentc.Auditor.username"><code class="docutils literal notranslate"><span class="pre">Auditor.username</span></code></a></li>
 <li><a class="reference internal" href="#agentc.Auditor.accept"><code class="docutils literal notranslate"><span class="pre">Auditor.accept()</span></code></a></li>
@@ -1135,7 +1134,6 @@ methods (as well as their asynchronous variants <code class="xref py py-meth doc
 <li><a class="reference internal" href="#agentc.Provider.catalog"><code class="docutils literal notranslate"><span class="pre">Provider.catalog</span></code></a></li>
 <li><a class="reference internal" href="#agentc.Provider.conn_string"><code class="docutils literal notranslate"><span class="pre">Provider.conn_string</span></code></a></li>
 <li><a class="reference internal" href="#agentc.Provider.decorator"><code class="docutils literal notranslate"><span class="pre">Provider.decorator</span></code></a></li>
-<li><a class="reference internal" href="#agentc.Provider.embedding_model"><code class="docutils literal notranslate"><span class="pre">Provider.embedding_model</span></code></a></li>
 <li><a class="reference internal" href="#agentc.Provider.password"><code class="docutils literal notranslate"><span class="pre">Provider.password</span></code></a></li>
 <li><a class="reference internal" href="#agentc.Provider.provider_output"><code class="docutils literal notranslate"><span class="pre">Provider.provider_output</span></code></a></li>
 <li><a class="reference internal" href="#agentc.Provider.refiner"><code class="docutils literal notranslate"><span class="pre">Provider.refiner</span></code></a></li>

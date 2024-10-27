@@ -205,7 +205,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../guide.html">Agent Catalog User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command Line Tool</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">Agent Catalog API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../faqs.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faqs.html">Frequently Asked Questions</a></li>
 </ul>
 
 </div>
@@ -254,6 +254,7 @@
 <span class="kn">from</span> <span class="nn">agentc_core.activity</span> <span class="kn">import</span> <span class="n">LocalAuditor</span>
 <span class="kn">from</span> <span class="nn">agentc_core.analytics</span> <span class="kn">import</span> <span class="n">Kind</span>
 <span class="kn">from</span> <span class="nn">agentc_core.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_ACTIVITY_FOLDER</span>
+<span class="kn">from</span> <span class="nn">agentc_core.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_CATALOG_FOLDER</span>
 <span class="kn">from</span> <span class="nn">agentc_core.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_LLM_ACTIVITY_NAME</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -269,11 +270,18 @@
 
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic_settings</span><span class="o">.</span><span class="n">SettingsConfigDict</span><span class="p">(</span><span class="n">env_prefix</span><span class="o">=</span><span class="s2">&quot;AGENT_CATALOG_&quot;</span><span class="p">)</span>
 
-    <span class="n">llm_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">llm_model_name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Name of the LLM model used to generate the chat messages to-be-audited.</span>
 
 <span class="sd">    This field can be specified on instantiation or on :py:meth:`accept()`.</span>
 <span class="sd">    A model specified in :py:meth:`accept()` overrides a model specified on instantiation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">agent_name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Name of the agent tied to this auditor.</span>
+
+<span class="sd">    This field can be specified on instantiation or on :py:meth:`accept()`.</span>
+<span class="sd">    Agent name specified in :py:meth:`accept()` overrides a model specified on instantiation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">conn_string</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -324,14 +332,6 @@
 <span class="sd">    Audit log files will reach a maximum of 128MB (by default) before they are rotated and compressed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">agent_name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Name of the agent for which this auditor was instantiated.</span>
-
-<span class="sd">    This helps user to know query logs by Agent Name</span>
-<span class="sd">    This field can be specified on instantiation or on :py:meth:`accept()`.</span>
-<span class="sd">    Agent name specified in :py:meth:`accept()` overrides a model specified on instantiation.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">_local_auditor</span><span class="p">:</span> <span class="n">LocalAuditor</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">_db_auditor</span><span class="p">:</span> <span class="n">DBAuditor</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">_audit</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span>
@@ -341,15 +341,17 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auditor_output</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">working_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                <span class="s1">&#39;Starting best effort search for the activity folder. Searching for &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span><span class="p">,</span>
-                <span class="n">DEFAULT_ACTIVITY_FOLDER</span><span class="p">,</span>
+                <span class="s1">&#39;Starting best effort search for the agent catalog folder. Searching for &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span><span class="p">,</span>
+                <span class="n">DEFAULT_CATALOG_FOLDER</span><span class="p">,</span>
             <span class="p">)</span>
 
-            <span class="c1"># Iteratively ascend our starting path until we find the activity folder.</span>
-            <span class="k">while</span> <span class="ow">not</span> <span class="p">(</span><span class="n">working_path</span> <span class="o">/</span> <span class="n">DEFAULT_ACTIVITY_FOLDER</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="c1"># Iteratively ascend our starting path until we find the catalog folder.</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="p">(</span><span class="n">working_path</span> <span class="o">/</span> <span class="n">DEFAULT_CATALOG_FOLDER</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">working_path</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">working_path</span><span class="p">:</span>
+                    <span class="c1"># We have reached the root. We cannot find the catalog folder.</span>
                     <span class="k">return</span> <span class="bp">self</span>
                 <span class="n">working_path</span> <span class="o">=</span> <span class="n">working_path</span><span class="o">.</span><span class="n">parent</span>
+            <span class="p">(</span><span class="n">working_path</span> <span class="o">/</span> <span class="n">DEFAULT_ACTIVITY_FOLDER</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">auditor_output</span> <span class="o">=</span> <span class="n">working_path</span> <span class="o">/</span> <span class="n">DEFAULT_ACTIVITY_FOLDER</span> <span class="o">/</span> <span class="n">DEFAULT_LLM_ACTIVITY_NAME</span>
 
         <span class="k">return</span> <span class="bp">self</span>
@@ -376,13 +378,15 @@
     <span class="k">def</span> <span class="nf">_initialize_auditor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auditor_output</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn_string</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">error_message</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">                Could not find $AGENT_CATALOG_ACTIVITY nor $AGENT_CATALOG_CONN_STRING! If this is a new project, please</span>
-<span class="s2">                run the command `agentc index` before instantiating an auditor. Otherwise, please set either of these</span>
-<span class="s2">                variables.</span>
+<span class="s2">                Could not initialize a local or remote auditor!</span>
+<span class="s2">                If this is a new project, please run the command `agentc index` before instantiating an auditor.</span>
+<span class="s2">                If you are intending to use a remote-only auditor, please ensure that all of the relevant variables</span>
+<span class="s2">                (i.e., conn_string, username, password, and bucket) are set.</span>
 <span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
 
+        <span class="c1"># TODO (GLENN): We should also add support for specifying a catalog version directly (with validation).</span>
         <span class="c1"># To grab the catalog version, we&#39;ll instantiate a provider.</span>
         <span class="n">provider</span> <span class="o">=</span> <span class="n">Provider</span><span class="p">(</span>
             <span class="n">conn_string</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conn_string</span><span class="p">,</span>
@@ -395,14 +399,19 @@
         <span class="c1"># Finally, instantiate our auditors.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auditor_output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_local_auditor</span> <span class="o">=</span> <span class="n">LocalAuditor</span><span class="p">(</span>
-                <span class="n">output</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">auditor_output</span><span class="p">,</span> <span class="n">catalog_version</span><span class="o">=</span><span class="n">provider</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">llm_name</span>
+                <span class="n">output</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">auditor_output</span><span class="p">,</span>
+                <span class="n">catalog_version</span><span class="o">=</span><span class="n">provider</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
+                <span class="n">model_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">llm_model_name</span><span class="p">,</span>
+                <span class="n">agent_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_name</span><span class="p">,</span>
             <span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn_string</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_db_auditor</span> <span class="o">=</span> <span class="n">DBAuditor</span><span class="p">(</span>
                 <span class="n">conn_string</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conn_string</span><span class="p">,</span>
                 <span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">(),</span>
                 <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">(),</span>
-                <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">llm_name</span><span class="p">,</span>
+                <span class="n">model_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">llm_model_name</span><span class="p">,</span>
+                <span class="n">agent_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_name</span><span class="p">,</span>
                 <span class="n">bucket</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span>
                 <span class="n">catalog_version</span><span class="o">=</span><span class="n">provider</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
             <span class="p">)</span>
@@ -425,7 +434,6 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># We should never reach this point (this error is handled above).</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not instantiate an auditor.&quot;</span><span class="p">)</span>
-
         <span class="k">return</span> <span class="bp">self</span>
 
 <div class="viewcode-block" id="Auditor.accept">
@@ -437,7 +445,7 @@
         <span class="n">session</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">AnyStr</span><span class="p">,</span>
         <span class="n">grouping</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">AnyStr</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">timestamp</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">agent_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -447,20 +455,20 @@
 <span class="sd">        :param session: A unique string associated with the current session / conversation / thread.</span>
 <span class="sd">        :param grouping: A unique string associated with one &quot;generate&quot; invocation across a group of messages.</span>
 <span class="sd">        :param timestamp: The time associated with the message production. This must have time-zone information.</span>
-<span class="sd">        :param model: LLM model used with this audit instance. This field can be specified on instantiation</span>
-<span class="sd">                      or on accept(). A model specified in accept() overrides a model specified on instantiation.</span>
-<span class="sd">        :param agent_name: Name of the Agent associated with this audit instance.</span>
+<span class="sd">        :param model_name: LLM model used with this audit instance. This field can be specified on instantiation</span>
+<span class="sd">               or on accept(). A model_name specified in accept() overrides a model specified on instantiation.</span>
+<span class="sd">        :param agent_name: Agent used with this audit instance. This field can be specified on instantiation</span>
+<span class="sd">               or on accept(). An agent_name specified in accept() overrides a model specified on instantiation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">model</span> <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">llm_name</span>
+        <span class="n">model_name</span> <span class="o">=</span> <span class="n">model_name</span> <span class="k">if</span> <span class="n">model_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">llm_model_name</span>
         <span class="n">agent_name</span> <span class="o">=</span> <span class="n">agent_name</span> <span class="k">if</span> <span class="n">agent_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_name</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">_audit</span><span class="p">(</span>
             <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span>
             <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">,</span>
             <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
             <span class="n">grouping</span><span class="o">=</span><span class="n">grouping</span><span class="p">,</span>
             <span class="n">timestamp</span><span class="o">=</span><span class="n">timestamp</span><span class="p">,</span>
-            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
             <span class="n">agent_name</span><span class="o">=</span><span class="n">agent_name</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span></div>
@@ -475,7 +483,7 @@
         <span class="n">session</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">AnyStr</span><span class="p">,</span>
         <span class="n">content</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">timestamp</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">agent_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
@@ -485,11 +493,12 @@
 <span class="sd">        :param session: A unique string associated with the current session / conversation / thread.</span>
 <span class="sd">        :param content: Any additional content that should be recorded with this message.</span>
 <span class="sd">        :param timestamp: The time associated with the message production. This must have time-zone information.</span>
-<span class="sd">        :param model: LLM model used with this audit instance. This field can be specified on instantiation</span>
-<span class="sd">                      or on enter(). A model specified in enter() overrides a model specified on instantiation.</span>
-<span class="sd">        :param agent_name: Name of the Agent associated with this audit instance.</span>
+<span class="sd">        :param model_name: LLM model used with this audit instance. This field can be specified on instantiation</span>
+<span class="sd">               or on accept(). A model_name specified in accept() overrides a model specified on instantiation.</span>
+<span class="sd">        :param agent_name: Agent used with this audit instance. This field can be specified on instantiation</span>
+<span class="sd">               or on accept(). An agent_name specified in accept() overrides a model specified on instantiation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">model</span> <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">llm_name</span>
+        <span class="n">model_name</span> <span class="o">=</span> <span class="n">model_name</span> <span class="k">if</span> <span class="n">model_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">llm_model_name</span>
         <span class="n">agent_name</span> <span class="o">=</span> <span class="n">agent_name</span> <span class="k">if</span> <span class="n">agent_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_name</span>
 
         <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s2">&quot;enter&quot;</span><span class="p">:</span>
@@ -504,7 +513,7 @@
             <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">,</span>
             <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
             <span class="n">timestamp</span><span class="o">=</span><span class="n">timestamp</span><span class="p">,</span>
-            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
             <span class="n">agent_name</span><span class="o">=</span><span class="n">agent_name</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span></div>

@@ -205,7 +205,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../guide.html">Agent Catalog User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command Line Tool</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">Agent Catalog API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../faqs.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faqs.html">Frequently Asked Questions</a></li>
 </ul>
 
 </div>
@@ -250,7 +250,6 @@
 <span class="kn">import</span> <span class="nn">pydantic</span>
 <span class="kn">import</span> <span class="nn">pydantic_settings</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">import</span> <span class="nn">textwrap</span>
 <span class="kn">import</span> <span class="nn">typing</span>
 
 <span class="kn">from</span> <span class="nn">agentc_core.catalog</span> <span class="kn">import</span> <span class="n">LATEST_SNAPSHOT_VERSION</span>
@@ -260,10 +259,9 @@
 <span class="kn">from</span> <span class="nn">agentc_core.catalog</span> <span class="kn">import</span> <span class="n">CatalogMem</span>
 <span class="kn">from</span> <span class="nn">agentc_core.catalog</span> <span class="kn">import</span> <span class="n">SearchResult</span>
 <span class="kn">from</span> <span class="nn">agentc_core.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_CATALOG_FOLDER</span>
-<span class="kn">from</span> <span class="nn">agentc_core.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_EMBEDDING_MODEL</span>
 <span class="kn">from</span> <span class="nn">agentc_core.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_PROMPT_CATALOG_NAME</span>
 <span class="kn">from</span> <span class="nn">agentc_core.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_TOOL_CATALOG_NAME</span>
-<span class="kn">from</span> <span class="nn">agentc_core.embedding.embedding</span> <span class="kn">import</span> <span class="n">EmbeddingModel</span>
+<span class="kn">from</span> <span class="nn">agentc_core.learned.embedding</span> <span class="kn">import</span> <span class="n">EmbeddingModel</span>
 <span class="kn">from</span> <span class="nn">agentc_core.provider</span> <span class="kn">import</span> <span class="n">ModelType</span>
 <span class="kn">from</span> <span class="nn">agentc_core.provider</span> <span class="kn">import</span> <span class="n">PromptProvider</span>
 <span class="kn">from</span> <span class="nn">agentc_core.provider</span> <span class="kn">import</span> <span class="n">PythonTarget</span>
@@ -395,12 +393,6 @@
 <span class="sd">        })</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">embedding_model</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">AnyStr</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_EMBEDDING_MODEL</span><span class="p">)</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; The embedding model used when performing a semantic search for tools / prompts.</span>
-
-<span class="sd">    Currently, only models that can specified with sentence-transformers through its string constructor are supported.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">tool_model</span><span class="p">:</span> <span class="n">SchemaModel</span> <span class="o">=</span> <span class="n">SchemaModel</span><span class="o">.</span><span class="n">TypingTypedDict</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; The target model type for the generated (schema) code for tools.</span>
 
@@ -437,10 +429,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">catalog</span> <span class="o">=</span> <span class="n">working_path</span> <span class="o">/</span> <span class="n">DEFAULT_CATALOG_FOLDER</span>
 
         <span class="c1"># Note: we will defer embedding model mismatches to the remote catalog validator.</span>
-        <span class="n">embedding_model</span> <span class="o">=</span> <span class="n">EmbeddingModel</span><span class="p">(</span>
-            <span class="n">embedding_model_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_model</span><span class="p">,</span>
-            <span class="n">catalog_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">catalog</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="n">embedding_model</span> <span class="o">=</span> <span class="n">EmbeddingModel</span><span class="p">(</span><span class="n">catalog_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">catalog</span><span class="p">)</span>
 
         <span class="c1"># Set our local catalog if it exists.</span>
         <span class="n">tool_catalog_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog</span> <span class="o">/</span> <span class="n">DEFAULT_TOOL_CATALOG_NAME</span>
@@ -480,62 +469,49 @@
             <span class="p">),</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_tool_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_prompt_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">catalog_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog</span>
+            <span class="n">embedding_model</span> <span class="o">=</span> <span class="n">EmbeddingModel</span><span class="p">(</span>
+                <span class="n">cb_bucket</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span>
+                <span class="n">cb_cluster</span><span class="o">=</span><span class="n">cluster</span><span class="p">,</span>
+                <span class="n">catalog_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">catalog</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">catalog_path</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">embedding_model</span> <span class="o">=</span> <span class="n">EmbeddingModel</span><span class="p">(</span>
-            <span class="n">embedding_model_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding_model</span><span class="p">,</span>
-            <span class="n">cb_bucket</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span>
-            <span class="n">cb_cluster</span><span class="o">=</span><span class="n">cluster</span><span class="p">,</span>
-            <span class="n">catalog_path</span><span class="o">=</span><span class="n">catalog_path</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">cluster</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">embedding_model</span> <span class="o">=</span> <span class="n">EmbeddingModel</span><span class="p">(</span>
+                <span class="n">cb_bucket</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span>
+                <span class="n">cb_cluster</span><span class="o">=</span><span class="n">cluster</span><span class="p">,</span>
+            <span class="p">)</span>
 
-        <span class="c1"># TODO (GLENN): Add support for passing an already open connection to CatalogDB.</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_remote_tool_catalog</span> <span class="o">=</span> <span class="n">CatalogDB</span><span class="p">(</span>
                 <span class="n">cluster</span><span class="o">=</span><span class="n">cluster</span><span class="p">,</span> <span class="n">bucket</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="n">embedding_model</span><span class="o">=</span><span class="n">embedding_model</span>
             <span class="p">)</span>
         <span class="k">except</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;&#39;agentc publish --kind tool&#39; has not been run. Skipping remote tool catalog.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;&#39;agentc publish tool&#39; has not been run. Skipping remote tool catalog.&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_remote_tool_catalog</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_remote_prompt_catalog</span> <span class="o">=</span> <span class="n">CatalogDB</span><span class="p">(</span>
                 <span class="n">cluster</span><span class="o">=</span><span class="n">cluster</span><span class="p">,</span> <span class="n">bucket</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;prompt&quot;</span><span class="p">,</span> <span class="n">embedding_model</span><span class="o">=</span><span class="n">embedding_model</span>
             <span class="p">)</span>
         <span class="k">except</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;&#39;agentc publish --kind prompt&#39; has not been run. Skipping remote prompt catalog.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;&#39;agentc publish prompt&#39; has not been run. Skipping remote prompt catalog.&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_remote_prompt_catalog</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="c1"># Note: this must be placed **after** _find_local_catalog and _find_remote_catalog.</span>
     <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_initialize_provider</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
-        <span class="n">local_catalogs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_tool_catalog</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_prompt_catalog</span>
-        <span class="n">remote_catalogs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_tool_catalog</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_prompt_catalog</span>
-        <span class="n">catalog_mutators</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="s2">&quot;_tool_catalog&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">),</span>
-            <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="s2">&quot;_prompt_catalog&quot;</span><span class="p">,</span> <span class="n">p</span><span class="p">),</span>
-        <span class="p">)</span>
-        <span class="k">for</span> <span class="n">catalog_tuple</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">local_catalogs</span><span class="p">,</span> <span class="n">remote_catalogs</span><span class="p">,</span> <span class="n">catalog_mutators</span><span class="p">):</span>
-            <span class="n">local_catalog</span><span class="p">,</span> <span class="n">remote_catalog</span><span class="p">,</span> <span class="n">set_catalog</span> <span class="o">=</span> <span class="n">catalog_tuple</span>
-            <span class="k">if</span> <span class="n">local_catalog</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">remote_catalog</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">error_message</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">                    Could not find $AGENT_CATALOG_CATALOG nor $AGENT_CATALOG_CONN_STRING! If this is a new project,</span>
-<span class="s2">                    please run the command `agentc index` before instantiating a provider. Otherwise, please set either</span>
-<span class="s2">                    of these variables.</span>
-<span class="s2">                &quot;&quot;&quot;</span><span class="p">)</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">local_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">remote_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;A local catalog and a remote catalog have been found. Building a chained catalog.&quot;</span><span class="p">)</span>
-                <span class="n">set_catalog</span><span class="p">(</span><span class="n">CatalogChain</span><span class="p">(</span><span class="n">local_catalog</span><span class="p">,</span> <span class="n">remote_catalog</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">local_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Only a local catalog has been found. Using the local catalog.&quot;</span><span class="p">)</span>
-                <span class="n">set_catalog</span><span class="p">(</span><span class="n">local_catalog</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>  <span class="c1"># remote_catalog is not None:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Only a remote catalog has been found. Using the remote catalog.&quot;</span><span class="p">)</span>
-                <span class="n">set_catalog</span><span class="p">(</span><span class="n">remote_catalog</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_initialize_tool_provider</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
+        <span class="c1"># Set our catalog.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_tool_catalog</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_tool_catalog</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No local or remote catalog found. Skipping tool provider initialization.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_tool_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_tool_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;A local catalog and a remote catalog have been found. Building a chained tool catalog.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tool_catalog</span> <span class="o">=</span> <span class="n">CatalogChain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_local_tool_catalog</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_tool_catalog</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_tool_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Only a local catalog has been found. Using the local tool catalog.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tool_catalog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_tool_catalog</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># self._remote_tool_catalog is not None:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Only a remote catalog has been found. Using the remote tool tool catalog.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tool_catalog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_tool_catalog</span>
 
         <span class="c1"># Check the version of Python (this is needed for the code-generator).</span>
         <span class="k">match</span> <span class="n">version_tuple</span> <span class="o">:=</span> <span class="n">platform</span><span class="o">.</span><span class="n">python_version_tuple</span><span class="p">():</span>
@@ -560,7 +536,7 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Python version </span><span class="si">{</span><span class="n">platform</span><span class="o">.</span><span class="n">python_version</span><span class="p">()</span><span class="si">}</span><span class="s2"> not supported.&quot;</span><span class="p">)</span>
 
-        <span class="c1"># Finally, initialize our provider.</span>
+        <span class="c1"># Finally, initialize our provider(s).</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tool_provider</span> <span class="o">=</span> <span class="n">ToolProvider</span><span class="p">(</span>
             <span class="n">catalog</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tool_catalog</span><span class="p">,</span>
             <span class="n">output</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">provider_output</span><span class="p">,</span>
@@ -570,21 +546,58 @@
             <span class="n">python_version</span><span class="o">=</span><span class="n">target_python_version</span><span class="p">,</span>
             <span class="n">model_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tool_model</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="c1"># Note: this must be placed **after** _find_local_catalog and _find_remote_catalog.</span>
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_initialize_prompt_provider</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
+        <span class="c1"># Set our catalog.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_prompt_catalog</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_prompt_catalog</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No local or remote catalog found. Skipping prompt provider initialization.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_prompt_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_prompt_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;A local catalog and a remote catalog have been found. Building a chained prompt catalog.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_catalog</span> <span class="o">=</span> <span class="n">CatalogChain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_local_prompt_catalog</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_prompt_catalog</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_prompt_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Only a local catalog has been found. Using the local prompt catalog.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_catalog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_prompt_catalog</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># self._remote_prompt_catalog is not None:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Only a remote catalog has been found. Using the remote prompt catalog.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_catalog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_prompt_catalog</span>
+
+        <span class="c1"># Initialize our prompt provider.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_provider</span> <span class="o">=</span> <span class="n">PromptProvider</span><span class="p">(</span>
-            <span class="n">tool_provider</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tool_provider</span><span class="p">,</span>
             <span class="n">catalog</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_prompt_catalog</span><span class="p">,</span>
+            <span class="n">tool_provider</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tool_provider</span><span class="p">,</span>
             <span class="n">refiner</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">refiner</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_one_provider_should_exist</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tool_provider</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_provider</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Could not initialize a tool or prompt provider! &quot;</span>
+                <span class="s2">&quot;If this is a new project, please run the command `agentc index` before instantiating a provider. &quot;</span>
+                <span class="s2">&quot;If you are intending to use a remote-only catalog, please ensure that all of the relevant variables &quot;</span>
+                <span class="s2">&quot;(i.e., conn_string, username, password, and bucket) are set.&quot;</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="nd">@pydantic</span><span class="o">.</span><span class="n">computed_field</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VersionDescriptor</span><span class="p">:</span>
-        <span class="c1"># TODO (GLENN): How should we factor the prompt catalog version into all of this?</span>
+        <span class="c1"># We will take the latest version across all catalogs.</span>
+        <span class="n">version_tuples</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_tool_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tool_catalog</span><span class="o">.</span><span class="n">version</span>
+            <span class="n">version_tuples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_local_tool_catalog</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_tool_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_tool_catalog</span><span class="o">.</span><span class="n">version</span>
+            <span class="n">version_tuples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_remote_tool_catalog</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_prompt_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">version_tuples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_local_prompt_catalog</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_prompt_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">version_tuples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_remote_prompt_catalog</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">version_tuples</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Provider.get_tools_for">
 <a class="viewcode-back" href="../../api.html#agentc.Provider.get_tools_for">[docs]</a>
@@ -604,11 +617,14 @@
 <span class="sd">        :param limit: The maximum number of results to return.</span>
 <span class="sd">        :return: A list of tools (Python functions).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tool_provider</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Tool provider has not been initialized. &quot;</span>
+                <span class="s2">&quot;Please run &#39;agentc index tool&#39; to first build a local tool catalog.&quot;</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tool_provider</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="n">annotations</span><span class="p">,</span> <span class="n">snapshot</span><span class="o">=</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># AV-88220 agentic workflows need list of tools, but get() function return only 1 tool, so wrapping it</span>
-            <span class="c1"># around [] to make list</span>
             <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_tool_provider</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="n">annotations</span><span class="p">,</span> <span class="n">snapshot</span><span class="o">=</span><span class="n">snapshot</span><span class="p">)]</span></div>
 
 
@@ -628,6 +644,11 @@
 <span class="sd">        :param snapshot: The snapshot version to find the tools for. By default, we use the latest snapshot.</span>
 <span class="sd">        :return: A single prompt as well any tools attached to the prompt.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_provider</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Prompt provider has not been initialized. &quot;</span>
+                <span class="s2">&quot;Please run &#39;agentc index prompt&#39; to first build a local prompt catalog.&quot;</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_provider</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="n">annotations</span><span class="p">,</span> <span class="n">snapshot</span><span class="o">=</span><span class="n">snapshot</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>

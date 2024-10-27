@@ -206,7 +206,7 @@
 <li class="toctree-l1"><a class="reference internal" href="guide.html">Agent Catalog User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Tool</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Agent Catalog API</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">FAQs</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Frequently Asked Questions</a></li>
 </ul>
 
 </div>
@@ -249,21 +249,26 @@
         <article role="main" id="furo-main-content">
           <section id="frequently-asked-questions">
 <h1>Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Link to this heading">¶</a></h1>
-<p>This section provides answers to common questions about the project. It covers key concepts, solutions to typical issues,
-and guidance on using various features. For additional information, consult the documentation or community resources.</p>
-<section id="how-to-roll-back-to-a-previous-catalog-version">
-<h2>How to roll back to a previous catalog version?<a class="headerlink" href="#how-to-roll-back-to-a-previous-catalog-version" title="Link to this heading">¶</a></h2>
-<p>After publishing multiple versions of your tool or prompt catalog, each with its own set of use cases, you may want to
-test each version individually and have the option to roll back to a previous catalog version.</p>
-<p>Catalog versions are nothing but git commit hashes and can published catalogs (residing in Couchbase) can be tracked
-with their <code class="docutils literal notranslate"><span class="pre">catalog</span> <span class="pre">id</span></code>. Following is a step by step guide to do the same.</p>
-<p>1. <strong>List catalog versions</strong> : Start by running the <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">status</span></code> command with the following options to list all the
-published catalog versions of tools in your bucket (here, we are checking in <code class="docutils literal notranslate"><span class="pre">travel-sample</span></code>):</p>
+<p>Welcome to the FAQ section of the project documentation!
+This section provides answers to common questions about the Agent Catalog project (key concepts, solutions to
+common issues, guidance on using various features, etc…).
+For additional information, consult the documentation or community resources.</p>
+<section id="how-do-i-roll-back-to-a-previous-catalog-version">
+<h2>How do I roll back to a previous catalog version?<a class="headerlink" href="#how-do-i-roll-back-to-a-previous-catalog-version" title="Link to this heading">¶</a></h2>
+<p>Agent Catalog was built on the principle of agent <em>snapshots</em>.
+Consequently, it is possible to roll back to a previous catalog version <span class="math notranslate nohighlight">\(v\)</span> if you have <span class="math notranslate nohighlight">\(v\)</span>’s version ID.
+Some common use cases for rolling back to a previous catalog version include performing A/B testing on different
+versions of your agent or rolling back your agent due to some regression.</p>
+<p>Catalog versions are Git commit hashes.
+To roll back to a previous catalog version, follow these steps:</p>
+<ol class="arabic">
+<li><p><strong>List Catalog Versions</strong> : Start by running the <strong class="command">agentc status</strong> command with the <code class="docutils literal notranslate"><span class="pre">--status-db</span></code> flag to
+list all the published catalog versions of tools in your bucket (here, we are checking in <code class="docutils literal notranslate"><span class="pre">travel-sample</span></code>):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># run agentc status --help for all options</span>
 agentc<span class="w"> </span>status<span class="w"> </span>--kind<span class="w"> </span>tool<span class="w"> </span>--status-db<span class="w"> </span>--bucket<span class="w"> </span>travel-sample
 </pre></div>
 </div>
-<p>This will return a list of all the catalogs you have published so far as shown below.</p>
+<p>Running the command above will return a list of all the tool catalog snapshots you have published to Couchbase.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">-----------------------------------------------------------------</span>
 <span class="go">TOOL</span>
 <span class="go">-----------------------------------------------------------------</span>
@@ -293,21 +298,44 @@ agentc<span class="w"> </span>status<span class="w"> </span>--kind<span class="w
 <span class="go">-----------------------------------------------------------------</span>
 </pre></div>
 </div>
-<p>2. <strong>Browse git commits</strong>: Next, check the <code class="docutils literal notranslate"><span class="pre">catalog</span> <span class="pre">id</span></code> from the above output for the git commit hash at which the
-catalogs were published to the database. Open your repository commit history on github or run <strong class="command">git log</strong> in
-your terminal to view the commit history for your project and choose a commit to roll back to.</p>
-<ol class="arabic simple" start="4">
-<li><p>On deciding the catalog version to roll back to, use the following git command(s) to:</p></li>
+</li>
+<li><p><strong>Browse Git Commits</strong>: Next, check the <code class="docutils literal notranslate"><span class="pre">catalog</span> <span class="pre">id</span></code> from the above output for the Git commit hash at which the
+catalogs were published to the database.
+Open your repository commit history on Github or run the <strong class="command">git log</strong> command in your terminal to view the
+commit history for your project.
+Once you have a comprehensive list of commits, you can decide which catalog version to roll back to.</p></li>
+<li><p><strong>Perform Rollback</strong>: When you decide which catalog version you want to roll back to, you can move forward
+(or rather, “backward”) in three ways:</p>
+<ol class="loweralpha">
+<li><p>To revert your changes to a specific commit in a non-destructive manner, run <strong class="command">git revert</strong>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>revert<span class="w"> </span>&lt;commit_hash&gt;..HEAD
+</pre></div>
+</div>
+<p>This command will rollback your repository to <cite>&lt;commit_hash&gt;</cite> <em>but</em> with a new commit hash.
+This is a safe way to rollback to a previous version without losing your current work, as your existing
+Git commit history will be preserved.</p>
+</li>
+<li><p>To checkout a particular commit (i.e., all changes associated with some commit), run <strong class="command">git checkout</strong>.</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>checkout<span class="w"> </span>&lt;commit_hash&gt;
+</pre></div>
+</div>
+<p>This command will checkout the commit <cite>&lt;commit_hash&gt;</cite> without creating a new commit.</p>
+</div></blockquote>
+</li>
+<li><p>To revert your changes to a specific commit in a <strong>destructive</strong> manner, run <strong class="command">git reset</strong>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>reset<span class="w"> </span>--hard<span class="w"> </span>&lt;commit_hash&gt;
+</pre></div>
+</div>
+<p>This command will reset your working Git HEAD to the provided commit if you have not published your changes so
+far.
+<strong>This command is destructive, so make sure all your changes have been committed or are stashed beforehand!</strong></p>
+</li>
 </ol>
-<p>a. Revert changes to a particular commit - <strong class="command">git revert &lt;commit_hash&gt;..HEAD</strong> will change commit history and
-revert all commits till the specified one.</p>
-<p>b. Checkout to a particular commit - <strong class="command">git checkout &lt;commit_hash&gt;</strong> will checkout to a published commit but will
-not push any changes</p>
-<p>c. Remove unpublished changes - <strong class="command">git reset --hard &lt;commit_hash&gt;</strong> will reset HEAD to the provided commit if
-you have not published your changes so far</p>
-<p><cite>Apart from these commands, please refer to git documentation for more information on reverting or rolling back.</cite></p>
-<p>With this, you will have rolled back to your desired catalog version. Make sure to have committed (and published) your
-current local catalog to avoid losing track!</p>
+<p>For further information on Git, please refer to git documentation
+<a class="reference external" href="https://training.github.com/downloads/github-git-cheat-sheet">here</a> .</p>
+</li>
+</ol>
 </section>
 </section>
 
@@ -359,7 +387,7 @@ current local catalog to avoid losing track!</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Frequently Asked Questions</a><ul>
-<li><a class="reference internal" href="#how-to-roll-back-to-a-previous-catalog-version">How to roll back to a previous catalog version?</a></li>
+<li><a class="reference internal" href="#how-do-i-roll-back-to-a-previous-catalog-version">How do I roll back to a previous catalog version?</a></li>
 </ul>
 </li>
 </ul>
@@ -377,5 +405,6 @@ current local catalog to avoid losing track!</p>
     <script src="_static/scripts/furo.js?v=5fa4622c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </body>
 </html>
