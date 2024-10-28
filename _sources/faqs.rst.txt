@@ -151,9 +151,9 @@ Some variables are **mandatory** for using both the CLI commands and the SDK:
 
 * ``CB_CONN_STRING``: Couchbase connection string, which can be set to localhost or obtained from Capella. For more info on connection strings, refer to the `official documentation <https://docs.couchbase.com/python-sdk/current/howtos/managing-connections.html#connection-strings>`_.
 
-* ``CB_USERNAME``: Username needed to sign in to your Couchbase cluster, either hosted locally (if ``CB_CONN_STRING`` =``localhost``) or within your Capella organization. When using Capella, this is the username associated with the database access key required for the connection string set up.
+* ``CB_USERNAME``: Username needed to sign in to your Couchbase cluster, either hosted locally (if ``CB_CONN_STRING`` = ``localhost``) or within your Capella organization. When using Capella, this is the username associated with the database access key required for the connection string set up.
 
-* ``CB_PASSWORD``: Password needed to sign in to your Couchbase cluster, either hosted locally (if ``CB_CONN_STRING`` =``localhost``) or within your Capella organization. When using Capella, this is the password associated with the database access key required for the connection string set up.
+* ``CB_PASSWORD``: Password needed to sign in to your Couchbase cluster, either hosted locally (if ``CB_CONN_STRING`` = ``localhost``) or within your Capella organization. When using Capella, this is the password associated with the database access key required for the connection string set up.
 
 2. LLM Connection
 

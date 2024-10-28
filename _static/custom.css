@@ -1,8 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700&display=swap');
+
+body {
+    font-family: Public Sans,-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+    text-align: justify;
+}
+
+p {
+    line-height: 1.7em;
+}
+
 .highlight .hll {
     background-color: #ff387f61 !important; /*changes this code block highlight colour*/
 }
 
 .content {
-    padding: 0 1.5em !important;
+    padding: 0 2.5em !important;
     width: 56em !important;
+}
+
+.sidebar-brand-text {
+    text-align: center !important;
+}
+
+.page {
+    margin: auto;
+    max-width: fit-content;
 }
