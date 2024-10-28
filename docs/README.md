@@ -1,5 +1,7 @@
 # Agent Catalog Documentation
 
+## Building the Docs
+
 Below are instructions for building the Agent Catalog documentation.
 
 1. Install the top-level project with `poetry install`.
@@ -19,3 +21,36 @@ Below are instructions for building the Agent Catalog documentation.
    ```
 
    In both cases, you can now navigate to http://localhost:8000 and navigate the docs!
+
+## Contributing to the Docs
+
+For those new to writing in reStructuredText, see [here](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html)
+for a quick primer.
+When contributing to the docs, please adhere to the following guidelines:
+
+1. For easy (future) editing, please use a new line for each sentence.
+
+   Good:
+   ```rst
+   This is a sentence.
+   This is another sentence.
+   ```
+
+   Not Good:
+   ```rst
+   This is a sentence. This is another sentence.
+   ```
+
+2. Make sure that all section lines go to the end of the text.
+
+   Good:
+   ```rst
+   This is a section title
+   =======================
+   ```
+
+   Not Good:
+   ```rst
+   This is a section title
+   =====
+   ```
