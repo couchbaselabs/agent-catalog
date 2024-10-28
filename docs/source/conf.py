@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.abspath("../libs"))
 project = "Agent Catalog"
 copyright = "2024, Couchbase"
 author = "Couchbase"
-release = "0.0.1"
+release = "v0.0.1"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -41,3 +41,4 @@ autodoc_default_options = {"exclude-members": "model_post_init"}
 html_theme = "furo"
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
+html_favicon = "_static/favicon.png"

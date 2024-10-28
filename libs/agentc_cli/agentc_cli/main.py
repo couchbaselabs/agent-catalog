@@ -125,11 +125,10 @@ def click_main(ctx, catalog, activity, verbose, interactive):
     "--output",
     default=os.getcwd(),
     type=click.Path(exists=False, file_okay=False, dir_okay=True, path_type=pathlib.Path),
-    help="Location to save the generated tool / prompt to.",
-    show_default=True,
+    help="Location to save the generated tool / prompt to. Defaults to your current working directory.",
 )
 @click.option(
-    "--record-kind", type=click.Choice([c for c in RecordKind], case_sensitive=False), default=None, show_default=False
+    "--record-kind", type=click.Choice([c for c in RecordKind], case_sensitive=False), default=None, show_default=True
 )
 @click.pass_context
 def add(ctx, output: pathlib.Path, record_kind: RecordKind):

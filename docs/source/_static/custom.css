@@ -1,8 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Open+Sans:wght@700&family=Source+Code+Pro&display=swap');
+
+body {
+    font-family: 'Open Sans' ,Public Sans,-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+    text-align: justify;
+}
+
+h1,h2,h3,h4,h5,h6{
+    font-family: 'Open Sans' ,Public Sans,-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;;
+}
+
+pre{
+    font-family: "Source Code Pro",Menlo,monospace;
+}
+
+.pre{
+     font-family: "Source Code Pro",Menlo,monospace;
+}
+
+p {
+    line-height: 1.7em;
+}
+
 .highlight .hll {
     background-color: #ff387f61 !important; /*changes this code block highlight colour*/
 }
 
 .content {
-    padding: 0 1.5em !important;
+    padding: 0 2.5em !important;
     width: 56em !important;
+}
+
+.sidebar-brand-text {
+    text-align: center !important;
+}
+
+.page {
+    margin: auto;
+    max-width: fit-content;
+}
+
+.toc-tree {
+    text-align: left;
 }
