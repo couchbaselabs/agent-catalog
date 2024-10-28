@@ -26,3 +26,7 @@ p {
     margin: auto;
     max-width: fit-content;
 }
+
+.toc-tree {
+    text-align: left;
+}

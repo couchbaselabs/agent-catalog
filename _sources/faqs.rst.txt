@@ -157,10 +157,22 @@ Some variables are **mandatory** for using both the CLI commands and the SDK:
 
 2. LLM Connection
 
-* ``OPENAI_API_KEY``: To start using Agent Catalog functionalities, you require an OpenAI API key. Refer to the next section on :ref:`OpenAI API Key usage <How does Agent Catalog use my OpenAI API key?>` to know more about how we leverage OpenAI to enhance agent workflow development.
+* ``OPENAI_API_KEY``: To start using Agent Catalog functionalities, you require an OpenAI API key. Refer to the section on :ref:`OpenAI API Key usage <How does Agent Catalog use my OpenAI API key?>` to know more about how we leverage OpenAI to enhance agent workflow development.
 
 The rest of the variables are optional and contextual to the ``travel-agent`` example as explained in `this repository <https://github.com/couchbaselabs/agent-catalog-example>`_.
 
+
+Can I write multiple tools/prompts in one file?
+-----------------------------------------------
+TODO
+
+Do CLI commands need to be executed in an order?
+------------------------------------------------
+TODO
+
+Can I index and publish catalogs programmatically?
+--------------------------------------------------
+TODO
 
 How does Agent Catalog use my OpenAI API key?
 ---------------------------------------------
@@ -169,7 +181,7 @@ Agent Catalog does not use your OpenAI API key directly. While developing agent 
 
 Agent Catalog itself does not rely on an LLM, which means it does not utilize your API key. The LLM is solely needed by your agent development framework, such as ControlFlow, Langgraph, or similar, to perform tasks like generating responses and executing complex reasoning.
 
-Can I use any LLM ?
+Can I use any LLM I wish to?
 -------------------
 
 Absolutely! You are free to choose any LLM for your agent workflow development, as long as the framework you select supports it. This flexibility allows you to tailor your agent’s capabilities to your specific needs and preferences.
