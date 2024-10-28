@@ -119,7 +119,8 @@ def cmd_execute(
             if str(tmp_dir_path.absolute()) not in sys.path:
                 sys.path.append(str(tmp_dir_path.absolute()))
 
-            file_stem = [x.stem for x in (tmp_dir_path.iterdir()) if x.stem != "__init__"][0]
+            file_stems = [x.stem for x in (tmp_dir_path.iterdir()) if x.stem != "__init__"]
+            file_stem = file_stems[1] if file_stems[0] == "__pytest__" else file_stems[0]
             gen_code_modules = importlib.import_module(file_stem)
 
         click.secho(DASHES, fg="yellow")

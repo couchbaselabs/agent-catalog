@@ -14,6 +14,7 @@ from agentc_core.defaults import DEFAULT_TOOL_CATALOG_NAME
 from agentc_testing.repo import ExampleRepoKind
 from agentc_testing.repo import initialize_repo
 from agentc_testing.server import get_isolated_server
+from unittest.mock import patch
 
 # This is to keep ruff from falsely flagging this as unused.
 _ = get_isolated_server
@@ -314,3 +315,38 @@ def test_clean(tmp_path, get_isolated_server):
         )
         print("\n\nRan assertion for db status when tool catalog does not exist in db")
         assert expected_response_db in output
+
+
+@pytest.mark.regression
+def test_execute(tmp_path):
+    runner = click.testing.CliRunner()
+    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        initialize_repo(
+            directory=pathlib.Path(td),
+            repo_kind=ExampleRepoKind.INDEXED_CLEAN_TOOLS_TRAVEL,
+            click_runner=runner,
+            click_command=click_main,
+        )
+
+        print("Starting tests for execute command on local catalog...")
+
+        output = runner.invoke(click_main, ["execute", "--name", "random_tool", "-local"]).stdout
+        assert "No catalog items found" in output
+
+        with patch("click.prompt", side_effect=["BVC"]):
+            output = runner.invoke(click_main, ["execute", "--name", "check_if_airport_exists", "-local"]).stdout
+            assert "True" in output
+
+        with patch("click.prompt", side_effect=["ABC"]):
+            output = runner.invoke(click_main, ["execute", "--name", "check_if_airport_exists", "-local"]).stdout
+            assert "False" in output
+
+        with patch("click.prompt", side_effect=["BVC"]):
+            output = runner.invoke(click_main, ["execute", "--query", "is airport valid", "-local"]).stdout
+            assert "True" in output
+
+        with patch("click.prompt", side_effect=["ABC"]):
+            output = runner.invoke(click_main, ["execute", "--query", "is airport valid", "-local"]).stdout
+            assert "False" in output
+
+        print("Completed testing execute command on local catalog.")

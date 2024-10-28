@@ -6,7 +6,8 @@ repository = "https://github.com/couchbaselabs/rosetta-core"
 authors = [
     "Glenn Galvizo <glenn.galvizo@couchbase.com>",
     "Steve Yen <steve.yen@couchbase.com>",
-    "Tanvi Johari <tanvi.johari@couchbase.com>"
+    "Tanvi Johari <tanvi.johari@couchbase.com>",
+    "Thejas N U <thejas.nu@couchbase.com>"
 ]
 packages = [
     { include = "agentc_cli" },

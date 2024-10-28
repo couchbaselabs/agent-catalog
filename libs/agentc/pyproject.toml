@@ -5,7 +5,8 @@ description = "The front-facing package for the Couchbase Agent Catalog project.
 repository = "https://github.com/couchbaselabs/agent-catalog"
 authors = [
     "Glenn Galvizo <glenn.galvizo@couchbase.com>",
-    "Tanvi Johari <tanvi.johari@couchbase.com>"
+    "Tanvi Johari <tanvi.johari@couchbase.com>",
+    "Thejas N U <thejas.nu@couchbase.com>"
 ]
 packages = [
     { include = "agentc" },
