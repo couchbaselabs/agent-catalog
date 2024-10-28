@@ -82,11 +82,11 @@ To roll back to a previous catalog version, follow these steps:
 
    b. To checkout a particular commit (i.e., all changes associated with some commit), run :command:`git checkout`.
 
-       .. code-block:: bash
+      .. code-block:: bash
 
-           git checkout <commit_hash>
+          git checkout <commit_hash>
 
-       This command will checkout the commit `<commit_hash>` without creating a new commit.
+      This command will checkout the commit `<commit_hash>` without creating a new commit.
 
    c. To revert your changes to a specific commit in a **destructive** manner, run :command:`git reset`.
 
@@ -102,65 +102,42 @@ To roll back to a previous catalog version, follow these steps:
    `here <https://training.github.com/downloads/github-git-cheat-sheet>`_ .
 
 
-What should my .env contain?
-----------------------------
+What environment variables are required to use Agent Catalog?
+-------------------------------------------------------------
 
-To get started with Agent Catalog, you'll need to initialize certain environment variables in a ``.env`` file located at the
-root of your project (make sure the file is created where all your ``agentc`` commands will be running). These variables configure key settings, such as API keys, database connections, and other project-specific options, that are essential for running CLI commands and building agent workflows.
+To get started with Agent Catalog, you'll need to initialize certain environment variables.
+These can be in a ``.env`` file located at the root of your project (where all of your :command:`agentc` commands are
+run) *or* manually using :command:`export`.
 
 Make sure to review the required variables and populate them with appropriate values before starting your project.
 
 .. code-block:: ini
-       :caption: Add the following to your ``.env`` file, and replace the default values with your desired settings
 
        ------------------------------------------ REQUIRED -----------------------------------------
-       # Couchbase-specific environment variables.
-       CB_CONN_STRING=localhost
-       CB_USERNAME=Administrator
-       CB_PASSWORD=password
-
-       # The OpenAI API key.
-       OPENAI_API_KEY=...
-
-       ------------------------------------------ OPTIONAL ------------------------------------------
-       # These are from the starter agent as described in `travel-agent` example
-
        # Agent Catalog specific environment variables that identify where the catalog is stored.
-       AGENT_CATALOG_CONN_STRING=couchbase://localhost
+       AGENT_CATALOG_CONN_STRING=localhost
        AGENT_CATALOG_USERNAME=Administrator
        AGENT_CATALOG_PASSWORD=password
        AGENT_CATALOG_BUCKET=travel-sample
 
-       # For example purposes, we want to see what our agent is doing (this is CF-specific).
-       CONTROLFLOW_TOOLS_VERBOSE=true
-       PREFECT_LOGGING_LEVEL=CRITICAL
+       ------------------------------------------ OPTIONAL ------------------------------------------
+       # Couchbase specific environment variables (for the travel-agent example tools).
+       CB_CONN_STRING=couchbase://localhost
+       CB_USERNAME=Administrator
+       CB_PASSWORD=password
 
        # ControlFlow specific environment variables (which are really just Prefect environment variables).
+       CONTROLFLOW_TOOLS_VERBOSE=true
+       PREFECT_LOGGING_LEVEL=CRITICAL
        PREFECT_API_URL="http://127.0.0.1:4200/api"
-
-       # Default model used when encoding our tool / prompt descriptions.
-       DEFAULT_SENTENCE_EMODEL=sentence-transformers/all-MiniLM-L12-v2
 
        # To stop sentence_transformers from being fussy about multiple imports.
        TOKENIZERS_PARALLELISM=false
 
-The list above details the environment variables required to enable Agent Catalog functionalities.
-Some variables are **mandatory** for using both the CLI commands and the SDK:
+       # The holy OpenAI API key. :-)
+       OPENAI_API_KEY=...
 
-1. Couchbase specific environment variables
-
-* ``CB_CONN_STRING``: Couchbase connection string, which can be set to localhost or obtained from Capella. For more info on connection strings, refer to the `official documentation <https://docs.couchbase.com/python-sdk/current/howtos/managing-connections.html#connection-strings>`_.
-
-* ``CB_USERNAME``: Username needed to sign in to your Couchbase cluster, either hosted locally (if ``CB_CONN_STRING`` = ``localhost``) or within your Capella organization. When using Capella, this is the username associated with the database access key required for the connection string set up.
-
-* ``CB_PASSWORD``: Password needed to sign in to your Couchbase cluster, either hosted locally (if ``CB_CONN_STRING`` = ``localhost``) or within your Capella organization. When using Capella, this is the password associated with the database access key required for the connection string set up.
-
-2. LLM Connection
-
-* ``OPENAI_API_KEY``: To start using Agent Catalog functionalities, you require an OpenAI API key. Refer to the section on :ref:`OpenAI API Key usage <How does Agent Catalog use my OpenAI API key?>` to know more about how we leverage OpenAI to enhance agent workflow development.
-
-The rest of the variables are optional and contextual to the ``travel-agent`` example as explained in `this repository <https://github.com/couchbaselabs/agent-catalog-example>`_.
-
+For more information on Agent Catalog environment variables, refer to the documentation `here <env>`_.
 
 Can I write multiple tools/prompts in one file?
 -----------------------------------------------
@@ -174,15 +151,15 @@ Can I index and publish catalogs programmatically?
 --------------------------------------------------
 TODO
 
-How does Agent Catalog use my OpenAI API key?
----------------------------------------------
+Does Agent Catalog require an OpenAI API key?
+----------------------------------------------
 
-Agent Catalog does not use your OpenAI API key directly. While developing agent workflows with your preferred frameworks, a large language model (LLM) is essential for tasks such as response generation and decision-making. Agent Catalog simplifies this process by maintaining a comprehensive catalog of tools and prompts that your agents may require. It generates and stores embeddings of tool and prompt descriptions, allowing for efficient semantic searches to retrieve relevant items.
+Agent Catalog does not require an OpenAI API key.
 
-Agent Catalog itself does not rely on an LLM, which means it does not utilize your API key. The LLM is solely needed by your agent development framework, such as ControlFlow, Langgraph, or similar, to perform tasks like generating responses and executing complex reasoning.
+Does Agent Catalog work with any LLM?
+-------------------------------------
 
-Can I use any LLM I wish to?
--------------------
-
-Absolutely! You are free to choose any LLM for your agent workflow development, as long as the framework you select supports it. This flexibility allows you to tailor your agent’s capabilities to your specific needs and preferences.
-
+Yes!
+Agent Catalog does not restrict you to a specific language model.
+You are free to choose any LLM for your agent workflow development (if your chosen agent framework supports your chosen
+LLM).

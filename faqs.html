@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="agentc Package Documentation" href="api.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="Agent Catalog Environment Variables" href="env.html" />
 
     <link rel="shortcut icon" href="_static/favicon.png"/><!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
         <title>Frequently Asked Questions - Agent Catalog v0.0.1 documentation</title>
@@ -206,6 +206,7 @@
 <li class="toctree-l1"><a class="reference internal" href="guide.html">Agent Catalog User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Tool</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Agent Catalog API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="env.html">Environment Variables</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Frequently Asked Questions</a></li>
 </ul>
 
@@ -316,12 +317,10 @@ This is a safe way to rollback to a previous version without losing your current
 Git commit history will be preserved.</p>
 </li>
 <li><p>To checkout a particular commit (i.e., all changes associated with some commit), run <strong class="command">git checkout</strong>.</p>
-<blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>checkout<span class="w"> </span>&lt;commit_hash&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>checkout<span class="w"> </span>&lt;commit_hash&gt;
 </pre></div>
 </div>
 <p>This command will checkout the commit <cite>&lt;commit_hash&gt;</cite> without creating a new commit.</p>
-</div></blockquote>
 </li>
 <li><p>To revert your changes to a specific commit in a <strong>destructive</strong> manner, run <strong class="command">git reset</strong>.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>reset<span class="w"> </span>--hard<span class="w"> </span>&lt;commit_hash&gt;
@@ -337,63 +336,38 @@ far.
 </li>
 </ol>
 </section>
-<section id="what-should-my-env-contain">
-<h2>What should my .env contain?<a class="headerlink" href="#what-should-my-env-contain" title="Link to this heading">¶</a></h2>
-<p>To get started with Agent Catalog, you’ll need to initialize certain environment variables in a <code class="docutils literal notranslate"><span class="pre">.env</span></code> file located at the
-root of your project (make sure the file is created where all your <code class="docutils literal notranslate"><span class="pre">agentc</span></code> commands will be running). These variables configure key settings, such as API keys, database connections, and other project-specific options, that are essential for running CLI commands and building agent workflows.</p>
+<section id="what-environment-variables-are-required-to-use-agent-catalog">
+<h2>What environment variables are required to use Agent Catalog?<a class="headerlink" href="#what-environment-variables-are-required-to-use-agent-catalog" title="Link to this heading">¶</a></h2>
+<p>To get started with Agent Catalog, you’ll need to initialize certain environment variables.
+These can be in a <code class="docutils literal notranslate"><span class="pre">.env</span></code> file located at the root of your project (where all of your <strong class="command">agentc</strong> commands are
+run) <em>or</em> manually using <strong class="command">export</strong>.</p>
 <p>Make sure to review the required variables and populate them with appropriate values before starting your project.</p>
-<div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">Add the following to your <code class="docutils literal notranslate"><span class="pre">.env</span></code> file, and replace the default values with your desired settings</span><a class="headerlink" href="#id1" title="Link to this code">¶</a></div>
 <div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">------------------------------------------ REQUIRED -----------------------------------------</span>
-<span class="c1"># Couchbase-specific environment variables.</span>
-<span class="na">CB_CONN_STRING</span><span class="o">=</span><span class="s">localhost</span>
-<span class="na">CB_USERNAME</span><span class="o">=</span><span class="s">Administrator</span>
-<span class="na">CB_PASSWORD</span><span class="o">=</span><span class="s">password</span>
-
-<span class="c1"># The OpenAI API key.</span>
-<span class="na">OPENAI_API_KEY</span><span class="o">=</span><span class="s">...</span>
-
-<span class="na">------------------------------------------ OPTIONAL ------------------------------------------</span>
-<span class="c1"># These are from the starter agent as described in `travel-agent` example</span>
-
 <span class="c1"># Agent Catalog specific environment variables that identify where the catalog is stored.</span>
-<span class="na">AGENT_CATALOG_CONN_STRING</span><span class="o">=</span><span class="s">couchbase://localhost</span>
+<span class="na">AGENT_CATALOG_CONN_STRING</span><span class="o">=</span><span class="s">localhost</span>
 <span class="na">AGENT_CATALOG_USERNAME</span><span class="o">=</span><span class="s">Administrator</span>
 <span class="na">AGENT_CATALOG_PASSWORD</span><span class="o">=</span><span class="s">password</span>
 <span class="na">AGENT_CATALOG_BUCKET</span><span class="o">=</span><span class="s">travel-sample</span>
 
-<span class="c1"># For example purposes, we want to see what our agent is doing (this is CF-specific).</span>
-<span class="na">CONTROLFLOW_TOOLS_VERBOSE</span><span class="o">=</span><span class="s">true</span>
-<span class="na">PREFECT_LOGGING_LEVEL</span><span class="o">=</span><span class="s">CRITICAL</span>
+<span class="na">------------------------------------------ OPTIONAL ------------------------------------------</span>
+<span class="c1"># Couchbase specific environment variables (for the travel-agent example tools).</span>
+<span class="na">CB_CONN_STRING</span><span class="o">=</span><span class="s">couchbase://localhost</span>
+<span class="na">CB_USERNAME</span><span class="o">=</span><span class="s">Administrator</span>
+<span class="na">CB_PASSWORD</span><span class="o">=</span><span class="s">password</span>
 
 <span class="c1"># ControlFlow specific environment variables (which are really just Prefect environment variables).</span>
+<span class="na">CONTROLFLOW_TOOLS_VERBOSE</span><span class="o">=</span><span class="s">true</span>
+<span class="na">PREFECT_LOGGING_LEVEL</span><span class="o">=</span><span class="s">CRITICAL</span>
 <span class="na">PREFECT_API_URL</span><span class="o">=</span><span class="s">&quot;http://127.0.0.1:4200/api&quot;</span>
-
-<span class="c1"># Default model used when encoding our tool / prompt descriptions.</span>
-<span class="na">DEFAULT_SENTENCE_EMODEL</span><span class="o">=</span><span class="s">sentence-transformers/all-MiniLM-L12-v2</span>
 
 <span class="c1"># To stop sentence_transformers from being fussy about multiple imports.</span>
 <span class="na">TOKENIZERS_PARALLELISM</span><span class="o">=</span><span class="s">false</span>
+
+<span class="c1"># The holy OpenAI API key. :-)</span>
+<span class="na">OPENAI_API_KEY</span><span class="o">=</span><span class="s">...</span>
 </pre></div>
 </div>
-</div>
-<p>The list above details the environment variables required to enable Agent Catalog functionalities.
-Some variables are <strong>mandatory</strong> for using both the CLI commands and the SDK:</p>
-<ol class="arabic simple">
-<li><p>Couchbase specific environment variables</p></li>
-</ol>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">CB_CONN_STRING</span></code>: Couchbase connection string, which can be set to localhost or obtained from Capella. For more info on connection strings, refer to the <a class="reference external" href="https://docs.couchbase.com/python-sdk/current/howtos/managing-connections.html#connection-strings">official documentation</a>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">CB_USERNAME</span></code>: Username needed to sign in to your Couchbase cluster, either hosted locally (if <code class="docutils literal notranslate"><span class="pre">CB_CONN_STRING</span></code> = <code class="docutils literal notranslate"><span class="pre">localhost</span></code>) or within your Capella organization. When using Capella, this is the username associated with the database access key required for the connection string set up.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">CB_PASSWORD</span></code>: Password needed to sign in to your Couchbase cluster, either hosted locally (if <code class="docutils literal notranslate"><span class="pre">CB_CONN_STRING</span></code> = <code class="docutils literal notranslate"><span class="pre">localhost</span></code>) or within your Capella organization. When using Capella, this is the password associated with the database access key required for the connection string set up.</p></li>
-</ul>
-<ol class="arabic simple" start="2">
-<li><p>LLM Connection</p></li>
-</ol>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">OPENAI_API_KEY</span></code>: To start using Agent Catalog functionalities, you require an OpenAI API key. Refer to the section on <a class="reference internal" href="#how-does-agent-catalog-use-my-openai-api-key"><span class="std std-ref">OpenAI API Key usage</span></a> to know more about how we leverage OpenAI to enhance agent workflow development.</p></li>
-</ul>
-<p>The rest of the variables are optional and contextual to the <code class="docutils literal notranslate"><span class="pre">travel-agent</span></code> example as explained in <a class="reference external" href="https://github.com/couchbaselabs/agent-catalog-example">this repository</a>.</p>
+<p>For more information on Agent Catalog environment variables, refer to the documentation <a class="reference external" href="env">here</a>.</p>
 </section>
 <section id="can-i-write-multiple-tools-prompts-in-one-file">
 <h2>Can I write multiple tools/prompts in one file?<a class="headerlink" href="#can-i-write-multiple-tools-prompts-in-one-file" title="Link to this heading">¶</a></h2>
@@ -407,14 +381,16 @@ Some variables are <strong>mandatory</strong> for using both the CLI commands an
 <h2>Can I index and publish catalogs programmatically?<a class="headerlink" href="#can-i-index-and-publish-catalogs-programmatically" title="Link to this heading">¶</a></h2>
 <p>TODO</p>
 </section>
-<section id="how-does-agent-catalog-use-my-openai-api-key">
-<h2>How does Agent Catalog use my OpenAI API key?<a class="headerlink" href="#how-does-agent-catalog-use-my-openai-api-key" title="Link to this heading">¶</a></h2>
-<p>Agent Catalog does not use your OpenAI API key directly. While developing agent workflows with your preferred frameworks, a large language model (LLM) is essential for tasks such as response generation and decision-making. Agent Catalog simplifies this process by maintaining a comprehensive catalog of tools and prompts that your agents may require. It generates and stores embeddings of tool and prompt descriptions, allowing for efficient semantic searches to retrieve relevant items.</p>
-<p>Agent Catalog itself does not rely on an LLM, which means it does not utilize your API key. The LLM is solely needed by your agent development framework, such as ControlFlow, Langgraph, or similar, to perform tasks like generating responses and executing complex reasoning.</p>
+<section id="does-agent-catalog-require-an-openai-api-key">
+<h2>Does Agent Catalog require an OpenAI API key?<a class="headerlink" href="#does-agent-catalog-require-an-openai-api-key" title="Link to this heading">¶</a></h2>
+<p>Agent Catalog does not require an OpenAI API key.</p>
 </section>
-<section id="can-i-use-any-llm-i-wish-to">
-<h2>Can I use any LLM I wish to?<a class="headerlink" href="#can-i-use-any-llm-i-wish-to" title="Link to this heading">¶</a></h2>
-<p>Absolutely! You are free to choose any LLM for your agent workflow development, as long as the framework you select supports it. This flexibility allows you to tailor your agent’s capabilities to your specific needs and preferences.</p>
+<section id="does-agent-catalog-work-with-any-llm">
+<h2>Does Agent Catalog work with any LLM?<a class="headerlink" href="#does-agent-catalog-work-with-any-llm" title="Link to this heading">¶</a></h2>
+<p>Yes!
+Agent Catalog does not restrict you to a specific language model.
+You are free to choose any LLM for your agent workflow development (if your chosen agent framework supports your chosen
+LLM).</p>
 </section>
 </section>
 
@@ -424,14 +400,14 @@ Some variables are <strong>mandatory</strong> for using both the CLI commands an
         
         <div class="related-pages">
           
-          <a class="prev-page" href="api.html">
+          <a class="prev-page" href="env.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title"><cite>agentc</cite> Package Documentation</div>
+                <div class="title">Agent Catalog Environment Variables</div>
                 
               </div>
             </a>
@@ -467,12 +443,12 @@ Some variables are <strong>mandatory</strong> for using both the CLI commands an
             <ul>
 <li><a class="reference internal" href="#">Frequently Asked Questions</a><ul>
 <li><a class="reference internal" href="#how-do-i-roll-back-to-a-previous-catalog-version">How do I roll back to a previous catalog version?</a></li>
-<li><a class="reference internal" href="#what-should-my-env-contain">What should my .env contain?</a></li>
+<li><a class="reference internal" href="#what-environment-variables-are-required-to-use-agent-catalog">What environment variables are required to use Agent Catalog?</a></li>
 <li><a class="reference internal" href="#can-i-write-multiple-tools-prompts-in-one-file">Can I write multiple tools/prompts in one file?</a></li>
 <li><a class="reference internal" href="#do-cli-commands-need-to-be-executed-in-an-order">Do CLI commands need to be executed in an order?</a></li>
 <li><a class="reference internal" href="#can-i-index-and-publish-catalogs-programmatically">Can I index and publish catalogs programmatically?</a></li>
-<li><a class="reference internal" href="#how-does-agent-catalog-use-my-openai-api-key">How does Agent Catalog use my OpenAI API key?</a></li>
-<li><a class="reference internal" href="#can-i-use-any-llm-i-wish-to">Can I use any LLM I wish to?</a></li>
+<li><a class="reference internal" href="#does-agent-catalog-require-an-openai-api-key">Does Agent Catalog require an OpenAI API key?</a></li>
+<li><a class="reference internal" href="#does-agent-catalog-work-with-any-llm">Does Agent Catalog work with any LLM?</a></li>
 </ul>
 </li>
 </ul>
