@@ -100,3 +100,64 @@ To roll back to a previous catalog version, follow these steps:
 
    For further information on Git, please refer to git documentation
    `here <https://training.github.com/downloads/github-git-cheat-sheet>`_ .
+
+
+What should my .env contain?
+----------------------------
+
+To get started with Agent Catalog, you'll need to initialize certain environment variables in a ``.env`` file located at the
+root of your project (make sure the file is created where all your ``agentc`` commands will be running). These variables configure key settings, such as API keys, database connections, and other project-specific options, that are essential for running CLI commands and building agent workflows.
+
+Make sure to review the required variables and populate them with appropriate values before starting your project.
+
+.. code-block:: ini
+       :caption: Add the following to your ``.env`` file, and replace the default values with your desired settings
+
+       ------------------------------------------ REQUIRED -----------------------------------------
+       # Couchbase-specific environment variables.
+       CB_CONN_STRING=localhost
+       CB_USERNAME=Administrator
+       CB_PASSWORD=password
+
+       # The OpenAI API key.
+       OPENAI_API_KEY=...
+
+       ------------------------------------------ OPTIONAL ------------------------------------------
+       # These are from the starter agent as described in `travel-agent` example
+
+       # Agent Catalog specific environment variables that identify where the catalog is stored.
+       AGENT_CATALOG_CONN_STRING=couchbase://localhost
+       AGENT_CATALOG_USERNAME=Administrator
+       AGENT_CATALOG_PASSWORD=password
+       AGENT_CATALOG_BUCKET=travel-sample
+
+       # For example purposes, we want to see what our agent is doing (this is CF-specific).
+       CONTROLFLOW_TOOLS_VERBOSE=true
+       PREFECT_LOGGING_LEVEL=CRITICAL
+
+       # ControlFlow specific environment variables (which are really just Prefect environment variables).
+       PREFECT_API_URL="http://127.0.0.1:4200/api"
+
+       # Default model used when encoding our tool / prompt descriptions.
+       DEFAULT_SENTENCE_EMODEL=sentence-transformers/all-MiniLM-L12-v2
+
+       # To stop sentence_transformers from being fussy about multiple imports.
+       TOKENIZERS_PARALLELISM=false
+
+The list above details the environment variables required to enable Agent Catalog functionalities.
+Some variables are **mandatory** for using both the CLI commands and the SDK:
+
+1. Couchbase specific environment variables
+
+* ``CB_CONN_STRING``: Couchbase connection string, which can be set to localhost or obtained from Capella. For more info on connection strings, refer to the `official documentation <https://docs.couchbase.com/python-sdk/current/howtos/managing-connections.html#connection-strings>`_.
+
+* ``CB_USERNAME``: Username needed to sign in to your Couchbase cluster, either hosted locally (if ``CB_CONN_STRING`` =``localhost``) or within your Capella organization. When using Capella, this is the username associated with the database access key required for the connection string set up.
+
+* ``CB_PASSWORD``: Password needed to sign in to your Couchbase cluster, either hosted locally (if ``CB_CONN_STRING`` =``localhost``) or within your Capella organization. When using Capella, this is the password associated with the database access key required for the connection string set up.
+
+2. LLM Connection
+
+* ``OPENAI_API_KEY``: To start using Agent Catalog functionalities, you require an OpenAI API key. Refer to the next section on :ref:`OpenAI API Key usage <How does Agent Catalog use my OpenAI API key?>` to know more about how we leverage OpenAI to enhance agent workflow development.
+
+The rest of the variables are optional and contextual to the ``travel-agent`` example as explained in `this repository <https://github.com/couchbaselabs/agent-catalog-example>`_.
+
