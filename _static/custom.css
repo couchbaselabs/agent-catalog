@@ -1,8 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Open+Sans:wght@700&family=Source+Code+Pro&display=swap');
 
 body {
-    font-family: Public Sans,-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+    font-family: 'Open Sans' ,Public Sans,-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
     text-align: justify;
+}
+
+h1,h2,h3,h4,h5,h6{
+    font-family: 'Open Sans' ,Public Sans,-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;;
+}
+
+pre{
+    font-family: "Source Code Pro",Menlo,monospace;
+}
+
+.pre{
+     font-family: "Source Code Pro",Menlo,monospace;
 }
 
 p {
