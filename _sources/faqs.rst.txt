@@ -161,3 +161,16 @@ Some variables are **mandatory** for using both the CLI commands and the SDK:
 
 The rest of the variables are optional and contextual to the ``travel-agent`` example as explained in `this repository <https://github.com/couchbaselabs/agent-catalog-example>`_.
 
+
+How does Agent Catalog use my OpenAI API key?
+---------------------------------------------
+
+Agent Catalog does not use your OpenAI API key directly. While developing agent workflows with your preferred frameworks, a large language model (LLM) is essential for tasks such as response generation and decision-making. Agent Catalog simplifies this process by maintaining a comprehensive catalog of tools and prompts that your agents may require. It generates and stores embeddings of tool and prompt descriptions, allowing for efficient semantic searches to retrieve relevant items.
+
+Agent Catalog itself does not rely on an LLM, which means it does not utilize your API key. The LLM is solely needed by your agent development framework, such as ControlFlow, Langgraph, or similar, to perform tasks like generating responses and executing complex reasoning.
+
+Can I use any LLM ?
+-------------------
+
+Absolutely! You are free to choose any LLM for your agent workflow development, as long as the framework you select supports it. This flexibility allows you to tailor your agent’s capabilities to your specific needs and preferences.
+
