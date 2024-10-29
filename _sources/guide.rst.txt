@@ -64,7 +64,7 @@ Couchbase-Backed Agent Catalogs
 The catalog (currently) versions two types of items: tools and prompts.
 Both tool builders and prompt builders (i.e., agent builders) will follow this workflow:
 
-1. **Template Downloading**: Download the appropriate template from the :file:`templates` directory.
+1. **Template Downloading**: Download the appropriate template from the :file:`templates` directory. Alternatively, use the ``agentc add`` `command <cli.html#agentc-add>`_ to auto-download the template of choice.
 
 2. **Tool/Prompt Creation**: Fill out the template with the necessary information.
 

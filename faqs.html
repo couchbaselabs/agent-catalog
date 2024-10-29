@@ -369,9 +369,64 @@ run) <em>or</em> manually using <strong class="command">export</strong>.</p>
 </div>
 <p>For more information on Agent Catalog environment variables, refer to the documentation <a class="reference external" href="env">here</a>.</p>
 </section>
+<section id="what-are-the-different-types-of-tools-and-prompts-i-can-create">
+<h2>What are the different types of tools and prompts I can create?<a class="headerlink" href="#what-are-the-different-types-of-tools-and-prompts-i-can-create" title="Link to this heading">¶</a></h2>
+<p>You can define four types of tools and two types of prompts, each designed for different functionalities:</p>
+<ol class="arabic simple">
+<li><p><strong>Tools</strong></p></li>
+</ol>
+<ul class="simple">
+<li><p><strong>Python Functions</strong> (<code class="docutils literal notranslate"><span class="pre">.py</span></code>) - Define Python functions with specific inputs and outputs, following the prescribed function definitions. The functions are tagged with the <code class="docutils literal notranslate"><span class="pre">&#64;tool</span></code> decorator for easy identification and use.</p></li>
+<li><p><strong>SQL++ Query</strong> (<code class="docutils literal notranslate"><span class="pre">.sqlpp</span></code>) - Create Couchbase SQL++ queries that run on your cluster, returning results based on a schema you define. This tool is ideal for working with structured data stored in Couchbase.</p></li>
+<li><p><strong>Semantic Search</strong> (<code class="docutils literal notranslate"><span class="pre">.yaml</span></code>) - Perform semantic searches on specific fields within documents using Couchbase Vector Search. This tool allows you to search for documents by meaning rather than exact keyword matches.</p></li>
+<li><p><strong>HTTP Requests</strong> (<code class="docutils literal notranslate"><span class="pre">.yaml</span></code>) - Configure REST API calls to external endpoints of your choice for data retrieval or interaction. These tools are useful for interacting with external services, retrieving or sending data, or triggering workflows that rely on third-party APIs.</p></li>
+</ul>
+<ol class="arabic simple" start="2">
+<li><p><strong>Prompts</strong> - TODO</p></li>
+</ol>
+<ul class="simple">
+<li><p><strong>Jinja</strong> (<code class="docutils literal notranslate"><span class="pre">.jinja</span></code>) - These prompts utilize the Jinja templating engine to create dynamic and flexible input templates. They allow you to craft prompts with placeholders, which can be filled at runtime based on the specific context of the agent, enabling powerful and reusable prompt generation.</p></li>
+<li><p><strong>Raw prompts</strong> (<code class="docutils literal notranslate"><span class="pre">.prompt</span></code>) - Raw prompts are static, predefined text-based instructions for the language model. They are written directly as plain text without any dynamic elements. These are best suited for straightforward tasks that require a single-shot interaction or fixed wording for the prompt.</p></li>
+</ul>
+<p>Refer to the templates <a class="reference external" href="https://github.com/couchbaselabs/agent-catalog/tree/master/resources/templates">here</a> for more information on how to write each tool and prompt.</p>
+</section>
 <section id="can-i-write-multiple-tools-prompts-in-one-file">
 <h2>Can I write multiple tools/prompts in one file?<a class="headerlink" href="#can-i-write-multiple-tools-prompts-in-one-file" title="Link to this heading">¶</a></h2>
-<p>TODO</p>
+<p>It is possible to define multiple tools in a single file for certain types of tools, while prompts must be written one per file.</p>
+<p>For Python tools (<code class="docutils literal notranslate"><span class="pre">record_kind</span></code> = <code class="docutils literal notranslate"><span class="pre">python_function</span></code>), you can include multiple tools in a single <code class="docutils literal notranslate"><span class="pre">.py</span></code> file, as each tool is uniquely identified with the <code class="docutils literal notranslate"><span class="pre">&#64;tool</span></code> decorator. Additionally, if you are defining HTTP tools (<code class="docutils literal notranslate"><span class="pre">record_kind</span></code> = <code class="docutils literal notranslate"><span class="pre">http_request</span></code>) in YAML, you may specify multiple path entries within the same file, provided that they share the same API specification.</p>
+<p>Examples illustrating this are shown below:</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Example of multiple python tools in a single .py file</span><a class="headerlink" href="#id4" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">agentc_core.tool</span> <span class="kn">import</span> <span class="n">tool</span>
+
+<span class="nd">@tool</span>
+<span class="k">def</span> <span class="nf">search_best_flight_deals</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">FlightDeal</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Search for the best flight deals.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="nd">@tool</span>
+<span class="k">def</span> <span class="nf">create_packing_checklist</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">PackingChecklistItem</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a packing checklist.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">Example of multiple http request tools in a single yaml file</span><a class="headerlink" href="#id5" title="Link to this code">¶</a></div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">record_kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http_request</span>
+
+<span class="nt">open_api</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">filename</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../rewards_spec.json</span>
+<span class="w">  </span><span class="nt">operations</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/create</span><span class="w">                       </span><span class="c1"># ===&gt; considered as one tool</span>
+<span class="w">      </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">post</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/rewards/{member_id}</span><span class="w">          </span><span class="c1"># ===&gt; considered as another tool</span>
+<span class="w">      </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">get</span>
+</pre></div>
+</div>
+</div>
+<p>For other types of tools and for all prompts, you must define one tool or prompt per file. If you’d like to auto-download tools or prompts using default configurations, you can refer to the <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">add</span></code> command in the documentation <a class="reference external" href="cli.html#agentc-add">here</a>.</p>
 </section>
 <section id="do-cli-commands-need-to-be-executed-in-an-order">
 <h2>Do CLI commands need to be executed in an order?<a class="headerlink" href="#do-cli-commands-need-to-be-executed-in-an-order" title="Link to this heading">¶</a></h2>
@@ -444,6 +499,7 @@ LLM).</p>
 <li><a class="reference internal" href="#">Frequently Asked Questions</a><ul>
 <li><a class="reference internal" href="#how-do-i-roll-back-to-a-previous-catalog-version">How do I roll back to a previous catalog version?</a></li>
 <li><a class="reference internal" href="#what-environment-variables-are-required-to-use-agent-catalog">What environment variables are required to use Agent Catalog?</a></li>
+<li><a class="reference internal" href="#what-are-the-different-types-of-tools-and-prompts-i-can-create">What are the different types of tools and prompts I can create?</a></li>
 <li><a class="reference internal" href="#can-i-write-multiple-tools-prompts-in-one-file">Can I write multiple tools/prompts in one file?</a></li>
 <li><a class="reference internal" href="#do-cli-commands-need-to-be-executed-in-an-order">Do CLI commands need to be executed in an order?</a></li>
 <li><a class="reference internal" href="#can-i-index-and-publish-catalogs-programmatically">Can I index and publish catalogs programmatically?</a></li>

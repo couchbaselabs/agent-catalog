@@ -306,7 +306,7 @@ Depending on how your <code class="code highlight python docutils literal highli
 <p>The catalog (currently) versions two types of items: tools and prompts.
 Both tool builders and prompt builders (i.e., agent builders) will follow this workflow:</p>
 <ol class="arabic">
-<li><p><strong>Template Downloading</strong>: Download the appropriate template from the <code class="file docutils literal notranslate"><span class="pre">templates</span></code> directory.</p></li>
+<li><p><strong>Template Downloading</strong>: Download the appropriate template from the <code class="file docutils literal notranslate"><span class="pre">templates</span></code> directory. Alternatively, use the <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">add</span></code> <a class="reference external" href="cli.html#agentc-add">command</a> to auto-download the template of choice.</p></li>
 <li><p><strong>Tool/Prompt Creation</strong>: Fill out the template with the necessary information.</p></li>
 <li><p><strong>Versioning</strong>: All tools and all prompts must be versioned.
 Agent Catalog currently integrates with Git (using the working Git SHA) to version each item.
