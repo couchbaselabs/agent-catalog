@@ -204,11 +204,26 @@ For other types of tools and for all prompts, you must define one tool or prompt
 
 Do CLI commands need to be executed in an order?
 ------------------------------------------------
-TODO
+While you can run any CLI command at any time, certain commands follow a logical order to ensure proper catalog management.
+
+1. **Indexing**: After creating tools or prompts, you first need to generate the catalog with the ``agentc index`` command. This step prepares the catalog for local use.
+
+2. **Finding**: Once the catalog is indexed, you can perform local searches using the ``agentc find`` command or work programmatically through the Provider.
+
+3. **Publishing**: To persist the catalog in your Couchbase cluster, use the ``agentc publish`` command. This allows database-level searches via ``agentc find --search-db``.
+
+.. note::
+
+       Publishing should only be done after indexing the catalog. For any changes made to the local catalog, you must re-index it, commit the changes to Git, and then publish it again to update the database.
+
+4. **Cleaning**: To remove the catalog and clean up the environment, use the ``agentc clean`` command.
+
+Other commands can be executed at any time and provide valuable information about your development environment.
+
 
 Can I index and publish catalogs programmatically?
 --------------------------------------------------
-TODO
+Yes! The ``agentc_cli`` package enables you to import all the CLI commands directly into your project, allowing you to programmatically manage tasks such as indexing and publishing catalogs. You can write custom scripts that use these commands to automate processes, integrate with existing workflows, etc., allowing you to streamline catalog management and optimize your agent workflow development.
 
 Does Agent Catalog require an OpenAI API key?
 ----------------------------------------------
