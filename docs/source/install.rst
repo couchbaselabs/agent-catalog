@@ -68,8 +68,8 @@ Building From Source (with Poetry + pip)
 Verifying Your Installation
 ---------------------------
 If you've followed the steps above, you should now have the :command:``agentc`` command line tool.
-Run :command:``agentc --help`` to verify your installation (note that your first run will take a couple of seconds,
-subsequent runs will be faster).
+Run :command:``agentc --help`` to verify your installation (note that your first run will take a couple of seconds as
+some libraries like numpy need to be built, subsequent runs will be faster).
 
 .. code-block:: console
 

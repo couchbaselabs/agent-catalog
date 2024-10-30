@@ -6,6 +6,7 @@ import logging
 import os
 import pathlib
 import pydantic
+import re
 import typing
 
 from ..models.context import Context
@@ -58,10 +59,19 @@ def load_repository(top_dir: pathlib.Path = None):
 
     def get_path_version(path: pathlib.Path) -> VersionDescriptor:
         is_dirty, identifier = False, None
-
         if repo.is_dirty(path=path.absolute()):
             is_dirty = True
-        commits = list(repo.iter_commits(paths=path.absolute(), max_count=1))
+
+        # Even if we are dirty, we want to find a commit id if it exists.
+        try:
+            commits = list(repo.iter_commits(paths=path.absolute(), max_count=1))
+        except ValueError as e:
+            if re.findall(r"Reference at '.*' does not exist", str(e)):
+                logger.debug(f"No commits found in the repository. Swallowing exception:\n{str(e)}")
+                commits = []
+            else:
+                raise e
+
         if not commits or len(commits) <= 0:
             is_dirty = True
         else:

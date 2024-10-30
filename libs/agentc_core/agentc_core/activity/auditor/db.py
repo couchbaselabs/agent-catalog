@@ -1,4 +1,8 @@
+import couchbase.auth
+import couchbase.cluster
 import couchbase.exceptions
+import couchbase.options
+import datetime
 import json
 import logging
 
@@ -11,7 +15,6 @@ from .base import BaseAuditor
 from agentc_core.util.connection import get_host_name
 from agentc_core.util.models import CouchbaseConnect
 from agentc_core.util.publish import create_scope_and_collection
-from agentc_core.util.publish import get_connection
 
 logger = logging.getLogger(__name__)
 
@@ -28,27 +31,32 @@ class DBAuditor(BaseAuditor):
         agent_name: str,
     ):
         super().__init__(catalog_version, model_name, agent_name)
-        conn = CouchbaseConnect(
+
+        # (this is to validate our connection parameters).
+        CouchbaseConnect(
             connection_url=conn_string,
             username=username,
             password=password,
             host=get_host_name(conn_string),
         )
-        err, cluster = get_connection(conn)
-        if err is not None:
-            logger.error(err)
-            return
+
+        # All exceptions should be raised if we cannot connect.
+        auth = couchbase.auth.PasswordAuthenticator(username, password)
+        options = couchbase.options.ClusterOptions(auth)
+        logger.debug(f"Connecting to Couchbase cluster at {conn_string}...")
+        cluster = couchbase.cluster.Cluster(conn_string, options)
+        cluster.wait_until_ready(datetime.timedelta(seconds=10))
+        logger.debug("Connection successfully established.")
 
         # Get bucket ref
         cb = cluster.bucket(bucket)
 
         # Get the bucket manager
         bucket_manager = cb.collections()
-
         msg, err = create_scope_and_collection(bucket_manager, DEFAULT_AUDIT_SCOPE, DEFAULT_AUDIT_COLLECTION)
         if err is not None:
             logger.error(err)
-            return
+            raise err
 
         try:
             create_analytics_udfs(cluster, bucket)

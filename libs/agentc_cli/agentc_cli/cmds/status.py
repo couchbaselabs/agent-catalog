@@ -28,16 +28,14 @@ logger = logging.getLogger(__name__)
 
 def cmd_status(
     ctx: Context,
-    kind: typing.Literal["all", "tool", "prompt"] = "all",
+    kind: list[typing.Literal["tool", "prompt"]],
     include_dirty: bool = True,
     status_db: bool = False,
     bucket: str = None,
     cluster: any = None,
     compare: bool = False,
 ):
-    catalog_kinds = ["tool", "prompt"] if kind == "all" else [kind]
-
-    for catalog_kind in catalog_kinds:
+    for catalog_kind in kind:
         if status_db:
             click.secho(DASHES, fg=KIND_COLORS[catalog_kind])
             click.secho(catalog_kind.upper(), fg=KIND_COLORS[catalog_kind], bold=True)

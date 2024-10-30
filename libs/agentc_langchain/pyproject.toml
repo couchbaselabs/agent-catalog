@@ -27,7 +27,9 @@ pydantic = "2.8.2"
 requests = "^2.32.3"
 python-dotenv = "^1.0.1"
 
-agentc-core = { path = "../agentc_core", develop = true }
+[tool.poetry.dependencies.agentc-core]
+path = "../agentc_core"
+develop = true
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"

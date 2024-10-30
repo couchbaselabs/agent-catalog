@@ -17,6 +17,7 @@ package-mode = false
 python = "^3.12"
 
 # All of our Agent Catalog packages.
+[tool.poetry.group.agent-catalog.dependencies]
 agentc = { path = "libs/agentc", develop = true }
 agentc-core = { path = "libs/agentc_core", develop = true }
 agentc-cli = { path = "libs/agentc_cli", develop = true }
@@ -27,7 +28,9 @@ pre-commit = "^3.2.2"
 pytest = "^8.3.2"
 
 # An internal testing package for the Agent Catalog.
-agentc-testing = { path = "libs/agentc_testing", develop = true }
+[tool.poetry.group.dev.dependencies.agentc-testing]
+path = "libs/agentc_testing"
+develop = true
 
 [tool.poetry.group.docs.dependencies]
 sphinx = "^8.1.3"

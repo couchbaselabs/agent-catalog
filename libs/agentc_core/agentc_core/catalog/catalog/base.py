@@ -1,4 +1,5 @@
 import abc
+import math
 import pydantic
 import typing
 
@@ -47,12 +48,17 @@ class CatalogBase(abc.ABC):
 
         raise NotImplementedError("CatalogBase.find()")
 
+    @staticmethod
+    def cosine_similarity(query: list[float], entry: list[float]) -> float:
+        dot_product = sum(q * e for q, e in zip(query, entry))
+        query_magnitude = math.sqrt(sum(q**2 for q in query))
+        entry_magnitude = math.sqrt(sum(e**2 for e in entry))
+        return dot_product / (query_magnitude * entry_magnitude)
+
     @classmethod
     def get_deltas(cls, query: list[float], entries: list[list[float]]) -> list[float]:
         """Returns the cosine similarity between the query and the entry."""
-        import sklearn
-
-        return [x[0] for x in sklearn.metrics.pairwise.cosine_similarity(X=entries, Y=[query])]
+        return [cls.cosine_similarity(query, entry) for entry in entries]
 
     @property
     @abc.abstractmethod

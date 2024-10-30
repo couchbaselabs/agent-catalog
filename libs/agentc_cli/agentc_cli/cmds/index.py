@@ -3,6 +3,7 @@ import datetime
 import logging
 import os
 import pathlib
+import re
 import typing
 
 from ..cmds.util import load_repository
@@ -56,11 +57,21 @@ def cmd_index(
     )
 
     # The version for the repo's HEAD commit.
-    version = VersionDescriptor(
-        identifier=str(repo.head.commit),
-        is_dirty=repo.is_dirty(),
-        timestamp=datetime.datetime.now(tz=datetime.timezone.utc),
-    )
+    try:
+        version = VersionDescriptor(
+            identifier=str(repo.head.commit),
+            is_dirty=repo.is_dirty(),
+            timestamp=datetime.datetime.now(tz=datetime.timezone.utc),
+        )
+    except ValueError as e:
+        if re.findall(r"Reference at '.*' does not exist", str(e)):
+            logger.debug(f"No commits found in the repository. Swallowing exception:\n{str(e)}")
+            version = VersionDescriptor(
+                is_dirty=True,
+                timestamp=datetime.datetime.now(tz=datetime.timezone.utc),
+            )
+        else:
+            raise e
 
     # TODO: The kind needs a security check as it's part of the path?
     catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)

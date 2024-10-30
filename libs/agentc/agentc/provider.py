@@ -1,5 +1,6 @@
 import couchbase.auth
 import couchbase.cluster
+import couchbase.exceptions
 import couchbase.options
 import logging
 import pathlib
@@ -214,15 +215,21 @@ class Provider(pydantic_settings.BaseSettings):
             return self
 
         # Try to connect to our cluster.
-        cluster = couchbase.cluster.Cluster.connect(
-            self.conn_string,
-            couchbase.options.ClusterOptions(
-                couchbase.auth.PasswordAuthenticator(
-                    username=self.username.get_secret_value(),
-                    password=self.password.get_secret_value(),
-                )
-            ),
-        )
+        try:
+            cluster = couchbase.cluster.Cluster.connect(
+                self.conn_string,
+                couchbase.options.ClusterOptions(
+                    couchbase.auth.PasswordAuthenticator(
+                        username=self.username.get_secret_value(),
+                        password=self.password.get_secret_value(),
+                    )
+                ),
+            )
+        except couchbase.exceptions.CouchbaseException:
+            logger.warning("Could not connect to the Couchbase cluster. Skipping remote catalog.")
+            return self
+
+        # Validate the embedding models of our tool and prompt catalogs.
         if self._local_tool_catalog is not None or self._local_prompt_catalog is not None:
             embedding_model = EmbeddingModel(
                 cb_bucket=self.bucket,

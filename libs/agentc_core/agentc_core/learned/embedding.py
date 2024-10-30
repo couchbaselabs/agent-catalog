@@ -109,23 +109,31 @@ class EmbeddingModel(pydantic.BaseModel):
                     wrapped_queries = [f"({query})" for query in union_subqueries]
                     metadata_query = self.cb_cluster.query(" UNION ALL ".join(wrapped_queries))
                 case _:
-                    raise ValueError("No metadata collections found in remote catalogs!")
-            for row in metadata_query:
-                collected_embedding_model_names.add(row)
+                    # No metadata collections were found (thus, agentc publish has not been run).
+                    logger.debug("No metadata collections found in remote catalogs.")
+                    metadata_query = None
+
+            if metadata_query is not None:
+                for row in metadata_query:
+                    collected_embedding_model_names.add(row)
 
             if len(collected_embedding_model_names) > 1:
                 raise ValueError(
                     f"Multiple embedding models found in remote catalogs: " f"{collected_embedding_model_names}"
                 )
-            remote_embedding_model_name = collected_embedding_model_names.pop()
-            logger.debug("Found embedding model %s in remote catalogs.", remote_embedding_model_name)
-            if from_catalog_embedding_model_name is None:
-                from_catalog_embedding_model_name = remote_embedding_model_name
-            elif from_catalog_embedding_model_name != remote_embedding_model_name:
-                raise ValueError(
-                    f"Local embedding model {from_catalog_embedding_model_name} does not match "
-                    f"remote embedding model {remote_embedding_model_name}!"
-                )
+            elif len(collected_embedding_model_names) == 1:
+                remote_embedding_model_name = collected_embedding_model_names.pop()
+                logger.debug("Found embedding model %s in remote catalogs.", remote_embedding_model_name)
+                if (
+                    from_catalog_embedding_model_name is not None
+                    and from_catalog_embedding_model_name != remote_embedding_model_name
+                ):
+                    raise ValueError(
+                        f"Local embedding model {from_catalog_embedding_model_name} does not match "
+                        f"remote embedding model {remote_embedding_model_name}!"
+                    )
+                elif from_catalog_embedding_model_name is None:
+                    from_catalog_embedding_model_name = remote_embedding_model_name
 
         if self.embedding_model_name is None:
             self.embedding_model_name = from_catalog_embedding_model_name
@@ -137,6 +145,8 @@ class EmbeddingModel(pydantic.BaseModel):
                 f"Local embedding model {from_catalog_embedding_model_name} does not match "
                 f"specified embedding model {self.embedding_model_name}!"
             )
+        elif self.embedding_model_name is None and from_catalog_embedding_model_name is None:
+            raise ValueError("No embedding model found (run 'agentc index' to download one).")
 
         # Note: we won't validate the embedding model name because sentence_transformers takes a while to import.
         self._embedding_model = None

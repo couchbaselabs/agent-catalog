@@ -1,9 +1,6 @@
 import abc
 import logging
-import numpy
 import pydantic
-import scipy.signal
-import sklearn.neighbors
 import typing
 
 from agentc_core.catalog import SearchResult
@@ -25,6 +22,22 @@ class ClosestClusterRefiner(pydantic.BaseModel, BaseRefiner):
     no_more_than_k: typing.Optional[int] = pydantic.Field(None, gt=0)
 
     def __call__(self, ordered_entries: list[SearchResult]):
+        try:
+            # TODO (GLENN): We could probably move this file to a separate package entirely...
+            # We'll move these imports here (numpy in particular we want to keep out of core for now).
+            import numpy
+            import scipy.signal
+            import sklearn.neighbors
+
+        except ImportError as e:
+            raise ImportError(
+                "To use the ClosestClusterRefiner, please install the following libraries:\n"
+                "\t- scikit-learn\n"
+                "\t- numpy\n"
+                "\t- scipy\n"
+                "(use the command `pip install scikit-learn numpy scipy`)"
+            ) from e
+
         # We are given tools in the order of most relevant to least relevant -- we need to reverse this list.
         a = numpy.array(sorted([t.delta for t in ordered_entries])).reshape(-1, 1)
         s = numpy.linspace(min(a) - 0.01, max(a) + 0.01, num=self.kde_distribution_n).reshape(-1, 1)

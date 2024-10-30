@@ -246,8 +246,8 @@ def clean(ctx, catalog, bucket, catalog_id, skip_confirm, kind):
         kind_list = ["tool", "prompt"] if kind == "all" else [kind]
         cmd_clean(
             ctx=ctx.obj,
-            is_db=False,
-            is_local=True,
+            is_db=clean_db,
+            is_local=clean_local,
             bucket=bucket,
             cluster=cluster,
             catalog_ids=catalog_id,
@@ -490,9 +490,6 @@ def publish(ctx, kind, bucket, annotations):
     if len(kind) == 0:
         kind = ["tool", "prompt"]
 
-    # Get keyspace and connection details
-    keyspace_details = Keyspace(bucket=bucket, scope=DEFAULT_CATALOG_SCOPE)
-
     # Load all Couchbase connection related data from env
     connection_details_env = CouchbaseConnect(
         connection_url=os.getenv("AGENT_CATALOG_CONN_STRING"),
@@ -505,10 +502,10 @@ def publish(ctx, kind, bucket, annotations):
     err, cluster = get_connection(conn=connection_details_env)
     if err:
         raise ValueError(f"Unable to connect to Couchbase!\n{err}")
-    cluster.close()
 
     # Determine the bucket.
     buckets = get_buckets(cluster=cluster)
+    cluster.close()
     if bucket is None and ctx_obj.interactive:
         bucket = click.prompt("Bucket", type=click.Choice(buckets), show_choices=True)
 
@@ -525,6 +522,9 @@ def publish(ctx, kind, bucket, annotations):
             "Add --bucket BUCKET_NAME to your command or run agent clean in interactive mode."
         )
 
+    # Get keyspace and connection details
+    keyspace_details = Keyspace(bucket=bucket, scope=DEFAULT_CATALOG_SCOPE)
+
     cmd_publish(
         ctx=ctx.obj,
         kind=kind,
@@ -536,12 +536,10 @@ def publish(ctx, kind, bucket, annotations):
 
 # TODO (GLENN): We should make kind an argument here (similar to publish and clean).
 @click_main.command()
-@click.option(
-    "--kind",
-    default="all",
-    type=click.Choice(["all", "tool", "prompt"], case_sensitive=False),
-    help="Kind of catalog to show status for.",
-    show_default=True,
+@click.argument(
+    "kind",
+    type=click.Choice(["tool", "prompt"], case_sensitive=False),
+    nargs=-1,
 )
 @click.option(
     "--include-dirty",
@@ -576,6 +574,9 @@ def publish(ctx, kind, bucket, annotations):
 def status(ctx, kind, include_dirty, status_db, bucket, compare):
     """Show the status of the local catalog."""
     ctx_obj: Context = ctx.obj
+
+    if len(kind) == 0:
+        kind = ["tool", "prompt"]
 
     if status_db or compare:
         # Get keyspace and connection details

@@ -43,14 +43,14 @@ def test_index(tmp_path):
         shutil.copy(resources_folder / "_good_spec.json", tool_folder / "_good_spec.json")
         invocation = runner.invoke(click_main, ["index", str(tool_folder.absolute())])
 
-        # We should see 6 files scanned and 7 tools indexed.
+        # We should see 8 files scanned and 9 tools indexed.
         output = invocation.output
         print(output)
         assert "Crawling" in output
         assert "Generating embeddings" in output
         assert "Catalog successfully indexed" in output
-        assert "0/6" in output
-        assert "0/7" in output
+        assert "0/8" in output
+        assert "0/9" in output
 
 
 # Small helper function to publish to a Couchbase catalog.
@@ -228,14 +228,14 @@ def test_status(tmp_path, get_isolated_server):
         publish_catalog(runner, catalog, catalog_folder)
 
         # Case 2 - tool catalog exists locally (testing for only one kind of catalog)
-        output = runner.invoke(click_main, ["status", "--include-dirty", "--kind", "tool"]).stdout
+        output = runner.invoke(click_main, ["status", "tool", "--include-dirty"]).stdout
         print("Ran assertion for local status when tool catalog exists")
         expected_response_local = "local catalog info:\n	path            : .agent-catalog/tool-catalog.json"
         assert expected_response_local in output
 
         # Case 3 - tool catalog exists in db (this test runs after publish test)
         output = runner.invoke(
-            click_main, ["status", "--include-dirty", "--kind", "tool", "--status-db", "--bucket", "travel-sample"]
+            click_main, ["status", "tool", "--include-dirty", "--status-db", "--bucket", "travel-sample"]
         ).stdout
         expected_response = "db catalog info"
         print("Ran assertion for db status when tool catalog exists")
@@ -243,7 +243,7 @@ def test_status(tmp_path, get_isolated_server):
 
         # Case 4 - compare the two catalogs
         output = runner.invoke(
-            click_main, ["status", "--compare", "--kind", "tool", "--bucket", "travel-sample", "--include-dirty"]
+            click_main, ["status", "tool", "--compare", "--bucket", "travel-sample", "--include-dirty"]
         ).stdout
         expected_response_db_path = "path            : travel-sample.agent_catalog.tool"
         print("Ran assertion for compare status when tool catalog exists both locally and in db")
@@ -308,7 +308,7 @@ def test_clean(tmp_path, get_isolated_server):
 
         # Test our status after clean
         output = runner.invoke(
-            click_main, ["status", "--include-dirty", "--kind", "tool", "--status-db", "--bucket", "travel-sample"]
+            click_main, ["status", "tool", "--include-dirty", "--status-db", "--bucket", "travel-sample"]
         ).stdout
         expected_response_db = (
             "ERROR: db catalog of kind tool does not exist yet: please use the publish command by specifying the kind."

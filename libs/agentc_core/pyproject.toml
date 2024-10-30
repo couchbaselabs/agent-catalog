@@ -15,13 +15,8 @@ packages = [
 ]
 
 include = [
-    # These are the Jinja templates we use for code-gen.
     "agentc_core/tool/generate/templates/*",
-
-    # These are the Analytics DDLs for log analysis.
     "agentc_core/analytics/ddls/*",
-
-    # These are the tool templates (primarily used for the add command).
     "agentc_core/tool/templates/*",
     "agentc_core/prompt/templates/*"
 ]
@@ -46,10 +41,11 @@ jinja2 = "^3.1.4"
 openapi3-parser = "^1.1.17"
 py-openapi-schema-to-json-schema = "^0.0.3"
 jsbeautifier = "^1.15.1"
-
 sentence-transformers = "^3.1.1"
 
-# TODO (GLENN): We should make this group optional (if no refinement is being performed).
+[tool.poetry.group.refiner]
+optional = true
+
 [tool.poetry.group.refiner.dependencies]
 scikit-learn = ">1.0.2"
 numpy = ">1.13.3"
@@ -59,7 +55,9 @@ scipy = ">0.14.0"
 pre-commit = "^3.2.2"
 pytest = "^8.3.2"
 
-agentc-testing = { path = "../agentc_testing", develop = true }
+[tool.poetry.group.dev.dependencies.agentc-testing]
+path = "../agentc_testing"
+develop = true
 
 [tool.pytest.ini_options]
 markers = [

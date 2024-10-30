@@ -101,6 +101,7 @@ def initialize_repo(
                 click_command, ["publish", "prompt", "--bucket", "travel-sample"] + (publish_args or [])
             )
         )
+    print(output)
     return output
 
 

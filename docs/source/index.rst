@@ -13,6 +13,7 @@ Table of Contents
 -----------------
 
 .. toctree::
+   :titlesonly:
 
    Getting Agent Catalog <install>
    Agent Catalog User Guide <guide>
@@ -26,5 +27,3 @@ Indices and Tables
 ------------------
 
 * :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

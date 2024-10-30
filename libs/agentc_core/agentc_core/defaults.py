@@ -1,9 +1,6 @@
 import gitignore_parser
 
-DEFAULT_EMBEDDING_MODEL = dict(
-    name="sentence-transformers/all-MiniLM-L12-v2",
-    endpoint="sentence_transformers",
-)
+DEFAULT_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L12-v2"
 DEFAULT_MODEL_CACHE_FOLDER = ".model-cache"
 DEFAULT_CATALOG_FOLDER = ".agent-catalog"
 DEFAULT_CATALOG_SCOPE = "agent_catalog"

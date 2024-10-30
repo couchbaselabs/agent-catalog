@@ -98,7 +98,7 @@ def cmd_clean(
     is_local: bool,
     is_db: bool,
     bucket: str,
-    cluster: couchbase.cluster,
+    cluster: couchbase.cluster.Cluster,
     catalog_ids: tuple[str],
     kind: list[typing.Literal["tool", "prompt"]],
     ctx: Context = None,

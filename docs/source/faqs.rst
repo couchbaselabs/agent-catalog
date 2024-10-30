@@ -20,13 +20,13 @@ versions of your agent or rolling back your agent due to some regression.
 Catalog versions are Git commit hashes.
 To roll back to a previous catalog version, follow these steps:
 
-1. **List Catalog Versions** : Start by running the :command:`agentc status` command with the ``--status-db`` flag to
+1. **List Catalog Versions** : Start by running the :command:`agentc status` command with the ``-db`` flag to
    list all the published catalog versions of tools in your bucket (here, we are checking in ``travel-sample``):
 
    .. code-block:: bash
 
        # run agentc status --help for all options
-       agentc status --kind tool --status-db --bucket travel-sample
+       agentc status tool -db --bucket travel-sample
 
    Running the command above will return a list of all the tool catalog snapshots you have published to Couchbase.
 

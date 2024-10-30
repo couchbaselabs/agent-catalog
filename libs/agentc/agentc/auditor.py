@@ -1,3 +1,4 @@
+import couchbase.exceptions
 import datetime
 import logging
 import pathlib
@@ -161,15 +162,19 @@ class Auditor(pydantic_settings.BaseSettings):
             )
 
         if self.conn_string is not None:
-            self._db_auditor = DBAuditor(
-                conn_string=self.conn_string,
-                username=self.username.get_secret_value(),
-                password=self.password.get_secret_value(),
-                model_name=self.llm_model_name,
-                agent_name=self.agent_name,
-                bucket=self.bucket,
-                catalog_version=provider.version,
-            )
+            try:
+                self._db_auditor = DBAuditor(
+                    conn_string=self.conn_string,
+                    username=self.username.get_secret_value(),
+                    password=self.password.get_secret_value(),
+                    model_name=self.llm_model_name,
+                    agent_name=self.agent_name,
+                    bucket=self.bucket,
+                    catalog_version=provider.version,
+                )
+            except couchbase.exceptions.CouchbaseException:
+                logger.warning("Could not connect to the Couchbase cluster.\nSkipping remote auditor.")
+                self._db_auditor = None
 
         # If we have both a local and remote auditor, we'll use both.
         if self._local_auditor is not None and self._db_auditor is not None:

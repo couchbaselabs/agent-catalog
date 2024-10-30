@@ -58,8 +58,8 @@ The mono-repo for the Couchbase Agent Catalog project.
 ### Verifying Your Installation
 
 If you've followed the steps above, you should now have the `agentc` command line tool.
-Run `agentc --help` to verify your installation (note that your first run will take a couple of seconds, subsequent
-runs will be faster).
+Run `agentc --help` to verify your installation (note that your first run will take a couple of seconds as some
+libraries like numpy need to be built, subsequent runs will be faster).
 
 ```bash
 Usage: agentc [OPTIONS] COMMAND [ARGS]...
