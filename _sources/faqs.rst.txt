@@ -137,43 +137,25 @@ Make sure to review the required variables and populate them with appropriate va
        # The holy OpenAI API key. :-)
        OPENAI_API_KEY=...
 
-For more information on Agent Catalog environment variables, refer to the documentation `here <env>`_.
+For more information on Agent Catalog environment variables, refer to the documentation `here <env.html>`_.
 
 What are the different types of tools and prompts I can create?
 ---------------------------------------------------------------
-You can define four types of tools and two types of prompts, each designed for different functionalities:
 
-1. **Tools**
-
-* **Python Functions** (``.py``) - Define Python functions with specific inputs and outputs, following the prescribed function definitions. The functions are tagged with the ``@tool`` decorator for easy identification and use.
-
-* **SQL++ Query** (``.sqlpp``) - Create Couchbase SQL++ queries that run on your cluster, returning results based on a schema you define. This tool is ideal for working with structured data stored in Couchbase.
-
-* **Semantic Search** (``.yaml``) - Perform semantic searches on specific fields within documents using Couchbase Vector Search. This tool allows you to search for documents by meaning rather than exact keyword matches.
-
-* **HTTP Requests** (``.yaml``) - Configure REST API calls to external endpoints of your choice for data retrieval or interaction. These tools are useful for interacting with external services, retrieving or sending data, or triggering workflows that rely on third-party APIs.
-
-2. **Prompts** - TODO
-
-* **Jinja** (``.jinja``) - These prompts utilize the Jinja templating engine to create dynamic and flexible input templates. They allow you to craft prompts with placeholders, which can be filled at runtime based on the specific context of the agent, enabling powerful and reusable prompt generation.
-
-* **Raw prompts** (``.prompt``) - Raw prompts are static, predefined text-based instructions for the language model. They are written directly as plain text without any dynamic elements. These are best suited for straightforward tasks that require a single-shot interaction or fixed wording for the prompt.
-
-
-Refer to the templates `here <https://github.com/couchbaselabs/agent-catalog/tree/master/resources/templates>`_ for more information on how to write each tool and prompt.
+Agent Catalog currently supports four types of tools (``python_function``, ``sqlpp_query``, ``semantic_search``,
+``http_request``) and two types of prompts (``raw_prompt``, ``jinja_prompt``).
+For more information on the types of tools and prompts you can create, refer to the documentation `here <entry.html>`_.
 
 Can I write multiple tools/prompts in one file?
 -----------------------------------------------
-It is possible to define multiple tools in a single file for certain types of tools, while prompts must be written one per file.
 
-For Python tools (``record_kind`` = ``python_function``), you can include multiple tools in a single ``.py`` file, as each tool is uniquely identified with the ``@tool`` decorator. Additionally, if you are defining HTTP tools (``record_kind`` = ``http_request``) in YAML, you may specify multiple path entries within the same file, provided that they share the same API specification.
-
-Examples illustrating this are shown below:
+All prompts must be defined in separate files, as each prompt is uniquely identified by its file name.
+However multiple tools can exist in a single file *if you are defining Python tools or HTTP request tools*.
+Examples of multiple tools existing within a single file are shown below:
 
 .. code-block:: python
-       :caption: Example of multiple python tools in a single .py file
 
-       from agentc_core.tool import tool
+       from agentc import tool
 
        @tool
        def search_best_flight_deals() -> list[FlightDeal]:
@@ -187,43 +169,74 @@ Examples illustrating this are shown below:
            return None
 
 .. code-block:: yaml
-       :caption: Example of multiple http request tools in a single yaml file
 
        record_kind: http_request
 
        open_api:
          filename: ../rewards_spec.json
          operations:
-           - path: /create                       # ===> considered as one tool
+           - path: /create                       # ===> one tool
              method: post
-           - path: /rewards/{member_id}          # ===> considered as another tool
+           - path: /rewards/{member_id}          # ===> another tool
              method: get
 
 
-For other types of tools and for all prompts, you must define one tool or prompt per file. If you'd like to auto-download tools or prompts using default configurations, you can refer to the ``agentc add`` command in the documentation `here <cli.html#agentc-add>`_.
+Do CLI commands need to be executed in a certain order?
+-------------------------------------------------------
 
-Do CLI commands need to be executed in an order?
-------------------------------------------------
-While you can run any CLI command at any time, certain commands follow a logical order to ensure proper catalog management.
+With the exception of the :command:`agentc publish` command, all other commands can be executed in any order.
 
-1. **Indexing**: After creating tools or prompts, you first need to generate the catalog with the ``agentc index`` command. This step prepares the catalog for local use.
+**Indexing**:
+   After creating your tools and/or prompts, you first need to generate a local catalog with the
+   :command:`agentc index` command.
+   This will build a file-based catalog that you can immediately use (without needing to connect to a Couchbase
+   instance).
 
-2. **Finding**: Once the catalog is indexed, you can perform local searches using the ``agentc find`` command or work programmatically through the Provider.
+**Publishing**:
+   To persist your catalog entries on Couchbase, use the :command:`agentc publish` command.
 
-3. **Publishing**: To persist the catalog in your Couchbase cluster, use the ``agentc publish`` command. This allows database-level searches via ``agentc find --search-db``.
+Publishing can only be done after indexing the catalog.
+To publish new changes, you must first commit your changes to Git and then run the :command:`agentc index` command
+again with a clean Git repository.
 
-.. note::
-
-       Publishing should only be done after indexing the catalog. For any changes made to the local catalog, you must re-index it, commit the changes to Git, and then publish it again to update the database.
-
-4. **Cleaning**: To remove the catalog and clean up the environment, use the ``agentc clean`` command.
-
-Other commands can be executed at any time and provide valuable information about your development environment.
-
+For the complete set of Agent Catalog CLI commands, refer to the documentation `here <cli.html>`_.
 
 Can I index and publish catalogs programmatically?
 --------------------------------------------------
-Yes! The ``agentc_cli`` package enables you to import all the CLI commands directly into your project, allowing you to programmatically manage tasks such as indexing and publishing catalogs. You can write custom scripts that use these commands to automate processes, integrate with existing workflows, etc., allowing you to streamline catalog management and optimize your agent workflow development.
+Yes!
+The ``agentc.cmd`` module allows developers to author Python scripts with the same functionality as our CLI commands.
+Below we give an example of how to index and publish catalogs programmatically:
+
+.. code-block:: python
+
+       from agentc.cmd import index, publish
+
+       # Index the directory named tools.
+       index(
+              directory="tools",
+              kind="tool",
+       )
+
+       # Publish our local catalog.
+       publish(
+              kind=["tool"],
+              bucket="travel-sample",
+              username="Administrator",
+              password="password",
+              connection_string="localhost"
+       )
+
+The script above is equivalent to running the following CLI commands:
+
+.. code-block:: bash
+
+       agentc index tools --kind tool
+
+       export AGENT_CATALOG_CONN_STRING=localhost
+       export AGENT_CATALOG_USERNAME=Administrator
+       export AGENT_CATALOG_PASSWORD=password
+       agentc publish tool --bucket travel-sample
+
 
 Does Agent Catalog require an OpenAI API key?
 ----------------------------------------------
@@ -235,5 +248,5 @@ Does Agent Catalog work with any LLM?
 
 Yes!
 Agent Catalog does not restrict you to a specific language model.
-You are free to choose any LLM for your agent workflow development (if your chosen agent framework supports your chosen
-LLM).
+You are free to choose any LLM for your agent workflow development (provided your chosen agent framework supports
+the LLM you choose).

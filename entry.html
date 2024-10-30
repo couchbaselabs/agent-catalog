@@ -1,0 +1,683 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Frequently Asked Questions" href="faqs.html" /><link rel="prev" title="Agent Catalog Environment Variables" href="env.html" />
+
+    <link rel="shortcut icon" href="_static/favicon.png"/><!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
+        <title>Agent Catalog Record Entries - Agent Catalog v0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=f0df55be" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">Agent Catalog v0.0.1 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">Agent Catalog v0.0.1 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Getting Agent Catalog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guide.html">Agent Catalog User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Agent Catalog API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="env.html">Environment Variables</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">On Catalog Entries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faqs.html">Frequently Asked Questions</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/entry.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="agent-catalog-record-entries">
+<h1>Agent Catalog Record Entries<a class="headerlink" href="#agent-catalog-record-entries" title="Link to this heading">¶</a></h1>
+<p>As of date, Agent Catalog supports six different types of records (four types of tools, two types of prompts).</p>
+<section id="tool-catalog-records">
+<h2>Tool Catalog Records<a class="headerlink" href="#tool-catalog-records" title="Link to this heading">¶</a></h2>
+<p>Tools are explicit actions that an agent can take to accomplish a task.
+Agent Catalog currently supports four types of tools: Python function tools, SQL++ query tools, semantic search tools,
+and HTTP request tools.</p>
+<section id="python-function-tools">
+<h3>Python Function Tools<a class="headerlink" href="#python-function-tools" title="Link to this heading">¶</a></h3>
+<p>The most generic tool is the Python function tool, which is associated with a function in <cite>.py</cite> file.
+To signal to Agent Catalog that you want to mark a function as a tool, you must use the <cite>&#64;tool</cite> decorator.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#</span>
+<span class="c1"># The following file is a template for a Python tool.</span>
+<span class="c1">#</span>
+<span class="kn">from</span> <span class="nn">agentc</span> <span class="kn">import</span> <span class="n">tool</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+
+
+<span class="c1"># Although Python uses duck-typing, the specification of models greatly improves the response quality of LLMs.</span>
+<span class="c1"># It is highly recommended that all tools specify the models of their bound functions using Pydantic or dataclasses.</span>
+<span class="k">class</span> <span class="nc">SalesModel</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">input_sources</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">sales_formula</span><span class="p">:</span> <span class="nb">str</span>
+
+
+<span class="c1"># Only functions decorated with &quot;tool&quot; will be indexed.</span>
+<span class="c1"># All other functions / module members will be ignored by the indexer.</span>
+<span class="nd">@tool</span>
+<span class="k">def</span> <span class="nf">compute_sales_for_this_week</span><span class="p">(</span><span class="n">sales_model</span><span class="p">:</span> <span class="n">SalesModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A description for the function bound to the tool. This is mandatory for tools.&quot;&quot;&quot;</span>
+
+    <span class="c1"># The implementation of the tool (given below) is *not* indexed.</span>
+    <span class="c1"># The indexer only cares about the name, function signature, and description.</span>
+    <span class="k">return</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="mf">0.99</span> <span class="o">+</span> <span class="mf">2.00</span> <span class="o">%</span> <span class="mf">6.0</span>
+
+
+<span class="c1"># You can also specify the name and description of the tool explicitly, as well as any annotations you wish to attach.</span>
+<span class="nd">@tool</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;compute_sales_for_the_month&quot;</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;sales&quot;</span><span class="p">})</span>
+<span class="k">def</span> <span class="nf">compute_sales_for_the_month</span><span class="p">(</span><span class="n">sales_model</span><span class="p">:</span> <span class="n">SalesModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A description for the function bound to the tool. This is mandatory for tools.&quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="mf">0.99</span> <span class="o">+</span> <span class="mf">2.00</span> <span class="o">%</span> <span class="mf">6.0</span>
+</pre></div>
+</div>
+</section>
+<section id="sql-query-tools">
+<h3>SQL++ Query Tools<a class="headerlink" href="#sql-query-tools" title="Link to this heading">¶</a></h3>
+<p>SQL++ is the query language used by Couchbase to interact with the data stored in the cluster.
+To create a SQL++ query tool, you must author a <code class="docutils literal notranslate"><span class="pre">.sqlpp</span></code> file with a header that details various metadata.
+If you are importing an existing SQL++ query, simply prepend the header to the query.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>--
+-- The following file is a template for a (Couchbase) SQL++ query tool.
+--
+
+-- All SQL++ query tools are specified using a valid SQL++ (.sqlpp) file.
+-- The tool metadata must be specified with YAML inside a multi-line C-style comment.
+/*
+# The name of the tool must be a valid Python identifier (e.g., no spaces).
+# This field is mandatory, and will be used as the name of a Python function.
+name: find_high_order_item_customers_between_date
+
+# A description for the function bound to this tool.
+# This field is mandatory, and will be used in the docstring of a Python function.
+description: &gt;
+    Given a date range, find the customers that have placed orders where the total number of items is more than 1000.
+
+# The inputs used to resolve the named parameters in the SQL++ query below.
+# Inputs are described using a JSON object that follows the JSON schema standard.
+# This field is mandatory, and will be used to build a Pydantic model.
+# See https://json-schema.org/learn/getting-started-step-by-step for more info.
+input: &gt;
+    {
+      &quot;type&quot;: &quot;object&quot;,
+      &quot;properties&quot;: {
+        &quot;orderdate_start&quot;: { &quot;type&quot;: &quot;string&quot; },
+        &quot;orderdate_end&quot;: { &quot;type&quot;: &quot;string&quot; }
+      }
+    }
+
+# The outputs used describe the structure of the SQL++ query result.
+# Outputs are described using a JSON object that follows the JSON schema standard.
+# This field is mandatory, and will be used to build a Pydantic model.
+# We recommend using the &#39;INFER&#39; command to build a JSON schema from your query results.
+# See https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/infer.html.
+# In the future, this field will be optional (we will INFER the query automatically for you).
+output: &gt;
+    {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+          &quot;cust_id&quot;: { &quot;type&quot;: &quot;string&quot; },
+          &quot;first_name&quot;: { &quot;type&quot;: &quot;string&quot; },
+          &quot;last_name&quot;: { &quot;type&quot;: &quot;string&quot; },
+          &quot;item_cnt&quot;: { &quot;type&quot;: &quot;integer&quot; }
+        }
+      }
+    }
+
+# As a supplement to the tool similarity search, users can optionally specify search annotations.
+# The values of these annotations MUST be strings (e.g., not &#39;true&#39;, but &#39;&quot;true&quot;&#39;).
+# This field is optional, and does not have to be present.
+annotations:
+  gdpr_2016_compliant: &quot;false&quot;
+  ccpa_2019_compliant: &quot;true&quot;
+
+# The &quot;secrets&quot; field defines search keys that will be used to query a &quot;secrets&quot; manager.
+# Note that these values are NOT the secrets themselves, rather they are used to lookup secrets.
+secrets:
+
+    # All Couchbase tools (e.g., semantic search, SQL++) must specify conn_string, username, and password.
+    - couchbase:
+        conn_string: CB_CONN_STRING
+        username: CB_USERNAME
+        password: CB_PASSWORD
+*/
+
+SELECT
+  c.cust_id,
+  c.name.first AS first_name,
+  c.name.last  AS last_name,
+  COUNT(*)     AS item_cnt
+FROM
+  customers AS c,
+  orders    AS o,
+  o.items   AS i
+WHERE
+  -- Parameters specified in the input field of the tool metadata above correspond to named parameters here.
+  -- The &#39;$&#39; syntax is used to denote a named parameter.
+  -- See https://docs.couchbase.com/server/current/n1ql/n1ql-rest-api/exnamed.html for more details.
+  ( o.orderdate BETWEEN $orderdate_start AND $orderdate_end ) AND
+  c.cust_id = o.cust_id
+GROUP BY
+  c.cust_id
+HAVING
+  COUNT(*) &gt; 1000;
+</pre></div>
+</div>
+</section>
+<section id="semantic-search-tools">
+<h3>Semantic Search Tools<a class="headerlink" href="#semantic-search-tools" title="Link to this heading">¶</a></h3>
+<p>Semantic search tools are used to search for text that is <em>semantically similar</em> to some query text.
+To create a semantic search tool, you must author a <code class="docutils literal notranslate"><span class="pre">.yaml</span></code> file with the <code class="docutils literal notranslate"><span class="pre">record_kind</span></code> field populated with
+<code class="docutils literal notranslate"><span class="pre">semantic_search</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#</span>
+<span class="c1"># The following file is a template for a (Couchbase) semantic search tool.</span>
+<span class="c1">#</span>
+<span class="n">record_kind</span><span class="p">:</span> <span class="n">semantic_search</span>
+
+<span class="c1"># The name of the tool must be a valid Python identifier (e.g., no spaces).</span>
+<span class="c1"># This field is mandatory, and will be used as the name of a Python function.</span>
+<span class="n">name</span><span class="p">:</span> <span class="n">search_for_relevant_products</span>
+
+<span class="c1"># A description for the function bound to this tool.</span>
+<span class="c1"># This field is mandatory, and will be used in the docstring of a Python function.</span>
+<span class="n">description</span><span class="p">:</span> <span class="o">&gt;</span>
+  <span class="n">Find</span> <span class="n">product</span> <span class="n">descriptions</span> <span class="n">that</span> <span class="n">are</span> <span class="n">closely</span> <span class="n">related</span> <span class="n">to</span> <span class="n">a</span> <span class="n">collection</span> <span class="n">of</span> <span class="n">tags</span><span class="o">.</span>
+
+<span class="c1"># The inputs used to build a comparable representation for a semantic search.</span>
+<span class="c1"># Inputs are described using a JSON object that follows the JSON schema standard.</span>
+<span class="c1"># This field is mandatory, and will be used to build a Pydantic model.</span>
+<span class="c1"># See https://json-schema.org/learn/getting-started-step-by-step for more info.</span>
+<span class="nb">input</span><span class="p">:</span> <span class="o">&gt;</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;search_tags&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span> <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+<span class="c1"># As a supplement to the tool similarity search, users can optionally specify search annotations.</span>
+<span class="c1"># The values of these annotations MUST be strings (e.g., not &#39;true&#39;, but &#39;&quot;true&quot;&#39;).</span>
+<span class="c1"># This field is optional, and does not have to be present.</span>
+<span class="n">annotations</span><span class="p">:</span>
+  <span class="n">gdpr_2016_compliant</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span>
+  <span class="n">ccpa_2019_compliant</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+
+<span class="c1"># The &quot;secrets&quot; field defines search keys that will be used to query a &quot;secrets&quot; manager.</span>
+<span class="c1"># Note that these values are NOT the secrets themselves, rather they are used to lookup secrets.</span>
+<span class="n">secrets</span><span class="p">:</span>
+
+  <span class="c1"># All Couchbase tools (e.g., semantic search, SQL++) must specify conn_string, username, and password.</span>
+  <span class="o">-</span> <span class="n">couchbase</span><span class="p">:</span>
+      <span class="n">conn_string</span><span class="p">:</span> <span class="n">CB_CONN_STRING</span>
+      <span class="n">username</span><span class="p">:</span> <span class="n">CB_USERNAME</span>
+      <span class="n">password</span><span class="p">:</span> <span class="n">CB_PASSWORD</span>
+
+<span class="c1"># Couchbase semantic search tools always involve a vector search.</span>
+<span class="n">vector_search</span><span class="p">:</span>
+
+  <span class="c1"># A bucket, scope, and collection must be specified.</span>
+  <span class="c1"># Semantic search across multiple collections is currently not supported.</span>
+  <span class="n">bucket</span><span class="p">:</span> <span class="n">my</span><span class="o">-</span><span class="n">bucket</span>
+  <span class="n">scope</span><span class="p">:</span> <span class="n">my</span><span class="o">-</span><span class="n">scope</span>
+  <span class="n">collection</span><span class="p">:</span> <span class="n">my</span><span class="o">-</span><span class="n">collection</span>
+
+  <span class="c1"># All semantic search operations require that a (FTS) vector index is built.</span>
+  <span class="c1"># In the future, we will relax this constraint.</span>
+  <span class="n">index</span><span class="p">:</span> <span class="n">my</span><span class="o">-</span><span class="n">vector</span><span class="o">-</span><span class="n">index</span>
+
+  <span class="c1"># The vector_field refers to the field the vector index (above) was built on.</span>
+  <span class="c1"># In the future, we will relax the constraint that an index exists on this field.</span>
+  <span class="n">vector_field</span><span class="p">:</span> <span class="n">vec</span>
+
+  <span class="c1"># The text_field is the field name used in the tool output (i.e., the results).</span>
+  <span class="c1"># In the future, we will support multi-field tool outputs for semantic search.</span>
+  <span class="n">text_field</span><span class="p">:</span> <span class="n">text</span>
+
+  <span class="c1"># The embedding model used to generate the vector_field.</span>
+  <span class="c1"># This embedding model field value is directly passed to sentence transformers.</span>
+  <span class="c1"># In the future, we will add support for other types of embedding models.</span>
+  <span class="n">embedding_model</span><span class="p">:</span> <span class="n">sentence</span><span class="o">-</span><span class="n">transformers</span><span class="o">/</span><span class="nb">all</span><span class="o">-</span><span class="n">MiniLM</span><span class="o">-</span><span class="n">L12</span><span class="o">-</span><span class="n">v2</span>
+</pre></div>
+</div>
+</section>
+<section id="http-request-tools">
+<h3>HTTP Request Tools<a class="headerlink" href="#http-request-tools" title="Link to this heading">¶</a></h3>
+<p>HTTP request tools are used to interact with external services via REST API calls.
+The details on how to interface with these external services are detailed in a standard OpenAPI spec (see
+<a class="reference external" href="https://swagger.io/specification/">here</a> for more details).
+To create an HTTP request tool, you must author a <code class="docutils literal notranslate"><span class="pre">.yaml</span></code> file with the <code class="docutils literal notranslate"><span class="pre">record_kind</span></code> field populated with
+<code class="docutils literal notranslate"><span class="pre">http_request</span></code>.
+One tool is generated per specified endpoint.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#</span>
+<span class="c1"># The following file is a template for a set of HTTP request tools.</span>
+<span class="c1">#</span>
+<span class="n">record_kind</span><span class="p">:</span> <span class="n">http_request</span>
+
+<span class="c1"># As a supplement to the tool similarity search, users can optionally specify search annotations.</span>
+<span class="c1"># The values of these annotations MUST be strings (e.g., not &#39;true&#39;, but &#39;&quot;true&quot;&#39;).</span>
+<span class="c1"># This field is optional, and does not have to be present.</span>
+<span class="n">annotations</span><span class="p">:</span>
+  <span class="n">gdpr_2016_compliant</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span>
+  <span class="n">ccpa_2019_compliant</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+
+<span class="c1"># HTTP requests must be specified using an OpenAPI spec.</span>
+<span class="n">open_api</span><span class="p">:</span>
+
+  <span class="c1"># The path relative to the tool-calling code.</span>
+  <span class="c1"># The OpenAPI spec can either be in JSON or YAML.</span>
+  <span class="n">filename</span><span class="p">:</span> <span class="n">path_to_openapi_spec</span><span class="o">.</span><span class="n">json</span>
+
+  <span class="c1"># A URL denoting where to retrieve the OpenAPI spec.</span>
+  <span class="c1"># The filename or the url must be specified (not both).</span>
+  <span class="c1"># url: http://url_to_openapi_spec/openapi.json</span>
+
+  <span class="c1"># Which OpenAPI operations should be indexed as tools are specified below.</span>
+  <span class="c1"># This field is mandatory, and each operation is validated against the spec on index.</span>
+  <span class="n">operations</span><span class="p">:</span>
+
+    <span class="c1"># All operations must specify a path and a method.</span>
+    <span class="c1"># 1. The path corresponds to an OpenAPI path object.</span>
+    <span class="c1"># 2. The method corresponds to GET/POST/PUT/PATCH/DELETE/HEAD/OPTIONS/TRACE.</span>
+    <span class="c1"># See https://swagger.io/specification/#path-item-object for more information.</span>
+    <span class="o">-</span> <span class="n">path</span><span class="p">:</span> <span class="o">/</span><span class="n">users</span><span class="o">/</span><span class="n">create</span>
+      <span class="n">method</span><span class="p">:</span> <span class="n">post</span>
+    <span class="o">-</span> <span class="n">path</span><span class="p">:</span> <span class="o">/</span><span class="n">users</span><span class="o">/</span><span class="n">delete</span><span class="o">/</span><span class="p">{</span><span class="n">user_id</span><span class="p">}</span>
+      <span class="n">method</span><span class="p">:</span> <span class="n">delete</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="prompt-catalog-records">
+<h2>Prompt Catalog Records<a class="headerlink" href="#prompt-catalog-records" title="Link to this heading">¶</a></h2>
+<p>Prompts in Agent Catalog are more than just a hunk of text: they also contain metadata that help developers build
+agents faster.
+These prompts can be a part of a larger workflow (e.g., as a nested prompt within an agent framework) or as a standalone
+set of instructions.
+Agent Catalog currently supports two types of prompts: raw prompts and Jinja templated prompts.</p>
+<section id="raw-prompts">
+<h3>Raw Prompts<a class="headerlink" href="#raw-prompts" title="Link to this heading">¶</a></h3>
+<p>Raw prompts are static, predefined text-based instructions used to guide your agent’s actions.
+Raw prompts are written directly as plain text without any dynamic elements.</p>
+</section>
+<section id="jinja-templated-prompts">
+<h3>Jinja Templated Prompts<a class="headerlink" href="#jinja-templated-prompts" title="Link to this heading">¶</a></h3>
+<p>In contrast to raw prompts, Jinja templated prompts enable users to author dynamic prompts that can be rendered at
+runtime.
+If you are working without an agent framework, Jinja templated prompts might make more sense for your use case.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">---</span>
+<span class="c1">#</span>
+<span class="c1"># The following file is a template for a Jinja2 prompt.</span>
+<span class="c1">#</span>
+<span class="c1"># The content in between the &#39;---&#39; lines must be valid YAML.</span>
+<span class="n">record_kind</span><span class="p">:</span> <span class="n">jinja_prompt</span>
+
+<span class="c1"># The name of the prompt must be a valid Python identifier (e.g., no spaces).</span>
+<span class="c1"># This field is mandatory, and will be used when searching for prompts by name.</span>
+<span class="n">name</span><span class="p">:</span> <span class="n">route_finding_prompt</span>
+
+<span class="c1"># A description of the prompt&#39;s purpose (e.g., where this prompt will be used).</span>
+<span class="c1"># This field is mandatory, and will be used (indirectly) when performing semantic search for prompts.</span>
+<span class="n">description</span><span class="p">:</span> <span class="o">&gt;</span>
+    <span class="n">Instructions</span> <span class="n">on</span> <span class="n">how</span> <span class="n">to</span> <span class="n">find</span> <span class="n">routes</span> <span class="n">between</span> <span class="n">two</span> <span class="n">specific</span> <span class="n">airports</span><span class="o">.</span>
+
+<span class="c1"># As a supplement to the description similarity search, users can optionally specify search annotations.</span>
+<span class="c1"># The values of these annotations MUST be strings (e.g., not &#39;true&#39;, but &#39;&quot;true&quot;&#39;).</span>
+<span class="c1"># This field is optional, and does not have to be present.</span>
+<span class="n">annotations</span><span class="p">:</span>
+  <span class="n">organization</span><span class="p">:</span> <span class="s2">&quot;sequoia&quot;</span>
+
+<span class="c1"># A prompt is _generally_ (more often than not) associated with a small collection of tools.</span>
+<span class="c1"># This field is used at provider time to search the catalog for tools.</span>
+<span class="c1"># This field is optional, and does not have to be present.</span>
+<span class="n">tools</span><span class="p">:</span>
+  <span class="c1"># Tools can be specified using the same parameters found in Provider.get_tools_for.</span>
+  <span class="c1"># For instance, we can condition on the tool name...</span>
+  <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="s2">&quot;find_indirect_routes&quot;</span>
+
+  <span class="c1"># ...the tool name and some annotations...</span>
+  <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="s2">&quot;find_direct_routes&quot;</span>
+    <span class="n">annotations</span><span class="p">:</span> <span class="n">gdpr_2016_compliant</span> <span class="o">=</span> <span class="s2">&quot;true&quot;</span>
+
+  <span class="c1"># ...or even a semantic search via the tool description.</span>
+  <span class="o">-</span> <span class="n">query</span><span class="p">:</span> <span class="s2">&quot;finding flights by name&quot;</span>
+    <span class="n">limit</span><span class="p">:</span> <span class="mi">2</span>
+
+<span class="c1"># Below the &#39;---&#39; represents the prompt in its entirety.</span>
+<span class="o">---</span>
+<span class="n">Goal</span><span class="p">:</span>
+<span class="n">Your</span> <span class="n">goal</span> <span class="ow">is</span> <span class="n">to</span> <span class="n">find</span> <span class="n">a</span> <span class="n">sequence</span> <span class="n">of</span> <span class="n">routes</span> <span class="n">between</span> <span class="n">the</span> <span class="n">source</span> <span class="ow">and</span> <span class="n">destination</span> <span class="n">airport</span><span class="o">.</span>
+
+<span class="n">Source</span> <span class="n">Airport</span><span class="p">:</span>
+<span class="p">{{</span> <span class="n">source_airport</span> <span class="p">}}</span>
+
+<span class="n">Destination</span> <span class="n">Airport</span>
+<span class="p">{{</span> <span class="n">destination_airport</span> <span class="p">}}</span>
+
+<span class="n">Examples</span><span class="p">:</span>
+<span class="o">...</span>
+
+<span class="n">Instructions</span><span class="p">:</span>
+<span class="n">Try</span> <span class="n">to</span> <span class="n">find</span> <span class="n">a</span> <span class="n">direct</span> <span class="n">routes</span> <span class="n">first</span> <span class="n">between</span> <span class="n">the</span> <span class="n">source</span> <span class="n">airport</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">destination</span> <span class="n">airport</span><span class="o">.</span>
+<span class="n">If</span> <span class="n">there</span> <span class="n">are</span> <span class="n">no</span> <span class="n">direct</span> <span class="n">routes</span><span class="p">,</span> <span class="n">then</span> <span class="n">find</span> <span class="n">a</span> <span class="n">one</span><span class="o">-</span><span class="n">layover</span> <span class="n">route</span><span class="o">.</span>
+<span class="n">If</span> <span class="n">there</span> <span class="n">are</span> <span class="n">no</span> <span class="n">such</span> <span class="n">routes</span><span class="p">,</span> <span class="n">then</span> <span class="k">try</span> <span class="n">another</span> <span class="n">source</span> <span class="n">airport</span> <span class="n">that</span> <span class="ow">is</span> <span class="n">close</span><span class="o">.</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="faqs.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Frequently Asked Questions</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="env.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Agent Catalog Environment Variables</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2024, Couchbase
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Agent Catalog Record Entries</a><ul>
+<li><a class="reference internal" href="#tool-catalog-records">Tool Catalog Records</a><ul>
+<li><a class="reference internal" href="#python-function-tools">Python Function Tools</a></li>
+<li><a class="reference internal" href="#sql-query-tools">SQL++ Query Tools</a></li>
+<li><a class="reference internal" href="#semantic-search-tools">Semantic Search Tools</a></li>
+<li><a class="reference internal" href="#http-request-tools">HTTP Request Tools</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#prompt-catalog-records">Prompt Catalog Records</a><ul>
+<li><a class="reference internal" href="#raw-prompts">Raw Prompts</a></li>
+<li><a class="reference internal" href="#jinja-templated-prompts">Jinja Templated Prompts</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=2fea6348"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="Agent Catalog Environment Variables" href="env.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="Agent Catalog Record Entries" href="entry.html" />
 
     <link rel="shortcut icon" href="_static/favicon.png"/><!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
         <title>Frequently Asked Questions - Agent Catalog v0.0.1 documentation</title>
@@ -207,6 +207,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Tool</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Agent Catalog API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="env.html">Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="entry.html">On Catalog Entries</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Frequently Asked Questions</a></li>
 </ul>
 
@@ -367,37 +368,20 @@ run) <em>or</em> manually using <strong class="command">export</strong>.</p>
 <span class="na">OPENAI_API_KEY</span><span class="o">=</span><span class="s">...</span>
 </pre></div>
 </div>
-<p>For more information on Agent Catalog environment variables, refer to the documentation <a class="reference external" href="env">here</a>.</p>
+<p>For more information on Agent Catalog environment variables, refer to the documentation <a class="reference external" href="env.html">here</a>.</p>
 </section>
 <section id="what-are-the-different-types-of-tools-and-prompts-i-can-create">
 <h2>What are the different types of tools and prompts I can create?<a class="headerlink" href="#what-are-the-different-types-of-tools-and-prompts-i-can-create" title="Link to this heading">¶</a></h2>
-<p>You can define four types of tools and two types of prompts, each designed for different functionalities:</p>
-<ol class="arabic simple">
-<li><p><strong>Tools</strong></p></li>
-</ol>
-<ul class="simple">
-<li><p><strong>Python Functions</strong> (<code class="docutils literal notranslate"><span class="pre">.py</span></code>) - Define Python functions with specific inputs and outputs, following the prescribed function definitions. The functions are tagged with the <code class="docutils literal notranslate"><span class="pre">&#64;tool</span></code> decorator for easy identification and use.</p></li>
-<li><p><strong>SQL++ Query</strong> (<code class="docutils literal notranslate"><span class="pre">.sqlpp</span></code>) - Create Couchbase SQL++ queries that run on your cluster, returning results based on a schema you define. This tool is ideal for working with structured data stored in Couchbase.</p></li>
-<li><p><strong>Semantic Search</strong> (<code class="docutils literal notranslate"><span class="pre">.yaml</span></code>) - Perform semantic searches on specific fields within documents using Couchbase Vector Search. This tool allows you to search for documents by meaning rather than exact keyword matches.</p></li>
-<li><p><strong>HTTP Requests</strong> (<code class="docutils literal notranslate"><span class="pre">.yaml</span></code>) - Configure REST API calls to external endpoints of your choice for data retrieval or interaction. These tools are useful for interacting with external services, retrieving or sending data, or triggering workflows that rely on third-party APIs.</p></li>
-</ul>
-<ol class="arabic simple" start="2">
-<li><p><strong>Prompts</strong> - TODO</p></li>
-</ol>
-<ul class="simple">
-<li><p><strong>Jinja</strong> (<code class="docutils literal notranslate"><span class="pre">.jinja</span></code>) - These prompts utilize the Jinja templating engine to create dynamic and flexible input templates. They allow you to craft prompts with placeholders, which can be filled at runtime based on the specific context of the agent, enabling powerful and reusable prompt generation.</p></li>
-<li><p><strong>Raw prompts</strong> (<code class="docutils literal notranslate"><span class="pre">.prompt</span></code>) - Raw prompts are static, predefined text-based instructions for the language model. They are written directly as plain text without any dynamic elements. These are best suited for straightforward tasks that require a single-shot interaction or fixed wording for the prompt.</p></li>
-</ul>
-<p>Refer to the templates <a class="reference external" href="https://github.com/couchbaselabs/agent-catalog/tree/master/resources/templates">here</a> for more information on how to write each tool and prompt.</p>
+<p>Agent Catalog currently supports four types of tools (<code class="docutils literal notranslate"><span class="pre">python_function</span></code>, <code class="docutils literal notranslate"><span class="pre">sqlpp_query</span></code>, <code class="docutils literal notranslate"><span class="pre">semantic_search</span></code>,
+<code class="docutils literal notranslate"><span class="pre">http_request</span></code>) and two types of prompts (<code class="docutils literal notranslate"><span class="pre">raw_prompt</span></code>, <code class="docutils literal notranslate"><span class="pre">jinja_prompt</span></code>).
+For more information on the types of tools and prompts you can create, refer to the documentation <a class="reference external" href="entry.html">here</a>.</p>
 </section>
 <section id="can-i-write-multiple-tools-prompts-in-one-file">
 <h2>Can I write multiple tools/prompts in one file?<a class="headerlink" href="#can-i-write-multiple-tools-prompts-in-one-file" title="Link to this heading">¶</a></h2>
-<p>It is possible to define multiple tools in a single file for certain types of tools, while prompts must be written one per file.</p>
-<p>For Python tools (<code class="docutils literal notranslate"><span class="pre">record_kind</span></code> = <code class="docutils literal notranslate"><span class="pre">python_function</span></code>), you can include multiple tools in a single <code class="docutils literal notranslate"><span class="pre">.py</span></code> file, as each tool is uniquely identified with the <code class="docutils literal notranslate"><span class="pre">&#64;tool</span></code> decorator. Additionally, if you are defining HTTP tools (<code class="docutils literal notranslate"><span class="pre">record_kind</span></code> = <code class="docutils literal notranslate"><span class="pre">http_request</span></code>) in YAML, you may specify multiple path entries within the same file, provided that they share the same API specification.</p>
-<p>Examples illustrating this are shown below:</p>
-<div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-text">Example of multiple python tools in a single .py file</span><a class="headerlink" href="#id4" title="Link to this code">¶</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">agentc_core.tool</span> <span class="kn">import</span> <span class="n">tool</span>
+<p>All prompts must be defined in separate files, as each prompt is uniquely identified by its file name.
+However multiple tools can exist in a single file <em>if you are defining Python tools or HTTP request tools</em>.
+Examples of multiple tools existing within a single file are shown below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">agentc</span> <span class="kn">import</span> <span class="n">tool</span>
 
 <span class="nd">@tool</span>
 <span class="k">def</span> <span class="nf">search_best_flight_deals</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">FlightDeal</span><span class="p">]:</span>
@@ -411,43 +395,67 @@ run) <em>or</em> manually using <strong class="command">export</strong>.</p>
     <span class="k">return</span> <span class="kc">None</span>
 </pre></div>
 </div>
-</div>
-<div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">Example of multiple http request tools in a single yaml file</span><a class="headerlink" href="#id5" title="Link to this code">¶</a></div>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">record_kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http_request</span>
 
 <span class="nt">open_api</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">filename</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../rewards_spec.json</span>
 <span class="w">  </span><span class="nt">operations</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/create</span><span class="w">                       </span><span class="c1"># ===&gt; considered as one tool</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/create</span><span class="w">                       </span><span class="c1"># ===&gt; one tool</span>
 <span class="w">      </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">post</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/rewards/{member_id}</span><span class="w">          </span><span class="c1"># ===&gt; considered as another tool</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/rewards/{member_id}</span><span class="w">          </span><span class="c1"># ===&gt; another tool</span>
 <span class="w">      </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">get</span>
 </pre></div>
 </div>
-</div>
-<p>For other types of tools and for all prompts, you must define one tool or prompt per file. If you’d like to auto-download tools or prompts using default configurations, you can refer to the <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">add</span></code> command in the documentation <a class="reference external" href="cli.html#agentc-add">here</a>.</p>
 </section>
-<section id="do-cli-commands-need-to-be-executed-in-an-order">
-<h2>Do CLI commands need to be executed in an order?<a class="headerlink" href="#do-cli-commands-need-to-be-executed-in-an-order" title="Link to this heading">¶</a></h2>
-<p>While you can run any CLI command at any time, certain commands follow a logical order to ensure proper catalog management.</p>
-<ol class="arabic simple">
-<li><p><strong>Indexing</strong>: After creating tools or prompts, you first need to generate the catalog with the <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">index</span></code> command. This step prepares the catalog for local use.</p></li>
-<li><p><strong>Finding</strong>: Once the catalog is indexed, you can perform local searches using the <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">find</span></code> command or work programmatically through the Provider.</p></li>
-<li><p><strong>Publishing</strong>: To persist the catalog in your Couchbase cluster, use the <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">publish</span></code> command. This allows database-level searches via <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">find</span> <span class="pre">--search-db</span></code>.</p></li>
-</ol>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Publishing should only be done after indexing the catalog. For any changes made to the local catalog, you must re-index it, commit the changes to Git, and then publish it again to update the database.</p>
-</div>
-<ol class="arabic simple" start="4">
-<li><p><strong>Cleaning</strong>: To remove the catalog and clean up the environment, use the <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">clean</span></code> command.</p></li>
-</ol>
-<p>Other commands can be executed at any time and provide valuable information about your development environment.</p>
+<section id="do-cli-commands-need-to-be-executed-in-a-certain-order">
+<h2>Do CLI commands need to be executed in a certain order?<a class="headerlink" href="#do-cli-commands-need-to-be-executed-in-a-certain-order" title="Link to this heading">¶</a></h2>
+<p>With the exception of the <strong class="command">agentc publish</strong> command, all other commands can be executed in any order.</p>
+<dl class="simple">
+<dt><strong>Indexing</strong>:</dt><dd><p>After creating your tools and/or prompts, you first need to generate a local catalog with the
+<strong class="command">agentc index</strong> command.
+This will build a file-based catalog that you can immediately use (without needing to connect to a Couchbase
+instance).</p>
+</dd>
+<dt><strong>Publishing</strong>:</dt><dd><p>To persist your catalog entries on Couchbase, use the <strong class="command">agentc publish</strong> command.</p>
+</dd>
+</dl>
+<p>Publishing can only be done after indexing the catalog.
+To publish new changes, you must first commit your changes to Git and then run the <strong class="command">agentc index</strong> command
+again with a clean Git repository.</p>
+<p>For the complete set of Agent Catalog CLI commands, refer to the documentation <a class="reference external" href="cli.html">here</a>.</p>
 </section>
 <section id="can-i-index-and-publish-catalogs-programmatically">
 <h2>Can I index and publish catalogs programmatically?<a class="headerlink" href="#can-i-index-and-publish-catalogs-programmatically" title="Link to this heading">¶</a></h2>
-<p>Yes! The <code class="docutils literal notranslate"><span class="pre">agentc_cli</span></code> package enables you to import all the CLI commands directly into your project, allowing you to programmatically manage tasks such as indexing and publishing catalogs. You can write custom scripts that use these commands to automate processes, integrate with existing workflows, etc., allowing you to streamline catalog management and optimize your agent workflow development.</p>
+<p>Yes!
+The <code class="docutils literal notranslate"><span class="pre">agentc.cmd</span></code> module allows developers to author Python scripts with the same functionality as our CLI commands.
+Below we give an example of how to index and publish catalogs programmatically:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">agentc.cmd</span> <span class="kn">import</span> <span class="n">index</span><span class="p">,</span> <span class="n">publish</span>
+
+<span class="c1"># Index the directory named tools.</span>
+<span class="n">index</span><span class="p">(</span>
+       <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;tools&quot;</span><span class="p">,</span>
+       <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Publish our local catalog.</span>
+<span class="n">publish</span><span class="p">(</span>
+       <span class="n">kind</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;tool&quot;</span><span class="p">],</span>
+       <span class="n">bucket</span><span class="o">=</span><span class="s2">&quot;travel-sample&quot;</span><span class="p">,</span>
+       <span class="n">username</span><span class="o">=</span><span class="s2">&quot;Administrator&quot;</span><span class="p">,</span>
+       <span class="n">password</span><span class="o">=</span><span class="s2">&quot;password&quot;</span><span class="p">,</span>
+       <span class="n">connection_string</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>The script above is equivalent to running the following CLI commands:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span>index<span class="w"> </span>tools<span class="w"> </span>--kind<span class="w"> </span>tool
+
+<span class="nb">export</span><span class="w"> </span><span class="nv">AGENT_CATALOG_CONN_STRING</span><span class="o">=</span>localhost
+<span class="nb">export</span><span class="w"> </span><span class="nv">AGENT_CATALOG_USERNAME</span><span class="o">=</span>Administrator
+<span class="nb">export</span><span class="w"> </span><span class="nv">AGENT_CATALOG_PASSWORD</span><span class="o">=</span>password
+agentc<span class="w"> </span>publish<span class="w"> </span>tool<span class="w"> </span>--bucket<span class="w"> </span>travel-sample
+</pre></div>
+</div>
 </section>
 <section id="does-agent-catalog-require-an-openai-api-key">
 <h2>Does Agent Catalog require an OpenAI API key?<a class="headerlink" href="#does-agent-catalog-require-an-openai-api-key" title="Link to this heading">¶</a></h2>
@@ -457,8 +465,8 @@ run) <em>or</em> manually using <strong class="command">export</strong>.</p>
 <h2>Does Agent Catalog work with any LLM?<a class="headerlink" href="#does-agent-catalog-work-with-any-llm" title="Link to this heading">¶</a></h2>
 <p>Yes!
 Agent Catalog does not restrict you to a specific language model.
-You are free to choose any LLM for your agent workflow development (if your chosen agent framework supports your chosen
-LLM).</p>
+You are free to choose any LLM for your agent workflow development (provided your chosen agent framework supports
+the LLM you choose).</p>
 </section>
 </section>
 
@@ -468,14 +476,14 @@ LLM).</p>
         
         <div class="related-pages">
           
-          <a class="prev-page" href="env.html">
+          <a class="prev-page" href="entry.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Agent Catalog Environment Variables</div>
+                <div class="title">Agent Catalog Record Entries</div>
                 
               </div>
             </a>
@@ -514,7 +522,7 @@ LLM).</p>
 <li><a class="reference internal" href="#what-environment-variables-are-required-to-use-agent-catalog">What environment variables are required to use Agent Catalog?</a></li>
 <li><a class="reference internal" href="#what-are-the-different-types-of-tools-and-prompts-i-can-create">What are the different types of tools and prompts I can create?</a></li>
 <li><a class="reference internal" href="#can-i-write-multiple-tools-prompts-in-one-file">Can I write multiple tools/prompts in one file?</a></li>
-<li><a class="reference internal" href="#do-cli-commands-need-to-be-executed-in-an-order">Do CLI commands need to be executed in an order?</a></li>
+<li><a class="reference internal" href="#do-cli-commands-need-to-be-executed-in-a-certain-order">Do CLI commands need to be executed in a certain order?</a></li>
 <li><a class="reference internal" href="#can-i-index-and-publish-catalogs-programmatically">Can I index and publish catalogs programmatically?</a></li>
 <li><a class="reference internal" href="#does-agent-catalog-require-an-openai-api-key">Does Agent Catalog require an OpenAI API key?</a></li>
 <li><a class="reference internal" href="#does-agent-catalog-work-with-any-llm">Does Agent Catalog work with any LLM?</a></li>

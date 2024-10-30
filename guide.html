@@ -207,6 +207,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Tool</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Agent Catalog API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="env.html">Environment Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="entry.html">On Catalog Entries</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faqs.html">Frequently Asked Questions</a></li>
 </ul>
 
@@ -261,14 +262,14 @@
 </dl>
 <p>In this short guide, we detail the workflow each type of user follows when using Agent Catalog.
 We assume that you have already installed the <code class="docutils literal notranslate"><span class="pre">agentc</span></code> package.
-If you have not, please refer to the <span class="xref std std-doc">Getting Started</span> page.</p>
+If you have not, please refer to the <a class="reference internal" href="install.html"><span class="doc">Installation</span></a> page.</p>
 <section id="metrics-driven-development">
 <h2>Metrics Driven Development<a class="headerlink" href="#metrics-driven-development" title="Link to this heading">¶</a></h2>
 <p>The Agent Catalog package is not just a tool/prompt catalog, it’s a foundation for building agents using metrics-driven
 development.
 Agent builders will follow this workflow:</p>
 <ol class="arabic">
-<li><p><strong>Sample Downloading</strong>: Download the starter agent from the <code class="file docutils literal notranslate"><span class="pre">recipes/starter_agent</span></code> directory.</p></li>
+<li><p><strong>Sample Downloading</strong>: Download the starter agent from the <code class="file docutils literal notranslate"><span class="pre">templates/starter_agent</span></code> directory.</p></li>
 <li><p><strong>Agent Building</strong>: The sample agent is meant to be a reference for building your own agents.
 You will need to modify the agent to fit your use case.</p>
 <ul>
@@ -306,7 +307,8 @@ Depending on how your <code class="code highlight python docutils literal highli
 <p>The catalog (currently) versions two types of items: tools and prompts.
 Both tool builders and prompt builders (i.e., agent builders) will follow this workflow:</p>
 <ol class="arabic">
-<li><p><strong>Template Downloading</strong>: Download the appropriate template from the <code class="file docutils literal notranslate"><span class="pre">templates</span></code> directory. Alternatively, use the <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">add</span></code> <a class="reference external" href="cli.html#agentc-add">command</a> to auto-download the template of choice.</p></li>
+<li><p><strong>Template Downloading</strong>: Use the <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">add</span></code> <a class="reference external" href="cli.html#agentc-add">command</a> to automatically download the
+template of your choice.</p></li>
 <li><p><strong>Tool/Prompt Creation</strong>: Fill out the template with the necessary information.</p></li>
 <li><p><strong>Versioning</strong>: All tools and all prompts must be versioned.
 Agent Catalog currently integrates with Git (using the working Git SHA) to version each item.
