@@ -1,9 +1,6 @@
-name: Publish
+name: publish
 run-name: 👁️ ${{ github.actor }} has pushed a new commit!
-on:
-  push:
-    tags:
-      - '*.*.*'
+on: [ push ]
 
 jobs:
   Pages:

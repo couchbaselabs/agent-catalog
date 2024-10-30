@@ -1,4 +1,4 @@
-name: Docs
+name: docs
 run-name: 👁️ ${{ github.actor }} has pushed a new commit!
 on: [ push ]
 
