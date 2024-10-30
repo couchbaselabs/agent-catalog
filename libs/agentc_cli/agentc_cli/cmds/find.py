@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 def cmd_find(
-    ctx: Context,
+    ctx: Context = None,
     query: str = None,
     name: str = None,
     bucket: str = None,
@@ -36,6 +36,9 @@ def cmd_find(
     cluster: couchbase.cluster.Cluster = None,
     force_db=False,
 ):
+    if ctx is None:
+        ctx = Context()
+
     # TODO: One day, also handle DBCatalogRef?
     # TODO: If DB is outdated and the local catalog has newer info,
     #       then we need to consult the latest, local catalog / MemCatalogRef?

@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 
 def cmd_execute(
-    ctx: Context,
+    ctx: Context = None,
     query: str = None,
     name: str = None,
     bucket: str = None,
@@ -40,6 +40,8 @@ def cmd_execute(
     cluster: couchbase.cluster.Cluster = None,
     force_db=False,
 ):
+    if ctx is None:
+        ctx = Context()
     search_opt = SearchOptions(query=query, name=name)
     query, name = search_opt.query, search_opt.name
     click.secho(DASHES, fg=KIND_COLORS["tool"])

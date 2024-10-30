@@ -3,6 +3,7 @@ import datetime
 import jinja2
 import logging
 import pathlib
+import typing
 
 from ..models.context import Context
 from agentc_core.record.descriptor import RecordKind
@@ -151,24 +152,29 @@ def add_sqlpp_query(output: pathlib.Path, template_env: jinja2.Environment):
     click.secho(f"SQL++ query tool written to: {output_file}", fg="green")
 
 
-def cmd_add(ctx: Context, output: pathlib.Path, record_kind: RecordKind):
+def cmd_add(
+    output: pathlib.Path,
+    record_kind: RecordKind
+    | typing.Literal["jinja_prompt", "raw_prompt", "http_request", "python_function", "semantic_search", "sqlpp_query"],
+    ctx: Context = None,
+):
     prompt_template_loader = jinja2.PackageLoader("agentc_core.prompt")
     tool_template_loader = jinja2.PackageLoader("agentc_core.tool")
     template_env = jinja2.Environment(loader=jinja2.ChoiceLoader([prompt_template_loader, tool_template_loader]))
     click.secho(f"Now building a new tool / prompt file. The output will be saved to: {output}", fg="yellow")
 
     match record_kind:
-        case RecordKind.JinjaPrompt:
+        case RecordKind.JinjaPrompt | "jinja_prompt":
             add_jinja_prompt(output, template_env)
-        case RecordKind.RawPrompt:
+        case RecordKind.RawPrompt | "raw_prompt":
             add_raw_prompt(output, template_env)
-        case RecordKind.HTTPRequest:
+        case RecordKind.HTTPRequest | "http_request":
             add_http_request(output, template_env)
-        case RecordKind.PythonFunction:
+        case RecordKind.PythonFunction | "python_function":
             add_python_function(output, template_env)
-        case RecordKind.SemanticSearch:
+        case RecordKind.SemanticSearch | "semantic_search":
             add_semantic_search(output, template_env)
-        case RecordKind.SQLPPQuery:
+        case RecordKind.SQLPPQuery | "sqlpp_query":
             add_sqlpp_query(output, template_env)
         case _:
             # We should never reach here.

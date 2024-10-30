@@ -40,6 +40,27 @@ def test_python_function():
         in positive_1_tools[0].description
     )
 
+    positive_2_factory = _get_tool_descriptor_factory(
+        cls=PythonToolDescriptor.Factory, filename=pathlib.Path("python_function/positive_2.py")
+    )
+    positive_2_tools = list(positive_2_factory)
+    assert len(positive_2_tools) == 1
+    assert positive_2_tools[0].name == "calculate_travel_costs"
+    assert (
+        "Calculate the travel costs based on distance, fuel efficiency, and fuel price."
+        in positive_2_tools[0].description
+    )
+
+    positive_3_factory = _get_tool_descriptor_factory(
+        cls=PythonToolDescriptor.Factory, filename=pathlib.Path("python_function/positive_3.py")
+    )
+    positive_3_tools = list(positive_3_factory)
+    assert len(positive_3_tools) == 1
+    assert positive_3_tools[0].name == "calculate_travel_costs_1"
+    assert "Calculate something" in positive_3_tools[0].description
+    assert positive_3_tools[0].annotations["a"] == "1"
+    assert positive_3_tools[0].annotations["b"] == "2"
+
 
 @pytest.mark.smoke
 def test_sqlpp_query():

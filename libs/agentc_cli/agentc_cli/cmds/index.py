@@ -15,6 +15,7 @@ from agentc_core.catalog.index import MetaVersion
 from agentc_core.catalog.index import index_catalog
 from agentc_core.catalog.version import lib_version
 from agentc_core.defaults import DEFAULT_CATALOG_NAME
+from agentc_core.defaults import DEFAULT_EMBEDDING_MODEL
 from agentc_core.defaults import DEFAULT_MAX_ERRS
 from agentc_core.defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from agentc_core.learned.embedding import EmbeddingModel
@@ -24,13 +25,16 @@ logger = logging.getLogger(__name__)
 
 
 def cmd_index(
-    ctx: Context,
     source_dirs: list[str | os.PathLike],
     kind: typing.Literal["tool", "prompt"],
-    embedding_model_name: str,
+    embedding_model_name: str = DEFAULT_EMBEDDING_MODEL,
     dry_run: bool = False,
+    ctx: Context = None,
     **_,
 ):
+    if ctx is None:
+        ctx = Context()
+
     # TODO: If the repo is dirty only because .agent-catalog/ is
     # dirty or because .agent-activity/ is dirty, then we might print
     # some helper instructions for the dev user on commiting the .agent-catalog/

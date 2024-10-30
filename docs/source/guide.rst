@@ -17,7 +17,7 @@ Agent Catalog targets three (non-mutually-exclusive) types of users:
 
 In this short guide, we detail the workflow each type of user follows when using Agent Catalog.
 We assume that you have already installed the ``agentc`` package.
-If you have not, please refer to the :doc:`Getting Started <start>` page.
+If you have not, please refer to the :doc:`Installation <install>` page.
 
 Metrics Driven Development
 --------------------------
@@ -26,7 +26,7 @@ The Agent Catalog package is not just a tool/prompt catalog, it's a foundation f
 development.
 Agent builders will follow this workflow:
 
-1. **Sample Downloading**: Download the starter agent from the :file:`recipes/starter_agent` directory.
+1. **Sample Downloading**: Download the starter agent from the :file:`templates/starter_agent` directory.
 
 2. **Agent Building**: The sample agent is meant to be a reference for building your own agents.
    You will need to modify the agent to fit your use case.
@@ -64,7 +64,8 @@ Couchbase-Backed Agent Catalogs
 The catalog (currently) versions two types of items: tools and prompts.
 Both tool builders and prompt builders (i.e., agent builders) will follow this workflow:
 
-1. **Template Downloading**: Download the appropriate template from the :file:`templates` directory. Alternatively, use the ``agentc add`` `command <cli.html#agentc-add>`_ to auto-download the template of choice.
+1. **Template Downloading**: Use the ``agentc add`` `command <cli.html#agentc-add>`_ to automatically download the
+   template of your choice.
 
 2. **Tool/Prompt Creation**: Fill out the template with the necessary information.
 

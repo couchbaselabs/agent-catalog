@@ -88,7 +88,7 @@ Commands:
   See: https://docs.couchbase.com for more information.
 ```
 
-If you see the output above, you are all set! Head on over to our [docs](docs) or our [recipes](recipes) to start
+If you see the output above, you are all set! Head on over to our [docs](docs) or our [templates](templates) to start
 developing your agent with Agent Catalog.
 
 ## Building From Source
@@ -99,7 +99,7 @@ the [agent-catalog-example](https://github.com/couchbaselabs/agent-catalog-examp
 ## Docs and Templates
 
 Refer to [`docs/`](docs) to explore templates and other references while writing your agent workflow with Couchbase
-Agent Catalog. We also provide some starter [`recipes`](recipes) if you are building an agent from scratch.
+Agent Catalog. We also provide some starter [`recipes`](templates) if you are building an agent from scratch.
 
 ## For Contributors / Developers
 

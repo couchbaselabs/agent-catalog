@@ -9,7 +9,9 @@ from agentc_core.catalog import LATEST_SNAPSHOT_VERSION
 from agentc_core.defaults import DEFAULT_EMBEDDING_MODEL
 
 
-def cmd_env(ctx: Context):
+def cmd_env(ctx: Context = None):
+    if ctx is None:
+        ctx = Context()
     environment_dict = {
         "AGENT_CATALOG_ACTIVITY": ctx.activity,
         "AGENT_CATALOG_CATALOG": ctx.catalog,

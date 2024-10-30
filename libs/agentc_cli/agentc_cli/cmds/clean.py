@@ -19,7 +19,7 @@ from agentc_core.util.query import execute_query
 logger = logging.getLogger(__name__)
 
 
-def clean_local(ctx: Context):
+def clean_local(ctx: Context | None):
     xs = [DEFAULT_ACTIVITY_FOLDER, DEFAULT_CATALOG_FOLDER]
 
     for x in xs:
@@ -35,7 +35,7 @@ def clean_local(ctx: Context):
 
 
 def clean_db(
-    ctx: Context,
+    ctx: Context | None,
     bucket: str,
     cluster: couchbase.cluster.Cluster,
     catalog_ids: list[str],
@@ -95,20 +95,20 @@ def clean_db(
 
 
 def cmd_clean(
-    ctx: Context,
     is_local: bool,
     is_db: bool,
     bucket: str,
     cluster: couchbase.cluster,
-    catalog_id: tuple,
+    catalog_ids: tuple[str],
     kind: list[typing.Literal["tool", "prompt"]],
+    ctx: Context = None,
 ):
     if is_local:
         clean_local(ctx)
         click.secho("Local catalog has been deleted!", fg="green")
 
     if is_db:
-        num_errs = clean_db(ctx, bucket, cluster, catalog_id, kind)
+        num_errs = clean_db(ctx, bucket, cluster, catalog_ids, kind)
         if num_errs > 0:
             raise ValueError("Failed to cleanup db catalog!")
         else:

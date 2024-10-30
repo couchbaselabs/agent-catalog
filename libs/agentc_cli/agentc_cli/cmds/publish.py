@@ -1,5 +1,4 @@
 import click
-import couchbase.cluster
 import json
 import logging
 import pathlib
@@ -12,6 +11,7 @@ from .util import KIND_COLORS
 from agentc_core.catalog.descriptor import CatalogDescriptor
 from agentc_core.defaults import DEFAULT_CATALOG_COLLECTION_NAME
 from agentc_core.defaults import DEFAULT_CATALOG_NAME
+from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_META_COLLECTION_NAME
 from agentc_core.util.ddl import create_gsi_indexes
 from agentc_core.util.ddl import create_vector_index
@@ -19,24 +19,52 @@ from agentc_core.util.models import CouchbaseConnect
 from agentc_core.util.models import CustomPublishEncoder
 from agentc_core.util.models import Keyspace
 from agentc_core.util.publish import create_scope_and_collection
+from agentc_core.util.publish import get_connection
 from couchbase.exceptions import CouchbaseException
 
 logger = logging.getLogger(__name__)
 
 
 def cmd_publish(
-    ctx: Context,
     kind: list[typing.Literal["tool", "prompt"]],
-    annotations: list[dict],
-    cluster: couchbase.cluster.Cluster,
-    keyspace: Keyspace,
-    connection_details_env: CouchbaseConnect,
+    bucket: str = None,
+    keyspace: Keyspace = None,
+    annotations: list[dict] = None,
+    connection_details_env: CouchbaseConnect = None,
+    connection_string: str = None,
+    username: str = None,
+    password: str = None,
+    hostname: str = None,
+    ctx: Context = None,
 ):
     """Command to publish catalog items to user's Couchbase cluster"""
-    bucket = keyspace.bucket
-    scope = keyspace.scope
+    if ctx is None:
+        ctx = Context()
+
+    if connection_details_env is None and None not in [connection_string, username, password, hostname]:
+        # Note: validation of the connection details occur here.
+        connection_details_env = CouchbaseConnect(
+            connection_url=connection_string, username=username, password=password, host=hostname
+        )
+    elif connection_details_env is None and None in [connection_string, username, password, hostname]:
+        raise ValueError("Connection details not provided!")
+
+    if keyspace is not None:
+        bucket = keyspace.bucket
+        scope = keyspace.scope
+    elif bucket is None:
+        bucket = bucket
+        scope = DEFAULT_CATALOG_SCOPE
+    else:
+        raise ValueError("Keyspace or bucket name not provided!")
+
+    if annotations is None:
+        annotations = list()
 
     # Get bucket ref
+    err, cluster = get_connection(conn=connection_details_env)
+    if err:
+        raise ValueError(f"Unable to connect to Couchbase!\n{err}")
     cb = cluster.bucket(bucket)
 
     for k in kind:

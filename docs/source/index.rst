@@ -13,13 +13,13 @@ Table of Contents
 -----------------
 
 .. toctree::
-   :titlesonly:
 
    Getting Agent Catalog <install>
    Agent Catalog User Guide <guide>
    Command Line Tool <cli>
    Agent Catalog API <api>
    Environment Variables <env>
+   On Catalog Entries <entry>
    Frequently Asked Questions <faqs>
 
 Indices and Tables

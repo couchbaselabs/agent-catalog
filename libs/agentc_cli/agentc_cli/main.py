@@ -144,7 +144,7 @@ def add(ctx, output: pathlib.Path, record_kind: RecordKind):
 
     if record_kind is None:
         record_kind = click.prompt("Record Kind", type=click.Choice([c for c in RecordKind], case_sensitive=False))
-    cmd_add(ctx_obj, output, record_kind)
+    cmd_add(ctx=ctx_obj, output=output, record_kind=record_kind)
 
 
 @click_main.command()
@@ -244,7 +244,15 @@ def clean(ctx, catalog, bucket, catalog_id, skip_confirm, kind):
 
         # Perform our clean operation.
         kind_list = ["tool", "prompt"] if kind == "all" else [kind]
-        cmd_clean(ctx.obj, False, True, bucket, cluster, catalog_id, kind_list)
+        cmd_clean(
+            ctx=ctx.obj,
+            is_db=False,
+            is_local=True,
+            bucket=bucket,
+            cluster=cluster,
+            catalog_ids=catalog_id,
+            kind=kind_list,
+        )
         cluster.close()
 
     if not clean_db and not clean_local:
@@ -258,7 +266,7 @@ def clean(ctx, catalog, bucket, catalog_id, skip_confirm, kind):
 @click.pass_context
 def env(ctx):
     """Return all agentc related environment and configuration parameters as a JSON object."""
-    cmd_env(ctx.obj)
+    cmd_env(ctx=ctx.obj)
 
 
 @click_main.command()
@@ -391,7 +399,7 @@ def find(
         bucket = None
 
     cmd_find(
-        ctx.obj,
+        ctx=ctx.obj,
         query=query,
         name=name,
         kind=kind,
@@ -443,7 +451,7 @@ def index(ctx, source_dirs, kind, embedding_model, dry_run):
         )
 
     cmd_index(
-        ctx.obj,
+        ctx=ctx.obj,
         source_dirs=source_dirs,
         kind=kind,
         embedding_model_name=embedding_model,
@@ -483,7 +491,7 @@ def publish(ctx, kind, bucket, annotations):
         kind = ["tool", "prompt"]
 
     # Get keyspace and connection details
-    keyspace_details = Keyspace(bucket="", scope=DEFAULT_CATALOG_SCOPE)
+    keyspace_details = Keyspace(bucket=bucket, scope=DEFAULT_CATALOG_SCOPE)
 
     # Load all Couchbase connection related data from env
     connection_details_env = CouchbaseConnect(
@@ -497,6 +505,7 @@ def publish(ctx, kind, bucket, annotations):
     err, cluster = get_connection(conn=connection_details_env)
     if err:
         raise ValueError(f"Unable to connect to Couchbase!\n{err}")
+    cluster.close()
 
     # Determine the bucket.
     buckets = get_buckets(cluster=cluster)
@@ -516,9 +525,13 @@ def publish(ctx, kind, bucket, annotations):
             "Add --bucket BUCKET_NAME to your command or run agent clean in interactive mode."
         )
 
-    keyspace_details.bucket = bucket
-    cmd_publish(ctx.obj, kind, annotations, cluster, keyspace_details, connection_details_env)
-    cluster.close()
+    cmd_publish(
+        ctx=ctx.obj,
+        kind=kind,
+        annotations=annotations,
+        keyspace=keyspace_details,
+        connection_details_env=connection_details_env,
+    )
 
 
 # TODO (GLENN): We should make kind an argument here (similar to publish and clean).
@@ -732,7 +745,7 @@ def execute(ctx, query, name, bucket, include_dirty, refiner, annotations, catal
         bucket = None
 
     cmd_execute(
-        ctx.obj,
+        ctx=ctx.obj,
         query=query,
         name=name,
         include_dirty=include_dirty,

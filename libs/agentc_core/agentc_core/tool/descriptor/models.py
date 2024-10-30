@@ -17,6 +17,9 @@ from ...record.descriptor import RecordDescriptor
 from ...record.descriptor import RecordKind
 from ...record.helper import JSONSchemaValidatingMixin
 from ...version import VersionDescriptor
+from ..decorator import get_annotations
+from ..decorator import get_description
+from ..decorator import get_name
 from ..decorator import is_tool
 from .secrets import CouchbaseSecrets
 
@@ -37,7 +40,6 @@ class _BaseFactory(abc.ABC):
         pass
 
 
-# Note: a Python Tool does not add any additional fields.
 class PythonToolDescriptor(RecordDescriptor):
     record_kind: typing.Literal[RecordKind.PythonFunction]
     contents: str
@@ -51,18 +53,17 @@ class PythonToolDescriptor(RecordDescriptor):
             with open(self.filename, "r") as fp:
                 source_contents = fp.read()
             imported_module = importlib.import_module(self.filename.stem)
-            for name, tool in inspect.getmembers(imported_module):
+            for _, tool in inspect.getmembers(imported_module):
                 if not is_tool(tool):
                     continue
                 yield PythonToolDescriptor(
                     record_kind=RecordKind.PythonFunction,
-                    name=name,
-                    description=tool.__doc__,
+                    name=get_name(tool),
+                    description=get_description(tool),
                     source=self.filename,
                     contents=source_contents,
                     version=self.version,
-                    # TODO (GLENN): Add support for user-defined annotations here.
-                    annotations=dict(),
+                    annotations=get_annotations(tool),
                 )
 
 

@@ -21,3 +21,11 @@ def compute_sales_for_this_week(sales_model: SalesModel) -> float:
     # The implementation of the tool (given below) is *not* indexed.
     # The indexer only cares about the name, function signature, and description.
     return 1.0 * 0.99 + 2.00 % 6.0
+
+
+# You can also specify the name and description of the tool explicitly, as well as any annotations you wish to attach.
+@tool(name="compute_sales_for_the_month", annotations={"type": "sales"})
+def compute_sales_for_the_month(sales_model: SalesModel) -> float:
+    """A description for the function bound to the tool. This is mandatory for tools."""
+
+    return 1.0 * 0.99 + 2.00 % 6.0

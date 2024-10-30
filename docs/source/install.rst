@@ -98,5 +98,5 @@ subsequent runs will be faster).
 
       See: https://docs.couchbase.com for more information.
 
-If you see the output above, you are all set! Head on over to our `docs <docs>`_ or our `recipes <recipes>`_ to start
-developing your agent with Agent Catalog.
+If you see the output above, you are all set!
+To build your first agent, head on over to the `user guide <guide.html>`_ page.
