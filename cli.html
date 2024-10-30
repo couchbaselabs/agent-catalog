@@ -634,7 +634,7 @@ Source files that will be scanned include <a href="#id1"><span class="problemati
 <dd><p>Embedding model used when indexing source files into the local catalog.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">{'name':</span> <span class="pre">'sentence-transformers/all-MiniLM-L12-v2',</span> <span class="pre">'endpoint':</span> <span class="pre">'sentence_transformers'}</span></code></p>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">'sentence-transformers/all-MiniLM-L12-v2'</span></code></p>
 </dd>
 </dl>
 </dd></dl>
@@ -692,24 +692,10 @@ Source files that will be scanned include <a href="#id1"><span class="problemati
 <section id="agentc-status">
 <h3>status<a class="headerlink" href="#agentc-status" title="Link to this heading">¶</a></h3>
 <p>Show the status of the local catalog.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span>status<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span>status<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span><span class="o">[[</span>tool<span class="p">|</span>prompt<span class="o">]]</span>...
 </pre></div>
 </div>
 <p class="rubric">Options</p>
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-status-kind">
-<span class="sig-name descname"><span class="pre">--kind</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;kind&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-status-kind" title="Link to this definition">¶</a></dt>
-<dd><p>Kind of catalog to show status for.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">'all'</span></code></p>
-</dd>
-<dt class="field-even">Options<span class="colon">:</span></dt>
-<dd class="field-even"><p>all | tool | prompt</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-agentc-status-include-dirty">
 <span class="sig-name descname"><span class="pre">--include-dirty</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-status-include-dirty" title="Link to this definition">¶</a></dt>
@@ -742,6 +728,13 @@ Source files that will be scanned include <a href="#id1"><span class="problemati
 <dt class="sig sig-object std" id="cmdoption-agentc-status-compare">
 <span class="sig-name descname"><span class="pre">--compare</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-status-compare" title="Link to this definition">¶</a></dt>
 <dd><p>Flag to compare the local catalog with the last published catalog.</p>
+</dd></dl>
+
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-agentc-status-arg-KIND">
+<span class="sig-name descname"><span class="pre">KIND</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-status-arg-KIND" title="Link to this definition">¶</a></dt>
+<dd><p>Optional argument(s)</p>
 </dd></dl>
 
 </section>

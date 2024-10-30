@@ -264,10 +264,10 @@ versions of your agent or rolling back your agent due to some regression.</p>
 <p>Catalog versions are Git commit hashes.
 To roll back to a previous catalog version, follow these steps:</p>
 <ol class="arabic">
-<li><p><strong>List Catalog Versions</strong> : Start by running the <strong class="command">agentc status</strong> command with the <code class="docutils literal notranslate"><span class="pre">--status-db</span></code> flag to
+<li><p><strong>List Catalog Versions</strong> : Start by running the <strong class="command">agentc status</strong> command with the <code class="docutils literal notranslate"><span class="pre">-db</span></code> flag to
 list all the published catalog versions of tools in your bucket (here, we are checking in <code class="docutils literal notranslate"><span class="pre">travel-sample</span></code>):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># run agentc status --help for all options</span>
-agentc<span class="w"> </span>status<span class="w"> </span>--kind<span class="w"> </span>tool<span class="w"> </span>--status-db<span class="w"> </span>--bucket<span class="w"> </span>travel-sample
+agentc<span class="w"> </span>status<span class="w"> </span>tool<span class="w"> </span>-db<span class="w"> </span>--bucket<span class="w"> </span>travel-sample
 </pre></div>
 </div>
 <p>Running the command above will return a list of all the tool catalog snapshots you have published to Couchbase.</p>
