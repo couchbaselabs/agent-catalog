@@ -319,6 +319,14 @@ Agent Catalog currently integrates with Git (using the working Git SHA) to versi
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">[DIRECTORY]</span></code> refers to the directory containing your tools/prompts.
 This command will create a local catalog and your items will be in the newly created <code class="file docutils literal notranslate"><span class="pre">./agent-catalog</span></code> folder.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When using the <strong class="command">agentc index</strong> command for the first time, Agent Catalog will download an
+embedding model from <a class="reference external" href="https://huggingface.co/models">HuggingFace</a> (by default, the
+<code class="docutils literal notranslate"><span class="pre">sentence-transformers/all-MiniLM-L12-v2</span></code> model) onto your machine (by default, in the <code class="docutils literal notranslate"><span class="pre">.model-cache</span></code>
+folder).
+Subsequent runs will use this downloaded model (and thus, be faster).</p>
+</div>
 </li>
 <li><p><strong>Publishing</strong>: By default, the <strong class="command">agentc index</strong> command will allow you index tools / prompts associated with
 a dirty Git repository.</p>

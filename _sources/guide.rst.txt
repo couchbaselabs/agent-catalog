@@ -82,6 +82,14 @@ Both tool builders and prompt builders (i.e., agent builders) will follow this w
    ``[DIRECTORY]`` refers to the directory containing your tools/prompts.
    This command will create a local catalog and your items will be in the newly created :file:`./agent-catalog` folder.
 
+   .. note::
+
+        When using the :command:`agentc index` command for the first time, Agent Catalog will download an
+        embedding model from `HuggingFace <https://huggingface.co/models>`_ (by default, the
+        ``sentence-transformers/all-MiniLM-L12-v2`` model) onto your machine (by default, in the ``.model-cache``
+        folder).
+        Subsequent runs will use this downloaded model (and thus, be faster).
+
 5. **Publishing**: By default, the :command:`agentc index` command will allow you index tools / prompts associated with
    a dirty Git repository.
 

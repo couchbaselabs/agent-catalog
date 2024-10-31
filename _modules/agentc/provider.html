@@ -245,6 +245,7 @@
           <h1>Source code for agentc.provider</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">couchbase.auth</span>
 <span class="kn">import</span> <span class="nn">couchbase.cluster</span>
+<span class="kn">import</span> <span class="nn">couchbase.exceptions</span>
 <span class="kn">import</span> <span class="nn">couchbase.options</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">pathlib</span>
@@ -461,15 +462,21 @@
             <span class="k">return</span> <span class="bp">self</span>
 
         <span class="c1"># Try to connect to our cluster.</span>
-        <span class="n">cluster</span> <span class="o">=</span> <span class="n">couchbase</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">Cluster</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">conn_string</span><span class="p">,</span>
-            <span class="n">couchbase</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">ClusterOptions</span><span class="p">(</span>
-                <span class="n">couchbase</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">PasswordAuthenticator</span><span class="p">(</span>
-                    <span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">(),</span>
-                    <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">(),</span>
-                <span class="p">)</span>
-            <span class="p">),</span>
-        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cluster</span> <span class="o">=</span> <span class="n">couchbase</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">Cluster</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">conn_string</span><span class="p">,</span>
+                <span class="n">couchbase</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">ClusterOptions</span><span class="p">(</span>
+                    <span class="n">couchbase</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">PasswordAuthenticator</span><span class="p">(</span>
+                        <span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">(),</span>
+                        <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">(),</span>
+                    <span class="p">)</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">couchbase</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">CouchbaseException</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Could not connect to the Couchbase cluster. Skipping remote catalog.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="c1"># Validate the embedding models of our tool and prompt catalogs.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_tool_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_prompt_catalog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">embedding_model</span> <span class="o">=</span> <span class="n">EmbeddingModel</span><span class="p">(</span>
                 <span class="n">cb_bucket</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span>
