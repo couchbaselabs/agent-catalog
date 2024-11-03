@@ -9,6 +9,191 @@ This section provides answers to common questions about the Agent Catalog projec
 common issues, guidance on using various features, etc...).
 For additional information, consult the documentation or community resources.
 
+Which Couchbase Capella or Server version should I use?
+-------------------------------------------------------
+Agent Catalog uses Vector search at its base, so any Couchbase version above and inclusive of ``7.6`` should be used. If you are a new user, we recommend using the latest version!
+
+What does Agent Catalog add to my Couchbase bucket?
+---------------------------------------------------
+
+When you persist catalogs using the ``agentc publish`` `command <cli.html#agentc-publish>`_, Agent Catalog creates a scope called ``agent_catalog`` within a user-specified bucket. Inside this scope, two collections are created:
+
+1. ``<kind>_catalog``: Stores individual catalog items. Following is an example tool present in this collection from the ``travel-sample`` example application:
+
+.. code-block:: json
+       :caption: tool_catalog collection - description of one tool from catalog
+
+       {
+         "record_kind": "semantic_search",
+         "name": "get_travel_blog_snippets_from_user_interests",
+         "description": "Fetch snippets of travel blogs using a user's interests.\n",
+         "source": "src/resources/agent_c/tools/blogs_from_interests.yaml",
+         "version": {
+           "timestamp": "2024-10-23 07:16:18.517967+00:00",
+           "identifier": "c33204b0bb39c954e10dbcc1e930cee814361945",
+           "is_dirty": false,
+           "version_system": "git",
+           "metadata": null
+         },
+         "embedding": [-0.027521444484591484, "..."],
+         "annotations": {
+           "ccpa_2019_compliant": "true",
+           "gdpr_2016_compliant": "true"
+         },
+         "input": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"user_interests\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    }\n  }\n}\n",
+         "vector_search": {
+           "bucket": "travel-sample",
+           "scope": "inventory",
+           "collection": "article",
+           "index": "articles-index",
+           "vector_field": "vec",
+           "text_field": "text",
+           "embedding_model": "sentence-transformers/all-MiniLM-L12-v2",
+           "num_candidates": 3
+         },
+         "secrets": [{
+           "couchbase": {
+             "conn_string": "CB_CONN_STRING",
+             "username": "CB_USERNAME",
+             "password": "CB_PASSWORD"
+           }
+         }],
+         "identifier": "src/resources/agent_c/tools/blogs_from_interests.yaml:get_travel_blog_snippets_from_user_interests:git_c33204b0bb39c954e10dbcc1e930cee814561945",
+         "catalog_identifier": "53010a92d74f96851fb36fc2c69b9c3337140890"
+       }
+
+2. ``<kind>_metadata``: Contains metadata for each version of the catalog. Following is an example tool catalog metadata present in this collection from the ``travel-sample`` example application:
+
+.. code-block:: json
+       :caption: tool_metadata collection - metadata associated with a catalog version
+
+       {
+         "schema_version": "0.0.0",
+         "library_version": "v0.0.0-0-g0",
+         "kind": "tool",
+         "embedding_model": "sentence-transformers/all-MiniLM-L12-v2",
+         "version": {
+           "timestamp": "2024-10-23 07:16:15.058405+00:00",
+           "identifier": "53010a92d74f96851fb36fc2c69b9c3337140890",
+           "is_dirty": false,
+           "version_system": "git",
+           "metadata": null
+         },
+         "source_dirs": [
+           "src/resources/agent_c/tools"
+         ],
+         "project": "main",
+         "snapshot_annotations": {}
+       }
+
+These two collections are used to search for the particular catalog item later during the find command or provider use. Additionally, these can be used to run queries to analyse trends, etc.
+
+Agent Catalog also creates GSI indexes on these collections for query optimisation as well as a vector index on the ``<kind>_catalog`` collection to perform vector search queries during find.
+
+
+What does the catalog by the index command contain?
+---------------------------------------------------
+
+Use the ``agentc index`` command after defining your tools and prompts to generate a unified catalog. This catalog consolidates both catalog-level and item-specific metadata, making it easy to view all your tools and prompts in one place. It also optimizes storage for efficient vector searches based on item descriptions, enabling you to build upon existing tools and prompts with ease.
+
+The catalog schema (``v1``) includes the following fields, with item schema being specific for a ``semantic_search`` record kind tool:
+
+.. code-block:: md
+
+       `embedding_model` *(string)*: Embedding model used to generate the embeddings of the item description.
+       `kind` *(string)*: Catalog type (e.g., `tool`).
+       `library_version` *(string)*: Version of agentc library.
+       `schema_version` *(string)*: Version of catalog schema.
+       `source_dirs` *(array)*: Source directories for catalog items.
+       `version` *(object)*: Catalog version details.
+         `identifier` *(string)*: Git commit hash for catalog.
+         `is_dirty` *(boolean)*: Indicates uncommitted changes.
+         `timestamp` *(string)*: Timestamp of catalog creation.
+       `items` *(array)*: List of catalog items.
+           `annotations` *(object key-value)*: Annotations of key-value type.
+           `description` *(string)*: Description of the item.
+           `embedding` *(array)*: Embeddings of item description.
+           `identifier` *(string - `source_of_item:file_name_of_item:git_commit_hash`)*: Unique identifier for the item.
+           `input` *(string)*: Input schema for the item.
+           `name` *(string)*: Name of the item.
+           `record_kind` *(string)*: Type of record (e.g., `semantic_search`).
+           `secrets` *(array)*: Secrets configuration.
+             `couchbase` *(object)*: Couchbase connection details.
+               `conn_string` *(string)*: Couchbase server connection string.
+               `password` *(string)*: Couchbase server password.
+               `username` *(string)*: Couchbase server username.
+           `source` *(string)*: Source file location.
+           `vector_search` *(object)*: Vector search configuration.
+             `bucket` *(string)*: Couchbase bucket name.
+             `collection` *(string)*: Couchbase collection name.
+             `embedding_model` *(string)*: Embedding model for vector search.
+             `index` *(string)*: Index name for Couchbase.
+             `scope` *(string)*: Scope in Couchbase bucket.
+             `text_field` *(string)*: Field containing text.
+             `vector_field` *(string)*: Field containing vectors.
+           `version` *(object)*: Version information.
+             `identifier` *(string)*: Git commit hash when this item was recorded.
+             `timestamp` *(string)*: Timestamp of creation / last update of item.
+
+1. ``embedding_model``: Specifies the name of the embedding model used to generate embeddings for catalog items during ``agentc index``.
+
+2. ``kind``: Type of catalog, e.g., `tool`.
+
+3. ``library_version``: Version of ``agentc`` library.
+
+4. ``schema_version``: Version of the catalog schema.
+
+5. ``source_dirs``: List of directories where source files for the catalog items are located.
+
+6. ``version``: Version details for the catalog itself.
+
+   - ``identifier``: Git commit hash for the catalog version.
+   - ``is_dirty``: Boolean indicating if there are uncommitted changes.
+   - ``timestamp``: Timestamp at the creation of the catalog.
+
+7. ``items``: A list of catalog items with the following fields ( ``record_kind`` = ``semantic_search`` ):
+
+   - ``annotations``: Key-value pairs to annotate each catalog item with specific information.
+
+   - ``description``: A brief description of the tool or prompt, detailing its purpose or functionality.
+
+   - ``embedding``: Embeddings generated for the item description (of dimensions depending on the specified model).
+
+   - ``identifier``: A unique identifier for the item, of the format ``source_of_item:file_name_of_item:git_commit_hash``.
+
+   - ``input``: JSON schema defining the expected input structure for the item.
+
+   - ``name``: Name of the item, matching the function or tool/prompt name.
+
+   - ``record_kind``: Indicates the type of record, eg. ``semantic_search`` for tool kind, that describes the item's purpose.
+
+   - ``secrets``: Secret configurations required for the tool depending on the record kind (for ``semantic_search``, this represents the secrets for Couchbase server used for vector search).
+
+     - ``couchbase``: Connection details for Couchbase, including:
+
+       - ``conn_string``: Connection string to Couchbase server.
+       - ``password``: Couchbase account password.
+       - ``username``: Couchbase account username.
+
+   - ``source``: The source file location of the item.
+
+   - ``vector_search``: Configuration for vector search on Couchbase.
+
+     - ``bucket``: Name of the Couchbase bucket used.
+     - ``collection``: Collection name where items are stored.
+     - ``embedding_model``: Embedding model used for vector search.
+     - ``index``: Name of the Couchbase index.
+     - ``scope``: Scope within the Couchbase bucket.
+     - ``text_field``: Field where text is stored for search.
+     - ``vector_field``: Field where vectors are stored for search.
+
+   - ``version``: Version information for each item.
+     - ``identifier``: Unique hash identifying the version.
+     - ``timestamp``: Timestamp of when the version was created.
+
+
+**Similar to the above item schema of ``record_kind`` = ``semantic_search``, there are three more types of record kinds possible for tools which have a slightly different schema.
+
 How do I roll back to a previous catalog version?
 -------------------------------------------------
 
