@@ -255,6 +255,87 @@
 This section provides answers to common questions about the Agent Catalog project (key concepts, solutions to
 common issues, guidance on using various features, etc…).
 For additional information, consult the documentation or community resources.</p>
+<section id="what-does-agent-catalog-add-to-my-couchbase-bucket">
+<h2>What does Agent Catalog add to my Couchbase bucket?<a class="headerlink" href="#what-does-agent-catalog-add-to-my-couchbase-bucket" title="Link to this heading">¶</a></h2>
+<p>When you persist catalogs using the <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">publish</span></code> <a class="reference external" href="cli.html#agentc-publish">command</a>, Agent Catalog creates a scope called <code class="docutils literal notranslate"><span class="pre">agent_catalog</span></code> within a user-specified bucket. Inside this scope, two collections are created:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;kind&gt;_catalog</span></code>: Stores individual catalog items. Following is an example tool present in this collection from the <code class="docutils literal notranslate"><span class="pre">travel-sample</span></code> example application:</p></li>
+</ol>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">tool_catalog collection - description of one tool from catalog</span><a class="headerlink" href="#id4" title="Link to this code">¶</a></div>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;record_kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;semantic_search&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;get_travel_blog_snippets_from_user_interests&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Fetch snippets of travel blogs using a user&#39;s interests.\n&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;src/resources/agent_c/tools/blogs_from_interests.yaml&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-10-23 07:16:18.517967+00:00&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;c33204b0bb39c954e10dbcc1e930cee814361945&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;is_dirty&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;version_system&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;git&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;embedding&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">-0.027521444484591484</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;annotations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;ccpa_2019_compliant&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;true&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;gdpr_2016_compliant&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;true&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;input&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;{\n  \&quot;type\&quot;: \&quot;object\&quot;,\n  \&quot;properties\&quot;: {\n    \&quot;user_interests\&quot;: {\n      \&quot;type\&quot;: \&quot;array\&quot;,\n      \&quot;items\&quot;: { \&quot;type\&quot;: \&quot;string\&quot; }\n    }\n  }\n}\n&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;vector_search&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;bucket&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;travel-sample&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;inventory&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;collection&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;article&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;articles-index&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;vector_field&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;vec&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;text_field&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;text&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;embedding_model&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sentence-transformers/all-MiniLM-L12-v2&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;num_candidates&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;secrets&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
+<span class="w">    </span><span class="nt">&quot;couchbase&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;conn_string&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CB_CONN_STRING&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CB_USERNAME&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CB_PASSWORD&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}],</span>
+<span class="w">  </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;src/resources/agent_c/tools/blogs_from_interests.yaml:get_travel_blog_snippets_from_user_interests:git_c33204b0bb39c954e10dbcc1e930cee814561945&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;catalog_identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;53010a92d74f96851fb36fc2c69b9c3337140890&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;kind&gt;_metadata</span></code>: Contains metadata for each version of the catalog. Following is an example tool catalog metadata present in this collection from the <code class="docutils literal notranslate"><span class="pre">travel-sample</span></code> example application:</p></li>
+</ol>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">tool_metadata collection - metadata associated with a catalog version</span><a class="headerlink" href="#id5" title="Link to this code">¶</a></div>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;schema_version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.0.0&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;library_version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v0.0.0-0-g0&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;tool&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;embedding_model&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sentence-transformers/all-MiniLM-L12-v2&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-10-23 07:16:15.058405+00:00&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;53010a92d74f96851fb36fc2c69b9c3337140890&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;is_dirty&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;version_system&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;git&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;source_dirs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;src/resources/agent_c/tools&quot;</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;project&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;main&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;snapshot_annotations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>These two collections are used to search for the particular catalog item later during the find command or provider use. Additionally, these can be used to run queries to analyse trends, etc.</p>
+<p>Agent Catalog also creates GSI indexes on these collections for query optimisation as well as a vector index on the <code class="docutils literal notranslate"><span class="pre">&lt;kind&gt;_catalog</span></code> collection to perform vector search queries during find.</p>
+</section>
+<section id="what-is-present-in-the-catalog-created-using-index-command">
+<h2>What is present in the catalog created using index command?<a class="headerlink" href="#what-is-present-in-the-catalog-created-using-index-command" title="Link to this heading">¶</a></h2>
+</section>
 <section id="how-do-i-roll-back-to-a-previous-catalog-version">
 <h2>How do I roll back to a previous catalog version?<a class="headerlink" href="#how-do-i-roll-back-to-a-previous-catalog-version" title="Link to this heading">¶</a></h2>
 <p>Agent Catalog was built on the principle of agent <em>snapshots</em>.
@@ -518,6 +599,8 @@ the LLM you choose).</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Frequently Asked Questions</a><ul>
+<li><a class="reference internal" href="#what-does-agent-catalog-add-to-my-couchbase-bucket">What does Agent Catalog add to my Couchbase bucket?</a></li>
+<li><a class="reference internal" href="#what-is-present-in-the-catalog-created-using-index-command">What is present in the catalog created using index command?</a></li>
 <li><a class="reference internal" href="#how-do-i-roll-back-to-a-previous-catalog-version">How do I roll back to a previous catalog version?</a></li>
 <li><a class="reference internal" href="#what-environment-variables-are-required-to-use-agent-catalog">What environment variables are required to use Agent Catalog?</a></li>
 <li><a class="reference internal" href="#what-are-the-different-types-of-tools-and-prompts-i-can-create">What are the different types of tools and prompts I can create?</a></li>

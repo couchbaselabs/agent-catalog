@@ -9,6 +9,88 @@ This section provides answers to common questions about the Agent Catalog projec
 common issues, guidance on using various features, etc...).
 For additional information, consult the documentation or community resources.
 
+What does Agent Catalog add to my Couchbase bucket?
+-------------------------------------------------------------------
+
+When you persist catalogs using the ``agentc publish`` `command <cli.html#agentc-publish>`_, Agent Catalog creates a scope called ``agent_catalog`` within a user-specified bucket. Inside this scope, two collections are created:
+
+1. ``<kind>_catalog``: Stores individual catalog items. Following is an example tool present in this collection from the ``travel-sample`` example application:
+
+.. code-block:: json
+       :caption: tool_catalog collection - description of one tool from catalog
+
+       {
+         "record_kind": "semantic_search",
+         "name": "get_travel_blog_snippets_from_user_interests",
+         "description": "Fetch snippets of travel blogs using a user's interests.\n",
+         "source": "src/resources/agent_c/tools/blogs_from_interests.yaml",
+         "version": {
+           "timestamp": "2024-10-23 07:16:18.517967+00:00",
+           "identifier": "c33204b0bb39c954e10dbcc1e930cee814361945",
+           "is_dirty": false,
+           "version_system": "git",
+           "metadata": null
+         },
+         "embedding": [-0.027521444484591484, "..."],
+         "annotations": {
+           "ccpa_2019_compliant": "true",
+           "gdpr_2016_compliant": "true"
+         },
+         "input": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"user_interests\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    }\n  }\n}\n",
+         "vector_search": {
+           "bucket": "travel-sample",
+           "scope": "inventory",
+           "collection": "article",
+           "index": "articles-index",
+           "vector_field": "vec",
+           "text_field": "text",
+           "embedding_model": "sentence-transformers/all-MiniLM-L12-v2",
+           "num_candidates": 3
+         },
+         "secrets": [{
+           "couchbase": {
+             "conn_string": "CB_CONN_STRING",
+             "username": "CB_USERNAME",
+             "password": "CB_PASSWORD"
+           }
+         }],
+         "identifier": "src/resources/agent_c/tools/blogs_from_interests.yaml:get_travel_blog_snippets_from_user_interests:git_c33204b0bb39c954e10dbcc1e930cee814561945",
+         "catalog_identifier": "53010a92d74f96851fb36fc2c69b9c3337140890"
+       }
+
+2. ``<kind>_metadata``: Contains metadata for each version of the catalog. Following is an example tool catalog metadata present in this collection from the ``travel-sample`` example application:
+
+.. code-block:: json
+       :caption: tool_metadata collection - metadata associated with a catalog version
+
+       {
+         "schema_version": "0.0.0",
+         "library_version": "v0.0.0-0-g0",
+         "kind": "tool",
+         "embedding_model": "sentence-transformers/all-MiniLM-L12-v2",
+         "version": {
+           "timestamp": "2024-10-23 07:16:15.058405+00:00",
+           "identifier": "53010a92d74f96851fb36fc2c69b9c3337140890",
+           "is_dirty": false,
+           "version_system": "git",
+           "metadata": null
+         },
+         "source_dirs": [
+           "src/resources/agent_c/tools"
+         ],
+         "project": "main",
+         "snapshot_annotations": {}
+       }
+
+These two collections are used to search for the particular catalog item later during the find command or provider use. Additionally, these can be used to run queries to analyse trends, etc.
+
+Agent Catalog also creates GSI indexes on these collections for query optimisation as well as a vector index on the ``<kind>_catalog`` collection to perform vector search queries during find.
+
+
+What is present in the catalog created using index command?
+-----------------------------------------------------------
+
+
 How do I roll back to a previous catalog version?
 -------------------------------------------------
 
