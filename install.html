@@ -255,24 +255,12 @@
 <h2>Building From Package<a class="headerlink" href="#building-from-package" title="Link to this heading">¶</a></h2>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>This part is in-the-works! For now, please refer to the <a class="reference internal" href="#building-from-source-with-poetry-pip">Building From Source (with Poetry + pip)</a> or
-<a class="reference internal" href="#building-from-git-with-poetry">Building From Git (with Poetry)</a> sections below.</p>
+<p>This part is in-the-works!
+For now, please refer to the <a class="reference internal" href="#building-from-source-with-pip">Building From Source (with pip)</a> section below.</p>
 </div>
 </section>
-<section id="building-from-git-with-poetry">
-<h2>Building From Git (with Poetry)<a class="headerlink" href="#building-from-git-with-poetry" title="Link to this heading">¶</a></h2>
-<ol class="arabic">
-<li><p>Make sure you have Python 3.12 and <a class="reference external" href="https://python-poetry.org/docs/#installation">Poetry</a> installed!</p></li>
-<li><p>In your <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> file, add the following line in the <code class="docutils literal notranslate"><span class="pre">[tool.poetry.dependencies]</span></code> section:</p>
-<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">agentc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">git</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;git@github.com:couchbaselabs/agent-catalog.git&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">subdirectory</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;libs/agentc&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">extras</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;langchain&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
-</pre></div>
-</div>
-</li>
-<li><p>Now run <strong class="command">poetry update</strong> to automatically download the <code class="docutils literal notranslate"><span class="pre">agentc</span></code> package into your Poetry environment.</p></li>
-</ol>
-</section>
-<section id="building-from-source-with-poetry-pip">
-<h2>Building From Source (with Poetry + pip)<a class="headerlink" href="#building-from-source-with-poetry-pip" title="Link to this heading">¶</a></h2>
+<section id="building-from-source-with-pip">
+<h2>Building From Source (with pip)<a class="headerlink" href="#building-from-source-with-pip" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
 <li><p>Make sure you have Python 3.12 and <a class="reference external" href="https://python-poetry.org/docs/#installation">Poetry</a> installed!</p></li>
 <li><p>Clone this repository.
@@ -281,26 +269,46 @@ Make sure you have your SSH key setup!</p>
 </pre></div>
 </div>
 </li>
-<li><p>Build the <code class="docutils literal notranslate"><span class="pre">agentc</span></code> package using Poetry.</p>
+<li><p>You are now ready to install the Agent Catalog package!
+Using your project’s Python environment, execute the following command to install a local package with
+<strong class="command">pip</strong>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>agent-catalog
+<span class="nb">source</span><span class="w"> </span><span class="nv">$MY_PYTHON_ENVIRONMENT</span>
+
+<span class="c1"># Install the agentc package.</span>
+pip<span class="w"> </span>install<span class="w"> </span>libs/agentc
+</pre></div>
+</div>
+<p>If you are interested in building a <code class="docutils literal notranslate"><span class="pre">.whl</span></code> file (for later use in <code class="docutils literal notranslate"><span class="pre">.whl</span></code>-based installs), use <strong class="command">poetry</strong>
+directly:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>libs/agentc
 poetry<span class="w"> </span>build
 </pre></div>
 </div>
 </li>
-<li><p>You should now have a <code class="docutils literal notranslate"><span class="pre">dist</span></code> folder inside <code class="docutils literal notranslate"><span class="pre">libs/agentc</span></code> populated with a <code class="docutils literal notranslate"><span class="pre">.whl</span></code> file, which you can install
-using <strong class="command">pip</strong>.
-Navigate to your project and install this Python wheel using your project’s Python environment.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="nv">AGENT_CATALOG_WHEEL_FILE</span><span class="o">=</span><span class="k">$(</span>ls<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/dist/agentc-*.whl<span class="w"> </span><span class="p">|</span><span class="w"> </span>tr<span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39;\n&#39;</span><span class="k">)</span>
-
-<span class="w"> </span><span class="c1"># Make sure you are using your project&#39;s Python environment!</span>
-<span class="w"> </span><span class="nb">cd</span><span class="w"> </span><span class="nv">$MY_AGENT_PROJECT</span>
-<span class="w"> </span><span class="nb">source</span><span class="w"> </span><span class="nv">$MY_PYTHON_ENVIRONMENT</span>
-
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$AGENT_CATALOG_WHEEL_FILE</span><span class="s2">&quot;</span>
+</ol>
+</section>
+<section id="building-from-source-with-poetry">
+<h2>Building From Source (with Poetry)<a class="headerlink" href="#building-from-source-with-poetry" title="Link to this heading">¶</a></h2>
+<ol class="arabic">
+<li><p>Make sure you have Python 3.12 and <a class="reference external" href="https://python-poetry.org/docs/#installation">Poetry</a> installed!</p></li>
+<li><p>Clone this repository.
+Make sure you have your SSH key setup!</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:couchbaselabs/agent-catalog.git
 </pre></div>
 </div>
-<p>To install the LangChain module associated with Agent Catalog, add <code class="docutils literal notranslate"><span class="pre">&quot;[langchain]&quot;</span></code> immediately after the wheel file:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$AGENT_CATALOG_WHEEL_FILE</span><span class="s2">&quot;&quot;[langchain]&quot;</span>
+</li>
+<li><p>Within <em>your own</em> <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> file, add the following dependency to your project:
+The <code class="docutils literal notranslate"><span class="pre">path</span></code> should point to the location of the <code class="docutils literal notranslate"><span class="pre">agentc</span></code> package (and is relative to the <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>
+file itself).</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[tool.poetry.dependencies]</span>
+<span class="n">agentc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;agent-catalog/libs/agentc&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">develop</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p>Run the command <strong class="command">poetry update</strong> to install the Agent Catalog package.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>agent-catalog
+poetry<span class="w"> </span>update
 </pre></div>
 </div>
 </li>
@@ -399,8 +407,8 @@ To build your first agent, head on over to the <a class="reference external" hre
             <ul>
 <li><a class="reference internal" href="#">Installation</a><ul>
 <li><a class="reference internal" href="#building-from-package">Building From Package</a></li>
-<li><a class="reference internal" href="#building-from-git-with-poetry">Building From Git (with Poetry)</a></li>
-<li><a class="reference internal" href="#building-from-source-with-poetry-pip">Building From Source (with Poetry + pip)</a></li>
+<li><a class="reference internal" href="#building-from-source-with-pip">Building From Source (with pip)</a></li>
+<li><a class="reference internal" href="#building-from-source-with-poetry">Building From Source (with Poetry)</a></li>
 <li><a class="reference internal" href="#verifying-your-installation">Verifying Your Installation</a></li>
 </ul>
 </li>
