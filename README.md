@@ -1,4 +1,5 @@
 # agent-catalog (Couchbase Agent Catalog)
+
 [![CI/CD Tests](https://github.com/couchbaselabs/agent-catalog/actions/workflows/tests.yaml/badge.svg)](https://github.com/couchbaselabs/agent-catalog/actions/workflows/tests.yaml)
 
 The mono-repo for the Couchbase Agent Catalog project.
@@ -9,50 +10,61 @@ The mono-repo for the Couchbase Agent Catalog project.
 
 (in the works!)
 
-### Installing from Git (with Poetry)
+### Installing from Source (with Pip)
 
 1. Make sure you have Python 3.12 and [Poetry](https://python-poetry.org/docs/#installation) installed!
-2. In your `pyproject.toml` file, add the following line in the `[tool.poetry.dependencies]` section:
 
-   ```toml
-   agentc = { git = "git@github.com:couchbaselabs/agent-catalog.git", subdirectory = "libs/agentc", extras = ["langchain"] }
-   ```
-
-3. Now run `poetry update` to automatically download the `agentc` package into your Poetry environment.
-
-### Installing from Source (with Poetry + Pip)
-
-1. Make sure you have Python 3.12 and [Poetry](https://python-poetry.org/docs/#installation) installed!
-2. Clone this repository. Make sure you have your SSH key setup!
+2. Clone this repository.
+   Make sure you have your SSH key setup!
 
    ```bash
    git clone git@github.com:couchbaselabs/agent-catalog.git
    ```
 
-3. Build the `agentc` package using Poetry.
+3. You are now ready to install the Agent Catalog package!
+   Using your project's Python environment, execute the following command to install a local package with `pip`:
+
+   ```bash
+   cd agent-catalog
+   source $MY_PYTHON_ENVIRONMENT
+
+   # Install the agentc package.
+   pip install libs/agentc
+   ```
+
+   If you are interested in building a ``.whl`` file (for later use in ``.whl``-based installs), use :command:`poetry`
+   directly:
 
    ```bash
    cd libs/agentc
    poetry build
    ```
 
-4. You should now have a `dist` folder inside `libs/agentc` populated with a `.whl` file, which you can install using
-   `pip`. Navigate to your project and install this Python wheel using your project's Python environment.
+### Installing from Source (with Poetry)
+
+1. Make sure you have Python 3.12 and [Poetry](https://python-poetry.org/docs/#installation) installed!
+
+2. Clone this repository.
+   Make sure you have your SSH key setup!
 
    ```bash
-   AGENT_CATALOG_WHEEL_FILE=$(ls $(pwd)/dist/agentc-*.whl | tr -d '\n')
-
-   # Make sure you are using your project's Python environment!
-   cd $MY_AGENT_PROJECT
-   source $MY_PYTHON_ENVIRONMENT
-
-   pip install "$AGENT_CATALOG_WHEEL_FILE"
+   git clone git@github.com:couchbaselabs/agent-catalog.git
    ```
 
-   To install the LangChain module associated with Agent Catalog, add `"[langchain]"` immediately after the wheel file:
+3. Within *your own* `pyproject.toml` file, add the following dependency to your project:
+   The `path` should point to the location of the `agentc` package (and is relative to the `pyproject.toml`
+   file itself).
+
+   ```toml
+   [tool.poetry.dependencies]
+   agentc = { path = "agent-catalog/libs/agentc", develop = true }
+   ```
+
+4. Run the command `poetry update` to install the Agent Catalog package.
 
    ```bash
-   pip install "$AGENT_CATALOG_WHEEL_FILE""[langchain]"
+   cd agent-catalog
+   poetry update
    ```
 
 ### Verifying Your Installation
