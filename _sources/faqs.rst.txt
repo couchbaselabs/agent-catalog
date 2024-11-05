@@ -399,7 +399,8 @@ Below we give an example of how to index and publish catalogs programmatically:
        # Index the directory named tools.
        index(
               directory="tools",
-              kind="tool",
+              tools=True,
+              prompts=False
        )
 
        # Publish our local catalog.
@@ -415,7 +416,7 @@ The script above is equivalent to running the following CLI commands:
 
 .. code-block:: bash
 
-       agentc index tools --kind tool
+       agentc index tools --no-prompts
 
        export AGENT_CATALOG_CONN_STRING=localhost
        export AGENT_CATALOG_USERNAME=Administrator

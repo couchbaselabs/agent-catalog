@@ -609,7 +609,8 @@ Below we give an example of how to index and publish catalogs programmatically:<
 <span class="c1"># Index the directory named tools.</span>
 <span class="n">index</span><span class="p">(</span>
        <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;tools&quot;</span><span class="p">,</span>
-       <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span>
+       <span class="n">tools</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+       <span class="n">prompts</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">)</span>
 
 <span class="c1"># Publish our local catalog.</span>
@@ -623,7 +624,7 @@ Below we give an example of how to index and publish catalogs programmatically:<
 </pre></div>
 </div>
 <p>The script above is equivalent to running the following CLI commands:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span>index<span class="w"> </span>tools<span class="w"> </span>--kind<span class="w"> </span>tool
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span>index<span class="w"> </span>tools<span class="w"> </span>--no-prompts
 
 <span class="nb">export</span><span class="w"> </span><span class="nv">AGENT_CATALOG_CONN_STRING</span><span class="o">=</span>localhost
 <span class="nb">export</span><span class="w"> </span><span class="nv">AGENT_CATALOG_USERNAME</span><span class="o">=</span>Administrator
