@@ -18,7 +18,8 @@ jobs:
           pip install --upgrade pip
           pip install "sphinx==8.1.3" "sphinx-copybutton==0.5.2" "sphinx-hoverxref==1.4.1" \
                       "sphinx-click==6.0.0" "sphinx_rtd_theme" "myst_parser" \
-                      "autodoc-pydantic==2.2.0" "sphinx-autobuild==2024.10.3"
+                      "autodoc-pydantic==2.2.0" "sphinx-autobuild==2024.10.3" "furo==2024.8.6" \
+                      "linkify-it-py==2.0.3"
 
       - name: Verify installation
         run: cd docs && pip show autodoc-pydantic
