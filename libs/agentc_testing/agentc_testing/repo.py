@@ -80,9 +80,9 @@ def initialize_repo(
     # ...otherwise, we'll call the index command.
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
     if repo_kind not in [ExampleRepoKind.INDEXED_CLEAN_PROMPTS_TRAVEL, ExampleRepoKind.PUBLISHED_PROMPTS_TRAVEL]:
-        output.append(click_runner.invoke(click_command, ["index", "tools", "--kind", "tool"] + (index_args or [])))
+        output.append(click_runner.invoke(click_command, ["index", "tools", "--no-prompts"] + (index_args or [])))
     if repo_kind not in [ExampleRepoKind.INDEXED_CLEAN_TOOLS_TRAVEL, ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL]:
-        output.append(click_runner.invoke(click_command, ["index", "prompts", "--kind", "prompt"] + (index_args or [])))
+        output.append(click_runner.invoke(click_command, ["index", "prompts", "--no-tools"] + (index_args or [])))
     if repo_kind not in [
         ExampleRepoKind.PUBLISHED_ALL_TRAVEL,
         ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL,

@@ -41,7 +41,7 @@ def test_index(tmp_path):
             pathlib.Path(tool_folder / tool.parent.name).mkdir(exist_ok=True)
             shutil.copy(tool, tool_folder / tool.parent.name / (uuid.uuid4().hex + tool.suffix))
         shutil.copy(resources_folder / "_good_spec.json", tool_folder / "_good_spec.json")
-        invocation = runner.invoke(click_main, ["index", str(tool_folder.absolute())])
+        invocation = runner.invoke(click_main, ["index", str(tool_folder.absolute()), "--no-prompts"])
 
         # We should see 8 files scanned and 9 tools indexed.
         output = invocation.output
