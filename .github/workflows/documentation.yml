@@ -14,16 +14,17 @@ jobs:
 
       - name: Install dependencies
         run: |
+          cd docs
           pip install --upgrade pip
           pip install "sphinx==8.1.3" "sphinx-copybutton==0.5.2" "sphinx-hoverxref==1.4.1" \
                       "sphinx-click==6.0.0" "sphinx_rtd_theme" "myst_parser" \
                       "autodoc-pydantic==2.2.0" "sphinx-autobuild==2024.10.3"
 
       - name: Verify installation
-        run: pip show autodoc-pydantic
+        run: cd docs && pip show autodoc-pydantic
 
       - name: Sphinx build
-        run: sphinx-build docs/source _build
+        run: cd docs && rm -rf _build && sphinx-build source _build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
