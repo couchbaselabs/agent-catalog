@@ -28,7 +28,7 @@ jobs:
         run: cd docs && rm -rf _build && sphinx-build source _build
 
       - name: List build files
-        run: ls -R _build/html
+        run: ls -R docs/_build/html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
