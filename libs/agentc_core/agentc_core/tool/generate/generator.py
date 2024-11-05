@@ -64,11 +64,15 @@ class SQLPPCodeGenerator(_BaseCodeGenerator):
         )
 
         # ...and the output schema.
-        output_model = generate_model_from_json_schema(
-            json_schema=self.record_descriptor.output,
-            class_name=OUTPUT_MODEL_CLASS_NAME_IN_TEMPLATES,
-            python_version=self.target_python_version,
-            model_type=self.target_model_type,
+        output_model = (
+            generate_model_from_json_schema(
+                json_schema=self.record_descriptor.output,
+                class_name=OUTPUT_MODEL_CLASS_NAME_IN_TEMPLATES,
+                python_version=self.target_python_version,
+                model_type=self.target_model_type,
+            )
+            if self.record_descriptor.output is not None
+            else ""
         )
 
         # Instantiate our template.

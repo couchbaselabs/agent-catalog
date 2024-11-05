@@ -69,8 +69,8 @@ class PythonToolDescriptor(RecordDescriptor):
 
 class SQLPPQueryToolDescriptor(RecordDescriptor):
     input: str
-    output: str
     query: str
+    output: typing.Optional[str] = None
     secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
     record_kind: typing.Literal[RecordKind.SQLPPQuery]
 
@@ -82,7 +82,7 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
             name: str
             description: str
             input: str
-            output: str
+            output: typing.Optional[str] = None
             secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
             record_kind: typing.Optional[typing.Literal[RecordKind.SQLPPQuery] | None] = None
             annotations: typing.Optional[dict[str, str] | None] = None
@@ -90,7 +90,8 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
             @pydantic.field_validator("input", "output")
             @classmethod
             def value_should_be_valid_json_schema(cls, v: str):
-                cls.check_if_valid_json_schema(v)
+                if v is not None:
+                    cls.check_if_valid_json_schema(v)
                 return v
 
             @pydantic.field_validator("name")
