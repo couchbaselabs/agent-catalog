@@ -35,6 +35,12 @@ class RecordKind(enum.StrEnum):
     RawPrompt = "raw_prompt"
     JinjaPrompt = "jinja_prompt"
 
+    def is_prompt(self) -> bool:
+        return self in [RecordKind.RawPrompt, RecordKind.JinjaPrompt]
+
+    def is_tool(self) -> bool:
+        return self not in [RecordKind.RawPrompt, RecordKind.JinjaPrompt]
+
 
 class RecordDescriptor(pydantic.BaseModel):
     """This model represents a tool's persistable description or metadata."""
