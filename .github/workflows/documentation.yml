@@ -28,7 +28,7 @@ jobs:
         run: cd docs && rm -rf _build && sphinx-build source _build
 
       - name: List build files
-        run: ls -R docs/_build/html
+        run: ls -R docs/_build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -36,5 +36,5 @@ jobs:
         with:
           publish_branch: github_pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: _build/html
+          publish_dir: _build
           force_orphan: true
