@@ -22,7 +22,7 @@ extensions = [
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.viewcode",
     "sphinx.ext.todo",
-    "sphinxcontrib.autodoc_pydantic",
+    "autodoc_pydantic",
     "sphinx_copybutton",
     "sphinx_click",
     "sphinx.ext.githubpages",
