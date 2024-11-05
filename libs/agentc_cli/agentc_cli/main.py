@@ -419,10 +419,17 @@ def find(
 @click_main.command()
 @click.argument("source_dirs", nargs=-1)
 @click.option(
-    "--kind",
-    default="tool",
-    type=click.Choice(["tool", "prompt"], case_sensitive=False),
-    help="Kind of items to index into the local catalog.",
+    "--prompts/--no-prompts",
+    is_flag=True,
+    default=True,
+    help="Flag to (avoid) ignoring prompt when indexing source files into the local catalog.",
+    show_default=True,
+)
+@click.option(
+    "--tools/--no-tools",
+    is_flag=True,
+    default=True,
+    help="Flag to (avoid) ignoring tools when indexing source files into the local catalog.",
     show_default=True,
 )
 @click.option(
@@ -440,7 +447,7 @@ def find(
     show_default=True,
 )
 @click.pass_context
-def index(ctx, source_dirs, kind, embedding_model, dry_run):
+def index(ctx, source_dirs, tools, prompts, embedding_model, dry_run):
     """Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
     Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc."""
 
@@ -450,10 +457,21 @@ def index(ctx, source_dirs, kind, embedding_model, dry_run):
             "Please use the command 'agentc index --help' for more information."
         )
 
+    kinds = list()
+    if tools:
+        kinds.append("tool")
+    if prompts:
+        kinds.append("prompt")
+    if len(kinds) == 0:
+        raise ValueError(
+            "No kinds specified!\n"
+            "Please specify at least one of 'tool' (via --tools) or 'prompt' (via --prompts) to index the "
+            "source directories."
+        )
     cmd_index(
         ctx=ctx.obj,
         source_dirs=source_dirs,
-        kind=kind,
+        kinds=kinds,
         embedding_model_name=embedding_model,
         dry_run=dry_run,
     )

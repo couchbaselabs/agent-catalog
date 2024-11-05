@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 def cmd_index(
     source_dirs: list[str | os.PathLike],
-    kind: typing.Literal["tool", "prompt"],
+    kinds: list[typing.Literal["tool", "prompt"]],
     embedding_model_name: str = DEFAULT_EMBEDDING_MODEL,
     dry_run: bool = False,
     ctx: Context = None,
@@ -73,9 +73,6 @@ def cmd_index(
         else:
             raise e
 
-    # TODO: The kind needs a security check as it's part of the path?
-    catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)
-
     meta_version = MetaVersion(
         schema_version=CATALOG_SCHEMA_VERSION,
         library_version=lib_version(),
@@ -91,24 +88,26 @@ def cmd_index(
     else:
         printer = click.secho
 
-    printer(DASHES, fg=KIND_COLORS[kind])
-    printer(kind.upper(), bold=True, fg=KIND_COLORS[kind])
-    printer(DASHES, fg=KIND_COLORS[kind])
-    next_catalog = index_catalog(
-        embedding_model,
-        meta_version,
-        version,
-        get_path_version,
-        kind,
-        catalog_path,
-        source_dirs,
-        scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
-        printer=printer,
-        print_progress=True,
-        max_errs=DEFAULT_MAX_ERRS,
-    )
-
-    if not dry_run:
-        next_catalog.dump(catalog_path)
-        click.secho("\nCatalog successfully indexed!", fg="green")
-    click.secho(DASHES, fg=KIND_COLORS[kind])
+    for kind in kinds:
+        # TODO: The kind needs a security check as it's part of the path?
+        catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)
+        printer(DASHES, fg=KIND_COLORS[kind])
+        printer(kind.upper(), bold=True, fg=KIND_COLORS[kind])
+        printer(DASHES, fg=KIND_COLORS[kind])
+        next_catalog = index_catalog(
+            embedding_model,
+            meta_version,
+            version,
+            get_path_version,
+            kind,
+            catalog_path,
+            source_dirs,
+            scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
+            printer=printer,
+            print_progress=True,
+            max_errs=DEFAULT_MAX_ERRS,
+        )
+        if not dry_run:
+            next_catalog.dump(catalog_path)
+            click.secho("\nCatalog successfully indexed!", fg="green")
+        click.secho(DASHES, fg=KIND_COLORS[kind])

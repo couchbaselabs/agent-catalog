@@ -4,17 +4,18 @@ import logging
 import tqdm
 import typing
 
+from ..defaults import DEFAULT_ITEM_DESCRIPTION_MAX_LEN
+from ..indexer import source_indexers
+from ..indexer import vectorize_descriptor
 from ..learned.embedding import EmbeddingModel
 from ..record.descriptor import RecordDescriptor
+from ..record.descriptor import RecordKind
 from .catalog.mem import CatalogMem
 from .descriptor import CatalogDescriptor
 from .directory import ScanDirectoryOpts
 from .directory import scan_directory
 from .version import catalog_schema_version_compare
 from .version import lib_version_compare
-from agentc_core.defaults import DEFAULT_ITEM_DESCRIPTION_MAX_LEN
-from agentc_core.indexer import source_indexers
-from agentc_core.indexer import vectorize_descriptor
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +33,7 @@ def index_catalog(
     meta_version: MetaVersion,
     catalog_version: str,
     get_path_version: typing.Callable[[str], str],
-    kind,
+    kind: typing.Literal["tool", "prompt"],
     catalog_path,
     source_dirs,
     scan_directory_opts: ScanDirectoryOpts = None,
@@ -93,7 +94,7 @@ def index_catalog_start(
     meta_version: MetaVersion,
     catalog_version: str,
     get_path_version: typing.Callable[[str], str],
-    kind,
+    kind: typing.Literal["tool", "prompt"],
     catalog_path,
     source_dirs,
     scan_directory_opts: ScanDirectoryOpts = None,
@@ -101,7 +102,17 @@ def index_catalog_start(
     print_progress: bool = True,
     max_errs=1,
 ):
-    # TODO: We should use different source_indexers & source_globs based on the kind?
+    if kind == "tool":
+        record_kind_whitelist = {
+            RecordKind.PythonFunction,
+            RecordKind.SemanticSearch,
+            RecordKind.SQLPPQuery,
+            RecordKind.HTTPRequest,
+        }
+    elif kind == "prompt":
+        record_kind_whitelist = {RecordKind.RawPrompt, RecordKind.JinjaPrompt}
+    else:
+        raise ValueError(f"Unknown kind: {kind}")
 
     # Load the old / previous local catalog if our catalog path exists.
     curr_catalog = (
@@ -132,6 +143,9 @@ def index_catalog_start(
 
                 errs, descriptors = indexer.start_descriptors(source_file, get_path_version)
                 for descriptor in descriptors:
+                    if descriptor.record_kind not in record_kind_whitelist:
+                        continue
+
                     # Validate description lengths
                     if len(descriptor.description) == 0:
                         printer(f"WARNING: Catalog item {descriptor.name} has an empty description.", fg="yellow")
