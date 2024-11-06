@@ -114,7 +114,7 @@ Commands:
   See: https://docs.couchbase.com for more information.
 ```
 
-If you see the output above, you are all set! Head on over to our [docs](docs) or our [templates](templates) to start
+If you see the output above, you are all set! Head on over to our [docs](https://couchbaselabs.github.io/agent-catalog/) or our [templates](templates) to start
 developing your agent with Agent Catalog.
 
 ## Building From Source
