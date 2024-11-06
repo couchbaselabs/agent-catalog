@@ -122,7 +122,7 @@ def cmd_execute(
                 sys.path.append(str(tmp_dir_path.absolute()))
 
             file_stems = [x.stem for x in (tmp_dir_path.iterdir()) if x.stem != "__init__"]
-            file_stem = file_stems[1] if file_stems[0] == "__pytest__" else file_stems[0]
+            file_stem = file_stems[1] if file_stems[0] == "__pycache__" else file_stems[0]
             gen_code_modules = importlib.import_module(file_stem)
 
         click.secho(DASHES, fg="yellow")
