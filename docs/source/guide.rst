@@ -77,7 +77,7 @@ Both tool builders and prompt builders (i.e., agent builders) will follow this w
 
    .. code-block:: bash
 
-    agentc index [DIRECTORY] --kind [tool|prompt]
+    agentc index [DIRECTORY] --prompts/no-prompts --tools/no-tools
 
    ``[DIRECTORY]`` refers to the directory containing your tools/prompts.
    This command will create a local catalog and your items will be in the newly created :file:`./agent-catalog` folder.
