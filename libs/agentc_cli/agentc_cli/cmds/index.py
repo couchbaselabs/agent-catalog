@@ -33,7 +33,7 @@ def cmd_index(
     ctx: Context = None,
     **_,
 ):
-    assert all(kind in ["tool", "prompt"] for kind in kinds)
+    assert all(kind in {"tool", "prompt"} for kind in kinds)
     if ctx is None:
         ctx = Context()
 

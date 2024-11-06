@@ -422,7 +422,7 @@ def find(
     "--prompts/--no-prompts",
     is_flag=True,
     default=True,
-    help="Flag to (avoid) ignoring prompt when indexing source files into the local catalog.",
+    help="Flag to (avoid) ignoring prompts when indexing source files into the local catalog.",
     show_default=True,
 )
 @click.option(

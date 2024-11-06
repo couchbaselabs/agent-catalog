@@ -41,8 +41,28 @@ class BaseFileIndexer(pydantic.BaseModel):
         """
         pass
 
+    @property
+    @abc.abstractmethod
+    def glob_pattern(self) -> str:
+        """Returns the glob pattern for this indexer, e.g., '*.py'."""
+        pass
+
+    @property
+    @abc.abstractmethod
+    def kind(self) -> list[RecordKind]:
+        """Returns the kind of record this indexer handles."""
+        pass
+
 
 class DotPyFileIndexer(BaseFileIndexer):
+    @property
+    def glob_pattern(self) -> str:
+        return "*.py"
+
+    @property
+    def kind(self) -> list[RecordKind]:
+        return [RecordKind.PythonFunction]
+
     def start_descriptors(
         self, filename: pathlib.Path, get_path_version
     ) -> typing.Tuple[list[ValueError], list[RecordDescriptor]]:
@@ -55,6 +75,14 @@ class DotPyFileIndexer(BaseFileIndexer):
 
 
 class DotSqlppFileIndexer(BaseFileIndexer):
+    @property
+    def glob_pattern(self) -> str:
+        return "*.sqlpp"
+
+    @property
+    def kind(self) -> list[RecordKind]:
+        return [RecordKind.SQLPPQuery]
+
     def start_descriptors(
         self, filename: pathlib.Path, get_path_version
     ) -> typing.Tuple[list[ValueError], list[RecordDescriptor]]:
@@ -67,6 +95,14 @@ class DotSqlppFileIndexer(BaseFileIndexer):
 
 
 class DotYamlFileIndexer(BaseFileIndexer):
+    @property
+    def glob_pattern(self) -> str:
+        return "*.yaml"
+
+    @property
+    def kind(self) -> list[RecordKind]:
+        return [RecordKind.SemanticSearch, RecordKind.HTTPRequest]
+
     def start_descriptors(
         self, filename: pathlib.Path, get_version
     ) -> typing.Tuple[list[ValueError], list[RecordDescriptor]]:
@@ -107,6 +143,14 @@ class DotPromptFileIndexer(BaseFileIndexer):
     ) -> typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         return None, list(RawPromptDescriptor.Factory(filename=filename, version=get_version(filename)))
 
+    @property
+    def glob_pattern(self) -> str:
+        return "*.prompt"
+
+    @property
+    def kind(self) -> list[RecordKind]:
+        return [RecordKind.RawPrompt]
+
 
 class DotJinjaFileIndexer(BaseFileIndexer):
     def start_descriptors(
@@ -114,14 +158,13 @@ class DotJinjaFileIndexer(BaseFileIndexer):
     ) -> typing.Tuple[list[ValueError], list[RecordDescriptor]]:
         return None, list(JinjaPromptDescriptor.Factory(filename=filename, version=get_path_version(filename)))
 
+    @property
+    def glob_pattern(self) -> str:
+        return "*.jinja"
 
-source_indexers = {
-    "*.py": DotPyFileIndexer(),
-    "*.sqlpp": DotSqlppFileIndexer(),
-    "*.yaml": DotYamlFileIndexer(),
-    "*.prompt": DotPromptFileIndexer(),
-    "*.jinja": DotJinjaFileIndexer(),
-}
+    @property
+    def kind(self) -> list[RecordKind]:
+        return [RecordKind.JinjaPrompt]
 
 
 def augment_descriptor(descriptor: RecordDescriptor) -> list[ValueError]:
@@ -148,3 +191,12 @@ def vectorize_descriptor(descriptor: RecordDescriptor, embedding_model: Embeddin
     descriptor.embedding = embedding_model.encode(descriptor.description)
 
     return None
+
+
+AllIndexers = [
+    DotPyFileIndexer(),
+    DotSqlppFileIndexer(),
+    DotYamlFileIndexer(),
+    DotPromptFileIndexer(),
+    DotJinjaFileIndexer(),
+]

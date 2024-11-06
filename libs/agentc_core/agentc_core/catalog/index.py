@@ -5,11 +5,10 @@ import tqdm
 import typing
 
 from ..defaults import DEFAULT_ITEM_DESCRIPTION_MAX_LEN
-from ..indexer import source_indexers
+from ..indexer import AllIndexers
 from ..indexer import vectorize_descriptor
 from ..learned.embedding import EmbeddingModel
 from ..record.descriptor import RecordDescriptor
-from ..record.descriptor import RecordKind
 from .catalog.mem import CatalogMem
 from .descriptor import CatalogDescriptor
 from .directory import ScanDirectoryOpts
@@ -18,8 +17,6 @@ from .version import catalog_schema_version_compare
 from .version import lib_version_compare
 
 logger = logging.getLogger(__name__)
-
-source_globs = list(source_indexers.keys())
 
 
 @dataclasses.dataclass
@@ -102,18 +99,6 @@ def index_catalog_start(
     print_progress: bool = True,
     max_errs=1,
 ):
-    if kind == "tool":
-        record_kind_whitelist = {
-            RecordKind.PythonFunction,
-            RecordKind.SemanticSearch,
-            RecordKind.SQLPPQuery,
-            RecordKind.HTTPRequest,
-        }
-    elif kind == "prompt":
-        record_kind_whitelist = {RecordKind.RawPrompt, RecordKind.JinjaPrompt}
-    else:
-        raise ValueError(f"Unknown kind: {kind}")
-
     # Load the old / previous local catalog if our catalog path exists.
     curr_catalog = (
         CatalogMem(catalog_path=catalog_path, embedding_model=embedding_model) if catalog_path.exists() else None
@@ -121,10 +106,15 @@ def index_catalog_start(
 
     logger.debug(f"Now crawling source directories. [{','.join(d for d in source_dirs)}]")
     printer(f"Crawling {','.join(d for d in source_dirs)}:")
-    source_files = []
+    source_files = list()
+    if kind == "tool":
+        source_globs = [i.glob_pattern for i in AllIndexers if all(k.is_tool() for k in i.kind)]
+    elif kind == "prompt":
+        source_globs = [i.glob_pattern for i in AllIndexers if all(k.is_prompt() for k in i.kind)]
+    else:
+        raise ValueError(f"Unknown kind: {kind}")
     for source_dir in source_dirs:
         source_files += scan_directory(source_dir, source_globs, opts=scan_directory_opts)
-
     all_errs = []
     all_descriptors = []
     source_iterable = tqdm.tqdm(source_files) if print_progress else source_files
@@ -133,8 +123,8 @@ def index_catalog_start(
             break
         if print_progress:
             source_iterable.set_description(f"{source_file.name}")
-        for glob, indexer in source_indexers.items():
-            if fnmatch.fnmatch(source_file.name, glob):
+        for indexer in AllIndexers:
+            if fnmatch.fnmatch(source_file.name, str(indexer.glob_pattern)):
                 logger.debug(f"Indexing file {source_file.name}.")
 
                 # Flags to validate catalog item description
@@ -143,9 +133,6 @@ def index_catalog_start(
 
                 errs, descriptors = indexer.start_descriptors(source_file, get_path_version)
                 for descriptor in descriptors:
-                    if descriptor.record_kind not in record_kind_whitelist:
-                        continue
-
                     # Validate description lengths
                     if len(descriptor.description) == 0:
                         printer(f"WARNING: Catalog item {descriptor.name} has an empty description.", fg="yellow")
