@@ -4,6 +4,20 @@
 
 The mono-repo for the Couchbase Agent Catalog project.
 
+## Table of Contents
+- [Getting Started](#getting-started)
+  * [Installing from Package](#installing-from-package)
+  * [Installing from Source (with Pip)](#installing-from-source-with-pip)
+  * [Installing from Source (with Poetry)](#installing-from-source-with-poetry)
+  * [Verifying Your Installation](#verifying-your-installation)
+- [Building From Source](#building-from-source)
+- [Docs and Templates](#docs-and-templates)
+- [For Contributors / Developers](#for-contributors--developers)
+  * [On Packages (inside `libs`)](#on-packages-inside-libs)
+  * [Working with Poetry](#working-with-poetry)
+  * [Setting up Pre-Commit](#setting-up-pre-commit)
+  * [Enabling Debug Mode](#enabling-debug-mode)
+
 ## Getting Started
 
 ### Installing from Package
