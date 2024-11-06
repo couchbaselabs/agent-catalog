@@ -107,7 +107,7 @@ def cmd_index(
             print_progress=True,
             max_errs=DEFAULT_MAX_ERRS,
         )
-        if not dry_run:
+        if not dry_run and len(next_catalog.catalog_descriptor.items) > 0:
             next_catalog.dump(catalog_path)
             click.secho("\nCatalog successfully indexed!", fg="green")
         click.secho(DASHES, fg=KIND_COLORS[kind])
