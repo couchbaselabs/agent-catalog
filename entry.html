@@ -331,23 +331,23 @@ input: &gt;
 
 # The outputs used describe the structure of the SQL++ query result.
 # Outputs are described using a JSON object that follows the JSON schema standard.
-# This field is optional, and will be used to build a Pydantic model.
+# This field is mandatory, and will be used to build a Pydantic model.
 # We recommend using the &#39;INFER&#39; command to build a JSON schema from your query results.
 # See https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/infer.html.
 # In the future, this field will be optional (we will INFER the query automatically for you).
-# output: &gt;
-#     {
-#       &quot;type&quot;: &quot;array&quot;,
-#       &quot;items&quot;: {
-#         &quot;type&quot;: &quot;object&quot;,
-#         &quot;properties&quot;: {
-#           &quot;cust_id&quot;: { &quot;type&quot;: &quot;string&quot; },
-#           &quot;first_name&quot;: { &quot;type&quot;: &quot;string&quot; },
-#           &quot;last_name&quot;: { &quot;type&quot;: &quot;string&quot; },
-#           &quot;item_cnt&quot;: { &quot;type&quot;: &quot;integer&quot; }
-#         }
-#       }
-#     }
+output: &gt;
+    {
+      &quot;type&quot;: &quot;array&quot;,
+      &quot;items&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+          &quot;cust_id&quot;: { &quot;type&quot;: &quot;string&quot; },
+          &quot;first_name&quot;: { &quot;type&quot;: &quot;string&quot; },
+          &quot;last_name&quot;: { &quot;type&quot;: &quot;string&quot; },
+          &quot;item_cnt&quot;: { &quot;type&quot;: &quot;integer&quot; }
+        }
+      }
+    }
 
 # As a supplement to the tool similarity search, users can optionally specify search annotations.
 # The values of these annotations MUST be strings (e.g., not &#39;true&#39;, but &#39;&quot;true&quot;&#39;).
