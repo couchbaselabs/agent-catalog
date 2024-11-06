@@ -17,6 +17,7 @@ from ..descriptor import SemanticSearchToolDescriptor
 from ..descriptor import SQLPPQueryToolDescriptor
 from .common import INPUT_MODEL_CLASS_NAME_IN_TEMPLATES
 from .common import OUTPUT_MODEL_CLASS_NAME_IN_TEMPLATES
+from .common import GeneratedCode
 from .common import generate_model_from_json_schema
 
 logger = logging.getLogger(__name__)
@@ -72,7 +73,7 @@ class SQLPPCodeGenerator(_BaseCodeGenerator):
                 model_type=self.target_model_type,
             )
             if self.record_descriptor.output is not None
-            else ""
+            else GeneratedCode(generated_code="", is_list_valued=False, type_name="dict")
         )
 
         # Instantiate our template.
