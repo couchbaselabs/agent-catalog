@@ -8,7 +8,9 @@ import warnings
 from .models import CouchbaseConnect
 from .query import execute_query
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
+from agentc_core.defaults import DEFAULT_HTTP_CLUSTER_ADMIN_PORT_NUMBER
 from agentc_core.defaults import DEFAULT_HTTP_FTS_PORT_NUMBER
+from agentc_core.defaults import DEFAULT_HTTPS_CLUSTER_ADMIN_PORT_NUMBER
 from agentc_core.defaults import DEFAULT_HTTPS_FTS_PORT_NUMBER
 
 # TODO: Add ca certificate authentication
@@ -68,6 +70,48 @@ def is_index_present(
         return False, e
 
 
+def get_no_of_fts_nodes(conn):
+    node_info_url_http = f"http://{conn.host}:{DEFAULT_HTTP_CLUSTER_ADMIN_PORT_NUMBER}/pools/default"
+    node_info_url_https = f"https://{conn.host}:{DEFAULT_HTTPS_CLUSTER_ADMIN_PORT_NUMBER}/pools/default"
+    auth = (conn.username, conn.password)
+
+    # Make HTTPS request to FTS
+    try:
+        # REST call to get node info
+        response = requests.request("GET", node_info_url_https, auth=auth, verify=False)
+        json_response = json.loads(response.text)
+        # If api call was successful
+        if json_response["name"] == "default":
+            no_of_nodes = len(json_response["nodes"])
+            print("no of nodes in total: ", no_of_nodes)
+            no_of_fts_nodes = 0
+            for node in json_response["nodes"]:
+                if "fts" in node["services"]:
+                    no_of_fts_nodes += 1
+            print("no of fts nodes: ", no_of_fts_nodes)
+            return no_of_fts_nodes, None
+    except Exception:
+        pass
+
+    # Make HTTP request if in case HTTPS ports are not made public
+    try:
+        print("making http call")
+        response = requests.request("GET", node_info_url_http, auth=auth)
+        json_response = json.loads(response.text)
+        # If api call was successful
+        if json_response["name"] == "default":
+            no_of_nodes = len(json_response["nodes"])
+            print("no of nodes in total: ", no_of_nodes)
+            no_of_fts_nodes = 0
+            for node in json_response["nodes"]:
+                if "fts" in node["services"]:
+                    no_of_fts_nodes += 1
+            print("no of fts nodes: ", no_of_fts_nodes)
+            return no_of_fts_nodes, None
+    except Exception as e:
+        return None, e
+
+
 def create_vector_index(
     bucket: str = "",
     kind: str = "tool",
@@ -78,6 +122,12 @@ def create_vector_index(
 
     non_qualified_index_name = f"v1_agent_catalog_{kind}_index"
     qualified_index_name = f"{bucket}.{DEFAULT_CATALOG_SCOPE}.{non_qualified_index_name}"
+
+    (no_of_fts_nodes, err) = get_no_of_fts_nodes(conn)
+    if no_of_fts_nodes == 0:
+        raise ValueError(
+            "No node with fts service found, cannot create vector index! Please ensure fts service is included in at least one node."
+        )
 
     (index_present, err) = is_index_present(bucket, qualified_index_name, conn)
     if err is None and isinstance(index_present, bool) and not index_present:
@@ -96,7 +146,7 @@ def create_vector_index(
                 "name": qualified_index_name,
                 "sourceType": "gocbcore",
                 "sourceName": bucket,
-                "planParams": {"maxPartitionsPerPIndex": 1024, "indexPartitions": 1},
+                "planParams": {"maxPartitionsPerPIndex": 512, "indexPartitions": (2 * no_of_fts_nodes)},
                 "params": {
                     "doc_config": {
                         "docid_prefix_delim": "",
@@ -171,6 +221,12 @@ def create_vector_index(
             return None, e
 
     elif err is None and isinstance(index_present, dict):
+        # Check if no. of fts nodes has changes since last update
+        cluster_fts_partitions = index_present["planParams"]["indexPartitions"]
+        new_fts_partitions = 2 * no_of_fts_nodes
+        if cluster_fts_partitions != new_fts_partitions:
+            index_present["planParams"]["indexPartitions"] = new_fts_partitions
+
         # Check if the mapping already exists
         existing_fields = index_present["params"]["mapping"]["types"][f"{DEFAULT_CATALOG_SCOPE}.{kind}_catalog"][
             "properties"
