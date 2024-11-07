@@ -49,8 +49,8 @@ def {{ tool.name }}(argument_input: {{ input.type_name }}):
         couchbase.options.QueryOptions(named_parameters=named_parameters)
     )
 
-    tool_results = []
     {% if output.is_list_valued %}
+    tool_results = []
     for result in query_results:
         tool_results.append({{ output.type_name }}(**result))
     logger.debug("{{ tool.name }} has returned the following: " + str(tool_results))

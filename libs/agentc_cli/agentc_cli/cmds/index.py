@@ -33,6 +33,7 @@ def cmd_index(
     ctx: Context = None,
     **_,
 ):
+    assert all(k in {"tool", "prompt"} for k in kinds)
     if ctx is None:
         ctx = Context()
 
@@ -89,7 +90,6 @@ def cmd_index(
         printer = click.secho
 
     for kind in kinds:
-        # TODO: The kind needs a security check as it's part of the path?
         catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)
         printer(DASHES, fg=KIND_COLORS[kind])
         printer(kind.upper(), bold=True, fg=KIND_COLORS[kind])
