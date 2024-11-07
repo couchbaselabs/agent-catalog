@@ -70,7 +70,9 @@ def is_index_present(
         return False, e
 
 
-def get_no_of_fts_nodes(conn):
+def get_no_of_fts_nodes(conn) -> tuple[int | None, Exception | None]:
+    """Find the number of nodes with fts support for index partition creation in create_vector_index()"""
+
     node_info_url_http = f"http://{conn.host}:{DEFAULT_HTTP_CLUSTER_ADMIN_PORT_NUMBER}/pools/default"
     node_info_url_https = f"https://{conn.host}:{DEFAULT_HTTPS_CLUSTER_ADMIN_PORT_NUMBER}/pools/default"
     auth = (conn.username, conn.password)
