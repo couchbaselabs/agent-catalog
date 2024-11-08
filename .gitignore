@@ -168,3 +168,4 @@ cython_debug/
 *.agent-catalog/
 *.agent-activity/
 *.model-cache/
+*.data/

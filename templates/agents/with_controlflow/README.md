@@ -9,10 +9,11 @@ This directory contains a starter project for building agents with Couchbase, Co
 
    ```bash
    poetry install --with analysis
+   poetry shell
    ```
 
 3. Run `agentc` to make sure this project has installed correctly (note that your first run will take a couple of
-   seconds, subsequent runs will be faster).
+   seconds as certain packages need to be compiled, subsequent runs will be faster).
 
    ```bash
    Usage: agentc [OPTIONS] COMMAND [ARGS]...
@@ -44,12 +45,28 @@ This directory contains a starter project for building agents with Couchbase, Co
 4. Make sure your Git repo is clean, and run `agentc index` to index your tools and prompts.
 
    ```bash
-   agentc index --kind tool tools
-   agentc index --kind prompt prompts
+   agentc index tools prompts
    ```
 
-5. Start up a Couchbase instance (see[here](https://docs.couchbase.com/server/current/install/install-intro.html) for
-   instructions on how to run Couchbase locally).
+5. Start up a Couchbase instance.
+
+   1. For those interested in using a local Couchbase instance, see
+      [here](https://docs.couchbase.com/server/current/install/install-intro.html).
+   2. For those interested in using Couchbase within a Docker container, run the command below:
+
+      ```bash
+      mkdir -p .data/couchbase
+      docker run -d --name my_couchbase \
+        -p 8091-8096:8091-8096 -p 11210-11211:11210-11211 \
+        -v "$(pwd)/.data/couchbase:/opt/couchbase/var" \
+        couchbase
+      ```
+
+   3. For those interested in using Capella, see [here](https://cloud.couchbase.com/sign-up).
+
+   This specific agent also uses the `travel-sample` bucket.
+   Be sure to log into your cluster and install this sample bucket.
+
 6. Create a `.env` file from the `.env.example` file and tweak this to your environment.
 
    ```bash
@@ -57,8 +74,9 @@ This directory contains a starter project for building agents with Couchbase, Co
    vi .env
    ```
 
-7. Publish your local agent catalog to your Couchbase instance with `agentc publish`. Your Couchbase instance details
-   in the `.env` file will be used for authentication. This starter agent uses the `travel-sample` bucket.
+7. Publish your local agent catalog to your Couchbase instance with `agentc publish`.
+   Your Couchbase instance details in the `.env` file will be used for authentication.
+   Again, this specific starter agent uses the `travel-sample` bucket.
 
    ```bash
    agentc publish tool prompt --bucket travel-sample
@@ -67,6 +85,7 @@ This directory contains a starter project for building agents with Couchbase, Co
 8. Start a prefect server and run your agent!
 
    ```bash
+   export PREFECT_API_URL=http://127.0.0.1:4200/api
    prefect server start &
    python agent.py
    ```

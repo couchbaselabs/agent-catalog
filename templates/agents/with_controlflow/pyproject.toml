@@ -13,11 +13,16 @@ package-mode = false
 python = "^3.12"
 
 # The agent framework of choice.
-controlflow = { git = "git@github.com:PrefectHQ/ControlFlow.git" }
+[tool.poetry.dependencies.controlflow]
+git = "git@github.com:PrefectHQ/ControlFlow.git"
+rev = "321c8726a12cee31db8d68eea5f7bd566dcab8dc"
 
 # TODO (GLENN): Replace this with the PyPI package once it's available.
 # The agentc project (the front-facing parts)!
-agentc = { path = "../../libs/agentc", develop = true, extras = ["langchain"] }
+[tool.poetry.dependencies.agentc]
+path = "../../../libs/agentc"
+extras = ["langchain"]
+develop = true
 
 # All agent analysis related packages.
 [tool.poetry.group.analysis]
