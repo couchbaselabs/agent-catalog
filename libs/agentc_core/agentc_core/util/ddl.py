@@ -70,7 +70,7 @@ def is_index_present(
         return False, e
 
 
-def get_no_of_fts_nodes(conn) -> tuple[int | None, Exception | None]:
+def get_no_of_fts_nodes(conn: CouchbaseConnect = "") -> tuple[int | None, Exception | None]:
     """Find the number of nodes with fts support for index partition creation in create_vector_index()"""
 
     node_info_url_http = f"http://{conn.host}:{DEFAULT_HTTP_CLUSTER_ADMIN_PORT_NUMBER}/pools/default"
@@ -84,13 +84,10 @@ def get_no_of_fts_nodes(conn) -> tuple[int | None, Exception | None]:
         json_response = json.loads(response.text)
         # If api call was successful
         if json_response["name"] == "default":
-            no_of_nodes = len(json_response["nodes"])
-            print("no of nodes in total: ", no_of_nodes)
             no_of_fts_nodes = 0
             for node in json_response["nodes"]:
                 if "fts" in node["services"]:
                     no_of_fts_nodes += 1
-            print("no of fts nodes: ", no_of_fts_nodes)
             return no_of_fts_nodes, None
     except Exception:
         pass
@@ -102,8 +99,6 @@ def get_no_of_fts_nodes(conn) -> tuple[int | None, Exception | None]:
         json_response = json.loads(response.text)
         # If api call was successful
         if json_response["name"] == "default":
-            no_of_nodes = len(json_response["nodes"])
-            print("no of nodes in total: ", no_of_nodes)
             no_of_fts_nodes = 0
             for node in json_response["nodes"]:
                 if "fts" in node["services"]:
