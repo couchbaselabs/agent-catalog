@@ -23,6 +23,19 @@ warnings.filterwarnings(
 logger = logging.getLogger(__name__)
 
 
+def get_index_info(json_response: dict = None, index_to_create: str = "") -> tuple[bool | dict | None, None]:
+    """Helper function for is_index_present()"""
+    if json_response["status"] == "ok":
+        if json_response["indexDefs"] is None:
+            return False, None
+        created_indexes = [el for el in json_response["indexDefs"]["indexDefs"]]
+        if index_to_create not in created_indexes:
+            return False, None
+        else:
+            index_def = json_response["indexDefs"]["indexDefs"][index_to_create]
+            return index_def, None
+
+
 def is_index_present(
     bucket: str = "", index_to_create: str = "", conn: CouchbaseConnect = ""
 ) -> tuple[bool | dict | None, Exception | None]:
@@ -40,17 +53,7 @@ def is_index_present(
         # REST call to get list of indexes
         response = requests.request("GET", find_index_https_url, auth=auth, verify=False)
         json_response = json.loads(response.text)
-        if json_response["status"] == "ok":
-            # If no vector indexes are present
-            if json_response["indexDefs"] is None:
-                return False, None
-            # If index_to_create not in existing vector index list
-            created_indexes = [el for el in json_response["indexDefs"]["indexDefs"]]
-            if index_to_create not in created_indexes:
-                return False, None
-            else:
-                index_def = json_response["indexDefs"]["indexDefs"][index_to_create]
-                return index_def, None
+        return get_index_info(json_response, index_to_create)
     except Exception:
         pass
 
@@ -58,17 +61,19 @@ def is_index_present(
     try:
         response = requests.request("GET", find_index_http_url, auth=auth)
         json_response = json.loads(response.text)
-        if json_response["status"] == "ok":
-            if json_response["indexDefs"] is None:
-                return False, None
-            created_indexes = [el for el in json_response["indexDefs"]["indexDefs"]]
-            if index_to_create not in created_indexes:
-                return False, None
-            else:
-                index_def = json_response["indexDefs"]["indexDefs"][index_to_create]
-                return index_def, None
+        return get_index_info(json_response, index_to_create)
     except Exception as e:
         return False, e
+
+
+def get_nodes_num(json_response: dict = None) -> tuple[int, None]:
+    """Helper function for get_no_of_fts_nodes()"""
+    if json_response["name"] == "default":
+        no_of_fts_nodes = 0
+        for node in json_response["nodes"]:
+            if "fts" in node["services"]:
+                no_of_fts_nodes += 1
+        return no_of_fts_nodes, None
 
 
 def get_no_of_fts_nodes(conn: CouchbaseConnect = None) -> tuple[int | None, Exception | None]:
@@ -84,12 +89,7 @@ def get_no_of_fts_nodes(conn: CouchbaseConnect = None) -> tuple[int | None, Exce
         response = requests.request("GET", node_info_url_https, auth=auth, verify=False)
         json_response = json.loads(response.text)
         # If api call was successful
-        if json_response["name"] == "default":
-            no_of_fts_nodes = 0
-            for node in json_response["nodes"]:
-                if "fts" in node["services"]:
-                    no_of_fts_nodes += 1
-            return no_of_fts_nodes, None
+        return get_nodes_num(json_response)
     except Exception:
         pass
 
@@ -98,12 +98,7 @@ def get_no_of_fts_nodes(conn: CouchbaseConnect = None) -> tuple[int | None, Exce
         response = requests.request("GET", node_info_url_http, auth=auth)
         json_response = json.loads(response.text)
         # If api call was successful
-        if json_response["name"] == "default":
-            no_of_fts_nodes = 0
-            for node in json_response["nodes"]:
-                if "fts" in node["services"]:
-                    no_of_fts_nodes += 1
-            return no_of_fts_nodes, None
+        return get_nodes_num(json_response)
     except Exception as e:
         return None, e
 
