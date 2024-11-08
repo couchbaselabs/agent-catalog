@@ -103,6 +103,15 @@ def get_no_of_fts_nodes(conn: CouchbaseConnect = None) -> tuple[int | None, Exce
         return None, e
 
 
+def update_vector_index(response: requests.Response) -> tuple[str, None] | Exception:
+    """Helper function fot create_vector_index()"""
+    if json.loads(response.text)["status"] == "ok":
+        logger.info("Updated vector index!!")
+        return "Success", None
+    elif json.loads(response.text)["status"] == "fail":
+        raise Exception(json.loads(response.text)["error"])
+
+
 def create_vector_index(
     bucket: str = "",
     kind: str = "tool",
@@ -225,38 +234,36 @@ def create_vector_index(
     elif err is None and isinstance(index_present, dict):
         # Check if no. of fts nodes has changes since last update
         cluster_fts_partitions = index_present["planParams"]["indexPartitions"]
-        new_fts_partitions = 2 * no_of_fts_nodes
-        if cluster_fts_partitions != new_fts_partitions:
-            index_present["planParams"]["indexPartitions"] = new_fts_partitions
+        if cluster_fts_partitions != index_partition:
+            index_present["planParams"]["indexPartitions"] = int(index_partition)
 
         # Check if the mapping already exists
         existing_fields = index_present["params"]["mapping"]["types"][f"{DEFAULT_CATALOG_SCOPE}.{kind}_catalog"][
             "properties"
         ]["embedding"]["fields"]
         existing_dims = [el["dims"] for el in existing_fields]
-        if dim in existing_dims:
-            return None, None
 
-        # If it doesn't, create it
-        logger.debug("Updating the index...")
-        # Update the index
-        new_field_mapping = {
-            "dims": dim,
-            "index": True,
-            "name": f"embedding-{dim}",
-            "similarity": "dot_product",
-            "type": "vector",
-            "vector_index_optimized_for": "recall",
-        }
+        if dim not in existing_dims:
+            # If it doesn't, create it
+            logger.debug("Updating the index...")
+            # Update the index
+            new_field_mapping = {
+                "dims": dim,
+                "index": True,
+                "name": f"embedding-{dim}",
+                "similarity": "dot_product",
+                "type": "vector",
+                "vector_index_optimized_for": "recall",
+            }
 
-        # Add field mapping with new model dim
-        field_mappings = index_present["params"]["mapping"]["types"][f"{DEFAULT_CATALOG_SCOPE}.{kind}_catalog"][
-            "properties"
-        ]["embedding"]["fields"]
-        field_mappings.append(new_field_mapping) if new_field_mapping not in field_mappings else field_mappings
-        index_present["params"]["mapping"]["types"][f"{DEFAULT_CATALOG_SCOPE}.{kind}_catalog"]["properties"][
-            "embedding"
-        ]["fields"] = field_mappings
+            # Add field mapping with new model dim
+            field_mappings = index_present["params"]["mapping"]["types"][f"{DEFAULT_CATALOG_SCOPE}.{kind}_catalog"][
+                "properties"
+            ]["embedding"]["fields"]
+            field_mappings.append(new_field_mapping) if new_field_mapping not in field_mappings else field_mappings
+            index_present["params"]["mapping"]["types"][f"{DEFAULT_CATALOG_SCOPE}.{kind}_catalog"]["properties"][
+                "embedding"
+            ]["fields"] = field_mappings
 
         update_vector_index_https_url = f"https://{conn.host}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
         update_vector_index_http_url = f"http://{conn.host}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
@@ -273,22 +280,16 @@ def create_vector_index(
             response = requests.request(
                 "PUT", update_vector_index_https_url, headers=headers, auth=auth, data=payload, verify=False
             )
-            if json.loads(response.text)["status"] == "ok":
-                logger.info("Updated vector index!!")
-                return "Success", None
-            elif json.loads(response.text)["status"] == "fail":
-                raise Exception(json.loads(response.text)["error"])
+            # Return status or exception
+            return update_vector_index(response)
         except Exception:
             pass
 
         # HTTP fallback call if HTTPS ports are not made public
         try:
             response = requests.request("PUT", update_vector_index_http_url, headers=headers, auth=auth, data=payload)
-            if json.loads(response.text)["status"] == "ok":
-                logger.info("Updated vector index!!")
-                return "Success", None
-            elif json.loads(response.text)["status"] == "fail":
-                raise Exception(json.loads(response.text)["error"])
+            # Return status or exception
+            return update_vector_index(response)
         except Exception as e:
             return None, e
 
@@ -309,7 +310,7 @@ def create_gsi_indexes(bucket, cluster, kind, print_progress):
     primary_idx = f"""
         CREATE PRIMARY INDEX IF NOT EXISTS `{primary_idx_name}`
         ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog` USING GSI;
-"""
+    """
     if print_progress:
         next(progress_bar_it)
         progress_bar.set_description(primary_idx_name)
