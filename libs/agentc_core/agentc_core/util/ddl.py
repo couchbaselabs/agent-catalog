@@ -1,6 +1,7 @@
 import contextlib
 import json
 import logging
+import os
 import requests
 import tqdm
 import warnings
@@ -70,7 +71,7 @@ def is_index_present(
         return False, e
 
 
-def get_no_of_fts_nodes(conn: CouchbaseConnect = "") -> tuple[int | None, Exception | None]:
+def get_no_of_fts_nodes(conn: CouchbaseConnect = None) -> tuple[int | None, Exception | None]:
     """Find the number of nodes with fts support for index partition creation in create_vector_index()"""
 
     node_info_url_http = f"http://{conn.host}:{DEFAULT_HTTP_CLUSTER_ADMIN_PORT_NUMBER}/pools/default"
@@ -94,7 +95,6 @@ def get_no_of_fts_nodes(conn: CouchbaseConnect = "") -> tuple[int | None, Except
 
     # Make HTTP request if in case HTTPS ports are not made public
     try:
-        print("making http call")
         response = requests.request("GET", node_info_url_http, auth=auth)
         json_response = json.loads(response.text)
         # If api call was successful
@@ -103,7 +103,6 @@ def get_no_of_fts_nodes(conn: CouchbaseConnect = "") -> tuple[int | None, Except
             for node in json_response["nodes"]:
                 if "fts" in node["services"]:
                     no_of_fts_nodes += 1
-            print("no of fts nodes: ", no_of_fts_nodes)
             return no_of_fts_nodes, None
     except Exception as e:
         return None, e
@@ -112,7 +111,7 @@ def get_no_of_fts_nodes(conn: CouchbaseConnect = "") -> tuple[int | None, Except
 def create_vector_index(
     bucket: str = "",
     kind: str = "tool",
-    conn: CouchbaseConnect = "",
+    conn: CouchbaseConnect = None,
     dim: int = None,
 ) -> tuple[str | None, Exception | None]:
     """Creates required vector index at publish"""
@@ -120,11 +119,22 @@ def create_vector_index(
     non_qualified_index_name = f"v1_agent_catalog_{kind}_index"
     qualified_index_name = f"{bucket}.{DEFAULT_CATALOG_SCOPE}.{non_qualified_index_name}"
 
+    # decide on plan params
     (no_of_fts_nodes, err) = get_no_of_fts_nodes(conn)
     if no_of_fts_nodes == 0:
         raise ValueError(
             "No node with fts service found, cannot create vector index! Please ensure fts service is included in at least one node."
         )
+    max_partition = (
+        os.getenv("AGENT_CATALOG_MAX_SOURCE_PARTITION")
+        if os.getenv("AGENT_CATALOG_MAX_SOURCE_PARTITION") is not None
+        else None
+    )
+    index_partition = (
+        os.getenv("AGENT_CATALOG_INDEX_PARTITION")
+        if os.getenv("AGENT_CATALOG_INDEX_PARTITION") is not None
+        else 2 * no_of_fts_nodes
+    )
 
     (index_present, err) = is_index_present(bucket, qualified_index_name, conn)
     if err is None and isinstance(index_present, bool) and not index_present:
@@ -143,7 +153,7 @@ def create_vector_index(
                 "name": qualified_index_name,
                 "sourceType": "gocbcore",
                 "sourceName": bucket,
-                "planParams": {"maxPartitionsPerPIndex": 512, "indexPartitions": (2 * no_of_fts_nodes)},
+                "planParams": {"maxPartitionsPerPIndex": max_partition, "indexPartitions": index_partition},
                 "params": {
                     "doc_config": {
                         "docid_prefix_delim": "",
