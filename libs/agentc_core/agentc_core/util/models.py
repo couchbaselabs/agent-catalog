@@ -1,9 +1,12 @@
 import datetime
 import json
+import os
 
 from pathlib import Path
 from pydantic import BaseModel
 from pydantic import field_validator
+from pydantic_core.core_schema import ValidationInfo
+from typing import Optional
 from urllib.parse import urlparse
 
 
@@ -17,10 +20,11 @@ class Keyspace(BaseModel):
 class CouchbaseConnect(BaseModel):
     """Pydantic model to capture couchbase connection details"""
 
-    connection_url: str | None
-    username: str | None
-    password: str | None
-    host: str | None
+    connection_url: Optional[str] = None
+    username: Optional[str] = None
+    password: Optional[str] = None
+    host: Optional[str] = None
+    certificate_path: Optional[str] = None
 
     @field_validator("connection_url")
     @classmethod
@@ -33,7 +37,7 @@ class CouchbaseConnect(BaseModel):
             )
         url = url.strip()
         parsed_url = urlparse(url)
-        if parsed_url.scheme == "" or parsed_url.netloc == "":
+        if parsed_url.scheme not in ["couchbase", "couchbases"] or parsed_url.netloc == "":
             raise ValueError(
                 "Malformed $AGENT_CATALOG_CONN_STRING recieved.\n"
                 "Please edit your $AGENT_CATALOG_CONN_STRING and try again.\n"
@@ -81,6 +85,30 @@ class CouchbaseConnect(BaseModel):
             )
 
         return pwd
+
+    @field_validator("certificate_path")
+    @classmethod
+    def certificate_path_must_be_valid_if_not_none(cls, path: str, info: ValidationInfo) -> Optional[str]:
+        conn_url = info.data["connection_url"]
+        if conn_url is not None and "couchbases" in conn_url:
+            if path is None:
+                raise ValueError(
+                    "Could not find the environment variable $AGENT_CATALOG_CONN_ROOT_CERT_PATH!\n"
+                    "Please run 'export AGENT_CATALOG_CONN_ROOT_CERT_PATH=...' or add "
+                    "$AGENT_CATALOG_CONN_ROOT_CERT_PATH to your .env file and try again."
+                )
+            elif not os.path.exists(path):
+                raise ValueError(
+                    "Value provided for variable $AGENT_CATALOG_CONN_ROOT_CERT_PATH does not exist in your file system!\n"
+                )
+            elif not os.path.isfile(path):
+                raise ValueError(
+                    "Value provided for variable $AGENT_CATALOG_CONN_ROOT_CERT_PATH is not a valid path to the cluster's root certificate file!\n"
+                )
+
+            return path
+
+        return None
 
 
 class CustomPublishEncoder(json.JSONEncoder):

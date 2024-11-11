@@ -218,6 +218,7 @@ def clean(ctx, catalog, bucket, catalog_id, skip_confirm, kind):
             username=os.getenv("AGENT_CATALOG_USERNAME"),
             password=os.getenv("AGENT_CATALOG_PASSWORD"),
             host=get_host_name(os.getenv("AGENT_CATALOG_CONN_STRING")),
+            certificate_path=os.getenv("AGENT_CATALOG_CONN_ROOT_CERT_PATH"),
         )
 
         # Establish a connection
@@ -363,6 +364,7 @@ def find(
                 username=os.getenv("AGENT_CATALOG_USERNAME"),
                 password=os.getenv("AGENT_CATALOG_PASSWORD"),
                 host=get_host_name(os.getenv("AGENT_CATALOG_CONN_STRING")),
+                certificate_path=os.getenv("AGENT_CATALOG_CONN_ROOT_CERT_PATH"),
             )
 
             # Establish a connection
@@ -514,6 +516,7 @@ def publish(ctx, kind, bucket, annotations):
         username=os.getenv("AGENT_CATALOG_USERNAME"),
         password=os.getenv("AGENT_CATALOG_PASSWORD"),
         host=get_host_name(os.getenv("AGENT_CATALOG_CONN_STRING")),
+        certificate_path=os.getenv("AGENT_CATALOG_CONN_ROOT_CERT_PATH"),
     )
 
     # Establish a connection
@@ -606,6 +609,7 @@ def status(ctx, kind, include_dirty, status_db, bucket, compare):
             username=os.getenv("AGENT_CATALOG_USERNAME"),
             password=os.getenv("AGENT_CATALOG_PASSWORD"),
             host=get_host_name(os.getenv("AGENT_CATALOG_CONN_STRING")),
+            certificate_path=os.getenv("AGENT_CATALOG_CONN_ROOT_CERT_PATH"),
         )
 
         # Establish a connection
@@ -728,6 +732,7 @@ def execute(ctx, query, name, bucket, include_dirty, refiner, annotations, catal
                 username=os.getenv("AGENT_CATALOG_USERNAME"),
                 password=os.getenv("AGENT_CATALOG_PASSWORD"),
                 host=get_host_name(os.getenv("AGENT_CATALOG_CONN_STRING")),
+                certificate_path=os.getenv("AGENT_CATALOG_CONN_ROOT_CERT_PATH"),
             )
 
             # Establish a connection

@@ -3,19 +3,12 @@ import json
 import logging
 import requests
 import tqdm
-import warnings
 
 from .models import CouchbaseConnect
 from .query import execute_query
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_HTTP_FTS_PORT_NUMBER
 from agentc_core.defaults import DEFAULT_HTTPS_FTS_PORT_NUMBER
-
-# TODO: Add ca certificate authentication
-warnings.filterwarnings(
-    action="ignore",
-    message=".*Unverified HTTPS.*",
-)
 
 logger = logging.getLogger(__name__)
 
@@ -32,32 +25,20 @@ def is_index_present(
     )
     auth = (conn.username, conn.password)
 
-    # Make HTTPS request to FTS
+    # Make request to FTS
     try:
-        # REST call to get list of indexes
-        response = requests.request("GET", find_index_https_url, auth=auth, verify=False)
+        # REST call to get list of indexes, decide HTTP or HTTPS based on certificate path
+        if conn.certificate_path is not None:
+            response = requests.request("GET", find_index_https_url, auth=auth, verify=conn.certificate_path)
+        else:
+            response = requests.request("GET", find_index_http_url, auth=auth)
+
         json_response = json.loads(response.text)
         if json_response["status"] == "ok":
             # If no vector indexes are present
             if json_response["indexDefs"] is None:
                 return False, None
             # If index_to_create not in existing vector index list
-            created_indexes = [el for el in json_response["indexDefs"]["indexDefs"]]
-            if index_to_create not in created_indexes:
-                return False, None
-            else:
-                index_def = json_response["indexDefs"]["indexDefs"][index_to_create]
-                return index_def, None
-    except Exception:
-        pass
-
-    # Make HTTP request if in case HTTPS ports are not made public
-    try:
-        response = requests.request("GET", find_index_http_url, auth=auth)
-        json_response = json.loads(response.text)
-        if json_response["status"] == "ok":
-            if json_response["indexDefs"] is None:
-                return False, None
             created_indexes = [el for el in json_response["indexDefs"]["indexDefs"]]
             if index_to_create not in created_indexes:
                 return False, None
@@ -71,7 +52,7 @@ def is_index_present(
 def create_vector_index(
     bucket: str = "",
     kind: str = "tool",
-    conn: CouchbaseConnect = "",
+    conn: CouchbaseConnect = None,
     dim: int = None,
 ) -> tuple[str | None, Exception | None]:
     """Creates required vector index at publish"""
@@ -145,23 +126,22 @@ def create_vector_index(
             }
         )
 
-        # HTTPS call
         try:
             # REST call to create the index
-            response = requests.request(
-                "PUT", create_vector_index_https_url, headers=headers, auth=auth, data=payload, verify=False
-            )
-            if json.loads(response.text)["status"] == "ok":
-                logger.info("Created vector index!!")
-                return qualified_index_name, None
-            elif json.loads(response.text)["status"] == "fail":
-                raise Exception(json.loads(response.text)["error"])
-        except Exception:
-            pass
+            if conn.certificate_path is not None:
+                response = requests.request(
+                    "PUT",
+                    create_vector_index_https_url,
+                    headers=headers,
+                    auth=auth,
+                    data=payload,
+                    verify=conn.certificate_path,
+                )
+            else:
+                response = requests.request(
+                    "PUT", create_vector_index_http_url, headers=headers, auth=auth, data=payload
+                )
 
-        # HTTP fallback call if HTTPS doesn't work
-        try:
-            response = requests.request("PUT", create_vector_index_http_url, headers=headers, auth=auth, data=payload)
             if json.loads(response.text)["status"] == "ok":
                 logger.info("Created vector index!!")
                 return qualified_index_name, None
@@ -209,23 +189,22 @@ def create_vector_index(
 
         payload = json.dumps(index_present)
 
-        # HTTPS call
         try:
             # REST call to update the index
-            response = requests.request(
-                "PUT", update_vector_index_https_url, headers=headers, auth=auth, data=payload, verify=False
-            )
-            if json.loads(response.text)["status"] == "ok":
-                logger.info("Updated vector index!!")
-                return "Success", None
-            elif json.loads(response.text)["status"] == "fail":
-                raise Exception(json.loads(response.text)["error"])
-        except Exception:
-            pass
+            if conn.certificate_path is not None:
+                response = requests.request(
+                    "PUT",
+                    update_vector_index_https_url,
+                    headers=headers,
+                    auth=auth,
+                    data=payload,
+                    verify=conn.certificate_path,
+                )
+            else:
+                response = requests.request(
+                    "PUT", update_vector_index_http_url, headers=headers, auth=auth, data=payload
+                )
 
-        # HTTP fallback call if HTTPS ports are not made public
-        try:
-            response = requests.request("PUT", update_vector_index_http_url, headers=headers, auth=auth, data=payload)
             if json.loads(response.text)["status"] == "ok":
                 logger.info("Updated vector index!!")
                 return "Success", None
