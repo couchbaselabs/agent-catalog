@@ -109,6 +109,26 @@ def test_sqlpp_query():
     assert positive_2_output_json["items"]["type"] == "object"
     assert positive_2_output_json["items"]["properties"]["airlines"]["type"] == "array"
 
+    # Test the exclusion of output.
+    positive_3_factory = _get_tool_descriptor_factory(
+        cls=SQLPPQueryToolDescriptor.Factory, filename=pathlib.Path("sqlpp_query/positive_3.sqlpp")
+    )
+    positive_3_tools = list(positive_3_factory)
+    assert len(positive_3_tools) == 1
+    assert positive_3_tools[0].name == "tool_1"
+    assert positive_3_tools[0].record_kind == RecordKind.SQLPPQuery
+    assert "SELECT 1;" in positive_3_tools[0].query
+    assert "i am a dummy tool" in positive_3_tools[0].description
+    assert "hello i am a dummy tool" in positive_3_tools[0].description
+    assert positive_3_tools[0].secrets[0].couchbase.conn_string == "CB_CONN_STRING"
+    assert positive_3_tools[0].secrets[0].couchbase.username == "CB_USERNAME"
+    assert positive_3_tools[0].secrets[0].couchbase.password == "CB_PASSWORD"
+    positive_3_input_json = json.loads(positive_3_tools[0].input)
+    assert positive_3_input_json["type"] == "object"
+    assert positive_3_input_json["properties"]["source_airport"]["type"] == "string"
+    assert positive_3_input_json["properties"]["destination_airport"]["type"] == "string"
+    assert positive_3_tools[0].output is None
+
     # Test an incomplete tool descriptor.
     negative_1_factory = _get_tool_descriptor_factory(
         cls=SQLPPQueryToolDescriptor.Factory, filename=pathlib.Path("sqlpp_query/negative_1.sqlpp")
