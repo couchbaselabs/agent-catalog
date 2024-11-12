@@ -71,10 +71,10 @@ class Auditor(pydantic_settings.BaseSettings):
     This field **must** be specified with :py:attr:`conn_string`, :py:attr:`username`, and :py:attr:`password`.
     """
 
-    certificate_path: typing.Optional[str] = None
-    """ Root certificate for TLS associated with the Couchbase cluster.
+    certificate: typing.Optional[str] = None
+    """ Path to the root certificate for TLS associated with the Couchbase cluster.
 
-    This field **must** be specified with :py:attr:`conn_string`, :py:attr:`username`, and :py:attr:`password`.
+    This field **can** be specified with :py:attr:`conn_string`, :py:attr:`username`, and :py:attr:`password` for secure connection verification with Couchbase cluster.
     """
 
     catalog: typing.Optional[pathlib.Path] = None
@@ -173,7 +173,7 @@ class Auditor(pydantic_settings.BaseSettings):
                     conn_string=self.conn_string,
                     username=self.username.get_secret_value(),
                     password=self.password.get_secret_value(),
-                    cert_path=self.certificate_path,
+                    certificate=self.certificate,
                     model_name=self.llm_model_name,
                     agent_name=self.agent_name,
                     bucket=self.bucket,

@@ -25,7 +25,7 @@ class DBAuditor(BaseAuditor):
         conn_string: str,
         username: str,
         password: str,
-        cert_path: str | None,
+        certificate: str | None,
         bucket: str,
         catalog_version: VersionDescriptor,
         model_name: str,
@@ -39,14 +39,14 @@ class DBAuditor(BaseAuditor):
             username=username,
             password=password,
             host=get_host_name(conn_string),
-            certificate_path=cert_path,
+            certificate=certificate,
         )
 
         # All exceptions should be raised if we cannot connect.
         auth = (
             couchbase.auth.PasswordAuthenticator(username, password)
-            if cert_path is None
-            else couchbase.auth.PasswordAuthenticator(username, password, cert_path=cert_path)
+            if certificate is None
+            else couchbase.auth.PasswordAuthenticator(username, password, cert_path=certificate)
         )
         options = couchbase.options.ClusterOptions(auth)
         logger.debug(f"Connecting to Couchbase cluster at {conn_string}...")

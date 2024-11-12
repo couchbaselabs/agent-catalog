@@ -24,7 +24,7 @@ class CouchbaseConnect(BaseModel):
     username: Optional[str] = None
     password: Optional[str] = None
     host: Optional[str] = None
-    certificate_path: Optional[str] = None
+    certificate: Optional[str] = None
 
     @field_validator("connection_url")
     @classmethod
@@ -86,24 +86,24 @@ class CouchbaseConnect(BaseModel):
 
         return pwd
 
-    @field_validator("certificate_path")
+    @field_validator("certificate")
     @classmethod
     def certificate_path_must_be_valid_if_not_none(cls, path: str, info: ValidationInfo) -> Optional[str]:
         conn_url = info.data["connection_url"]
         if conn_url is not None and "couchbases" in conn_url:
             if path is None:
                 raise ValueError(
-                    "Could not find the environment variable $AGENT_CATALOG_CONN_ROOT_CERT_PATH!\n"
-                    "Please run 'export AGENT_CATALOG_CONN_ROOT_CERT_PATH=...' or add "
-                    "$AGENT_CATALOG_CONN_ROOT_CERT_PATH to your .env file and try again."
+                    "Could not find the environment variable $AGENT_CATALOG_CONN_ROOT_CERTIFICATE!\n"
+                    "Please run 'export AGENT_CATALOG_CONN_ROOT_CERTIFICATE=...' or add "
+                    "$AGENT_CATALOG_CONN_ROOT_CERTIFICATE to your .env file and try again."
                 )
             elif not os.path.exists(path):
                 raise ValueError(
-                    "Value provided for variable $AGENT_CATALOG_CONN_ROOT_CERT_PATH does not exist in your file system!\n"
+                    "Value provided for variable $AGENT_CATALOG_CONN_ROOT_CERTIFICATE does not exist in your file system!\n"
                 )
             elif not os.path.isfile(path):
                 raise ValueError(
-                    "Value provided for variable $AGENT_CATALOG_CONN_ROOT_CERT_PATH is not a valid path to the cluster's root certificate file!\n"
+                    "Value provided for variable $AGENT_CATALOG_CONN_ROOT_CERTIFICATE is not a valid path to the cluster's root certificate file!\n"
                 )
 
             return path

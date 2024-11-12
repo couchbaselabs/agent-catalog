@@ -44,8 +44,8 @@ def is_index_present(
     # Make request to FTS
     try:
         # REST call to get list of indexes, decide HTTP or HTTPS based on certificate path
-        if conn.certificate_path is not None:
-            response = requests.request("GET", find_index_https_url, auth=auth, verify=conn.certificate_path)
+        if conn.certificate is not None:
+            response = requests.request("GET", find_index_https_url, auth=auth, verify=conn.certificate)
         else:
             response = requests.request("GET", find_index_http_url, auth=auth)
 
@@ -74,23 +74,14 @@ def get_no_of_fts_nodes(conn: CouchbaseConnect = None) -> tuple[int | None, Exce
     node_info_url_https = f"https://{conn.host}:{DEFAULT_HTTPS_CLUSTER_ADMIN_PORT_NUMBER}/pools/default"
     auth = (conn.username, conn.password)
 
-    # Make HTTPS request to FTS
+    # Make request to FTS
     try:
         # REST call to get node info
-        if conn.certificate_path is not None:
-            response = requests.request("GET", node_info_url_https, auth=auth, verify=conn.certificate_path)
+        if conn.certificate is not None:
+            response = requests.request("GET", node_info_url_https, auth=auth, verify=conn.certificate)
         else:
             response = requests.request("GET", node_info_url_http, auth=auth)
 
-        json_response = json.loads(response.text)
-        # If api call was successful
-        return get_nodes_num(json_response)
-    except Exception:
-        pass
-
-    # Make HTTP request if in case HTTPS ports are not made public
-    try:
-        response = requests.request("GET", node_info_url_http, auth=auth)
         json_response = json.loads(response.text)
         # If api call was successful
         return get_nodes_num(json_response)
@@ -203,14 +194,14 @@ def create_vector_index(
 
         try:
             # REST call to create the index
-            if conn.certificate_path is not None:
+            if conn.certificate is not None:
                 response = requests.request(
                     "PUT",
                     create_vector_index_https_url,
                     headers=headers,
                     auth=auth,
                     data=payload,
-                    verify=conn.certificate_path,
+                    verify=conn.certificate,
                 )
             else:
                 response = requests.request(
@@ -270,14 +261,14 @@ def create_vector_index(
 
         try:
             # REST call to update the index
-            if conn.certificate_path is not None:
+            if conn.certificate is not None:
                 response = requests.request(
                     "PUT",
                     update_vector_index_https_url,
                     headers=headers,
                     auth=auth,
                     data=payload,
-                    verify=conn.certificate_path,
+                    verify=conn.certificate,
                 )
             else:
                 response = requests.request(
@@ -294,7 +285,7 @@ def create_vector_index(
 
         except Exception as e:
             return None, e
-          
+
     else:
         return qualified_index_name, None
 
