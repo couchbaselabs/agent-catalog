@@ -131,9 +131,8 @@ Agent analysts will follow this workflow:
    For logs stored locally, you can find them in the :file:`./agent-activity` directory.
    *We recommend the former, as it allows for easy ad-hoc analysis through Couchbase Query and/or Couchbase Analytics.*
 
-2. **Log Transformations**: For users with Couchbase Analytics enabled, we provide four views (expressed as
-   Couchbase Analytics UDFs) to help you get started with conversational-based agents.
-   All UDFs below belong to the scope :file:`agent_activity`.
+2. **Log Transformations**: For users with Couchbase Analytics enabled, we provide four views to help you get
+   started with conversational-based agents:
 
    .. admonition:: Sessions ``(sid, start_t, vid, msgs)``
 
@@ -150,11 +149,6 @@ Agent analysts will follow this workflow:
 
         The ``msgs`` field details all events that occurred during the session (e.g., the user's messages, the response
         to the user, the internal "thinking" performed by the agent, the agent's transitions between tasks, etc...).
-        The latest session can be found by applying the filter:
-
-        .. code-block:: sql
-
-            WHERE sid = [[MY_BUCKET]].agent_activity.LastSession()
 
    .. admonition:: Exchanges ``(sid, question, answer, walk)``
 
