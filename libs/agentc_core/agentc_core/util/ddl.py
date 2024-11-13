@@ -127,7 +127,9 @@ def create_vector_index(
     )
 
     (index_present, err) = is_index_present(bucket, qualified_index_name, conn)
-    if err is None and isinstance(index_present, bool) and not index_present:
+    if err is not None:
+        return None, err
+    elif isinstance(index_present, bool) and not index_present:
         # Create the index for the first time
         create_vector_index_https_url = f"https://{conn.host}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
         create_vector_index_http_url = f"http://{conn.host}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
@@ -216,7 +218,7 @@ def create_vector_index(
         except Exception as e:
             return None, e
 
-    elif err is None and isinstance(index_present, dict):
+    elif isinstance(index_present, dict):
         # Check if no. of fts nodes has changes since last update
         cluster_fts_partitions = index_present["planParams"]["indexPartitions"]
         if cluster_fts_partitions != index_partition:
