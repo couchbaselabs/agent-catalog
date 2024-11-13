@@ -16,9 +16,14 @@ def get_connection(conn: CouchbaseConnect) -> tuple[str, None] | tuple[None, Clu
     cluster_url = conn.connection_url
     username = conn.username
     password = conn.password
+    certificate = conn.certificate
 
     # Connect to Couchbase
-    auth = PasswordAuthenticator(username, password)
+    auth = (
+        PasswordAuthenticator(username, password)
+        if certificate is None
+        else PasswordAuthenticator(username, password, cert_path=certificate)
+    )
     options = ClusterOptions(auth)
     options.apply_profile("wan_development")
 

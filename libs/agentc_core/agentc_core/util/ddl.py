@@ -4,7 +4,6 @@ import logging
 import os
 import requests
 import tqdm
-import warnings
 
 from .models import CouchbaseConnect
 from .query import execute_query
@@ -13,12 +12,6 @@ from agentc_core.defaults import DEFAULT_HTTP_CLUSTER_ADMIN_PORT_NUMBER
 from agentc_core.defaults import DEFAULT_HTTP_FTS_PORT_NUMBER
 from agentc_core.defaults import DEFAULT_HTTPS_CLUSTER_ADMIN_PORT_NUMBER
 from agentc_core.defaults import DEFAULT_HTTPS_FTS_PORT_NUMBER
-
-# TODO: Add ca certificate authentication
-warnings.filterwarnings(
-    action="ignore",
-    message=".*Unverified HTTPS.*",
-)
 
 logger = logging.getLogger(__name__)
 
@@ -48,20 +41,18 @@ def is_index_present(
     )
     auth = (conn.username, conn.password)
 
-    # Make HTTPS request to FTS
+    # Make request to FTS
     try:
-        # REST call to get list of indexes
-        response = requests.request("GET", find_index_https_url, auth=auth, verify=False)
-        json_response = json.loads(response.text)
-        return get_index_info(json_response, index_to_create)
-    except Exception:
-        pass
+        # REST call to get list of indexes, decide HTTP or HTTPS based on certificate path
+        if conn.certificate is not None:
+            response = requests.request("GET", find_index_https_url, auth=auth, verify=conn.certificate)
+        else:
+            response = requests.request("GET", find_index_http_url, auth=auth)
 
-    # Make HTTP request if in case HTTPS ports are not made public
-    try:
-        response = requests.request("GET", find_index_http_url, auth=auth)
         json_response = json.loads(response.text)
+
         return get_index_info(json_response, index_to_create)
+
     except Exception as e:
         return False, e
 
@@ -83,19 +74,14 @@ def get_no_of_fts_nodes(conn: CouchbaseConnect = None) -> tuple[int | None, Exce
     node_info_url_https = f"https://{conn.host}:{DEFAULT_HTTPS_CLUSTER_ADMIN_PORT_NUMBER}/pools/default"
     auth = (conn.username, conn.password)
 
-    # Make HTTPS request to FTS
+    # Make request to FTS
     try:
         # REST call to get node info
-        response = requests.request("GET", node_info_url_https, auth=auth, verify=False)
-        json_response = json.loads(response.text)
-        # If api call was successful
-        return get_nodes_num(json_response)
-    except Exception:
-        pass
+        if conn.certificate is not None:
+            response = requests.request("GET", node_info_url_https, auth=auth, verify=conn.certificate)
+        else:
+            response = requests.request("GET", node_info_url_http, auth=auth)
 
-    # Make HTTP request if in case HTTPS ports are not made public
-    try:
-        response = requests.request("GET", node_info_url_http, auth=auth)
         json_response = json.loads(response.text)
         # If api call was successful
         return get_nodes_num(json_response)
@@ -206,23 +192,22 @@ def create_vector_index(
             }
         )
 
-        # HTTPS call
         try:
             # REST call to create the index
-            response = requests.request(
-                "PUT", create_vector_index_https_url, headers=headers, auth=auth, data=payload, verify=False
-            )
-            if json.loads(response.text)["status"] == "ok":
-                logger.info("Created vector index!!")
-                return qualified_index_name, None
-            elif json.loads(response.text)["status"] == "fail":
-                raise Exception(json.loads(response.text)["error"])
-        except Exception:
-            pass
+            if conn.certificate is not None:
+                response = requests.request(
+                    "PUT",
+                    create_vector_index_https_url,
+                    headers=headers,
+                    auth=auth,
+                    data=payload,
+                    verify=conn.certificate,
+                )
+            else:
+                response = requests.request(
+                    "PUT", create_vector_index_http_url, headers=headers, auth=auth, data=payload
+                )
 
-        # HTTP fallback call if HTTPS doesn't work
-        try:
-            response = requests.request("PUT", create_vector_index_http_url, headers=headers, auth=auth, data=payload)
             if json.loads(response.text)["status"] == "ok":
                 logger.info("Created vector index!!")
                 return qualified_index_name, None
@@ -274,22 +259,30 @@ def create_vector_index(
 
         payload = json.dumps(index_present)
 
-        # HTTPS call
         try:
             # REST call to update the index
-            response = requests.request(
-                "PUT", update_vector_index_https_url, headers=headers, auth=auth, data=payload, verify=False
-            )
-            # Return status or exception
-            return update_vector_index(response)
-        except Exception:
-            pass
+            if conn.certificate is not None:
+                response = requests.request(
+                    "PUT",
+                    update_vector_index_https_url,
+                    headers=headers,
+                    auth=auth,
+                    data=payload,
+                    verify=conn.certificate,
+                )
+            else:
+                response = requests.request(
+                    "PUT", update_vector_index_http_url, headers=headers, auth=auth, data=payload
+                )
 
-        # HTTP fallback call if HTTPS ports are not made public
-        try:
-            response = requests.request("PUT", update_vector_index_http_url, headers=headers, auth=auth, data=payload)
-            # Return status or exception
+            if json.loads(response.text)["status"] == "ok":
+                logger.info("Updated vector index!!")
+                return "Success", None
+            elif json.loads(response.text)["status"] == "fail":
+                raise Exception(json.loads(response.text)["error"])
+
             return update_vector_index(response)
+
         except Exception as e:
             return None, e
 
