@@ -66,7 +66,7 @@ Raw Prompts
 Raw prompts are static, predefined text-based instructions used to guide your agent's actions.
 Raw prompts are written directly as plain text without any dynamic elements.
 
-.. literalinclude:: ../../templates/prompts/raw_prompt.yaml
+.. literalinclude:: ../../templates/prompts/raw_prompt.prompt
 
 Jinja Templated Prompts
 ^^^^^^^^^^^^^^^^^^^^^^^
