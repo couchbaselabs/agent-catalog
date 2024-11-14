@@ -180,7 +180,7 @@ class Auditor(pydantic_settings.BaseSettings):
                     catalog_version=provider.version,
                 )
             except couchbase.exceptions.CouchbaseException:
-                logger.warning("Could not connect to the Couchbase cluster.\nSkipping remote auditor.")
+                logger.warning("Could not connect to the Couchbase cluster. Skipping remote auditor.")
                 self._db_auditor = None
 
         # If we have both a local and remote auditor, we'll use both.

@@ -31,6 +31,7 @@ CAPELLA_URL_ORGANIZATIONS_SUBDIRECTORIES = "/v2/organizations/"
 CAPELLA_URL_IQ_COMPLETIONS_SUBDIRECTORIES = "/integrations/iq/openai/chat/completions"
 
 
+# TODO (GLENN): We might be able to get rid of this and just use the OpenAI model directly (or just subclass that).
 class IQBackedChatModel(BaseChatModel):
     """A Chat Model that calls IQ proxy for all completions."""
 
