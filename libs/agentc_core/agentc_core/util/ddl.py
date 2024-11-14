@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 def is_index_present(
-    bucket: str = "", index_to_create: str = "", conn: CouchbaseConnect = None, fts_nodes_hostname=None
+    bucket: str = "", index_to_create: str = "", conn: CouchbaseConnect = None, fts_nodes_hostname: list[str] = None
 ) -> tuple[bool | dict | None, Exception | None]:
     """Checks for existence of index_to_create in the given keyspace"""
     if fts_nodes_hostname is None:
@@ -103,7 +103,7 @@ def create_vector_index(
 
     if num_fts_nodes == 0:
         raise ValueError(
-            "No node with fts service found, cannot create vector index! Please ensure fts service is included in at least one node."
+            "No node with 'search' service found, cannot create vector index! Please ensure 'search' service is included in at least one node."
         )
 
     max_partition = (
