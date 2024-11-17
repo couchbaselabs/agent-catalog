@@ -10,10 +10,10 @@ from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_NAME
 from agentc_testing.repo import ExampleRepoKind
 from agentc_testing.repo import initialize_repo
-from agentc_testing.server import get_isolated_server
+from agentc_testing.server import isolated_server_factory
 
 # This is to keep ruff from falsely flagging this as unused.
-_ = get_isolated_server
+_ = isolated_server_factory
 
 
 @pytest.mark.smoke
@@ -71,9 +71,10 @@ def test_local_provider(tmp_path):
 
 
 @pytest.mark.regression
-def test_db_tool_provider(tmp_path, get_isolated_server):
+def test_db_tool_provider(tmp_path, isolated_server_factory):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        isolated_server_factory(pathlib.Path(td) / ".couchbase")
         initialize_repo(
             directory=pathlib.Path(td),
             repo_kind=ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL,
@@ -90,20 +91,20 @@ def test_db_tool_provider(tmp_path, get_isolated_server):
 
 @pytest.mark.skip
 @pytest.mark.regression
-def test_db_prompt_provider(tmp_path, get_isolated_server):
+def test_db_prompt_provider(tmp_path, isolated_server_factory):
     # TODO (GLENN): Finish me!
     pass
 
 
 @pytest.mark.skip
 @pytest.mark.regression
-def test_chain_tool_provider(tmp_path, get_isolated_server):
+def test_chain_tool_provider(tmp_path, isolated_server_factory):
     # TODO (GLENN): Finish me!
     pass
 
 
 @pytest.mark.skip
 @pytest.mark.regression
-def test_chain_prompt_provider(tmp_path, get_isolated_server):
+def test_chain_prompt_provider(tmp_path, isolated_server_factory):
     # TODO (GLENN): Finish me!
     pass

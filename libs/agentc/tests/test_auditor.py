@@ -1,9 +1,9 @@
 import pytest
 
-from agentc_testing.server import get_isolated_server
+from agentc_testing.server import isolated_server_factory
 
 # This is to keep ruff from falsely flagging this as unused.
-_ = get_isolated_server
+_ = isolated_server_factory
 
 
 @pytest.mark.skip
@@ -15,14 +15,14 @@ def test_local_auditor(tmp_path):
 
 @pytest.mark.skip
 @pytest.mark.regression
-def test_db_auditor(tmp_path, get_isolated_server):
+def test_db_auditor(tmp_path, isolated_server_factory):
     # TODO (GLENN): Finish me!
     pass
 
 
 @pytest.mark.skip
 @pytest.mark.regression
-def test_chain_auditor(tmp_path, get_isolated_server):
+def test_chain_auditor(tmp_path, isolated_server_factory):
     # TODO (GLENN): Finish me!
     pass
 
@@ -36,13 +36,13 @@ def test_local_auditor_no_tools(tmp_path):
 
 @pytest.mark.skip
 @pytest.mark.regression
-def test_db_auditor_no_tools(tmp_path, get_isolated_server):
+def test_db_auditor_no_tools(tmp_path, isolated_server_factory):
     # TODO (GLENN): Finish me!
     pass
 
 
 @pytest.mark.skip
 @pytest.mark.regression
-def test_chain_auditor_no_tools(tmp_path, get_isolated_server):
+def test_chain_auditor_no_tools(tmp_path, isolated_server_factory):
     # TODO (GLENN): Finish me!
     pass

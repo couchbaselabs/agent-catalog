@@ -3,6 +3,7 @@ import docker.models.containers
 import http
 import logging
 import os
+import pathlib
 import pytest
 import requests
 import requests.adapters
@@ -33,7 +34,11 @@ def _execute_with_retry(
         time.sleep(backoff_factor * (2**i))
 
 
-def _start_couchbase(retry_count: int = 5, backoff_factor: float = 0.7) -> docker.models.containers.Container:
+def _start_couchbase(
+    volume_path: pathlib.Path, retry_count: int = 5, backoff_factor: float = 0.7
+) -> docker.models.containers.Container:
+    volume_path.mkdir(exist_ok=True)
+
     # Start the Couchbase container.
     client = docker.from_env()
     ports = {f"{port}/tcp": port for port in range(8091, 8098)}
@@ -45,7 +50,13 @@ def _start_couchbase(retry_count: int = 5, backoff_factor: float = 0.7) -> docke
         "11280/tcp": 11280,
     }
     container: docker.models.containers.Container = client.containers.run(
-        image="couchbase", name=f"agentc_{uuid.uuid4().hex}", ports=ports, detach=True, auto_remove=True, remove=True
+        image="couchbase",
+        name=f"agentc_{uuid.uuid4().hex}",
+        ports=ports,
+        detach=True,
+        auto_remove=True,
+        remove=True,
+        volumes={str(volume_path.absolute()): {"bind": "/opt/couchbase/var", "mode": "rw"}},
     )
 
     try:
@@ -117,18 +128,36 @@ def _stop_couchbase(container: docker.models.containers.Container):
 
 # Fixture to start a Couchbase server instance via Docker (and subsequently remove this instance).
 @pytest.fixture
-def get_isolated_server() -> docker.models.containers.Container:
-    container = None
+def isolated_server_factory() -> typing.Callable[[pathlib.Path], docker.models.containers.Container]:
+    os.environ["AGENT_CATALOG_CONN_STRING"] = DEFAULT_COUCHBASE_CONN_STRING
+    os.environ["AGENT_CATALOG_USERNAME"] = DEFAULT_COUCHBASE_USERNAME
+    os.environ["AGENT_CATALOG_PASSWORD"] = DEFAULT_COUCHBASE_PASSWORD
+
+    container_instance = set()
     try:
-        os.environ["AGENT_CATALOG_CONN_STRING"] = DEFAULT_COUCHBASE_CONN_STRING
-        os.environ["AGENT_CATALOG_USERNAME"] = DEFAULT_COUCHBASE_USERNAME
-        os.environ["AGENT_CATALOG_PASSWORD"] = DEFAULT_COUCHBASE_PASSWORD
+        # (we need to capture the container we spawn).
+        def get_isolated_server(volume_path: pathlib.Path) -> docker.models.containers.Container:
+            container = _start_couchbase(volume_path)
+            container_instance.add(container)
+            return container
 
         # Enter our test.
-        container = _start_couchbase()
-        yield container
+        yield get_isolated_server
 
     # Execute our cleanup.
     finally:
-        if container:
-            _stop_couchbase(container)
+        if len(container_instance) > 0:
+            _stop_couchbase(container_instance.pop())
+
+
+if __name__ == "__main__":
+    import tempfile
+
+    os.environ["AGENT_CATALOG_CONN_STRING"] = DEFAULT_COUCHBASE_CONN_STRING
+    os.environ["AGENT_CATALOG_USERNAME"] = DEFAULT_COUCHBASE_USERNAME
+    os.environ["AGENT_CATALOG_PASSWORD"] = DEFAULT_COUCHBASE_PASSWORD
+    with tempfile.TemporaryDirectory() as _tmp:
+        try:
+            _container = _start_couchbase(pathlib.Path(_tmp))
+        finally:
+            _stop_couchbase(_container)
