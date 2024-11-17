@@ -298,6 +298,10 @@ To create a semantic search tool, you must author a <code class="docutils litera
   <span class="c1"># This embedding model field value is directly passed to sentence transformers.</span>
   <span class="c1"># In the future, we will add support for other types of embedding models.</span>
   <span class="n">embedding_model</span><span class="p">:</span> <span class="n">sentence</span><span class="o">-</span><span class="n">transformers</span><span class="o">/</span><span class="nb">all</span><span class="o">-</span><span class="n">MiniLM</span><span class="o">-</span><span class="n">L12</span><span class="o">-</span><span class="n">v2</span>
+
+  <span class="c1"># The number of candidates (i.e., the K value) to request for when performing a vector top-k search.</span>
+  <span class="c1"># This field is optional, and defaults to k=3 if not specified.</span>
+  <span class="n">num_candidates</span><span class="p">:</span> <span class="mi">3</span>
 </pre></div>
 </div>
 </section>
