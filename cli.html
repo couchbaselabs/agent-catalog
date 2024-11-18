@@ -49,13 +49,103 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="install.html">Getting Agent Catalog</a></li>
-<li class="toctree-l1"><a class="reference internal" href="guide.html">Agent Catalog User Guide</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Command Line Tool</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">Agent Catalog API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="env.html">Environment Variables</a></li>
-<li class="toctree-l1"><a class="reference internal" href="entry.html">On Catalog Entries</a></li>
-<li class="toctree-l1"><a class="reference internal" href="faqs.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Getting Agent Catalog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#building-from-package">Building From Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#building-from-source-with-pip">Building From Source (with pip)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#building-from-source-with-poetry">Building From Source (with Poetry)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#verifying-your-installation">Verifying Your Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="guide.html">Agent Catalog User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guide.html#metrics-driven-development">Metrics Driven Development</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide.html#couchbase-backed-agent-catalogs">Couchbase-Backed Agent Catalogs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide.html#assessing-agent-quality">Assessing Agent Quality</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Command Line Tool</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#agentc">agentc</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#agentc-add">add</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agentc-clean">clean</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agentc-env">env</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agentc-execute">execute</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agentc-find">find</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agentc-index">index</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agentc-publish">publish</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agentc-status">status</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agentc-version">version</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Agent Catalog API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#agentc.Auditor"><code class="docutils literal notranslate"><span class="pre">Auditor</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.agent_name"><code class="docutils literal notranslate"><span class="pre">Auditor.agent_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.auditor_output"><code class="docutils literal notranslate"><span class="pre">Auditor.auditor_output</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.bucket"><code class="docutils literal notranslate"><span class="pre">Auditor.bucket</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.catalog"><code class="docutils literal notranslate"><span class="pre">Auditor.catalog</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.certificate"><code class="docutils literal notranslate"><span class="pre">Auditor.certificate</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.conn_string"><code class="docutils literal notranslate"><span class="pre">Auditor.conn_string</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.llm_model_name"><code class="docutils literal notranslate"><span class="pre">Auditor.llm_model_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.password"><code class="docutils literal notranslate"><span class="pre">Auditor.password</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.username"><code class="docutils literal notranslate"><span class="pre">Auditor.username</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.accept"><code class="docutils literal notranslate"><span class="pre">Auditor.accept()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.move"><code class="docutils literal notranslate"><span class="pre">Auditor.move()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#agentc.Provider"><code class="docutils literal notranslate"><span class="pre">Provider</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.bucket"><code class="docutils literal notranslate"><span class="pre">Provider.bucket</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.catalog"><code class="docutils literal notranslate"><span class="pre">Provider.catalog</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.conn_string"><code class="docutils literal notranslate"><span class="pre">Provider.conn_string</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.decorator"><code class="docutils literal notranslate"><span class="pre">Provider.decorator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.password"><code class="docutils literal notranslate"><span class="pre">Provider.password</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.provider_output"><code class="docutils literal notranslate"><span class="pre">Provider.provider_output</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.refiner"><code class="docutils literal notranslate"><span class="pre">Provider.refiner</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.secrets"><code class="docutils literal notranslate"><span class="pre">Provider.secrets</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.snapshot"><code class="docutils literal notranslate"><span class="pre">Provider.snapshot</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.tool_model"><code class="docutils literal notranslate"><span class="pre">Provider.tool_model</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.username"><code class="docutils literal notranslate"><span class="pre">Provider.username</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.get_prompt_for"><code class="docutils literal notranslate"><span class="pre">Provider.get_prompt_for()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.get_tools_for"><code class="docutils literal notranslate"><span class="pre">Provider.get_tools_for()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.version"><code class="docutils literal notranslate"><span class="pre">Provider.version</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#agentc.langchain.audit"><code class="docutils literal notranslate"><span class="pre">audit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="env.html">Environment Variables</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="env.html#mandatory-environment-variables">Mandatory Environment Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="env.html#optional-environment-variables">Optional Environment Variables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="entry.html">On Catalog Entries</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="entry.html#tool-catalog-records">Tool Catalog Records</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="entry.html#python-function-tools">Python Function Tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="entry.html#sql-query-tools">SQL++ Query Tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="entry.html#semantic-search-tools">Semantic Search Tools</a></li>
+<li class="toctree-l3"><a class="reference internal" href="entry.html#http-request-tools">HTTP Request Tools</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="entry.html#prompt-catalog-records">Prompt Catalog Records</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="entry.html#raw-prompts">Raw Prompts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="entry.html#jinja-templated-prompts">Jinja Templated Prompts</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faqs.html">Frequently Asked Questions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faqs.html#which-couchbase-capella-or-server-version-should-i-use">Which Couchbase Capella or Server version should I use?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-does-agent-catalog-add-to-my-couchbase-bucket">What does Agent Catalog add to my Couchbase bucket?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-is-agent-catalog-doing-when-i-run-agentc-index">What is Agent Catalog doing when I run <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">index</span></code>?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faqs.html#how-do-i-roll-back-to-a-previous-catalog-version">How do I roll back to a previous catalog version?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-environment-variables-are-required-to-use-agent-catalog">What environment variables are required to use Agent Catalog?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-are-the-different-types-of-tools-and-prompts-i-can-create">What are the different types of tools and prompts I can create?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faqs.html#can-i-write-multiple-tools-prompts-in-one-file">Can I write multiple tools/prompts in one file?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faqs.html#do-cli-commands-need-to-be-executed-in-a-certain-order">Do CLI commands need to be executed in a certain order?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faqs.html#can-i-index-and-publish-catalogs-programmatically">Can I index and publish catalogs programmatically?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faqs.html#does-agent-catalog-require-an-openai-api-key">Does Agent Catalog require an OpenAI API key?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faqs.html#does-agent-catalog-work-with-any-llm">Does Agent Catalog work with any LLM?</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
