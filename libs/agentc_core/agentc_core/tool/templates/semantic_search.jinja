@@ -55,3 +55,7 @@ vector_search:
   # This embedding model field value is directly passed to sentence transformers.
   # In the future, we will add support for other types of embedding models.
   embedding_model: {{ embedding_model }}
+
+  # The number of candidates (i.e., the K value) to request for when performing a vector top-k search.
+  # This field is optional, and defaults to k=3 if not specified.
+  num_candidates: 3
