@@ -14,11 +14,12 @@ Which Couchbase Capella or Server version should I use?
 Agent Catalog uses Vector search at its base, so any Couchbase version above and inclusive of ``7.6`` should be used.
 If you are a new user, we recommend using the latest version!
 
-Is there a dependency on Agent Development frameworks?
-------------------------------------------------------
-No, ``agentc`` does not depend on any Agent Development frameworks and is compatible with most of the popular frameworks in the market such as Controlflow, Langchain, etc.
-However, the `agent-catalog-example <https://github.com/couchbaselabs/agent-catalog-example>`_ repository uses Controlflow at its base to show a sample application using ``agentc``.
-
+Do I need to use a specific agent framework (e.g., LangChain) with Agent Catalog?
+---------------------------------------------------------------------------------
+No, Agent Catalog was designed to work *alongside* existing agent frameworks.
+Feel free to use your favorite framework (e.g., LangChain, LangGraph, Controlflow, etc...) when building your agent
+application!
+For our examples (see `here <https://github.com/couchbaselabs/agent-catalog-example>`_), we use Controlflow.
 
 What does Agent Catalog add to my Couchbase bucket?
 ---------------------------------------------------
