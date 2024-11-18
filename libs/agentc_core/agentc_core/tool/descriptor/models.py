@@ -155,6 +155,7 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
             secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
             annotations: typing.Optional[dict[str, str] | None] = None
             vector_search: "SemanticSearchToolDescriptor.VectorSearchMetadata"
+            num_candidates: typing.Optional[pydantic.PositiveInt] = 3
 
             @pydantic.field_validator("input")
             @classmethod

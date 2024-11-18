@@ -13,11 +13,7 @@ from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_NAME
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_NAME
 from agentc_testing.repo import ExampleRepoKind
 from agentc_testing.repo import initialize_repo
-from agentc_testing.server import get_isolated_server
 from unittest.mock import patch
-
-# This is to keep ruff from falsely flagging this as unused.
-_ = get_isolated_server
 
 
 @pytest.mark.smoke
@@ -43,14 +39,14 @@ def test_index(tmp_path):
         shutil.copy(resources_folder / "_good_spec.json", tool_folder / "_good_spec.json")
         invocation = runner.invoke(click_main, ["index", str(tool_folder.absolute()), "--no-prompts"])
 
-        # We should see 9 files scanned and 10 tools indexed.
+        # We should see 10 files scanned and 11 tools indexed.
         output = invocation.output
         print(output)
         assert "Crawling" in output
         assert "Generating embeddings" in output
         assert "Catalog successfully indexed" in output
-        assert "0/9" in output
         assert "0/10" in output
+        assert "0/11" in output
 
 
 # Small helper function to publish to a Couchbase catalog.
@@ -88,7 +84,7 @@ def publish_catalog(runner, input_catalog: pathlib.Path, output_catalog: pathlib
 
 
 @pytest.mark.regression
-def test_publish(tmp_path, get_isolated_server):
+def test_publish(tmp_path, isolated_server_factory):
     """
     This test performs the following checks:
         1. command does not publish to kv when catalog is dirty
@@ -99,6 +95,7 @@ def test_publish(tmp_path, get_isolated_server):
     """
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        isolated_server_factory(pathlib.Path(td) / ".couchbase")
         initialize_repo(
             directory=pathlib.Path(td),
             repo_kind=ExampleRepoKind.EMPTY,
@@ -112,7 +109,7 @@ def test_publish(tmp_path, get_isolated_server):
 
 
 @pytest.mark.regression
-def test_find(tmp_path, get_isolated_server):
+def test_find(tmp_path, isolated_server_factory):
     """
     This test performs the following checks:
     1. command executes only for kind=tool assuming same behaviour for prompt
@@ -121,6 +118,7 @@ def test_find(tmp_path, get_isolated_server):
     """
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        isolated_server_factory(pathlib.Path(td) / ".couchbase")
         initialize_repo(
             directory=pathlib.Path(td),
             repo_kind=ExampleRepoKind.EMPTY,
@@ -203,7 +201,7 @@ def test_find(tmp_path, get_isolated_server):
 
 
 @pytest.mark.regression
-def test_status(tmp_path, get_isolated_server):
+def test_status(tmp_path, isolated_server_factory):
     runner = click.testing.CliRunner()
     print("\n\n")
 
@@ -216,6 +214,7 @@ def test_status(tmp_path, get_isolated_server):
     assert expected_response_prompt in output
 
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        isolated_server_factory(pathlib.Path(td) / ".couchbase")
         initialize_repo(
             directory=pathlib.Path(td),
             repo_kind=ExampleRepoKind.EMPTY,
@@ -253,9 +252,10 @@ def test_status(tmp_path, get_isolated_server):
 
 
 @pytest.mark.regression
-def test_clean(tmp_path, get_isolated_server):
+def test_clean(tmp_path, isolated_server_factory):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        isolated_server_factory(pathlib.Path(td) / ".couchbase")
         initialize_repo(
             directory=pathlib.Path(td),
             repo_kind=ExampleRepoKind.EMPTY,
@@ -318,9 +318,10 @@ def test_clean(tmp_path, get_isolated_server):
 
 
 @pytest.mark.regression
-def test_execute(tmp_path):
+def test_execute(tmp_path, isolated_server_factory):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        isolated_server_factory(pathlib.Path(td) / ".couchbase")
         initialize_repo(
             directory=pathlib.Path(td),
             repo_kind=ExampleRepoKind.INDEXED_CLEAN_TOOLS_TRAVEL,
