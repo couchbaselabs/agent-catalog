@@ -36,8 +36,8 @@ def _extract_schema(bucket: str, scope: str, collection: str, cluster: Cluster) 
 
 
 @agentc.tool
-def iq_tool(bucket: str, scope: str, collection: str, natural_lang_query: str) -> str:
-    """Takes in natural language query that has to be performed on Couchbase cluster and returns SQL++ query for it, which can be executed later on the cluster."""
+def iq_insights_tool(bucket: str, scope: str, collection: str, natural_lang_query: str) -> dict:
+    """Takes in natural language query that has to be performed on Couchbase cluster, generates SQL++ query for it, executes it and the results are used for generating insights and plotly charts from it."""
 
     # Get all required secrets
     capella_address = get_secret("CAPELLA_CP_ADDRESS").get_secret_value()
@@ -47,7 +47,7 @@ def iq_tool(bucket: str, scope: str, collection: str, natural_lang_query: str) -
     # Extract schema
     cluster = _get_couchbase_cluster()
     if cluster is None:
-        return ""
+        return {}
     schema = _extract_schema(bucket, scope, collection, cluster)
 
     # Make call to iQ proxy
@@ -82,4 +82,16 @@ def iq_tool(bucket: str, scope: str, collection: str, natural_lang_query: str) -
     if "query" in res_dict:
         sqlpp_query = res_dict["query"]
 
-    return sqlpp_query
+    data = []
+    if sqlpp_query:
+        result = cluster.query(sqlpp_query)
+        for row in result:
+            data.append(row)
+
+    # Make call to iQ insights
+    iqinsights_url = f"{capella_address}/v2/organizations/{org_id}/iqinsights"
+    iqinsights_headers = {"Content-Type": "application/json", "Authorization": f"Bearer {jwt_token}"}
+    res = requests.post(iqinsights_url, headers=iqinsights_headers, json=data)
+    res_dict = json.loads(res.text)
+
+    return res_dict
