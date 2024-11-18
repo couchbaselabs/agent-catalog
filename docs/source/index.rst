@@ -13,7 +13,7 @@ Table of Contents
 -----------------
 
 .. toctree::
-   :titlesonly:
+   :maxdepth: 2
 
    Getting Agent Catalog <install>
    Agent Catalog User Guide <guide>

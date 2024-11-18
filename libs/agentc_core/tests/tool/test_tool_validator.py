@@ -177,9 +177,17 @@ def test_semantic_search():
         cls=SemanticSearchToolDescriptor.Factory, filename=pathlib.Path("semantic_search/positive_2.yaml")
     )
     positive_2_tools = list(positive_2_factory)
-    assert len(positive_1_tools) == 1
+    assert len(positive_2_tools) == 1
     assert positive_2_tools[0].annotations["just_for_testing"] == "false"
     assert positive_2_tools[0].annotations["gdpr_compliant"] == "true"
+
+    # Test the inclusion of the (optional) num_candidates field.
+    positive_3_factory = _get_tool_descriptor_factory(
+        cls=SemanticSearchToolDescriptor.Factory, filename=pathlib.Path("semantic_search/positive_3.yaml")
+    )
+    positive_3_tools = list(positive_3_factory)
+    assert len(positive_3_tools) == 1
+    assert positive_3_tools[0].vector_search.num_candidates == 10
 
     # Test a bad (non-Python-identifier) tool name.
     negative_1_factory = _get_tool_descriptor_factory(
