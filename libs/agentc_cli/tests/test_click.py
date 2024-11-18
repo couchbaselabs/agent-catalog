@@ -351,3 +351,10 @@ def test_execute(tmp_path, isolated_server_factory):
             assert "False" in output
 
         print("Completed testing execute command on local catalog.")
+
+
+@pytest.mark.skip
+@pytest.mark.integration
+def test_publish_multiple_nodes(tmp_path):
+    # TODO: Setup multinode cluster for test environment
+    pass
