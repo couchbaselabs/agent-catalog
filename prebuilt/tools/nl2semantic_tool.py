@@ -1,110 +1,85 @@
 import agentc
+import couchbase.search as search
 
+from agentc_core.secrets import get_secret
+from couchbase.auth import PasswordAuthenticator
+from couchbase.cluster import Cluster
+from couchbase.logic.vector_search import VectorQuery
+from couchbase.logic.vector_search import VectorSearch
+from couchbase.options import ClusterOptions
+from couchbase.search import SearchOptions
+from datetime import timedelta
 from sentence_transformers import SentenceTransformer
+
+
+def _get_couchbase_cluster() -> Cluster:
+    authenticator = PasswordAuthenticator(
+        username=get_secret("CB_USERNAME").get_secret_value(), password=get_secret("CB_PASSWORD").get_secret_value()
+    )
+    conn_string = get_secret("CB_CONN_STRING").get_secret_value()
+    options = ClusterOptions(authenticator)
+    options.apply_profile("wan_development")
+    cluster = Cluster(conn_string, options)
+    cluster.wait_until_ready(timedelta(seconds=15))
+    return cluster
+
+
+def _perform_vector_search(
+    bucket: str, scope: str, collection: str, vector_field: str, query_vector: list[float], cluster: Cluster, limit: int
+):
+    bucket_obj = cluster.bucket(bucket)
+    scope_obj = bucket_obj.scope(scope)
+
+    vector_search = VectorSearch.from_vector_query(VectorQuery(vector_field, query_vector, num_candidates=limit))
+    request = search.SearchRequest.create(vector_search)
+    result = scope_obj.search(collection, request, SearchOptions())
+    return result
+
+
+def _get_documents_by_keys(
+    bucket: str, scope: str, collection: str, keys: list[str], cluster: Cluster, answer_field: str
+):
+    bucket_obj = cluster.bucket(bucket)
+    cb_coll = bucket_obj.scope(scope).collection(collection)
+
+    docs = []
+    for key in keys:
+        result = cb_coll.get(key)
+        result_dict = result.content_as[dict]
+        if answer_field:
+            docs.append(result_dict[answer_field])
+        else:
+            docs.append(result_dict)
+
+    return docs
 
 
 @agentc.tool
 def vector_search_tool(
-    bucket,
-    collection,
-    scope,
-    username,
-    password,
-    cluster_url,
-    natural_language_query,
-    model,
-    vector_field,
-    answer_field=None,
-):
-    """run vector search given a natural language query"""
-    import couchbase.search as search
+    bucket: str,
+    scope: str,
+    collection: str,
+    natural_language_query: str,
+    num_docs: int = 2,
+    model_name: str = "flax-sentence-embeddings/st-codesearch-distilroberta-base",
+    vector_field: str = "",
+    answer_field: str = None,
+) -> list[dict]:
+    """Takes in natural language query and does vector search on using it on the documents present in Couchbase cluster based on num_docs parameter value."""
 
-    from couchbase.auth import PasswordAuthenticator
-    from couchbase.cluster import Cluster
-    from couchbase.exceptions import CouchbaseException
-    from couchbase.options import ClusterOptions
-    from couchbase.options import SearchOptions
-    from couchbase.vector_search import VectorQuery
-    from couchbase.vector_search import VectorSearch
-    from datetime import timedelta
+    # Extract schema
+    cluster = _get_couchbase_cluster()
+    if cluster is None:
+        return []
 
-    # logger = logging.getLogger()
-
-    cluster = None
-    if cluster_url == "couchbase://127.0.0.1" or cluster_url == "couchbase://localhost":
-        auth = PasswordAuthenticator(username, password)
-        options = ClusterOptions(auth)
-        options.apply_profile("wan_development")
-    else:
-        auth = PasswordAuthenticator(username, password, cert_path="certificates/cert.pem")
-        options = ClusterOptions(auth)
-        options.apply_profile("wan_development")
-
-    try:
-        cluster = Cluster(cluster_url, options)
-        cluster.wait_until_ready(timedelta(seconds=15))
-    except CouchbaseException as e:
-        return {"status": False, "message": f"Error connecting to couchbase : {e}"}
-
-    def perform_vector_search(scope, collection, vector_field, query_vector, limit=2):
-        cluster.wait_until_ready(timedelta(seconds=5))
-
-        bucket = cluster.bucket(bucket_name)
-        scope = bucket.scope(scope)
-
-        vector_search = VectorSearch.from_vector_query(VectorQuery(vector_field, query_vector, num_candidates=limit))
-        request = search.SearchRequest.create(vector_search)
-        result = scope.search(collection, request, SearchOptions())
-        return result
-
-    def get_document_by_keys(scope, collection, keys):
-        cluster.wait_until_ready(timedelta(seconds=5))
-
-        bucket = cluster.bucket(bucket_name)
-        cb_coll = bucket.scope(scope).collection(collection)
-
-        dict_results = []
-        for key in keys:
-            try:
-                result = cb_coll.get(key)
-                result_dict = result.content_as[dict]
-                if answer_field:
-                    dict_results.append(result_dict[answer_field])
-                else:
-                    dict_results.append(result_dict)
-            except Exception as e:
-                return {"status": False, "message": f"Error in document query : {e}"}
-        return dict_results
-
+    # Perform vector search
+    model = SentenceTransformer(model_name)
     query_vector = model.encode(natural_language_query).tolist()
-    results = perform_vector_search(scope, collection, vector_field, query_vector, limit=1)
+    results = _perform_vector_search(bucket, scope, collection, vector_field, query_vector, cluster, limit=num_docs)
+
     row_ids = []
     for row in results.rows():
-        print(f"Score: {row.score}")
-        print(f"Document Id: {row.id}")
-
         row_ids.append(row.id)
 
-    data = get_document_by_keys(scope, collection, row_ids)
+    data = _get_documents_by_keys(bucket, scope, collection, keys=row_ids, cluster=cluster, answer_field=answer_field)
     return data
-
-
-if __name__ == "__main__":
-    bucket_name = "agentc-search-test"
-    scope = "tools-catalog"
-    model = SentenceTransformer("flax-sentence-embeddings/st-codesearch-distilroberta-base")
-    natural_language_query = "train a model"
-    vector_field = "embedding"
-
-    data = vector_search_tool(
-        "agentc-search-test",
-        "glaive_v2_dataset_df_v1_small_train-langchaindescription-M1",
-        "tools-catalog",
-        "Administrator",
-        "password",
-        "couchbase://127.0.0.1",
-        natural_language_query,
-        model,
-        vector_field,
-    )
-    print(data)
