@@ -1,3 +1,8 @@
+import dotenv
+
+# Make sure you populate your .env file with the correct credentials!
+dotenv.load_dotenv()
+
 import agentc
 import agentc.auditor
 import agentc.langchain
@@ -6,16 +11,12 @@ import controlflow
 import controlflow.events
 import controlflow.orchestration
 import controlflow.tools
-import dotenv
 import langchain_openai
 import os
 import pydantic
 import uuid
 
 from utils import TaskFactory
-
-# Make sure you populate your .env file with the correct credentials!
-dotenv.load_dotenv()
 
 # The Agent Catalog provider serves versioned tools and prompts.
 # For a comprehensive list of what parameters can be set here, see the class documentation.
