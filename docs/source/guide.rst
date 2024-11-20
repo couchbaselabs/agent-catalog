@@ -48,7 +48,7 @@ Agent builders will follow this workflow:
 
 3. **Prompt Building**: Follow the steps outlined in the `Couchbase-Backed Agent Catalogs`_ section to create prompts.
 
-   - In a multi-team setting, you can also use :command:`agentc find --kind prompt` to see if other team members have
+   - In a multi-team setting, you can also use :command:`agentc find prompt` to see if other team members have
      already created prompts that address your use case.
 
    - To accelerate prompt building, you can specify your tool requirements in the prompt.
@@ -96,6 +96,12 @@ Both tool builders and prompt builders (i.e., agent builders) will follow this w
    1. To publish your items to a Couchbase instance, you must first commit your changes (to Git) and run the
       :command:`agentc index` command on a clean Git repository.
       :command:`git status` should reveal no tracked changes.
+
+      .. tip::
+
+        If you've made minor changes to your repository and don't want to use an entirely new commit ID before
+        publishing, add your files to Git with :command:`git add $MY_FILES` and amend your changes to the last commit
+        with :command:`git commit --amend`!
 
    2. Next, you must add your Couchbase connection string, username, and password to the environment.
       The most straightforward way to do this is by running the following commands:

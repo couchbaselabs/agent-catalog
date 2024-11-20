@@ -32,6 +32,8 @@ optional = true
 ragas = "^0.2.1"
 jupyterlab = "^4.2.5"
 langchain-openai = "^0.2.2"
+ipywidgets = "^8.1.5"
+llama-index = "^0.12.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.0.0"
