@@ -215,7 +215,7 @@ source code tied to the tool can be easily imported using Python’s <code class
 </li>
 <li><p><strong>Prompt Building</strong>: Follow the steps outlined in the <a class="reference internal" href="#couchbase-backed-agent-catalogs">Couchbase-Backed Agent Catalogs</a> section to create prompts.</p>
 <ul class="simple">
-<li><p>In a multi-team setting, you can also use <strong class="command">agentc find prompt</strong> to see if other team members have
+<li><p>In a multi-team setting, you can also use <strong class="command">agentc find --kind prompt</strong> to see if other team members have
 already created prompts that address your use case.</p></li>
 <li><p>To accelerate prompt building, you can specify your tool requirements in the prompt.
 This will allow Agent Catalog to automatically fetch the tools you need when the prompt is executed.</p></li>
@@ -257,14 +257,7 @@ a dirty Git repository.</p>
 <ol class="arabic">
 <li><p>To publish your items to a Couchbase instance, you must first commit your changes (to Git) and run the
 <strong class="command">agentc index</strong> command on a clean Git repository.
-<strong class="command">git status</strong> should reveal no tracked changes.</p>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>If you’ve made minor changes to your repository and don’t want to use an entirely new commit ID before
-publishing, add your files to Git with <strong class="command">git add $MY_FILES</strong> and amend your changes to the last commit
-with <strong class="command">git commit --amend</strong>!</p>
-</div>
-</li>
+<strong class="command">git status</strong> should reveal no tracked changes.</p></li>
 <li><p>Next, you must add your Couchbase connection string, username, and password to the environment.
 The most straightforward way to do this is by running the following commands:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">AGENT_CATALOG_CONN_STRING</span><span class="o">=</span>couchbase://localhost
