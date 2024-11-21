@@ -107,12 +107,12 @@ def create_vector_index(
         )
 
     max_partition = (
-        os.getenv("AGENT_CATALOG_MAX_SOURCE_PARTITION")
+        int(os.getenv("AGENT_CATALOG_MAX_SOURCE_PARTITION"))
         if os.getenv("AGENT_CATALOG_MAX_SOURCE_PARTITION") is not None
-        else None
+        else 1024
     )
     index_partition = (
-        os.getenv("AGENT_CATALOG_INDEX_PARTITION")
+        int(os.getenv("AGENT_CATALOG_INDEX_PARTITION"))
         if os.getenv("AGENT_CATALOG_INDEX_PARTITION") is not None
         else 2 * num_fts_nodes
     )
@@ -217,7 +217,7 @@ def create_vector_index(
         # Check if no. of fts nodes has changes since last update
         cluster_fts_partitions = index_present["planParams"]["indexPartitions"]
         if cluster_fts_partitions != index_partition:
-            index_present["planParams"]["indexPartitions"] = int(index_partition)
+            index_present["planParams"]["indexPartitions"] = index_partition
 
         # Check if the mapping already exists
         existing_fields = index_present["params"]["mapping"]["types"][f"{DEFAULT_CATALOG_SCOPE}.{kind}_catalog"][
