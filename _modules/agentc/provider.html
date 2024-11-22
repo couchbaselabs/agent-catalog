@@ -579,11 +579,7 @@
 <span class="sd">        :param name: The specific name of the catalog entry to search for.</span>
 <span class="sd">        :param annotations: An annotation query string in the form of ``KEY=&quot;VALUE&quot; (AND|OR KEY=&quot;VALUE&quot;)*``.</span>
 <span class="sd">        :param snapshot: The snapshot version to find the tools for. By default, we use the latest snapshot.</span>
-
-<span class="sd">        :return:</span>
-<span class="sd">                An instance of *PromptResult* class, with the following attributes:</span>
-<span class="sd">                    - **prompt** (str | jinja2.Template): The prompt content for the agent.</span>
-<span class="sd">                    - **tools** (list): The list containing the tool functions associated with the prompt.</span>
+<span class="sd">        :return: A single prompt as well any tools attached to the prompt.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_provider</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
