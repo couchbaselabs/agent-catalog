@@ -91,6 +91,8 @@ def initialize_repo(
         return output
 
     # Call our publish command. Note that this assumes a container / CB instance is active!
+    os.environ["AGENT_CATALOG_MAX_SOURCE_PARTITION"] = "1"
+    os.environ["AGENT_CATALOG_INDEX_PARTITION"] = "1"
     if repo_kind != ExampleRepoKind.PUBLISHED_PROMPTS_TRAVEL:
         output.append(
             click_runner.invoke(click_command, ["publish", "tool", "--bucket", "travel-sample"] + (publish_args or []))
