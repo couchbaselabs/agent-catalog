@@ -25,8 +25,8 @@ def is_index_present(
 
     auth = (conn.username, conn.password)
 
-    # Make request to FTS till you find live node
-    for fts_node_hostname in fts_nodes_hostname:
+    # Make a request to FTS until a live node is reached. If all nodes are down, try the host.
+    for fts_node_hostname in fts_nodes_hostname + [conn.host]:
         find_index_https_url = f"https://{fts_node_hostname}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index"
         find_index_http_url = f"http://{fts_node_hostname}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index"
         try:
@@ -182,8 +182,8 @@ def create_vector_index(
             }
         )
 
-        # keeping making requests in a loop till you find the alive fts node
-        for fts_node_hostname in fts_nodes_hostname:
+        # Make a request to FTS until a live node is reached. If all nodes are down, try the host.
+        for fts_node_hostname in fts_nodes_hostname + [conn.host]:
             create_vector_index_https_url = f"https://{fts_node_hostname}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
             create_vector_index_http_url = f"http://{fts_node_hostname}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
             try:
@@ -254,8 +254,8 @@ def create_vector_index(
 
         payload = json.dumps(index_present)
 
-        # keeping making requests in a loop till you find the alive fts node
-        for fts_node_hostname in fts_nodes_hostname:
+        # Make a request to FTS until a live node is reached. If all nodes are down, try the host.
+        for fts_node_hostname in fts_nodes_hostname + [conn.host]:
             update_vector_index_https_url = f"https://{fts_node_hostname}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
             update_vector_index_http_url = f"http://{fts_node_hostname}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
             try:
