@@ -1,4 +1,5 @@
 -- Note: all_sessions.sqlpp should be run before this script.
+-- TODO (GLENN): The purpose of this view is to aid in using Ragas, but we should use the raw_logs instead.
 CREATE OR REPLACE [ANALYTICS?] FUNCTION
     `[BUCKET_NAME]`.`[SCOPE_NAME]`.Exchanges() {
     (
