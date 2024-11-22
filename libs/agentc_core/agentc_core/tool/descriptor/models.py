@@ -1,14 +1,13 @@
 import abc
-import dataclasses
-import enum
 import importlib
 import inspect
 import json
 import logging
-import openapi_parser
+import openapi_pydantic
 import pathlib
 import pydantic
 import re
+import requests
 import sys
 import typing
 import yaml
@@ -199,6 +198,13 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
         path: str
         method: str
 
+        @pydantic.field_validator("method")
+        @classmethod
+        def method_should_be_valid_http_method(cls, v: str):
+            if v.lower() not in {"get", "put", "post", "delete", "options", "head", "patch", "trace"}:
+                raise ValueError(f"Invalid HTTP method {v}.")
+            return v.upper()
+
     class SpecificationMetadata(pydantic.BaseModel):
         filename: typing.Optional[pathlib.Path | None] = None
         url: typing.Optional[pathlib.Path | None] = None
@@ -208,26 +214,26 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
             self,
             path: str,
             method: str,
-            operation: openapi_parser.parser.Operation,
-            servers: list[openapi_parser.parser.Server],
-            parent_parameters: list[openapi_parser.parser.Parameter] = None,
+            operation: openapi_pydantic.Operation,
+            servers: list[openapi_pydantic.Server],
+            parent_parameters: list[openapi_pydantic.Parameter] = None,
         ):
             self.path = path
             self.method = method
-            self.servers = servers
-            self._operation = operation
-            self._parent_parameters = parent_parameters
+            self.servers: list[openapi_pydantic.Server] = servers
+            self._operation: openapi_pydantic.Operation = operation
+            self._parent_parameters: list[openapi_pydantic.Parameter] = parent_parameters
 
         @property
-        def parameters(self) -> list[openapi_parser.parser.Parameter]:
-            if len(self._operation.parameters) == 0:
+        def parameters(self) -> list[openapi_pydantic.Parameter]:
+            if self._operation.parameters is None or len(self._operation.parameters) == 0:
                 return self._parent_parameters
             else:
                 return self._operation.parameters
 
         @property
         def operation_id(self):
-            return self._operation.operation_id
+            return self._operation.operationId
 
         @property
         def description(self):
@@ -235,7 +241,7 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
 
         @property
         def request_body(self):
-            return self._operation.request_body
+            return self._operation.requestBody
 
         def __str__(self):
             return f"{self.method} {self.path}"
@@ -263,50 +269,70 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
                 spec_filename = source_filename.parent / spec_filename
             if not spec_filename.exists():
                 raise ValueError(f"Specification file {spec_filename} does not exist.")
-            open_api_spec = openapi_parser.parse(spec_filename.absolute().as_uri(), strict_enum=False)
+            with open(spec_filename, "r") as fp:
+                open_api_spec: openapi_pydantic.OpenAPI = openapi_pydantic.OpenAPI.model_validate_json(fp.read())
         else:
-            open_api_spec = openapi_parser.parse(url, strict_enum=False)
+            response = requests.get(url)
+            if response.status_code != 200:
+                raise ValueError(f"Could not fetch OpenAPI specification from {url}.")
+            open_api_spec: openapi_pydantic.OpenAPI = openapi_pydantic.OpenAPI.model_validate_json(response.text)
 
         # Determine our servers.
         if len(open_api_spec.servers) > 0:
             servers = open_api_spec.servers
         elif spec_filename is not None:
             servers = [
-                openapi_parser.parser.Server(url="https://localhost/"),
-                openapi_parser.parser.Server(url="http://localhost/"),
+                openapi_pydantic.Server(url="https://localhost/"),
+                openapi_pydantic.Server(url="http://localhost/"),
             ]
         else:  # url is not None
-            servers = [openapi_parser.parser.Server(url)]
+            servers = [openapi_pydantic.Server(url=url)]
 
         # Check the operation path...
-        specification_path = None
-        for p in open_api_spec.paths:
-            if operation.path == p.url:
-                specification_path = p
+        specification_path: openapi_pydantic.PathItem = None
+        if open_api_spec.paths is None:
+            raise ValueError("No paths found in the OpenAPI spec.")
+        for k, v in open_api_spec.paths.items():
+            if operation.path == k:
+                specification_path = v
                 break
         if specification_path is None:
             raise ValueError(f"Operation {operation} does not exist in the spec.")
 
         # ...and then the method.
-        specification_operation = None
-        for m in specification_path.operations:
-            if operation.method.lower() == m.method.value.lower():
-                specification_operation = m
-                break
+        match operation.method:
+            case "GET":
+                specification_operation = specification_path.get
+            case "PUT":
+                specification_operation = specification_path.put
+            case "POST":
+                specification_operation = specification_path.post
+            case "DELETE":
+                specification_operation = specification_path.delete
+            case "OPTIONS":
+                specification_operation = specification_path.options
+            case "HEAD":
+                specification_operation = specification_path.head
+            case "PATCH":
+                specification_operation = specification_path.patch
+            case "TRACE":
+                specification_operation = specification_path.trace
+            case _:
+                # We should never reach here (validation should be done by Pydantic earlier).
+                raise ValueError(f"Invalid HTTP method {operation.method} found in spec.")
         if specification_operation is None:
             raise ValueError(f"Operation {operation} does not exist in the spec.")
 
         # We additionally impose that a description and an operationId must exist.
         if specification_operation.description is None:
             raise ValueError(f"Description must be specified for operation {operation}.")
-        if specification_operation.operation_id is None:
+        if specification_operation.operationId is None:
             raise ValueError(f"OperationId must be specified for operation {operation}.")
 
-        # TODO (GLENN): openapi_parser doesn't support operation servers (OpenAPI 3.1.0).
         return HTTPRequestToolDescriptor.OperationHandle(
             method=operation.method,
             path=operation.path,
-            servers=servers,
+            servers=servers + (specification_operation.servers or []),
             operation=specification_operation,
             parent_parameters=specification_path.parameters,
         )
@@ -320,23 +346,6 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
             url=self.specification.url,
             operation=self.operation,
         )
-
-    class JSONEncoder(json.JSONEncoder):
-        def default(self, obj):
-            if isinstance(obj, openapi_parser.parser.Schema):
-                result_dict = dict()
-                for k, v in dataclasses.asdict(obj).items():
-                    result_dict[k] = self.default(v)
-                return result_dict
-
-            elif isinstance(obj, openapi_parser.parser.Property):
-                return {"name": obj.name, "schema": self.default(obj.schema)}
-
-            elif isinstance(obj, enum.Enum):
-                return obj.value
-
-            else:
-                return obj
 
     class Factory(_BaseFactory):
         class Metadata(pydantic.BaseModel):

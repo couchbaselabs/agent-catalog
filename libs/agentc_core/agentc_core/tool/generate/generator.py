@@ -5,7 +5,7 @@ import datetime
 import jinja2
 import json
 import logging
-import openapi_parser.parser
+import openapi_pydantic
 import openapi_schema_to_json_schema
 import pathlib
 import pydantic
@@ -136,7 +136,7 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
         model: typing.Any
         json_schema: dict
         locations_dict: dict
-        content_type: str = openapi_parser.parser.ContentType.JSON
+        content_type: str = openapi_pydantic.DataType.OBJECT
 
         @property
         def locations(self):
@@ -158,22 +158,16 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
         # Note: parent parameters are handled in the OperationMetadata class.
         for parameter in operation.parameters:
             base_object["properties"][parameter.name] = openapi_schema_to_json_schema.to_json_schema(
-                schema=json.loads(json.dumps(parameter.schema, cls=HTTPRequestToolDescriptor.JSONEncoder))
+                schema=parameter.param_schema.model_dump(by_alias=True, exclude_none=True)
             )
-            locations[parameter.name] = parameter.location.value.lower()
+            locations[parameter.name] = parameter.param_in.lower()
 
         if operation.request_body is not None:
             json_type_request_content = None
-            for content in operation.request_body.content:
-                match content.type:
-                    case openapi_parser.parser.ContentType.JSON:
-                        json_type_request_content = content
-                        break
+            if "application/json" in operation.request_body.content:
+                json_type_request_content = operation.request_body.content["application/json"]
 
-                    # TODO (GLENN): Implement other descriptor of request bodies.
-                    case _:
-                        continue
-
+            # TODO (GLENN): Implement other descriptor of request bodies.
             if json_type_request_content is None:
                 logger.warning("No application/json content (specification) found in the request body!")
             else:

@@ -66,6 +66,9 @@ def test_local_provider(tmp_path):
         tools = provider.get_tools_for("searching travel blogs")
         assert len(tools) == 1
         assert tools[0].__name__ == "get_travel_blog_snippets_from_user_interests"
+        tools = provider.get_tools_for(name="get_travel_blog_snippets_from_user_interests")
+        assert len(tools) == 1
+        assert tools[0].__name__ == "get_travel_blog_snippets_from_user_interests"
         assert prompt.tools is None
         assert prompt.meta.name == "get_user_location"
 
@@ -85,6 +88,9 @@ def test_db_tool_provider(tmp_path, isolated_server_factory):
         os.remove((pathlib.Path(td) / DEFAULT_CATALOG_FOLDER / DEFAULT_TOOL_CATALOG_NAME).absolute())
         provider = Provider(bucket="travel-sample")
         tools = provider.get_tools_for("searching travel blogs")
+        assert len(tools) == 1
+        assert tools[0].__name__ == "get_travel_blog_snippets_from_user_interests"
+        tools = provider.get_tools_for(name="get_travel_blog_snippets_from_user_interests")
         assert len(tools) == 1
         assert tools[0].__name__ == "get_travel_blog_snippets_from_user_interests"
 
