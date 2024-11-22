@@ -404,7 +404,6 @@ class Provider(pydantic_settings.BaseSettings):
                 An instance of *PromptResult* class, with the following attributes:
                     - **prompt** (str | jinja2.Template): The prompt content for the agent.
                     - **tools** (list): The list containing the tool functions associated with the prompt.
-                    - **meta** (RecordDescriptor): The metadata associated with the prompt.
         """
         if self._prompt_provider is None:
             raise RuntimeError(
