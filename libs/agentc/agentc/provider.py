@@ -399,11 +399,7 @@ class Provider(pydantic_settings.BaseSettings):
         :param name: The specific name of the catalog entry to search for.
         :param annotations: An annotation query string in the form of ``KEY="VALUE" (AND|OR KEY="VALUE")*``.
         :param snapshot: The snapshot version to find the tools for. By default, we use the latest snapshot.
-
-        :return:
-                An instance of *PromptResult* class, with the following attributes:
-                    - **prompt** (str | jinja2.Template): The prompt content for the agent.
-                    - **tools** (list): The list containing the tool functions associated with the prompt.
+        :return: A single prompt as well any tools attached to the prompt.
         """
         if self._prompt_provider is None:
             raise RuntimeError(
