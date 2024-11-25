@@ -45,7 +45,7 @@ class RecordKind(enum.StrEnum):
 class RecordDescriptor(pydantic.BaseModel):
     """This model represents a tool's persistable description or metadata."""
 
-    model_config = pydantic.ConfigDict(validate_assignment=True, use_enum_values=True)
+    model_config = pydantic.ConfigDict(validate_assignment=True, use_enum_values=True, extra="allow")
 
     record_kind: typing.Literal[
         RecordKind.PythonFunction,
