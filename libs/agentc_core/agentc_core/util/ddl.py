@@ -108,13 +108,13 @@ def create_vector_index(
 
     max_partition_env = os.getenv("AGENT_CATALOG_MAX_SOURCE_PARTITION")
     try:
-        max_partition_env = int(max_partition_env)
+        max_partition_env = int(max_partition_env) if isinstance(max_partition_env, str) else max_partition_env
     except Exception as e:
         raise ValueError(f"Cannot convert given value of max partition to integer: {e}") from e
 
     index_partition_env = os.getenv("AGENT_CATALOG_INDEX_PARTITION")
     try:
-        index_partition_env = int(index_partition_env)
+        index_partition_env = int(index_partition_env) if isinstance(index_partition_env, str) else index_partition_env
     except Exception as e:
         raise ValueError(f"Cannot convert given value of max partition to integer: {e}") from e
 
