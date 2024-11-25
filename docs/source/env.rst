@@ -73,3 +73,12 @@ Optional Environment Variables
     This *must* be a valid embedding model that is supported by the :python:`sentence_transformers.SentenceTransformer`
     class.
     By default, the ``sentence-transformers/all-MiniLM-L12-v2`` model is used.
+
+``AGENT_CATALOG_INDEX_PARTITION``
+    Required for advanced vector index definition. This is an integer that defines the number of index partitions on your node.
+    If not set, this value is ``2 * number of fts nodes`` on your cluster.
+    More information on index partitioning can be found `here <https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index-partitioning.html>`_.
+
+``AGENT_CATALOG_MAX_SOURCE_PARTITION``
+    Required for advanced vector index definition. This is an integer that defines the maximum number of source partitions.
+    If not set, this value is 1024.
