@@ -412,20 +412,6 @@ run) <em>or</em> manually using <strong class="command">export</strong>.</p>
 <span class="na">AGENT_CATALOG_PASSWORD</span><span class="o">=</span><span class="s">password</span>
 <span class="na">AGENT_CATALOG_BUCKET</span><span class="o">=</span><span class="s">travel-sample</span>
 
-<span class="na">------------------------------------------ OPTIONAL ------------------------------------------</span>
-<span class="c1"># Couchbase specific environment variables (for the travel-agent example tools).</span>
-<span class="na">CB_CONN_STRING</span><span class="o">=</span><span class="s">couchbase://localhost</span>
-<span class="na">CB_USERNAME</span><span class="o">=</span><span class="s">Administrator</span>
-<span class="na">CB_PASSWORD</span><span class="o">=</span><span class="s">password</span>
-
-<span class="c1"># ControlFlow specific environment variables (which are really just Prefect environment variables).</span>
-<span class="na">CONTROLFLOW_TOOLS_VERBOSE</span><span class="o">=</span><span class="s">true</span>
-<span class="na">PREFECT_LOGGING_LEVEL</span><span class="o">=</span><span class="s">CRITICAL</span>
-<span class="na">PREFECT_API_URL</span><span class="o">=</span><span class="s">&quot;http://127.0.0.1:4200/api&quot;</span>
-
-<span class="c1"># To stop sentence_transformers from being fussy about multiple imports.</span>
-<span class="na">TOKENIZERS_PARALLELISM</span><span class="o">=</span><span class="s">false</span>
-
 <span class="c1"># The holy OpenAI API key. :-)</span>
 <span class="na">OPENAI_API_KEY</span><span class="o">=</span><span class="s">...</span>
 </pre></div>
