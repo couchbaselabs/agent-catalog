@@ -260,20 +260,6 @@ Make sure to review the required variables and populate them with appropriate va
        AGENT_CATALOG_PASSWORD=password
        AGENT_CATALOG_BUCKET=travel-sample
 
-       ------------------------------------------ OPTIONAL ------------------------------------------
-       # Couchbase specific environment variables (for the travel-agent example tools).
-       CB_CONN_STRING=couchbase://localhost
-       CB_USERNAME=Administrator
-       CB_PASSWORD=password
-
-       # ControlFlow specific environment variables (which are really just Prefect environment variables).
-       CONTROLFLOW_TOOLS_VERBOSE=true
-       PREFECT_LOGGING_LEVEL=CRITICAL
-       PREFECT_API_URL="http://127.0.0.1:4200/api"
-
-       # To stop sentence_transformers from being fussy about multiple imports.
-       TOKENIZERS_PARALLELISM=false
-
        # The holy OpenAI API key. :-)
        OPENAI_API_KEY=...
 

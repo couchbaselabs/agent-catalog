@@ -26,7 +26,7 @@ def is_index_present(
     auth = (conn.username, conn.password)
 
     # Make a request to FTS until a live node is reached. If all nodes are down, try the host.
-    for fts_node_hostname in fts_nodes_hostname + [conn.host]:
+    for fts_node_hostname in fts_nodes_hostname:
         find_index_https_url = f"https://{fts_node_hostname}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index"
         find_index_http_url = f"http://{fts_node_hostname}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index"
         try:
@@ -77,7 +77,11 @@ def get_fts_nodes_hostname(conn: CouchbaseConnect = None) -> tuple[list[str] | N
             fts_nodes = []
             for node in json_response["nodes"]:
                 if "fts" in node["services"]:
-                    fts_nodes.append(node["hostname"].split(":")[0])
+                    last_idx = node["configuredHostname"].rfind(":")
+                    if last_idx == -1:
+                        fts_nodes.append(node["configuredHostname"])
+                    else:
+                        fts_nodes.append(node["configuredHostname"][:last_idx])
             return fts_nodes, None
         else:
             return None, RuntimeError("Couldn't check for the existing fts nodes!")
@@ -106,20 +110,24 @@ def create_vector_index(
             "No node with 'search' service found, cannot create vector index! Please ensure 'search' service is included in at least one node."
         )
 
+    # To be on safer side make request to connection string host
+    fts_nodes_hostname.append(conn.host)
+
     max_partition_env = os.getenv("AGENT_CATALOG_MAX_SOURCE_PARTITION")
     try:
-        max_partition_env = int(max_partition_env)
+        max_partition = int(max_partition_env) if max_partition_env is not None else 1024
     except Exception as e:
-        raise ValueError(f"Cannot convert given value of max partition to integer: {e}") from e
+        raise ValueError(
+            f"Cannot convert given value of max source partition to integer: {e}\nUpdate the environment variable 'AGENT_CATALOG_MAX_SOURCE_PARTITION' to an integer value"
+        ) from e
 
     index_partition_env = os.getenv("AGENT_CATALOG_INDEX_PARTITION")
     try:
-        index_partition_env = int(index_partition_env)
+        index_partition = int(index_partition_env) if index_partition_env is not None else 2 * num_fts_nodes
     except Exception as e:
-        raise ValueError(f"Cannot convert given value of max partition to integer: {e}") from e
-
-    max_partition = max_partition_env if max_partition_env is not None else 1024
-    index_partition = index_partition_env if index_partition_env is not None else 2 * num_fts_nodes
+        raise ValueError(
+            f"Cannot convert given value of index partition to integer: {e}\nUpdate the environment variable 'AGENT_CATALOG_INDEX_PARTITION' to an integer value"
+        ) from e
 
     (index_present, err) = is_index_present(bucket, qualified_index_name, conn, fts_nodes_hostname)
     if err is not None:
@@ -187,7 +195,7 @@ def create_vector_index(
         )
 
         # Make a request to FTS until a live node is reached. If all nodes are down, try the host.
-        for fts_node_hostname in fts_nodes_hostname + [conn.host]:
+        for fts_node_hostname in fts_nodes_hostname:
             create_vector_index_https_url = f"https://{fts_node_hostname}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
             create_vector_index_http_url = f"http://{fts_node_hostname}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
             try:
@@ -259,7 +267,7 @@ def create_vector_index(
         payload = json.dumps(index_present)
 
         # Make a request to FTS until a live node is reached. If all nodes are down, try the host.
-        for fts_node_hostname in fts_nodes_hostname + [conn.host]:
+        for fts_node_hostname in fts_nodes_hostname:
             update_vector_index_https_url = f"https://{fts_node_hostname}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
             update_vector_index_http_url = f"http://{fts_node_hostname}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
             try:
