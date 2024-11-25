@@ -112,18 +112,19 @@ def create_vector_index(
 
     max_partition_env = os.getenv("AGENT_CATALOG_MAX_SOURCE_PARTITION")
     try:
-        max_partition_env = int(max_partition_env)
+        max_partition = int(max_partition_env) if max_partition_env is not None else 1024
     except Exception as e:
-        raise ValueError(f"Cannot convert given value of max partition to integer: {e}") from e
+        raise ValueError(
+            f"Cannot convert given value of max source partition to integer: {e}\nUpdate the environment variable 'AGENT_CATALOG_MAX_SOURCE_PARTITION' to an integer value"
+        ) from e
 
     index_partition_env = os.getenv("AGENT_CATALOG_INDEX_PARTITION")
     try:
-        index_partition_env = int(index_partition_env)
+        index_partition = int(index_partition_env) if index_partition_env is not None else 2 * num_fts_nodes
     except Exception as e:
-        raise ValueError(f"Cannot convert given value of max partition to integer: {e}") from e
-
-    max_partition = max_partition_env if max_partition_env is not None else 1024
-    index_partition = index_partition_env if index_partition_env is not None else 2 * num_fts_nodes
+        raise ValueError(
+            f"Cannot convert given value of index partition to integer: {e}\nUpdate the environment variable 'AGENT_CATALOG_INDEX_PARTITION' to an integer value"
+        ) from e
 
     (index_present, err) = is_index_present(bucket, qualified_index_name, conn, fts_nodes_hostname)
     if err is not None:
