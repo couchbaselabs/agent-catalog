@@ -13,7 +13,11 @@ from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_NAME
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_NAME
 from agentc_testing.repo import ExampleRepoKind
 from agentc_testing.repo import initialize_repo
+from agentc_testing.server import isolated_server_factory
 from unittest.mock import patch
+
+# This is to keep ruff from falsely flagging this as unused.
+_ = isolated_server_factory
 
 
 @pytest.mark.smoke
