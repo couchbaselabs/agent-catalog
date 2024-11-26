@@ -136,7 +136,7 @@ def cmd_publish(
         progress_bar = tqdm.tqdm(catalog_desc.items)
         for item in progress_bar:
             try:
-                key = item.identifier
+                key = item.identifier + "_" + metadata["version"]["identifier"]
                 progress_bar.set_description(item.name)
 
                 # serialise object to str
