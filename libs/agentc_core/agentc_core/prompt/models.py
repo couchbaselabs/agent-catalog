@@ -109,7 +109,7 @@ class JinjaPromptDescriptor(RawPromptDescriptor):
     def prompt_must_be_valid_jinja_template(cls, v: str):
         # We'll rely on Jinja to raise an error here.
         try:
-            jinja2.Template(source=v)
+            jinja2.Template(source=v, autoescape=True)
             return v
         except jinja2.exceptions.TemplateError as e:
             raise ValueError("Malformed input! Invalid Jinja template.") from e

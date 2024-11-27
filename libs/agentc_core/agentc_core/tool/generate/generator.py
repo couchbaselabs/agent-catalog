@@ -78,7 +78,7 @@ class SQLPPCodeGenerator(_BaseCodeGenerator):
 
         # Instantiate our template.
         with (self.template_directory / "sqlpp_q.jinja").open("r") as tmpl_fp:
-            template = jinja2.Template(source=tmpl_fp.read())
+            template = jinja2.Template(source=tmpl_fp.read(), autoescape=True)
             generation_time = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
             rendered_code = template.render(
                 {
@@ -112,7 +112,7 @@ class SemanticSearchCodeGenerator(_BaseCodeGenerator):
 
         # Instantiate our template.
         with (self.template_directory / "semantic_q.jinja").open("r") as tmpl_fp:
-            template = jinja2.Template(source=tmpl_fp.read())
+            template = jinja2.Template(source=tmpl_fp.read(), autoescape=True)
             generation_time = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
             rendered_code = template.render(
                 {
@@ -209,7 +209,7 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
 
             # Instantiate our template.
             with (self.template_directory / "httpreq_q.jinja").open("r") as tmpl_fp:
-                template = jinja2.Template(source=tmpl_fp.read())
+                template = jinja2.Template(source=tmpl_fp.read(), autoescape=True)
                 generation_time = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
                 rendered_code = template.render(
                     {
