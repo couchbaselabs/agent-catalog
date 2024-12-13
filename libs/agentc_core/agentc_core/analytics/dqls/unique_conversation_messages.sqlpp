@@ -1,4 +1,5 @@
 -- This query prints all distinct messages in a conversation between the user and the llm including tool calls.
+-- This is an example query with bucket = `travel-sample`
 SELECT b.*
 FROM `travel-sample`.agent_activity.raw_logs AS b
 JOIN (
