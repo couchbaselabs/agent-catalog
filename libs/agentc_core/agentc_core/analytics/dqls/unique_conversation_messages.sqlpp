@@ -1,0 +1,11 @@
+-- This query prints all distinct messages in a conversation between the user and the llm including tool calls.
+SELECT b.*
+FROM `travel-sample`.agent_activity.raw_logs AS b
+JOIN (
+    SELECT c.content.content AS message, MIN(c.timestamp) AS first_timestamp
+    FROM `travel-sample`.agent_activity.raw_logs AS c
+    WHERE c.content.content IS NOT NULL
+    GROUP BY c.content.content
+) AS earliest
+ON b.content.content = earliest.message AND b.timestamp = earliest.first_timestamp
+ORDER BY b.timestamp;
