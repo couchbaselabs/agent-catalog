@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class ToolSearchMetadata(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(extra="allow")
     name: typing.Optional[str] = None
     query: typing.Optional[str] = None
     annotations: typing.Optional[str] = None
@@ -42,6 +43,7 @@ class ToolSearchMetadata(pydantic.BaseModel):
 
 class _BaseFactory(abc.ABC):
     class PromptMetadata(pydantic.BaseModel):
+        model_config = pydantic.ConfigDict(extra="allow")
         name: str
         description: str
         record_kind: typing.Literal[RecordKind.RawPrompt, RecordKind.JinjaPrompt]
@@ -80,6 +82,11 @@ class RawPromptDescriptor(RecordDescriptor):
         def __iter__(self) -> typing.Iterable["RawPromptDescriptor"]:
             front_matter, prompt_text = self._get_prompt_metadata()
             metadata = RawPromptDescriptor.Factory.PromptMetadata.model_validate(front_matter)
+            if metadata.__pydantic_extra__:
+                logger.warning(
+                    f"Extra fields found in {self.filename.name}: {metadata.__pydantic_extra__}. "
+                    f"We will ignore these."
+                )
             descriptor_args = {
                 "name": metadata.name,
                 "description": metadata.description,
@@ -102,7 +109,7 @@ class JinjaPromptDescriptor(RawPromptDescriptor):
     def prompt_must_be_valid_jinja_template(cls, v: str):
         # We'll rely on Jinja to raise an error here.
         try:
-            jinja2.Template(source=v)
+            jinja2.Template(source=v, autoescape=True)
             return v
         except jinja2.exceptions.TemplateError as e:
             raise ValueError("Malformed input! Invalid Jinja template.") from e
@@ -111,6 +118,11 @@ class JinjaPromptDescriptor(RawPromptDescriptor):
         def __iter__(self) -> typing.Iterable["JinjaPromptDescriptor"]:
             front_matter, prompt_text = self._get_prompt_metadata()
             metadata = JinjaPromptDescriptor.Factory.PromptMetadata.model_validate(front_matter)
+            if metadata.__pydantic_extra__:
+                logger.warning(
+                    f"Extra fields found in {self.filename.name}: {metadata.__pydantic_extra__}. "
+                    f"We will ignore these."
+                )
             descriptor_args = {
                 "name": metadata.name,
                 "description": metadata.description,

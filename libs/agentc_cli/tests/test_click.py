@@ -1,7 +1,12 @@
 import click.testing
+import couchbase.auth
+import couchbase.cluster
+import couchbase.options
 import git
+import os
 import pathlib
 import pytest
+import re
 import shutil
 import uuid
 
@@ -13,7 +18,14 @@ from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_NAME
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_NAME
 from agentc_testing.repo import ExampleRepoKind
 from agentc_testing.repo import initialize_repo
+from agentc_testing.server import DEFAULT_COUCHBASE_CONN_STRING
+from agentc_testing.server import DEFAULT_COUCHBASE_PASSWORD
+from agentc_testing.server import DEFAULT_COUCHBASE_USERNAME
+from agentc_testing.server import isolated_server_factory
 from unittest.mock import patch
+
+# This is to keep ruff from falsely flagging this as unused.
+_ = isolated_server_factory
 
 
 @pytest.mark.smoke
@@ -51,9 +63,11 @@ def test_index(tmp_path):
 
 # Small helper function to publish to a Couchbase catalog.
 def publish_catalog(runner, input_catalog: pathlib.Path, output_catalog: pathlib.Path):
+    os.environ["AGENT_CATALOG_MAX_SOURCE_PARTITION"] = "1"
+    os.environ["AGENT_CATALOG_INDEX_PARTITION"] = "1"
+
     # Clean up file names (remove negative or positive from file name)
-    new_catalog = str(input_catalog.name).replace("negative", "").replace("positive", "")
-    new_catalog = new_catalog.replace("--", "-").replace("-.", ".").strip("-")
+    new_catalog = re.sub(r"-catalog-(positive|negative)-\d+\.json", "-catalog.json", input_catalog.name)
 
     # Copy file to temp dir under new name
     shutil.copy(input_catalog, output_catalog / new_catalog)
@@ -104,7 +118,7 @@ def test_publish(tmp_path, isolated_server_factory):
         )
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
         catalog_folder.mkdir()
-        for catalog in (pathlib.Path(__file__).parent / "resources" / "publish_catalog").rglob("*"):
+        for catalog in (pathlib.Path(__file__).parent / "resources" / "publish_catalog").rglob("*-1.json"):
             publish_catalog(runner, catalog, catalog_folder)
 
 
@@ -127,7 +141,7 @@ def test_find(tmp_path, isolated_server_factory):
         )
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
         catalog_folder.mkdir()
-        catalog = pathlib.Path(__file__).parent / "resources" / "find_catalog" / "tool-catalog.json"
+        catalog = pathlib.Path(__file__).parent / "resources" / "find_catalog" / "tool-catalog-positive-1.json"
         publish_catalog(runner, catalog, catalog_folder)
 
         # DB find
@@ -223,7 +237,7 @@ def test_status(tmp_path, isolated_server_factory):
         )
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
         catalog_folder.mkdir()
-        catalog = pathlib.Path(__file__).parent / "resources" / "find_catalog" / "tool-catalog.json"
+        catalog = pathlib.Path(__file__).parent / "resources" / "find_catalog" / "tool-catalog-positive-1.json"
         publish_catalog(runner, catalog, catalog_folder)
 
         # Case 2 - tool catalog exists locally (testing for only one kind of catalog)
@@ -283,7 +297,7 @@ def test_clean(tmp_path, isolated_server_factory):
 
         # DB clean
         catalog_folder.mkdir()
-        catalog = pathlib.Path(__file__).parent / "resources" / "find_catalog" / "tool-catalog.json"
+        catalog = pathlib.Path(__file__).parent / "resources" / "find_catalog" / "tool-catalog-positive-1.json"
         publish_catalog(runner, catalog, catalog_folder)
         runner.invoke(click_main, ["clean", "db", "-y", "--bucket", "travel-sample"])
 
@@ -354,7 +368,41 @@ def test_execute(tmp_path, isolated_server_factory):
 
 
 @pytest.mark.skip
-@pytest.mark.integration
+@pytest.mark.regression
 def test_publish_multiple_nodes(tmp_path):
     # TODO: Setup multinode cluster for test environment
     pass
+
+
+@pytest.mark.regression
+def test_publish_different_versions(tmp_path, isolated_server_factory):
+    runner = click.testing.CliRunner()
+    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        isolated_server_factory(pathlib.Path(td) / ".couchbase")
+        initialize_repo(
+            directory=pathlib.Path(td),
+            repo_kind=ExampleRepoKind.EMPTY,
+            click_runner=runner,
+            click_command=click_main,
+        )
+        catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
+        catalog_folder.mkdir()
+
+        catalog = pathlib.Path(__file__).parent / "resources" / "publish_catalog" / "prompt-catalog-positive-1.json"
+        publish_catalog(runner, catalog, catalog_folder)
+        catalog = pathlib.Path(__file__).parent / "resources" / "publish_catalog" / "prompt-catalog-positive-2.json"
+        publish_catalog(runner, catalog, catalog_folder)
+        cluster = couchbase.cluster.Cluster(
+            DEFAULT_COUCHBASE_CONN_STRING,
+            couchbase.options.ClusterOptions(
+                authenticator=couchbase.auth.PasswordAuthenticator(
+                    DEFAULT_COUCHBASE_USERNAME, DEFAULT_COUCHBASE_PASSWORD
+                ),
+            ),
+        )
+        query = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.prompt_catalog;")
+        for row in query:
+            assert row == 4
+        query = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.prompt_metadata;")
+        for row in query:
+            assert row == 2

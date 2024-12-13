@@ -56,7 +56,7 @@ class PythonToolDescriptor(RecordDescriptor):
             for _, tool in inspect.getmembers(imported_module):
                 if not is_tool(tool):
                     continue
-                yield PythonToolDescriptor(
+                record_descriptor = PythonToolDescriptor(
                     record_kind=RecordKind.PythonFunction,
                     name=get_name(tool),
                     description=get_description(tool),
@@ -65,6 +65,12 @@ class PythonToolDescriptor(RecordDescriptor):
                     version=self.version,
                     annotations=get_annotations(tool),
                 )
+                if record_descriptor.__pydantic_extra__:
+                    logger.warning(
+                        f"Extra fields found in {self.filename.name} for tool {get_name(tool)}: "
+                        f"{record_descriptor.__pydantic_extra__.keys()}. We will ignore these."
+                    )
+                yield record_descriptor
 
 
 class SQLPPQueryToolDescriptor(RecordDescriptor):
@@ -76,7 +82,7 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
 
     class Factory(_BaseFactory):
         class Metadata(pydantic.BaseModel, JSONSchemaValidatingMixin):
-            model_config = pydantic.ConfigDict(frozen=True, use_enum_values=True)
+            model_config = pydantic.ConfigDict(frozen=True, use_enum_values=True, extra="allow")
 
             # Below, we enumerate all fields that appear in a .sqlpp file.
             name: str
@@ -110,6 +116,11 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
                 elif len(matches) != 1:
                     logger.warning("More than one multi-line comment found. Using first comment.")
                 metadata = SQLPPQueryToolDescriptor.Factory.Metadata.model_validate(yaml.safe_load(matches[0]))
+                if metadata.__pydantic_extra__:
+                    logger.warning(
+                        f"Extra fields found in {self.filename.name}: {metadata.__pydantic_extra__}. "
+                        f"We will ignore these."
+                    )
 
             # Now, generate a single SQL++ tool descriptor.
             yield SQLPPQueryToolDescriptor(
@@ -145,7 +156,7 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
 
     class Factory(_BaseFactory):
         class Metadata(pydantic.BaseModel, JSONSchemaValidatingMixin):
-            model_config = pydantic.ConfigDict(frozen=True, use_enum_values=True)
+            model_config = pydantic.ConfigDict(frozen=True, use_enum_values=True, extra="allow")
 
             # Below, we enumerate all fields that appear in a .yaml file for semantic search.
             record_kind: typing.Literal[RecordKind.SemanticSearch]
@@ -181,6 +192,11 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
         def __iter__(self) -> typing.Iterable["SemanticSearchToolDescriptor"]:
             with self.filename.open("r") as fp:
                 metadata = SemanticSearchToolDescriptor.Factory.Metadata.model_validate(yaml.safe_load(fp))
+                if metadata.__pydantic_extra__:
+                    logger.warning(
+                        f"Extra fields found in {self.filename.name}: {metadata.__pydantic_extra__}. "
+                        f"We will ignore these."
+                    )
                 yield SemanticSearchToolDescriptor(
                     record_kind=RecordKind.SemanticSearch,
                     name=metadata.name,
@@ -340,10 +356,11 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
 
     class Factory(_BaseFactory):
         class Metadata(pydantic.BaseModel):
-            model_config = pydantic.ConfigDict(frozen=True, use_enum_values=True)
+            model_config = pydantic.ConfigDict(frozen=True, use_enum_values=True, extra="allow")
 
             # Note: we cannot validate this model in isolation (we need the referencing descriptor as well).
             class OpenAPIMetadata(pydantic.BaseModel):
+                model_config = pydantic.ConfigDict(extra="allow")
                 filename: typing.Optional[str | None] = None
                 url: typing.Optional[str | None] = None
                 operations: list["HTTPRequestToolDescriptor.OperationMetadata"]
@@ -356,6 +373,11 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
         def __iter__(self) -> typing.Iterable["HTTPRequestToolDescriptor"]:
             with self.filename.open("r") as fp:
                 metadata = HTTPRequestToolDescriptor.Factory.Metadata.model_validate(yaml.safe_load(fp))
+                if metadata.__pydantic_extra__:
+                    logger.warning(
+                        f"Extra fields found in {self.filename.name}: {metadata.__pydantic_extra__}. "
+                        f"We will ignore these."
+                    )
                 for operation in metadata.open_api.operations:
                     operation_handle = HTTPRequestToolDescriptor.validate_operation(
                         source_filename=self.filename,
