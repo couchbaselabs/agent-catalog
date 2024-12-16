@@ -25,6 +25,7 @@ from agentc_core.provider import PromptProvider
 from agentc_core.provider import PythonTarget
 from agentc_core.provider import ToolProvider
 from agentc_core.version import VersionDescriptor
+from typing import Union
 
 logger = logging.getLogger(__name__)
 
@@ -361,7 +362,26 @@ class Provider(pydantic_settings.BaseSettings):
             version_tuples.append(self._remote_prompt_catalog.version)
         return sorted(version_tuples, key=lambda x: x.timestamp, reverse=True)[0]
 
-    def get_tools_for(
+    def get_item(
+        self,
+        query: str = None,
+        name: str = None,
+        annotations: str = None,
+        snapshot: str = LATEST_SNAPSHOT_VERSION,
+        limit: typing.Union[int | None] = 1,
+        item_type: str = str,
+    ) -> Union[list[typing.Any] | Prompt | None]:
+        if item_type == "tool":
+            return self._get_tools_for(query, name, annotations, snapshot, limit)
+        elif item_type == "prompt":
+            print("in prompt")
+            return self._get_prompt_for(query, name, annotations, snapshot)
+        elif item_type == "agent":
+            pass
+        else:
+            raise ValueError(f"Unknown item type: {item_type}, expected 'tool', 'prompt', or 'agent'.")
+
+    def _get_tools_for(
         self,
         query: str = None,
         name: str = None,
@@ -387,7 +407,7 @@ class Provider(pydantic_settings.BaseSettings):
         else:
             return [self._tool_provider.get(name=name, annotations=annotations, snapshot=snapshot)]
 
-    def get_prompt_for(
+    def _get_prompt_for(
         self,
         query: str = None,
         name: str = None,
