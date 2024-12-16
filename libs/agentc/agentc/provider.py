@@ -374,7 +374,6 @@ class Provider(pydantic_settings.BaseSettings):
         if item_type == "tool":
             return self._get_tools_for(query, name, annotations, snapshot, limit)
         elif item_type == "prompt":
-            print("in prompt")
             return self._get_prompt_for(query, name, annotations, snapshot)
         elif item_type == "agent":
             pass
