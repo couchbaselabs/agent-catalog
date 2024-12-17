@@ -13,6 +13,7 @@ from .cmds import cmd_env
 from .cmds import cmd_execute
 from .cmds import cmd_find
 from .cmds import cmd_index
+from .cmds import cmd_ls
 from .cmds import cmd_publish
 from .cmds import cmd_status
 from .cmds import cmd_version
@@ -779,6 +780,27 @@ def execute(ctx, query, name, bucket, include_dirty, refiner, annotations, catal
         bucket=bucket,
         cluster=cluster,
         force_db=search_db,
+    )
+
+
+@click_main.command()
+@click.argument(
+    "kind",
+    nargs=-1,
+    type=click.Choice(["tool", "prompt"], case_sensitive=False),
+)
+@click.pass_context
+def ls(ctx, kind):
+    """List all tools or prompts in the catalog."""
+    ctx_obj: Context = ctx.obj
+
+    # By default, we'll list everything.
+    if len(kind) == 0:
+        kind = ["tool", "prompt"]
+
+    cmd_ls(
+        ctx=ctx_obj,
+        kind=kind,
     )
 
 

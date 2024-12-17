@@ -48,6 +48,12 @@ class CatalogBase(abc.ABC):
 
         raise NotImplementedError("CatalogBase.find()")
 
+    @abc.abstractmethod
+    def get_all_items(self) -> list[RecordDescriptor]:
+        """Returns all the catalog items."""
+
+        raise NotImplementedError("CatalogBase.get_all()")
+
     @staticmethod
     def cosine_similarity(query: list[float], entry: list[float]) -> float:
         dot_product = sum(q * e for q, e in zip(query, entry))

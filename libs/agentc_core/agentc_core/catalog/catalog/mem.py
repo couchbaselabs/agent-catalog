@@ -11,6 +11,7 @@ from ...version import VersionDescriptor
 from .base import LATEST_SNAPSHOT_VERSION
 from .base import CatalogBase
 from .base import SearchResult
+from agentc_core.record.descriptor import RecordDescriptor
 
 logger = logging.getLogger(__name__)
 
@@ -106,6 +107,9 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
         if limit > 0:
             results = results[:limit]
         return results
+
+    def get_all_items(self) -> list[RecordDescriptor]:
+        return self.catalog_descriptor.items
 
     @property
     def version(self) -> VersionDescriptor:
