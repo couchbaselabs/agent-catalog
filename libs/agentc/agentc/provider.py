@@ -25,6 +25,7 @@ from agentc_core.provider import PromptProvider
 from agentc_core.provider import PythonTarget
 from agentc_core.provider import ToolProvider
 from agentc_core.version import VersionDescriptor
+from typing import Literal
 from typing import Union
 
 logger = logging.getLogger(__name__)
@@ -369,7 +370,7 @@ class Provider(pydantic_settings.BaseSettings):
         annotations: str = None,
         snapshot: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
-        item_type: str = str,
+        item_type: Literal["tool", "prompt", "agent"] = None,
     ) -> Union[list[typing.Any] | Prompt | None]:
         if item_type == "tool":
             return self._get_tools_for(query, name, annotations, snapshot, limit)
