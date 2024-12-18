@@ -1,39 +1,36 @@
 -- Note: all_sessions.sqlpp should be run before this script.
-CREATE OR REPLACE [ANALYTICS?] FUNCTION
-    `[BUCKET_NAME]`.`[SCOPE_NAME]`.ToolCalls() {
-    (
+CREATE OR REPLACE [ANALYTICS?] VIEW ToolCalls AS
+FROM
+    -- The tool calls our LLM has authored.
+    Sessions AS s1,
+    s1.msgs AS m1,
+    -- Note: this is LangChain specific! We need to factor this out later.
+    m1.content.dump.kwargs.tool_calls AS tc1,
+    -- The results of the tools.
+    Sessions AS s2,
+    s2.msgs AS m2
+WHERE
+    m1.kind = "llm" AND
+    m2.kind = "tool" AND
+    tc1.id = m2.content.dump.kwargs.tool_call_id
+GROUP BY
+    s1
+    GROUP AS g
+LETTING
+    tool_calls = (
         FROM
-            -- The tool calls our LLM has authored.
-            `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions() AS s1,
-            s1.msgs AS m1,
-            -- Note: this is LangChain specific! We need to factor this out later.
-            m1.content.dump.kwargs.tool_calls AS tc1,
-            -- The results of the tools.
-            `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions() AS s2,
-            s2.msgs AS m2
-        WHERE
-            m1.kind = "llm" AND
-            m2.kind = "tool" AND
-            tc1.id = m2.content.dump.kwargs.tool_call_id
-        GROUP BY
-            s1
-            GROUP AS g
-        LETTING
-            tool_calls = (
-                FROM
-                    g AS gi
-                SELECT
-                    gi.tc1.name AS tool_name,
-                    gi.tc1.args AS tool_args,
-                    gi.tc1.id AS tool_call_id,
-                    m2.content.dump.kwargs.content AS tool_result,
-                    m2.content.dump.kwargs.status AS tool_status
-            )
+            g AS gi
         SELECT
-            s1.sid AS sid,
-            s1.vid AS vid,
-            tool_calls AS tool_calls
-        ORDER BY
-            vid.timestamp DESC
+            gi.tc1.name AS tool_name,
+            gi.tc1.args AS tool_args,
+            gi.tc1.id AS tool_call_id,
+            m2.content.dump.kwargs.content AS tool_result,
+            m2.content.dump.kwargs.status AS tool_status
     )
-};
+SELECT
+    s1.sid AS sid,
+    s1.vid AS vid,
+    tool_calls AS tool_calls
+ORDER BY
+    vid.timestamp DESC
+;
