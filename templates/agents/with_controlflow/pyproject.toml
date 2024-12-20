@@ -15,7 +15,7 @@ python = "^3.12"
 # The agent framework of choice.
 [tool.poetry.dependencies.controlflow]
 git = "git@github.com:PrefectHQ/ControlFlow.git"
-rev = "321c8726a12cee31db8d68eea5f7bd566dcab8dc"
+rev = "f259fa8144ed31b8bde5902a2de8548dd4601ce5"
 
 # TODO (GLENN): Replace this with the PyPI package once it's available.
 # The agentc project (the front-facing parts)!
