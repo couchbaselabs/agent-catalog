@@ -1,4 +1,4 @@
-CREATE OR REPLACE [ANALYTICS?] VIEW Sessions AS
+CREATE OR REPLACE ANALYTICS VIEW Sessions AS
 WITH
     DeDuplicatedLogs AS (
         FROM
