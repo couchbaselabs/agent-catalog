@@ -1,6 +1,6 @@
 name: docs
 run-name: 👁️ ${{ github.actor }} has pushed a new commit!
-on: [ push ]
+on: push
 
 # Note: this doesn't deploy anything for now! It just pushes to the gh-pages branch.
 jobs:
