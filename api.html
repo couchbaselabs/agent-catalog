@@ -104,8 +104,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#agentc.Provider.snapshot"><code class="docutils literal notranslate"><span class="pre">Provider.snapshot</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#agentc.Provider.tool_model"><code class="docutils literal notranslate"><span class="pre">Provider.tool_model</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#agentc.Provider.username"><code class="docutils literal notranslate"><span class="pre">Provider.username</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#agentc.Provider.get_prompt_for"><code class="docutils literal notranslate"><span class="pre">Provider.get_prompt_for()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#agentc.Provider.get_tools_for"><code class="docutils literal notranslate"><span class="pre">Provider.get_tools_for()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agentc.Provider.get_item"><code class="docutils literal notranslate"><span class="pre">Provider.get_item()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#agentc.Provider.version"><code class="docutils literal notranslate"><span class="pre">Provider.version</span></code></a></li>
 </ul>
 </li>
@@ -772,7 +771,7 @@ local catalog (with local catalog entries taking precedence).</p>
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="agentc.Provider.decorator">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">decorator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">ToolResult</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;function</span> <span class="pre">Provider.&lt;lambda&gt;&gt;</span></em><a class="headerlink" href="#agentc.Provider.decorator" title="Link to this definition"></a></dt>
-<dd><p>A Python decorator (function) to apply to each result yielded by <a class="reference internal" href="#agentc.Provider.get_tools_for" title="agentc.Provider.get_tools_for"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_tools_for()</span></code></a>.</p>
+<dd><p>A Python decorator (function) to apply to each result yielded by <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_tools_for()</span></code>.</p>
 <p>By default, yielded results are callable and possess type annotations + documentation strings, but some agent
 frameworks may ask for tools whose type is tailored to their own framework.
 As an example, in LangChain, vanilla Python functions must be converted to langchain_core.tools.BaseTool instances.
@@ -812,7 +811,7 @@ To avoid having to “box” these tools yourself, we accept a callback to perfo
 <dt class="sig sig-object py" id="agentc.Provider.provider_output">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">provider_output</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">TemporaryDirectory</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc.Provider.provider_output" title="Link to this definition"></a></dt>
 <dd><p>Location to save generated Python stubs to, if desired.</p>
-<p>On <a class="reference internal" href="#agentc.Provider.get_tools_for" title="agentc.Provider.get_tools_for"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_tools_for()</span></code></a>, tools are dynamically generated and served as annotated Python callables.
+<p>On <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_tools_for()</span></code>, tools are dynamically generated and served as annotated Python callables.
 By default, this code is never written to disk.
 If this field is specified, we will write all generated files to the given output directory and serve the generated
 Python callables from these files with a “standard import”.</p>
@@ -895,7 +894,7 @@ map whose values are secret keys.</p>
 <p>By default, we use the latest snapshot version if the repo is clean.
 This snapshot version is retrieved directly from Git (if the repo is clean).
 If the repo is dirty, we will fetch all tools and prompts from the local catalog (by default).
-If snapshot is specified at search time (i.e., with <a class="reference internal" href="#agentc.Provider.get_tools_for" title="agentc.Provider.get_tools_for"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_tools_for()</span></code></a> or <a class="reference internal" href="#agentc.Provider.get_prompt_for" title="agentc.Provider.get_prompt_for"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_prompt_for()</span></code></a>), we will
+If snapshot is specified at search time (i.e., with <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_tools_for()</span></code> or <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_prompt_for()</span></code>), we will
 use that snapshot version instead.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Validated by<span class="colon">:</span></dt>
@@ -950,48 +949,9 @@ frameworks.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="agentc.Provider.get_prompt_for">
-<span class="sig-name descname"><span class="pre">get_prompt_for</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'__LATEST__'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PromptResult</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/agentc/provider.html#Provider.get_prompt_for"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc.Provider.get_prompt_for" title="Link to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>query</strong> – A query string (natural language) to search the catalog with.</p></li>
-<li><p><strong>name</strong> – The specific name of the catalog entry to search for.</p></li>
-<li><p><strong>annotations</strong> – An annotation query string in the form of <code class="docutils literal notranslate"><span class="pre">KEY=&quot;VALUE&quot;</span> <span class="pre">(AND|OR</span> <span class="pre">KEY=&quot;VALUE&quot;)*</span></code>.</p></li>
-<li><p><strong>snapshot</strong> – The snapshot version to find the tools for. By default, we use the latest snapshot.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>An instance of <em>PromptResult</em> class, with the following attributes:</dt><dd><ul class="simple">
-<li><p><strong>prompt</strong> (str | jinja2.Template): The prompt content for the agent.</p></li>
-<li><p><strong>tools</strong> (list): The list containing the tool functions associated with the prompt.</p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="agentc.Provider.get_tools_for">
-<span class="sig-name descname"><span class="pre">get_tools_for</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'__LATEST__'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/agentc/provider.html#Provider.get_tools_for"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc.Provider.get_tools_for" title="Link to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>query</strong> – A query string (natural language) to search the catalog with.</p></li>
-<li><p><strong>name</strong> – The specific name of the catalog entry to search for.</p></li>
-<li><p><strong>annotations</strong> – An annotation query string in the form of <code class="docutils literal notranslate"><span class="pre">KEY=&quot;VALUE&quot;</span> <span class="pre">(AND|OR</span> <span class="pre">KEY=&quot;VALUE&quot;)*</span></code>.</p></li>
-<li><p><strong>snapshot</strong> – The snapshot version to find the tools for. By default, we use the latest snapshot.</p></li>
-<li><p><strong>limit</strong> – The maximum number of results to return.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list of tools (Python functions).</p>
-</dd>
-</dl>
-</dd></dl>
+<dt class="sig sig-object py" id="agentc.Provider.get_item">
+<span class="sig-name descname"><span class="pre">get_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'__LATEST__'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'tool'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'prompt'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'agent'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">PromptResult</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/agentc/provider.html#Provider.get_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc.Provider.get_item" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="agentc.Provider.version">
