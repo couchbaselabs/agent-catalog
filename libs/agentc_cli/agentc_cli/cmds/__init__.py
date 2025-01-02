@@ -4,6 +4,7 @@ from .env import cmd_env
 from .execute import cmd_execute
 from .find import cmd_find
 from .index import cmd_index
+from .ls import cmd_ls
 from .publish import cmd_publish
 from .status import cmd_status
 from .version import cmd_version
@@ -20,4 +21,5 @@ __all__ = [
     "cmd_status",
     "cmd_version",
     "cmd_web",
+    "cmd_ls",
 ]
