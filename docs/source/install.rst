@@ -100,6 +100,7 @@ some libraries like numpy need to be built, subsequent runs will be faster).
       execute  Search and execute a specific tool.
       find     Find items from the catalog based on a natural language QUERY string or by name.
       index    Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
+      ls       List all tools or prompts in the catalog.
       publish  Upload the local catalog to a Couchbase instance.
       status   Show the status of the local catalog.
       version  Show the current version of agentc.
