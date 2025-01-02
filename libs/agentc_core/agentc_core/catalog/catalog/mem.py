@@ -109,6 +109,7 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
         return results
 
     def get_all_items(self) -> list[RecordDescriptor]:
+        """Returns all the catalog items in local catalog."""
         return self.catalog_descriptor.items
 
     @property

@@ -207,7 +207,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
         return sorted(results, key=lambda t: t.delta, reverse=True)
 
     def get_all_items(self) -> list[RecordDescriptor]:
-        """Returns all the catalog items."""
+        """Returns all the catalog in db catalog."""
 
         query = f"""
             FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{self.kind}_catalog` AS t

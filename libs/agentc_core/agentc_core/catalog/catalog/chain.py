@@ -44,15 +44,16 @@ class CatalogChain(CatalogBase):
         return results
 
     def get_all_items(self) -> list[RecordDescriptor]:
+        """Returns unique catalog items after aggregating results from both local,db and removing duplicates."""
         all_items = []
         seen = set()  # Keyed by 'source:name'
-        for c in self.chain:
-            items_c = c.get_all_items()
-            for x in items_c:
-                source_name = str(x.source) + ":" + x.name
+        for catalog in self.chain:
+            catalog_items = catalog.get_all_items()
+            for item in catalog_items:
+                source_name = str(item.source) + ":" + item.name
                 if source_name not in seen:
                     seen.add(source_name)
-                    all_items.append(x)
+                    all_items.append(item)
         return all_items
 
     @property

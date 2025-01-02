@@ -10,7 +10,7 @@ from agentc_cli.models import Context
 
 def cmd_ls(
     ctx: Context,
-    kind: list[typing.Literal["tool", "prompt"]],
+    kind_list: list[typing.Literal["tool", "prompt"]],
     bucket: str = None,
     cluster: couchbase.cluster.Cluster = None,
     force_db=False,
@@ -18,12 +18,12 @@ def cmd_ls(
     if ctx is None:
         ctx = Context()
 
-    for k in kind:
-        click.secho(DASHES, fg=KIND_COLORS[k])
-        click.secho(k.upper(), bold=True, fg=KIND_COLORS[k])
-        click.secho(DASHES, fg=KIND_COLORS[k])
+    for kind in kind_list:
+        click.secho(DASHES, fg=KIND_COLORS[kind])
+        click.secho(kind.upper(), bold=True, fg=KIND_COLORS[kind])
+        click.secho(DASHES, fg=KIND_COLORS[kind])
         catalog = get_catalog(
-            ctx.catalog, bucket=bucket, cluster=cluster, force_db=force_db, include_dirty=False, kind=k
+            ctx.catalog, bucket=bucket, cluster=cluster, force_db=force_db, include_dirty=False, kind=kind
         )
 
         catalog_items = catalog.get_all_items()
@@ -32,4 +32,4 @@ def cmd_ls(
             click.echo(f"{num}. {click.style(catalog_item.name, bold=True)}\n\t{catalog_item.description}")
             num += 1
 
-        click.secho(DASHES, fg=KIND_COLORS[k])
+        click.secho(DASHES, fg=KIND_COLORS[kind])

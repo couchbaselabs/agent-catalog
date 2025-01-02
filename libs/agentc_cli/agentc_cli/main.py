@@ -865,13 +865,13 @@ def ls(ctx, kind, search_db, search_local, bucket):
         elif bucket is None and not ctx_obj.interactive:
             raise ValueError(
                 "Bucket must be specified to search the database catalog."
-                "Add --bucket BUCKET_NAME to your command or run agent clean in interactive mode."
+                "Add --bucket BUCKET_NAME to your command or run the command in interactive mode."
             )
 
     else:
         bucket = None
 
-    cmd_ls(ctx=ctx_obj, kind=kind, bucket=bucket, cluster=cluster, force_db=search_db)
+    cmd_ls(ctx=ctx_obj, kind_list=kind, bucket=bucket, cluster=cluster, force_db=search_db)
 
 
 # @click_main.command()
