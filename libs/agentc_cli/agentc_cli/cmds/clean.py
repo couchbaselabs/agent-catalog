@@ -21,24 +21,23 @@ logger = logging.getLogger(__name__)
 
 
 def clean_local(ctx: Context | None, type_metadata: str):
-    xs = []
     if type_metadata == "catalog":
-        xs = [DEFAULT_CATALOG_FOLDER]
+        default_folder = [DEFAULT_CATALOG_FOLDER]
     elif type_metadata == "activity":
-        xs = [DEFAULT_ACTIVITY_FOLDER]
+        default_folder = [DEFAULT_ACTIVITY_FOLDER]
     else:
-        xs = [DEFAULT_ACTIVITY_FOLDER, DEFAULT_CATALOG_FOLDER]
+        default_folder = [DEFAULT_ACTIVITY_FOLDER, DEFAULT_CATALOG_FOLDER]
 
-    for x in xs:
-        if not x or not os.path.exists(x):
+    for folder in default_folder:
+        if not folder or not os.path.exists(folder):
             continue
 
-        x_path = pathlib.Path(x)
+        folder_path = pathlib.Path(folder)
 
-        if x_path.is_file():
-            os.remove(x_path.absolute())
-        elif x_path.is_dir():
-            shutil.rmtree(x_path.absolute())
+        if folder_path.is_file():
+            os.remove(folder_path.absolute())
+        elif folder_path.is_dir():
+            shutil.rmtree(folder_path.absolute())
 
 
 def clean_db(
