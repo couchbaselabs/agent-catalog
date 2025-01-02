@@ -70,6 +70,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#agentc-execute">execute</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#agentc-find">find</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#agentc-index">index</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agentc-ls">ls</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#agentc-publish">publish</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#agentc-status">status</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#agentc-version">version</a></li>
@@ -586,6 +587,49 @@ Source files that will be scanned include <a href="#id1"><span class="problemati
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-agentc-index-arg-SOURCE_DIRS">
 <span class="sig-name descname"><span class="pre">SOURCE_DIRS</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-index-arg-SOURCE_DIRS" title="Link to this definition"></a></dt>
+<dd><p>Optional argument(s)</p>
+</dd></dl>
+
+</section>
+<section id="agentc-ls">
+<h3>ls<a class="headerlink" href="#agentc-ls" title="Link to this heading"></a></h3>
+<p>List all tools or prompts in the catalog.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span>ls<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span><span class="o">[[</span>tool<span class="p">|</span>prompt<span class="o">]]</span>...
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-agentc-ls-db">
+<span id="cmdoption-agentc-ls-search-db"></span><span class="sig-name descname"><span class="pre">-db</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--search-db</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-ls-db" title="Link to this definition"></a></dt>
+<dd><p>Flag to force a DB-only search.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-agentc-ls-local">
+<span id="cmdoption-agentc-ls-search-local"></span><span class="sig-name descname"><span class="pre">-local</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--search-local</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-ls-local" title="Link to this definition"></a></dt>
+<dd><p>Flag to force a local-only search.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Default<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-agentc-ls-bucket">
+<span class="sig-name descname"><span class="pre">--bucket</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;bucket&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-ls-bucket" title="Link to this definition"></a></dt>
+<dd><p>Name of Couchbase bucket that is being used for agentc functionalities.</p>
+</dd></dl>
+
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-agentc-ls-arg-KIND">
+<span class="sig-name descname"><span class="pre">KIND</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-ls-arg-KIND" title="Link to this definition"></a></dt>
 <dd><p>Optional argument(s)</p>
 </dd></dl>
 
