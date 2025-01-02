@@ -4,6 +4,7 @@ from ...annotation import AnnotationPredicate
 from ...version import VersionDescriptor
 from .base import CatalogBase
 from .base import SearchResult
+from agentc_core.record.descriptor import RecordDescriptor
 
 
 class CatalogChain(CatalogBase):
@@ -41,6 +42,18 @@ class CatalogChain(CatalogBase):
             results = results[:limit]
 
         return results
+
+    def get_all_items(self) -> list[RecordDescriptor]:
+        all_items = []
+        seen = set()  # Keyed by 'source:name'
+        for c in self.chain:
+            items_c = c.get_all_items()
+            for x in items_c:
+                source_name = str(x.source) + ":" + x.name
+                if source_name not in seen:
+                    seen.add(source_name)
+                    all_items.append(x)
+        return all_items
 
     @property
     def version(self) -> VersionDescriptor:
