@@ -407,7 +407,7 @@ def find(
         elif bucket is None and not ctx_obj.interactive:
             raise ValueError(
                 "Bucket must be specified to search the database catalog."
-                "Add --bucket BUCKET_NAME to your command or run agent clean in interactive mode."
+                "Add --bucket BUCKET_NAME to your command or run agentc clean in interactive mode."
             )
 
     else:
@@ -553,7 +553,7 @@ def publish(ctx, kind, bucket, annotations):
     elif bucket is None and not ctx_obj.interactive:
         raise ValueError(
             "Bucket must be specified to publish to the database catalog."
-            "Add --bucket BUCKET_NAME to your command or run agent clean in interactive mode."
+            "Add --bucket BUCKET_NAME to your command or run agentc clean in interactive mode."
         )
 
     # Get keyspace and connection details
@@ -775,7 +775,7 @@ def execute(ctx, query, name, bucket, include_dirty, refiner, annotations, catal
         elif bucket is None and not ctx_obj.interactive:
             raise ValueError(
                 "Bucket must be specified to search the database catalog."
-                "Add --bucket BUCKET_NAME to your command or run agent clean in interactive mode."
+                "Add --bucket BUCKET_NAME to your command or run agentc clean in interactive mode."
             )
 
     else:
