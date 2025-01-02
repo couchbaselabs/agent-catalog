@@ -15,12 +15,19 @@ from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_META_COLLECTION_NAME
 from agentc_core.util.query import execute_query
+from typing_extensions import Literal
 
 logger = logging.getLogger(__name__)
 
 
-def clean_local(ctx: Context | None):
-    xs = [DEFAULT_ACTIVITY_FOLDER, DEFAULT_CATALOG_FOLDER]
+def clean_local(ctx: Context | None, type_metadata: str):
+    xs = []
+    if type_metadata == "catalog":
+        xs = [DEFAULT_CATALOG_FOLDER]
+    elif type_metadata == "activity":
+        xs = [DEFAULT_ACTIVITY_FOLDER]
+    else:
+        xs = [DEFAULT_ACTIVITY_FOLDER, DEFAULT_CATALOG_FOLDER]
 
     for x in xs:
         if not x or not os.path.exists(x):
@@ -40,8 +47,11 @@ def clean_db(
     cluster: couchbase.cluster.Cluster,
     catalog_ids: list[str],
     kind_list: list[typing.Literal["tool", "prompt"]],
+    type_metadata: Literal["catalog", "activity", "all"],
 ) -> int:
     all_errs = []
+    clean_catalog = "catalog" in type_metadata or "all" in type_metadata
+    clean_activity = "activity" in type_metadata or "all" in type_metadata
 
     for kind in kind_list:
         if len(catalog_ids) > 0:
@@ -74,19 +84,21 @@ def clean_db(
             if err is not None:
                 all_errs.append(err)
         else:
-            drop_scope_query = f"DROP SCOPE `{bucket}`.`{DEFAULT_CATALOG_SCOPE}` IF EXISTS;"
-            res, err = execute_query(cluster, drop_scope_query)
-            for r in res.rows():
-                logger.debug(r)
-            if err is not None:
-                all_errs.append(err)
+            if clean_catalog:
+                drop_scope_query = f"DROP SCOPE `{bucket}`.`{DEFAULT_CATALOG_SCOPE}` IF EXISTS;"
+                res, err = execute_query(cluster, drop_scope_query)
+                for r in res.rows():
+                    logger.debug(r)
+                if err is not None:
+                    all_errs.append(err)
 
-            drop_scope_query = f"DROP SCOPE `{bucket}`.`{DEFAULT_AUDIT_SCOPE}` IF EXISTS;"
-            res, err = execute_query(cluster, drop_scope_query)
-            for r in res.rows():
-                logger.debug(r)
-            if err is not None:
-                all_errs.append(err)
+            if clean_activity:
+                drop_scope_query = f"DROP SCOPE `{bucket}`.`{DEFAULT_AUDIT_SCOPE}` IF EXISTS;"
+                res, err = execute_query(cluster, drop_scope_query)
+                for r in res.rows():
+                    logger.debug(r)
+                if err is not None:
+                    all_errs.append(err)
 
             if len(all_errs) > 0:
                 logger.error(all_errs)
@@ -102,17 +114,18 @@ def cmd_clean(
     catalog_ids: tuple[str],
     kind: list[typing.Literal["tool", "prompt"]],
     ctx: Context = None,
+    type_metadata: Literal["catalog", "activity", "all"] = "all",
 ):
     if is_local:
-        clean_local(ctx)
-        click.secho("Local catalog has been deleted!", fg="green")
+        clean_local(ctx, type_metadata)
+        click.secho("Local catalog/metadata has been deleted!", fg="green")
 
     if is_db:
-        num_errs = clean_db(ctx, bucket, cluster, catalog_ids, kind)
+        num_errs = clean_db(ctx, bucket, cluster, catalog_ids, kind, type_metadata)
         if num_errs > 0:
-            raise ValueError("Failed to cleanup db catalog!")
+            raise ValueError("Failed to cleanup db catalog/metadata!")
         else:
-            click.secho("Database catalog has been deleted!", fg="green")
+            click.secho("Database catalog/metadata has been deleted!", fg="green")
 
 
 # Note: flask is an optional dependency.

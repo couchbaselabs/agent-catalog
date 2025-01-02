@@ -153,6 +153,10 @@ def add(ctx, output: pathlib.Path, record_kind: RecordKind):
     type=click.Choice(["local", "db"], case_sensitive=False),
     nargs=-1,
 )
+@click.argument(
+    "type_metadata",
+    type=click.Choice(["catalog", "activity", "all"], case_sensitive=False),
+)
 @click.option(
     "--bucket",
     default=None,
@@ -185,8 +189,8 @@ def add(ctx, output: pathlib.Path, record_kind: RecordKind):
     show_default=True,
 )
 @click.pass_context
-def clean(ctx, catalog, bucket, catalog_id, skip_confirm, kind):
-    """Delete all agent catalog related files / collections."""
+def clean(ctx, catalog, type_metadata, bucket, catalog_id, skip_confirm, kind):
+    """Delete all or specific (catalog and/or activity) agent related files / collections."""
     ctx_obj: Context = ctx.obj
     clean_db = "db" in catalog
     clean_local = "local" in catalog
@@ -206,7 +210,16 @@ def clean(ctx, catalog, bucket, catalog_id, skip_confirm, kind):
             click.confirm(
                 "Are you sure you want to delete catalogs and/or audit logs from your filesystem?", abort=True
             )
-        cmd_clean(ctx.obj, True, False, None, None, None, None)
+        cmd_clean(
+            ctx=ctx_obj,
+            is_local=clean_local,
+            is_db=clean_db,
+            bucket=None,
+            cluster=None,
+            catalog_ids=None,
+            kind=None,
+            type_metadata=type_metadata,
+        )
 
     if clean_db:
         if not skip_confirm:
