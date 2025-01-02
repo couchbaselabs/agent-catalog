@@ -17,7 +17,7 @@ from agentc_core.secrets import get_secret
 
 logger = logging.getLogger(__name__)
 
-{{ input.generated_code }}
+{{ input.generated_code | safe }}
 
 
 def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
