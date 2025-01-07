@@ -406,3 +406,63 @@ def test_publish_different_versions(tmp_path, isolated_server_factory):
         query = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.prompt_metadata;")
         for row in query:
             assert row == 2
+
+
+@pytest.mark.regression
+def test_ls_local(tmp_path):
+    runner = click.testing.CliRunner()
+    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        ############################################################################################################
+        # when the repo is empty
+        output = runner.invoke(click_main, ["ls", "-local"]).stdout
+        assert "Searching" not in output
+        ############################################################################################################
+        # when there are tools and prompts, but are not indexed
+        initialize_repo(
+            directory=pathlib.Path(td),
+            repo_kind=ExampleRepoKind.NON_INDEXED_ALL_TRAVEL,
+            click_runner=runner,
+            click_command=click_main,
+        )
+        output = runner.invoke(click_main, ["ls", "-local"]).stdout
+        assert "Searching" not in output
+        ############################################################################################################
+        # when only tools are indexed
+        initialize_repo(
+            directory=pathlib.Path(td),
+            repo_kind=ExampleRepoKind.INDEXED_CLEAN_TOOLS_TRAVEL,
+            click_runner=runner,
+            click_command=click_main,
+        )
+        output = runner.invoke(click_main, ["ls", "tool", "-local"]).stdout
+        assert "TOOL" in output and "1" in output
+        output = runner.invoke(click_main, ["ls", "prompt", "-local"]).stdout
+        assert "PROMPT" in output and "1" not in output
+        ############################################################################################################
+        # when only prompts are indexed
+        runner.invoke(click_main, ["clean", "local", "--kind", "tool", "-y"])
+        initialize_repo(
+            directory=pathlib.Path(td),
+            repo_kind=ExampleRepoKind.INDEXED_CLEAN_PROMPTS_TRAVEL,
+            click_runner=runner,
+            click_command=click_main,
+        )
+        output = runner.invoke(click_main, ["ls", "prompt", "-local"]).stdout
+        assert "PROMPT" in output and "1" in output
+        output = runner.invoke(click_main, ["ls", "tool", "-local"]).stdout
+        assert "TOOL" in output and "1" not in output
+        ############################################################################################################
+        # when there are both tools and prompts
+        initialize_repo(
+            directory=pathlib.Path(td),
+            repo_kind=ExampleRepoKind.INDEXED_CLEAN_ALL_TRAVEL,
+            click_runner=runner,
+            click_command=click_main,
+        )
+        output = runner.invoke(click_main, ["ls", "prompt", "-local"]).stdout
+        assert "PROMPT" in output and "1" in output
+        output = runner.invoke(click_main, ["ls", "tool", "-local"]).stdout
+        assert "TOOL" in output and "1" in output
+        output = runner.invoke(click_main, ["ls", "-local"]).stdout
+        assert "PROMPT" in output and "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 2
+        ############################################################################################################
