@@ -61,7 +61,7 @@ def cmd_publish(
         scope = keyspace.scope
     elif bucket is None:
         bucket = bucket
-        scope = DEFAULT_AUDIT_SCOPE if is_kind_log else DEFAULT_CATALOG_SCOPE
+        scope = DEFAULT_CATALOG_SCOPE
     else:
         raise ValueError("Keyspace or bucket name not provided!")
 
@@ -98,7 +98,7 @@ def cmd_publish(
         bucket_manager = cb.collections()
 
         log_col = DEFAULT_AUDIT_COLLECTION
-        log_scope = scope
+        log_scope = DEFAULT_AUDIT_SCOPE
         try:
             (msg, err) = create_scope_and_collection(bucket_manager, scope=log_scope, collection=log_col)
         except:
