@@ -289,7 +289,7 @@ def test_clean(tmp_path, isolated_server_factory):
         with dummy_file_2.open("w") as fp:
             fp.write("more dummy content")
 
-        runner.invoke(click_main, ["clean", "local", "-y"])
+        runner.invoke(click_main, ["clean", "local", "all", "-y"])
 
         print("\n\nRan assertion for local clean")
         assert not dummy_file_1.exists()
@@ -299,7 +299,7 @@ def test_clean(tmp_path, isolated_server_factory):
         catalog_folder.mkdir()
         catalog = pathlib.Path(__file__).parent / "resources" / "find_catalog" / "tool-catalog-positive-1.json"
         publish_catalog(runner, catalog, catalog_folder)
-        runner.invoke(click_main, ["clean", "db", "-y", "--bucket", "travel-sample"])
+        runner.invoke(click_main, ["clean", "db", "-y", "--bucket", "travel-sample", "all"])
 
         import json
         import requests

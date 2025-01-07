@@ -95,7 +95,7 @@ some libraries like numpy need to be built, subsequent runs will be faster).
 
     Commands:
       add      Interactively create a new tool or prompt and save it to the filesystem (output).
-      clean    Delete all agent catalog related files / collections.
+      clean    Delete all or specific (catalog and/or activity) agent related files / collections.
       env      Return all agentc related environment and configuration parameters as a JSON object.
       execute  Search and execute a specific tool.
       find     Find items from the catalog based on a natural language QUERY string or by name.
