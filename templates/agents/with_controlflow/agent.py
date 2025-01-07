@@ -1,8 +1,3 @@
-import dotenv
-
-# Make sure you populate your .env file with the correct credentials!
-dotenv.load_dotenv()
-
 import agentc
 import agentc.auditor
 import agentc.langchain
@@ -11,12 +6,17 @@ import controlflow
 import controlflow.events
 import controlflow.orchestration
 import controlflow.tools
+import dotenv
 import langchain_openai
 import os
 import pydantic
 import uuid
 
+from pydantic import SecretStr
 from utils import TaskFactory
+
+# Make sure you populate your .env file with the correct credentials!
+dotenv.load_dotenv()
 
 # The Agent Catalog provider serves versioned tools and prompts.
 # For a comprehensive list of what parameters can be set here, see the class documentation.
@@ -29,9 +29,9 @@ provider = agentc.Provider(
     # The 'values' of this dictionary map to actual values required by the tool.
     # In this case, we get the Couchbase connection string, username, and password from environment variables.
     secrets={
-        "CB_CONN_STRING": os.getenv("CB_CONN_STRING"),
-        "CB_USERNAME": os.getenv("CB_USERNAME"),
-        "CB_PASSWORD": os.getenv("CB_PASSWORD"),
+        "CB_CONN_STRING": SecretStr(os.getenv("CB_CONN_STRING")),
+        "CB_USERNAME": SecretStr(os.getenv("CB_USERNAME")),
+        "CB_PASSWORD": SecretStr(os.getenv("CB_PASSWORD")),
     },
 )
 
@@ -85,7 +85,7 @@ def run_flow(thread_id: str):
     while True:
         endpoints = task_factory.run(
             # Search for prompts using your provider.
-            prompt=provider.get_prompt_for(query="asking for source and destination airports"),
+            prompt=provider.get_item(query="asking for source and destination airports", item_type="prompt"),
             # All other arguments are forwarded to the ControlFlow Task constructor.
             # Check out their docs here: https://controlflow.ai/concepts/tasks#task-properties
             result_type=EndpointsType,
@@ -94,13 +94,14 @@ def run_flow(thread_id: str):
         # We "draw" implicit dependency edges by using the results of previous tasks.
         # In this example, all tasks are executed eagerly (though there is some limited support for lazy evaluation).
         travel_routes = task_factory.run(
-            prompt=provider.get_prompt_for(query="finding routes between airports"),
+            prompt=provider.get_item(query="finding routes between airports", item_type="prompt"),
             context={"source_airport": endpoints.source_airport, "destination_airport": endpoints.dest_airport},
             result_type=str,
         )
         print(f"Your routes are: {travel_routes}")
         is_continue = task_factory.run(
-            prompt=provider.get_prompt_for(query="after addressing a user's request"), result_type=[True, False]
+            prompt=provider.get_item(query="after addressing a user's request", item_type="prompt"),
+            result_type=[True, False],
         )
         if not is_continue:
             break
