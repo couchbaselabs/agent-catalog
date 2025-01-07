@@ -827,7 +827,7 @@ def execute(ctx, query, name, bucket, include_dirty, refiner, annotations, catal
 )
 @click.pass_context
 def ls(ctx, kind, search_db, search_local, bucket):
-    """List all tools or prompts in the catalog."""
+    """List all indexed tools and/or prompts in the catalog."""
     ctx_obj: Context = ctx.obj
 
     if search_db and search_local:
