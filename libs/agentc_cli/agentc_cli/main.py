@@ -496,7 +496,7 @@ def index(ctx, source_dirs, tools, prompts, embedding_model, dry_run):
 @click.argument(
     "kind",
     nargs=-1,
-    type=click.Choice(["tool", "prompt"], case_sensitive=False),
+    type=click.Choice(["tool", "prompt", "log"], case_sensitive=False),
 )
 @click.option(
     "--bucket",
@@ -511,17 +511,17 @@ def index(ctx, source_dirs, tools, prompts, embedding_model, dry_run):
     multiple=True,
     type=click.Tuple([str, str]),
     default=[],
-    help="Snapshot level annotations to be added while publishing.",
+    help="Snapshot level annotations to be added while publishing catalogs.",
     show_default=True,
 )
 @click.pass_context
 def publish(ctx, kind, bucket, annotations):
-    """Upload the local catalog to a Couchbase instance."""
+    """Upload the local catalog and/or logs to a Couchbase instance.
+    By default, only tools and prompts are published unless log is specified."""
     ctx_obj: Context = ctx.obj
 
     # By default, we'll publish everything.
-    if len(kind) == 0:
-        kind = ["tool", "prompt"]
+    kind = ["tool", "prompt"] if len(kind) == 0 else list(kind)
 
     # Load all Couchbase connection related data from env
     connection_details_env = CouchbaseConnect(
