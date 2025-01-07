@@ -641,8 +641,9 @@ Source files that will be scanned include <a href="#id1"><span class="problemati
 </section>
 <section id="agentc-publish">
 <h3>publish<a class="headerlink" href="#agentc-publish" title="Link to this heading"></a></h3>
-<p>Upload the local catalog to a Couchbase instance.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span>publish<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span><span class="o">[[</span>tool<span class="p">|</span>prompt<span class="o">]]</span>...
+<p>Upload the local catalog and/or logs to a Couchbase instance.
+By default, only tools and prompts are published unless log is specified.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span>publish<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span><span class="o">[[</span>tool<span class="p">|</span>prompt<span class="p">|</span>log<span class="o">]]</span>...
 </pre></div>
 </div>
 <p class="rubric">Options</p>
@@ -655,7 +656,7 @@ Source files that will be scanned include <a href="#id1"><span class="problemati
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-agentc-publish-an">
 <span id="cmdoption-agentc-publish-annotations"></span><span class="sig-name descname"><span class="pre">-an</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--annotations</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;annotations&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-publish-an" title="Link to this definition"></a></dt>
-<dd><p>Snapshot level annotations to be added while publishing.</p>
+<dd><p>Snapshot level annotations to be added while publishing catalogs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
