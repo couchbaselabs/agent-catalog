@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Frequently Asked Questions &mdash; Agent Catalog v0.0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -104,8 +104,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.snapshot"><code class="docutils literal notranslate"><span class="pre">Provider.snapshot</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.tool_model"><code class="docutils literal notranslate"><span class="pre">Provider.tool_model</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.username"><code class="docutils literal notranslate"><span class="pre">Provider.username</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.get_prompt_for"><code class="docutils literal notranslate"><span class="pre">Provider.get_prompt_for()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.get_tools_for"><code class="docutils literal notranslate"><span class="pre">Provider.get_tools_for()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.get_item"><code class="docutils literal notranslate"><span class="pre">Provider.get_item()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.version"><code class="docutils literal notranslate"><span class="pre">Provider.version</span></code></a></li>
 </ul>
 </li>
@@ -429,16 +428,16 @@ For more information on the types of tools and prompts you can create, refer to 
 <p>All prompts must be defined in separate files, as each prompt is uniquely identified by its file name.
 However multiple tools can exist in a single file <em>if you are defining Python tools or HTTP request tools</em>.
 Examples of multiple tools existing within a single file are shown below:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">agentc</span> <span class="kn">import</span> <span class="n">tool</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">agentc</span><span class="w"> </span><span class="kn">import</span> <span class="n">tool</span>
 
 <span class="nd">@tool</span>
-<span class="k">def</span> <span class="nf">search_best_flight_deals</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">FlightDeal</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">search_best_flight_deals</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">FlightDeal</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Search for the best flight deals.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="kc">None</span>
 
 
 <span class="nd">@tool</span>
-<span class="k">def</span> <span class="nf">create_packing_checklist</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">PackingChecklistItem</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_packing_checklist</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">PackingChecklistItem</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a packing checklist.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="kc">None</span>
 </pre></div>
@@ -477,7 +476,7 @@ again with a clean Git repository.</p>
 <p>Yes!
 The <code class="docutils literal notranslate"><span class="pre">agentc.cmd</span></code> module allows developers to author Python scripts with the same functionality as our CLI commands.
 Below we give an example of how to index and publish catalogs programmatically:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">agentc.cmd</span> <span class="kn">import</span> <span class="n">index</span><span class="p">,</span> <span class="n">publish</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">agentc.cmd</span><span class="w"> </span><span class="kn">import</span> <span class="n">index</span><span class="p">,</span> <span class="n">publish</span>
 
 <span class="c1"># Index the directory named tools.</span>
 <span class="n">index</span><span class="p">(</span>

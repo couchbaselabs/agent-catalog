@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>agentc.auditor &mdash; Agent Catalog v0.0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/autodoc_pydantic.css" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -101,8 +101,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api.html#agentc.Provider.snapshot"><code class="docutils literal notranslate"><span class="pre">Provider.snapshot</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api.html#agentc.Provider.tool_model"><code class="docutils literal notranslate"><span class="pre">Provider.tool_model</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api.html#agentc.Provider.username"><code class="docutils literal notranslate"><span class="pre">Provider.username</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#agentc.Provider.get_prompt_for"><code class="docutils literal notranslate"><span class="pre">Provider.get_prompt_for()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api.html#agentc.Provider.get_tools_for"><code class="docutils literal notranslate"><span class="pre">Provider.get_tools_for()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api.html#agentc.Provider.get_item"><code class="docutils literal notranslate"><span class="pre">Provider.get_item()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api.html#agentc.Provider.version"><code class="docutils literal notranslate"><span class="pre">Provider.version</span></code></a></li>
 </ul>
 </li>
@@ -171,22 +170,22 @@
            <div itemprop="articleBody">
              
   <h1>Source code for agentc.auditor</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">couchbase.exceptions</span>
-<span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">pathlib</span>
-<span class="kn">import</span> <span class="nn">pydantic</span>
-<span class="kn">import</span> <span class="nn">pydantic_settings</span>
-<span class="kn">import</span> <span class="nn">textwrap</span>
-<span class="kn">import</span> <span class="nn">typing</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">couchbase.exceptions</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pydantic_settings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">textwrap</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
 
-<span class="kn">from</span> <span class="nn">.provider</span> <span class="kn">import</span> <span class="n">Provider</span>
-<span class="kn">from</span> <span class="nn">agentc_core.activity</span> <span class="kn">import</span> <span class="n">DBAuditor</span>
-<span class="kn">from</span> <span class="nn">agentc_core.activity</span> <span class="kn">import</span> <span class="n">LocalAuditor</span>
-<span class="kn">from</span> <span class="nn">agentc_core.analytics</span> <span class="kn">import</span> <span class="n">Kind</span>
-<span class="kn">from</span> <span class="nn">agentc_core.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_ACTIVITY_FOLDER</span>
-<span class="kn">from</span> <span class="nn">agentc_core.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_CATALOG_FOLDER</span>
-<span class="kn">from</span> <span class="nn">agentc_core.defaults</span> <span class="kn">import</span> <span class="n">DEFAULT_LLM_ACTIVITY_NAME</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">Provider</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.activity</span><span class="w"> </span><span class="kn">import</span> <span class="n">DBAuditor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.activity</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalAuditor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.analytics</span><span class="w"> </span><span class="kn">import</span> <span class="n">Kind</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_ACTIVITY_FOLDER</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_CATALOG_FOLDER</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_LLM_ACTIVITY_NAME</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -196,7 +195,7 @@
 
 <div class="viewcode-block" id="Auditor">
 <a class="viewcode-back" href="../../api.html#agentc.Auditor">[docs]</a>
-<span class="k">class</span> <span class="nc">Auditor</span><span class="p">(</span><span class="n">pydantic_settings</span><span class="o">.</span><span class="n">BaseSettings</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Auditor</span><span class="p">(</span><span class="n">pydantic_settings</span><span class="o">.</span><span class="n">BaseSettings</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An auditor of various events (e.g., LLM completions) given a catalog.&quot;&quot;&quot;</span>
 
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic_settings</span><span class="o">.</span><span class="n">SettingsConfigDict</span><span class="p">(</span><span class="n">env_prefix</span><span class="o">=</span><span class="s2">&quot;AGENT_CATALOG_&quot;</span><span class="p">)</span>
@@ -274,7 +273,7 @@
     <span class="n">_audit</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_find_local_log</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_find_local_log</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auditor_output</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">working_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
@@ -294,7 +293,7 @@
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_find_remote_log</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_find_remote_log</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn_string</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span>
 
@@ -312,7 +311,7 @@
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_initialize_auditor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_auditor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auditor_output</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn_string</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">error_message</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">                Could not initialize a local or remote auditor!</span>
@@ -362,7 +361,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_auditor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_db_auditor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using both a local auditor and a remote auditor.&quot;</span><span class="p">)</span>
 
-            <span class="k">def</span> <span class="nf">accept</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">accept</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_local_auditor</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_db_auditor</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -380,7 +379,7 @@
 
 <div class="viewcode-block" id="Auditor.accept">
 <a class="viewcode-back" href="../../api.html#agentc.Auditor.accept">[docs]</a>
-    <span class="k">def</span> <span class="nf">accept</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">accept</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">kind</span><span class="p">:</span> <span class="n">Kind</span><span class="p">,</span>
         <span class="n">content</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span>
@@ -418,7 +417,7 @@
 
 <div class="viewcode-block" id="Auditor.move">
 <a class="viewcode-back" href="../../api.html#agentc.Auditor.move">[docs]</a>
-    <span class="k">def</span> <span class="nf">move</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">move</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">node_name</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">AnyStr</span><span class="p">,</span>
         <span class="n">direction</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;enter&quot;</span><span class="p">,</span> <span class="s2">&quot;exit&quot;</span><span class="p">],</span>

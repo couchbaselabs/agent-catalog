@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Agent Catalog Record Entries &mdash; Agent Catalog v0.0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -104,8 +104,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.snapshot"><code class="docutils literal notranslate"><span class="pre">Provider.snapshot</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.tool_model"><code class="docutils literal notranslate"><span class="pre">Provider.tool_model</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.username"><code class="docutils literal notranslate"><span class="pre">Provider.username</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.get_prompt_for"><code class="docutils literal notranslate"><span class="pre">Provider.get_prompt_for()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.get_tools_for"><code class="docutils literal notranslate"><span class="pre">Provider.get_tools_for()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.get_item"><code class="docutils literal notranslate"><span class="pre">Provider.get_item()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.version"><code class="docutils literal notranslate"><span class="pre">Provider.version</span></code></a></li>
 </ul>
 </li>
@@ -188,13 +187,13 @@ To signal to Agent Catalog that you want to mark a function as a tool, you must 
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#</span>
 <span class="c1"># The following file is a template for a Python tool.</span>
 <span class="c1">#</span>
-<span class="kn">from</span> <span class="nn">agentc</span> <span class="kn">import</span> <span class="n">tool</span>
-<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc</span><span class="w"> </span><span class="kn">import</span> <span class="n">tool</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
 
 
 <span class="c1"># Although Python uses duck-typing, the specification of models greatly improves the response quality of LLMs.</span>
 <span class="c1"># It is highly recommended that all tools specify the models of their bound functions using Pydantic or dataclasses.</span>
-<span class="k">class</span> <span class="nc">SalesModel</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SalesModel</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="n">input_sources</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="n">sales_formula</span><span class="p">:</span> <span class="nb">str</span>
 
@@ -202,7 +201,7 @@ To signal to Agent Catalog that you want to mark a function as a tool, you must 
 <span class="c1"># Only functions decorated with &quot;tool&quot; will be indexed.</span>
 <span class="c1"># All other functions / module members will be ignored by the indexer.</span>
 <span class="nd">@tool</span>
-<span class="k">def</span> <span class="nf">compute_sales_for_this_week</span><span class="p">(</span><span class="n">sales_model</span><span class="p">:</span> <span class="n">SalesModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_sales_for_this_week</span><span class="p">(</span><span class="n">sales_model</span><span class="p">:</span> <span class="n">SalesModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A description for the function bound to the tool. This is mandatory for tools.&quot;&quot;&quot;</span>
 
     <span class="c1"># The implementation of the tool (given below) is *not* indexed.</span>
@@ -212,7 +211,7 @@ To signal to Agent Catalog that you want to mark a function as a tool, you must 
 
 <span class="c1"># You can also specify the name and description of the tool explicitly, as well as any annotations you wish to attach.</span>
 <span class="nd">@tool</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;compute_sales_for_the_month&quot;</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;sales&quot;</span><span class="p">})</span>
-<span class="k">def</span> <span class="nf">compute_sales_for_the_month</span><span class="p">(</span><span class="n">sales_model</span><span class="p">:</span> <span class="n">SalesModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_sales_for_the_month</span><span class="p">(</span><span class="n">sales_model</span><span class="p">:</span> <span class="n">SalesModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A description for the function bound to the tool. This is mandatory for tools.&quot;&quot;&quot;</span>
 
     <span class="k">return</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="mf">0.99</span> <span class="o">+</span> <span class="mf">2.00</span> <span class="o">%</span> <span class="mf">6.0</span>
