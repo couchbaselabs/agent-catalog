@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 class ScanDirectoryOpts(typing.TypedDict):
     unwanted_patterns: typing.Optional[typing.Iterable[str]]
-    ignore_file_name: typing.Optional[typing.Iterable[str]]
+    ignore_file_names: typing.Optional[typing.List[typing.Iterable[str]]]
     ignore_file_parser_factory: typing.Optional[typing.Callable[[str], typing.Callable]]
 
 
@@ -20,14 +20,15 @@ def scan_directory(
     config files (like ".gitignore" files) that are encountered in the directory tree.
     """
 
-    ignore_file_parser = None
+    ignore_file_parsers = []
     if opts:
-        ignore_file_path = pathlib.Path(root_dir) / opts["ignore_file_name"]
-        if ignore_file_path.exists() and opts["ignore_file_parser_factory"]:
-            ignore_file_parser = opts["ignore_file_parser_factory"](ignore_file_path.absolute())
+        for ignore_file_name in opts["ignore_file_names"]:
+            ignore_file_path = pathlib.Path(root_dir) / ignore_file_name
+            if ignore_file_path.exists() and opts["ignore_file_parser_factory"]:
+                ignore_file_parsers.append(opts["ignore_file_parser_factory"](ignore_file_path.absolute()))
 
     for path in pathlib.Path(root_dir).rglob("*"):
-        if ignore_file_parser and ignore_file_parser(path):
+        if len(ignore_file_parsers) > 0 and any(ignore_file_parser(path) for ignore_file_parser in ignore_file_parsers):
             logger.debug(f"Ignoring file {path.absolute()}.")
             continue
         if opts and any(fnmatch.fnmatch(path, p) for p in opts["unwanted_patterns"] or []):
