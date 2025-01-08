@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 class ScanDirectoryOpts(typing.TypedDict):
     unwanted_patterns: typing.Optional[typing.Iterable[str]]
-    ignore_file_names: typing.Optional[typing.List[typing.Iterable[str]]]
+    ignore_file_names: typing.Optional[typing.Iterable[str]]
     ignore_file_parser_factory: typing.Optional[typing.Callable[[str], typing.Callable]]
 
 
