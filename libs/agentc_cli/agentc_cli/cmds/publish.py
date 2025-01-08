@@ -8,10 +8,14 @@ import typing
 from ..models import Context
 from .util import DASHES
 from .util import KIND_COLORS
+from agentc_core.analytics import Log
 from agentc_core.catalog.descriptor import CatalogDescriptor
+from agentc_core.defaults import DEFAULT_AUDIT_COLLECTION
+from agentc_core.defaults import DEFAULT_AUDIT_SCOPE
 from agentc_core.defaults import DEFAULT_CATALOG_COLLECTION_NAME
 from agentc_core.defaults import DEFAULT_CATALOG_NAME
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
+from agentc_core.defaults import DEFAULT_LLM_ACTIVITY_NAME
 from agentc_core.defaults import DEFAULT_META_COLLECTION_NAME
 from agentc_core.util.ddl import create_gsi_indexes
 from agentc_core.util.ddl import create_vector_index
@@ -21,12 +25,13 @@ from agentc_core.util.models import Keyspace
 from agentc_core.util.publish import create_scope_and_collection
 from agentc_core.util.publish import get_connection
 from couchbase.exceptions import CouchbaseException
+from pydantic import ValidationError
 
 logger = logging.getLogger(__name__)
 
 
 def cmd_publish(
-    kind: list[typing.Literal["tool", "prompt"]],
+    kind: list[typing.Literal["tool", "prompt", "log"]],
     bucket: str = None,
     keyspace: Keyspace = None,
     annotations: list[dict] = None,
@@ -49,6 +54,8 @@ def cmd_publish(
     elif connection_details_env is None and None in [connection_string, username, password, hostname]:
         raise ValueError("Connection details not provided!")
 
+    is_kind_log = "log" in kind
+
     if keyspace is not None:
         bucket = keyspace.bucket
         scope = keyspace.scope
@@ -67,6 +74,53 @@ def cmd_publish(
         raise ValueError(f"Unable to connect to Couchbase!\n{err}")
     cb = cluster.bucket(bucket)
 
+    # Publish logs to cluster
+    if is_kind_log:
+        k = "log"
+        click.secho(DASHES, fg=KIND_COLORS[k])
+        click.secho(k.upper(), bold=True, fg=KIND_COLORS[k])
+        click.secho(DASHES, fg=KIND_COLORS[k])
+        log_path = pathlib.Path(ctx.activity) / DEFAULT_LLM_ACTIVITY_NAME
+        logger.debug("Local log path: ", log_path)
+        log_messages = []
+        try:
+            with log_path.open("r") as fp:
+                for line in fp:
+                    try:
+                        log_messages.append(Log.model_validate_json(line.strip()))
+                    except ValidationError as e:
+                        logger.error(f"Invalid log entry: {e}")
+        except FileNotFoundError:
+            raise ValueError("No log file found! Please run auditor!") from None
+
+        logger.debug(len(log_messages), "logs found..\n")
+
+        bucket_manager = cb.collections()
+
+        log_col = DEFAULT_AUDIT_COLLECTION
+        log_scope = DEFAULT_AUDIT_SCOPE
+        try:
+            (msg, err) = create_scope_and_collection(bucket_manager, scope=log_scope, collection=log_col)
+        except:
+            raise ValueError(msg) from err
+
+        # get collection ref
+        cb_coll = cb.scope(log_scope).collection(log_col)
+
+        logger.debug("Upserting logs into the cluster.")
+        for msg in log_messages:
+            try:
+                msg_str = msg.model_dump_json()
+                msg_dict = json.loads(msg_str)
+                key = msg_dict["timestamp"] + msg_dict["session"]
+                cb_coll.upsert(key, msg_dict)
+            except CouchbaseException as e:
+                raise ValueError(f"Couldn't insert log!\n{e.message}") from e
+        click.secho(f"Successfully upserted {len(log_messages)} local logs to cluster!")
+        click.secho(DASHES, fg=KIND_COLORS[k])
+        kind.remove("log")
+
+    # Publish tools and/or prompts
     for k in kind:
         click.secho(DASHES, fg=KIND_COLORS[k])
         click.secho(k.upper(), bold=True, fg=KIND_COLORS[k])

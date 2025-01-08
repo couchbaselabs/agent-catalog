@@ -206,6 +206,38 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
         results = [SearchResult(entry=descriptors[i], delta=deltas[i]) for i in range(len(deltas))]
         return sorted(results, key=lambda t: t.delta, reverse=True)
 
+    def get_all_items(self) -> list[RecordDescriptor]:
+        """Returns all the catalog in db catalog."""
+
+        query = f"""
+            FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{self.kind}_catalog` AS t
+            SELECT t.*;
+        """
+        res, err = execute_query(self.cluster, query)
+        if err is not None:
+            logger.error(err)
+            return []
+        descriptors: list[RecordDescriptor] = []
+        for row in res:
+            match row["record_kind"]:
+                case RecordKind.SemanticSearch.value:
+                    descriptor = SemanticSearchToolDescriptor.model_validate(row)
+                case RecordKind.PythonFunction.value:
+                    descriptor = PythonToolDescriptor.model_validate(row)
+                case RecordKind.SQLPPQuery.value:
+                    descriptor = SQLPPQueryToolDescriptor.model_validate(row)
+                case RecordKind.HTTPRequest.value:
+                    descriptor = HTTPRequestToolDescriptor.model_validate(row)
+                case RecordKind.RawPrompt.value:
+                    descriptor = RawPromptDescriptor.model_validate(row)
+                case RecordKind.JinjaPrompt.value:
+                    descriptor = JinjaPromptDescriptor.model_validate(row)
+                case _:
+                    kind = row["record_kind"]
+                    raise LookupError(f"Unknown record encountered of kind = '{kind}'!")
+            descriptors.append(descriptor)
+        return descriptors
+
     @property
     def version(self) -> VersionDescriptor:
         """Returns the latest version of the kind catalog"""
