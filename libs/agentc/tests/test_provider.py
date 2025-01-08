@@ -28,7 +28,7 @@ def test_local_tool_provider(tmp_path):
         )
         os.chdir(td)
         provider = Provider()
-        tools = provider.get_tools_for("searching travel blogs")
+        tools = provider.get_item(query="searching travel blogs", item_type="tool")
         assert len(tools) == 1
         assert tools[0].__name__ == "get_travel_blog_snippets_from_user_interests"
 
@@ -45,7 +45,7 @@ def test_local_prompt_provider(tmp_path):
         )
         os.chdir(td)
         provider = Provider()
-        prompt = provider.get_prompt_for("asking a user their location")
+        prompt = provider.get_item(query="asking a user their location", item_type="prompt")
         assert prompt.tools is None
         assert prompt.meta.name == "get_user_location"
 
@@ -62,8 +62,8 @@ def test_local_provider(tmp_path):
         )
         os.chdir(td)
         provider = Provider()
-        prompt = provider.get_prompt_for("asking a user their location")
-        tools = provider.get_tools_for("searching travel blogs")
+        prompt = provider.get_item(query="asking a user their location", item_type="prompt")
+        tools = provider.get_item(query="searching travel blogs", item_type="tool")
         assert len(tools) == 1
         assert tools[0].__name__ == "get_travel_blog_snippets_from_user_interests"
         assert prompt.tools is None
@@ -84,7 +84,7 @@ def test_db_tool_provider(tmp_path, isolated_server_factory):
         os.chdir(td)
         os.remove((pathlib.Path(td) / DEFAULT_CATALOG_FOLDER / DEFAULT_TOOL_CATALOG_NAME).absolute())
         provider = Provider(bucket="travel-sample")
-        tools = provider.get_tools_for("searching travel blogs")
+        tools = provider.get_item(query="searching travel blogs", item_type="tool")
         assert len(tools) == 1
         assert tools[0].__name__ == "get_travel_blog_snippets_from_user_interests"
 

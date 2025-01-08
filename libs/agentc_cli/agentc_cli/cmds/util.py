@@ -25,7 +25,7 @@ from agentc_core.version import VersionDescriptor
 
 # The following are used for colorizing output.
 LEVEL_COLORS = {"good": "green", "warn": "yellow", "error": "red"}
-KIND_COLORS = {"tool": "bright_magenta", "prompt": "blue"}
+KIND_COLORS = {"tool": "bright_magenta", "prompt": "blue", "log": "cyan"}
 try:
     DASHES = "-" * os.get_terminal_size().columns
 except OSError:
