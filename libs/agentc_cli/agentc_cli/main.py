@@ -13,6 +13,7 @@ from .cmds import cmd_env
 from .cmds import cmd_execute
 from .cmds import cmd_find
 from .cmds import cmd_index
+from .cmds import cmd_ls
 from .cmds import cmd_publish
 from .cmds import cmd_status
 from .cmds import cmd_version
@@ -496,7 +497,7 @@ def index(ctx, source_dirs, tools, prompts, embedding_model, dry_run):
 @click.argument(
     "kind",
     nargs=-1,
-    type=click.Choice(["tool", "prompt"], case_sensitive=False),
+    type=click.Choice(["tool", "prompt", "log"], case_sensitive=False),
 )
 @click.option(
     "--bucket",
@@ -511,17 +512,17 @@ def index(ctx, source_dirs, tools, prompts, embedding_model, dry_run):
     multiple=True,
     type=click.Tuple([str, str]),
     default=[],
-    help="Snapshot level annotations to be added while publishing.",
+    help="Snapshot level annotations to be added while publishing catalogs.",
     show_default=True,
 )
 @click.pass_context
 def publish(ctx, kind, bucket, annotations):
-    """Upload the local catalog to a Couchbase instance."""
+    """Upload the local catalog and/or logs to a Couchbase instance.
+    By default, only tools and prompts are published unless log is specified."""
     ctx_obj: Context = ctx.obj
 
     # By default, we'll publish everything.
-    if len(kind) == 0:
-        kind = ["tool", "prompt"]
+    kind = ["tool", "prompt"] if len(kind) == 0 else list(kind)
 
     # Load all Couchbase connection related data from env
     connection_details_env = CouchbaseConnect(
@@ -793,6 +794,97 @@ def execute(ctx, query, name, bucket, include_dirty, refiner, annotations, catal
         cluster=cluster,
         force_db=search_db,
     )
+
+
+@click_main.command()
+@click.argument(
+    "kind",
+    nargs=-1,
+    type=click.Choice(["tool", "prompt"], case_sensitive=False),
+)
+@click.option(
+    "-db",
+    "--search-db",
+    default=False,
+    is_flag=True,
+    help="Flag to force a DB-only search.",
+    show_default=True,
+)
+@click.option(
+    "-local",
+    "--search-local",
+    default=False,
+    is_flag=True,
+    help="Flag to force a local-only search.",
+    show_default=True,
+)
+@click.option(
+    "--bucket",
+    default=None,
+    type=str,
+    help="Name of Couchbase bucket that is being used for agentc functionalities.",
+    show_default=True,
+)
+@click.pass_context
+def ls(ctx, kind, search_db, search_local, bucket):
+    """List all indexed tools and/or prompts in the catalog."""
+    ctx_obj: Context = ctx.obj
+
+    if search_db and search_local:
+        raise ValueError(
+            "Both local and database force search tags should not be used simultaneously. Please specify one or don't specify any tag to search both."
+        )
+
+    # By default, we'll list everything.
+    if len(kind) == 0:
+        kind = ["tool", "prompt"]
+
+    # Perform a best-effort attempt to connect to the database if search_db is not raised.
+    if not search_local:
+        try:
+            # Load all Couchbase connection related data from env
+            connection_details_env = CouchbaseConnect(
+                connection_url=os.getenv("AGENT_CATALOG_CONN_STRING"),
+                username=os.getenv("AGENT_CATALOG_USERNAME"),
+                password=os.getenv("AGENT_CATALOG_PASSWORD"),
+                host=get_host_name(os.getenv("AGENT_CATALOG_CONN_STRING")),
+                certificate=os.getenv("AGENT_CATALOG_CONN_ROOT_CERTIFICATE"),
+            )
+
+            # Establish a connection
+            err, cluster = get_connection(conn=connection_details_env)
+            if err and search_db:
+                raise ValueError(f"Unable to connect to Couchbase!\n{err}")
+
+        except pydantic.ValidationError as e:
+            cluster = None
+            if search_db:
+                raise e
+    else:
+        cluster = None
+
+    if cluster is not None:
+        # Determine the bucket.
+        buckets = get_buckets(cluster=cluster)
+        if bucket is None and ctx_obj.interactive:
+            bucket = click.prompt("Bucket", type=click.Choice(buckets), show_choices=True)
+
+        elif bucket is not None and bucket not in buckets:
+            raise ValueError(
+                "Bucket does not exist!\n"
+                f"Available buckets from cluster are: {','.join(buckets)}\nRun agentc --help for more information."
+            )
+
+        elif bucket is None and not ctx_obj.interactive:
+            raise ValueError(
+                "Bucket must be specified to search the database catalog."
+                "Add --bucket BUCKET_NAME to your command or run the command in interactive mode."
+            )
+
+    else:
+        bucket = None
+
+    cmd_ls(ctx=ctx_obj, kind_list=kind, bucket=bucket, cluster=cluster, force_db=search_db)
 
 
 # @click_main.command()
