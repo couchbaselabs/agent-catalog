@@ -13,6 +13,7 @@ from .cmds import cmd_env
 from .cmds import cmd_execute
 from .cmds import cmd_find
 from .cmds import cmd_index
+from .cmds import cmd_init
 from .cmds import cmd_ls
 from .cmds import cmd_publish
 from .cmds import cmd_status
@@ -118,6 +119,22 @@ class AliasedGroup(click.Group):
 def click_main(ctx, catalog, activity, verbose, interactive):
     """The Couchbase Agent Catalog command line tool."""
     ctx.obj = Context(activity=activity, catalog=catalog, verbose=verbose, interactive=interactive)
+
+
+@click_main.command()
+@click.pass_context
+@click.argument(
+    "type_metadata",
+    type=click.Choice(["index", "publish", "audit"], case_sensitive=False),
+    nargs=-1,
+)
+def init(ctx, type_metadata):
+    """Initialize the necessary files/collections for local/database catalog."""
+    ctx_obj: Context = ctx.obj
+    if not type_metadata:
+        type_metadata = ["index", "publish", "audit"]
+
+    cmd_init(ctx=ctx_obj, type_metadata=type_metadata)
 
 
 @click_main.command()
