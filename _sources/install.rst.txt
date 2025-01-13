@@ -22,7 +22,7 @@ Building From Source (with pip)
 
    .. code-block:: bash
 
-       git clone git@github.com:couchbaselabs/agent-catalog.git
+          git clone https://github.com/couchbaselabs/agent-catalog
 
 3. You are now ready to install the Agent Catalog package!
    Using your project's Python environment, execute the following command to install a local package with
