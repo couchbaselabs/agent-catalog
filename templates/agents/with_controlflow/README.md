@@ -27,7 +27,6 @@ This directory contains a starter project for building agents with Couchbase, Co
 
    ```bash
    poetry install --with analysis
-   poetry shell
    ```
 
 5. Run `agentc` to make sure this project has installed correctly (note that your first run will take a couple of
