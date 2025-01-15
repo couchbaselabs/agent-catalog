@@ -63,7 +63,9 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
         """Returns the catalog items that best match a query."""
 
         # Catalog item has to be queried directly
-        if name is not None and snapshot is not None:
+        if name is not None:
+            if snapshot == LATEST_SNAPSHOT_VERSION:
+                snapshot = self.version.identifier
             # TODO (GLENN): Need to add some validation around bucket (to prevent injection)
             # TODO (GLENN): Need to add some validation around name (to prevent injection)
             item_query = f"""
@@ -72,18 +74,6 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                 SELECT a.*;
             """
             res, err = execute_query_with_parameters(self.cluster, item_query, {"name": name, "snapshot": snapshot})
-            if err is not None:
-                logger.error(err)
-                return []
-            query_embeddings = None
-
-        elif name is not None:
-            item_query = f"""
-                FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{self.kind}_catalog` AS a
-                WHERE a.name = $name
-                SELECT a.*;
-            """
-            res, err = execute_query_with_parameters(self.cluster, item_query, {"name": name})
             if err is not None:
                 logger.error(err)
                 return []
@@ -202,6 +192,9 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             descriptors.append(descriptor)
 
         # We compute the true cosine distance here (Couchbase uses a different score :-)).
+        if name is not None:
+            return [SearchResult(entry=descriptors[0], delta=1)]
+
         deltas = self.get_deltas(query_embeddings, [t.embedding for t in descriptors])
         results = [SearchResult(entry=descriptors[i], delta=deltas[i]) for i in range(len(deltas))]
         return sorted(results, key=lambda t: t.delta, reverse=True)
