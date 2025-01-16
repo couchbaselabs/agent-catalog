@@ -11,7 +11,7 @@
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=f0df55be" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=86a354c8" />
 
   
     <link rel="shortcut icon" href="_static/favicon.png"/>
@@ -60,6 +60,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#metrics-driven-development">Metrics Driven Development</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#couchbase-backed-agent-catalogs">Couchbase-Backed Agent Catalogs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#assessing-agent-quality">Assessing Agent Quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ignoring-files-while-indexing">Ignoring Files While Indexing</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Tool</a><ul>
@@ -371,6 +372,38 @@ graph walks) and incorporate various notions of ground truth in your analysis.</
 <p>Stay tuned for more work around log visualization tailored towards agent analysis!</p>
 </aside>
 </aside>
+</section>
+<section id="ignoring-files-while-indexing">
+<h2>Ignoring Files While Indexing<a class="headerlink" href="#ignoring-files-while-indexing" title="Link to this heading"></a></h2>
+<p>When indexing tools and prompts, you may want to ignore certain files.</p>
+<p>By default the <code class="file docutils literal notranslate"><span class="pre">index</span></code> command will ignore files/patterns present in <code class="file docutils literal notranslate"><span class="pre">.gitignore</span></code> file.</p>
+<p>In addition to <code class="file docutils literal notranslate"><span class="pre">.gitignore</span></code>, there might be situation where additional files have to be ignored by agentc and not git.
+To add such files/patterns <code class="file docutils literal notranslate"><span class="pre">.agentcignore</span></code> file can be used similar to <code class="file docutils literal notranslate"><span class="pre">.gitignore</span></code>.</p>
+<p>For example,</p>
+<p>If the project structure is as below:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>project/
+├── docs/
+│   ├── conf.py
+│   ├── index.rst
+│   └── structure.rst
+├── src/
+│   ├── tool1.py
+│   ├── tool2.sqlpp
+│   └── agent.py
+├── prompts/
+│   ├── prompt1.prompt
+│   └── prompt2.jinja
+├── .gitignore
+└── README.md
+</pre></div>
+</div>
+<p><code class="file docutils literal notranslate"><span class="pre">src/agent.py</span></code> contains the code for agent which uses the tools and prompts present in the project.
+<code class="file docutils literal notranslate"><span class="pre">src</span></code> directory contains the code for the agent along with the tools.</p>
+<p>While indexing using the command <strong class="command">agentc index --tools src</strong>, <code class="file docutils literal notranslate"><span class="pre">src/agent.py</span></code> will be indexed along with the tools present in the <code class="file docutils literal notranslate"><span class="pre">src</span></code> directory.</p>
+<p>Inorder to avoid that <code class="file docutils literal notranslate"><span class="pre">.agentcignore</span></code> file can be added in <code class="file docutils literal notranslate"><span class="pre">src</span></code> directory with the following content to avoid indexing the file containing agent code:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>agent.py
+</pre></div>
+</div>
 </section>
 </section>
 
