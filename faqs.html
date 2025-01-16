@@ -408,10 +408,14 @@ run) <em>or</em> manually using <strong class="command">export</strong>.</p>
 <p>Make sure to review the required variables and populate them with appropriate values before starting your project.</p>
 <div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">------------------------------------------ REQUIRED -----------------------------------------</span>
 <span class="c1"># Agent Catalog specific environment variables that identify where the catalog is stored.</span>
-<span class="na">AGENT_CATALOG_CONN_STRING</span><span class="o">=</span><span class="s">localhost</span>
+<span class="na">AGENT_CATALOG_CONN_STRING</span><span class="o">=</span><span class="s">couchbase://localhost</span>
 <span class="na">AGENT_CATALOG_USERNAME</span><span class="o">=</span><span class="s">Administrator</span>
 <span class="na">AGENT_CATALOG_PASSWORD</span><span class="o">=</span><span class="s">password</span>
 <span class="na">AGENT_CATALOG_BUCKET</span><span class="o">=</span><span class="s">travel-sample</span>
+
+<span class="c1"># In case of capella instance or if secure connection is required</span>
+<span class="c1"># replace couchbase with couchbases in AGENT_CATALOG_CONN_STRING and add the following</span>
+<span class="c1"># AGENT_CATALOG_CONN_ROOT_CERTIFICATE=/path/to/cluster/root/certificate/on/local/system</span>
 
 <span class="c1"># The holy OpenAI API key. :-)</span>
 <span class="na">OPENAI_API_KEY</span><span class="o">=</span><span class="s">...</span>
