@@ -35,7 +35,8 @@ The mono-repo for the Couchbase Agent Catalog project.
    git clone git@github.com:couchbaselabs/agent-catalog.git
    ```
 
-3. You are now ready to install the Agent Catalog package!
+3. You are now ready to install the Agent Catalog package! We recommend using Anaconda to create a virtual environment
+   for your project to ensure no global dependencies interfere with the project.
    Using your project's Python environment, execute the following command to install a local package with `pip`:
 
    ```bash
@@ -44,6 +45,11 @@ The mono-repo for the Couchbase Agent Catalog project.
 
    # Install the agentc package.
    pip install libs/agentc
+   ```
+   If you are interested in developing with langchain, also install `agentc_langchain` by running the following:
+
+   ```bash
+   pip install libs/agentc_langchain
    ```
 
    If you are interested in building a ``.whl`` file (for later use in ``.whl``-based installs), use :command:`poetry`
@@ -107,12 +113,12 @@ Commands:
   execute  Search and execute a specific tool.
   find     Find items from the catalog based on a natural language QUERY string or by name.
   index    Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
-  ls       List all tools or prompts in the catalog.
-  publish  Upload the local catalog to a Couchbase instance.
+  ls       List all indexed tools and/or prompts in the catalog.
+  publish  Upload the local catalog and/or logs to a Couchbase instance.
   status   Show the status of the local catalog.
   version  Show the current version of agentc.
 
-  See: https://docs.couchbase.com for more information.
+  See: https://docs.couchbase.com or https://couchbaselabs.github.io/agent-catalog/index.html# for more information.
 ```
 
 If you see the output above, you are all set! Head on over to our [docs](https://couchbaselabs.github.io/agent-catalog/) or our [templates](templates) to start

@@ -74,7 +74,7 @@ class AliasedGroup(click.Group):
 
 @click.group(
     cls=AliasedGroup,
-    epilog="See: https://docs.couchbase.com for more information.",
+    epilog="See: https://docs.couchbase.com or https://couchbaselabs.github.io/agent-catalog/index.html# for more information.",
     context_settings=dict(max_content_width=800),
 )
 @click.option(
