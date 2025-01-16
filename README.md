@@ -129,6 +129,14 @@ developing your agent with Agent Catalog.
 For examples on what an agentic workflow with `agentc` looks like, see
 the [agent-catalog-example](https://github.com/couchbaselabs/agent-catalog-example) repository.
 
+## Adding files to ignore while indexing
+
+By default, the `index` command will ignore files/patterns present in `.gitignore` file.
+In addition to `.gitignore`, there might be situation where additional files have to be ignored by agentc and not git.
+To add such files/pattern `.agentcignore` file can be used similar to `.gitignore`.
+
+For more guide on how to use `.agentcignore` file check the [documentation](https://couchbaselabs.github.io/agent-catalog/guide.html#ignoring-files-while-indexing)
+
 ## Docs and Templates
 
 Refer to [`docs/`](docs) to explore templates and other references while writing your agent workflow with Couchbase
