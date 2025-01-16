@@ -255,10 +255,14 @@ Make sure to review the required variables and populate them with appropriate va
 
        ------------------------------------------ REQUIRED -----------------------------------------
        # Agent Catalog specific environment variables that identify where the catalog is stored.
-       AGENT_CATALOG_CONN_STRING=localhost
+       AGENT_CATALOG_CONN_STRING=couchbase://localhost
        AGENT_CATALOG_USERNAME=Administrator
        AGENT_CATALOG_PASSWORD=password
        AGENT_CATALOG_BUCKET=travel-sample
+
+       # In case of capella instance or if secure connection is required
+       # replace couchbase with couchbases in AGENT_CATALOG_CONN_STRING and add the following
+       # AGENT_CATALOG_CONN_ROOT_CERTIFICATE=/path/to/cluster/root/certificate
 
        # The holy OpenAI API key. :-)
        OPENAI_API_KEY=...
