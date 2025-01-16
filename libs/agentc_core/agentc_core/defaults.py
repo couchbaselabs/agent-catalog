@@ -20,7 +20,7 @@ DEFAULT_MAX_ERRS = 10
 DEFAULT_VERBOSITY_LEVEL = 0
 DEFAULT_SCAN_DIRECTORY_OPTS = dict(
     unwanted_patterns=frozenset([".git", "*__pycache__*", "*.lock", "*.toml", "*.md"]),
-    ignore_file_name=".gitignore",
+    ignore_file_names=[".gitignore", ".agentcignore"],
     ignore_file_parser_factory=gitignore_parser.parse_gitignore,
 )
 DEFAULT_CATALOG_NAME = "-catalog.json"

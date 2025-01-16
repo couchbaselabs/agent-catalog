@@ -42,3 +42,7 @@ p {
 .toc-tree {
     text-align: left;
 }
+
+li.toctree-l2  a{
+    text-align: left !important;
+}
