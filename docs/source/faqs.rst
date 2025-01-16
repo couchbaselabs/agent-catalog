@@ -262,7 +262,7 @@ Make sure to review the required variables and populate them with appropriate va
 
        # In case of capella instance or if secure connection is required
        # replace couchbase with couchbases in AGENT_CATALOG_CONN_STRING and add the following
-       # AGENT_CATALOG_CONN_ROOT_CERTIFICATE=/path/to/cluster/root/certificate
+       # AGENT_CATALOG_CONN_ROOT_CERTIFICATE=/path/to/cluster/root/certificate/on/local/system
 
        # The holy OpenAI API key. :-)
        OPENAI_API_KEY=...
