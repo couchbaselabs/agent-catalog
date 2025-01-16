@@ -133,7 +133,7 @@ def click_main(ctx, catalog, activity, verbose, interactive):
 )
 @click.pass_context
 def add(ctx, output: pathlib.Path, record_kind: RecordKind):
-    """Interactively create a new tool or prompt and save it to the filesystem (output)."""
+    """Interactively create a new tool or prompt and save it to the filesystem (output). You MUST edit the generated file as per your requirements!"""
     ctx_obj: Context = ctx.obj
     if not ctx_obj.interactive:
         click.secho(
