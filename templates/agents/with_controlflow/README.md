@@ -10,7 +10,7 @@ This directory contains a starter project for building agents with Couchbase, Co
 2. Clone this repository and navigate to this directory (we will assume all subsequent commands are run from here).
 
    ```bash
-   git clone git@github.com:couchbaselabs/agent-catalog.git
+   git clone https://github.com/couchbaselabs/agent-catalog
    cd templates/agents/with_controlflow
    ```
 

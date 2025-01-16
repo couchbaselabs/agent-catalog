@@ -29,10 +29,9 @@ The mono-repo for the Couchbase Agent Catalog project.
 1. Make sure you have Python 3.12 and [Poetry](https://python-poetry.org/docs/#installation) installed!
 
 2. Clone this repository.
-   Make sure you have your SSH key setup!
 
    ```bash
-   git clone git@github.com:couchbaselabs/agent-catalog.git
+   git clone https://github.com/couchbaselabs/agent-catalog
    ```
 
 3. You are now ready to install the Agent Catalog package! We recommend using Anaconda to create a virtual environment
@@ -65,10 +64,9 @@ The mono-repo for the Couchbase Agent Catalog project.
 1. Make sure you have Python 3.12 and [Poetry](https://python-poetry.org/docs/#installation) installed!
 
 2. Clone this repository.
-   Make sure you have your SSH key setup!
 
    ```bash
-   git clone git@github.com:couchbaselabs/agent-catalog.git
+   git clone https://github.com/couchbaselabs/agent-catalog
    ```
 
 3. Within *your own* `pyproject.toml` file, add the following dependency to your project:

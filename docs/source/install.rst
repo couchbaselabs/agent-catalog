@@ -50,11 +50,10 @@ Building From Source (with Poetry)
 1. Make sure you have Python 3.12 and `Poetry <https://python-poetry.org/docs/#installation>`_ installed!
 
 2. Clone this repository.
-   Make sure you have your SSH key setup!
 
    .. code-block:: bash
 
-       git clone git@github.com:couchbaselabs/agent-catalog.git
+       git clone https://github.com/couchbaselabs/agent-catalog
 
 3. Within *your own* ``pyproject.toml`` file, add the following dependency to your project:
    The ``path`` should point to the location of the ``agentc`` package (and is relative to the ``pyproject.toml``
