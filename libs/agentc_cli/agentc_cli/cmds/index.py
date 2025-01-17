@@ -10,7 +10,6 @@ from ..cmds.util import load_repository
 from ..models.context import Context
 from .util import DASHES
 from .util import KIND_COLORS
-from .util import init_local
 from agentc_core.catalog import __version__ as CATALOG_SCHEMA_VERSION
 from agentc_core.catalog.index import MetaVersion
 from agentc_core.catalog.index import index_catalog
@@ -43,7 +42,7 @@ def cmd_index(
     # and on how to add .agent-activity/ to the .gitignore file? Or, should
     # we instead preemptively generate a .agent-activity/.gitiginore
     # file during init_local()?
-    init_local(ctx)
+    # init_local(ctx)
 
     # TODO: One day, maybe allow users to choose a different branch instead of assuming
     # the HEAD branch, as users currently would have to 'git checkout BRANCH_THEY_WANT'
