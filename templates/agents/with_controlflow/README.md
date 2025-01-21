@@ -23,13 +23,26 @@ This directory contains a starter project for building agents with Couchbase, Co
    git commit -m "Initial commit"
    ```
 
-4. Install this project with Poetry (with the `analysis` group dependencies). We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
+4. Installing anaconda.
+   We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
+   
+   [Click here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for installation steps.
+
+   Once anaconda or any of its distribution is installed, execute the following commands to active the environment.
+
+   ```bash
+   conda create -n travel-agent python=3.12
+
+   conda activate travel-agent
+   ```
+
+5. Install this project with Poetry (with the `analysis` group dependencies). We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
 
    ```bash
    poetry install --with analysis
    ```
 
-5. Run `agentc` to make sure this project has installed correctly (note that your first run will take a couple of
+6. Run `agentc` to make sure this project has installed correctly (note that your first run will take a couple of
    seconds as certain packages need to be compiled, subsequent runs will be faster).
 
    ```bash
@@ -59,7 +72,7 @@ This directory contains a starter project for building agents with Couchbase, Co
      See: https://docs.couchbase.com or https://couchbaselabs.github.io/agent-catalog/index.html# for more information.
    ```
 
-6. Make sure your Git repo is clean, and run `agentc index` to index your tools and prompts.
+7. Make sure your Git repo is clean, and run `agentc index` to index your tools and prompts.
    Note that `tools` and `prompts` are _relative paths_ to the `tools` and `prompts` folder.
 
    ```bash
@@ -72,7 +85,7 @@ This directory contains a starter project for building agents with Couchbase, Co
    _Hint: if you've made changes but want to keep the same commit ID for the later "publish" step, use
    `git add $MY_FILES` followed by `git commit --amend`!_
 
-7. Start up a Couchbase instance.
+8. Start up a Couchbase instance.
 
     1. For those interested in using a local Couchbase instance, see
        [here](https://docs.couchbase.com/server/current/install/install-intro.html).
@@ -92,14 +105,14 @@ This directory contains a starter project for building agents with Couchbase, Co
    You'll need to navigate to your instance's UI (for local instances, this is on http://localhost:8091) to install
    this sample bucket.
 
-8. Create a `.env` file from the `.env.example` file and tweak this to your environment.
+9. Create a `.env` file from the `.env.example` file and tweak this to your environment.
 
    ```bash
    cp .env.example .env
    vi .env
    ```
 
-9. Publish your local agent catalog to your Couchbase instance with `agentc publish`.
+10. Publish your local agent catalog to your Couchbase instance with `agentc publish`.
    Your Couchbase instance details in the `.env` file will be used for authentication.
    Again, this specific starter agent uses the `travel-sample` bucket.
 
@@ -107,7 +120,7 @@ This directory contains a starter project for building agents with Couchbase, Co
    agentc publish tool prompt --bucket travel-sample
    ```
 
-10. Start a prefect server and run your agent!
+11. Start a prefect server and run your agent!
 
    ```bash
    export PREFECT_API_URL=http://127.0.0.1:4200/api
@@ -115,7 +128,7 @@ This directory contains a starter project for building agents with Couchbase, Co
    python agent.py
    ```
 
-11. Let's now talk with our agent!
+12. Let's now talk with our agent!
     I initiated three conversations: two "positive" and one "negative".
     The first positive case is given below:
 
