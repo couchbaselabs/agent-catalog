@@ -1,0 +1,55 @@
+[tool.poetry]
+name = "research-agent"
+version = "0.1.0"
+description = "Research agent application built using Couchbase Agent Catalog."
+repository = "https://github.com/couchbaselabs/agent-catalog"
+authors = [
+    "Tanvi Johari <tanvi.johari@couchbase.com>",
+    "Thejas N U <thejas.nu@couchbase.com>"
+]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+sentence-transformers = "^3.0.1"
+python-dotenv = "^1.0.1"
+couchbase = "^4.3.0"
+# For Google search
+serpapi = "^0.1.5"
+google_search_results = "^2.4.2"
+# For hosting servers (in general).
+fastapi = "^0.111.1"
+# For graphs
+ipython = "^8.27.0"
+langgraph = "^0.2.52"
+langchain-community = "^0.3.10"
+langchain-experimental = "^0.3.3"
+matplotlib = "^3.9.3"
+
+# The agentc project (the front-facing parts)!
+ragas = "^0.2.8"
+[tool.poetry.dependencies.agentc]
+path = "../../../libs/agentc"
+extras = ["langchain"]
+develop = true
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.0.0"
+pytest = "^8.3.2"
+
+[tool.ruff]
+line-length = 120
+lint.select = ["F", "B", "I", "SIM"]
+show-fixes = true
+
+[tool.ruff.lint.isort]
+no-sections = true
+force-single-line = true
+lines-between-types = 1
+force-wrap-aliases = true
+split-on-trailing-comma = false
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
