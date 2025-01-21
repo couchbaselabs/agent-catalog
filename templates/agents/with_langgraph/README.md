@@ -104,7 +104,7 @@ This directory contains a starter project for building agents with Couchbase, La
    You'll need to navigate to your instance's UI (for local instances, this is on http://localhost:8091) to import
    this sample bucket.
 
-9. Create a `.env` file from the `.env.example` file and tweak this to your environment.
+9. Create a `.env` file using `.env.example` as a reference and tweak it according to your environment.
 
    ```bash
    cp .env.example .env
