@@ -69,7 +69,7 @@ This directory contains a starter project for building agents with Couchbase, La
      status   Show the status of the local catalog.
      version  Show the current version of agentc.
 
-     See: https://docs.couchbase.com or https://couchbaselabs.github.io/agent-catalog/index.html# for more information.
+     See: https://docs.couchbase.com for more information.
    ```
 
 7. Make sure your Git repo is clean, and run `agentc index` to index your tools and prompts.
