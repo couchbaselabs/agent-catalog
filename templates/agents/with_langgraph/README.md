@@ -1,6 +1,6 @@
 # A Research Agent
 
-This directory contains a starter project for building agents with Couchbase, ControlFlow, and Agent Catalog.
+This directory contains a starter project for building agents with Couchbase, Langgraph, and Agent Catalog.
 
 ## Getting Started
 
