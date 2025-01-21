@@ -101,7 +101,7 @@ This directory contains a starter project for building agents with Couchbase, La
     3. For those interested in using Capella, see [here](https://cloud.couchbase.com/sign-up).
 
    This specific agent also uses the `travel-sample` bucket.
-   You'll need to navigate to your instance's UI (for local instances, this is on http://localhost:8091) to install
+   You'll need to navigate to your instance's UI (for local instances, this is on http://localhost:8091) to import
    this sample bucket.
 
 9. Create a `.env` file from the `.env.example` file and tweak this to your environment.
