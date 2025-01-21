@@ -23,7 +23,7 @@ This directory contains a starter project for building agents with Couchbase, Co
    git commit -m "Initial commit"
    ```
 
-4. Install this project with Poetry (with the `analysis` group dependencies).
+4. Install this project with Poetry (with the `analysis` group dependencies). We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
 
    ```bash
    poetry install --with analysis
