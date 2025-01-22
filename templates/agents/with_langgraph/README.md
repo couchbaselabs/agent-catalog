@@ -26,9 +26,9 @@ This directory contains a starter project for building agents with Couchbase, La
 4. Installing anaconda.
    We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
 
-   [Click here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for installation steps.
+   [Click here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for Anaconda installation steps.
 
-   Once anaconda or any of its distribution is installed, execute the following commands to active the environment.
+   Once anaconda or any of its distribution is installed, execute the following commands to activate the environment.
 
    ```bash
    conda create -n research-agent python=3.12
@@ -76,6 +76,7 @@ This directory contains a starter project for building agents with Couchbase, La
    Note that `tools` and `prompts` are _relative paths_ to the `tools` and `prompts` folder.
 
    ```bash
+   # agentc index $PATH_TO_TOOLS_FOLDER $PATH_TO_PROMPTS_FOLDER
    agentc index tools prompts
    ```
 
