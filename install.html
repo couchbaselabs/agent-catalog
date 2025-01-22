@@ -136,7 +136,9 @@
 <li class="toctree-l1"><a class="reference internal" href="faqs.html">Frequently Asked Questions</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="faqs.html#which-couchbase-capella-or-server-version-should-i-use">Which Couchbase Capella or Server version should I use?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faqs.html#do-i-need-to-use-a-specific-agent-framework-e-g-langchain-with-agent-catalog">Do I need to use a specific agent framework (e.g., LangChain) with Agent Catalog?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-services-do-i-need-to-enable-on-my-couchbase-cluster">What services do I need to enable on my Couchbase cluster?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faqs.html#what-does-agent-catalog-add-to-my-couchbase-bucket">What does Agent Catalog add to my Couchbase bucket?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faqs.html#do-i-need-couchbase-instance-to-run-agent-catalog">Do I need Couchbase instance to run Agent Catalog?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faqs.html#what-is-agent-catalog-doing-when-i-run-agentc-index">What is Agent Catalog doing when I run <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">index</span></code>?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faqs.html#how-do-i-roll-back-to-a-previous-catalog-version">How do I roll back to a previous catalog version?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faqs.html#what-environment-variables-are-required-to-use-agent-catalog">What environment variables are required to use Agent Catalog?</a></li>
@@ -146,6 +148,7 @@
 <li class="toctree-l2"><a class="reference internal" href="faqs.html#can-i-index-and-publish-catalogs-programmatically">Can I index and publish catalogs programmatically?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faqs.html#does-agent-catalog-require-an-openai-api-key">Does Agent Catalog require an OpenAI API key?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faqs.html#does-agent-catalog-work-with-any-llm">Does Agent Catalog work with any LLM?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faqs.html#why-am-i-not-able-to-install-agent-catalog-agentc-because-of-pytorch-error">Why am I not able to install Agent Catalog(agentc) because of PyTorch error?</a></li>
 </ul>
 </li>
 </ul>
@@ -188,17 +191,23 @@ For now, please refer to the <a class="reference internal" href="#building-from-
 <h2>Building From Source (with pip)<a class="headerlink" href="#building-from-source-with-pip" title="Link to this heading"></a></h2>
 <ol class="arabic">
 <li><p>Make sure you have Python 3.12 and <a class="reference external" href="https://python-poetry.org/docs/#installation">Poetry</a> installed!</p></li>
-<li><p>Clone this repository.
-Make sure you have your SSH key setup!</p>
+<li><p>Clone this repository.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/couchbaselabs/agent-catalog
 </pre></div>
 </div>
 </li>
-<li><p>You are now ready to install the Agent Catalog package!
-Using your project’s Python environment, execute the following command to install a local package with
-<strong class="command">pip</strong>:</p>
+<li><p>You are now ready to install the Agent Catalog package!</p>
+<p>We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.</p>
+<p><a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html">Click here</a> for Anaconda installation steps.</p>
+<p>Once anaconda or any of its distribution is installed, execute the following commands to activate the environment.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>agentcenv<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.12
+
+conda<span class="w"> </span>activate<span class="w"> </span>agentcenv
+</pre></div>
+</div>
+<p>Alternatively, you can use any Python virtual environment manager.</p>
+<p>Once environment is set up, execute the following command to install a local package with <strong class="command">pip</strong>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>agent-catalog
-<span class="nb">source</span><span class="w"> </span><span class="nv">$MY_PYTHON_ENVIRONMENT</span>
 
 <span class="c1"># Install the agentc package.</span>
 pip<span class="w"> </span>install<span class="w"> </span>libs/agentc
@@ -262,12 +271,12 @@ some libraries like numpy need to be built, subsequent runs will be faster).</p>
 <span class="go">  execute  Search and execute a specific tool.</span>
 <span class="go">  find     Find items from the catalog based on a natural language QUERY string or by name.</span>
 <span class="go">  index    Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.</span>
-<span class="go">  ls       List all tools or prompts in the catalog.</span>
-<span class="go">  publish  Upload the local catalog to a Couchbase instance.</span>
+<span class="go">  ls       List all indexed tools and/or prompts in the catalog.</span>
+<span class="go">  publish  Upload the local catalog and/or logs to a Couchbase instance.</span>
 <span class="go">  status   Show the status of the local catalog.</span>
 <span class="go">  version  Show the current version of agentc.</span>
 
-<span class="go">  See: https://docs.couchbase.com for more information.</span>
+<span class="go">  See: https://docs.couchbase.com or https://couchbaselabs.github.io/agent-catalog/index.html# for more information.</span>
 </pre></div>
 </div>
 <p>If you see the output above, you are all set!
