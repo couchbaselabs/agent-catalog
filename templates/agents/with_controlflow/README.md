@@ -25,10 +25,10 @@ This directory contains a starter project for building agents with Couchbase, Co
 
 4. Installing anaconda.
    We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
-   
-   [Click here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for installation steps.
 
-   Once anaconda or any of its distribution is installed, execute the following commands to active the environment.
+   [Click here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for Anaconda installation steps.
+
+   Once anaconda or any of its distribution is installed, execute the following commands to activate the environment.
 
    ```bash
    conda create -n travel-agent python=3.12
@@ -100,6 +100,11 @@ This directory contains a starter project for building agents with Couchbase, Co
        ```
 
     3. For those interested in using Capella, see [here](https://cloud.couchbase.com/sign-up).
+
+   Once Couchbase instance is running, enable the following services on your Couchbase cluster:
+     - Data, Query, Index: For storing items and searching them.
+     - Search: For performing vector search on items.
+     - Analytics: For creating views on audit logs and to query the views for better insights on logs.
 
    This specific agent also uses the `travel-sample` bucket.
    You'll need to navigate to your instance's UI (for local instances, this is on http://localhost:8091) to install
