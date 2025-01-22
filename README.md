@@ -34,13 +34,23 @@ The mono-repo for the Couchbase Agent Catalog project.
    git clone https://github.com/couchbaselabs/agent-catalog
    ```
 
-3. You are now ready to install the Agent Catalog package! We recommend using Anaconda to create a virtual environment
-   for your project to ensure no global dependencies interfere with the project.
-   Using your project's Python environment, execute the following command to install a local package with `pip`:
+3. You are now ready to install the Agent Catalog package!
+   <br/>We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
+
+   [Click here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for Anaconda installation steps.
+
+   Once anaconda or any of its distribution is installed, execute the following commands to activate the environment.
 
    ```bash
+   conda create -n agentcenv python=3.12
+
+   conda activate agentcenv
+   ```
+   Alternatively, you can use any Python virtual environment manager.
+
+   Once environment is set up, execute the following command to install a local package with `pip`:
+   ```bash
    cd agent-catalog
-   source $MY_PYTHON_ENVIRONMENT
 
    # Install the agentc package.
    pip install libs/agentc
