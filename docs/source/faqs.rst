@@ -397,7 +397,7 @@ Agent Catalog does not restrict you to a specific language model.
 You are free to choose any LLM for your agent workflow development (provided your chosen agent framework supports
 the LLM you choose).
 
-Why am I not able to install Agent Catalog(agentc) because of pytorch error?
+Why am I not able to install Agent Catalog(agentc) because of PyTorch error?
 --------------------------------------------------------------------
 
 While installing agentc, you may face a dependency clash between the PyTorch version installed globally in your system and the PyTorch version being installed by the Sentence transformers library in agentc. This likely happens when the globally installed PyTorch is of a different version as compared to the one agentc requires.
