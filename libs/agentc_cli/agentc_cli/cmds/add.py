@@ -3,6 +3,7 @@ import datetime
 import jinja2
 import logging
 import pathlib
+import subprocess
 import typing
 
 from ..models.context import Context
@@ -37,6 +38,7 @@ def add_jinja_prompt(output: pathlib.Path, template_env: jinja2.Environment):
     with output_file.open("w") as fp:
         fp.write(rendered)
     click.secho(f"Jinja prompt written to: {output_file}", fg="green")
+    subprocess.run(["vi", f"{output_file}"])
 
 
 def add_raw_prompt(output: pathlib.Path, template_env: jinja2.Environment):
@@ -56,6 +58,7 @@ def add_raw_prompt(output: pathlib.Path, template_env: jinja2.Environment):
     with output_file.open("w") as fp:
         fp.write(rendered)
     click.secho(f"Raw prompt written to: {output_file}", fg="green")
+    subprocess.run(["vi", f"{output_file}"])
 
 
 def add_http_request(output: pathlib.Path, template_env: jinja2.Environment):
@@ -82,6 +85,7 @@ def add_http_request(output: pathlib.Path, template_env: jinja2.Environment):
     with output_file.open("w") as fp:
         fp.write(rendered)
     click.secho(f"HTML request tool written to: {output_file}", fg="green")
+    subprocess.run(["vi", f"{output_file}"])
 
 
 def add_python_function(output: pathlib.Path, template_env: jinja2.Environment):
@@ -99,6 +103,7 @@ def add_python_function(output: pathlib.Path, template_env: jinja2.Environment):
     with output_file.open("w") as fp:
         fp.write(rendered)
     click.secho(f"Python (function) tool written to: {output_file}", fg="green")
+    subprocess.run(["vi", f"{output_file}"])
 
 
 def add_semantic_search(output: pathlib.Path, template_env: jinja2.Environment):
@@ -133,6 +138,7 @@ def add_semantic_search(output: pathlib.Path, template_env: jinja2.Environment):
     with output_file.open("w") as fp:
         fp.write(rendered)
     click.secho(f"Semantic search tool written to: {output_file}", fg="green")
+    subprocess.run(["vi", f"{output_file}"])
 
 
 def add_sqlpp_query(output: pathlib.Path, template_env: jinja2.Environment):
@@ -150,6 +156,7 @@ def add_sqlpp_query(output: pathlib.Path, template_env: jinja2.Environment):
     with output_file.open("w") as fp:
         fp.write(rendered)
     click.secho(f"SQL++ query tool written to: {output_file}", fg="green")
+    subprocess.run(["vi", f"{output_file}"])
 
 
 def cmd_add(
