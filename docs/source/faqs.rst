@@ -21,6 +21,14 @@ Feel free to use your favorite framework (e.g., LangChain, LangGraph, Controlflo
 application!
 For our examples (see `here <https://github.com/couchbaselabs/agent-catalog-example>`_), we use Controlflow.
 
+What services do I need to enable on my Couchbase cluster?
+-----------------------------------------------------------
+
+Enable the following services on your Couchbase cluster:
+    - Data, Query, Index: For storing items and searching them.
+    - Search: For performing vector search on items.
+    - Analytics: For creating views on audit logs and to query the views for better insights on logs.
+
 What does Agent Catalog add to my Couchbase bucket?
 ---------------------------------------------------
 

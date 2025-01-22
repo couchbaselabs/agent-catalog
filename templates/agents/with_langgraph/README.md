@@ -101,6 +101,11 @@ This directory contains a starter project for building agents with Couchbase, La
 
     3. For those interested in using Capella, see [here](https://cloud.couchbase.com/sign-up).
 
+   Once Couchbase instance is running, enable the following services on your Couchbase cluster:
+     - Data, Query, Index: For storing items and searching them.
+     - Search: For performing vector search on items.
+     - Analytics: For creating views on audit logs and to query the views for better insights on logs.
+
    This specific agent also uses the `travel-sample` bucket.
    You'll need to navigate to your instance's UI (for local instances, this is on http://localhost:8091) to import
    this sample bucket.
