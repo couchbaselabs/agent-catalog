@@ -23,6 +23,8 @@ langgraph = "^0.2.52"
 langchain-community = "^0.3.10"
 langchain-experimental = "^0.3.3"
 matplotlib = "^3.9.3"
+jupyter = "^1.1.1"
+ipykernel = "^6.29.5"
 
 [tool.poetry.dependencies.agentc]
 path = "../../../libs/agentc"

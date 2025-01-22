@@ -121,4 +121,10 @@ This directory contains a starter project for building agents with Couchbase, La
 
 11. Run your agent!
 
-   Execute the jupyter notebook `agent.ipynb` to interact with your agent.
+   To start jupyter server, run the following command:
+
+    ```bash
+    poetry run jupyter notebook
+    ```
+
+   Once the server is running, open the `agent.ipynb` notebook and execute it to interact with your agent.
