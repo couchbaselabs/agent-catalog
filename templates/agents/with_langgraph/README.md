@@ -1,6 +1,6 @@
-# A Starter Agent
+# A Research Agent
 
-This directory contains a starter project for building agents with Couchbase, ControlFlow, and Agent Catalog.
+This directory contains a starter project for building agents with Couchbase, Langgraph, and Agent Catalog.
 
 ## Getting Started
 
@@ -11,11 +11,11 @@ This directory contains a starter project for building agents with Couchbase, Co
 
    ```bash
    git clone https://github.com/couchbaselabs/agent-catalog
-   cd templates/agents/with_controlflow
+   cd templates/agents/with_langgraph
    ```
 
 3. Agent Catalog uses Git for its versioning.
-   Run the command below to initialize a new Git repository within the `templates/agents/with_controlflow` directory.
+   Run the command below to initialize a new Git repository within the `templates/agents/with_langgraph` directory.
 
    ```bash
    git init
@@ -31,15 +31,15 @@ This directory contains a starter project for building agents with Couchbase, Co
    Once anaconda or any of its distribution is installed, execute the following commands to activate the environment.
 
    ```bash
-   conda create -n travel-agent python=3.12
+   conda create -n research-agent python=3.12
 
-   conda activate travel-agent
+   conda activate research-agent
    ```
 
-5. Install this project with Poetry (with the `analysis` group dependencies). We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
+5. Install this project with Poetry. We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
 
    ```bash
-   poetry install --with analysis
+   poetry install
    ```
 
 6. Run `agentc` to make sure this project has installed correctly (note that your first run will take a couple of
@@ -107,10 +107,10 @@ This directory contains a starter project for building agents with Couchbase, Co
      - Analytics: For creating views on audit logs and to query the views for better insights on logs.
 
    This specific agent also uses the `travel-sample` bucket.
-   You'll need to navigate to your instance's UI (for local instances, this is on http://localhost:8091) to install
+   You'll need to navigate to your instance's UI (for local instances, this is on http://localhost:8091) to import
    this sample bucket.
 
-9. Create a `.env` file from the `.env.example` file and tweak this to your environment.
+9. Create a `.env` file using `.env.example` as a reference and tweak it according to your environment.
 
    ```bash
    cp .env.example .env
@@ -125,110 +125,12 @@ This directory contains a starter project for building agents with Couchbase, Co
    agentc publish tool prompt --bucket travel-sample
    ```
 
-11. Start a prefect server and run your agent!
+11. Run your agent!
 
-   ```bash
-   export PREFECT_API_URL=http://127.0.0.1:4200/api
-   prefect server start &
-   python agent.py
-   ```
+   To start jupyter server, run the following command:
 
-12. Let's now talk with our agent!
-    I initiated three conversations: two "positive" and one "negative".
-    The first positive case is given below:
+    ```bash
+    poetry run jupyter notebook
+    ```
 
-   ```text
-   Agent: Please provide the names of the source and destination airports, so I can find
-     their IATA codes for you.
-
-   User: Let's go to LAX. I'm in SFO.
-
-   Agent Tool Call: find_direct_routes_between_airports(
-     {'argument_input': {'source_airport': 'SFO', 'dest_airport': 'LAX'}}
-   )
-
-   Agent Task Result: Direct routes found between SFO and LAX with the following airlines:
-     AS, DL, UA, US, VX, WN, AA.
-
-   Agent: Your routes are: Direct routes found between SFO and LAX with the following airlines: AS, DL, UA, US,
-     VX, WN, AA.
-
-   Agent: Do you want to continue? Please respond with 'yes' or 'no'.
-
-   User: no
-   ```
-
-   The second positive case is given below:
-
-   ```text
-   Agent: Please provide the names of the source and destination airports, so I can find
-     their IATA codes for you.
-
-   User: I need to go to LAX from YNW
-
-   Agent Tool Call: find_direct_routes_between_airports(
-     {'argument_input': {'source_airport': 'YNW', 'dest_airport': 'LAX'}}
-   )
-
-   Agent Tool Call: find_routes_with_one_layover(
-     {'argument_input': {'source_airport': 'YNW', 'dest_airport': 'LAX'}}
-   )
-
-   Agent Task Result: I couldn't find any direct or one-layover routes from YNW to LAX. Could you
-     please provide another source airport that is close to YNW?
-
-   User: SFO
-
-   Agent Tool Call: find_direct_routes_between_airports(
-     {'argument_input': {'source_airport': 'SFO', 'dest_airport': 'LAX'}}
-   )
-
-   Agent Tool Call: find_routes_with_one_layover(
-     {'argument_input': {'source_airport': 'SFO', 'dest_airport': 'LAX'}}
-   )
-
-   Agent: Your routes are: I found several direct routes from SFO to LAX:
-      1. Airline: AS, From: SFO, To: LAX
-      2. Airline: DL, From: SFO, To: LAX
-      3. Airline: UA, From: SFO, To: LAX
-      4. Airline: US, From: SFO, To: LAX
-      5. Airline: VX, From: SFO, To: LAX
-      6. Airline: WN, From: SFO, To: LAX
-      7. Airline: AA, From: SFO, To: LAX
-
-   Additionally, there are routes with one layover:
-   1. Airlines: AI, CX, From: SFO, Layover: HKG, To: LAX
-      2. Airlines: AI, AA, From: SFO, Layover: HKG, To: LAX
-      3. Airlines: AI, DL, From: SFO, Layover: ICN, To: LAX
-      4. Airlines: AI, KE, From: SFO, Layover: ICN, To: LAX
-      5. Airlines: AI, OZ, From: SFO, Layover: ICN, To: LAX
-      6. Airlines: AI, TG, From: SFO, Layover: ICN, To: LAX
-      7. Airlines: AI, UA, From: SFO, Layover: ICN, To: LAX
-      8. Airlines: AM, AS, From: SFO, Layover: ATL, To: LAX
-      9. Airlines: AM, AZ, From: SFO, Layover: ATL, To: LAX
-      10. Airlines: AM, CI, From: SFO, Layover: ATL, To: LAX
-
-   Agent: Do you want to continue? Please respond with 'yes' or 'no'.
-
-   User: no
-   ```
-
-   The negative case is given below:
-
-   ```text
-   Agent: Please provide the names of the source and destination airports, so I can find
-     their IATA codes for you.
-
-   User: i want to go to Mars, I'm from Saturn
-
-   Agent: It seems like you're mentioning planets! For this task, I need the names of
-     actual airports on Earth. Could you please provide the name of the source
-     airport and the destination airport?
-
-   User: no
-
-   Error: The user did not provide valid source and destination airports, which are necessary to
-     complete the task of returning IATA codes.
-   ```
-
-   For some ideas on how to quantify the quality of your agent, see the `notebook.ipynb` file!
+   Once the server is running, open the `agent.ipynb` notebook and execute it to interact with your agent.
