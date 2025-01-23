@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 def init_local_catalog(ctx: Context):
     # Init directories.
-    os.makedirs(ctx.activity, exist_ok=True)
+    os.makedirs(ctx.catalog, exist_ok=True)
 
     # (Note: the version checking logic has been moved into index).
 

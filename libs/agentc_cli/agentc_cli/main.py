@@ -124,17 +124,24 @@ def click_main(ctx, catalog, activity, verbose, interactive):
 @click_main.command()
 @click.pass_context
 @click.argument(
-    "type_metadata",
-    type=click.Choice(["index", "publish", "audit"], case_sensitive=False),
+    "catalog_type",
+    type=click.Choice(["local", "db"], case_sensitive=False),
     nargs=-1,
 )
-def init(ctx, type_metadata):
+@click.argument(
+    "type_metadata",
+    type=click.Choice(["catalog", "auditor", "all"], case_sensitive=False),
+)
+def init(ctx, catalog_type, type_metadata):
     """Initialize the necessary files/collections for local/database catalog."""
     ctx_obj: Context = ctx.obj
-    if not type_metadata:
-        type_metadata = ["index", "publish", "audit"]
 
-    cmd_init(ctx=ctx_obj, type_metadata=type_metadata)
+    if not catalog_type:
+        catalog_type = ["local", "db"]
+
+    type_metadata = ["catalog", "auditor"] if type_metadata == "all" else [type_metadata]
+
+    cmd_init(ctx=ctx_obj, catalog_type=catalog_type, type_metadata=type_metadata)
 
 
 @click_main.command()

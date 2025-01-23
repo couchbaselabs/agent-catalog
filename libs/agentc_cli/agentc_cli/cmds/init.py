@@ -4,13 +4,17 @@ from ..models import Context
 from .util import init_local_activity
 from .util import init_local_catalog
 
+func_mappings = {"local": {"catalog": init_local_catalog, "auditor": init_local_activity}}
 
-def cmd_init(ctx: Context, type_metadata: typing.List[typing.Literal["index", "publish", "audit"]]):
+
+def cmd_init(
+    ctx: Context,
+    catalog_type: typing.List[typing.Literal["catalog", "auditor"]],
+    type_metadata: typing.List[typing.Literal["catalog", "auditor"]],
+):
     if ctx is None:
         ctx = Context()
 
-    if "index" in type_metadata:
-        init_local_catalog(ctx)
-
-    if "audit" in type_metadata:
-        init_local_activity(ctx)
+    for catalog in catalog_type:
+        for init_type in type_metadata:
+            func_mappings[catalog][init_type](ctx)
