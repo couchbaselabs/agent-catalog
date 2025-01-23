@@ -1,15 +1,11 @@
-CREATE OR REPLACE ANALYTICS VIEW LlmGenerations AS
-SELECT
-    session,
-    llm_generations
-FROM (
+CREATE OR REPLACE ANALYTICS VIEW LLMGenerations AS
     SELECT
         session,
-        grouping AS grouping_id,
-        documents
-    FROM `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]`
-    GROUP BY session, grouping
-    GROUP AS documents
-) AS msg_group
-GROUP BY session
-GROUP AS llm_generations;
+        grouping_id,
+        ( FROM g gi SELECT VALUE gi.rl ) AS generation
+    FROM
+        `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]` AS rl
+    GROUP BY 
+        rl.session AS session,
+        rl.`grouping` AS grouping_id
+        GROUP AS g;
