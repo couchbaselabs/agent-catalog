@@ -18,23 +18,35 @@ Building From Source (with pip)
 1. Make sure you have Python 3.12 and `Poetry <https://python-poetry.org/docs/#installation>`_ installed!
 
 2. Clone this repository.
-   Make sure you have your SSH key setup!
 
    .. code-block:: bash
 
           git clone https://github.com/couchbaselabs/agent-catalog
 
 3. You are now ready to install the Agent Catalog package!
-   Using your project's Python environment, execute the following command to install a local package with
-   :command:`pip`:
+
+   We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
+
+   `Click here <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`_ for Anaconda installation steps.
+
+   Once anaconda or any of its distribution is installed, execute the following commands to activate the environment.
 
    .. code-block:: bash
 
-       cd agent-catalog
-       source $MY_PYTHON_ENVIRONMENT
+      conda create -n agentcenv python=3.12
 
-       # Install the agentc package.
-       pip install libs/agentc
+      conda activate agentcenv
+
+   Alternatively, you can use any Python virtual environment manager.
+
+   Once environment is set up, execute the following command to install a local package with :command:`pip`:
+
+   .. code-block:: bash
+
+      cd agent-catalog
+
+      # Install the agentc package.
+      pip install libs/agentc
 
    If you are interested in building a ``.whl`` file (for later use in ``.whl``-based installs), use :command:`poetry`
    directly:
@@ -50,11 +62,10 @@ Building From Source (with Poetry)
 1. Make sure you have Python 3.12 and `Poetry <https://python-poetry.org/docs/#installation>`_ installed!
 
 2. Clone this repository.
-   Make sure you have your SSH key setup!
 
    .. code-block:: bash
 
-       git clone git@github.com:couchbaselabs/agent-catalog.git
+       git clone https://github.com/couchbaselabs/agent-catalog
 
 3. Within *your own* ``pyproject.toml`` file, add the following dependency to your project:
    The ``path`` should point to the location of the ``agentc`` package (and is relative to the ``pyproject.toml``
@@ -100,12 +111,12 @@ some libraries like numpy need to be built, subsequent runs will be faster).
       execute  Search and execute a specific tool.
       find     Find items from the catalog based on a natural language QUERY string or by name.
       index    Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
-      ls       List all tools or prompts in the catalog.
-      publish  Upload the local catalog to a Couchbase instance.
+      ls       List all indexed tools and/or prompts in the catalog.
+      publish  Upload the local catalog and/or logs to a Couchbase instance.
       status   Show the status of the local catalog.
       version  Show the current version of agentc.
 
-      See: https://docs.couchbase.com for more information.
+      See: https://docs.couchbase.com or https://couchbaselabs.github.io/agent-catalog/index.html# for more information.
 
 If you see the output above, you are all set!
 To build your first agent, head on over to the `user guide <guide.html>`_ page.

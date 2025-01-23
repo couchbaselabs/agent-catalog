@@ -21,6 +21,14 @@ Feel free to use your favorite framework (e.g., LangChain, LangGraph, Controlflo
 application!
 For our examples (see `here <https://github.com/couchbaselabs/agent-catalog-example>`_), we use Controlflow.
 
+What services do I need to enable on my Couchbase cluster?
+-----------------------------------------------------------
+
+Enable the following services on your Couchbase cluster:
+    - Data, Query, Index: For storing items and searching them.
+    - Search: For performing vector search on items.
+    - Analytics: For creating views on audit logs and to query the views for better insights on logs.
+
 What does Agent Catalog add to my Couchbase bucket?
 ---------------------------------------------------
 
@@ -101,6 +109,13 @@ Inside this scope, two collections are created:
 Agent Catalog also creates GSI indexes on these collections (to optimize tool / prompt retrieval) as well as vector
 indexes on the ``<kind>_catalog`` collection for tool / prompt semantic search.
 
+Do I need Couchbase instance to run Agent Catalog?
+--------------------------------------------------
+
+No, you do not need a Couchbase instance to run Agent Catalog.
+
+If couchbase credentials are not provided in the environment variables file, Agent Catalog will use only the local catalog.
+For functionalities such as :command:`find`, :command:`execute` if couchbase credentials are not mentioned, only the local catalog will be used for searching tools/prompts.
 
 What is Agent Catalog doing when I run ``agentc index``?
 --------------------------------------------------------
@@ -255,10 +270,14 @@ Make sure to review the required variables and populate them with appropriate va
 
        ------------------------------------------ REQUIRED -----------------------------------------
        # Agent Catalog specific environment variables that identify where the catalog is stored.
-       AGENT_CATALOG_CONN_STRING=localhost
+       AGENT_CATALOG_CONN_STRING=couchbase://localhost
        AGENT_CATALOG_USERNAME=Administrator
        AGENT_CATALOG_PASSWORD=password
        AGENT_CATALOG_BUCKET=travel-sample
+
+       # In case of capella instance or if secure connection is required
+       # replace couchbase with couchbases in AGENT_CATALOG_CONN_STRING and add the following
+       # AGENT_CATALOG_CONN_ROOT_CERTIFICATE=/path/to/cluster/root/certificate/on/local/system
 
        # The holy OpenAI API key. :-)
        OPENAI_API_KEY=...
@@ -377,3 +396,11 @@ Yes!
 Agent Catalog does not restrict you to a specific language model.
 You are free to choose any LLM for your agent workflow development (provided your chosen agent framework supports
 the LLM you choose).
+
+Why am I not able to install Agent Catalog(agentc) because of PyTorch error?
+--------------------------------------------------------------------
+
+While installing agentc, you may face a dependency clash between the PyTorch version installed globally in your system and the PyTorch version being installed by the Sentence transformers library in agentc. This likely happens when the globally installed PyTorch is of a different version as compared to the one agentc requires.
+
+You can resolve this by using Anaconda or any other virtual environment manager instead of the in-built python venv manager. We have found Anaconda to be better in terms of isolating project dependencies. In case this does not solve the issue and you are on an older OS, considering using a Virtual Machine to run your application.
+

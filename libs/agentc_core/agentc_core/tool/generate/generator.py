@@ -73,7 +73,7 @@ class SQLPPCodeGenerator(_BaseCodeGenerator):
                 model_type=self.target_model_type,
             )
             if self.record_descriptor.output is not None
-            else GeneratedCode(generated_code="", is_list_valued=False, type_name="dict")
+            else GeneratedCode(generated_code="", is_list_valued=True, type_name="dict")
         )
 
         # Instantiate our template.

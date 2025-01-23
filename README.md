@@ -29,21 +29,36 @@ The mono-repo for the Couchbase Agent Catalog project.
 1. Make sure you have Python 3.12 and [Poetry](https://python-poetry.org/docs/#installation) installed!
 
 2. Clone this repository.
-   Make sure you have your SSH key setup!
 
    ```bash
-   git clone git@github.com:couchbaselabs/agent-catalog.git
+   git clone https://github.com/couchbaselabs/agent-catalog
    ```
 
 3. You are now ready to install the Agent Catalog package!
-   Using your project's Python environment, execute the following command to install a local package with `pip`:
+   <br/>We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
+
+   [Click here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for Anaconda installation steps.
+
+   Once anaconda or any of its distribution is installed, execute the following commands to activate the environment.
 
    ```bash
+   conda create -n agentcenv python=3.12
+
+   conda activate agentcenv
+   ```
+   Alternatively, you can use any Python virtual environment manager.
+
+   Once environment is set up, execute the following command to install a local package with `pip`:
+   ```bash
    cd agent-catalog
-   source $MY_PYTHON_ENVIRONMENT
 
    # Install the agentc package.
    pip install libs/agentc
+   ```
+   If you are interested in developing with langchain, also install `agentc_langchain` by running the following:
+
+   ```bash
+   pip install libs/agentc_langchain
    ```
 
    If you are interested in building a ``.whl`` file (for later use in ``.whl``-based installs), use :command:`poetry`
@@ -59,10 +74,9 @@ The mono-repo for the Couchbase Agent Catalog project.
 1. Make sure you have Python 3.12 and [Poetry](https://python-poetry.org/docs/#installation) installed!
 
 2. Clone this repository.
-   Make sure you have your SSH key setup!
 
    ```bash
-   git clone git@github.com:couchbaselabs/agent-catalog.git
+   git clone https://github.com/couchbaselabs/agent-catalog
    ```
 
 3. Within *your own* `pyproject.toml` file, add the following dependency to your project:
@@ -107,12 +121,12 @@ Commands:
   execute  Search and execute a specific tool.
   find     Find items from the catalog based on a natural language QUERY string or by name.
   index    Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
-  ls       List all tools or prompts in the catalog.
-  publish  Upload the local catalog to a Couchbase instance.
+  ls       List all indexed tools and/or prompts in the catalog.
+  publish  Upload the local catalog and/or logs to a Couchbase instance.
   status   Show the status of the local catalog.
   version  Show the current version of agentc.
 
-  See: https://docs.couchbase.com for more information.
+  See: https://docs.couchbase.com or https://couchbaselabs.github.io/agent-catalog/index.html# for more information.
 ```
 
 If you see the output above, you are all set! Head on over to our [docs](https://couchbaselabs.github.io/agent-catalog/) or our [templates](templates) to start
@@ -122,6 +136,14 @@ developing your agent with Agent Catalog.
 
 For examples on what an agentic workflow with `agentc` looks like, see
 the [agent-catalog-example](https://github.com/couchbaselabs/agent-catalog-example) repository.
+
+## Adding files to ignore while indexing
+
+By default, the `index` command will ignore files/patterns present in `.gitignore` file.
+In addition to `.gitignore`, there might be situation where additional files have to be ignored by agentc and not git.
+To add such files/pattern `.agentcignore` file can be used similar to `.gitignore`.
+
+For more guide on how to use `.agentcignore` file check the [documentation](https://couchbaselabs.github.io/agent-catalog/guide.html#ignoring-files-while-indexing)
 
 ## Docs and Templates
 
