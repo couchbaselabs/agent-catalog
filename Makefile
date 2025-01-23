@@ -1,4 +1,5 @@
-dev-local: init-env install-agentc-pip post-install
+dev-local-pip: init-env install-agentc-pip post-install
+dev-local-poetry: init-env install-agentc-poetry post-install
 
 # To install agentc in any project, given that the clone
 # of agent-catalog and project directory have common parent
@@ -21,5 +22,17 @@ install-agentc-pip:
 		echo '----agentc Usage----' && \
 		agentc --help"
 
+install-agentc-poetry:
+	@echo "----Installing Agentc----"
+	@echo "This may take some time..."
+	conda run -n agentc_env bash -c "\
+		poetry install && \
+		echo '' && \
+        echo '----Verifying Installation----' && \
+        pip list | grep agentc && \
+        echo '' && \
+        echo '----agentc Usage----' && \
+        agentc --help"
+
 post-install:
-	@echo "Note: Please run 'conda agentc_env activate' to activate your python env and run agentc commands"
+	@echo "Note: Please run 'conda activate agentc_env' to activate your python env and run agentc commands"
