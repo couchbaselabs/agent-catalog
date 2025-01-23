@@ -4,6 +4,7 @@ import jinja2
 import logging
 import os
 import pathlib
+import platform
 import subprocess
 import typing
 
@@ -16,6 +17,8 @@ if os.environ.get("EDITOR"):
     default_editor = os.environ.get("EDITOR")
 elif os.environ.get("VISUAL"):
     default_editor = os.environ.get("VISUAL")
+elif platform.system() == "Windows":
+    default_editor = "notepad"
 else:
     default_editor = "vi"
 
