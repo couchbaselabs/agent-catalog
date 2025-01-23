@@ -2,6 +2,7 @@ import click
 import datetime
 import jinja2
 import logging
+import os
 import pathlib
 import subprocess
 import typing
@@ -10,6 +11,13 @@ from ..models.context import Context
 from agentc_core.record.descriptor import RecordKind
 
 logger = logging.getLogger(__name__)
+
+if os.environ.get("EDITOR"):
+    default_editor = os.environ.get("EDITOR")
+elif os.environ.get("VISUAL"):
+    default_editor = os.environ.get("VISUAL")
+else:
+    default_editor = "vi"
 
 
 def _get_name_and_description() -> tuple[str, str]:
@@ -38,7 +46,7 @@ def add_jinja_prompt(output: pathlib.Path, template_env: jinja2.Environment):
     with output_file.open("w") as fp:
         fp.write(rendered)
     click.secho(f"Jinja prompt written to: {output_file}", fg="green")
-    subprocess.run(["vi", f"{output_file}"])
+    subprocess.run([default_editor, f"{output_file}"])
 
 
 def add_raw_prompt(output: pathlib.Path, template_env: jinja2.Environment):
@@ -58,7 +66,7 @@ def add_raw_prompt(output: pathlib.Path, template_env: jinja2.Environment):
     with output_file.open("w") as fp:
         fp.write(rendered)
     click.secho(f"Raw prompt written to: {output_file}", fg="green")
-    subprocess.run(["vi", f"{output_file}"])
+    subprocess.run([default_editor, f"{output_file}"])
 
 
 def add_http_request(output: pathlib.Path, template_env: jinja2.Environment):
@@ -85,7 +93,7 @@ def add_http_request(output: pathlib.Path, template_env: jinja2.Environment):
     with output_file.open("w") as fp:
         fp.write(rendered)
     click.secho(f"HTML request tool written to: {output_file}", fg="green")
-    subprocess.run(["vi", f"{output_file}"])
+    subprocess.run([default_editor, f"{output_file}"])
 
 
 def add_python_function(output: pathlib.Path, template_env: jinja2.Environment):
@@ -103,7 +111,7 @@ def add_python_function(output: pathlib.Path, template_env: jinja2.Environment):
     with output_file.open("w") as fp:
         fp.write(rendered)
     click.secho(f"Python (function) tool written to: {output_file}", fg="green")
-    subprocess.run(["vi", f"{output_file}"])
+    subprocess.run([default_editor, f"{output_file}"])
 
 
 def add_semantic_search(output: pathlib.Path, template_env: jinja2.Environment):
@@ -138,7 +146,7 @@ def add_semantic_search(output: pathlib.Path, template_env: jinja2.Environment):
     with output_file.open("w") as fp:
         fp.write(rendered)
     click.secho(f"Semantic search tool written to: {output_file}", fg="green")
-    subprocess.run(["vi", f"{output_file}"])
+    subprocess.run([default_editor, f"{output_file}"])
 
 
 def add_sqlpp_query(output: pathlib.Path, template_env: jinja2.Environment):
@@ -156,7 +164,7 @@ def add_sqlpp_query(output: pathlib.Path, template_env: jinja2.Environment):
     with output_file.open("w") as fp:
         fp.write(rendered)
     click.secho(f"SQL++ query tool written to: {output_file}", fg="green")
-    subprocess.run(["vi", f"{output_file}"])
+    subprocess.run([default_editor, f"{output_file}"])
 
 
 def cmd_add(
