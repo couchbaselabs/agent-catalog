@@ -55,25 +55,25 @@ class Provider(pydantic_settings.BaseSettings):
     If this field AND ``$AGENT_CATALOG_CATALOG`` are specified, we will issue :command:`find` on both the remote and
     local catalog (with local catalog entries taking precedence).
 
-    This field must be specified with :py:attr:`username`, :py:attr:`password`, and  :py:attr:`bucket`.
+    This field **must** be specified with :py:attr:`username`, :py:attr:`password`, and  :py:attr:`bucket`.
     """
 
     username: typing.Optional[pydantic.SecretStr] = None
     """ Username associated with the Couchbase instance possessing the catalog.
 
-    This field must be specified with :py:attr:`conn_string`, :py:attr:`password`, and :py:attr:`bucket`.
+    This field **must** be specified with :py:attr:`conn_string`, :py:attr:`password`, and :py:attr:`bucket`.
     """
 
     password: typing.Optional[pydantic.SecretStr] = None
     """ Password associated with the Couchbase instance possessing the catalog.
 
-    This field must be specified with :py:attr:`conn_string`, :py:attr:`username`, and :py:attr:`bucket`.
+    This field **must** be specified with :py:attr:`conn_string`, :py:attr:`username`, and :py:attr:`bucket`.
     """
 
     bucket: typing.Optional[str] = None
     """ The name of the Couchbase bucket possessing the catalog.
 
-    This field must be specified with :py:attr:`conn_string`, :py:attr:`username`, and :py:attr:`password`.
+    This field **must** be specified with :py:attr:`conn_string`, :py:attr:`username`, and :py:attr:`password`.
     """
 
     catalog: typing.Optional[pathlib.Path] = None
@@ -81,6 +81,14 @@ class Provider(pydantic_settings.BaseSettings):
 
     If this field and ``$AGENT_CATALOG_CONN_STRING`` are not set, we will perform a best-effort search by walking upward
     from the current working directory until we find the :py:data:`agentc_core.defaults.DEFAULT_ACTIVITY_FOLDER` folder.
+    """
+
+    conn_root_certificate: typing.Optional[str | pathlib.Path] = None
+    """ Path to the root certificate file for the Couchbase cluster.
+
+    This field is optional and only required if the Couchbase cluster is using a self-signed certificate.
+    If specified, this field **must** be specified with :py:attr:`conn_string`, :py:attr:`username`,
+    and :py:attr:`password`.
     """
 
     snapshot: typing.Optional[str] = LATEST_SNAPSHOT_VERSION
@@ -218,12 +226,15 @@ class Provider(pydantic_settings.BaseSettings):
 
         # Try to connect to our cluster.
         try:
+            if self.conn_root_certificate is not None and isinstance(self.conn_root_certificate, pathlib.Path):
+                self.conn_root_certificate = self.conn_root_certificate.absolute()
             cluster = couchbase.cluster.Cluster.connect(
                 self.conn_string,
                 couchbase.options.ClusterOptions(
                     couchbase.auth.PasswordAuthenticator(
                         username=self.username.get_secret_value(),
                         password=self.password.get_secret_value(),
+                        cert_path=self.conn_root_certificate,
                     )
                 ),
             )
@@ -363,21 +374,19 @@ class Provider(pydantic_settings.BaseSettings):
             version_tuples.append(self._remote_prompt_catalog.version)
         return sorted(version_tuples, key=lambda x: x.timestamp, reverse=True)[0]
 
-    def get_item(
+    def get(
         self,
+        item_type: Literal["tool", "prompt"],
         query: str = None,
         name: str = None,
         annotations: str = None,
         snapshot: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
-        item_type: Literal["tool", "prompt", "agent"] = None,
     ) -> Union[list[typing.Any] | Prompt | None]:
         if item_type == "tool":
             return self._get_tools_for(query, name, annotations, snapshot, limit)
         elif item_type == "prompt":
             return self._get_prompt_for(query, name, annotations, snapshot)
-        elif item_type == "agent":
-            pass
         else:
             raise ValueError(f"Unknown item type: {item_type}, expected 'tool', 'prompt', or 'agent'.")
 

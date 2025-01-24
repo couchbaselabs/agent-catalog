@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 {% if input is not none %}
 {{ input.model.generated_code | safe }}
-parameter_locations = {{ input.locations }}
+parameter_locations = {{ input.locations | safe }}
 {% endif %}
 
 @tool
