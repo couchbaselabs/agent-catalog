@@ -85,7 +85,7 @@ def run_flow(thread_id: str):
     while True:
         endpoints = task_factory.run(
             # Search for prompts using your provider.
-            prompt=provider.get("prompt", query="asking for source and destination airports"),
+            prompt=provider.get_item(query="asking for source and destination airports", item_type="prompt"),
             # All other arguments are forwarded to the ControlFlow Task constructor.
             # Check out their docs here: https://controlflow.ai/concepts/tasks#task-properties
             result_type=EndpointsType,
@@ -94,13 +94,13 @@ def run_flow(thread_id: str):
         # We "draw" implicit dependency edges by using the results of previous tasks.
         # In this example, all tasks are executed eagerly (though there is some limited support for lazy evaluation).
         travel_routes = task_factory.run(
-            prompt=provider.get("prompt", query="finding routes between airports"),
+            prompt=provider.get_item(query="finding routes between airports", item_type="prompt"),
             context={"source_airport": endpoints.source_airport, "destination_airport": endpoints.dest_airport},
             result_type=str,
         )
         print(f"Your routes are: {travel_routes}")
         is_continue = task_factory.run(
-            prompt=provider.get("prompt", query="after addressing a user's request"),
+            prompt=provider.get_item(query="after addressing a user's request", item_type="prompt"),
             result_type=[True, False],
         )
         if not is_continue:

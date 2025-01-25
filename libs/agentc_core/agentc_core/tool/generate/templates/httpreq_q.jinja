@@ -39,7 +39,7 @@ def {{ tool.name }}({% if input is not none %}argument_input: {{ input.model.typ
     {% endif %}
 
     # TODO (GLENN): We need to formalize how to handle multiple URLs.
-    for server_url in {{ urls }}:
+    for server_url in {{ urls | safe }}:
         url = server_url + '{{ path }}'
         request_body = dict()
         parameters = dict()
