@@ -408,15 +408,14 @@ def test_publish_different_versions(tmp_path, isolated_server_factory):
             assert row == 2
 
 
-@pytest.mark.regression
-def test_ls_local(tmp_path):
+@pytest.mark.smoke
+def test_ls_local_empty_notindexed(tmp_path):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        ############################################################################################################
         # when the repo is empty
         output = runner.invoke(click_main, ["ls", "-local"]).stdout
         assert "Searching" not in output
-        ############################################################################################################
+
         # when there are tools and prompts, but are not indexed
         initialize_repo(
             directory=pathlib.Path(td),
@@ -426,7 +425,12 @@ def test_ls_local(tmp_path):
         )
         output = runner.invoke(click_main, ["ls", "-local"]).stdout
         assert "Searching" not in output
-        ############################################################################################################
+
+
+@pytest.mark.smoke
+def test_ls_local_only_tools(tmp_path):
+    runner = click.testing.CliRunner()
+    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         # when only tools are indexed
         initialize_repo(
             directory=pathlib.Path(td),
@@ -435,12 +439,16 @@ def test_ls_local(tmp_path):
             click_command=click_main,
         )
         output = runner.invoke(click_main, ["ls", "tool", "-local"]).stdout
-        assert "TOOL" in output and "1" in output
+        assert "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 1
         output = runner.invoke(click_main, ["ls", "prompt", "-local"]).stdout
-        assert "PROMPT" in output and "1" not in output
-        ############################################################################################################
+        assert "PROMPT" in output and len(re.findall(r"\b1\.\s.+", output)) == 0
+
+
+@pytest.mark.smoke
+def test_ls_local_only_prompts(tmp_path):
+    runner = click.testing.CliRunner()
+    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         # when only prompts are indexed
-        runner.invoke(click_main, ["clean", "local", "--kind", "tool", "-y"])
         initialize_repo(
             directory=pathlib.Path(td),
             repo_kind=ExampleRepoKind.INDEXED_CLEAN_PROMPTS_TRAVEL,
@@ -448,10 +456,15 @@ def test_ls_local(tmp_path):
             click_command=click_main,
         )
         output = runner.invoke(click_main, ["ls", "prompt", "-local"]).stdout
-        assert "PROMPT" in output and "1" in output
+        assert "PROMPT" in output and len(re.findall(r"\b1\.\s.+", output)) == 1
         output = runner.invoke(click_main, ["ls", "tool", "-local"]).stdout
-        assert "TOOL" in output and "1" not in output
-        ############################################################################################################
+        assert "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 0
+
+
+@pytest.mark.smoke
+def test_ls_local_both_tools_prompts(tmp_path):
+    runner = click.testing.CliRunner()
+    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         # when there are both tools and prompts
         initialize_repo(
             directory=pathlib.Path(td),
@@ -460,9 +473,8 @@ def test_ls_local(tmp_path):
             click_command=click_main,
         )
         output = runner.invoke(click_main, ["ls", "prompt", "-local"]).stdout
-        assert "PROMPT" in output and "1" in output
+        assert "PROMPT" in output and len(re.findall(r"\b1\.\s.+", output)) == 1
         output = runner.invoke(click_main, ["ls", "tool", "-local"]).stdout
-        assert "TOOL" in output and "1" in output
+        assert "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 1
         output = runner.invoke(click_main, ["ls", "-local"]).stdout
         assert "PROMPT" in output and "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 2
-        ############################################################################################################
