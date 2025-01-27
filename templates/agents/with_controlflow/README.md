@@ -23,20 +23,20 @@ This directory contains a starter project for building agents with Couchbase, Co
    git commit -m "Initial commit"
    ```
 
-4. Installing anaconda.
-   We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
+4. Initialize a virtual environment with Anaconda.
+   We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies
+   interfere with your project.
 
-   [Click here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for Anaconda installation steps.
+   See [here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for Anaconda installation steps.
 
-   Once anaconda or any of its distribution is installed, execute the following commands to activate the environment.
+   Once Anaconda is installed, execute the following commands to activate the environment.
 
    ```bash
    conda create -n travel-agent python=3.12
-
    conda activate travel-agent
    ```
 
-5. Install this project with Poetry (with the `analysis` group dependencies). We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
+5. Install this project with Poetry (with the `analysis` group dependencies).
 
    ```bash
    poetry install --with analysis

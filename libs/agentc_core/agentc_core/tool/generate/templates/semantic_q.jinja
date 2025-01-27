@@ -22,7 +22,8 @@ logger = logging.getLogger(__name__)
 def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
     authenticator = couchbase.auth.PasswordAuthenticator(
         username=get_secret("{{ secrets.username }}").get_secret_value(),
-        password=get_secret("{{ secrets.password }}").get_secret_value()
+        password=get_secret("{{ secrets.password }}").get_secret_value(),
+        {% if secrets.certificate is none %}cert_path=get_secret("{{ secrets.certificate | safe }}").get_secret_value(){% endif %}
     )
     conn_string = get_secret("{{ secrets.conn_string }}").get_secret_value()
     return couchbase.cluster.Cluster(conn_string, couchbase.options.ClusterOptions(authenticator))
