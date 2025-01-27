@@ -132,7 +132,14 @@ def click_main(ctx, catalog, activity, verbose, interactive):
     "type_metadata",
     type=click.Choice(["catalog", "auditor", "all"], case_sensitive=False),
 )
-def init(ctx, catalog_type, type_metadata):
+@click.option(
+    "--bucket",
+    default=None,
+    type=str,
+    help="Name of the Couchbase bucket to initialize in.",
+    show_default=False,
+)
+def init(ctx, catalog_type, type_metadata, bucket):
     """Initialize the necessary files/collections for local/database catalog."""
     ctx_obj: Context = ctx.obj
 
@@ -141,7 +148,53 @@ def init(ctx, catalog_type, type_metadata):
 
     type_metadata = ["catalog", "auditor"] if type_metadata == "all" else [type_metadata]
 
-    cmd_init(ctx=ctx_obj, catalog_type=catalog_type, type_metadata=type_metadata)
+    connection_details_env = None
+    keyspace_details = None
+
+    if "db" in catalog_type:
+        # Load all Couchbase connection related data from env
+        connection_details_env = CouchbaseConnect(
+            connection_url=os.getenv("AGENT_CATALOG_CONN_STRING"),
+            username=os.getenv("AGENT_CATALOG_USERNAME"),
+            password=os.getenv("AGENT_CATALOG_PASSWORD"),
+            host=get_host_name(os.getenv("AGENT_CATALOG_CONN_STRING")),
+            certificate=os.getenv("AGENT_CATALOG_CONN_ROOT_CERTIFICATE"),
+        )
+
+        # Establish a connection
+        err, cluster = get_connection(conn=connection_details_env)
+        if err:
+            raise ValueError(f"Unable to connect to Couchbase!\n{err}")
+
+        # Determine the bucket.
+        buckets = get_buckets(cluster=cluster)
+        cluster.close()
+        if bucket is None and ctx_obj.interactive:
+            bucket = click.prompt("Bucket", type=click.Choice(buckets), show_choices=True)
+
+        elif bucket is not None and bucket not in buckets:
+            raise ValueError(
+                "Bucket does not exist!\n"
+                f"Available buckets from cluster are: {','.join(buckets)}\n"
+                f"Run agentc publish --help for more information."
+            )
+
+        elif bucket is None and not ctx_obj.interactive:
+            raise ValueError(
+                "Bucket must be specified to publish to the database catalog."
+                "Add --bucket BUCKET_NAME to your command or run agentc clean in interactive mode."
+            )
+
+        # Get keyspace and connection details
+        keyspace_details = Keyspace(bucket=bucket, scope=DEFAULT_CATALOG_SCOPE)
+
+    cmd_init(
+        ctx=ctx_obj,
+        catalog_type=catalog_type,
+        type_metadata=type_metadata,
+        connection_details_env=connection_details_env,
+        keyspace_details=keyspace_details,
+    )
 
 
 @click_main.command()
