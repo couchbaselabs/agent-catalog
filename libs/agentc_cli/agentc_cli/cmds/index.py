@@ -42,7 +42,11 @@ def cmd_index(
     # and on how to add .agent-activity/ to the .gitignore file? Or, should
     # we instead preemptively generate a .agent-activity/.gitiginore
     # file during init_local()?
-    # init_local(ctx)
+
+    if not os.path.exists(ctx.catalog):
+        raise RuntimeError(
+            "Local catalog directory does not exist!\nPlease use 'agentc init' command first.\nExecute 'agentc init --help' for more information."
+        )
 
     # TODO: One day, maybe allow users to choose a different branch instead of assuming
     # the HEAD branch, as users currently would have to 'git checkout BRANCH_THEY_WANT'

@@ -17,12 +17,10 @@ from agentc_core.defaults import DEFAULT_CATALOG_NAME
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_LLM_ACTIVITY_NAME
 from agentc_core.defaults import DEFAULT_META_COLLECTION_NAME
-from agentc_core.util.ddl import create_gsi_indexes
-from agentc_core.util.ddl import create_vector_index
+from agentc_core.util.ddl import check_if_scope_collection_exist
 from agentc_core.util.models import CouchbaseConnect
 from agentc_core.util.models import CustomPublishEncoder
 from agentc_core.util.models import Keyspace
-from agentc_core.util.publish import create_scope_and_collection
 from agentc_core.util.publish import get_connection
 from couchbase.exceptions import CouchbaseException
 from pydantic import ValidationError
@@ -95,14 +93,12 @@ def cmd_publish(
 
         logger.debug(len(log_messages), "logs found..\n")
 
-        bucket_manager = cb.collections()
-
         log_col = DEFAULT_AUDIT_COLLECTION
         log_scope = DEFAULT_AUDIT_SCOPE
-        try:
-            (msg, err) = create_scope_and_collection(bucket_manager, scope=log_scope, collection=log_col)
-        except:
-            raise ValueError(msg) from err
+
+        bucket_manager = cb.collections()
+
+        check_if_scope_collection_exist(bucket_manager, log_scope, log_col, True)
 
         # get collection ref
         cb_coll = cb.scope(log_scope).collection(log_col)
@@ -149,9 +145,8 @@ def cmd_publish(
         # ---------------------------------------------------------------------------------------- #
         meta_col = k + DEFAULT_META_COLLECTION_NAME
         meta_scope = scope
-        (msg, err) = create_scope_and_collection(bucket_manager, scope=meta_scope, collection=meta_col)
-        if err is not None:
-            raise ValueError(msg)
+
+        check_if_scope_collection_exist(bucket_manager, meta_scope, meta_col, True)
 
         # get collection ref
         cb_coll = cb.scope(meta_scope).collection(meta_col)
@@ -178,9 +173,8 @@ def cmd_publish(
         # ---------------------------------------------------------------------------------------- #
         catalog_col = k + DEFAULT_CATALOG_COLLECTION_NAME
         catalog_scope = scope
-        (msg, err) = create_scope_and_collection(bucket_manager, scope=catalog_scope, collection=catalog_col)
-        if err is not None:
-            raise ValueError(msg)
+
+        check_if_scope_collection_exist(bucket_manager, catalog_scope, catalog_col, True)
 
         # get collection ref
         cb_coll = cb.scope(catalog_scope).collection(catalog_col)
@@ -206,24 +200,3 @@ def cmd_publish(
                 click.secho(f"Couldn't insert catalog items!\n{e.message}", fg="red")
                 return e
         click.secho(f"{k.capitalize()} catalog items successfully uploaded to Couchbase!\n", fg="green")
-
-        # ---------------------------------------------------------------------------------------- #
-        #                               GSI and Vector Indexes                                     #
-        # ---------------------------------------------------------------------------------------- #
-        click.secho(f"Now building the GSI indexes for the {k} catalog.", fg="yellow")
-        s, err = create_gsi_indexes(bucket, cluster, k, True)
-        if not s:
-            raise ValueError(f"GSI indexes could not be created \n{err}")
-        else:
-            click.secho(f"All GSI indexes for the {k} catalog have been successfully created!\n", fg="green")
-            logger.debug("Indexes created successfully!")
-
-        click.secho(f"Now building the vector index for the {k} catalog.", fg="yellow")
-        dims = len(catalog_desc.items[0].embedding)
-        _, err = create_vector_index(bucket, k, connection_details_env, dims)
-        if err is not None:
-            raise ValueError(f"Vector index could not be created \n{err}")
-        else:
-            click.secho(f"Vector index for the {k} catalog has been successfully created!", fg="green")
-            logger.debug("Vector index created successfully!")
-        click.secho(DASHES, fg=KIND_COLORS[k])

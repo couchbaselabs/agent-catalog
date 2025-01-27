@@ -12,6 +12,7 @@ from agentc_core.defaults import DEFAULT_HTTP_CLUSTER_ADMIN_PORT_NUMBER
 from agentc_core.defaults import DEFAULT_HTTP_FTS_PORT_NUMBER
 from agentc_core.defaults import DEFAULT_HTTPS_CLUSTER_ADMIN_PORT_NUMBER
 from agentc_core.defaults import DEFAULT_HTTPS_FTS_PORT_NUMBER
+from couchbase.bucket import CollectionManager
 
 logger = logging.getLogger(__name__)
 
@@ -384,3 +385,28 @@ def create_gsi_indexes(bucket, cluster, kind, print_progress):
     with contextlib.suppress(StopIteration):
         next(progress_bar_it)
     return completion_status, all_errs
+
+
+def check_if_scope_collection_exist(
+    bucket_manager: CollectionManager, scope: str, collection: str, raise_exception: bool
+) -> bool:
+    """Check if the given scope and collection exist in the bucket"""
+    scopes = bucket_manager.get_all_scopes()
+    scope_exists = any(s.name == scope for s in scopes)
+    if not scope_exists:
+        if raise_exception:
+            raise ValueError(
+                f"Scope {scope} not found in the given bucket!\nPlease use 'agentc init' command first.\nExecute 'agentc init --help' for more information."
+            )
+        return False
+
+    collections = [c.name for s in scopes if s.name == scope for c in s.collections]
+    collection_exists = collection in collections
+    if not collection_exists:
+        if raise_exception:
+            raise ValueError(
+                f"Collection {scope}.{collection} not found in the given bucket!\nPlease use 'agentc init' command first.\nExecute 'agentc init --help' for more information."
+            )
+        return False
+
+    return True

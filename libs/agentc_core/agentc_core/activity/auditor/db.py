@@ -7,14 +7,13 @@ import json
 import logging
 
 from ...analytics import Log
-from ...analytics.create import create_analytics_udfs
 from ...defaults import DEFAULT_AUDIT_COLLECTION
 from ...defaults import DEFAULT_AUDIT_SCOPE
+from ...util.ddl import check_if_scope_collection_exist
 from ...version import VersionDescriptor
 from .base import BaseAuditor
 from agentc_core.util.connection import get_host_name
 from agentc_core.util.models import CouchbaseConnect
-from agentc_core.util.publish import create_scope_and_collection
 
 logger = logging.getLogger(__name__)
 
@@ -59,16 +58,14 @@ class DBAuditor(BaseAuditor):
 
         # Get the bucket manager
         bucket_manager = cb.collections()
-        msg, err = create_scope_and_collection(bucket_manager, DEFAULT_AUDIT_SCOPE, DEFAULT_AUDIT_COLLECTION)
-        if err is not None:
-            logger.error(err)
-            raise err
 
-        try:
-            create_analytics_udfs(cluster, bucket)
-        except couchbase.exceptions.CouchbaseException as e:
-            logger.warning("Analytics views could not be created: %s", e)
-            pass
+        scope_collection_exist = check_if_scope_collection_exist(
+            bucket_manager, DEFAULT_AUDIT_SCOPE, DEFAULT_AUDIT_COLLECTION, False
+        )
+        if not scope_collection_exist:
+            raise ValueError(
+                f"Scope {DEFAULT_AUDIT_SCOPE} and collection {DEFAULT_AUDIT_COLLECTION} does not exist in bucket {bucket}.\nPlease use 'agentc init' command first to create keyspace.\nExecute 'agentc init --help' for more information."
+            )
 
         # get collection ref
         cb_coll = cb.scope(DEFAULT_AUDIT_SCOPE).collection(DEFAULT_AUDIT_COLLECTION)
