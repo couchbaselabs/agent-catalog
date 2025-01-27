@@ -28,7 +28,10 @@ This directory contains a starter project for building agents with Couchbase, La
 
    [Click here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for Anaconda installation steps.
 
-5. Install this project with Poetry.
+5. Install this project with Poetry from Makefile.
+
+   Ensure you have Anaconda and Make installed (`make` for [MacOS](https://formulae.brew.sh/formula/make), [Windows](https://gnuwin32.sourceforge.net/packages/make.htm), [Ubuntu](https://www.geeksforgeeks.org/how-to-install-make-on-ubuntu/)).
+
    Run the following commands to create and activate a virtual environment using Anaconda and install all the requirements required to run this example.
 
    Replace `research_agent` with any other suitable environment name.
@@ -43,7 +46,27 @@ This directory contains a starter project for building agents with Couchbase, La
    conda activate research_agent
    ```
 
-6. Run `agentc` to make sure this project has installed correctly (note that your first run will take a couple of
+6. Manually install this project.
+
+   Create a virtual environment either using Anaconda or any other Python environment manager.
+   ```bash
+   # create venv using Anaconda
+   conda create -n research_agent python=3.12
+   conda activate research_agent
+   ```
+
+   Install the example using Poetry
+   ```bash
+   poetry install
+   ```
+
+   Alternatively, install the example using `pip`
+   ```bash
+   pip install ../../../libs/agentc
+   pip install ../../../libs/agentc_langchain
+   ```
+
+7. Run `agentc` to make sure this project has installed correctly (note that your first run will take a couple of
    seconds as certain packages need to be compiled, subsequent runs will be faster).
 
    ```bash
@@ -73,7 +96,7 @@ This directory contains a starter project for building agents with Couchbase, La
      See: https://docs.couchbase.com or https://couchbaselabs.github.io/agent-catalog/index.html# for more information.
    ```
 
-7. Make sure your Git repo is clean, and run `agentc index` to index your tools and prompts.
+8. Make sure your Git repo is clean, and run `agentc index` to index your tools and prompts.
    Note that `tools` and `prompts` are _relative paths_ to the `tools` and `prompts` folder.
 
    ```bash
@@ -86,7 +109,7 @@ This directory contains a starter project for building agents with Couchbase, La
    _Hint: if you've made changes but want to keep the same commit ID for the later "publish" step, use
    `git add $MY_FILES` followed by `git commit --amend`!_
 
-8. Start up a Couchbase instance.
+9. Start up a Couchbase instance.
 
     1. For those interested in using a local Couchbase instance, see
        [here](https://docs.couchbase.com/server/current/install/install-intro.html).
@@ -111,14 +134,14 @@ This directory contains a starter project for building agents with Couchbase, La
    You'll need to navigate to your instance's UI (for local instances, this is on http://localhost:8091) to import
    this sample bucket.
 
-9. Create a `.env` file using `.env.example` as a reference and tweak it according to your environment.
+10. Create a `.env` file using `.env.example` as a reference and tweak it according to your environment.
 
    ```bash
    cp .env.example .env
    vi .env
    ```
 
-10. Publish your local agent catalog to your Couchbase instance with `agentc publish`.
+11. Publish your local agent catalog to your Couchbase instance with `agentc publish`.
    Your Couchbase instance details in the `.env` file will be used for authentication.
    Again, this specific starter agent uses the `travel-sample` bucket.
 
@@ -126,7 +149,7 @@ This directory contains a starter project for building agents with Couchbase, La
    agentc publish tool prompt --bucket travel-sample
    ```
 
-11. Run your agent!
+12. Run your agent!
 
    To start jupyter server, run the following command:
 
