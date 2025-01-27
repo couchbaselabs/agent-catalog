@@ -38,6 +38,7 @@ The mono-repo for the Couchbase Agent Catalog project.
 
    To run the following `make` commands, you must have Anaconda and Make installed (`make` for [MacOS](https://formulae.brew.sh/formula/make), [Windows](https://gnuwin32.sourceforge.net/packages/make.htm), [Ubuntu](https://www.geeksforgeeks.org/how-to-install-make-on-ubuntu/)).
 
+
    We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
 
    [Click here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for Anaconda installation steps.
