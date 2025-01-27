@@ -36,7 +36,8 @@ The mono-repo for the Couchbase Agent Catalog project.
 
 3. Installation using Makefile
 
-   To run the following `make` commands, you must have Anaconda installed.
+   To run the following `make` commands, you must have Anaconda and Make installed (`make` for [MacOS](https://formulae.brew.sh/formula/make), [Windows](https://gnuwin32.sourceforge.net/packages/make.htm), [Ubuntu](https://www.geeksforgeeks.org/how-to-install-make-on-ubuntu/)).
+
 
    We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
 
@@ -109,7 +110,9 @@ The mono-repo for the Couchbase Agent Catalog project.
 
 5. Install using Makefile
 
-   You can install Agentc without adding to your pyproject if you wish to explore first. Simply run the following make commands to create and activate a virtual environment and install the requirements. To run the following `make` commands, you must have Anaconda installed.
+   You can install Agentc without adding to your pyproject if you wish to explore first. Simply run the following make commands to create and activate a virtual environment and install the requirements.
+
+   To run the following `make` commands, you must have Anaconda and Make installed (`make` for [MacOS](https://formulae.brew.sh/formula/make), [Windows](https://gnuwin32.sourceforge.net/packages/make.htm), [Ubuntu](https://www.geeksforgeeks.org/how-to-install-make-on-ubuntu/)).
 
    We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
 
