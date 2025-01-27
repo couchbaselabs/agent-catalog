@@ -28,18 +28,19 @@ This directory contains a starter project for building agents with Couchbase, Co
 
    [Click here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for Anaconda installation steps.
 
-   Once anaconda or any of its distribution is installed, execute the following commands to activate the environment.
+5. Install this project with Poetry (with the `analysis` group dependencies).
+   Run the following commands to create and activate a virtual environment using Anaconda and install all the requirements required to run this example.
 
+   Replace `travel_agent` with any other suitable environment name.
    ```bash
-   conda create -n travel-agent python=3.12
-
-   conda activate travel-agent
+   make cf-poetry env_name=travel_agent
+   conda activate travel_agent
    ```
 
-5. Install this project with Poetry (with the `analysis` group dependencies). We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
-
+   Alternatively, you can install the project with `pip` with the following commands.
    ```bash
-   poetry install --with analysis
+   make cf-pip env_name=travel_agent
+   conda activate travel_agent
    ```
 
 6. Run `agentc` to make sure this project has installed correctly (note that your first run will take a couple of

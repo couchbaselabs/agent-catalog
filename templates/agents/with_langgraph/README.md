@@ -28,18 +28,19 @@ This directory contains a starter project for building agents with Couchbase, La
 
    [Click here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for Anaconda installation steps.
 
-   Once anaconda or any of its distribution is installed, execute the following commands to activate the environment.
+5. Install this project with Poetry.
+   Run the following commands to create and activate a virtual environment using Anaconda and install all the requirements required to run this example.
 
+   Replace `research_agent` with any other suitable environment name.
    ```bash
-   conda create -n research-agent python=3.12
-
-   conda activate research-agent
+   make lg-poetry env_name=research_agent
+   conda activate research_agent
    ```
 
-5. Install this project with Poetry. We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
-
+   Alternatively, you can install the project with `pip` with the following commands.
    ```bash
-   poetry install
+   make lg-pip env_name=research_agent
+   conda activate research_agent
    ```
 
 6. Run `agentc` to make sure this project has installed correctly (note that your first run will take a couple of
