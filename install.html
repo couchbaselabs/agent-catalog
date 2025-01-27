@@ -196,25 +196,27 @@ For now, please refer to the <a class="reference internal" href="#building-from-
 </pre></div>
 </div>
 </li>
-<li><p>You are now ready to install the Agent Catalog package!</p>
+<li><p>Installation using Makefile</p>
+<p>To run the following <code class="docutils literal notranslate"><span class="pre">make</span></code> commands, you must have Anaconda and Make installed (<code class="docutils literal notranslate"><span class="pre">make</span></code> for <a class="reference external" href="https://formulae.brew.sh/formula/make">MacOS</a>, <a class="reference external" href="https://gnuwin32.sourceforge.net/packages/make.htm">Windows</a>, <a class="reference external" href="https://www.geeksforgeeks.org/how-to-install-make-on-ubuntu/">Ubuntu</a>).</p>
 <p>We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.</p>
 <p><a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html">Click here</a> for Anaconda installation steps.</p>
-<p>Once anaconda or any of its distribution is installed, execute the following commands to activate the environment.</p>
+<p>Once anaconda or any of its distribution is installed, run the following commands to create and activate a virtual environment using Anaconda and install Agentc.
+Replace <code class="docutils literal notranslate"><span class="pre">agentcenv</span></code> with any other suitable environment name.</p>
+<p>You are now ready to explore Agentc!</p>
+</li>
+<li><p>Manual Installation</p>
+<p>Alternatively, you can choose to manually install Agentc by first creating a virtual environment either using Anaconda or any other Python virtual environment manager.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>agentcenv<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.12
-
 conda<span class="w"> </span>activate<span class="w"> </span>agentcenv
 </pre></div>
 </div>
-<p>Alternatively, you can use any Python virtual environment manager.</p>
-<p>Once environment is set up, execute the following command to install a local package with <strong class="command">pip</strong>:</p>
+<p>Once environment is set up, execute the following command to install a local package with <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>agent-catalog
-
 <span class="c1"># Install the agentc package.</span>
 pip<span class="w"> </span>install<span class="w"> </span>libs/agentc
 </pre></div>
 </div>
-<p>If you are interested in building a <code class="docutils literal notranslate"><span class="pre">.whl</span></code> file (for later use in <code class="docutils literal notranslate"><span class="pre">.whl</span></code>-based installs), use <strong class="command">poetry</strong>
-directly:</p>
+<p>If you are interested in developing with langchain, also install <code class="docutils literal notranslate"><span class="pre">agentc_langchain</span></code> by running the following:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>libs/agentc
 poetry<span class="w"> </span>build
 </pre></div>
@@ -242,6 +244,18 @@ file itself).</p>
 <li><p>Run the command <strong class="command">poetry update</strong> to install the Agent Catalog package.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>agent-catalog
 poetry<span class="w"> </span>update
+</pre></div>
+</div>
+</li>
+<li><p>Install using Makefile</p>
+<p>You can install Agentc without adding to your pyproject if you wish to explore first. Simply run the following make commands to create and activate a virtual environment and install the requirements.</p>
+<p>To run the following <code class="docutils literal notranslate"><span class="pre">make</span></code> commands, you must have Anaconda and Make installed (<code class="docutils literal notranslate"><span class="pre">make</span></code> for <a class="reference external" href="https://formulae.brew.sh/formula/make">MacOS</a>, <a class="reference external" href="https://gnuwin32.sourceforge.net/packages/make.htm">Windows</a>, <a class="reference external" href="https://www.geeksforgeeks.org/how-to-install-make-on-ubuntu/">Ubuntu</a>).</p>
+<p>We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.</p>
+<p><a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html">Click here</a> for Anaconda installation steps.</p>
+<p>Once anaconda or any of its distribution is installed, run the following commands to create and activate a virtual environment using Anaconda and install Agentc.</p>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">agentcenv</span></code> with any other suitable environment name.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>dev-local-poetry<span class="w"> </span><span class="nv">env_name</span><span class="o">=</span>agentcenv
+conda<span class="w"> </span>activate<span class="w"> </span>agentcenv
 </pre></div>
 </div>
 </li>
