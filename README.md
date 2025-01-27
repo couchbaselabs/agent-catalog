@@ -34,27 +34,40 @@ The mono-repo for the Couchbase Agent Catalog project.
    git clone https://github.com/couchbaselabs/agent-catalog
    ```
 
-3. You are now ready to install the Agent Catalog package!
-   <br/>We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
+3. Installation using Makefile
+
+   To run the following `make` commands, you must have Anaconda and Make installed (`make` for [MacOS](https://formulae.brew.sh/formula/make), [Windows](https://gnuwin32.sourceforge.net/packages/make.htm), [Ubuntu](https://www.geeksforgeeks.org/how-to-install-make-on-ubuntu/)).
+
+
+   We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
 
    [Click here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for Anaconda installation steps.
 
-   Once anaconda or any of its distribution is installed, execute the following commands to activate the environment.
-
+   Once anaconda or any of its distribution is installed, run the following commands to create and activate a virtual environment using Anaconda and install Agentc.
+   Replace `agentcenv` with any other suitable environment name.
    ```bash
-   conda create -n agentcenv python=3.12
-
+   make dev-local-pip env_name=agentcenv
    conda activate agentcenv
    ```
-   Alternatively, you can use any Python virtual environment manager.
+
+   You are now ready to explore Agentc!
+
+4. Manual Installation
+
+   Alternatively, you can choose to manually install Agentc by first creating a virtual environment either using Anaconda or any other Python virtual environment manager.
+   ```bash
+   # create venv using Anaconda
+   conda create -n agentcenv python=3.12
+   conda activate agentcenv
+   ```
 
    Once environment is set up, execute the following command to install a local package with `pip`:
    ```bash
    cd agent-catalog
-
    # Install the agentc package.
    pip install libs/agentc
    ```
+
    If you are interested in developing with langchain, also install `agentc_langchain` by running the following:
 
    ```bash
@@ -93,6 +106,24 @@ The mono-repo for the Couchbase Agent Catalog project.
    ```bash
    cd agent-catalog
    poetry update
+   ```
+
+5. Install using Makefile
+
+   You can install Agentc without adding to your pyproject if you wish to explore first. Simply run the following make commands to create and activate a virtual environment and install the requirements.
+
+   To run the following `make` commands, you must have Anaconda and Make installed (`make` for [MacOS](https://formulae.brew.sh/formula/make), [Windows](https://gnuwin32.sourceforge.net/packages/make.htm), [Ubuntu](https://www.geeksforgeeks.org/how-to-install-make-on-ubuntu/)).
+
+   We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.
+
+   [Click here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for Anaconda installation steps.
+
+   Once anaconda or any of its distribution is installed, run the following commands to create and activate a virtual environment using Anaconda and install Agentc.
+   Replace `agentcenv` with any other suitable environment name.
+
+   ```bash
+   make dev-local-poetry env_name=agentcenv
+   conda activate agentcenv
    ```
 
 ### Verifying Your Installation
