@@ -1,4 +1,4 @@
-CREATE OR REPLACE ANALYTICS VIEW LLMGenerations AS
+CREATE OR REPLACE ANALYTICS VIEW `[BUCKET_NAME]`.`[SCOPE_NAME]`.LLMGenerations AS
     SELECT
         session,
         grouping_id,
