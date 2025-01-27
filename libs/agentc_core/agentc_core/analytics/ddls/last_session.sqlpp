@@ -3,7 +3,7 @@ CREATE OR REPLACE ANALYTICS FUNCTION
     `[BUCKET_NAME]`.`[SCOPE_NAME]`.LastSession () {
         (
             FROM
-                `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions() AS s
+                `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions AS s
             SELECT VALUE
                 s.sid
             ORDER BY

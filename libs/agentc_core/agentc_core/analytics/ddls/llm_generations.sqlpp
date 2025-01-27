@@ -5,7 +5,7 @@ CREATE OR REPLACE ANALYTICS VIEW LLMGenerations AS
         ( FROM g gi SELECT VALUE gi.rl ) AS generation
     FROM
         `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]` AS rl
-    GROUP BY 
+    GROUP BY
         rl.session AS session,
         rl.`grouping` AS grouping_id
         GROUP AS g;
