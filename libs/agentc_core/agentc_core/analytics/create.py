@@ -54,8 +54,7 @@ def create_analytics_udfs(cluster: couchbase.cluster.Cluster, bucket: str) -> No
         with open(ddl_file, "r") as fp:
             raw_ddl_string = fp.read()
             ddl_string = (
-                raw_ddl_string.replace("[ANALYTICS?]", "ANALYTICS")
-                .replace("[BUCKET_NAME]", bucket)
+                raw_ddl_string.replace("[BUCKET_NAME]", bucket)
                 .replace("[SCOPE_NAME]", DEFAULT_AUDIT_SCOPE)
                 .replace("[LOG_COLLECTION_NAME]", DEFAULT_AUDIT_COLLECTION)
             )

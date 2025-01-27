@@ -1,5 +1,5 @@
 -- Note: all_sessions.sqlpp should be run before this script.
-CREATE OR REPLACE ANALYTICS VIEW ToolCalls AS
+CREATE OR REPLACE ANALYTICS VIEW `[BUCKET_NAME]`.`[SCOPE_NAME]`.ToolCalls AS
 FROM
     -- The tool calls our LLM has authored.
     Sessions AS s1,

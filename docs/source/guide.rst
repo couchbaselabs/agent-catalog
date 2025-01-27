@@ -137,9 +137,9 @@ Agent analysts will follow this workflow:
    For logs stored locally, you can find them in the :file:`./agent-activity` directory.
    *We recommend the former, as it allows for easy ad-hoc analysis through Couchbase Query and/or Couchbase Analytics.*
 
-2. **Log Transformations**: For users with Couchbase Analytics enabled, we provide four views (expressed as
-   Couchbase Analytics UDFs) to help you get started with conversational-based agents.
-   All UDFs below belong to the scope :file:`agent_activity`.
+2. **Log Transformations**: For users with Couchbase Analytics enabled, we provide the following views (expressed as
+   Couchbase Analytics Views) to help you get started with conversational-based agents.
+   All Views below belong to the scope :file:`agent_activity`.
 
    .. admonition:: Sessions ``(sid, start_t, vid, msgs)``
 
