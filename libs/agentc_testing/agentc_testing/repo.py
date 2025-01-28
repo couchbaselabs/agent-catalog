@@ -73,6 +73,9 @@ def initialize_repo(
     repo.index.commit("Initial commit")
     output = list()
 
+    # Initialize the local catalog.
+    click_runner.invoke(click_command, ["init", "local", "catalog"])
+
     # If we are not using the index command, we can return early...
     if repo_kind == ExampleRepoKind.EMPTY or repo_kind == ExampleRepoKind.NON_INDEXED_ALL_TRAVEL:
         return output
@@ -89,6 +92,9 @@ def initialize_repo(
         ExampleRepoKind.PUBLISHED_PROMPTS_TRAVEL,
     ]:
         return output
+
+    # Initialize the DB catalog.
+    click_runner.invoke(click_command, ["init", "db", "catalog", "--bucket", "travel-sample"])
 
     # Call our publish command. Note that this assumes a container / CB instance is active!
     os.environ["AGENT_CATALOG_MAX_SOURCE_PARTITION"] = "1"
