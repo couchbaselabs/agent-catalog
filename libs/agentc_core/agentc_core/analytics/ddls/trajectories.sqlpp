@@ -1,5 +1,5 @@
 -- Note: all_sessions.sqlpp should be run before this script.
-CREATE OR REPLACE ANALYTICS VIEW Walks AS
+CREATE OR REPLACE ANALYTICS VIEW `[BUCKET_NAME]`.`[SCOPE_NAME]`.Walks AS
 FROM
     Sessions AS s,
     s.msgs AS msg
