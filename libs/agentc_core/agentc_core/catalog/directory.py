@@ -1,5 +1,6 @@
 import fnmatch
 import logging
+import os
 import pathlib
 import typing
 
@@ -21,11 +22,27 @@ def scan_directory(
     """
 
     ignore_file_parsers = []
+    all_ignore_files_paths = []
     if opts:
-        for ignore_file_name in opts["ignore_file_names"]:
-            ignore_file_path = pathlib.Path(root_dir) / ignore_file_name
-            if ignore_file_path.exists() and opts["ignore_file_parser_factory"]:
-                ignore_file_parsers.append(opts["ignore_file_parser_factory"](ignore_file_path.absolute()))
+        current_dir = os.getcwd()
+        user_target_dir = os.path.abspath(os.path.join(current_dir, root_dir))
+        # Find all ignore files in the directory tree till user mentioned directory.
+        for root, _dirs, files in os.walk(current_dir):
+            # Ignore path if it does not appear in the path towards user mentioned directory.
+            if root not in user_target_dir:
+                continue
+
+            for file in files:
+                if file in opts["ignore_file_names"]:
+                    all_ignore_files_paths.append(os.path.join(root, file))
+
+            # Stop crawling once user mentioned directory is crawled.
+            if root == user_target_dir:
+                break
+
+        if opts["ignore_file_parser_factory"]:
+            for ignore_file_path in all_ignore_files_paths:
+                ignore_file_parsers.append(opts["ignore_file_parser_factory"](ignore_file_path))
 
     for path in pathlib.Path(root_dir).rglob("*"):
         if len(ignore_file_parsers) > 0 and any(ignore_file_parser(path) for ignore_file_parser in ignore_file_parsers):
