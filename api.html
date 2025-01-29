@@ -85,7 +85,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#agentc.Auditor.auditor_output"><code class="docutils literal notranslate"><span class="pre">Auditor.auditor_output</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#agentc.Auditor.bucket"><code class="docutils literal notranslate"><span class="pre">Auditor.bucket</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#agentc.Auditor.catalog"><code class="docutils literal notranslate"><span class="pre">Auditor.catalog</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#agentc.Auditor.certificate"><code class="docutils literal notranslate"><span class="pre">Auditor.certificate</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agentc.Auditor.conn_root_certificate"><code class="docutils literal notranslate"><span class="pre">Auditor.conn_root_certificate</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#agentc.Auditor.conn_string"><code class="docutils literal notranslate"><span class="pre">Auditor.conn_string</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#agentc.Auditor.llm_model_name"><code class="docutils literal notranslate"><span class="pre">Auditor.llm_model_name</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#agentc.Auditor.password"><code class="docutils literal notranslate"><span class="pre">Auditor.password</span></code></a></li>
@@ -97,6 +97,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#agentc.Provider"><code class="docutils literal notranslate"><span class="pre">Provider</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#agentc.Provider.bucket"><code class="docutils literal notranslate"><span class="pre">Provider.bucket</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#agentc.Provider.catalog"><code class="docutils literal notranslate"><span class="pre">Provider.catalog</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#agentc.Provider.conn_root_certificate"><code class="docutils literal notranslate"><span class="pre">Provider.conn_root_certificate</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#agentc.Provider.conn_string"><code class="docutils literal notranslate"><span class="pre">Provider.conn_string</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#agentc.Provider.decorator"><code class="docutils literal notranslate"><span class="pre">Provider.decorator</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#agentc.Provider.password"><code class="docutils literal notranslate"><span class="pre">Provider.password</span></code></a></li>
@@ -265,9 +266,13 @@
 <span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Bucket&quot;</span>
 <span class="w">      </span><span class="p">},</span>
-<span class="w">      </span><span class="nt">&quot;certificate&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;conn_root_certificate&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;path&quot;</span><span class="p">,</span>
 <span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
 <span class="w">            </span><span class="p">},</span>
 <span class="w">            </span><span class="p">{</span>
@@ -275,7 +280,7 @@
 <span class="w">            </span><span class="p">}</span>
 <span class="w">         </span><span class="p">],</span>
 <span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Certificate&quot;</span>
+<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Conn Root Certificate&quot;</span>
 <span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;catalog&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
@@ -320,7 +325,7 @@
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">auditor_output</span> <span class="pre">(pathlib.Path</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bucket</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">catalog</span> <span class="pre">(pathlib.Path</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">certificate</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">conn_root_certificate</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">pathlib.Path</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">conn_string</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">llm_model_name</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">password</span> <span class="pre">(pydantic.types.SecretStr</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
@@ -405,10 +410,12 @@ If this field is not set, we will defer to the default behavior of <a class="ref
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
-<dt class="sig sig-object py" id="agentc.Auditor.certificate">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">certificate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc.Auditor.certificate" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="agentc.Auditor.conn_root_certificate">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">conn_root_certificate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc.Auditor.conn_root_certificate" title="Link to this definition"></a></dt>
 <dd><p>Path to the root certificate for TLS associated with the Couchbase cluster.</p>
-<p>This field <strong>can</strong> be specified with <a class="reference internal" href="#agentc.Auditor.conn_string" title="agentc.Auditor.conn_string"><code class="xref py py-attr docutils literal notranslate"><span class="pre">conn_string</span></code></a>, <a class="reference internal" href="#agentc.Auditor.username" title="agentc.Auditor.username"><code class="xref py py-attr docutils literal notranslate"><span class="pre">username</span></code></a>, and <a class="reference internal" href="#agentc.Auditor.password" title="agentc.Auditor.password"><code class="xref py py-attr docutils literal notranslate"><span class="pre">password</span></code></a> for secure connection verification with Couchbase cluster.</p>
+<p>This field is optional and only required if the Couchbase cluster is using a self-signed certificate.
+If specified, this field <strong>must</strong> be specified with <a class="reference internal" href="#agentc.Auditor.conn_string" title="agentc.Auditor.conn_string"><code class="xref py py-attr docutils literal notranslate"><span class="pre">conn_string</span></code></a>, <a class="reference internal" href="#agentc.Auditor.username" title="agentc.Auditor.username"><code class="xref py py-attr docutils literal notranslate"><span class="pre">username</span></code></a>,
+and <a class="reference internal" href="#agentc.Auditor.password" title="agentc.Auditor.password"><code class="xref py py-attr docutils literal notranslate"><span class="pre">password</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Validated by<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -607,6 +614,22 @@ or on accept(). An agent_name specified in accept() overrides a model specified 
 <span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Catalog&quot;</span>
 <span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;conn_root_certificate&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;path&quot;</span><span class="p">,</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">         </span><span class="p">],</span>
+<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Conn Root Certificate&quot;</span>
+<span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;snapshot&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">            </span><span class="p">{</span>
@@ -692,6 +715,7 @@ or on accept(). An agent_name specified in accept() overrides a model specified 
 <dd class="field-even"><ul class="simple">
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bucket</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">catalog</span> <span class="pre">(pathlib.Path</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">conn_root_certificate</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">pathlib.Path</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">conn_string</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">decorator</span> <span class="pre">(Callable[[agentc_core.provider.provider.ToolProvider.ToolResult],</span> <span class="pre">Any]</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">password</span> <span class="pre">(pydantic.types.SecretStr</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
@@ -717,7 +741,7 @@ or on accept(). An agent_name specified in accept() overrides a model specified 
 <dt class="sig sig-object py" id="agentc.Provider.bucket">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bucket</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc.Provider.bucket" title="Link to this definition"></a></dt>
 <dd><p>The name of the Couchbase bucket possessing the catalog.</p>
-<p>This field must be specified with <a class="reference internal" href="#agentc.Provider.conn_string" title="agentc.Provider.conn_string"><code class="xref py py-attr docutils literal notranslate"><span class="pre">conn_string</span></code></a>, <a class="reference internal" href="#agentc.Provider.username" title="agentc.Provider.username"><code class="xref py py-attr docutils literal notranslate"><span class="pre">username</span></code></a>, and <a class="reference internal" href="#agentc.Provider.password" title="agentc.Provider.password"><code class="xref py py-attr docutils literal notranslate"><span class="pre">password</span></code></a>.</p>
+<p>This field <strong>must</strong> be specified with <a class="reference internal" href="#agentc.Provider.conn_string" title="agentc.Provider.conn_string"><code class="xref py py-attr docutils literal notranslate"><span class="pre">conn_string</span></code></a>, <a class="reference internal" href="#agentc.Provider.username" title="agentc.Provider.username"><code class="xref py py-attr docutils literal notranslate"><span class="pre">username</span></code></a>, and <a class="reference internal" href="#agentc.Provider.password" title="agentc.Provider.password"><code class="xref py py-attr docutils literal notranslate"><span class="pre">password</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Validated by<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -751,6 +775,26 @@ from the current working directory until we find the <code class="xref py py-dat
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="agentc.Provider.conn_root_certificate">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">conn_root_certificate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc.Provider.conn_root_certificate" title="Link to this definition"></a></dt>
+<dd><p>Path to the root certificate file for the Couchbase cluster.</p>
+<p>This field is optional and only required if the Couchbase cluster is using a self-signed certificate.
+If specified, this field <strong>must</strong> be specified with <a class="reference internal" href="#agentc.Provider.conn_string" title="agentc.Provider.conn_string"><code class="xref py py-attr docutils literal notranslate"><span class="pre">conn_string</span></code></a>, <a class="reference internal" href="#agentc.Provider.username" title="agentc.Provider.username"><code class="xref py py-attr docutils literal notranslate"><span class="pre">username</span></code></a>,
+and <a class="reference internal" href="#agentc.Provider.password" title="agentc.Provider.password"><code class="xref py py-attr docutils literal notranslate"><span class="pre">password</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_local_catalog</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_find_remote_catalog</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_prompt_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_tool_provider</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_one_provider_should_exist</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="agentc.Provider.conn_string">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">conn_string</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc.Provider.conn_string" title="Link to this definition"></a></dt>
 <dd><p>Couchbase connection string that points to the catalog.</p>
@@ -759,7 +803,7 @@ If there exists no local catalog (e.g., this is deployed in a standalone environ
 <strong class="command">find</strong> commands directly on the remote catalog.
 If this field AND <code class="docutils literal notranslate"><span class="pre">$AGENT_CATALOG_CATALOG</span></code> are specified, we will issue <strong class="command">find</strong> on both the remote and
 local catalog (with local catalog entries taking precedence).</p>
-<p>This field must be specified with <a class="reference internal" href="#agentc.Provider.username" title="agentc.Provider.username"><code class="xref py py-attr docutils literal notranslate"><span class="pre">username</span></code></a>, <a class="reference internal" href="#agentc.Provider.password" title="agentc.Provider.password"><code class="xref py py-attr docutils literal notranslate"><span class="pre">password</span></code></a>, and  <a class="reference internal" href="#agentc.Provider.bucket" title="agentc.Provider.bucket"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bucket</span></code></a>.</p>
+<p>This field <strong>must</strong> be specified with <a class="reference internal" href="#agentc.Provider.username" title="agentc.Provider.username"><code class="xref py py-attr docutils literal notranslate"><span class="pre">username</span></code></a>, <a class="reference internal" href="#agentc.Provider.password" title="agentc.Provider.password"><code class="xref py py-attr docutils literal notranslate"><span class="pre">password</span></code></a>, and  <a class="reference internal" href="#agentc.Provider.bucket" title="agentc.Provider.bucket"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bucket</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Validated by<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -798,7 +842,7 @@ To avoid having to “box” these tools yourself, we accept a callback to perfo
 <dt class="sig sig-object py" id="agentc.Provider.password">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">password</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SecretStr</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc.Provider.password" title="Link to this definition"></a></dt>
 <dd><p>Password associated with the Couchbase instance possessing the catalog.</p>
-<p>This field must be specified with <a class="reference internal" href="#agentc.Provider.conn_string" title="agentc.Provider.conn_string"><code class="xref py py-attr docutils literal notranslate"><span class="pre">conn_string</span></code></a>, <a class="reference internal" href="#agentc.Provider.username" title="agentc.Provider.username"><code class="xref py py-attr docutils literal notranslate"><span class="pre">username</span></code></a>, and <a class="reference internal" href="#agentc.Provider.bucket" title="agentc.Provider.bucket"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bucket</span></code></a>.</p>
+<p>This field <strong>must</strong> be specified with <a class="reference internal" href="#agentc.Provider.conn_string" title="agentc.Provider.conn_string"><code class="xref py py-attr docutils literal notranslate"><span class="pre">conn_string</span></code></a>, <a class="reference internal" href="#agentc.Provider.username" title="agentc.Provider.username"><code class="xref py py-attr docutils literal notranslate"><span class="pre">username</span></code></a>, and <a class="reference internal" href="#agentc.Provider.bucket" title="agentc.Provider.bucket"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bucket</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Validated by<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -939,7 +983,7 @@ frameworks.</p>
 <dt class="sig sig-object py" id="agentc.Provider.username">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">username</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SecretStr</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc.Provider.username" title="Link to this definition"></a></dt>
 <dd><p>Username associated with the Couchbase instance possessing the catalog.</p>
-<p>This field must be specified with <a class="reference internal" href="#agentc.Provider.conn_string" title="agentc.Provider.conn_string"><code class="xref py py-attr docutils literal notranslate"><span class="pre">conn_string</span></code></a>, <a class="reference internal" href="#agentc.Provider.password" title="agentc.Provider.password"><code class="xref py py-attr docutils literal notranslate"><span class="pre">password</span></code></a>, and <a class="reference internal" href="#agentc.Provider.bucket" title="agentc.Provider.bucket"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bucket</span></code></a>.</p>
+<p>This field <strong>must</strong> be specified with <a class="reference internal" href="#agentc.Provider.conn_string" title="agentc.Provider.conn_string"><code class="xref py py-attr docutils literal notranslate"><span class="pre">conn_string</span></code></a>, <a class="reference internal" href="#agentc.Provider.password" title="agentc.Provider.password"><code class="xref py py-attr docutils literal notranslate"><span class="pre">password</span></code></a>, and <a class="reference internal" href="#agentc.Provider.bucket" title="agentc.Provider.bucket"><code class="xref py py-attr docutils literal notranslate"><span class="pre">bucket</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Validated by<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
