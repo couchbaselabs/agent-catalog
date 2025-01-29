@@ -73,7 +73,11 @@ Both tool builders and prompt builders (i.e., agent builders) will follow this w
    Agent Catalog currently integrates with Git (using the working Git SHA) to version each item.
    **You must be in a Git repository to use Agent Catalog.**
 
-4. **Indexing**: Use the command below to index your tools/prompts:
+4. **Indexing**: Use the command below to first initialize local catalog and later index your tools/prompts:
+
+   .. code-block:: bash
+
+    agentc init local catalog
 
    .. code-block:: bash
 
@@ -112,16 +116,24 @@ Both tool builders and prompt builders (i.e., agent builders) will follow this w
         export AGENT_CATALOG_USERNAME=Administrator
         export AGENT_CATALOG_PASSWORD=password
 
-   3. Use the command to publish your items to your Couchbase instance.
+   3. Use the command to initialize database catalog.
+
+      .. code-block:: bash
+
+            agentc init db catalog --bucket [BUCKET_NAME]
+
+      This will create a new scope in the specified bucket called ``agent_catalog``, which will contain all of your
+      items. It also creates necessary collections and indexes for the catalog.
+
+   4. Use the command to publish your items to your Couchbase instance.
 
       .. code-block:: bash
 
         agentc publish [[tool|prompt]] --bucket [BUCKET_NAME]
 
-      This will create a new scope in the specified bucket called ``agent_catalog``, which will contain all of your
-      items.
+      This will push all local catalog items to the scope ``agent_catalog`` in the specified bucket.
 
-   4. Note that Agent Catalog isn't meant for the "publish once and forget" case.
+   5. Note that Agent Catalog isn't meant for the "publish once and forget" case.
       You are encouraged to run the :command:`agentc publish` command as often as you like to keep your items
       up-to-date.
 
