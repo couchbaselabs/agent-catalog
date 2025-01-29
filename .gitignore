@@ -169,3 +169,6 @@ cython_debug/
 *.agent-activity/
 *.model-cache/
 *.data/
+
+# Security certificate files
+*.pem
