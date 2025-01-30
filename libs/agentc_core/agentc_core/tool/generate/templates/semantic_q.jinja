@@ -50,8 +50,8 @@ def {{ tool.name }}(question: {{ input.type_name }}) -> list[str]:
     else:
         raise ValueError("Bad input given to tool!")
 
+    if
     import sentence_transformers
-
     logger.debug("{{ tool.name }} is generating an embedding for: " + formatted_question + ".")
     embedding_model = sentence_transformers.SentenceTransformer(
         '{{ vector_search.embedding_model }}',

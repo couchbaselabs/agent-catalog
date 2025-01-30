@@ -29,6 +29,7 @@ def cmd_index(
     source_dirs: list[str | os.PathLike],
     kinds: list[typing.Literal["tool", "prompt"]],
     embedding_model_name: str = DEFAULT_EMBEDDING_MODEL,
+    embedding_model_url: str = None,
     dry_run: bool = False,
     ctx: Context = None,
     **_,
@@ -54,6 +55,7 @@ def cmd_index(
     repo, get_path_version = load_repository(pathlib.Path(os.getcwd()))
     embedding_model = EmbeddingModel(
         embedding_model_name=embedding_model_name,
+        embedding_model_url=embedding_model_url,
         catalog_path=pathlib.Path(ctx.catalog),
     )
 
