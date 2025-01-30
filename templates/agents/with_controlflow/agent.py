@@ -12,7 +12,6 @@ import os
 import pydantic
 import uuid
 
-from pydantic import SecretStr
 from utils import TaskFactory
 
 # Make sure you populate your .env file with the correct credentials!
@@ -29,9 +28,10 @@ provider = agentc.Provider(
     # The 'values' of this dictionary map to actual values required by the tool.
     # In this case, we get the Couchbase connection string, username, and password from environment variables.
     secrets={
-        "CB_CONN_STRING": SecretStr(os.getenv("CB_CONN_STRING")),
-        "CB_USERNAME": SecretStr(os.getenv("CB_USERNAME")),
-        "CB_PASSWORD": SecretStr(os.getenv("CB_PASSWORD")),
+        "CB_CONN_STRING": os.getenv("CB_CONN_STRING"),
+        "CB_USERNAME": os.getenv("CB_USERNAME"),
+        "CB_PASSWORD": os.getenv("CB_PASSWORD"),
+        "CB_CERTIFICATE": os.getenv("CB_CERTIFICATE"),
     },
 )
 

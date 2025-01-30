@@ -2,12 +2,12 @@
 CREATE OR REPLACE ANALYTICS VIEW `[BUCKET_NAME]`.`[SCOPE_NAME]`.ToolCalls AS
 FROM
     -- The tool calls our LLM has authored.
-    Sessions AS s1,
+    `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions AS s1,
     s1.msgs AS m1,
     -- Note: this is LangChain specific! We need to factor this out later.
     m1.content.dump.kwargs.tool_calls AS tc1,
     -- The results of the tools.
-    Sessions AS s2,
+    `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions AS s2,
     s2.msgs AS m2
 WHERE
     m1.kind = "llm" AND
