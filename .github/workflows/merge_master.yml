@@ -1,0 +1,36 @@
+name: Merge master to target branch
+
+on:
+  push:
+    branches:
+      - master  # Trigger this on pushes to the master branch
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the master branch and target branch
+      - name: Checkout master branch
+        uses: actions/checkout@v2
+        with:
+          ref: master
+
+      - name: Checkout target branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.target_branch }} # Use input variable for target branch
+          path: target-branch
+
+      # Merge master into the target branch
+      - name: Merge master into target branch
+        run: |
+          git fetch origin
+          git checkout ${{ github.event.inputs.target_branch }}
+          git merge origin/master --no-ff --commit -m "Merging master into ${{ github.event.inputs.target_branch }}"
+
+      # Push the changes back to the target branch
+      - name: Push changes to target branch
+        run: |
+          git push origin ${{ github.event.inputs.target_branch }}
+          
