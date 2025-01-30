@@ -26,6 +26,7 @@ def scan_directory(
     if opts:
         current_dir = os.getcwd()
         user_target_dir = os.path.abspath(os.path.join(current_dir, root_dir))
+
         # Find all ignore files in the directory tree till user mentioned directory.
         for root, _dirs, files in os.walk(current_dir):
             # Ignore path if it does not appear in the path towards user mentioned directory.
