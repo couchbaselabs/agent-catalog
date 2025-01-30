@@ -87,19 +87,29 @@ This directory contains a starter project for building agents with Couchbase, Co
 
    Commands:
      add      Interactively create a new tool or prompt and save it to the filesystem (output).
-     clean    Delete all agent catalog related files / collections.
+     clean    Delete all or specific (catalog and/or activity) agent related files / collections.
      env      Return all agentc related environment and configuration parameters as a JSON object.
      execute  Search and execute a specific tool.
      find     Find items from the catalog based on a natural language QUERY string or by name.
      index    Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
-     publish  Upload the local catalog to a Couchbase instance.
+     init     Initialize the necessary files/collections for local/database catalog.
+     ls       List all indexed tools and/or prompts in the catalog.
+     publish  Upload the local catalog and/or logs to a Couchbase instance.
      status   Show the status of the local catalog.
      version  Show the current version of agentc.
 
      See: https://docs.couchbase.com or https://couchbaselabs.github.io/agent-catalog/index.html# for more information.
    ```
 
-8. Make sure your Git repo is clean, and run `agentc index` to index your tools and prompts.
+8. Initialize the local catalog and auditor.
+
+   ```bash
+   agentc init local all
+   ```
+
+   This command will create the necessary directories for the local catalog and auditor.
+
+9. Make sure your Git repo is clean, and run `agentc index` to index your tools and prompts.
    Note that `tools` and `prompts` are _relative paths_ to the `tools` and `prompts` folder.
 
    ```bash
@@ -112,10 +122,11 @@ This directory contains a starter project for building agents with Couchbase, Co
    _Hint: if you've made changes but want to keep the same commit ID for the later "publish" step, use
    `git add $MY_FILES` followed by `git commit --amend`!_
 
-9. Start up a Couchbase instance.
+10. Start up a Couchbase instance.
 
     1. For those interested in using a local Couchbase instance, see
-       [here](https://docs.couchbase.com/server/current/install/install-intro.html).
+     [here](https://docs.couchbase.com/server/current/install/install-intro.html).
+
     2. For those interested in using Couchbase within a Docker container, run the command below:
 
        ```bash
@@ -128,23 +139,31 @@ This directory contains a starter project for building agents with Couchbase, Co
 
     3. For those interested in using Capella, see [here](https://cloud.couchbase.com/sign-up).
 
-   Once Couchbase instance is running, enable the following services on your Couchbase cluster:
-     - Data, Query, Index: For storing items and searching them.
-     - Search: For performing vector search on items.
-     - Analytics: For creating views on audit logs and to query the views for better insights on logs.
+       Once Couchbase instance is running, enable the following services on your Couchbase cluster:
+         - Data, Query, Index: For storing items and searching them.
+         - Search: For performing vector search on items.
+         - Analytics: For creating views on audit logs and to query the views for better insights on logs.
 
-   This specific agent also uses the `travel-sample` bucket.
-   You'll need to navigate to your instance's UI (for local instances, this is on http://localhost:8091) to install
-   this sample bucket.
+       This specific agent also uses the `travel-sample` bucket.
+       You'll need to navigate to your instance's UI (for local instances, this is on http://localhost:8091) to install
+       this sample bucket.
 
-10. Create a `.env` file from the `.env.example` file and tweak this to your environment.
+11. Create a `.env` file from the `.env.example` file and tweak this to your environment.
 
    ```bash
    cp .env.example .env
    vi .env
    ```
 
-11. Publish your local agent catalog to your Couchbase instance with `agentc publish`.
+12. Initialize the database catalog and auditor.
+
+   ```bash
+   agentc init db all --bucket travel-sample
+   ```
+
+    This command will create the necessary scopes, collections, secondary indexes, vector indexes and analytics views for the database catalog and auditor.
+
+13. Publish your local agent catalog to your Couchbase instance with `agentc publish`.
    Your Couchbase instance details in the `.env` file will be used for authentication.
    Again, this specific starter agent uses the `travel-sample` bucket.
 
@@ -152,7 +171,7 @@ This directory contains a starter project for building agents with Couchbase, Co
    agentc publish tool prompt --bucket travel-sample
    ```
 
-12. Start a prefect server and run your agent!
+14. Start a prefect server and run your agent!
 
    ```bash
    export PREFECT_API_URL=http://127.0.0.1:4200/api
@@ -160,7 +179,7 @@ This directory contains a starter project for building agents with Couchbase, Co
    python agent.py
    ```
 
-13. Let's now talk with our agent!
+15. Let's now talk with our agent!
     I initiated three conversations: two "positive" and one "negative".
     The first positive case is given below:
 

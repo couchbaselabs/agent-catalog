@@ -10,20 +10,34 @@ import re
 import typing
 
 from ..models.context import Context
+from agentc_core.analytics.create import create_analytics_udfs
 from agentc_core.catalog import CatalogChain
 from agentc_core.catalog import CatalogDB
 from agentc_core.catalog import CatalogMem
 from agentc_core.catalog import __version__ as CATALOG_SCHEMA_VERSION
+from agentc_core.catalog.descriptor import CatalogDescriptor
 from agentc_core.catalog.index import MetaVersion
 from agentc_core.catalog.index import index_catalog
 from agentc_core.catalog.version import lib_version
+from agentc_core.defaults import DEFAULT_AUDIT_COLLECTION
+from agentc_core.defaults import DEFAULT_AUDIT_SCOPE
+from agentc_core.defaults import DEFAULT_CATALOG_COLLECTION_NAME
 from agentc_core.defaults import DEFAULT_CATALOG_NAME
 from agentc_core.defaults import DEFAULT_MAX_ERRS
+from agentc_core.defaults import DEFAULT_META_COLLECTION_NAME
 from agentc_core.defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from agentc_core.learned.embedding import EmbeddingModel
+from agentc_core.util.ddl import create_gsi_indexes
+from agentc_core.util.ddl import create_vector_index
+from agentc_core.util.models import CouchbaseConnect
+from agentc_core.util.models import Keyspace
+from agentc_core.util.publish import create_scope_and_collection
 from agentc_core.version import VersionDescriptor
+from couchbase.cluster import Cluster
+from couchbase.exceptions import CouchbaseException
 
 # The following are used for colorizing output.
+CATALOG_KINDS = ["prompt", "tool"]
 LEVEL_COLORS = {"good": "green", "warn": "yellow", "error": "red"}
 KIND_COLORS = {"tool": "bright_magenta", "prompt": "blue", "log": "cyan"}
 try:
@@ -33,14 +47,6 @@ except OSError:
     DASHES = "-" * 80
 
 logger = logging.getLogger(__name__)
-
-
-def init_local(ctx: Context):
-    # Init directories.
-    os.makedirs(ctx.catalog, exist_ok=True)
-    os.makedirs(ctx.activity, exist_ok=True)
-
-    # (Note: the version checking logic has been moved into index).
 
 
 def load_repository(top_dir: pathlib.Path = None):
@@ -173,3 +179,97 @@ def get_catalog(
 # the pattern similar to repo_load()'s searching for a .git/ directory
 # and scan up the parent directories to find the first .agent-catalog/
 # subdirectory?
+
+
+def init_local_catalog(ctx: Context):
+    # Init directories.
+    os.makedirs(ctx.catalog, exist_ok=True)
+
+
+def init_local_activity(ctx: Context):
+    # Init directories.
+    os.makedirs(ctx.activity, exist_ok=True)
+
+
+def init_db_catalog(
+    ctx: Context, cluster: Cluster, keyspace_details: Keyspace, connection_details_env: CouchbaseConnect
+):
+    # Get the bucket manager
+    cb = cluster.bucket(keyspace_details.bucket)
+    bucket_manager = cb.collections()
+
+    # ---------------------------------------------------------------------------------------- #
+    #                               SCOPES and COLLECTIONS                                     #
+    # ---------------------------------------------------------------------------------------- #
+    for kind in CATALOG_KINDS:
+        # Create the metadata collection if it does not exist
+        click.secho(f"Now creating scope and collections for the {kind} catalog.", fg="yellow")
+        meta_col = kind + DEFAULT_META_COLLECTION_NAME
+        (msg, err) = create_scope_and_collection(bucket_manager, scope=keyspace_details.scope, collection=meta_col)
+        if err is not None:
+            raise ValueError(msg)
+        else:
+            click.secho(f"Metadata collection for the {kind} catalog has been successfully created!\n", fg="green")
+
+        # Create the catalog collection if it does not exist
+        click.secho(f"Now creating the catalog collection for the {kind} catalog.", fg="yellow")
+        catalog_col = kind + DEFAULT_CATALOG_COLLECTION_NAME
+        (msg, err) = create_scope_and_collection(bucket_manager, scope=keyspace_details.scope, collection=catalog_col)
+        if err is not None:
+            raise ValueError(msg)
+        else:
+            click.secho(f"Catalog collection for the {kind} catalog has been successfully created!\n", fg="green")
+
+    # ---------------------------------------------------------------------------------------- #
+    #                               GSI and Vector Indexes                                     #
+    # ---------------------------------------------------------------------------------------- #
+    for kind in CATALOG_KINDS:
+        click.secho(f"Now building the GSI indexes for the {kind} catalog.", fg="yellow")
+        completion_status, err = create_gsi_indexes(keyspace_details.bucket, cluster, kind, True)
+        if not completion_status:
+            raise ValueError(f"GSI indexes could not be created \n{err}")
+        else:
+            click.secho(f"All GSI indexes for the {kind} catalog have been successfully created!\n", fg="green")
+
+        click.secho(f"Now building the vector index for the {kind} catalog.", fg="yellow")
+        catalog_path = pathlib.Path(ctx.catalog) / (kind + DEFAULT_CATALOG_NAME)
+
+        try:
+            with catalog_path.open("r") as fp:
+                catalog_desc = CatalogDescriptor.model_validate_json(fp.read())
+        except FileNotFoundError:
+            click.secho(
+                f"Unable to create vector index for {kind} catalog because dimension of vector can't be determined!\nInitialize the local catalog first, index items and try initializing the db catalog again.\n",
+                fg="red",
+            )
+            continue
+
+        dims = len(catalog_desc.items[0].embedding)
+        _, err = create_vector_index(keyspace_details.bucket, kind, connection_details_env, dims)
+        if err is not None:
+            raise ValueError(f"Vector index could not be created \n{err}")
+        else:
+            click.secho(f"Vector index for the {kind} catalog has been successfully created!\n", fg="green")
+
+
+def init_db_auditor(ctx: Context, cluster: Cluster, keyspace_details: Keyspace):
+    # Get the bucket manager
+    cb = cluster.bucket(keyspace_details.bucket)
+    bucket_manager = cb.collections()
+
+    log_col = DEFAULT_AUDIT_COLLECTION
+    log_scope = DEFAULT_AUDIT_SCOPE
+    click.secho("Now creating scope and collections for the auditor.", fg="yellow")
+    (msg, err) = create_scope_and_collection(bucket_manager, scope=log_scope, collection=log_col)
+    if err is not None:
+        raise ValueError(msg)
+    else:
+        click.secho("Scope and collection for the auditor have been successfully created!\n", fg="green")
+
+    click.secho("Now creating the analytics UDFs for the auditor.", fg="yellow")
+    try:
+        create_analytics_udfs(cluster, keyspace_details.bucket)
+        click.secho("All analytics UDFs for the auditor have been successfully created!\n", fg="green")
+    except CouchbaseException as e:
+        click.secho("Analytics views could not be created.", fg="red")
+        logger.warning("Analytics views could not be created: %s", e)

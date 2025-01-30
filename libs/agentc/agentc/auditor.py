@@ -113,7 +113,13 @@ class Auditor(pydantic_settings.BaseSettings):
                     # We have reached the root. We cannot find the catalog folder.
                     return self
                 working_path = working_path.parent
-            (working_path / DEFAULT_ACTIVITY_FOLDER).mkdir(exist_ok=True)
+
+            auditor_directory_path = working_path / DEFAULT_ACTIVITY_FOLDER
+            if not auditor_directory_path.exists():
+                raise ValueError(
+                    f"Could not find the {DEFAULT_ACTIVITY_FOLDER} folder!\nPlease use 'agentc init' command first.\nExecute 'agentc init --help' for more information."
+                )
+
             self.auditor_output = working_path / DEFAULT_ACTIVITY_FOLDER / DEFAULT_LLM_ACTIVITY_NAME
 
         return self

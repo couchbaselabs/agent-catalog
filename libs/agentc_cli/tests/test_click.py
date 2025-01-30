@@ -478,3 +478,31 @@ def test_ls_local_both_tools_prompts(tmp_path):
         assert "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 1
         output = runner.invoke(click_main, ["ls", "-local"]).stdout
         assert "PROMPT" in output and "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 2
+
+
+@pytest.mark.smoke
+def test_init_local(tmp_path):
+    runner = click.testing.CliRunner()
+    with runner.isolated_filesystem(temp_dir=tmp_path):
+        files_present = os.listdir()
+        assert ".agent-catalog" not in files_present and ".agent-activity" not in files_present
+
+        runner.invoke(click_main, ["init", "local", "catalog"])
+        files_present = os.listdir()
+        assert ".agent-catalog" in files_present and ".agent-activity" not in files_present
+
+        runner.invoke(click_main, ["init", "local", "auditor"])
+        files_present = os.listdir()
+        assert ".agent-catalog" in files_present and ".agent-activity" in files_present
+
+
+@pytest.mark.smoke
+def test_init_local_all(tmp_path):
+    runner = click.testing.CliRunner()
+    with runner.isolated_filesystem(temp_dir=tmp_path):
+        files_present = os.listdir()
+        assert ".agent-catalog" not in files_present and ".agent-activity" not in files_present
+
+        runner.invoke(click_main, ["init", "local", "all"])
+        files_present = os.listdir()
+        assert ".agent-catalog" in files_present and ".agent-activity" in files_present
