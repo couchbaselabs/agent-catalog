@@ -15,7 +15,7 @@ jobs:
       repository-projects: write
     steps:
       - uses: actions/checkout@v2
-      - uses: everlytic/branch-merge@1.1.2
+      - uses: everlytic/branch-merge@f1304f3c45db1c13f5d14e8ce99e23e7fabdbe79
         with:
           github_token: ${{ github.token }}
           source_ref: ${{ github.ref }}
