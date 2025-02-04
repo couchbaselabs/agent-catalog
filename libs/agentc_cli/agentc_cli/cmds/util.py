@@ -7,6 +7,7 @@ import os
 import pathlib
 import pydantic
 import re
+import shutil
 import typing
 
 from ..models.context import Context
@@ -165,6 +166,18 @@ def get_catalog(
     else:
         raise ValueError("No catalog found!")
     return catalog
+
+
+def remove_directory(folder: str):
+    if not folder or not os.path.exists(folder):
+        return
+
+    folder_path = pathlib.Path(folder)
+
+    if folder_path.is_file():
+        os.remove(folder_path.absolute())
+    elif folder_path.is_dir():
+        shutil.rmtree(folder_path.absolute())
 
 
 # TODO: One use case is a user's repo (like agent-catalog-example) might
