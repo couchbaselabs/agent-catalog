@@ -25,6 +25,7 @@ agentc = "agentc_cli.main:main"
 python = "^3.12"
 click-extra = "^4.15.0"
 tqdm = "^4.66.5"
+dateparser = "^1.2.0"
 
 [tool.poetry.dependencies.agentc-core]
 path = "../agentc_core"
