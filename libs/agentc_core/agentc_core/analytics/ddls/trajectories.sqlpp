@@ -1,7 +1,7 @@
 -- Note: all_sessions.sqlpp should be run before this script.
 CREATE OR REPLACE ANALYTICS VIEW `[BUCKET_NAME]`.`[SCOPE_NAME]`.Walks AS
 FROM
-    Sessions AS s,
+    `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions AS s,
     s.msgs AS msg
 WHERE
     msg.kind = "transition"
