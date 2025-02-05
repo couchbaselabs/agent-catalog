@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 {% if input is not none %}
 {{ input.model.generated_code | safe }}
-parameter_locations = {{ input.locations }}
+parameter_locations = {{ input.locations | safe }}
 {% endif %}
 
 @tool
@@ -39,7 +39,7 @@ def {{ tool.name }}({% if input is not none %}argument_input: {{ input.model.typ
     {% endif %}
 
     # TODO (GLENN): We need to formalize how to handle multiple URLs.
-    for server_url in {{ urls }}:
+    for server_url in {{ urls | safe }}:
         url = server_url + '{{ path }}'
         request_body = dict()
         parameters = dict()
