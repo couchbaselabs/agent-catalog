@@ -194,7 +194,7 @@ def add(ctx, output: pathlib.Path, record_kind: RecordKind):
     "--date",
     default=None,
     type=str,
-    help="Date and Time before which the logs must be removed. Ex: 2021-09-01T00:00:00, 20th Jan 2024 8:00PM, 2 days ago",
+    help="Datetime of the oldest log entry to keep (older log entries will be deleted).",
     show_default=False,
 )
 @click.pass_context
