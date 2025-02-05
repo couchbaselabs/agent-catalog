@@ -1,6 +1,7 @@
 import dataclasses
 import fnmatch
 import logging
+import os
 import tqdm
 import typing
 
@@ -106,6 +107,7 @@ def index_catalog_start(
 
     logger.debug(f"Now crawling source directories. [{','.join(d for d in source_dirs)}]")
     printer(f"Crawling {','.join(d for d in source_dirs)}:")
+
     source_files = list()
     if kind == "tool":
         source_globs = [i.glob_pattern for i in AllIndexers if all(k.is_tool() for k in i.kind)]
@@ -114,7 +116,8 @@ def index_catalog_start(
     else:
         raise ValueError(f"Unknown kind: {kind}")
     for source_dir in source_dirs:
-        source_files += scan_directory(source_dir, source_globs, opts=scan_directory_opts)
+        source_files += scan_directory(os.getcwd(), source_dir, source_globs, opts=scan_directory_opts)
+
     all_errs = []
     all_descriptors = []
     source_iterable = tqdm.tqdm(source_files) if print_progress else source_files
