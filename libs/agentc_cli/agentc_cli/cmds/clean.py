@@ -2,13 +2,13 @@ import click
 import couchbase.cluster
 import dateparser
 import importlib.util
+import json
 import logging
 import pathlib
 import typing
 
 from ..models.context import Context
 from .util import remove_directory
-from agentc_core.analytics import Log
 from agentc_core.defaults import DEFAULT_AUDIT_COLLECTION
 from agentc_core.defaults import DEFAULT_AUDIT_SCOPE
 from agentc_core.defaults import DEFAULT_CATALOG_COLLECTION_NAME
@@ -16,7 +16,7 @@ from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_LLM_ACTIVITY_NAME
 from agentc_core.defaults import DEFAULT_META_COLLECTION_NAME
 from agentc_core.util.query import execute_query
-from pydantic import ValidationError
+from json import JSONDecodeError
 from typing_extensions import Literal
 from tzlocal import get_localzone
 
@@ -42,18 +42,31 @@ def clean_local(ctx: Context | None, type_metadata: str, date: str = None):
             log_path = pathlib.Path(ctx.activity) / DEFAULT_LLM_ACTIVITY_NAME
             try:
                 with log_path.open("r+") as fp:
-                    # read all lines before editing the file
-                    lines = fp.readlines()
                     # move file pointer to the beginning of a file
                     fp.seek(0)
-                    for line in lines:
+                    pos = 0
+                    while True:
+                        line = fp.readline()
+                        if not line:
+                            break
                         try:
-                            cur_log = Log.model_validate_json(line.strip())
-                            cur_log_timestamp = dateparser.parse(cur_log.timestamp.isoformat())
+                            cur_log_timestamp = dateparser.parse(json.loads(line.strip())["timestamp"])
                             if cur_log_timestamp >= req_date:
-                                fp.write(line)
-                        except ValidationError as e:
+                                break
+                        except (JSONDecodeError, KeyError) as e:
                             logger.error(f"Invalid log entry: {e}")
+                        pos = fp.tell()
+
+                    # no log found before the date, might be present in old log files which are compressed
+                    if pos == 0:
+                        raise NotImplementedError("No log entries found before the given date in the current log!")
+
+                    # seek to the last log before the mentioned date once again to be on safer side
+                    fp.seek(pos)
+                    # move file pointer to the beginning of a file and write remaining lines
+                    remaining_lines = fp.readlines()
+                    fp.seek(0)
+                    fp.writelines(remaining_lines)
                     # truncate the file
                     fp.truncate()
             except FileNotFoundError:
