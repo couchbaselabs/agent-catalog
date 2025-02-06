@@ -14,4 +14,8 @@ class EmbeddingModel(pydantic.BaseModel):
         description="The base URL of the embedding model."
         "This field must be specified is using a non-SentenceTransformers-based model.",
         examples=["https://12fs345d.apps.cloud.couchbase.com"],
+        default=None,
     )
+
+    def __hash__(self):
+        return self.name.__hash__()

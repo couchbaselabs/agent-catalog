@@ -55,7 +55,7 @@ def {{ tool.name }}(question: {{ input.type_name }}) -> list[str]:
     import sentence_transformers
     logger.debug("{{ tool.name }} is generating an embedding for: " + formatted_question + ".")
     embedding_model = sentence_transformers.SentenceTransformer(
-        '{{ vector_search.embedding_model }}',
+        '{{ vector_search.embedding_model.name }}',
         tokenizer_kwargs={'clean_up_tokenization_spaces': True},
         cache_folder=DEFAULT_MODEL_CACHE_FOLDER,
         local_files_only=True

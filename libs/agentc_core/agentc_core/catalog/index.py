@@ -9,6 +9,7 @@ from ..defaults import DEFAULT_ITEM_DESCRIPTION_MAX_LEN
 from ..indexer import AllIndexers
 from ..indexer import vectorize_descriptor
 from ..learned.embedding import EmbeddingModel
+from ..learned.model import EmbeddingModel as CatalogDescriptorEmbeddingModel
 from ..record.descriptor import RecordDescriptor
 from .catalog.mem import CatalogMem
 from .descriptor import CatalogDescriptor
@@ -167,13 +168,20 @@ def index_catalog_start(
         logger.error("Encountered error(s) while crawling source directories: " + "\n".join([str(e) for e in all_errs]))
         raise all_errs[0]
 
+    catalog_descriptor_embedding_model = (
+        CatalogDescriptorEmbeddingModel(name=embedding_model.name, base_url=None, kind="sentence-transformers")
+        if embedding_model.embedding_model_url is None
+        else CatalogDescriptorEmbeddingModel(
+            name=embedding_model.name, base_url=embedding_model.embedding_model_url, kind="openai"
+        )
+    )
     next_catalog = CatalogMem(
         embedding_model=embedding_model,
         catalog_descriptor=CatalogDescriptor(
             schema_version=meta_version.schema_version,
             library_version=meta_version.library_version,
             version=catalog_version,
-            embedding_model=embedding_model.name,
+            embedding_model=catalog_descriptor_embedding_model,
             kind=kind,
             source_dirs=source_dirs,
             items=all_descriptors,

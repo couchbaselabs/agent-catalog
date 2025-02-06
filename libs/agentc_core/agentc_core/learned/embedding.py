@@ -126,10 +126,13 @@ class EmbeddingModel(pydantic.BaseModel):
             elif len(collected_embedding_models) == 1:
                 remote_embedding_model = collected_embedding_models.pop()
                 logger.debug("Found embedding model %s in remote catalogs.", remote_embedding_model)
-                if from_catalog_embedding_model is not None and from_catalog_embedding_model != remote_embedding_model:
+                if (
+                    from_catalog_embedding_model is not None
+                    and from_catalog_embedding_model.name != remote_embedding_model.name
+                ):
                     raise ValueError(
-                        f"Local embedding model {from_catalog_embedding_model} does not match "
-                        f"remote embedding model {remote_embedding_model}!"
+                        f"Local embedding model {from_catalog_embedding_model.name} does not match "
+                        f"remote embedding model {remote_embedding_model.name}!"
                     )
                 elif from_catalog_embedding_model is None:
                     from_catalog_embedding_model = remote_embedding_model
@@ -137,7 +140,9 @@ class EmbeddingModel(pydantic.BaseModel):
         if self.embedding_model_name is None:
             self.embedding_model_name = from_catalog_embedding_model.name
             self.embedding_model_url = from_catalog_embedding_model.base_url
-        elif from_catalog_embedding_model is not None and self.embedding_model_name != from_catalog_embedding_model:
+        elif (
+            from_catalog_embedding_model is not None and self.embedding_model_name != from_catalog_embedding_model.name
+        ):
             raise ValueError(
                 f"Local embedding model {from_catalog_embedding_model.name} does not match "
                 f"specified embedding model {self.embedding_model_name}!"
