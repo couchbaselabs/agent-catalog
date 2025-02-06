@@ -142,7 +142,7 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
     class VectorSearchMetadata(pydantic.BaseModel):
         class EmbeddingModel(pydantic.BaseModel):
             name: str
-            base_url: typing.Optional[str]
+            base_url: typing.Optional[str] = None
 
             @property
             @pydantic.computed_field
