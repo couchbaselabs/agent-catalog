@@ -33,8 +33,12 @@ def clean_local(ctx: Context | None, type_metadata: str, date: str = None):
     if clean_activity:
         if date is not None:
             req_date = dateparser.parse(date)
-            local_tz = get_localzone()
-            req_date = req_date.replace(tzinfo=local_tz)
+            if req_date is None:
+                raise ValueError(f"Invalid datetime provided: {date}")
+
+            if req_date.tzinfo is None:
+                local_tz = get_localzone()
+                req_date = req_date.replace(tzinfo=local_tz)
 
             if req_date is None:
                 raise ValueError(f"Invalid date provided: {date}")
@@ -132,8 +136,12 @@ def clean_db(
     if clean_activity:
         if date is not None:
             req_date = dateparser.parse(date)
-            local_tz = get_localzone()
-            req_date = req_date.replace(tzinfo=local_tz)
+            if req_date is None:
+                raise ValueError(f"Invalid datetime provided: {date}")
+
+            if req_date.tzinfo is None:
+                local_tz = get_localzone()
+                req_date = req_date.replace(tzinfo=local_tz)
 
             remove_catalogs_query = f"""
                             DELETE FROM
