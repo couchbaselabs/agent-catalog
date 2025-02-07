@@ -194,7 +194,7 @@ def add(ctx, output: pathlib.Path, record_kind: RecordKind):
     "--date",
     default=None,
     type=str,
-    help="Datetime of the oldest log entry to keep (older log entries will be deleted).",
+    help="Datetime of the oldest log entry to keep (older log entries will be deleted).\nEx: 2021-09-01T00:00:00, 20th Jan 2024 8:00PM, 2 days ago",
     show_default=False,
 )
 @click.pass_context
@@ -212,6 +212,11 @@ def clean(ctx, catalog, type_metadata, bucket, catalog_id, skip_confirm, kind, d
             fg="yellow",
         )
         return
+
+    if date is not None and (type_metadata == "all" or type_metadata == "catalog"):
+        raise ValueError(
+            "Datetime can only be specified for deletion of activity logs, not catalog entries.\nExecute 'agentc clean [[local|db]] activity --date DATETIME' separately to delete logs based on time."
+        )
 
     # Similar to the rm command, we will prompt the user for each catalog to delete.
     if clean_local:
