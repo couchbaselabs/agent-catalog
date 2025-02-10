@@ -13,8 +13,7 @@ class CouchbaseSecrets(pydantic.BaseModel):
 
 
 class EmbeddingModelSecrets(pydantic.BaseModel):
-    class OpenAI(pydantic.BaseModel):
-        username: typing.Optional[str]
-        password: typing.Optional[str]
+    class EmbeddingModel(pydantic.BaseModel):
+        auth: str
 
-    openai: OpenAI
+    embedding: EmbeddingModel
