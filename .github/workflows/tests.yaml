@@ -34,8 +34,9 @@ jobs:
           poetry install --with dev
 
       - name: Export OPENAI API KEY for tests
-        run: |
-          export AGENT_CATALOG_EMBEDDING_MODEL_AUTH=${{ secrets.AGENT_CATALOG_EMBEDDING_MODEL_AUTH }}
+        env:
+          AGENT_CATALOG_EMBEDDING_MODEL_AUTH: ${{ secrets.AGENT_CATALOG_EMBEDDING_MODEL_AUTH }}
+        run: python -c 'import os;print(os.environ)'
 
       - run: echo "🔥 Starting the core tests (🤞 please don't break!)."
       - name: Verify Pytest installation
