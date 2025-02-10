@@ -1,0 +1,23 @@
+name: Update dev branch
+run-name: Merge master branch into dev/0.2.0_release branch
+on:
+  pull_request:
+    branches: [master]
+    types: [closed]
+jobs:
+  merge-branch:
+    if: github.event.pull_request.merged == true
+    timeout-minutes: 2
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
+    steps:
+      - uses: actions/checkout@v2
+      - uses: everlytic/branch-merge@f1304f3c45db1c13f5d14e8ce99e23e7fabdbe79
+        with:
+          github_token: ${{ github.token }}
+          source_ref: ${{ github.ref }}
+          target_branch: 'dev/0.2.0_release'
+          commit_message_template: '[Automated] Merge master into {target_branch}'
