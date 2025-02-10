@@ -161,7 +161,7 @@ class EmbeddingModel(pydantic.BaseModel):
     def encode(self, text: str) -> list[float]:
         # Lazily-load the embedding model.
         if self._embedding_model is None:
-            if self.embedding_model_name.startswith("https://") or self.embedding_model_name.startswith("http://"):
+            if self.embedding_model_url is not None:
                 import openai
 
                 open_ai_client = openai.OpenAI(
