@@ -310,7 +310,7 @@ def create_vector_index(
 
 def create_gsi_indexes(bucket, cluster, kind, print_progress):
     """Creates required indexes at publish"""
-    progress_bar = tqdm.tqdm(range(4))
+    progress_bar = tqdm.tqdm(range(5))
     progress_bar_it = iter(progress_bar)
 
     completion_status = True
@@ -321,6 +321,22 @@ def create_gsi_indexes(bucket, cluster, kind, print_progress):
     primary_idx = f"""
         CREATE PRIMARY INDEX IF NOT EXISTS `{primary_idx_name}`
         ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog` USING GSI;
+    """
+    if print_progress:
+        next(progress_bar_it)
+        progress_bar.set_description(primary_idx_name)
+    res, err = execute_query(cluster, primary_idx)
+    for r in res.rows():
+        logger.debug(r)
+    if err is not None:
+        all_errs += err
+        completion_status = False
+
+    # Primary index on kind_metadata
+    primary_idx_metadata_name = f"v1_agent_catalog_primary_{kind}_metadata"
+    primary_idx = f"""
+        CREATE PRIMARY INDEX IF NOT EXISTS `{primary_idx_metadata_name}`
+        ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_metadata` USING GSI;
     """
     if print_progress:
         next(progress_bar_it)

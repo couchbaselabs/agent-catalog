@@ -30,7 +30,7 @@ WITH LatestGenerations AS (
                 msgsi.content,
                 msgsi.row_num
             ORDER BY
-                msgsi.timestamp ASC
+                STR_TO_MILLIS(msgsi.timestamp) ASC
             LIMIT 1
         )[0],
         last_message = (
@@ -40,7 +40,7 @@ WITH LatestGenerations AS (
                 COALESCE(msgsi.content, msgsi.tool_calls) AS content,
                 msgsi.row_num
             ORDER BY
-                msgsi.timestamp DESC
+                STR_TO_MILLIS(msgsi.timestamp) DESC
             LIMIT 1
         )[0],
         context = (

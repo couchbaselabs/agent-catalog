@@ -51,14 +51,14 @@ def test_index(tmp_path):
         shutil.copy(resources_folder / "_good_spec.json", tool_folder / "_good_spec.json")
         invocation = runner.invoke(click_main, ["index", str(tool_folder.absolute()), "--no-prompts"])
 
-        # We should see 10 files scanned and 11 tools indexed.
+        # We should see 11 files scanned and 12 tools indexed.
         output = invocation.output
         print(output)
         assert "Crawling" in output
         assert "Generating embeddings" in output
         assert "Catalog successfully indexed" in output
-        assert "0/10" in output
         assert "0/11" in output
+        assert "0/12" in output
 
 
 # Small helper function to publish to a Couchbase catalog.
