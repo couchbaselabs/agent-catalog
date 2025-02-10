@@ -89,7 +89,7 @@ def audit(
     :py:meth:`BaseChatModel._astream`) to methods that log LLM calls.
 
     :param chat_model: The LangChain chat model to audit.
-    :param session: The session associated with all messages we will audit.
+    :param session: The session associated with all messages we will audit. We suggest generating this dynamically using a UUID generator or similar to ensure every run of the application is a new session.
     :param auditor: The auditor to bind to the chat model.
     :return: The same LangChain chat model that was passed in, but with methods dispatched to audit LLM calls.
     """
