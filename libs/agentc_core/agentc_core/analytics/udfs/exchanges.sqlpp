@@ -1,5 +1,5 @@
 -- Note: all_sessions.sqlpp should be run before this script.
--- WIP
+CREATE OR REPLACE FUNCTION `[BUCKET_NAME]`.`[SCOPE_NAME]`.QueryLatestMessages() AS
 WITH LM AS
 (
 WITH msgs AS (
@@ -11,7 +11,7 @@ WITH msgs AS (
         s.grouping,
         s.session,
         ROW_NUMBER() OVER (PARTITION BY s.grouping, s.session ORDER BY s.timestamp) AS row_num
-    FROM umc.agent_activity.raw_logs AS s
+    FROM `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]` AS s
     WHERE s.grouping IS NOT NULL
 ),
 first_human AS (
