@@ -49,6 +49,7 @@ def test_index(tmp_path):
             pathlib.Path(tool_folder / tool.parent.name).mkdir(exist_ok=True)
             shutil.copy(tool, tool_folder / tool.parent.name / (uuid.uuid4().hex + tool.suffix))
         shutil.copy(resources_folder / "_good_spec.json", tool_folder / "_good_spec.json")
+        runner.invoke(click_main, ["init", "local", "model"])
         invocation = runner.invoke(click_main, ["index", str(tool_folder.absolute()), "--no-prompts"])
 
         # We should see 11 files scanned and 12 tools indexed.
@@ -489,11 +490,25 @@ def test_init_local(tmp_path):
 
         runner.invoke(click_main, ["init", "local", "catalog"])
         files_present = os.listdir()
-        assert ".agent-catalog" in files_present and ".agent-activity" not in files_present
+        assert (
+            ".agent-catalog" in files_present
+            and ".agent-activity" not in files_present
+            and ".model-cache" not in files_present
+        )
 
         runner.invoke(click_main, ["init", "local", "auditor"])
         files_present = os.listdir()
-        assert ".agent-catalog" in files_present and ".agent-activity" in files_present
+        assert (
+            ".agent-catalog" in files_present
+            and ".agent-activity" in files_present
+            and ".model-cache" not in files_present
+        )
+
+        runner.invoke(click_main, ["init", "local", "model"])
+        files_present = os.listdir()
+        assert (
+            ".agent-catalog" in files_present and ".agent-activity" in files_present and ".model-cache" in files_present
+        )
 
 
 @pytest.mark.smoke
@@ -505,4 +520,6 @@ def test_init_local_all(tmp_path):
 
         runner.invoke(click_main, ["init", "local", "all"])
         files_present = os.listdir()
-        assert ".agent-catalog" in files_present and ".agent-activity" in files_present
+        assert (
+            ".agent-catalog" in files_present and ".agent-activity" in files_present and ".model-cache" in files_present
+        )

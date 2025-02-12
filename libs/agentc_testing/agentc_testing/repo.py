@@ -75,6 +75,7 @@ def initialize_repo(
 
     # Initialize the local catalog.
     click_runner.invoke(click_command, ["init", "local", "catalog"])
+    click_runner.invoke(click_command, ["init", "local", "model"])
 
     # If we are not using the index command, we can return early...
     if repo_kind == ExampleRepoKind.EMPTY or repo_kind == ExampleRepoKind.NON_INDEXED_ALL_TRAVEL:
