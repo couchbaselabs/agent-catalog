@@ -7,7 +7,7 @@ CREATE OR REPLACE FUNCTION
             SELECT VALUE
                 s.sid
             ORDER BY
-                s.start_t DESC
+                STR_TO_MILLIS(s.start_t) DESC
             LIMIT 1
         )[0]
     };

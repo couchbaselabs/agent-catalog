@@ -10,7 +10,8 @@ import re
 import typing
 
 from ..models.context import Context
-from agentc_core.analytics.create import create_analytics_udfs
+from agentc_core.analytics.create import create_analytics_views
+from agentc_core.analytics.create import create_query_udfs
 from agentc_core.catalog import CatalogChain
 from agentc_core.catalog import CatalogDB
 from agentc_core.catalog import CatalogMem
@@ -268,10 +269,18 @@ def init_db_auditor(ctx: Context, cluster: Cluster, keyspace_details: Keyspace):
     else:
         click.secho("Scope and collection for the auditor have been successfully created!\n", fg="green")
 
-    click.secho("Now creating the analytics UDFs for the auditor.", fg="yellow")
+    click.secho("Now creating query UDFs for the auditor.", fg="yellow")
     try:
-        create_analytics_udfs(cluster, keyspace_details.bucket)
-        click.secho("All analytics UDFs for the auditor have been successfully created!\n", fg="green")
+        create_query_udfs(cluster, keyspace_details.bucket)
+        click.secho("All query UDFs for the auditor have been successfully created!\n", fg="green")
+    except CouchbaseException as e:
+        click.secho("Query UDFs could not be created.", fg="red")
+        logger.warning("Query UDFs could not be created: %s", e)
+
+    click.secho("Now creating the analytics views for the auditor.", fg="yellow")
+    try:
+        create_analytics_views(cluster, keyspace_details.bucket)
+        click.secho("All analytics views for the auditor have been successfully created!\n", fg="green")
     except CouchbaseException as e:
         click.secho("Analytics views could not be created.", fg="red")
         logger.warning("Analytics views could not be created: %s", e)

@@ -17,7 +17,7 @@ CREATE OR REPLACE FUNCTION
                 SELECT VALUE
                     gi.msg
                 ORDER BY
-                    gi.msg.timestamp ASC
+                    STR_TO_MILLIS(gi.msg.timestamp) ASC
             )
         SELECT
             s.sid AS sid,
