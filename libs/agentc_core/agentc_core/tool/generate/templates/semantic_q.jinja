@@ -21,11 +21,11 @@ logger = logging.getLogger(__name__)
 
 def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
     authenticator = couchbase.auth.PasswordAuthenticator(
-        username=get_secret("{{ secrets.username }}").get_secret_value(),
-        password=get_secret("{{ secrets.password }}").get_secret_value(),
-        {% if secrets.certificate is none %}cert_path=get_secret("{{ secrets.certificate | safe }}").get_secret_value(){% endif %}
+        username=get_secret("{{ cluster_secrets.username }}").get_secret_value(),
+        password=get_secret("{{ cluster_secrets.password }}").get_secret_value(),
+        {% if cluster_secrets.certificate is none %}cert_path=get_secret("{{ cluster_secrets.certificate | safe }}").get_secret_value(){% endif %}
     )
-    conn_string = get_secret("{{ secrets.conn_string }}").get_secret_value()
+    conn_string = get_secret("{{ cluster_secrets.conn_string }}").get_secret_value()
     return couchbase.cluster.Cluster(conn_string, couchbase.options.ClusterOptions(authenticator))
 
 
@@ -51,17 +51,24 @@ def {{ tool.name }}(question: {{ input.type_name }}) -> list[str]:
     else:
         raise ValueError("Bad input given to tool!")
 
-    import sentence_transformers
-
     logger.debug("{{ tool.name }} is generating an embedding for: " + formatted_question + ".")
+    {% if vector_search.embedding_model.base_url is none %}
+    import sentence_transformers
     embedding_model = sentence_transformers.SentenceTransformer(
-        '{{ vector_search.embedding_model }}',
+        "{{ vector_search.embedding_model.name }}",
         tokenizer_kwargs={'clean_up_tokenization_spaces': True},
         cache_folder=DEFAULT_MODEL_CACHE_FOLDER,
         local_files_only=True
     )
     _embedding = embedding_model.encode(formatted_question)
     for_q = list(_embedding.astype('float64'))
+    {% else %}
+    import openai
+    open_ai_client = openai.OpenAI(
+        base_url="{{ vector_search.embedding_model.base_url }}", api_key=get_secret("{{ embedding_secrets.auth }}").get_secret_value()
+    )
+    for_q=open_ai_client.embeddings.create(model="{{ vector_search.embedding_model.name }}", input=formatted_question, encoding_format="float").data[0].embedding
+    {% endif %}
     vector_req = couchbase.vector_search.VectorSearch.from_vector_query(
         couchbase.vector_search.VectorQuery('{{ vector_search.vector_field }}', for_q, num_candidates={{ vector_search.num_candidates }})
     )

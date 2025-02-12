@@ -12,6 +12,7 @@ from ..tool.descriptor.models import PythonToolDescriptor
 from ..tool.descriptor.models import SemanticSearchToolDescriptor
 from ..tool.descriptor.models import SQLPPQueryToolDescriptor
 from ..version import VersionDescriptor
+from agentc_core.learned.model import EmbeddingModel
 
 
 class CatalogKind(enum.StrEnum):
@@ -47,10 +48,8 @@ class CatalogDescriptor(pydantic.BaseModel):
 
     kind: CatalogKind = pydantic.Field(description="The type of items within the catalog.")
 
-    embedding_model: str = pydantic.Field(
-        description="The sentence-transformers embedding model used to generate the vector representations "
-        "of each catalog entry.",
-        examples=["sentence-transformers/all-MiniLM-L12-v2"],
+    embedding_model: EmbeddingModel = pydantic.Field(
+        description="Embedding model used to generate embedding for tool/prompt descriptions to store in the catalogs.",
     )
 
     version: VersionDescriptor = pydantic.Field(

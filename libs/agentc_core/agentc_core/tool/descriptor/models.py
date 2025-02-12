@@ -22,6 +22,7 @@ from ..decorator import get_description
 from ..decorator import get_name
 from ..decorator import is_tool
 from .secrets import CouchbaseSecrets
+from agentc_core.tool.descriptor.secrets import EmbeddingModelSecrets
 
 logger = logging.getLogger(__name__)
 
@@ -139,19 +140,27 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
 
 class SemanticSearchToolDescriptor(RecordDescriptor):
     class VectorSearchMetadata(pydantic.BaseModel):
-        # TODO (GLENN): Copy all vector-search-specific validations here.
+        class EmbeddingModel(pydantic.BaseModel):
+            name: str
+            base_url: typing.Optional[str] = None
+
+            @property
+            @pydantic.computed_field
+            def kind(self) -> typing.Literal["sentence-transformers", "openai"]:
+                return "sentence-transformers" if self.base_url is None else "openai"
+
         bucket: str
         scope: str
         collection: str
         index: str
         vector_field: str
         text_field: str
-        embedding_model: str
+        embedding_model: EmbeddingModel
         num_candidates: int = 3
 
     input: str
     vector_search: VectorSearchMetadata
-    secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
+    secrets: list[CouchbaseSecrets | EmbeddingModelSecrets] = pydantic.Field(min_length=1, max_length=2)
     record_kind: typing.Literal[RecordKind.SemanticSearch]
 
     class Factory(_BaseFactory):
@@ -163,10 +172,17 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
             name: str
             description: str
             input: str
-            secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
+            secrets: list[CouchbaseSecrets | EmbeddingModelSecrets] = pydantic.Field(min_length=1, max_length=2)
             annotations: typing.Optional[dict[str, str] | None] = None
             vector_search: "SemanticSearchToolDescriptor.VectorSearchMetadata"
             num_candidates: typing.Optional[pydantic.PositiveInt] = 3
+
+            @pydantic.field_validator("secrets")
+            @classmethod
+            def couchbase_secrets_must_exist(cls, v: list[CouchbaseSecrets | EmbeddingModelSecrets]):
+                if not any(isinstance(s, CouchbaseSecrets) for s in v):
+                    raise ValueError("Secrets list 'secrets' must contain the 'couchbase' field.")
+                return v
 
             @pydantic.field_validator("input")
             @classmethod

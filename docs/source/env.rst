@@ -23,7 +23,7 @@ Mandatory Environment Variables
     The username of the account/database access key used to access your Couchbase cluster.
 
 ``AGENT_CATALOG_PASSWORD``
-    The password of the account/database access key used to access your Couchbase cluster
+    The password of the account/database access key used to access your Couchbase cluster.
 
 ``AGENT_CATALOG_BUCKET``
     The name of the bucket where your catalog and all audit logs are/will be stored.
@@ -34,9 +34,8 @@ Optional Environment Variables
 
 ``AGENT_CATALOG_CONN_ROOT_CERTIFICATE``
     Path to the `TLS <https://en.wikipedia.org/wiki/Transport_Layer_Security>`_ Root Certificate associated with your
-    Couchbase cluster for secure connection establishment.
-
-    Instructions for Couchbase Server certificates can be found `here <https://docs.couchbase.com/server/current/learn/security/certificates.html>`_.
+    Couchbase cluster.
+    More information about Couchbase Server certificates can be found `here <https://docs.couchbase.com/server/current/learn/security/certificates.html>`_.
 
 ``AGENT_CATALOG_ACTIVITY``
     The location on your filesystem that denotes where the local audit logs are stored.
@@ -68,17 +67,39 @@ Optional Environment Variables
     The location + filename of the audit logs that the :python:`agentc.Auditor` will write to.
     By default, the :python:`agentc.Auditor` class will write and rotate logs in the :file:`./agent-activity` directory.
 
-``AGENT_CATALOG_EMBEDDING_MODEL``
+``AGENT_CATALOG_EMBEDDING_MODEL_NAME``
     The embedding model that Agent Catalog will use when indexing and querying tools and prompts.
     This *must* be a valid embedding model that is supported by the :python:`sentence_transformers.SentenceTransformer`
-    class.
+    class *or* the name of a model that can be used from the endpoint specified in the environment variable
+    ``AGENT_CATALOG_EMBEDDING_MODEL_URL``.
     By default, the ``sentence-transformers/all-MiniLM-L12-v2`` model is used.
 
+``AGENT_CATALOG_EMBEDDING_MODEL_URL``
+    An OpenAI-standard client base URL whose ``/embeddings`` endpoint will be used to generate embeddings for Agent
+    Catalog tools and prompts.
+    The specified endpoint *must* host the embedding model given in ``AGENT_CATALOG_EMBEDDING_MODEL_NAME``.
+    If this variable is specified, Agent Catalog will assume the model given in ``AGENT_CATALOG_EMBEDDING_MODEL_NAME``
+    should be accessed through an OpenAI-standard interface.
+    This variable *must* be specified with ``AGENT_CATALOG_EMBEDDING_MODEL_AUTH``.
+    By default, this variable is not set (thus, a locally hosted SentenceTransformers is used).
+
+``AGENT_CATALOG_EMBEDDING_MODEL_AUTH``
+    The field used in the authorization header of all OpenAI-standard client embedding requests.
+    For embedding models hosted by OpenAI, this field refers to the API key.
+    For embedding models hosted by Capella, this field refers to the Base64-encoded value of
+    ``MY_USERNAME.MY_PASSWORD``.
+    If this variable is specified, Agent Catalog will assume the model given in ``AGENT_CATALOG_EMBEDDING_MODEL_NAME``
+    should be accessed through an OpenAI-standard interface.
+    This variable *must* be specified with ``AGENT_CATALOG_EMBEDDING_MODEL_URL``.
+    By default, this variable is not set (thus, a locally hosted SentenceTransformers is used).
+
 ``AGENT_CATALOG_INDEX_PARTITION``
-    Required for advanced vector index definition. This is an integer that defines the number of index partitions on your node.
-    If not set, this value is ``2 * number of nodes with 'search' service`` on your cluster.
+    The number of index partitions associated with your cluster.
+    This variable is used during the creation of vector indexes for semantic catalog search.
+    By default, this value is set to ``2 * number of nodes with 'search' service on your cluster``.
     More information on index partitioning can be found `here <https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index-partitioning.html>`_.
 
 ``AGENT_CATALOG_MAX_SOURCE_PARTITION``
-    Required for advanced vector index definition. This is an integer that defines the maximum number of source partitions.
-    If not set, this value is 1024.
+    The maximum number of source partitions associated with your cluster.
+    This variable is used during the creation of vector indexes for semantic catalog search.
+    By default, this value is set to 1024.

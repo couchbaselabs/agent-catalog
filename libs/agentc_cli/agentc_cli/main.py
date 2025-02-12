@@ -75,7 +75,8 @@ class AliasedGroup(click.Group):
 
 @click.group(
     cls=AliasedGroup,
-    epilog="See: https://docs.couchbase.com or https://couchbaselabs.github.io/agent-catalog/index.html# for more information.",
+    epilog="See: https://docs.couchbase.com or "
+    "https://couchbaselabs.github.io/agent-catalog/index.html# for more information.",
     context_settings=dict(max_content_width=800),
 )
 @click.option(
@@ -527,9 +528,15 @@ def find(
 )
 @click.option(
     "-em",
-    "--embedding-model",
+    "--embedding-model-name",
     default=DEFAULT_EMBEDDING_MODEL,
-    help="Embedding model used when indexing source files into the local catalog.",
+    help="Name of the embedding model used when indexing source files into the local catalog.",
+    show_default=True,
+)
+@click.option(
+    "--embedding-model-url",
+    default=None,
+    help="Base URL of an OpenAI-standard endpoint that exposes an embedding model.",
     show_default=True,
 )
 @click.option(
@@ -540,7 +547,7 @@ def find(
     show_default=True,
 )
 @click.pass_context
-def index(ctx, source_dirs, tools, prompts, embedding_model, dry_run):
+def index(ctx, source_dirs, tools, prompts, embedding_model_name, embedding_model_url, dry_run):
     """Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
     Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc."""
 
@@ -565,7 +572,8 @@ def index(ctx, source_dirs, tools, prompts, embedding_model, dry_run):
         ctx=ctx.obj,
         source_dirs=source_dirs,
         kinds=kinds,
-        embedding_model_name=embedding_model,
+        embedding_model_name=embedding_model_name,
+        embedding_model_url=embedding_model_url,
         dry_run=dry_run,
     )
 

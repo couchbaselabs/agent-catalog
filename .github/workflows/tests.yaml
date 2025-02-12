@@ -33,6 +33,9 @@ jobs:
         run: |
           poetry install --with dev
 
+      - name: Export OPENAI API KEY secret
+        run: echo "AGENT_CATALOG_EMBEDDING_MODEL_AUTH=${{ secrets.AGENT_CATALOG_EMBEDDING_MODEL_AUTH }}" >> $GITHUB_ENV
+
       - run: echo "🔥 Starting the core tests (🤞 please don't break!)."
       - name: Verify Pytest installation
         run: poetry show pytest
