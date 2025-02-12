@@ -131,7 +131,7 @@ def click_main(ctx, catalog, activity, verbose, interactive):
 )
 @click.argument(
     "type_metadata",
-    type=click.Choice(["catalog", "auditor", "all"], case_sensitive=False),
+    type=click.Choice(["model", "catalog", "auditor", "all"], case_sensitive=False),
 )
 @click.option(
     "--bucket",
@@ -141,18 +141,23 @@ def click_main(ctx, catalog, activity, verbose, interactive):
     show_default=False,
 )
 def init(ctx, catalog_type, type_metadata, bucket):
-    """Initialize the necessary files/collections for local/database catalog."""
+    """Initialize the necessary files/collections for local/database catalog or download sentence-transformer model required for embedding."""
     ctx_obj: Context = ctx.obj
 
     if not catalog_type:
         catalog_type = ["local", "db"]
 
-    type_metadata = ["catalog", "auditor"] if type_metadata == "all" else [type_metadata]
+    type_metadata = ["model", "catalog", "auditor"] if type_metadata == "all" else [type_metadata]
 
     connection_details_env = None
     keyspace_details = None
 
     if "db" in catalog_type:
+        if "model" in type_metadata:
+            raise ValueError(
+                "Model initialization can be used only with local keyword, db is not supported!!\nPlease execute separately 'agentc init local model' to download the model."
+            )
+
         # Load all Couchbase connection related data from env
         connection_details_env = CouchbaseConnect(
             connection_url=os.getenv("AGENT_CATALOG_CONN_STRING"),
@@ -529,7 +534,7 @@ def find(
 @click.option(
     "-em",
     "--embedding-model-name",
-    default=DEFAULT_EMBEDDING_MODEL,
+    default=os.getenv("AGENT_CATALOG_EMBEDDING_MODEL_NAME", DEFAULT_EMBEDDING_MODEL),
     help="Name of the embedding model used when indexing source files into the local catalog.",
     show_default=True,
 )

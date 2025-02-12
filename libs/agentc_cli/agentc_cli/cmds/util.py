@@ -23,8 +23,10 @@ from agentc_core.defaults import DEFAULT_AUDIT_COLLECTION
 from agentc_core.defaults import DEFAULT_AUDIT_SCOPE
 from agentc_core.defaults import DEFAULT_CATALOG_COLLECTION_NAME
 from agentc_core.defaults import DEFAULT_CATALOG_NAME
+from agentc_core.defaults import DEFAULT_EMBEDDING_MODEL
 from agentc_core.defaults import DEFAULT_MAX_ERRS
 from agentc_core.defaults import DEFAULT_META_COLLECTION_NAME
+from agentc_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
 from agentc_core.defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from agentc_core.learned.embedding import EmbeddingModel
 from agentc_core.util.ddl import create_gsi_indexes
@@ -273,3 +275,20 @@ def init_db_auditor(ctx: Context, cluster: Cluster, keyspace_details: Keyspace):
     except CouchbaseException as e:
         click.secho("Analytics views could not be created.", fg="red")
         logger.warning("Analytics views could not be created: %s", e)
+
+
+def init_local_embedding_model():
+    # import only in this function to avoid large import times
+    import sentence_transformers
+
+    try:
+        sentence_transformers.SentenceTransformer(
+            os.getenv("AGENT_CATALOG_EMBEDDING_MODEL_NAME", DEFAULT_EMBEDDING_MODEL),
+            tokenizer_kwargs={"clean_up_tokenization_spaces": True},
+            cache_folder=DEFAULT_MODEL_CACHE_FOLDER,
+            local_files_only=False,
+        )
+    except Exception as e:
+        raise RuntimeError(
+            f"Unable to download model {os.getenv("AGENT_CATALOG_EMBEDDING_MODEL_NAME", DEFAULT_EMBEDDING_MODEL)}!!\n{e}"
+        ) from None

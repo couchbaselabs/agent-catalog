@@ -182,12 +182,17 @@ class EmbeddingModel(pydantic.BaseModel):
             else:
                 import sentence_transformers
 
-                sentence_transformers_model = sentence_transformers.SentenceTransformer(
-                    self.embedding_model_name,
-                    tokenizer_kwargs={"clean_up_tokenization_spaces": True},
-                    cache_folder=DEFAULT_MODEL_CACHE_FOLDER,
-                    local_files_only=False,
-                )
+                try:
+                    sentence_transformers_model = sentence_transformers.SentenceTransformer(
+                        self.embedding_model_name,
+                        tokenizer_kwargs={"clean_up_tokenization_spaces": True},
+                        cache_folder=DEFAULT_MODEL_CACHE_FOLDER,
+                        local_files_only=True,
+                    )
+                except OSError:
+                    raise ValueError(
+                        f"Unable to find local embedding model {self.embedding_model_name}!!!\nPlease execute 'agentc init local model' to download the model."
+                    ) from None
 
                 def _encode(_text: str) -> list[float]:
                     return sentence_transformers_model.encode(_text, convert_to_tensor=False).tolist()
