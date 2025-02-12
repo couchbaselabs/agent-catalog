@@ -1,0 +1,68 @@
+CREATE OR REPLACE FUNCTION `[BUCKET_NAME]`.`[SCOPE_NAME]`.QuerySessions() {
+(
+WITH
+    DeDuplicatedLogs AS (
+        FROM
+            `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]` AS rsli
+        LET
+            _id =
+                CASE
+                    WHEN rsli.kwargs IS NOT MISSING
+                    THEN rsli.kwargs.id
+                    ELSE rsli.content
+                END
+        SELECT
+            rsli.*,
+            ROW_NUMBER()
+                OVER (
+                    PARTITION BY
+                        _id
+                    ORDER BY
+                        rsli.timestamp ASC
+                ) AS rn
+    )
+    SELECT
+    sid,
+    (
+        FROM
+            g AS gi
+        SELECT VALUE
+            gi.rsl.timestamp
+        ORDER BY
+            gi.rsl.timestamp ASC
+        LIMIT 1
+    )[0] AS start_t,
+    vid,
+    msgs
+    FROM
+    DeDuplicatedLogs AS rsl
+WHERE
+    rsl.rn = 1
+GROUP BY
+    rsl.session AS sid,
+    rsl.catalog_version AS ver
+    GROUP AS g
+LETTING
+    msgs = (
+        FROM (
+            FROM
+                g AS gii
+            SELECT VALUE
+                gii
+            ORDER BY
+                gii.rsl.timestamp ASC
+        ) AS gi
+        SELECT
+            gi.rsl.content AS content,
+            gi.rsl.timestamp AS timestamp,
+            gi.rsl.kind AS kind,
+            ROW_NUMBER() OVER(ORDER BY gi.rsl.timestamp ASC) AS msg_num
+    ),
+    vid = {
+        "identifier": ver.identifier,
+        "timestamp": ver.timestamp
+    }
+    ORDER BY
+    start_t DESC
+)
+};
