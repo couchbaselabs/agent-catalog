@@ -237,7 +237,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
         ts_query = f"""
             FROM     `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{self.kind}{DEFAULT_META_COLLECTION_NAME}` AS t
             SELECT   VALUE  t.version
-            ORDER BY t.version.timestamp DESC
+            ORDER BY STR_TO_MILLIS(t.version.timestamp) DESC
             LIMIT    1
         """
         res, err = execute_query(self.cluster, ts_query)

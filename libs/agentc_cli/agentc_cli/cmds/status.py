@@ -108,7 +108,7 @@ def db_catalog_status(kind, bucket, cluster, compare):
                     GROUP BY b.catalog_identifier
                 ) AS subquery
                 ON a.version.identifier = subquery.catalog_identifier
-                ORDER BY a.version.timestamp DESC LIMIT 1;
+                ORDER BY STR_TO_MILLIS(a.version.timestamp) DESC LIMIT 1;
             """
     else:
         # Query to get the metadata based on the kind of catalog

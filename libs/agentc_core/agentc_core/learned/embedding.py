@@ -94,7 +94,7 @@ class EmbeddingModel(pydantic.BaseModel):
                             SELECT
                                 VALUE mc.embedding_model
                             ORDER BY
-                                mc.version.timestamp DESC
+                                STR_TO_MILLIS(mc.version.timestamp) DESC
                             LIMIT 1
                         """
                     ]
