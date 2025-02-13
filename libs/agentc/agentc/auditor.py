@@ -149,7 +149,8 @@ class Auditor(pydantic_settings.BaseSettings):
         if self.auditor_output is None and self.conn_string is None:
             error_message = textwrap.dedent("""
                 Could not initialize a local or remote auditor!
-                If this is a new project, please run the command `agentc index` before instantiating an auditor.
+                If this is a new project, please run the command `agentc init activity` before instantiating an auditor.
+                Execute `agentc init --help` for more information.
                 If you are intending to use a remote-only auditor, please ensure that all of the relevant variables
                 (i.e., conn_string, username, password, and bucket) are set.
             """)

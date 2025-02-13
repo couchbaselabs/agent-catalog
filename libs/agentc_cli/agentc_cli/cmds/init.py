@@ -5,6 +5,7 @@ from .util import init_db_auditor
 from .util import init_db_catalog
 from .util import init_local_activity
 from .util import init_local_catalog
+from .util import init_local_embedding_model
 from agentc_core.util.models import CouchbaseConnect
 from agentc_core.util.models import Keyspace
 from agentc_core.util.publish import get_connection
@@ -25,6 +26,10 @@ def cmd_init(
     initialize_db = "db" in catalog_type
     initialize_catalog = "catalog" in type_metadata
     initialize_auditor = "auditor" in type_metadata
+    initialize_model = "model" in type_metadata
+
+    if initialize_model:
+        init_local_embedding_model()
 
     if initialize_local:
         if initialize_catalog:

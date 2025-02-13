@@ -10,7 +10,8 @@ import re
 import typing
 
 from ..models.context import Context
-from agentc_core.analytics.create import create_analytics_udfs
+from agentc_core.analytics.create import create_analytics_views
+from agentc_core.analytics.create import create_query_udfs
 from agentc_core.catalog import CatalogChain
 from agentc_core.catalog import CatalogDB
 from agentc_core.catalog import CatalogMem
@@ -23,8 +24,10 @@ from agentc_core.defaults import DEFAULT_AUDIT_COLLECTION
 from agentc_core.defaults import DEFAULT_AUDIT_SCOPE
 from agentc_core.defaults import DEFAULT_CATALOG_COLLECTION_NAME
 from agentc_core.defaults import DEFAULT_CATALOG_NAME
+from agentc_core.defaults import DEFAULT_EMBEDDING_MODEL
 from agentc_core.defaults import DEFAULT_MAX_ERRS
 from agentc_core.defaults import DEFAULT_META_COLLECTION_NAME
+from agentc_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
 from agentc_core.defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from agentc_core.learned.embedding import EmbeddingModel
 from agentc_core.util.ddl import create_gsi_indexes
@@ -266,10 +269,35 @@ def init_db_auditor(ctx: Context, cluster: Cluster, keyspace_details: Keyspace):
     else:
         click.secho("Scope and collection for the auditor have been successfully created!\n", fg="green")
 
-    click.secho("Now creating the analytics UDFs for the auditor.", fg="yellow")
+    click.secho("Now creating query UDFs for the auditor.", fg="yellow")
     try:
-        create_analytics_udfs(cluster, keyspace_details.bucket)
-        click.secho("All analytics UDFs for the auditor have been successfully created!\n", fg="green")
+        create_query_udfs(cluster, keyspace_details.bucket)
+        click.secho("All query UDFs for the auditor have been successfully created!\n", fg="green")
+    except CouchbaseException as e:
+        click.secho("Query UDFs could not be created.", fg="red")
+        logger.warning("Query UDFs could not be created: %s", e)
+
+    click.secho("Now creating the analytics views for the auditor.", fg="yellow")
+    try:
+        create_analytics_views(cluster, keyspace_details.bucket)
+        click.secho("All analytics views for the auditor have been successfully created!\n", fg="green")
     except CouchbaseException as e:
         click.secho("Analytics views could not be created.", fg="red")
         logger.warning("Analytics views could not be created: %s", e)
+
+
+def init_local_embedding_model():
+    # import only in this function to avoid large import times
+    import sentence_transformers
+
+    try:
+        sentence_transformers.SentenceTransformer(
+            os.getenv("AGENT_CATALOG_EMBEDDING_MODEL_NAME", DEFAULT_EMBEDDING_MODEL),
+            tokenizer_kwargs={"clean_up_tokenization_spaces": True},
+            cache_folder=DEFAULT_MODEL_CACHE_FOLDER,
+            local_files_only=False,
+        )
+    except Exception as e:
+        raise RuntimeError(
+            f"Unable to download model {os.getenv("AGENT_CATALOG_EMBEDDING_MODEL_NAME", DEFAULT_EMBEDDING_MODEL)}!!\n{e}"
+        ) from None

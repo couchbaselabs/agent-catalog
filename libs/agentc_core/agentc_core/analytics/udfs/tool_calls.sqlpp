@@ -1,5 +1,6 @@
 -- Note: all_sessions.sqlpp should be run before this script.
-CREATE OR REPLACE FUNCTION `[BUCKET_NAME]`.`[SCOPE_NAME]`.QueryToolCalls()
+CREATE OR REPLACE FUNCTION `[BUCKET_NAME]`.`[SCOPE_NAME]`.QueryToolCalls(){
+(
 SELECT
     s1.sid AS sid,
     s1.vid AS vid,
@@ -30,5 +31,6 @@ LETTING
             gi.m2.content.dump.kwargs.status AS tool_status
     )
 ORDER BY
-    vid.timestamp DESC
-;
+    STR_TO_MILLIS(vid.timestamp) DESC
+)
+};

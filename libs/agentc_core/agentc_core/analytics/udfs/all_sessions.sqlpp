@@ -18,7 +18,7 @@ WITH
                     PARTITION BY
                         _id
                     ORDER BY
-                        rsli.timestamp ASC
+                        STR_TO_MILLIS(rsli.timestamp) ASC
                 ) AS rn
     )
     SELECT
@@ -29,7 +29,7 @@ WITH
         SELECT VALUE
             gi.rsl.timestamp
         ORDER BY
-            gi.rsl.timestamp ASC
+            STR_TO_MILLIS(gi.rsl.timestamp) ASC
         LIMIT 1
     )[0] AS start_t,
     vid,
@@ -50,19 +50,19 @@ LETTING
             SELECT VALUE
                 gii
             ORDER BY
-                gii.rsl.timestamp ASC
+                STR_TO_MILLIS(gii.rsl.timestamp) ASC
         ) AS gi
         SELECT
             gi.rsl.content AS content,
             gi.rsl.timestamp AS timestamp,
             gi.rsl.kind AS kind,
-            ROW_NUMBER() OVER(ORDER BY gi.rsl.timestamp ASC) AS msg_num
+            ROW_NUMBER() OVER(ORDER BY STR_TO_MILLIS(gi.rsl.timestamp) ASC) AS msg_num
     ),
     vid = {
         "identifier": ver.identifier,
         "timestamp": ver.timestamp
     }
     ORDER BY
-    start_t DESC
+    STR_TO_MILLIS(start_t) DESC
 )
 };

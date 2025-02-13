@@ -1,5 +1,6 @@
 -- Note: all_sessions.sqlpp should be run before this script.
-CREATE OR REPLACE FUNCTION `[BUCKET_NAME]`.`[SCOPE_NAME]`.QueryLatestMessages() AS
+CREATE OR REPLACE FUNCTION `[BUCKET_NAME]`.`[SCOPE_NAME]`.QueryLatestMessages() {
+(
 WITH LM AS
 (
 WITH msgs AS (
@@ -10,7 +11,7 @@ WITH msgs AS (
         s.timestamp,
         s.grouping,
         s.session,
-        ROW_NUMBER() OVER (PARTITION BY s.grouping, s.session ORDER BY s.timestamp) AS row_num
+        ROW_NUMBER() OVER (PARTITION BY s.grouping, s.session ORDER BY STR_TO_MILLIS(s.timestamp)) AS row_num
     FROM `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]` AS s
     WHERE s.grouping IS NOT NULL
 ),
@@ -18,13 +19,13 @@ first_human AS (
     SELECT msgsi.row_num
     FROM msgs AS msgsi
     WHERE msgsi.kind = "human"
-    ORDER BY msgsi.timestamp ASC
+    ORDER BY STR_TO_MILLIS(msgsi.timestamp) ASC
     LIMIT 1
 ),
 last_message AS (
     SELECT msgsi.row_num
     FROM msgs AS msgsi
-    ORDER BY msgsi.timestamp DESC
+    ORDER BY STR_TO_MILLIS(msgsi.timestamp) DESC
     LIMIT 1
 )
 SELECT
@@ -33,14 +34,14 @@ SELECT
      WHERE msgsi.kind = "human"
      AND msgsi.grouping = g.grouping
      AND msgsi.session = g.session
-     ORDER BY msgsi.timestamp ASC
+     ORDER BY STR_TO_MILLIS(msgsi.timestamp) ASC
      LIMIT 1) AS question,
 
     (SELECT RAW COALESCE(msgsi.content, msgsi.tool_calls)
      FROM msgs AS msgsi
      WHERE msgsi.grouping = g.grouping
      AND msgsi.session = g.session
-     ORDER BY msgsi.timestamp DESC
+     ORDER BY STR_TO_MILLIS(msgsi.timestamp) DESC
      LIMIT 1) AS answer,
 
     (SELECT RAW COALESCE(msgsi.content, msgsi.tool_calls)
@@ -57,4 +58,6 @@ FROM (SELECT DISTINCT grouping, session FROM msgs) AS g
 SELECT
 (FROM LM e SELECT VALUE e.question ORDER BY e.row_num) AS question,
 (FROM LM e SELECT VALUE e.answer ORDER BY e.row_num) AS answer,
-(FROM LM e SELECT VALUE e.contexts ORDER BY e.row_num) AS contexts;
+(FROM LM e SELECT VALUE e.contexts ORDER BY e.row_num) AS contexts
+)
+};
