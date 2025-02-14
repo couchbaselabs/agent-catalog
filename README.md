@@ -179,7 +179,7 @@ For more guide on how to use `.agentcignore` file check the [documentation](http
 ## Docs and Templates
 
 Refer to [`docs/`](docs) to explore templates and other references while writing your agent workflow with Couchbase
-Agent Catalog. We also provide some starter [`agents`](templates/agents) with different frameworks to understand the flow better.
+Agent Catalog. We also provide some starter [`agents`](templates/agents) using different frameworks to understand the flow better.
 
 For more info on basic tool and prompt definitions, please refer to the [`tool`](templates/tools) and [`prompt`](templates/prompts) templates that can be created using `agentc add` command.
 
