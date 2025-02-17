@@ -63,7 +63,6 @@ This directory contains a starter project for building agents with Couchbase, La
    Alternatively, install the example using `pip`
    ```bash
    pip install ../../../libs/agentc
-   pip install ../../../libs/agentc_langchain
    ```
 
 7. Run `agentc` to make sure this project has installed correctly (note that your first run will take a couple of
