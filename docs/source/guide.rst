@@ -143,7 +143,7 @@ Agent analysts will follow this workflow:
 
    .. code-block:: sql
 
-        SELECT A.* FROM `[[MY_BUCKET]]`.agent_activity.[VIEW_NAME] AS A;
+        SELECT logs_view.* FROM `[[MY_BUCKET]]`.agent_activity.[VIEW_NAME] AS logs_view;
 
    Following are the type of Views available to explore:
 
