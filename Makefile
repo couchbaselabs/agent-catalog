@@ -14,7 +14,6 @@ install-agentc-pip:
 	@echo "This may take some time..."
 	conda run -n $(or $(env_name),agentc_env) bash -c "\
 		pip install $(AGENT_CATALOG_LIBS)/agentc && \
-		pip install $(AGENT_CATALOG_LIBS)/agentc_langchain && \
 		echo '' && \
 		echo '----Verifying Installation----' && \
 		pip list | grep agentc && \
