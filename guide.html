@@ -198,7 +198,7 @@ If you have not, please refer to the <a class="reference internal" href="install
 development.
 Agent builders will follow this workflow:</p>
 <ol class="arabic">
-<li><p><strong>Sample Downloading</strong>: Download the starter agent from the <code class="file docutils literal notranslate"><span class="pre">templates/starter_agent</span></code> directory.</p></li>
+<li><p><strong>Sample Downloading</strong>: Download the starter agent from the <code class="file docutils literal notranslate"><span class="pre">templates/agents</span></code> directory.</p></li>
 <li><p><strong>Agent Building</strong>: The sample agent is meant to be a reference for building your own agents.
 You will need to modify the agent to fit your use case.</p>
 <ul>
@@ -304,7 +304,11 @@ For logs stored locally, you can find them in the <code class="file docutils lit
 <em>We recommend the former, as it allows for easy ad-hoc analysis through Couchbase Query and/or Couchbase Analytics.</em></p></li>
 <li><p><strong>Log Transformations</strong>: For users with Couchbase Analytics enabled, we provide the following views (expressed as
 Couchbase Analytics Views) to help you get started with conversational-based agents.
-All Views below belong to the scope <code class="file docutils literal notranslate"><span class="pre">agent_activity</span></code>.</p>
+All Views belong to the scope <code class="file docutils literal notranslate"><span class="pre">agent_activity</span></code> and can be queried using the Analytics service by executing the following query:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">SELECT</span><span class="w"> </span><span class="n">logs_view</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="o">`</span><span class="p">[[</span><span class="n">MY_BUCKET</span><span class="p">]]</span><span class="o">`</span><span class="p">.</span><span class="n">agent_activity</span><span class="p">.[</span><span class="n">VIEW_NAME</span><span class="p">]</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">logs_view</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Following are the type of Views available to explore:</p>
 <div class="admonition-sessions-sid-start-t-vid-msgs admonition">
 <p class="admonition-title">Sessions <code class="docutils literal notranslate"><span class="pre">(sid,</span> <span class="pre">start_t,</span> <span class="pre">vid,</span> <span class="pre">msgs)</span></code></p>
 <p>The <code class="docutils literal notranslate"><span class="pre">Sessions</span></code> view provides one record per session (alt. conversation).
@@ -318,7 +322,7 @@ Each session record contains:</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">msgs</span></code> field details all events that occurred during the session (e.g., the user’s messages, the response
 to the user, the internal “thinking” performed by the agent, the agent’s transitions between tasks, etc…).
 The latest session can be found by applying the filter:</p>
-<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">WHERE</span><span class="w"> </span><span class="n">sid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[[</span><span class="n">MY_BUCKET</span><span class="p">]].</span><span class="n">agent_activity</span><span class="p">.</span><span class="n">LastSession</span><span class="p">()</span>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">WHERE</span><span class="w"> </span><span class="n">sid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">`</span><span class="p">[[</span><span class="n">MY_BUCKET</span><span class="p">]]</span><span class="o">`</span><span class="p">.</span><span class="n">agent_activity</span><span class="p">.</span><span class="n">LastSession</span>
 </pre></div>
 </div>
 </div>
@@ -389,12 +393,11 @@ graph walks) and incorporate various notions of ground truth in your analysis.</
 </section>
 <section id="ignoring-files-while-indexing">
 <h2>Ignoring Files While Indexing<a class="headerlink" href="#ignoring-files-while-indexing" title="Link to this heading"></a></h2>
-<p>When indexing tools and prompts, you may want to ignore certain files.</p>
-<p>By default the <code class="file docutils literal notranslate"><span class="pre">index</span></code> command will ignore files/patterns present in <code class="file docutils literal notranslate"><span class="pre">.gitignore</span></code> file.</p>
+<p>When indexing tools and prompts, you may want to ignore certain files.
+By default the <code class="file docutils literal notranslate"><span class="pre">index</span></code> command will ignore files/patterns present in <code class="file docutils literal notranslate"><span class="pre">.gitignore</span></code> file.</p>
 <p>In addition to <code class="file docutils literal notranslate"><span class="pre">.gitignore</span></code>, there might be situation where additional files have to be ignored by agentc and not git.
 To add such files/patterns <code class="file docutils literal notranslate"><span class="pre">.agentcignore</span></code> file can be used similar to <code class="file docutils literal notranslate"><span class="pre">.gitignore</span></code>.</p>
-<p>For example,</p>
-<p>If the project structure is as below:</p>
+<p>For example, if the project structure is as below:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>project/
 ├── docs/
 │   ├── conf.py
@@ -414,7 +417,7 @@ To add such files/patterns <code class="file docutils literal notranslate"><span
 <p><code class="file docutils literal notranslate"><span class="pre">src/agent.py</span></code> contains the code for agent which uses the tools and prompts present in the project.
 <code class="file docutils literal notranslate"><span class="pre">src</span></code> directory contains the code for the agent along with the tools.</p>
 <p>While indexing using the command <strong class="command">agentc index --tools src</strong>, <code class="file docutils literal notranslate"><span class="pre">src/agent.py</span></code> will be indexed along with the tools present in the <code class="file docutils literal notranslate"><span class="pre">src</span></code> directory.</p>
-<p>Inorder to avoid that <code class="file docutils literal notranslate"><span class="pre">.agentcignore</span></code> file can be added in <code class="file docutils literal notranslate"><span class="pre">src</span></code> directory with the following content to avoid indexing the file containing agent code:</p>
+<p>Inorder to avoid that, <code class="file docutils literal notranslate"><span class="pre">.agentcignore</span></code> file can be added in <code class="file docutils literal notranslate"><span class="pre">src</span></code> directory with the following content to avoid indexing the file containing agent code:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>agent.py
 </pre></div>
 </div>

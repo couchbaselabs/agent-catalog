@@ -26,7 +26,7 @@ The Agent Catalog package is not just a tool/prompt catalog, it's a foundation f
 development.
 Agent builders will follow this workflow:
 
-1. **Sample Downloading**: Download the starter agent from the :file:`templates/starter_agent` directory.
+1. **Sample Downloading**: Download the starter agent from the :file:`templates/agents` directory.
 
 2. **Agent Building**: The sample agent is meant to be a reference for building your own agents.
    You will need to modify the agent to fit your use case.
@@ -139,7 +139,13 @@ Agent analysts will follow this workflow:
 
 2. **Log Transformations**: For users with Couchbase Analytics enabled, we provide the following views (expressed as
    Couchbase Analytics Views) to help you get started with conversational-based agents.
-   All Views below belong to the scope :file:`agent_activity`.
+   All Views belong to the scope :file:`agent_activity` and can be queried using the Analytics service by executing the following query:
+
+   .. code-block:: sql
+
+        SELECT logs_view.* FROM `[[MY_BUCKET]]`.agent_activity.[VIEW_NAME] AS logs_view;
+
+   Following are the type of Views available to explore:
 
    .. admonition:: Sessions ``(sid, start_t, vid, msgs)``
 
@@ -160,7 +166,7 @@ Agent analysts will follow this workflow:
 
         .. code-block:: sql
 
-            WHERE sid = [[MY_BUCKET]].agent_activity.LastSession()
+            WHERE sid = `[[MY_BUCKET]]`.agent_activity.LastSession
 
    .. admonition:: Exchanges ``(sid, question, answer, walk)``
 
@@ -230,15 +236,12 @@ Ignoring Files While Indexing
 -----------------------------
 
 When indexing tools and prompts, you may want to ignore certain files.
-
 By default the :file:`index` command will ignore files/patterns present in :file:`.gitignore` file.
 
 In addition to :file:`.gitignore`, there might be situation where additional files have to be ignored by agentc and not git.
 To add such files/patterns :file:`.agentcignore` file can be used similar to :file:`.gitignore`.
 
-For example,
-
-If the project structure is as below:
+For example, if the project structure is as below:
 
 .. code-block:: text
 
@@ -262,7 +265,7 @@ If the project structure is as below:
 
 While indexing using the command :command:`agentc index --tools src`, :file:`src/agent.py` will be indexed along with the tools present in the :file:`src` directory.
 
-Inorder to avoid that :file:`.agentcignore` file can be added in :file:`src` directory with the following content to avoid indexing the file containing agent code:
+Inorder to avoid that, :file:`.agentcignore` file can be added in :file:`src` directory with the following content to avoid indexing the file containing agent code:
 
 .. code-block:: text
 
