@@ -57,7 +57,8 @@ Building From Source (with pip)
       # Install the agentc package.
       pip install libs/agentc
 
-   If you are interested in developing with langchain, also install ``agentc_langchain`` by running the following:
+   If you are interested in building a ``.whl`` file (for later use in ``.whl``-based installs), use :command:`poetry`
+   directly:
 
    .. code-block:: bash
 
