@@ -36,7 +36,7 @@ controlflow @ git+https://github.com/PrefectHQ/ControlFlow@f259fa8144ed31b8bde59
 coolname==2.2.0
 couchbase==4.3.4
 croniter==6.0.0
-cryptography==44.0.0
+cryptography==44.0.1
 dataclasses-json==0.6.7
 datamodel-code-generator==0.26.5
 datasets==2.14.4
