@@ -7,6 +7,7 @@ import pathlib
 import shutil
 import typing
 
+from .util import logging_command
 from agentc_core.config import Config
 from agentc_core.defaults import DEFAULT_ACTIVITY_FOLDER
 from agentc_core.defaults import DEFAULT_AUDIT_SCOPE
@@ -103,6 +104,7 @@ def clean_db(
     return len(all_errs)
 
 
+@logging_command(parent_logger=logger)
 def cmd_clean(
     cfg: Config = None,
     *,

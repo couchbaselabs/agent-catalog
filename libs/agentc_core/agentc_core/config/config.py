@@ -160,6 +160,37 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
         return cluster
 
 
+class EmbeddingModelConfig(pydantic_settings.BaseSettings):
+    model_config = pydantic_settings.SettingsConfigDict(env_prefix="AGENT_CATALOG_")
+
+    embedding_model_name: str = agentc_core.defaults.DEFAULT_EMBEDDING_MODEL_NAME
+    """ The name of the embedding model that Agent Catalog will use when indexing and querying tools and model inputs.
+
+    By default, the ``sentence-transformers/all-MiniLM-L12-v2`` model is used.
+    """
+
+    embedding_model_url: typing.Optional[str] = None
+    """ The base URL of an OpenAI-client-compatible endpoint.
+
+    This field is optional, but if specified we will assume that the model specified by ``embedding_model_name`` is
+    accessible by this endpoint.
+    """
+
+    embedding_model_auth: typing.Optional[str] = None
+    """ The authentication token for the endpoint specified by ``embedding_model_url``.
+
+    For endpoints hosted by OpenAI, this is the API key.
+    For endpoints hosted on Capella, this is your JWT.
+    """
+
+    sentence_transformers_model_cache: typing.Optional[str] = agentc_core.defaults.DEFAULT_MODEL_CACHE_FOLDER
+    """ The path to the folder where sentence-transformer embedding models will be cached.
+
+    By default, this is ``.model-cache``.
+    For OpenAI embedding models, this field is ignored.
+    """
+
+
 class LocalCatalogConfig(pydantic_settings.BaseSettings):
     model_config = pydantic_settings.SettingsConfigDict(env_prefix="AGENT_CATALOG_")
 
@@ -174,15 +205,6 @@ class LocalCatalogConfig(pydantic_settings.BaseSettings):
     By default, this code is never written to disk.
     If this field is specified, we will write all generated files to the given output directory and serve the generated
     Python callables from these files with a "standard import".
-    """
-
-    embedding_model: str = agentc_core.defaults.DEFAULT_EMBEDDING_MODEL
-    """ The name of the embedding model that Agent Catalog will use when indexing and querying tools and model inputs.
-
-    TODO (GLENN): This will be false soon!
-    This *must* be a valid embedding model that is supported by the :python:`sentence_transformers.SentenceTransformer`
-    class.
-    By default, the ``sentence-transformers/all-MiniLM-L12-v2`` model is used.
     """
 
     @pydantic.model_validator(mode="after")
@@ -223,13 +245,15 @@ class LocalCatalogConfig(pydantic_settings.BaseSettings):
         # If a catalog path is not set, perform a best-effort search.
         starting_path = self.project_path if self.project_path is not None else pathlib.Path.cwd()
         logger.debug(
-            'Starting upwards search for the catalog folder. Searching for "%s".',
+            'Starting upwards search for the catalog folder in "%s". Searching for "%s".',
+            starting_path,
             agentc_core.defaults.DEFAULT_CATALOG_FOLDER,
         )
 
         # Iteratively ascend our starting path until we find the catalog folder.
         working_path = starting_path
         while not (working_path / agentc_core.defaults.DEFAULT_CATALOG_FOLDER).exists():
+            logger.debug("Searching in %s.", working_path.absolute())
             if working_path.parent == working_path:
                 raise ValueError(
                     f"Local catalog not found using an upwards search from {starting_path}!\n"
@@ -285,7 +309,7 @@ class VersioningConfig(pydantic_settings.BaseSettings):
 
 
 # We'll take a mix-in approach here.
-class Config(LocalCatalogConfig, RemoteCatalogConfig, CommandLineConfig, VersioningConfig):
+class Config(LocalCatalogConfig, RemoteCatalogConfig, CommandLineConfig, VersioningConfig, EmbeddingModelConfig):
     model_config = pydantic_settings.SettingsConfigDict(env_prefix="AGENT_CATALOG_")
 
     debug: bool = False

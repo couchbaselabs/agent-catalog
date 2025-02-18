@@ -1,6 +1,6 @@
 import click
-import couchbase.cluster
 import datetime
+import functools
 import git
 import logging
 import os
@@ -16,6 +16,7 @@ from agentc_core.catalog import __version__ as CATALOG_SCHEMA_VERSION
 from agentc_core.catalog.index import MetaVersion
 from agentc_core.catalog.index import index_catalog
 from agentc_core.catalog.version import lib_version
+from agentc_core.config import Config
 from agentc_core.defaults import DEFAULT_MAX_ERRS
 from agentc_core.defaults import DEFAULT_MODEL_INPUT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_SCAN_DIRECTORY_OPTS
@@ -31,10 +32,26 @@ LEVEL_COLORS = {"good": "green", "warn": "yellow", "error": "red"}
 KIND_COLORS = {"tool": "bright_magenta", "model-input": "blue", "log": "cyan"}
 try:
     DASHES = "-" * os.get_terminal_size().columns
-except OSError as e:
-    logger.debug(f"Unable to retrieve the terminal screen size. Swallowing exception {str(e)}.")
+except OSError as _e:
+    logger.debug(f"Unable to retrieve the terminal screen size. Swallowing exception {str(_e)}.")
     # We might run into this error while running in a debugger.
     DASHES = "-" * 80
+
+
+def logging_command(parent_logger: logging.Logger):
+    # This decorator is used to catch unrecoverable errors from commands (mainly for testing purposes).
+    def decorator(func):
+        @functools.wraps(func)
+        def new_func(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                parent_logger.error(f"Command {func.__name__} failed with exception: {str(e)}")
+                raise e
+
+        return new_func
+
+    return decorator
 
 
 def load_repository(top_dir: pathlib.Path = None):
@@ -81,9 +98,7 @@ def load_repository(top_dir: pathlib.Path = None):
 
 
 def get_catalog(
-    catalog_path: pathlib.Path,
-    bucket: str,
-    cluster: couchbase.cluster.Cluster,
+    cfg: Config,
     include_dirty: bool,
     kind: typing.Literal["tool", "model-input"],
     force: typing.Literal["local", "db", "chain"] = None,
@@ -91,24 +106,36 @@ def get_catalog(
     # We have three options: (1) db catalog, (2) local catalog, or (3) both.
     repo, get_path_version = load_repository(pathlib.Path(os.getcwd()))
     if kind == "tool":
-        catalog_file = catalog_path / DEFAULT_TOOL_CATALOG_FILE
+        catalog_file = cfg.CatalogPath() / DEFAULT_TOOL_CATALOG_FILE
     elif kind == "model-input":
-        catalog_file = catalog_path / DEFAULT_MODEL_INPUT_CATALOG_FILE
+        catalog_file = cfg.CatalogPath() / DEFAULT_MODEL_INPUT_CATALOG_FILE
     else:
         raise ValueError(f"Unknown catalog kind: {kind}")
     db_catalog, local_catalog = None, None
 
     # Path #1: Search our DB catalog.
-    if force == "db" and (bucket is None or cluster is None):
+    try:
+        cluster = cfg.Cluster()
+    except ValueError as e:
+        if force == "db":
+            raise e
+        else:
+            logger.debug(f"Unable to initialize DB cluster. Swallowing exception: {str(e)}")
+            cluster = None
+    if force == "db" and (cfg.bucket is None or cluster is None):
         raise ValueError("Must provide a bucket and cluster to search the DB catalog.")
-    if bucket is not None and cluster is not None:
+    if cfg.bucket is not None and cluster is not None:
         try:
             embedding_model = EmbeddingModel(
-                catalog_path=pathlib.Path(catalog_path),
-                cb_bucket=bucket,
+                catalog_path=cfg.CatalogPath(),
+                cb_bucket=cfg.bucket,
                 cb_cluster=cluster,
+                embedding_model_name=cfg.embedding_model_name,
+                embedding_model_url=cfg.embedding_model_url,
+                embedding_model_auth=cfg.embedding_model_auth,
+                sentence_transformers_model_cache=cfg.sentence_transformers_model_cache,
             )
-            db_catalog = CatalogDB(cluster=cluster, bucket=bucket, kind=kind, embedding_model=embedding_model)
+            db_catalog = CatalogDB(cluster=cluster, bucket=cfg.bucket, kind=kind, embedding_model=embedding_model)
         except pydantic.ValidationError as e:
             if force == "db":
                 raise e
@@ -120,7 +147,11 @@ def get_catalog(
         raise ValueError(f"Could not find local catalog at {catalog_file}.")
     if catalog_file.exists():
         embedding_model = EmbeddingModel(
-            catalog_path=catalog_path,
+            catalog_path=cfg.CatalogPath(),
+            embedding_model_name=cfg.embedding_model_name,
+            embedding_model_url=cfg.embedding_model_url,
+            embedding_model_auth=cfg.embedding_model_auth,
+            sentence_transformers_model_cache=cfg.sentence_transformers_model_cache,
         )
         local_catalog = CatalogMem(catalog_file=catalog_file, embedding_model=embedding_model)
 

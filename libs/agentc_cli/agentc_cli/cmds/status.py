@@ -13,6 +13,7 @@ from ..cmds.util import DASHES
 from ..cmds.util import KIND_COLORS
 from ..cmds.util import LEVEL_COLORS
 from ..cmds.util import load_repository
+from .util import logging_command
 from agentc_core.catalog.descriptor import CatalogDescriptor
 from agentc_core.catalog.index import MetaVersion
 from agentc_core.catalog.index import index_catalog_start
@@ -33,6 +34,7 @@ from couchbase.exceptions import ScopeNotFoundException
 logger = logging.getLogger(__name__)
 
 
+@logging_command(logger)
 def cmd_status(
     cfg: Config = None,
     *,
@@ -269,7 +271,11 @@ def get_local_status(
                 # Start a CatalogMem on-the-fly that incorporates the dirty
                 # source file items which we'll use instead of the local catalog file.
                 errs, catalog, uninitialized_items = index_catalog_start(
-                    EmbeddingModel(embedding_model_name=catalog_desc.embedding_model),
+                    EmbeddingModel(
+                        embedding_model_name=cfg.embedding_model_name,
+                        embedding_model_auth=cfg.embedding_model_auth,
+                        embedding_model_url=cfg.embedding_model_url,
+                    ),
                     MetaVersion(
                         schema_version=catalog_desc.schema_version, library_version=catalog_desc.library_version
                     ),

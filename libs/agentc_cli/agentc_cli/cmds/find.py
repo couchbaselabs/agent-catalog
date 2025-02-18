@@ -1,5 +1,4 @@
 import click
-import couchbase.cluster
 import logging
 import pydantic
 import textwrap
@@ -8,6 +7,7 @@ import typing
 from .util import DASHES
 from .util import KIND_COLORS
 from .util import get_catalog
+from .util import logging_command
 from agentc_core.annotation import AnnotationPredicate
 from agentc_core.catalog import SearchResult
 from agentc_core.config import Config
@@ -41,6 +41,7 @@ class SearchOptions(pydantic.BaseModel):
         return values
 
 
+@logging_command(logger)
 def cmd_find(
     cfg: Config = None,
     *,
@@ -84,15 +85,7 @@ def cmd_find(
         raise ValueError("Either local FS or DB catalog must be specified!")
 
     # Execute the find on our catalog.
-    cluster: couchbase.cluster.Cluster = cfg.Cluster()
-    catalog = get_catalog(
-        catalog_path=cfg.CatalogPath(),
-        bucket=cfg.bucket,
-        cluster=cluster,
-        force=force,
-        include_dirty=include_dirty,
-        kind=kind,
-    )
+    catalog = get_catalog(cfg=cfg, force=force, include_dirty=include_dirty, kind=kind)
     annotations_predicate = AnnotationPredicate(annotations) if annotations is not None else None
     search_results = [
         SearchResult(entry=x.entry, delta=x.delta)

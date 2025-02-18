@@ -5,9 +5,11 @@ import logging
 import pathlib
 import tqdm
 import typing
+import uuid
 
 from .util import DASHES
 from .util import KIND_COLORS
+from agentc_cli.cmds.util import logging_command
 from agentc_core.analytics import Log
 from agentc_core.catalog.descriptor import CatalogDescriptor
 from agentc_core.config import Config
@@ -28,6 +30,7 @@ from pydantic import ValidationError
 logger = logging.getLogger(__name__)
 
 
+@logging_command(parent_logger=logger)
 def cmd_publish(
     cfg: Config = None,
     *,
@@ -155,7 +158,7 @@ def cmd_publish(
         progress_bar = tqdm.tqdm(catalog_desc.items)
         for item in progress_bar:
             try:
-                key = item.identifier + "_" + metadata["version"]["identifier"]
+                key = uuid.uuid4().hex
                 progress_bar.set_description(item.name)
 
                 # serialise object to str
@@ -169,5 +172,5 @@ def cmd_publish(
                 cb_coll.upsert(key, item_json)
             except CouchbaseException as e:
                 click.secho(f"Couldn't insert catalog items!\n{e.message}", fg="red")
-                return e
+                raise e
         click.secho(f"{k.capitalize()} catalog items successfully uploaded to Couchbase!\n", fg="green")

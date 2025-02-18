@@ -1,10 +1,15 @@
 import click
 import importlib.util
+import logging
 
+from .util import logging_command
 from agentc_core.catalog import version as core_version
 from agentc_core.config import Config
 
+logger = logging.getLogger(__name__)
 
+
+@logging_command(parent_logger=logger)
 def cmd_version(cfg: Config = None):
     if cfg is None:
         cfg = Config()

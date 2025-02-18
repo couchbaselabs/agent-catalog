@@ -13,8 +13,9 @@ from agentc_core.catalog.implementations.chain import CatalogChain
 from agentc_core.catalog.implementations.db import CatalogDB
 from agentc_core.catalog.implementations.mem import CatalogMem
 from agentc_core.config import LATEST_SNAPSHOT_VERSION
-from agentc_core.config.config import LocalCatalogConfig
-from agentc_core.config.config import RemoteCatalogConfig
+from agentc_core.config import EmbeddingModelConfig
+from agentc_core.config import LocalCatalogConfig
+from agentc_core.config import RemoteCatalogConfig
 from agentc_core.defaults import DEFAULT_MODEL_INPUT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
 from agentc_core.learned.embedding import EmbeddingModel
@@ -37,7 +38,7 @@ ModelInput = ModelInputProvider.ModelInput
 Tool = ToolProvider.ToolResult
 
 
-class Catalog(RemoteCatalogConfig, LocalCatalogConfig):
+class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
     """A provider of indexed "agent building blocks" (e.g., tools, model inputs, etc...)."""
 
     refiner: typing.Optional[typing.Callable[[list[SearchResult]], list[SearchResult]]] = lambda results: results
@@ -113,7 +114,13 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig):
             return self
 
         # Note: we will defer embedding model mismatches to the remote catalog validator.
-        embedding_model = EmbeddingModel(catalog_path=self.catalog_path)
+        embedding_model = EmbeddingModel(
+            embedding_model_name=self.embedding_model_name,
+            embedding_model_auth=self.embedding_model_auth,
+            embedding_model_url=self.embedding_model_url,
+            sentence_transformers_model_cache=self.sentence_transformers_model_cache,
+            catalog_path=self.catalog_path,
+        )
 
         # Set our local catalog if it exists.
         tool_catalog_file = self.catalog_path / DEFAULT_TOOL_CATALOG_FILE
@@ -160,11 +167,19 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig):
                 cb_bucket=self.bucket,
                 cb_cluster=cluster,
                 catalog_path=self.CatalogPath(),
+                embedding_model_name=self.embedding_model_name,
+                embedding_model_auth=self.embedding_model_auth,
+                embedding_model_url=self.embedding_model_url,
+                sentence_transformers_model_cache=self.sentence_transformers_model_cache,
             )
         else:
             embedding_model = EmbeddingModel(
                 cb_bucket=self.bucket,
                 cb_cluster=cluster,
+                embedding_model_name=self.embedding_model_name,
+                embedding_model_auth=self.embedding_model_auth,
+                embedding_model_url=self.embedding_model_url,
+                sentence_transformers_model_cache=self.sentence_transformers_model_cache,
             )
 
         try:

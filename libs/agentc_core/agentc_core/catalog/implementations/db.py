@@ -64,18 +64,19 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
     ) -> list[SearchResult]:
         """Returns the catalog items that best match a query."""
         collection = DEFAULT_CATALOG_TOOL_COLLECTION if self.kind == "tool" else DEFAULT_CATALOG_MODEL_INPUT_COLLECTION
+        sqlpp_query = None
 
         # Catalog item has to be queried directly
         if name is not None:
             if snapshot == LATEST_SNAPSHOT_VERSION:
                 snapshot = self.version.identifier
             # TODO (GLENN): Need to add some validation around bucket (to prevent injection)
-            item_query = f"""
+            sqlpp_query = f"""
                 FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}` AS a
                 WHERE a.name = $name AND a.catalog_identifier = $snapshot
                 SELECT a.*;
             """
-            res, err = execute_query_with_parameters(self.cluster, item_query, {"name": name, "snapshot": snapshot})
+            res, err = execute_query_with_parameters(self.cluster, sqlpp_query, {"name": name, "snapshot": snapshot})
             if err is not None:
                 logger.error(err)
                 return []
@@ -101,7 +102,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                 if snapshot == LATEST_SNAPSHOT_VERSION:
                     snapshot = self.version.identifier
 
-                filter_records_query = f"""
+                sqlpp_query = f"""
                     SELECT a.* FROM (
                         SELECT t.*, SEARCH_SCORE() AS score
                         FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}` AS t
@@ -129,7 +130,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
 
             # No snapshot id has been mentioned
             else:
-                filter_records_query = f"""
+                sqlpp_query = f"""
                     SELECT a.* FROM (
                         SELECT t.*, SEARCH_SCORE() AS score
                         FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}` as t
@@ -156,7 +157,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                 """
 
             # Execute query after filtering by catalog_identifier if provided
-            res, err = execute_query(self.cluster, filter_records_query)
+            res, err = execute_query(self.cluster, sqlpp_query)
             if err is not None:
                 logger.error(err)
                 return []
@@ -165,7 +166,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
 
         # If result set is empty
         if len(resp) == 0:
-            logger.debug("No catalog items found with given conditions...")
+            logger.debug(f"No catalog items found using the SQL++ query: {sqlpp_query}")
             return []
 
         # ---------------------------------------------------------------------------------------- #

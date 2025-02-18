@@ -8,6 +8,7 @@ import platform
 import subprocess
 import typing
 
+from .util import logging_command
 from agentc_core.config import Config
 from agentc_core.record.descriptor import RecordKind
 
@@ -149,6 +150,7 @@ def add_sqlpp_query(output: pathlib.Path, template_env: jinja2.Environment):
     subprocess.run([default_editor, f"{output_file}"])
 
 
+@logging_command(parent_logger=logger)
 def cmd_add(
     cfg: Config = None,
     *,

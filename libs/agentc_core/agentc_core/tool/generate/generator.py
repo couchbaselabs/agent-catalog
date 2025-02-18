@@ -1,4 +1,5 @@
 import abc
+import agentc_core.defaults
 import dataclasses
 import datamodel_code_generator
 import datetime
@@ -7,6 +8,7 @@ import json
 import logging
 import openapi_parser.parser
 import openapi_schema_to_json_schema
+import os
 import pathlib
 import pydantic
 import typing
@@ -135,7 +137,13 @@ class SemanticSearchCodeGenerator(_BaseCodeGenerator):
                     "input": input_model,
                     "vector_search": self.record_descriptor.vector_search,
                     "cluster_secrets": cluster_secrets.couchbase if cluster_secrets is not None else None,
-                    "embedding_secrets": embedding_secrets.embedding if embedding_secrets is not None else None,
+                    "embedding_model": {
+                        "secrets": embedding_secrets.embedding if embedding_secrets is not None else None,
+                        "cache": os.getenv(
+                            "AGENT_CATALOG_SENTENCE_TRANSFORMERS_MODEL_CACHE",
+                            agentc_core.defaults.DEFAULT_MODEL_CACHE_FOLDER,
+                        ),
+                    },
                 }
             )
             logger.debug("The following code has been generated:\n" + rendered_code)

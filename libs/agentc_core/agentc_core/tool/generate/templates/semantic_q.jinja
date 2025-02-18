@@ -11,7 +11,6 @@ import json
 import logging
 import os
 
-from agentc_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
 from agentc_core.tool import tool
 from agentc_core.secrets import get_secret
 
@@ -58,7 +57,7 @@ def {{ tool.name }}(question: {{ input.type_name }}) -> list[str]:
     embedding_model = sentence_transformers.SentenceTransformer(
         "{{ vector_search.embedding_model.name }}",
         tokenizer_kwargs={'clean_up_tokenization_spaces': True},
-        cache_folder=os.getenv("AGENT_CATALOG_SENTENCE_TRANSFORMERS_MODEL_CACHE", DEFAULT_MODEL_CACHE_FOLDER),
+        cache_folder="{{ embedding_model.cache }}",
         local_files_only=True
     )
     _embedding = embedding_model.encode(formatted_question)
@@ -66,7 +65,7 @@ def {{ tool.name }}(question: {{ input.type_name }}) -> list[str]:
     {% else %}
     import openai
     open_ai_client = openai.OpenAI(
-        base_url="{{ vector_search.embedding_model.base_url }}", api_key=get_secret("{{ embedding_secrets.auth }}").get_secret_value()
+        base_url="{{ vector_search.embedding_model.base_url }}", api_key=get_secret("{{ embedding_model.secrets.auth }}").get_secret_value()
     )
     for_q=open_ai_client.embeddings.create(model="{{ vector_search.embedding_model.name }}", input=formatted_question, encoding_format="float").data[0].embedding
     {% endif %}

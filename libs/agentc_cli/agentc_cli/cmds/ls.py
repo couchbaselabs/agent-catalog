@@ -1,13 +1,18 @@
 import click
+import logging
 import typing
 
 from agentc_cli.cmds.util import DASHES
 from agentc_cli.cmds.util import KIND_COLORS
 from agentc_cli.cmds.util import get_catalog
+from agentc_cli.cmds.util import logging_command
 from agentc_core.catalog import CatalogBase
 from agentc_core.config import Config
 
+logger = logging.getLogger(__name__)
 
+
+@logging_command(parent_logger=logger)
 def cmd_ls(
     cfg: Config = None,
     *,
@@ -33,15 +38,7 @@ def cmd_ls(
         click.secho(DASHES, fg=KIND_COLORS[k])
         click.secho(k.upper(), bold=True, fg=KIND_COLORS[k])
         click.secho(DASHES, fg=KIND_COLORS[k])
-        catalog: CatalogBase = get_catalog(
-            catalog_path=cfg.CatalogPath(),
-            bucket=cfg.bucket,
-            cluster=cfg.Cluster() if with_db else None,
-            force=force,
-            include_dirty=include_dirty,
-            kind=k,
-        )
-
+        catalog: CatalogBase = get_catalog(cfg, force=force, include_dirty=include_dirty, kind=k)
         catalog_items = list(catalog)
         num = 1
         for catalog_item in catalog_items:

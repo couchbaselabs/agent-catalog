@@ -9,6 +9,7 @@ import pathlib
 import typing
 
 from .util import CATALOG_KINDS
+from .util import logging_command
 from agentc_core.analytics.create import create_analytics_views
 from agentc_core.analytics.create import create_query_udfs
 from agentc_core.config import Config
@@ -27,6 +28,7 @@ from agentc_core.util.ddl import create_vector_index
 logger = logging.getLogger(__name__)
 
 
+@logging_command(parent_logger=logger)
 def cmd_init(
     cfg: Config = None,
     *,
@@ -38,12 +40,14 @@ def cmd_init(
         cfg = Config()
 
     if local:
+        logger.debug("Initializing local-FS catalog and activity.")
         if "catalog" in targets:
             init_local_catalog(cfg)
         if "activity" in targets:
             init_local_activity(cfg)
 
     if db:
+        logger.debug("Initializing DB catalog and activity.")
         cluster = cfg.Cluster()
         if "catalog" in targets:
             init_db_catalog(cfg, cluster)
@@ -112,6 +116,13 @@ def init_db_catalog(cfg: Config, cluster: couchbase.cluster.Cluster):
     # ---------------------------------------------------------------------------------------- #
     #                               GSI and Vector Indexes                                     #
     # ---------------------------------------------------------------------------------------- #
+    embedding_model = EmbeddingModel(
+        embedding_model_name=cfg.embedding_model_name,
+        embedding_model_url=cfg.embedding_model_url,
+        embedding_model_auth=cfg.embedding_model_auth,
+        sentence_transformers_model_cache=cfg.sentence_transformers_model_cache,
+    )
+    dims = len(embedding_model.encode("test"))
     for kind in CATALOG_KINDS:
         click.secho(f"Now building the GSI indexes for the {kind} catalog.", fg="yellow")
         completion_status, err = create_gsi_indexes(cfg, kind, True)
@@ -121,8 +132,6 @@ def init_db_catalog(cfg: Config, cluster: couchbase.cluster.Cluster):
             click.secho(f"All GSI indexes for the {kind} catalog have been successfully created!\n", fg="green")
 
         click.secho(f"Now building the vector index for the {kind} catalog.", fg="yellow")
-        embedding_model = EmbeddingModel(embedding_model_name=cfg.embedding_model)
-        dims = len(embedding_model.encode("test"))
         _, err = create_vector_index(
             cfg=cfg,
             scope=DEFAULT_CATALOG_SCOPE,

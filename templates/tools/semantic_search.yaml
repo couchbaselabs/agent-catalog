@@ -66,10 +66,12 @@ vector_search:
   text_field: text
 
   # The embedding model used to generate the vector_field.
-  # This embedding model field value is directly passed to sentence transformers.
-  # In the future, we will add support for other types of embedding models.
+  # If a URL is specified, we will assume the URL serves as the base of an OpenAI-client-compatible endpoint.
+  # If a URL is not specified (the default), we will assume the embedding model is a sentence-transformers model
+  # that can be downloaded from HuggingFace.
   embedding_model:
     name: sentence-transformers/all-MiniLM-L12-v2
+    # url:
 
   # The number of candidates (i.e., the K value) to request for when performing a vector top-k search.
   # This field is optional, and defaults to k=3 if not specified.

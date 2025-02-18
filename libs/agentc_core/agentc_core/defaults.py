@@ -1,6 +1,6 @@
 import gitignore_parser
 
-DEFAULT_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L12-v2"
+DEFAULT_EMBEDDING_MODEL_NAME = "sentence-transformers/all-MiniLM-L12-v2"
 DEFAULT_MODEL_CACHE_FOLDER = ".model-cache"
 DEFAULT_CATALOG_FOLDER = ".agent-catalog"
 DEFAULT_CATALOG_SCOPE = "agent_catalog"
@@ -30,7 +30,7 @@ DEFAULT_SCAN_DIRECTORY_OPTS = dict(
 )
 
 __all__ = [
-    "DEFAULT_EMBEDDING_MODEL",
+    "DEFAULT_EMBEDDING_MODEL_NAME",
     "DEFAULT_MODEL_CACHE_FOLDER",
     "DEFAULT_CATALOG_FOLDER",
     "DEFAULT_ACTIVITY_FOLDER",

@@ -1,8 +1,8 @@
+import os
 import pytest
 import sentence_transformers
 
-from agentc_core.defaults import DEFAULT_EMBEDDING_MODEL
-from agentc_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
+from agentc_core.defaults import DEFAULT_EMBEDDING_MODEL_NAME
 from agentc_core.learned.embedding import EmbeddingModel
 
 
@@ -10,12 +10,15 @@ from agentc_core.learned.embedding import EmbeddingModel
 def test_embedding_local_default():
     # download the model
     sentence_transformers.SentenceTransformer(
-        DEFAULT_EMBEDDING_MODEL, cache_folder=DEFAULT_MODEL_CACHE_FOLDER, local_files_only=False
+        DEFAULT_EMBEDDING_MODEL_NAME,
+        cache_folder=os.getenv("AGENT_CATALOG_SENTENCE_TRANSFORMERS_MODEL_CACHE"),
+        local_files_only=False,
     )
 
     # execute the model
     embedding_model = EmbeddingModel(
-        embedding_model_name=DEFAULT_EMBEDDING_MODEL,
+        embedding_model_name=DEFAULT_EMBEDDING_MODEL_NAME,
+        sentence_transformers_model_cache=os.getenv("AGENT_CATALOG_SENTENCE_TRANSFORMERS_MODEL_CACHE"),
     )
 
     embedding = embedding_model.encode("agentc")
@@ -26,12 +29,15 @@ def test_embedding_local_default():
 def test_embedding_local_pretrained():
     # download the model
     sentence_transformers.SentenceTransformer(
-        "paraphrase-albert-small-v2", cache_folder=DEFAULT_MODEL_CACHE_FOLDER, local_files_only=False
+        "paraphrase-albert-small-v2",
+        cache_folder=os.getenv("AGENT_CATALOG_SENTENCE_TRANSFORMERS_MODEL_CACHE"),
+        local_files_only=False,
     )
 
     # execute the model
     embedding_model = EmbeddingModel(
         embedding_model_name="paraphrase-albert-small-v2",
+        sentence_transformers_model_cache=os.getenv("AGENT_CATALOG_SENTENCE_TRANSFORMERS_MODEL_CACHE"),
     )
 
     embedding = embedding_model.encode("agentc")

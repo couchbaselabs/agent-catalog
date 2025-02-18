@@ -10,6 +10,7 @@ from .find import SearchOptions
 from .util import DASHES
 from .util import KIND_COLORS
 from .util import get_catalog
+from agentc_cli.cmds.util import logging_command
 from agentc_core.config import Config
 from agentc_core.provider import ToolProvider
 from agentc_core.record.descriptor import RecordDescriptor
@@ -27,6 +28,7 @@ types_mapping = {"array": list, "integer": int, "number": float, "string": str}
 logger = logging.getLogger(__name__)
 
 
+@logging_command(logger)
 def cmd_execute(
     cfg: Config = None,
     *,
@@ -58,14 +60,7 @@ def cmd_execute(
         raise ValueError("Either local FS or DB catalog must be specified!")
 
     # Initialize a catalog instance.
-    catalog = get_catalog(
-        catalog_path=cfg.CatalogPath(),
-        bucket=cfg.bucket,
-        cluster=cfg.Cluster() if with_db else None,
-        force=force,
-        include_dirty=include_dirty,
-        kind="tool",
-    )
+    catalog = get_catalog(cfg=cfg, force=force, include_dirty=include_dirty, kind="tool")
 
     # create temp directory for code dump
     _dir = cfg.codegen_output if cfg.codegen_output is not None else os.getcwd()
