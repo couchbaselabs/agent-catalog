@@ -19,6 +19,7 @@ Table of Contents
    Agent Catalog User Guide <guide>
    Command Line Tool <cli>
    Agent Catalog API <api>
+   Provider Configuration <provider>
    Environment Variables <env>
    On Catalog Entries <entry>
    Frequently Asked Questions <faqs>
