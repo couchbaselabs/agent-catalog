@@ -189,8 +189,16 @@ def add(ctx, output: pathlib.Path, record_kind: RecordKind):
     help="Kind of catalog to remove versions from.",
     show_default=True,
 )
+@click.option(
+    "-d",
+    "--date",
+    default=None,
+    type=str,
+    help="Datetime of the oldest log entry to keep (older log entries will be deleted).\nEx: 2021-09-01T00:00:00, 20th Jan 2024 8:00PM, 2 days ago",
+    show_default=False,
+)
 @click.pass_context
-def clean(ctx, catalog, type_metadata, bucket, catalog_id, skip_confirm, kind):
+def clean(ctx, catalog, type_metadata, bucket, catalog_id, skip_confirm, kind, date):
     """Delete all or specific (catalog and/or activity) agent related files / collections."""
     ctx_obj: Context = ctx.obj
     clean_db = "db" in catalog
@@ -204,6 +212,11 @@ def clean(ctx, catalog, type_metadata, bucket, catalog_id, skip_confirm, kind):
             fg="yellow",
         )
         return
+
+    if date is not None and (type_metadata == "all" or type_metadata == "catalog"):
+        raise ValueError(
+            "Datetime can only be specified for deletion of activity logs, not catalog entries.\nExecute 'agentc clean [[local|db]] activity --date DATETIME' separately to delete logs based on time."
+        )
 
     # Similar to the rm command, we will prompt the user for each catalog to delete.
     if clean_local:
@@ -220,6 +233,7 @@ def clean(ctx, catalog, type_metadata, bucket, catalog_id, skip_confirm, kind):
             catalog_ids=None,
             kind=None,
             type_metadata=type_metadata,
+            date=date,
         )
 
     if clean_db:
@@ -267,6 +281,7 @@ def clean(ctx, catalog, type_metadata, bucket, catalog_id, skip_confirm, kind):
             cluster=cluster,
             catalog_ids=catalog_id,
             kind=kind_list,
+            date=date,
         )
         cluster.close()
 
