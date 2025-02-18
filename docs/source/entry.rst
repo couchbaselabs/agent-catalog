@@ -4,7 +4,7 @@
 Agent Catalog Record Entries
 ============================
 
-As of date, Agent Catalog supports six different types of records (four types of tools, two types of prompts).
+As of date, Agent Catalog supports five different types of records (four types of tools and the generic model-input).
 
 Tool Catalog Records
 --------------------
@@ -54,28 +54,10 @@ One tool is generated per specified endpoint.
 To know more on generating your OpenAPI spec, check out the schema `here <https://spec.openapis.org/oas/v3.1.0.html#schema>`_.
 For an example OpenAPI spec used in the ``travel-sample`` agent, see `here <https://github.com/couchbaselabs/agent-catalog-example/blob/master/travel_agent/src/endpoints/rewards_spec.json>`_.
 
-Prompt Catalog Records
-----------------------
+Model Input Records
+-------------------
 
-Prompts in Agent Catalog are more than just a hunk of text: they also contain metadata that help developers build
-agents faster.
-These prompts can be a part of a larger workflow (e.g., as a nested prompt within an agent framework) or as a standalone
-set of instructions.
-Agent Catalog currently supports two types of prompts: raw prompts and Jinja templated prompts.
+Model inputs in Agent Catalog refer to the aggregation of all **all** inputs (tool choices, prompts, output types,
+etc...) given to an LLM (or an agent framework).
 
-Raw Prompts
-^^^^^^^^^^^
-
-Raw prompts are static, predefined text-based instructions used to guide your agent's actions.
-Raw prompts are written directly as plain text without any dynamic elements.
-
-.. literalinclude:: ../../templates/prompts/raw_prompt.prompt
-
-Jinja Templated Prompts
-^^^^^^^^^^^^^^^^^^^^^^^
-
-In contrast to raw prompts, Jinja templated prompts enable users to author dynamic prompts that can be rendered at
-runtime.
-If you are working without an agent framework, Jinja templated prompts might make more sense for your use case.
-
-.. literalinclude:: ../../templates/prompts/jinja_prompt.jinja
+.. literalinclude:: ../../templates/inputs/model_input.yaml

@@ -1,27 +1,27 @@
 import click
+import couchbase.cluster
 import json
 import logging
 import pathlib
 import tqdm
 import typing
 
-from ..models import Context
 from .util import DASHES
 from .util import KIND_COLORS
 from agentc_core.analytics import Log
 from agentc_core.catalog.descriptor import CatalogDescriptor
-from agentc_core.defaults import DEFAULT_AUDIT_COLLECTION
+from agentc_core.config import Config
+from agentc_core.defaults import DEFAULT_ACTIVITY_FILE
+from agentc_core.defaults import DEFAULT_ACTIVITY_LOG_COLLECTION
 from agentc_core.defaults import DEFAULT_AUDIT_SCOPE
-from agentc_core.defaults import DEFAULT_CATALOG_COLLECTION_NAME
-from agentc_core.defaults import DEFAULT_CATALOG_NAME
+from agentc_core.defaults import DEFAULT_CATALOG_METADATA_COLLECTION
+from agentc_core.defaults import DEFAULT_CATALOG_MODEL_INPUT_COLLECTION
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
-from agentc_core.defaults import DEFAULT_LLM_ACTIVITY_NAME
-from agentc_core.defaults import DEFAULT_META_COLLECTION_NAME
+from agentc_core.defaults import DEFAULT_CATALOG_TOOL_COLLECTION
+from agentc_core.defaults import DEFAULT_MODEL_INPUT_CATALOG_FILE
+from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
 from agentc_core.util.ddl import check_if_scope_collection_exist
-from agentc_core.util.models import CouchbaseConnect
 from agentc_core.util.models import CustomPublishEncoder
-from agentc_core.util.models import Keyspace
-from agentc_core.util.publish import get_connection
 from couchbase.exceptions import CouchbaseException
 from pydantic import ValidationError
 
@@ -29,57 +29,29 @@ logger = logging.getLogger(__name__)
 
 
 def cmd_publish(
-    kind: list[typing.Literal["tool", "prompt", "log"]],
-    bucket: str = None,
-    keyspace: Keyspace = None,
+    cfg: Config = None,
+    *,
+    kind: list[typing.Literal["tool", "model-input", "log"]],
     annotations: list[dict] = None,
-    connection_details_env: CouchbaseConnect = None,
-    connection_string: str = None,
-    username: str = None,
-    password: str = None,
-    hostname: str = None,
-    ctx: Context = None,
 ):
     """Command to publish catalog items to user's Couchbase cluster"""
-    if ctx is None:
-        ctx = Context()
-
-    if connection_details_env is None and None not in [connection_string, username, password, hostname]:
-        # Note: validation of the connection details occur here.
-        connection_details_env = CouchbaseConnect(
-            connection_url=connection_string, username=username, password=password, host=hostname
-        )
-    elif connection_details_env is None and None in [connection_string, username, password, hostname]:
-        raise ValueError("Connection details not provided!")
-
-    is_kind_log = "log" in kind
-
-    if keyspace is not None:
-        bucket = keyspace.bucket
-        scope = keyspace.scope
-    elif bucket is None:
-        bucket = bucket
-        scope = DEFAULT_CATALOG_SCOPE
-    else:
-        raise ValueError("Keyspace or bucket name not provided!")
-
+    if cfg is None:
+        cfg = Config()
     if annotations is None:
         annotations = list()
 
-    # Get bucket ref
-    err, cluster = get_connection(conn=connection_details_env)
-    if err:
-        raise ValueError(f"Unable to connect to Couchbase!\n{err}")
-    cb = cluster.bucket(bucket)
+    # Connect to our bucket.
+    cluster: couchbase.cluster.Cluster = cfg.Cluster()
+    cb: couchbase.cluster.Bucket = cluster.bucket(cfg.bucket)
 
     # Publish logs to cluster
-    if is_kind_log:
+    if "log" in kind:
         k = "log"
         click.secho(DASHES, fg=KIND_COLORS[k])
         click.secho(k.upper(), bold=True, fg=KIND_COLORS[k])
         click.secho(DASHES, fg=KIND_COLORS[k])
-        log_path = pathlib.Path(ctx.activity) / DEFAULT_LLM_ACTIVITY_NAME
-        logger.debug("Local log path: ", log_path)
+        log_path = pathlib.Path(cfg.activity_folder) / DEFAULT_ACTIVITY_FILE
+        logger.debug("Local FS log path: ", log_path)
         log_messages = []
         try:
             with log_path.open("r") as fp:
@@ -87,21 +59,19 @@ def cmd_publish(
                     try:
                         log_messages.append(Log.model_validate_json(line.strip()))
                     except ValidationError as e:
-                        logger.error(f"Invalid log entry: {e}")
-        except FileNotFoundError:
-            raise ValueError("No log file found! Please run auditor!") from None
+                        logger.warning(
+                            f"Invalid log entry encountered!\n"
+                            f"Read malformed log entry: {line}\n"
+                            f"Swallowing exception {e}."
+                        )
+            logger.debug(len(log_messages), "logs found..\n")
+        except FileNotFoundError as e:
+            raise ValueError("No log file found! Please run generate activity using the auditor!") from e
 
-        logger.debug(len(log_messages), "logs found..\n")
-
-        log_col = DEFAULT_AUDIT_COLLECTION
-        log_scope = DEFAULT_AUDIT_SCOPE
-
+        # Connect to our log collection.
         bucket_manager = cb.collections()
-
-        check_if_scope_collection_exist(bucket_manager, log_scope, log_col, True)
-
-        # get collection ref
-        cb_coll = cb.scope(log_scope).collection(log_col)
+        check_if_scope_collection_exist(bucket_manager, DEFAULT_AUDIT_SCOPE, DEFAULT_ACTIVITY_LOG_COLLECTION, True)
+        cb_coll = cb.scope(DEFAULT_AUDIT_SCOPE).collection(DEFAULT_ACTIVITY_LOG_COLLECTION)
 
         logger.debug("Upserting logs into the cluster.")
         for msg in log_messages:
@@ -112,21 +82,25 @@ def cmd_publish(
                 cb_coll.upsert(key, msg_dict)
             except CouchbaseException as e:
                 raise ValueError(f"Couldn't insert log!\n{e.message}") from e
-        click.secho(f"Successfully upserted {len(log_messages)} local logs to cluster!")
+        click.secho(f"Successfully upserted {len(log_messages)} local FS logs to cluster!")
         click.secho(DASHES, fg=KIND_COLORS[k])
-        kind.remove("log")
 
-    # Publish tools and/or prompts
-    for k in kind:
+    # Publish tools and/or model-inputs
+    for k in [_k for _k in kind if _k != "log"]:
         click.secho(DASHES, fg=KIND_COLORS[k])
         click.secho(k.upper(), bold=True, fg=KIND_COLORS[k])
         click.secho(DASHES, fg=KIND_COLORS[k])
-        catalog_path = pathlib.Path(ctx.catalog) / (k + DEFAULT_CATALOG_NAME)
+        if k == "tool":
+            catalog_path = cfg.CatalogPath() / DEFAULT_TOOL_CATALOG_FILE
+        else:
+            catalog_path = cfg.CatalogPath() / DEFAULT_MODEL_INPUT_CATALOG_FILE
         try:
             with catalog_path.open("r") as fp:
                 catalog_desc = CatalogDescriptor.model_validate_json(fp.read())
-        except FileNotFoundError:
+        except FileNotFoundError as e:
             # If only one type of catalog is present
+            # TODO (GLENN): Unsure what this is doing here?
+            logger.debug(f"Swallowing exception {str(e)}.")
             continue
 
         # Check to ensure a dirty catalog is not published
@@ -143,13 +117,12 @@ def cmd_publish(
         # ---------------------------------------------------------------------------------------- #
         #                                  Metadata collection                                     #
         # ---------------------------------------------------------------------------------------- #
-        meta_col = k + DEFAULT_META_COLLECTION_NAME
-        meta_scope = scope
-
-        check_if_scope_collection_exist(bucket_manager, meta_scope, meta_col, True)
+        check_if_scope_collection_exist(
+            bucket_manager, DEFAULT_CATALOG_SCOPE, DEFAULT_CATALOG_METADATA_COLLECTION, True
+        )
 
         # get collection ref
-        cb_coll = cb.scope(meta_scope).collection(meta_col)
+        cb_coll = cb.scope(DEFAULT_CATALOG_SCOPE).collection(DEFAULT_CATALOG_METADATA_COLLECTION)
 
         # dict to store all the metadata - snapshot related data
         metadata = {el: catalog_desc.model_dump()[el] for el in catalog_desc.model_dump() if el != "items"}
@@ -171,13 +144,11 @@ def cmd_publish(
         # ---------------------------------------------------------------------------------------- #
         #                               Catalog items collection                                   #
         # ---------------------------------------------------------------------------------------- #
-        catalog_col = k + DEFAULT_CATALOG_COLLECTION_NAME
-        catalog_scope = scope
-
-        check_if_scope_collection_exist(bucket_manager, catalog_scope, catalog_col, True)
+        catalog_col = DEFAULT_CATALOG_TOOL_COLLECTION if k == "tool" else DEFAULT_CATALOG_MODEL_INPUT_COLLECTION
+        check_if_scope_collection_exist(bucket_manager, DEFAULT_CATALOG_SCOPE, catalog_col, True)
 
         # get collection ref
-        cb_coll = cb.scope(catalog_scope).collection(catalog_col)
+        cb_coll = cb.scope(DEFAULT_CATALOG_SCOPE).collection(catalog_col)
 
         click.secho(f"Uploading the {k} catalog items to Couchbase.", fg="yellow")
         logger.debug("Inserting catalog items...")

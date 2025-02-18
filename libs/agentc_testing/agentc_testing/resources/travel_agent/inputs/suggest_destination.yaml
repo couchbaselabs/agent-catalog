@@ -1,0 +1,22 @@
+record_kind: model_input
+
+name: suggest_destination
+
+description: Instructions on how get a suggested destination from a user.
+
+tools:
+  - name: get_travel_blog_snippets_from_user_interests
+
+annotations:
+  framework: "controlflow"
+
+content: >
+  Your objective is to follow the plan below.
+  DO NOT deviate from the following plan.
+
+  Plan:
+  1. Get a user's interests around travel. Ask them about their hobbies.
+  2. Using the user's interests, find travel destinations using travel blogs.
+     DO NOT hallucinate travel destinations, you must use a tool to find travel blog snippets first.
+  3. Ask the user to confirm their travel destination from the list of recommended destinations.
+     You MUST ask the user to confirm their travel destination.

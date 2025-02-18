@@ -8,7 +8,7 @@ import platform
 import subprocess
 import typing
 
-from ..models.context import Context
+from agentc_core.config import Config
 from agentc_core.record.descriptor import RecordKind
 
 logger = logging.getLogger(__name__)
@@ -32,43 +32,22 @@ def _get_name_and_description() -> tuple[str, str]:
     return name, description
 
 
-def add_jinja_prompt(output: pathlib.Path, template_env: jinja2.Environment):
-    template = template_env.get_template("jinja_prompt.jinja")
-    click.echo("Type: jinja_prompt")
+def add_model_input(output: pathlib.Path, template_env: jinja2.Environment):
+    template = template_env.get_template("model_input.jinja")
+    click.echo("Type: model_input")
 
     # Prompt for our additional fields.
     name, description = _get_name_and_description()
 
     # Render and write our template.
     rendered = template.render(
-        prompt_name=name,
-        prompt_description=description,
-        timestamp=datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
+        input_name=name,
+        input_description=description,
     )
-    output_file = output / f"{name}.jinja"
+    output_file = output / f"{name}.yaml"
     with output_file.open("w") as fp:
         fp.write(rendered)
-    click.secho(f"Jinja prompt written to: {output_file}", fg="green")
-    subprocess.run([default_editor, f"{output_file}"])
-
-
-def add_raw_prompt(output: pathlib.Path, template_env: jinja2.Environment):
-    template = template_env.get_template("raw_prompt.jinja")
-    click.echo("Type: raw_prompt")
-
-    # Prompt for our additional fields.
-    name, description = _get_name_and_description()
-
-    # Render and write our template.
-    rendered = template.render(
-        prompt_name=name,
-        prompt_description=description,
-        timestamp=datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
-    )
-    output_file = output / f"{name}.prompt"
-    with output_file.open("w") as fp:
-        fp.write(rendered)
-    click.secho(f"Raw prompt written to: {output_file}", fg="green")
+    click.secho(f"Model input written to: {output_file}", fg="green")
     subprocess.run([default_editor, f"{output_file}"])
 
 
@@ -171,21 +150,23 @@ def add_sqlpp_query(output: pathlib.Path, template_env: jinja2.Environment):
 
 
 def cmd_add(
+    cfg: Config = None,
+    *,
     output: pathlib.Path,
-    record_kind: RecordKind
-    | typing.Literal["jinja_prompt", "raw_prompt", "http_request", "python_function", "semantic_search", "sqlpp_query"],
-    ctx: Context = None,
+    kind: RecordKind
+    | typing.Literal["model_input", "http_request", "python_function", "semantic_search", "sqlpp_query"],
 ):
-    prompt_template_loader = jinja2.PackageLoader("agentc_core.prompt")
-    tool_template_loader = jinja2.PackageLoader("agentc_core.tool")
-    template_env = jinja2.Environment(loader=jinja2.ChoiceLoader([prompt_template_loader, tool_template_loader]))
-    click.secho(f"Now building a new tool / prompt file. The output will be saved to: {output}", fg="yellow")
+    if cfg is None:
+        cfg = Config()
 
-    match record_kind:
-        case RecordKind.JinjaPrompt | "jinja_prompt":
-            add_jinja_prompt(output, template_env)
-        case RecordKind.RawPrompt | "raw_prompt":
-            add_raw_prompt(output, template_env)
+    inputs_template_loader = jinja2.PackageLoader("agentc_core.inputs")
+    tool_template_loader = jinja2.PackageLoader("agentc_core.tool")
+    template_env = jinja2.Environment(loader=jinja2.ChoiceLoader([inputs_template_loader, tool_template_loader]))
+    click.secho(f"Now building a new tool / input file. The output will be saved to: {output}", fg="yellow")
+
+    match kind:
+        case RecordKind.ModelInput | "model_input":
+            add_model_input(output, template_env)
         case RecordKind.HTTPRequest | "http_request":
             add_http_request(output, template_env)
         case RecordKind.PythonFunction | "python_function":
@@ -196,4 +177,4 @@ def cmd_add(
             add_sqlpp_query(output, template_env)
         case _:
             # We should never reach here.
-            raise ValueError(f"Unsupported record kind: {record_kind}!")
+            raise ValueError(f"Unsupported record kind: {kind}!")

@@ -1,0 +1,12 @@
+record_kind: model_input
+
+name: get_user_intent
+
+description: Instructions on how to figure out the user intent.
+
+annotations:
+  framework: "controlflow"
+
+content:
+  Ask the user what they need help with.
+  NEVER assume the user intent, always ask them first.

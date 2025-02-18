@@ -17,6 +17,9 @@ DEFAULT_COUCHBASE_CONN_STRING = "couchbase://localhost"
 DEFAULT_COUCHBASE_USERNAME = "Administrator"
 DEFAULT_COUCHBASE_PASSWORD = "password"
 
+# TODO (GLENN): We should move this to a more appropriate location.
+os.environ["AGENT_CATALOG_DEBUG"] = "true"
+
 
 # For whatever reason, the HTTP Retry adapter isn't working for me.
 def _execute_with_retry(
@@ -159,5 +162,12 @@ if __name__ == "__main__":
     with tempfile.TemporaryDirectory() as _tmp:
         try:
             _container = _start_couchbase(pathlib.Path(_tmp))
+            print("Couchbase container started. Press Ctrl+C to stop.")
+            while True:
+                pass
+
+        except KeyboardInterrupt:
+            pass
+
         finally:
             _stop_couchbase(_container)

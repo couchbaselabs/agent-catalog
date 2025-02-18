@@ -34,14 +34,14 @@ PyYAML = "^6.0.1"
 semantic_version = "^2.10.0"
 gitignore-parser = "^0.1.11"
 GitPython = "^3.1.43"
-pydantic = "^2.8.2"
+pydantic = "^2.10.6"
 datamodel-code-generator = "^0.26.0"
 couchbase = "^4.3.0"
 jinja2 = "^3.1.4"
 openapi3-parser = "^1.1.17"
 py-openapi-schema-to-json-schema = "^0.0.3"
 jsbeautifier = "^1.15.1"
-sentence-transformers = "^3.1.1"
+sentence-transformers = "^3.4.1"
 
 [tool.poetry.group.refiner]
 optional = true

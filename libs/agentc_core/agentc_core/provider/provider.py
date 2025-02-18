@@ -1,21 +1,18 @@
 import abc
 import dataclasses
-import jinja2
 import logging
 import os
 import typing
 
 from agentc_core.annotation import AnnotationPredicate
-from agentc_core.catalog import LATEST_SNAPSHOT_VERSION
-from agentc_core.catalog import CatalogBase
-from agentc_core.catalog import SearchResult
-from agentc_core.prompt.models import JinjaPromptDescriptor
-from agentc_core.prompt.models import RawPromptDescriptor
+from agentc_core.catalog.implementations.base import CatalogBase
+from agentc_core.catalog.implementations.base import SearchResult
+from agentc_core.config import LATEST_SNAPSHOT_VERSION
+from agentc_core.inputs.models import ModelInputDescriptor
 from agentc_core.provider.loader import EntryLoader
 from agentc_core.provider.loader import ModelType
 from agentc_core.provider.loader import PythonTarget
 from agentc_core.record.descriptor import RecordDescriptor
-from agentc_core.record.descriptor import RecordKind
 from agentc_core.secrets import put_secret
 
 logger = logging.getLogger(__name__)
@@ -42,14 +39,13 @@ class BaseProvider(abc.ABC):
 class ToolProvider(BaseProvider):
     @dataclasses.dataclass
     class ToolResult:
-        func: typing.Any
+        func: typing.Callable
         meta: RecordDescriptor
 
     def __init__(
         self,
         catalog: CatalogBase,
         output: os.PathLike = None,
-        decorator: typing.Callable[["ToolProvider.ToolResult"], typing.Any] = lambda x: x,
         refiner: typing.Callable[[list[SearchResult]], list[SearchResult]] = None,
         secrets: typing.Optional[dict[str, str]] = None,
         python_version: PythonTarget = PythonTarget.PY_312,
@@ -58,7 +54,6 @@ class ToolProvider(BaseProvider):
         """
         :param catalog: A handle to the catalog. Entries can either be in memory or in Couchbase.
         :param output: Location to place the generated Python stubs (if desired).
-        :param decorator: Function to apply to each search result.
         :param refiner: Refiner (reranker / post processor) to use when retrieving tools.
         :param secrets: Map of identifiers to secret values.
         :param python_version: The target Python version for the generated (schema) code.
@@ -69,14 +64,13 @@ class ToolProvider(BaseProvider):
         self._loader = EntryLoader(output=output, python_version=python_version, model_type=model_type)
 
         # Handle our defaults.
-        self.decorator = decorator if decorator is not None else lambda s: s.func
         if secrets is not None:
             # Note: we only register our secrets at instantiation-time.
             for k, v in secrets.items():
                 put_secret(k, v)
 
     def _generate_result(self, tool_descriptor: RecordDescriptor) -> typing.Any:
-        return self.decorator(ToolProvider.ToolResult(func=self._tool_cache[tool_descriptor], meta=tool_descriptor))
+        return ToolProvider.ToolResult(func=self._tool_cache[tool_descriptor], meta=tool_descriptor)
 
     def search(
         self,
@@ -84,7 +78,7 @@ class ToolProvider(BaseProvider):
         annotations: str = None,
         snapshot: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
-    ) -> list[typing.Any]:
+    ) -> list[ToolResult]:
         """
         :param query: A string to search the catalog with.
         :param annotations: An annotation query string in the form of KEY=VALUE (AND|OR KEY=VALUE)*.
@@ -105,7 +99,7 @@ class ToolProvider(BaseProvider):
         # Return the tools from the cache.
         return [self._generate_result(x.entry) for x in results]
 
-    def get(self, name: str, snapshot: str = LATEST_SNAPSHOT_VERSION, annotations: str = None) -> typing.Any | None:
+    def get(self, name: str, snapshot: str = LATEST_SNAPSHOT_VERSION, annotations: str = None) -> ToolResult | None:
         annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
         results = self.catalog.find(name=name, snapshot=snapshot, annotations=annotation_predicate, limit=1)
 
@@ -118,11 +112,12 @@ class ToolProvider(BaseProvider):
         return [self._generate_result(x.entry) for x in results][0] if len(results) != 0 else None
 
 
-class PromptProvider(BaseProvider):
+class ModelInputProvider(BaseProvider):
     @dataclasses.dataclass
-    class PromptResult:
-        prompt: str | jinja2.Template
-        tools: typing.Optional[list[typing.Any]]
+    class ModelInput:
+        content: str | dict
+        tools: typing.Optional[list[ToolProvider.ToolResult]]
+        output: typing.Optional[dict]
         meta: RecordDescriptor
 
     def __init__(
@@ -130,38 +125,34 @@ class PromptProvider(BaseProvider):
         catalog: CatalogBase,
         tool_provider: ToolProvider = None,
         refiner: typing.Callable[[list[SearchResult]], list[SearchResult]] = None,
-        jinja2_environment: jinja2.Environment = None,
     ):
-        super(PromptProvider, self).__init__(catalog, refiner)
+        super(ModelInputProvider, self).__init__(catalog, refiner)
         self.tool_provider = tool_provider
         if self.tool_provider is None:
-            logger.warning("PromptProvider has been instantiated without a ToolProvider.")
-        self.jinja2_environment = (
-            jinja2_environment if jinja2_environment is not None else jinja2.Environment(loader=jinja2.BaseLoader)
-        )
+            logger.warning("ModelInputProvider has been instantiated without a ToolProvider.")
 
-    def _generate_result(self, prompt_descriptor: RawPromptDescriptor | JinjaPromptDescriptor) -> PromptResult:
-        # If our prompt has defined tools, fetch them here.
+    def _generate_result(self, model_input_descriptor: ModelInputDescriptor) -> ModelInput:
+        # If our model-input has defined tools, fetch them here.
         tools = None
-        if prompt_descriptor.tools is not None:
+        if model_input_descriptor.tools is not None:
             if self.tool_provider is None:
                 raise ValueError(
-                    "Tool(s) have been defined in the prompt, but no ToolProvider has been provided. "
+                    "Tool(s) have been defined in the model-input, but no ToolProvider has been provided. "
                     "If this is a new repo, please run `agentc index tool` to first index your tools."
                 )
             tools = list()
-            for tool in prompt_descriptor.tools:
+            for tool in model_input_descriptor.tools:
                 if tool.query is not None:
                     tools += self.tool_provider.search(query=tool.query, annotations=tool.annotations, limit=tool.limit)
                 else:  # tool.name is not None
                     tools.append(self.tool_provider.get(name=tool.name, annotations=tool.annotations))
 
-        # If our prompt is a Jinja prompt, return the template.
-        if prompt_descriptor.record_kind == RecordKind.JinjaPrompt:
-            prompt = self.jinja2_environment.from_string(prompt_descriptor.prompt)
-        else:  # prompt_descriptor.record_kind == RecordKind.RawPrompt
-            prompt = prompt_descriptor.prompt
-        return PromptProvider.PromptResult(prompt=prompt, tools=tools, meta=prompt_descriptor)
+        return ModelInputProvider.ModelInput(
+            content=model_input_descriptor.content,
+            output=model_input_descriptor.output,
+            tools=tools,
+            meta=model_input_descriptor,
+        )
 
     def search(
         self,
@@ -169,7 +160,7 @@ class PromptProvider(BaseProvider):
         annotations: str = None,
         snapshot: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
-    ) -> list["PromptProvider.PromptResult"]:
+    ) -> list[ModelInput]:
         annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
         results = self.refiner(
             self.catalog.find(query=query, snapshot=snapshot, annotations=annotation_predicate, limit=limit)
@@ -178,7 +169,7 @@ class PromptProvider(BaseProvider):
 
     def get(
         self, name: str, snapshot: str = LATEST_SNAPSHOT_VERSION, annotations: str = None
-    ) -> typing.Optional["PromptProvider.PromptResult"]:
+    ) -> typing.Optional[ModelInput]:
         annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
         results = self.catalog.find(name=name, snapshot=snapshot, annotations=annotation_predicate, limit=1)
         return [self._generate_result(r.entry) for r in results][0] if len(results) != 0 else None

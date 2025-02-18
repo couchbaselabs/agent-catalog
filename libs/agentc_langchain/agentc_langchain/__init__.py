@@ -1,3 +1,3 @@
-from agentc_langchain import audit
+from agentc_langchain.models import audit
 
 __all__ = ["audit"]

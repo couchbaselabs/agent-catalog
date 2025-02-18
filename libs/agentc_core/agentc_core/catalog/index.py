@@ -11,12 +11,13 @@ from ..indexer import vectorize_descriptor
 from ..learned.embedding import EmbeddingModel
 from ..learned.model import EmbeddingModel as CatalogDescriptorEmbeddingModel
 from ..record.descriptor import RecordDescriptor
-from .catalog.mem import CatalogMem
 from .descriptor import CatalogDescriptor
 from .directory import ScanDirectoryOpts
 from .directory import scan_directory
+from .implementations.mem import CatalogMem
 from .version import catalog_schema_version_compare
 from .version import lib_version_compare
+from agentc_core.record.descriptor import RecordKind
 
 logger = logging.getLogger(__name__)
 
@@ -32,8 +33,8 @@ def index_catalog(
     meta_version: MetaVersion,
     catalog_version: str,
     get_path_version: typing.Callable[[str], str],
-    kind: typing.Literal["tool", "prompt"],
-    catalog_path,
+    kind: typing.Literal["tool", "model-input"],
+    catalog_file,
     source_dirs,
     scan_directory_opts: ScanDirectoryOpts = None,
     printer: typing.Callable = lambda x, *args, **kwargs: print(x),
@@ -46,7 +47,7 @@ def index_catalog(
         catalog_version=catalog_version,
         get_path_version=get_path_version,
         kind=kind,
-        catalog_path=catalog_path,
+        catalog_file=catalog_file,
         source_dirs=source_dirs,
         scan_directory_opts=scan_directory_opts,
         printer=printer,
@@ -93,8 +94,8 @@ def index_catalog_start(
     meta_version: MetaVersion,
     catalog_version: str,
     get_path_version: typing.Callable[[str], str],
-    kind: typing.Literal["tool", "prompt"],
-    catalog_path,
+    kind: typing.Literal["tool", "model-input"],
+    catalog_file,
     source_dirs,
     scan_directory_opts: ScanDirectoryOpts = None,
     printer: typing.Callable = lambda x, *args, **kwargs: print(x),
@@ -103,7 +104,7 @@ def index_catalog_start(
 ):
     # Load the old / previous local catalog if our catalog path exists.
     curr_catalog = (
-        CatalogMem(catalog_path=catalog_path, embedding_model=embedding_model) if catalog_path.exists() else None
+        CatalogMem(catalog_file=catalog_file, embedding_model=embedding_model) if catalog_file.exists() else None
     )
 
     logger.debug(f"Now crawling source directories. [{','.join(d for d in source_dirs)}]")
@@ -111,9 +112,9 @@ def index_catalog_start(
 
     source_files = list()
     if kind == "tool":
-        source_globs = [i.glob_pattern for i in AllIndexers if all(k.is_tool() for k in i.kind)]
-    elif kind == "prompt":
-        source_globs = [i.glob_pattern for i in AllIndexers if all(k.is_prompt() for k in i.kind)]
+        source_globs = [i.glob_pattern for i in AllIndexers if any(k != RecordKind.ModelInput for k in i.kind)]
+    elif kind == "model-input":
+        source_globs = [i.glob_pattern for i in AllIndexers if any(k == RecordKind.ModelInput for k in i.kind)]
     else:
         raise ValueError(f"Unknown kind: {kind}")
     for source_dir in source_dirs:

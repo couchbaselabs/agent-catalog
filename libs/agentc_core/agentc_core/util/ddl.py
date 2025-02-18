@@ -1,39 +1,52 @@
+import agentc_core.defaults
 import contextlib
+import couchbase.cluster
+import couchbase.exceptions
 import json
 import logging
-import os
 import requests
 import tqdm
+import typing
 
-from .models import CouchbaseConnect
 from .query import execute_query
+from agentc_core.config import Config
+from agentc_core.defaults import DEFAULT_CATALOG_METADATA_COLLECTION
+from agentc_core.defaults import DEFAULT_CATALOG_MODEL_INPUT_COLLECTION
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
+from agentc_core.defaults import DEFAULT_CATALOG_TOOL_COLLECTION
 from agentc_core.defaults import DEFAULT_HTTP_CLUSTER_ADMIN_PORT_NUMBER
 from agentc_core.defaults import DEFAULT_HTTP_FTS_PORT_NUMBER
 from agentc_core.defaults import DEFAULT_HTTPS_CLUSTER_ADMIN_PORT_NUMBER
 from agentc_core.defaults import DEFAULT_HTTPS_FTS_PORT_NUMBER
+from agentc_core.util.connection import get_host_name
 from couchbase.bucket import CollectionManager
 
 logger = logging.getLogger(__name__)
 
 
 def is_index_present(
-    bucket: str = "", index_to_create: str = "", conn: CouchbaseConnect = None, fts_nodes_hostname: list[str] = None
+    cfg: agentc_core.config.Config, index_to_create: str, fts_nodes_hostname: list[str] = None
 ) -> tuple[bool | dict | None, Exception | None]:
     """Checks for existence of index_to_create in the given keyspace"""
     if fts_nodes_hostname is None:
         fts_nodes_hostname = []
 
-    auth = (conn.username, conn.password)
+    auth = (cfg.username, cfg.password.get_secret_value())
 
     # Make a request to FTS until a live node is reached. If all nodes are down, try the host.
     for fts_node_hostname in fts_nodes_hostname:
-        find_index_https_url = f"https://{fts_node_hostname}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index"
-        find_index_http_url = f"http://{fts_node_hostname}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index"
+        find_index_https_url = (
+            f"https://{fts_node_hostname}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/"
+            f"{cfg.bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index"
+        )
+        find_index_http_url = (
+            f"http://{fts_node_hostname}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/"
+            f"{cfg.bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index"
+        )
         try:
             # REST call to get list of indexes, decide HTTP or HTTPS based on certificate path
-            if conn.certificate is not None:
-                response = requests.request("GET", find_index_https_url, auth=auth, verify=conn.certificate)
+            if cfg.conn_root_certificate is not None:
+                response = requests.request("GET", find_index_https_url, auth=auth, verify=cfg.conn_root_certificate)
             else:
                 response = requests.request("GET", find_index_http_url, auth=auth)
 
@@ -50,25 +63,29 @@ def is_index_present(
                     return index_def, None
             else:
                 raise RuntimeError("Couldn't check for the existing vector indexes!")
-        except Exception:
+
+        # TODO (GLENN): Catch a narrower exception here + log the fact an exception was raised.
+        except Exception as e:
+            logger.debug(f"Swallowing exception {str(e)}.")
             continue
 
     # if there is exception in all nodes then no nodes are alive
     return False, RuntimeError("Couldn't make request to any of the nodes with 'search' service!")
 
 
-def get_fts_nodes_hostname(conn: CouchbaseConnect = None) -> tuple[list[str] | None, Exception | None]:
+def get_fts_nodes_hostname(cfg: Config) -> tuple[list[str] | None, Exception | None]:
     """Find the hostname of nodes with fts support for index partition creation in create_vector_index()"""
 
-    node_info_url_http = f"http://{conn.host}:{DEFAULT_HTTP_CLUSTER_ADMIN_PORT_NUMBER}/pools/default"
-    node_info_url_https = f"https://{conn.host}:{DEFAULT_HTTPS_CLUSTER_ADMIN_PORT_NUMBER}/pools/default"
-    auth = (conn.username, conn.password)
+    host = get_host_name(cfg.conn_string)
+    node_info_url_http = f"http://{host}:{DEFAULT_HTTP_CLUSTER_ADMIN_PORT_NUMBER}/pools/default"
+    node_info_url_https = f"https://{host}:{DEFAULT_HTTPS_CLUSTER_ADMIN_PORT_NUMBER}/pools/default"
+    auth = (cfg.username, cfg.password.get_secret_value())
 
     # Make request to FTS
     try:
         # REST call to get node info
-        if conn.certificate is not None:
-            response = requests.request("GET", node_info_url_https, auth=auth, verify=conn.certificate)
+        if cfg.conn_root_certificate is not None:
+            response = requests.request("GET", node_info_url_https, auth=auth, verify=cfg.conn_root_certificate)
         else:
             response = requests.request("GET", node_info_url_http, auth=auth)
 
@@ -87,24 +104,26 @@ def get_fts_nodes_hostname(conn: CouchbaseConnect = None) -> tuple[list[str] | N
         else:
             return None, RuntimeError("Couldn't check for the existing fts nodes!")
 
+    # TODO (GLENN): Catch a narrower exception here + log the fact an exception was raised.
     except Exception as e:
         return None, e
 
 
 def create_vector_index(
-    bucket: str = "",
-    kind: str = "tool",
-    conn: CouchbaseConnect = None,
-    dim: int = None,
+    cfg: Config,
+    scope: str,
+    collection: str,
+    index_name: str,
+    dim: int,
 ) -> tuple[str | None, Exception | None]:
     """Creates required vector index at publish"""
-
-    non_qualified_index_name = f"v1_agent_catalog_{kind}_index"
-    qualified_index_name = f"{bucket}.{DEFAULT_CATALOG_SCOPE}.{non_qualified_index_name}"
+    qualified_index_name = f"{cfg.bucket}.{scope}.{index_name}"
 
     # decide on plan params
-    (fts_nodes_hostname, err) = get_fts_nodes_hostname(conn)
+    (fts_nodes_hostname, err) = get_fts_nodes_hostname(cfg)
     num_fts_nodes = len(fts_nodes_hostname)
+    if cfg.index_partition is None:
+        cfg.index_partition = 2 * num_fts_nodes
 
     if num_fts_nodes == 0:
         raise ValueError(
@@ -112,25 +131,9 @@ def create_vector_index(
         )
 
     # To be on safer side make request to connection string host
-    fts_nodes_hostname.append(conn.host)
+    fts_nodes_hostname.append(get_host_name(cfg.conn_string))
 
-    max_partition_env = os.getenv("AGENT_CATALOG_MAX_SOURCE_PARTITION")
-    try:
-        max_partition = int(max_partition_env) if max_partition_env is not None else 1024
-    except Exception as e:
-        raise ValueError(
-            f"Cannot convert given value of max source partition to integer: {e}\nUpdate the environment variable 'AGENT_CATALOG_MAX_SOURCE_PARTITION' to an integer value"
-        ) from e
-
-    index_partition_env = os.getenv("AGENT_CATALOG_INDEX_PARTITION")
-    try:
-        index_partition = int(index_partition_env) if index_partition_env is not None else 2 * num_fts_nodes
-    except Exception as e:
-        raise ValueError(
-            f"Cannot convert given value of index partition to integer: {e}\nUpdate the environment variable 'AGENT_CATALOG_INDEX_PARTITION' to an integer value"
-        ) from e
-
-    (index_present, err) = is_index_present(bucket, qualified_index_name, conn, fts_nodes_hostname)
+    (index_present, err) = is_index_present(cfg, qualified_index_name, fts_nodes_hostname)
     if err is not None:
         return None, err
     elif isinstance(index_present, bool) and not index_present:
@@ -138,15 +141,18 @@ def create_vector_index(
         headers = {
             "Content-Type": "application/json",
         }
-        auth = (conn.username, conn.password)
+        auth = (cfg.username, cfg.password.get_secret_value())
 
         payload = json.dumps(
             {
                 "type": "fulltext-index",
                 "name": qualified_index_name,
                 "sourceType": "gocbcore",
-                "sourceName": bucket,
-                "planParams": {"maxPartitionsPerPIndex": max_partition, "indexPartitions": index_partition},
+                "sourceName": cfg.bucket,
+                "planParams": {
+                    "maxPartitionsPerPIndex": cfg.max_index_partition,
+                    "indexPartitions": cfg.index_partition,
+                },
                 "params": {
                     "doc_config": {
                         "docid_prefix_delim": "",
@@ -166,7 +172,7 @@ def create_vector_index(
                         "store_dynamic": False,
                         "type_field": "_type",
                         "types": {
-                            f"{DEFAULT_CATALOG_SCOPE}.{kind}_catalog": {
+                            f"{scope}.{collection}": {
                                 "dynamic": False,
                                 "enabled": True,
                                 "properties": {
@@ -197,18 +203,24 @@ def create_vector_index(
 
         # Make a request to FTS until a live node is reached. If all nodes are down, try the host.
         for fts_node_hostname in fts_nodes_hostname:
-            create_vector_index_https_url = f"https://{fts_node_hostname}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
-            create_vector_index_http_url = f"http://{fts_node_hostname}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
+            create_vector_index_https_url = (
+                f"https://{fts_node_hostname}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/"
+                f"{cfg.bucket}/scope/{scope}/index/{index_name}"
+            )
+            create_vector_index_http_url = (
+                f"http://{fts_node_hostname}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/"
+                f"{cfg.bucket}/scope/{scope}/index/{index_name}"
+            )
             try:
                 # REST call to create the index
-                if conn.certificate is not None:
+                if cfg.conn_root_certificate is not None:
                     response = requests.request(
                         "PUT",
                         create_vector_index_https_url,
                         headers=headers,
                         auth=auth,
                         data=payload,
-                        verify=conn.certificate,
+                        verify=cfg.conn_root_certificate,
                     )
                 else:
                     response = requests.request(
@@ -220,7 +232,10 @@ def create_vector_index(
                     return qualified_index_name, None
                 elif json.loads(response.text)["status"] == "fail":
                     raise Exception(json.loads(response.text)["error"])
-            except Exception:
+
+            # TODO (GLENN): Catch a narrower exception here + log the fact an exception was raised.
+            except Exception as e:
+                logger.debug(f"Swallowing exception {str(e)}.")
                 continue
 
         # if there is exception in all nodes then no nodes are alive
@@ -229,13 +244,13 @@ def create_vector_index(
     elif isinstance(index_present, dict):
         # Check if no. of fts nodes has changes since last update
         cluster_fts_partitions = index_present["planParams"]["indexPartitions"]
-        if cluster_fts_partitions != index_partition:
-            index_present["planParams"]["indexPartitions"] = index_partition
+        if cluster_fts_partitions != cfg.index_partition:
+            index_present["planParams"]["indexPartitions"] = cfg.index_partition
 
         # Check if the mapping already exists
-        existing_fields = index_present["params"]["mapping"]["types"][f"{DEFAULT_CATALOG_SCOPE}.{kind}_catalog"][
-            "properties"
-        ]["embedding"]["fields"]
+        existing_fields = index_present["params"]["mapping"]["types"][f"{scope}.{collection}"]["properties"][
+            "embedding"
+        ]["fields"]
         existing_dims = [el["dims"] for el in existing_fields]
 
         if dim not in existing_dims:
@@ -252,35 +267,41 @@ def create_vector_index(
             }
 
             # Add field mapping with new model dim
-            field_mappings = index_present["params"]["mapping"]["types"][f"{DEFAULT_CATALOG_SCOPE}.{kind}_catalog"][
-                "properties"
-            ]["embedding"]["fields"]
-            field_mappings.append(new_field_mapping) if new_field_mapping not in field_mappings else field_mappings
-            index_present["params"]["mapping"]["types"][f"{DEFAULT_CATALOG_SCOPE}.{kind}_catalog"]["properties"][
+            field_mappings = index_present["params"]["mapping"]["types"][f"{scope}.{collection}"]["properties"][
                 "embedding"
-            ]["fields"] = field_mappings
+            ]["fields"]
+            field_mappings.append(new_field_mapping) if new_field_mapping not in field_mappings else field_mappings
+            index_present["params"]["mapping"]["types"][f"{scope}.{collection}"]["properties"]["embedding"][
+                "fields"
+            ] = field_mappings
 
         headers = {
             "Content-Type": "application/json",
         }
-        auth = (conn.username, conn.password)
+        auth = (cfg.username, cfg.password.get_secret_value())
 
         payload = json.dumps(index_present)
 
         # Make a request to FTS until a live node is reached. If all nodes are down, try the host.
         for fts_node_hostname in fts_nodes_hostname:
-            update_vector_index_https_url = f"https://{fts_node_hostname}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
-            update_vector_index_http_url = f"http://{fts_node_hostname}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/{bucket}/scope/{DEFAULT_CATALOG_SCOPE}/index/{non_qualified_index_name}"
+            update_vector_index_https_url = (
+                f"https://{fts_node_hostname}:{DEFAULT_HTTPS_FTS_PORT_NUMBER}/api/bucket/"
+                f"{cfg.bucket}/scope/{scope}/index/{index_name}"
+            )
+            update_vector_index_http_url = (
+                f"http://{fts_node_hostname}:{DEFAULT_HTTP_FTS_PORT_NUMBER}/api/bucket/"
+                f"{cfg.bucket}/scope/{scope}/index/{index_name}"
+            )
             try:
                 # REST call to update the index
-                if conn.certificate is not None:
+                if cfg.conn_root_certificate is not None:
                     response = requests.request(
                         "PUT",
                         update_vector_index_https_url,
                         headers=headers,
                         auth=auth,
                         data=payload,
-                        verify=conn.certificate,
+                        verify=cfg.conn_root_certificate,
                     )
                 else:
                     response = requests.request(
@@ -299,7 +320,9 @@ def create_vector_index(
                 elif json.loads(response.text)["status"] == "fail":
                     raise Exception(json.loads(response.text)["error"])
 
-            except Exception:
+            # TODO (GLENN): Catch a narrower exception here + log the fact an exception was raised.
+            except Exception as e:
+                logger.debug(f"Swallowing exception {str(e)}.")
                 continue
 
         # if there is exception in all nodes then no nodes are alive
@@ -309,7 +332,7 @@ def create_vector_index(
         return qualified_index_name, None
 
 
-def create_gsi_indexes(bucket, cluster, kind, print_progress):
+def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "model-input"], print_progress):
     """Creates required indexes at publish"""
     progress_bar = tqdm.tqdm(range(5))
     progress_bar_it = iter(progress_bar)
@@ -318,10 +341,12 @@ def create_gsi_indexes(bucket, cluster, kind, print_progress):
     all_errs = ""
 
     # Primary index on kind_catalog
+    cluster = cfg.Cluster()
+    collection = DEFAULT_CATALOG_TOOL_COLLECTION if kind == "tool" else DEFAULT_CATALOG_MODEL_INPUT_COLLECTION
     primary_idx_name = f"v1_agent_catalog_primary_{kind}"
     primary_idx = f"""
         CREATE PRIMARY INDEX IF NOT EXISTS `{primary_idx_name}`
-        ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog` USING GSI;
+        ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}` USING GSI;
     """
     if print_progress:
         next(progress_bar_it)
@@ -334,10 +359,10 @@ def create_gsi_indexes(bucket, cluster, kind, print_progress):
         completion_status = False
 
     # Primary index on kind_metadata
-    primary_idx_metadata_name = f"v1_agent_catalog_primary_{kind}_metadata"
+    primary_idx_metadata_name = "v1_agent_catalog_primary_metadata"
     primary_idx = f"""
         CREATE PRIMARY INDEX IF NOT EXISTS `{primary_idx_metadata_name}`
-        ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_metadata` USING GSI;
+        ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{DEFAULT_CATALOG_METADATA_COLLECTION}` USING GSI;
     """
     if print_progress:
         next(progress_bar_it)
@@ -353,7 +378,7 @@ def create_gsi_indexes(bucket, cluster, kind, print_progress):
     cat_idx_name = f"v1_agent_catalog_{kind}cat_version_identifier"
     cat_idx = f"""
         CREATE INDEX IF NOT EXISTS `{cat_idx_name}`
-        ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog`(catalog_identifier);
+        ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}`(catalog_identifier);
     """
     if print_progress:
         next(progress_bar_it)
@@ -369,7 +394,7 @@ def create_gsi_indexes(bucket, cluster, kind, print_progress):
     cat_ann_idx_name = f"v1_agent_catalog_{kind}cat_catalog_identifier_annotations"
     cat_ann_idx = f"""
         CREATE INDEX IF NOT EXISTS `{cat_ann_idx_name}`
-        ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog`(catalog_identifier,annotations);
+        ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}`(catalog_identifier,annotations);
     """
     if print_progress:
         next(progress_bar_it)
@@ -385,7 +410,7 @@ def create_gsi_indexes(bucket, cluster, kind, print_progress):
     ann_idx_name = f"v1_agent_catalog_{kind}cat_annotations"
     ann_idx = f"""
         CREATE INDEX IF NOT EXISTS `{ann_idx_name}`
-        ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{kind}_catalog`(`annotations`);
+        ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}`(`annotations`);
     """
     if print_progress:
         next(progress_bar_it)
@@ -426,3 +451,43 @@ def check_if_scope_collection_exist(
         return False
 
     return True
+
+
+def create_scope_and_collection(bucket_manager, scope, collection):
+    """Create new Couchbase scope and collection within it if they do not exist"""
+    # TODO (GLENN): Refactor to just use cluster.query and CREATE SCOPE and CREATE COLLECTION statements
+    #               (you can use IF NOT EXISTS instead of checking if the scope / collection exists)
+
+    # Create a new scope if it does not exist
+    try:
+        scopes = bucket_manager.get_all_scopes()
+        scope_exists = any(s.name == scope for s in scopes)
+        if not scope_exists:
+            logger.debug(f"Scope {scope} not found. Attempting to create scope now.")
+            bucket_manager.create_scope(scope)
+            logger.debug(f"Scope {scope} was created successfully.")
+    except couchbase.exceptions.CouchbaseException as e:
+        error_message = f"Encountered error while creating scope {scope}:\n{e.message}"
+        logger.error(error_message)
+        return error_message, e
+
+    # Create a new collection within the scope if collection does not exist
+    try:
+        if scope_exists:
+            collections = [c.name for s in scopes if s.name == scope for c in s.collections]
+            collection_exists = collection in collections
+            if not collection_exists:
+                logger.debug(f"Collection {scope}.{collection} not found. Attempting to create collection now.")
+                bucket_manager.create_collection(scope, collection)
+                logger.debug(f"Collection {scope}.{collection} was created successfully.")
+        else:
+            logger.debug(f"Collection {scope}.{collection} not found. Attempting to create collection now.")
+            bucket_manager.create_collection(scope, collection)
+            logger.debug(f"Collection {scope}.{collection} was created successfully.")
+
+    except couchbase.exceptions.CouchbaseException as e:
+        error_message = f"Encountered error while creating collection {scope}.{collection}:\n{e.message}"
+        logger.error(error_message)
+        return error_message, e
+
+    return "Successfully created scope and collection", None

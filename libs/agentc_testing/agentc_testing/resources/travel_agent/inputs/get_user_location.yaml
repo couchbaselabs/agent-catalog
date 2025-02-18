@@ -1,0 +1,10 @@
+record_kind: model_input
+
+name: get_user_location
+
+description: Instructions on how to ask a user for their current location.
+
+annotations:
+  framework: "controlflow"
+
+content: Ask the user for their location.

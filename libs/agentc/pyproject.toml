@@ -22,7 +22,7 @@ agentc = "agentc.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-pydantic-settings = "^2.4.0"
+pydantic-settings = "^2.7.1"
 
 [tool.poetry.dependencies.agentc-core]
 path = "../agentc_core"

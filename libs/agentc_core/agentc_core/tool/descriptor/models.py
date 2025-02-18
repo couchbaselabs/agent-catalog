@@ -22,7 +22,6 @@ from ..decorator import get_description
 from ..decorator import get_name
 from ..decorator import is_tool
 from .secrets import CouchbaseSecrets
-from agentc_core.tool.descriptor.secrets import EmbeddingModelSecrets
 
 logger = logging.getLogger(__name__)
 
@@ -88,17 +87,22 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
             # Below, we enumerate all fields that appear in a .sqlpp file.
             name: str
             description: str
-            input: str
-            output: typing.Optional[str] = None
+            input: str | dict
+            output: typing.Optional[str | dict] = None
             secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
             record_kind: typing.Optional[typing.Literal[RecordKind.SQLPPQuery] | None] = None
             annotations: typing.Optional[dict[str, str] | None] = None
 
             @pydantic.field_validator("input", "output")
             @classmethod
-            def value_should_be_valid_json_schema(cls, v: str):
-                if v is not None:
-                    cls.check_if_valid_json_schema(v)
+            def value_should_be_valid_json_schema(cls, v: str | dict):
+                if v is not None and isinstance(v, str):
+                    cls.check_if_valid_json_schema_str(v)
+                elif v is not None and isinstance(v, dict):
+                    cls.check_if_valid_json_schema_dict(v)
+                    v = json.dumps(v)
+                else:
+                    raise ValueError("Type must be either a string or a YAML dictionary.")
                 return v
 
             @pydantic.field_validator("name")
@@ -140,27 +144,19 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
 
 class SemanticSearchToolDescriptor(RecordDescriptor):
     class VectorSearchMetadata(pydantic.BaseModel):
-        class EmbeddingModel(pydantic.BaseModel):
-            name: str
-            base_url: typing.Optional[str] = None
-
-            @property
-            @pydantic.computed_field
-            def kind(self) -> typing.Literal["sentence-transformers", "openai"]:
-                return "sentence-transformers" if self.base_url is None else "openai"
-
+        # TODO (GLENN): Copy all vector-search-specific validations here.
         bucket: str
         scope: str
         collection: str
         index: str
         vector_field: str
         text_field: str
-        embedding_model: EmbeddingModel
+        embedding_model: str
         num_candidates: int = 3
 
     input: str
     vector_search: VectorSearchMetadata
-    secrets: list[CouchbaseSecrets | EmbeddingModelSecrets] = pydantic.Field(min_length=1, max_length=2)
+    secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
     record_kind: typing.Literal[RecordKind.SemanticSearch]
 
     class Factory(_BaseFactory):
@@ -171,23 +167,22 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
             record_kind: typing.Literal[RecordKind.SemanticSearch]
             name: str
             description: str
-            input: str
-            secrets: list[CouchbaseSecrets | EmbeddingModelSecrets] = pydantic.Field(min_length=1, max_length=2)
+            input: str | dict
+            secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
             annotations: typing.Optional[dict[str, str] | None] = None
             vector_search: "SemanticSearchToolDescriptor.VectorSearchMetadata"
             num_candidates: typing.Optional[pydantic.PositiveInt] = 3
 
-            @pydantic.field_validator("secrets")
-            @classmethod
-            def couchbase_secrets_must_exist(cls, v: list[CouchbaseSecrets | EmbeddingModelSecrets]):
-                if not any(isinstance(s, CouchbaseSecrets) for s in v):
-                    raise ValueError("Secrets list 'secrets' must contain the 'couchbase' field.")
-                return v
-
             @pydantic.field_validator("input")
             @classmethod
-            def value_should_be_valid_json_schema(cls, v: str):
-                cls.check_if_valid_json_schema(v)
+            def value_should_be_valid_json_schema(cls, v: str | dict):
+                if v is not None and isinstance(v, str):
+                    cls.check_if_valid_json_schema_str(v)
+                elif v is not None and isinstance(v, dict):
+                    cls.check_if_valid_json_schema_dict(v)
+                    v = json.dumps(v)
+                else:
+                    raise ValueError("Type must be either a string or a YAML dictionary.")
                 return v
 
             @pydantic.field_validator("input")

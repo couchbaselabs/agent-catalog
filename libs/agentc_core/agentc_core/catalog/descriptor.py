@@ -4,8 +4,7 @@ import json
 import pydantic
 import typing
 
-from ..prompt.models import JinjaPromptDescriptor
-from ..prompt.models import RawPromptDescriptor
+from ..inputs.models import ModelInputDescriptor
 from ..record.descriptor import BEAUTIFY_OPTS
 from ..tool.descriptor.models import HTTPRequestToolDescriptor
 from ..tool.descriptor.models import PythonToolDescriptor
@@ -17,7 +16,7 @@ from agentc_core.learned.model import EmbeddingModel
 
 class CatalogKind(enum.StrEnum):
     Tool = "tool"
-    Prompt = "prompt"
+    ModelInput = "model-input"
 
     # TODO (GLENN): Include other classes.
 
@@ -27,8 +26,7 @@ RecordDescriptorUnionType = typing.Annotated[
     | SQLPPQueryToolDescriptor
     | SemanticSearchToolDescriptor
     | HTTPRequestToolDescriptor
-    | RawPromptDescriptor
-    | JinjaPromptDescriptor,
+    | ModelInputDescriptor,
     pydantic.Field(discriminator="record_kind"),
 ]
 
@@ -58,11 +56,6 @@ class CatalogDescriptor(pydantic.BaseModel):
 
     source_dirs: list[str] = pydantic.Field(
         description="A list of source directories that were crawled to generate this catalog."
-    )
-
-    project: typing.Optional[str] = pydantic.Field(
-        description="An optional user-defined field to group snapshots by.",
-        default="main",  # TODO (GLENN): Should we use a different name here?
     )
 
     items: list[RecordDescriptorUnionType] = pydantic.Field(description="The entries in the catalog.")

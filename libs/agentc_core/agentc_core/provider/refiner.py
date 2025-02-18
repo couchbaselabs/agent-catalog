@@ -3,7 +3,7 @@ import logging
 import pydantic
 import typing
 
-from agentc_core.catalog import SearchResult
+from agentc_core.catalog.implementations.base import SearchResult
 
 logger = logging.getLogger(__name__)
 

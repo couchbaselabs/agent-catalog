@@ -1,3 +1,3 @@
-from .capella import IQBackedChatModel
+from .chat import audit
 
-__all__ = ["IQBackedChatModel"]
+__all__ = ["audit"]

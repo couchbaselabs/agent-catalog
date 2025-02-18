@@ -170,5 +170,9 @@ cython_debug/
 *.model-cache/
 *.data/
 
+# Agent Catalog's test output files.
+libs/agentc_testing/agentc_testing/resources/models/
+*.output
+
 # Security certificate files
 *.pem

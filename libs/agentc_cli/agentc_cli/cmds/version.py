@@ -1,11 +1,13 @@
 import click
 import importlib.util
 
-from ..models.context import Context
 from agentc_core.catalog import version as core_version
+from agentc_core.config import Config
 
 
-def cmd_version(ctx: Context):
+def cmd_version(cfg: Config = None):
+    if cfg is None:
+        cfg = Config()
     click.secho(core_version.lib_version(), bold=True)
 
 

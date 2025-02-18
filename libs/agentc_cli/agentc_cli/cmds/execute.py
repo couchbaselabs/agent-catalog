@@ -1,5 +1,4 @@
 import click
-import couchbase.cluster
 import importlib
 import logging
 import os
@@ -7,11 +6,11 @@ import pathlib
 import sys
 import tempfile
 
-from ..models import Context
-from ..models.find import SearchOptions
+from .find import SearchOptions
 from .util import DASHES
 from .util import KIND_COLORS
 from .util import get_catalog
+from agentc_core.config import Config
 from agentc_core.provider import ToolProvider
 from agentc_core.record.descriptor import RecordDescriptor
 from agentc_core.record.descriptor import RecordKind
@@ -29,33 +28,54 @@ logger = logging.getLogger(__name__)
 
 
 def cmd_execute(
-    ctx: Context = None,
+    cfg: Config = None,
+    *,
     query: str = None,
     name: str = None,
-    bucket: str = None,
     include_dirty: bool = True,
     refiner: str = None,
     annotations: str = None,
     catalog_id: str = None,
-    cluster: couchbase.cluster.Cluster = None,
-    force_db=False,
+    with_db: bool = False,
+    with_local: bool = False,
 ):
-    if ctx is None:
-        ctx = Context()
+    if cfg is None:
+        cfg = Config()
+
+    # Validate our search options.
     search_opt = SearchOptions(query=query, name=name)
     query, name = search_opt.query, search_opt.name
     click.secho(DASHES, fg=KIND_COLORS["tool"])
-    catalog = get_catalog(ctx.catalog, bucket, cluster, force_db, include_dirty, "tool")
+
+    # Determine what type of catalog we want.
+    if with_local and with_db:
+        force = "chain"
+    elif with_db:
+        force = "db"
+    elif with_local:
+        force = "local"
+    else:
+        raise ValueError("Either local FS or DB catalog must be specified!")
+
+    # Initialize a catalog instance.
+    catalog = get_catalog(
+        catalog_path=cfg.CatalogPath(),
+        bucket=cfg.bucket,
+        cluster=cfg.Cluster() if with_db else None,
+        force=force,
+        include_dirty=include_dirty,
+        kind="tool",
+    )
 
     # create temp directory for code dump
-    with tempfile.TemporaryDirectory(prefix="exec_code", dir=os.getcwd()) as tmp_dir:
+    _dir = cfg.codegen_output if cfg.codegen_output is not None else os.getcwd()
+    with tempfile.TemporaryDirectory(dir=_dir) as tmp_dir:
         tmp_dir_path = pathlib.Path(tmp_dir)
 
         # initialize tool provider
         provider = ToolProvider(
             catalog=catalog,
             output=tmp_dir_path,
-            decorator=lambda x: x,
             refiner=refiner,
         )
 
@@ -235,7 +255,8 @@ def take_verify_list_inputs(entered_val, input_name, input_type, inp_type_to_sho
     try:
         conv_inps = split_and_convert(entered_val, types_mapping[list_type])
         return conv_inps
-    except ValueError:
+    except ValueError as e:
+        logger.debug(f"Error {str(e)} is being swallowed.")
         is_correct = False
 
     while not is_correct:
@@ -245,5 +266,6 @@ def take_verify_list_inputs(entered_val, input_name, input_type, inp_type_to_sho
             conv_inps = split_and_convert(entered_val, types_mapping[list_type])
             is_correct = True
             return conv_inps
-        except ValueError:
+        except ValueError as e:
+            logger.debug(f"Error {str(e)} is being swallowed.")
             is_correct = False

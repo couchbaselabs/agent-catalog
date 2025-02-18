@@ -30,16 +30,7 @@ class RecordKind(enum.StrEnum):
     SQLPPQuery = "sqlpp_query"
     SemanticSearch = "semantic_search"
     HTTPRequest = "http_request"
-
-    # TODO (GLENN): Include other classes for prompts.
-    RawPrompt = "raw_prompt"
-    JinjaPrompt = "jinja_prompt"
-
-    def is_prompt(self) -> bool:
-        return self in [RecordKind.RawPrompt, RecordKind.JinjaPrompt]
-
-    def is_tool(self) -> bool:
-        return self not in [RecordKind.RawPrompt, RecordKind.JinjaPrompt]
+    ModelInput = "model_input"
 
 
 class RecordDescriptor(pydantic.BaseModel):
@@ -52,9 +43,8 @@ class RecordDescriptor(pydantic.BaseModel):
         RecordKind.SQLPPQuery,
         RecordKind.SemanticSearch,
         RecordKind.HTTPRequest,
-        RecordKind.RawPrompt,
-        RecordKind.JinjaPrompt,
-    ] = pydantic.Field(description="The type of catalog entry (python tool, prompt, etc...).")
+        RecordKind.ModelInput,
+    ] = pydantic.Field(description="The type of catalog entry (python tool, model input, etc...).")
 
     name: str = pydantic.Field(
         description="A short (Python-identifier-valid) name for the tool, where multiple versions of the "

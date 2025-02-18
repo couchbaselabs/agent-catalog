@@ -3,20 +3,12 @@ WITH
     DeDuplicatedLogs AS (
         FROM
             `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]` AS rsli
-        LET
-            _id =
-                -- Note: this is LangChain specific! We need to factor this out later.
-                CASE
-                    WHEN rsli.kwargs IS NOT MISSING
-                    THEN rsli.kwargs.id
-                    ELSE rsli.content
-                END
         SELECT
             rsli.*,
             ROW_NUMBER()
                 OVER (
                     PARTITION BY
-                        _id
+                        rsli.identifier
                     ORDER BY
                         STR_TO_MILLIS(rsli.timestamp) ASC
                 ) AS rn

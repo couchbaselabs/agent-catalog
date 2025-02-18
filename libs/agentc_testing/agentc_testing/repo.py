@@ -5,6 +5,9 @@ import os
 import pathlib
 import shutil
 
+# TODO (GLENN): We should move this to a more appropriate location.
+os.environ["AGENT_CATALOG_DEBUG"] = "true"
+
 
 class ExampleRepoKind(enum.StrEnum):
     EMPTY = "empty"
@@ -17,9 +20,9 @@ class ExampleRepoKind(enum.StrEnum):
 
     # The following relate to different tool/prompt only tests.
     INDEXED_CLEAN_TOOLS_TRAVEL = "indexed_clean_tools_travel"
-    INDEXED_CLEAN_PROMPTS_TRAVEL = "indexed_clean_prompts_travel"
+    INDEXED_CLEAN_INPUTS_TRAVEL = "indexed_clean_inputs_travel"
     PUBLISHED_TOOLS_TRAVEL = "published_tools_travel"
-    PUBLISHED_PROMPTS_TRAVEL = "published_prompts_travel"
+    PUBLISHED_INPUTS_TRAVEL = "published_inputs_travel"
 
 
 def initialize_repo(
@@ -33,6 +36,11 @@ def initialize_repo(
     repo: git.Repo = git.Repo.init(directory)
     with (directory / "README.md").open("w") as f:
         f.write("# Test Test\nI'm a test!")
+
+    # For all tests, we will use a sentence-transformers model saved in the agentc_testing module.
+    os.environ["AGENT_CATALOG_SENTENCE_TRANSFORMERS_MODEL_CACHE"] = str(
+        (pathlib.Path(__file__).parent / "resources" / "models").absolute()
+    )
 
     # Depending on the repo kind, copy the appropriate files to the input directory.
     files_to_commit = ["README.md"]
@@ -54,14 +62,14 @@ def initialize_repo(
         case ExampleRepoKind.INDEXED_CLEAN_TOOLS_TRAVEL | ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL:
             travel_agent_path = pathlib.Path(__file__).parent / "resources" / "travel_agent"
             shutil.copytree(travel_agent_path.absolute(), directory.absolute(), dirs_exist_ok=True)
-            for filename in travel_agent_path.rglob("*tools*"):
+            for filename in (travel_agent_path / "tools").glob("*"):
                 if filename.is_file():
                     files_to_commit.append(filename.relative_to(travel_agent_path))
 
-        case ExampleRepoKind.INDEXED_CLEAN_PROMPTS_TRAVEL | ExampleRepoKind.PUBLISHED_PROMPTS_TRAVEL:
+        case ExampleRepoKind.INDEXED_CLEAN_INPUTS_TRAVEL | ExampleRepoKind.PUBLISHED_INPUTS_TRAVEL:
             travel_agent_path = pathlib.Path(__file__).parent / "resources" / "travel_agent"
             shutil.copytree(travel_agent_path.absolute(), directory.absolute(), dirs_exist_ok=True)
-            for filename in travel_agent_path.rglob("*prompts*"):
+            for filename in (travel_agent_path / "inputs").glob("*"):
                 if filename.is_file():
                     files_to_commit.append(filename.relative_to(travel_agent_path))
 
@@ -73,41 +81,41 @@ def initialize_repo(
     repo.index.commit("Initial commit")
     output = list()
 
-    # Initialize the local catalog.
-    click_runner.invoke(click_command, ["init", "local", "catalog"])
-    click_runner.invoke(click_command, ["init", "local", "model"])
-
     # If we are not using the index command, we can return early...
     if repo_kind == ExampleRepoKind.EMPTY or repo_kind == ExampleRepoKind.NON_INDEXED_ALL_TRAVEL:
         return output
 
-    # ...otherwise, we'll call the index command.
+    # ...otherwise we need to initialize our catalog...
+    output.append(click_runner.invoke(click_command, ["init", "catalog", "--local", "--no-db"]))
+
+    # ...and, call the index command.
+    os.environ["AGENT_CATALOG_BUCKET"] = "travel-sample"
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
-    if repo_kind not in [ExampleRepoKind.INDEXED_CLEAN_PROMPTS_TRAVEL, ExampleRepoKind.PUBLISHED_PROMPTS_TRAVEL]:
-        output.append(click_runner.invoke(click_command, ["index", "tools", "--no-prompts"] + (index_args or [])))
+    if repo_kind not in [ExampleRepoKind.INDEXED_CLEAN_INPUTS_TRAVEL, ExampleRepoKind.PUBLISHED_INPUTS_TRAVEL]:
+        output.append(click_runner.invoke(click_command, ["index", "tools", "--no-model-inputs"] + (index_args or [])))
     if repo_kind not in [ExampleRepoKind.INDEXED_CLEAN_TOOLS_TRAVEL, ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL]:
-        output.append(click_runner.invoke(click_command, ["index", "prompts", "--no-tools"] + (index_args or [])))
+        output.append(click_runner.invoke(click_command, ["index", "inputs", "--no-tools"] + (index_args or [])))
     if repo_kind not in [
         ExampleRepoKind.PUBLISHED_ALL_TRAVEL,
         ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL,
-        ExampleRepoKind.PUBLISHED_PROMPTS_TRAVEL,
+        ExampleRepoKind.PUBLISHED_INPUTS_TRAVEL,
     ]:
         return output
 
     # Initialize the DB catalog.
-    click_runner.invoke(click_command, ["init", "db", "catalog", "--bucket", "travel-sample"])
+    output.append(click_runner.invoke(click_command, ["init", "catalog", "--no-local", "--db"]))
 
     # Call our publish command. Note that this assumes a container / CB instance is active!
-    os.environ["AGENT_CATALOG_MAX_SOURCE_PARTITION"] = "1"
+    os.environ["AGENT_CATALOG_MAX_INDEX_PARTITION"] = "1"
     os.environ["AGENT_CATALOG_INDEX_PARTITION"] = "1"
-    if repo_kind != ExampleRepoKind.PUBLISHED_PROMPTS_TRAVEL:
+    if repo_kind != ExampleRepoKind.PUBLISHED_INPUTS_TRAVEL:
         output.append(
             click_runner.invoke(click_command, ["publish", "tool", "--bucket", "travel-sample"] + (publish_args or []))
         )
     if repo_kind != ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL:
         output.append(
             click_runner.invoke(
-                click_command, ["publish", "prompt", "--bucket", "travel-sample"] + (publish_args or [])
+                click_command, ["publish", "model-input", "--bucket", "travel-sample"] + (publish_args or [])
             )
         )
     print(output)
@@ -122,7 +130,7 @@ if __name__ == "__main__":
     with _runner.isolated_filesystem() as td:
         _results = initialize_repo(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.INDEXED_CLEAN_ALL_TRAVEL,
+            repo_kind=ExampleRepoKind.PUBLISHED_ALL_TRAVEL,
             click_runner=_runner,
             click_command=_click_main,
         )

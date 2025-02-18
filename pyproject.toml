@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "agent-catalog"
-version = "0.0.1"
+version = "0.2.0"
 description = "The mono-repo for the Couchbase Agent Catalog project."
 repository = "https://github.com/couchbaselabs/agent-catalog"
 authors = [
@@ -60,7 +60,8 @@ markers = [
     "regression: marks regression tests for running on each git-push",
 ]
 testpaths = [
-    "libs/agentc_core/tests"
+    "libs/agentc_core/tests",
+    "libs/agentc_cli/tests",
 ]
 
 [build-system]

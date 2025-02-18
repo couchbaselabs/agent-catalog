@@ -14,7 +14,7 @@ def lib_version():
     if v == "vMajor.Minor.Micro-N-GITSHA":
         return "v0.0.0-0-g0"
 
-        # TODO: BUG: This does not work unless we're in the rosetta-agentc_core.
+        # TODO: BUG: This does not work unless we're in agentc_core.
 
         # Default to output of `git describe --long --always`.
         v = (
