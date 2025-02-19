@@ -297,21 +297,26 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
         # We will take the latest version across all catalogs.
         version_tuples = list()
         if self._local_tool_catalog is not None:
-            version_tuples.append(self._local_tool_catalog.version)
+            version_tuples += [self._local_tool_catalog.version]
         if self._remote_tool_catalog is not None:
-            version_tuples.append(self._remote_tool_catalog.version)
+            version_tuples += [self._remote_tool_catalog.version]
         if self._local_model_input_catalog is not None:
-            version_tuples.append(self._local_model_input_catalog.version)
+            version_tuples += [self._local_model_input_catalog.version]
         if self._remote_model_input_catalog is not None:
-            version_tuples.append(self._remote_model_input_catalog.version)
+            version_tuples += [self._remote_model_input_catalog.version]
         return sorted(version_tuples, key=lambda x: x.timestamp, reverse=True)[0]
 
     def Scope(self, *args, **kwargs) -> "Scope":
         """A factory method to initialize an Activity instance."""
-        # Note: we'll defer the import to avoid circular dependencies.
         from agentc_core.activity import GlobalScope
 
-        return GlobalScope(*args, config=self.config, **kwargs)
+        if "version" in kwargs:
+            raise ValueError(
+                "The 'version' parameter is reserved for Agent Catalog logs. "
+                "Please use another name for your keyword argument."
+            )
+
+        return GlobalScope(*args, config=self, version=self.version, **kwargs)
 
     def get(
         self,

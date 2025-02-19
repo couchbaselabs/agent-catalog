@@ -7,7 +7,6 @@ import uuid
 from ...analytics import Kind
 from ...analytics import Log
 from ...version import VersionDescriptor
-from ..scope import Scope
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +19,7 @@ class BaseLogger(abc.ABC):
     def log(
         self,
         kind: Kind,
-        scope: Scope,
+        scope: list[str],
         content: typing.Any,
         identifier: typing.AnyStr = None,
         timestamp: datetime.datetime = None,
@@ -33,7 +32,7 @@ class BaseLogger(abc.ABC):
         message = Log(
             identifier=identifier or uuid.uuid4().hex,
             timestamp=timestamp.isoformat(),
-            scope=scope.identifier,
+            scope=scope,
             kind=kind,
             content=content,
             catalog_version=self.catalog_version,

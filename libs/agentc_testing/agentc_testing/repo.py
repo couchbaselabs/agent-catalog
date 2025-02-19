@@ -85,11 +85,14 @@ def initialize_repo(
     output = list()
 
     # If we are not using the index command, we can return early...
-    if repo_kind == ExampleRepoKind.EMPTY or repo_kind == ExampleRepoKind.NON_INDEXED_ALL_TRAVEL:
+    if repo_kind == ExampleRepoKind.EMPTY:
         return output
 
     # ...otherwise we need to initialize our catalog...
     output.append(click_runner.invoke(click_command, ["init", "catalog", "--local", "--no-db"]))
+    output.append(click_runner.invoke(click_command, ["init", "activity", "--local", "--no-db"]))
+    if repo_kind == ExampleRepoKind.NON_INDEXED_ALL_TRAVEL:
+        return output
 
     # ...and, call the index command.
     os.environ["AGENT_CATALOG_BUCKET"] = "travel-sample"
@@ -107,6 +110,7 @@ def initialize_repo(
 
     # Initialize the DB catalog.
     output.append(click_runner.invoke(click_command, ["init", "catalog", "--no-local", "--db"]))
+    output.append(click_runner.invoke(click_command, ["init", "activity", "--no-local", "--db"]))
 
     # Call our publish command. Note that this assumes a container / CB instance is active!
     os.environ["AGENT_CATALOG_MAX_INDEX_PARTITION"] = "1"

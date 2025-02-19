@@ -6,7 +6,7 @@ import os
 import shutil
 
 from ...analytics import Log
-from ...config import Config
+from ...config import LocalCatalogConfig
 from .base import BaseLogger
 from agentc_core.version import VersionDescriptor
 
@@ -15,7 +15,9 @@ logger = logging.getLogger(__name__)
 
 class LocalLogger(BaseLogger):
     # TODO (GLENN): Add rollover to our Config class.
-    def __init__(self, cfg: Config, catalog_version: VersionDescriptor, rollover: int = 128_000_000, **kwargs):
+    def __init__(
+        self, cfg: LocalCatalogConfig, catalog_version: VersionDescriptor, rollover: int = 128_000_000, **kwargs
+    ):
         """
         :param output: Output file to write the audit logs to.
         :param catalog_version: Catalog version associated with this audit instance.
@@ -34,11 +36,11 @@ class LocalLogger(BaseLogger):
 
         # We'll rotate log files and subsequently compress them when they get too large.
         filename = cfg.ActivityPath() / agentc_core.defaults.DEFAULT_ACTIVITY_FILE
-        rotating_handler = logging.handlers.RotatingFileHandler(filename, maxBytes=rollover)
-        rotating_handler.rotator = compress_and_remove
-        rotating_handler.namer = lambda name: name + ".gz"
-        rotating_handler.setFormatter(logging.Formatter("%(message)s"))
-        self.audit_logger.addHandler(rotating_handler)
+        self.rotating_handler = logging.handlers.RotatingFileHandler(filename, maxBytes=rollover)
+        self.rotating_handler.rotator = compress_and_remove
+        self.rotating_handler.namer = lambda name: name + ".gz"
+        self.rotating_handler.setFormatter(logging.Formatter("%(message)s"))
+        self.audit_logger.addHandler(self.rotating_handler)
 
     def _accept(self, message: Log):
         self.audit_logger.info(message.model_dump_json())

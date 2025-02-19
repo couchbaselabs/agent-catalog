@@ -1,6 +1,6 @@
-from .logger.base import BaseLogger
-from .logger.db import DBLogger
-from .logger.local import LocalLogger
+from .logger import BaseLogger
+from .logger import DBLogger
+from .logger import LocalLogger
 from .scope import GlobalScope
 from .scope import Scope
 

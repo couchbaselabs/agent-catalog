@@ -9,23 +9,33 @@ from ..analytics import Kind
 from ..analytics import TransitionContent
 from .logger import DBLogger
 from .logger import LocalLogger
-from agentc_core.config import Config
+from agentc_core.config import LocalCatalogConfig
+from agentc_core.config import RemoteCatalogConfig
+from agentc_core.version import VersionDescriptor
 
 logger = logging.getLogger(__name__)
 
 
-class Scope:
-    def __init__(self, log: typing.Callable, name: str, parent: "Scope" = None, state: typing.Any = None, **kwargs):
-        self.log = log
-        self.name = name
-        self.parent = parent
-        self.state = state
-        self.kwargs = kwargs
+class Scope(pydantic.BaseModel):
+    logger: typing.Optional[typing.Callable] = None
+    """ Method which handles the logging implementation. """
+
+    name: str
+    """ Name to bind to each message logged within this scope. """
+
+    parent: "Scope" = None
+    """ Parent scope of this scope (i.e., the scope that had :py:meth:`new` called on it). """
+
+    state: typing.Any = None
+    """ A JSON-serializable object that will be logged on entering and exiting this scope. """
+
+    kwargs: typing.Optional[dict[str, typing.Any]] = pydantic.Field(default_factory=dict)
+    """ Annotations to apply to all messages logged within this scope. """
 
     def new(self, name: typing.AnyStr, state: typing.Any = None, **kwargs):
         new_kwargs = {**self.kwargs, **kwargs}
         return Scope(
-            log=self.log,
+            logger=self.logger,
             name=name,
             parent=self,
             state=state or self.state,
@@ -34,16 +44,17 @@ class Scope:
 
     def log(self, kind: Kind, content: typing.Any, **kwargs):
         new_kwargs = {**self.kwargs, **kwargs}
-        self.log(kind=kind, content=content, scope=self, **new_kwargs)
+        self.logger(kind=kind, content=content, scope=self.identifier, **new_kwargs)
 
+    @pydantic.computed_field
     @property
     def identifier(self) -> list[str]:
         name_stack = [self.name]
         parent = self.parent
         while parent is not None:
-            name_stack.append(parent.name)
+            name_stack += [parent.name]
             parent = parent.parent
-        return reversed(name_stack)
+        return list(reversed(name_stack))
 
     def __enter__(self):
         if self.state is not None:
@@ -51,12 +62,11 @@ class Scope:
             self.log(
                 kind=Kind.Transition,
                 content=TransitionContent(to_state=self.state, from_state=None, extra=None),
-                scope=self,
             )
         return self
 
     def __setitem__(self, key, value):
-        self.log(kind=Kind.Custom, content=CustomContent(name=key, value=value, extra=self.kwargs), scope=self)
+        self.log(kind=Kind.Custom, content=CustomContent(name=key, value=value, extra=self.kwargs))
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         # We will only record this transition if we are exiting cleanly.
@@ -64,19 +74,17 @@ class Scope:
             self.log(
                 kind=Kind.Transition,
                 content=TransitionContent(to_state=None, from_state=self.state, extra=None),
-                scope=self,
             )
 
 
-class GlobalScope(Scope, pydantic.BaseModel):
+class GlobalScope(Scope):
     """An auditor of various events (e.g., LLM completions) given a catalog."""
 
-    config: Config
-    """ Config (configuration) instance associated with this activity.
+    config: typing.Union[LocalCatalogConfig, RemoteCatalogConfig]
+    """ Config (configuration) instance associated with this activity. """
 
-    This ``config`` instance is used to determine the version of the catalog that this auditor is associated with as
-    well as where to write our output to.
-    """
+    version: VersionDescriptor
+    """ Catalog version to bind all messages logged within this auditor. """
 
     annotations: typing.Optional[dict[str, typing.Any]] = None
     """ Activity-level annotations to apply to all messages.
@@ -87,7 +95,6 @@ class GlobalScope(Scope, pydantic.BaseModel):
 
     _local_logger: LocalLogger = None
     _db_logger: DBLogger = None
-    _log: typing.Callable = None
 
     @pydantic.model_validator(mode="after")
     def _find_local_activity(self) -> typing.Self:
@@ -116,10 +123,10 @@ class GlobalScope(Scope, pydantic.BaseModel):
 
         # Finally, instantiate our auditors.
         if self.config.activity_path is not None:
-            self._local_logger = LocalLogger(cfg=self.config, catalog_version=self.catalog.version)
-        if self.conn_string is not None:
+            self._local_logger = LocalLogger(cfg=self.config, catalog_version=self.version)
+        if self.config.conn_string is not None:
             try:
-                self._db_logger = DBLogger(cfg=self.config, catalog_version=self.catalog.version)
+                self._db_logger = DBLogger(cfg=self.config, catalog_version=self.version)
             except (couchbase.exceptions.CouchbaseException, ValueError) as e:
                 logger.warning(
                     f"Could not connect to the Couchbase cluster. "
@@ -135,13 +142,13 @@ class GlobalScope(Scope, pydantic.BaseModel):
                 self._local_logger.log(*args, **kwargs)
                 self._db_logger.log(*args, **kwargs)
 
-            self._audit = accept
+            self.logger = accept
         elif self._local_logger is not None:
             logger.info("Using a local auditor (a connection to a remote auditor could not be established).")
-            self._audit = self._local_logger.log
+            self.logger = self._local_logger.log
         elif self._db_logger is not None:
             logger.info("Using a remote auditor (a local auditor could not be instantiated).")
-            self._audit = self._db_logger.log
+            self.logger = self._db_logger.log
         else:
             # We should never reach this point (this error is handled above).
             raise ValueError("Could not instantiate an auditor.")
@@ -154,4 +161,4 @@ class GlobalScope(Scope, pydantic.BaseModel):
         :param state: The starting state of the scope. This will be recorded upon entering and exiting the scope.
         :param kwargs: Additional annotations to apply to the scope.
         """
-        return Scope(log=self._log, name=name, parent=None, state=state, **kwargs)
+        return Scope(logger=self.logger, name=name, parent=self, state=state, kwargs=kwargs)

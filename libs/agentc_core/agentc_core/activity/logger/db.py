@@ -7,14 +7,14 @@ from ...defaults import DEFAULT_ACTIVITY_LOG_COLLECTION
 from ...defaults import DEFAULT_AUDIT_SCOPE
 from ...util.ddl import check_if_scope_collection_exist
 from .base import BaseLogger
-from agentc_core.config import Config
+from agentc_core.config import RemoteCatalogConfig
 from agentc_core.version import VersionDescriptor
 
 logger = logging.getLogger(__name__)
 
 
 class DBLogger(BaseLogger):
-    def __init__(self, cfg: Config, catalog_version: VersionDescriptor, **kwargs):
+    def __init__(self, cfg: RemoteCatalogConfig, catalog_version: VersionDescriptor, **kwargs):
         super().__init__(catalog_version=catalog_version, **kwargs)
 
         # Get bucket ref
