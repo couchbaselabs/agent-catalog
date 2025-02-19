@@ -150,4 +150,4 @@ pytest libs/agentc_cli/tests libs/agentc_core/tests --log-file .output
 ```
 
 This command will run all tests and record the logger output to a `.output` file.
-Note that Click doesn't play too well with Pytest's `log_cli=true` option, so we recommend logging to a file.
+Note that Click doesn't play too well with pytest's `log_cli=true` option, so we recommend logging to a file.

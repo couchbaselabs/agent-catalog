@@ -1,4 +1,5 @@
 import click
+import couchbase.exceptions
 import datetime
 import functools
 import git
@@ -116,7 +117,7 @@ def get_catalog(
     # Path #1: Search our DB catalog.
     try:
         cluster = cfg.Cluster()
-    except ValueError as e:
+    except (ValueError, couchbase.exceptions.CouchbaseException) as e:
         if force == "db":
             raise e
         else:

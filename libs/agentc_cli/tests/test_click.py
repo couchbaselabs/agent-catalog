@@ -43,6 +43,7 @@ def test_index(tmp_path):
             click_runner=runner,
             click_command=click_main,
         )
+        os.chdir(td)
 
         repo = git.Repo.init(td)
         repo.index.commit("Initial commit")
@@ -120,6 +121,7 @@ def test_publish(tmp_path, isolated_server_factory):
             click_runner=runner,
             click_command=click_main,
         )
+        os.chdir(td)
         runner.invoke(click_main, ["init", "catalog", "--local", "--db"])
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
         for catalog in (pathlib.Path(__file__).parent / "resources" / "publish").rglob("*-1.json"):
@@ -143,6 +145,7 @@ def test_find(tmp_path, isolated_server_factory):
             click_runner=runner,
             click_command=click_main,
         )
+        os.chdir(td)
         runner.invoke(click_main, ["init", "catalog", "--local", "--db"])
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
         catalog = pathlib.Path(__file__).parent / "resources" / "find" / "tools-positive-1.json"
@@ -213,12 +216,14 @@ def test_find(tmp_path, isolated_server_factory):
 @pytest.mark.regression
 def test_status(tmp_path, isolated_server_factory):
     runner = click.testing.CliRunner()
-
-    # Case 1 - catalog does not exist locally
-    output = runner.invoke(click_main, ["status"])
-    assert "Local catalog not found " in str(output.exception)
-    assert isinstance(output.exception, ValueError)
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        os.chdir(td)
+
+        # Case 1 - catalog does not exist locally
+        output = runner.invoke(click_main, ["status"])
+        assert "Local catalog not found " in str(output.exception)
+        assert isinstance(output.exception, ValueError)
+
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
         initialize_repo(
             directory=pathlib.Path(td),
@@ -252,6 +257,8 @@ def test_clean(tmp_path, isolated_server_factory):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
+        os.chdir(td)
+
         runner.invoke(click_main, ["init", "catalog", "--local", "--db"])
         initialize_repo(
             directory=pathlib.Path(td),
@@ -323,6 +330,7 @@ def test_execute(tmp_path):
             click_runner=runner,
             click_command=click_main,
         )
+        os.chdir(td)
 
         output = runner.invoke(click_main, ["execute", "--name", "random_tool", "--local"]).stdout
         assert "No catalog items found" in output
@@ -362,6 +370,7 @@ def test_publish_different_versions(tmp_path, isolated_server_factory):
             click_runner=runner,
             click_command=click_main,
         )
+        os.chdir(td)
         runner.invoke(click_main, ["init", "catalog", "--local", "--db"])
 
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
@@ -389,6 +398,8 @@ def test_publish_different_versions(tmp_path, isolated_server_factory):
 def test_ls_local_empty_notindexed(tmp_path):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        os.chdir(td)
+
         # when the repo is empty
         output = runner.invoke(click_main, ["ls", "--local"]).stdout
         assert "Searching" not in output
@@ -408,6 +419,8 @@ def test_ls_local_empty_notindexed(tmp_path):
 def test_ls_local_only_tools(tmp_path):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        os.chdir(td)
+
         # when only tools are indexed
         initialize_repo(
             directory=pathlib.Path(td),
@@ -425,6 +438,8 @@ def test_ls_local_only_tools(tmp_path):
 def test_ls_local_only_inputs(tmp_path):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        os.chdir(td)
+
         # when only prompts are indexed
         initialize_repo(
             directory=pathlib.Path(td),
@@ -442,6 +457,8 @@ def test_ls_local_only_inputs(tmp_path):
 def test_ls_local_both_tools_prompts(tmp_path):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        os.chdir(td)
+
         # when there are both tools and prompts
         initialize_repo(
             directory=pathlib.Path(td),
@@ -460,7 +477,9 @@ def test_ls_local_both_tools_prompts(tmp_path):
 @pytest.mark.smoke
 def test_init_local(tmp_path):
     runner = click.testing.CliRunner()
-    with runner.isolated_filesystem(temp_dir=tmp_path):
+    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        os.chdir(td)
+
         files_present = os.listdir()
         assert ".agent-catalog" not in files_present and ".agent-activity" not in files_present
 
@@ -476,7 +495,8 @@ def test_init_local(tmp_path):
 @pytest.mark.smoke
 def test_init_local_all(tmp_path):
     runner = click.testing.CliRunner()
-    with runner.isolated_filesystem(temp_dir=tmp_path):
+    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        os.chdir(td)
         files_present = os.listdir()
         assert ".agent-catalog" not in files_present and ".agent-activity" not in files_present
 

@@ -84,7 +84,7 @@ def test_db_tool_provider(tmp_path, isolated_server_factory):
         os.chdir(td)
         os.remove((pathlib.Path(td) / DEFAULT_CATALOG_FOLDER / DEFAULT_TOOL_CATALOG_FILE).absolute())
         catalog = Catalog(bucket="travel-sample")
-        tools = catalog.get("tool", query="searching travel blogs")
+        tools = catalog.get("tool", query="searching travel blogs using user interests")
         assert len(tools) == 1
         assert tools[0].func.__name__ == "get_travel_blog_snippets_from_user_interests"
 

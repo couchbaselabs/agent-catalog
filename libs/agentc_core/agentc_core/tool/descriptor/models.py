@@ -1,4 +1,5 @@
 import abc
+import agentc_core.learned.model
 import dataclasses
 import enum
 import importlib
@@ -145,22 +146,13 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
 
 class SemanticSearchToolDescriptor(RecordDescriptor):
     class VectorSearchMetadata(pydantic.BaseModel):
-        class EmbeddingModel(pydantic.BaseModel):
-            name: str
-            base_url: typing.Optional[str] = None
-
-            @property
-            @pydantic.computed_field
-            def kind(self) -> typing.Literal["sentence-transformers", "openai"]:
-                return "sentence-transformers" if self.base_url is None else "openai"
-
         bucket: str
         scope: str
         collection: str
         index: str
         vector_field: str
         text_field: str
-        embedding_model: EmbeddingModel
+        embedding_model: agentc_core.learned.model.EmbeddingModel
         num_candidates: int = 3
 
     input: str

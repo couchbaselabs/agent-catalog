@@ -170,11 +170,9 @@ def index_catalog_start(
         raise all_errs[0]
 
     catalog_descriptor_embedding_model = (
-        CatalogDescriptorEmbeddingModel(name=embedding_model.name, base_url=None, kind="sentence-transformers")
+        CatalogDescriptorEmbeddingModel(name=embedding_model.name, base_url=None)
         if embedding_model.embedding_model_url is None
-        else CatalogDescriptorEmbeddingModel(
-            name=embedding_model.name, base_url=embedding_model.embedding_model_url, kind="openai"
-        )
+        else CatalogDescriptorEmbeddingModel(name=embedding_model.name, base_url=embedding_model.embedding_model_url)
     )
     next_catalog = CatalogMem(
         embedding_model=embedding_model,

@@ -1,5 +1,8 @@
 {
-  "embedding_model": "sentence-transformers/all-MiniLM-L12-v2",
+  "embedding_model":
+  {
+    "name": "sentence-transformers/all-MiniLM-L12-v2"
+  },
   "items": [
   {
     "annotations":
@@ -27,7 +30,10 @@
     {
       "bucket": "travel-sample",
       "collection": "article",
-      "embedding_model": "sentence-transformers/all-MiniLM-L12-v2",
+      "embedding_model":
+      {
+        "name": "sentence-transformers/all-MiniLM-L12-v2"
+      },
       "index": "articles-index",
       "scope": "inventory",
       "text_field": "text",

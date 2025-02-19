@@ -1,5 +1,8 @@
 {
-  "embedding_model": "sentence-transformers/all-MiniLM-L12-v2",
+  "embedding_model":
+  {
+    "name": "sentence-transformers/all-MiniLM-L12-v2"
+  },
   "items": [
   {
     "annotations":

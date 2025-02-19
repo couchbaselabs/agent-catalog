@@ -47,7 +47,7 @@ class CatalogDescriptor(pydantic.BaseModel):
     kind: CatalogKind = pydantic.Field(description="The type of items within the catalog.")
 
     embedding_model: EmbeddingModel = pydantic.Field(
-        description="Embedding model used to generate embedding for tool/prompt descriptions to store in the catalogs.",
+        description="Embedding model used for tool/model-input descriptions within the catalog.",
     )
 
     version: VersionDescriptor = pydantic.Field(

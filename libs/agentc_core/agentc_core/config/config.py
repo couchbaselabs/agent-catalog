@@ -1,4 +1,3 @@
-import agentc_core.defaults
 import couchbase.auth
 import couchbase.cluster
 import couchbase.options
@@ -11,6 +10,13 @@ import pydantic_settings
 import tempfile
 import typing
 import urllib.parse
+
+from agentc_core.defaults import DEFAULT_ACTIVITY_FOLDER
+from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
+from agentc_core.defaults import DEFAULT_CLUSTER_WAIT_UNTIL_READY_SECONDS
+from agentc_core.defaults import DEFAULT_EMBEDDING_MODEL_NAME
+from agentc_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
+from agentc_core.defaults import DEFAULT_VERBOSITY_LEVEL
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +80,15 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
 
     This parameter is used by the Search service to build vector indexes on ``agentc init``.
     By default, this value is ``2 * number of FTS nodes in your cluster``.
-    More information on index partitioning can be found `here <https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index-partitioning.html>`_.
+    More information on index partitioning can be found
+    `here <https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index-partitioning.html>`_.
+    """
+
+    wait_until_ready_seconds: typing.Optional[int] = DEFAULT_CLUSTER_WAIT_UNTIL_READY_SECONDS
+    """ The default waiting time for the cluster to be ready.
+
+    If you have a slow network connection, you may want to increase this value.
+    If you are working with a local-FS-only catalog, set this value to **0** to skip the wait.
     """
 
     @pydantic.field_validator("conn_string")
@@ -153,9 +167,9 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
         # Connect to our cluster.
         logger.debug(f"Connecting to Couchbase cluster at {self.conn_string}...")
         cluster = couchbase.cluster.Cluster(self.conn_string, options)
-        cluster.wait_until_ready(
-            datetime.timedelta(seconds=agentc_core.defaults.DEFAULT_CLUSTER_WAIT_UNTIL_READY_SECONDS)
-        )
+        if self.wait_until_ready_seconds > 0:
+            logger.debug(f"Waiting {self.wait_until_ready_seconds} seconds for cluster to be ready...")
+            cluster.wait_until_ready(datetime.timedelta(seconds=self.wait_until_ready_seconds))
         logger.debug("Connection successfully established.")
         return cluster
 
@@ -163,7 +177,7 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
 class EmbeddingModelConfig(pydantic_settings.BaseSettings):
     model_config = pydantic_settings.SettingsConfigDict(env_prefix="AGENT_CATALOG_")
 
-    embedding_model_name: str = agentc_core.defaults.DEFAULT_EMBEDDING_MODEL_NAME
+    embedding_model_name: str = DEFAULT_EMBEDDING_MODEL_NAME
     """ The name of the embedding model that Agent Catalog will use when indexing and querying tools and model inputs.
 
     By default, the ``sentence-transformers/all-MiniLM-L12-v2`` model is used.
@@ -183,7 +197,7 @@ class EmbeddingModelConfig(pydantic_settings.BaseSettings):
     For endpoints hosted on Capella, this is your JWT.
     """
 
-    sentence_transformers_model_cache: typing.Optional[str] = agentc_core.defaults.DEFAULT_MODEL_CACHE_FOLDER
+    sentence_transformers_model_cache: typing.Optional[str] = DEFAULT_MODEL_CACHE_FOLDER
     """ The path to the folder where sentence-transformer embedding models will be cached.
 
     By default, this is ``.model-cache``.
@@ -213,7 +227,7 @@ class LocalCatalogConfig(pydantic_settings.BaseSettings):
         if self.project_path is None or (self.catalog_path is None and self.activity_path is None):
             return self
         if self.catalog_path is not None:  # and self.project_path is not None
-            catalog_path_under_project = self.project_path / agentc_core.defaults.DEFAULT_CATALOG_FOLDER
+            catalog_path_under_project = self.project_path / DEFAULT_CATALOG_FOLDER
             if not self.catalog_path.samefile(catalog_path_under_project):
                 raise ValueError(
                     f"AGENT_CATALOG_PROJECT_PATH specified with misaligned AGENT_CATALOG_CATALOG_PATH!\n"
@@ -222,7 +236,7 @@ class LocalCatalogConfig(pydantic_settings.BaseSettings):
                     f"`unset AGENT_CATALOG_CATALOG_PATH`."
                 )
         if self.activity_path is not None:
-            activity_path_under_project = self.project_path / agentc_core.defaults.DEFAULT_ACTIVITY_FOLDER
+            activity_path_under_project = self.project_path / DEFAULT_ACTIVITY_FOLDER
             if not self.catalog_path.samefile(activity_path_under_project):
                 raise ValueError(
                     f"AGENT_CATALOG_PROJECT_PATH specified with misaligned AGENT_CATALOG_ACTIVITY_PATH!\n"
@@ -247,12 +261,12 @@ class LocalCatalogConfig(pydantic_settings.BaseSettings):
         logger.debug(
             'Starting upwards search for the catalog folder in "%s". Searching for "%s".',
             starting_path,
-            agentc_core.defaults.DEFAULT_CATALOG_FOLDER,
+            DEFAULT_CATALOG_FOLDER,
         )
 
         # Iteratively ascend our starting path until we find the catalog folder.
         working_path = starting_path
-        while not (working_path / agentc_core.defaults.DEFAULT_CATALOG_FOLDER).exists():
+        while not (working_path / DEFAULT_CATALOG_FOLDER).exists():
             logger.debug("Searching in %s.", working_path.absolute())
             if working_path.parent == working_path:
                 raise ValueError(
@@ -260,7 +274,7 @@ class LocalCatalogConfig(pydantic_settings.BaseSettings):
                     f"If this is a new Agent Catalog instance, please run the 'agentc init' command."
                 )
             working_path = working_path.parent
-        self.catalog_path = working_path / agentc_core.defaults.DEFAULT_CATALOG_FOLDER
+        self.catalog_path = working_path / DEFAULT_CATALOG_FOLDER
         return self.catalog_path
 
     def ActivityPath(self) -> pathlib.Path:
@@ -274,23 +288,23 @@ class LocalCatalogConfig(pydantic_settings.BaseSettings):
         starting_path = self.project_path if self.project_path is not None else pathlib.Path.cwd()
         logger.debug(
             'Starting upwards search for the activity folder. Searching for "%s".',
-            agentc_core.defaults.DEFAULT_ACTIVITY_FOLDER,
+            DEFAULT_ACTIVITY_FOLDER,
         )
 
         # Iteratively ascend our starting path until we find the activity folder.
         working_path = starting_path
-        while not (working_path / agentc_core.defaults.DEFAULT_ACTIVITY_FOLDER).exists():
+        while not (working_path / DEFAULT_ACTIVITY_FOLDER).exists():
             if working_path.parent == working_path:
                 raise ValueError(f"Activity (folder) not found with search from {starting_path}!")
             working_path = working_path.parent
-        self.activity_path = working_path / agentc_core.defaults.DEFAULT_ACTIVITY_FOLDER
+        self.activity_path = working_path / DEFAULT_ACTIVITY_FOLDER
         return self.activity_path
 
 
 class CommandLineConfig(pydantic_settings.BaseSettings):
     model_config = pydantic_settings.SettingsConfigDict(env_prefix="AGENT_CATALOG_")
 
-    verbosity_level: int = pydantic.Field(agentc_core.defaults.DEFAULT_VERBOSITY_LEVEL, ge=0, le=2)
+    verbosity_level: int = pydantic.Field(DEFAULT_VERBOSITY_LEVEL, ge=0, le=2)
     with_interaction: bool = True
 
 

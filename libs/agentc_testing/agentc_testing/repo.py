@@ -1,9 +1,12 @@
 import click.testing
 import enum
 import git
+import logging
 import os
 import pathlib
 import shutil
+
+logger = logging.getLogger(__name__)
 
 # TODO (GLENN): We should move this to a more appropriate location.
 os.environ["AGENT_CATALOG_DEBUG"] = "true"
@@ -41,6 +44,15 @@ def initialize_repo(
     os.environ["AGENT_CATALOG_SENTENCE_TRANSFORMERS_MODEL_CACHE"] = str(
         (pathlib.Path(__file__).parent / "resources" / "models").absolute()
     )
+
+    # Disable the wait for our catalog if we are not publishing our catalog.
+    if repo_kind not in {
+        ExampleRepoKind.PUBLISHED_ALL_TRAVEL,
+        ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL,
+        ExampleRepoKind.PUBLISHED_INPUTS_TRAVEL,
+    }:
+        logger.debug("Disabling wait for catalog.")
+        os.environ["AGENT_CATALOG_WAIT_UNTIL_READY_SECONDS"] = "0"
 
     # Depending on the repo kind, copy the appropriate files to the input directory.
     files_to_commit = ["README.md"]
@@ -118,7 +130,7 @@ def initialize_repo(
                 click_command, ["publish", "model-input", "--bucket", "travel-sample"] + (publish_args or [])
             )
         )
-    print(output)
+    logger.info(output)
     return output
 
 
