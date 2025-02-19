@@ -151,6 +151,9 @@ def isolated_server_factory() -> typing.Callable[[pathlib.Path], docker.models.c
     finally:
         if len(container_instance) > 0:
             _stop_couchbase(container_instance.pop())
+            os.unsetenv("AGENT_CATALOG_CONN_STRING")
+            os.unsetenv("AGENT_CATALOG_USERNAME")
+            os.unsetenv("AGENT_CATALOG_PASSWORD")
 
 
 if __name__ == "__main__":
@@ -171,3 +174,6 @@ if __name__ == "__main__":
 
         finally:
             _stop_couchbase(_container)
+            os.unsetenv("AGENT_CATALOG_CONN_STRING")
+            os.unsetenv("AGENT_CATALOG_USERNAME")
+            os.unsetenv("AGENT_CATALOG_PASSWORD")

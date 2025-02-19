@@ -45,15 +45,6 @@ def initialize_repo(
         (pathlib.Path(__file__).parent / "resources" / "models").absolute()
     )
 
-    # Disable the wait for our catalog if we are not publishing our catalog.
-    if repo_kind not in {
-        ExampleRepoKind.PUBLISHED_ALL_TRAVEL,
-        ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL,
-        ExampleRepoKind.PUBLISHED_INPUTS_TRAVEL,
-    }:
-        logger.debug("Disabling wait for catalog.")
-        os.environ["AGENT_CATALOG_WAIT_UNTIL_READY_SECONDS"] = "0"
-
     # Depending on the repo kind, copy the appropriate files to the input directory.
     files_to_commit = ["README.md"]
     match repo_kind:

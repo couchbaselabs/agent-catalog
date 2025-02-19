@@ -85,10 +85,10 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
     """
 
     wait_until_ready_seconds: typing.Optional[int] = DEFAULT_CLUSTER_WAIT_UNTIL_READY_SECONDS
-    """ The default waiting time for the cluster to be ready.
+    """ The default waiting time when connecting to a Couchbase cluster.
 
     If you have a slow network connection, you may want to increase this value.
-    If you are working with a local-FS-only catalog, set this value to **0** to skip the wait.
+    By default, this value is 5 seconds.
     """
 
     @pydantic.field_validator("conn_string")
@@ -167,9 +167,7 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
         # Connect to our cluster.
         logger.debug(f"Connecting to Couchbase cluster at {self.conn_string}...")
         cluster = couchbase.cluster.Cluster(self.conn_string, options)
-        if self.wait_until_ready_seconds > 0:
-            logger.debug(f"Waiting {self.wait_until_ready_seconds} seconds for cluster to be ready...")
-            cluster.wait_until_ready(datetime.timedelta(seconds=self.wait_until_ready_seconds))
+        cluster.wait_until_ready(datetime.timedelta(seconds=self.wait_until_ready_seconds))
         logger.debug("Connection successfully established.")
         return cluster
 
