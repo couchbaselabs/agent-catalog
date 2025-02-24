@@ -36,8 +36,8 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
     This Couchbase instance refers to the CB instance used with the :command:`publish` command.
     If there exists no local catalog (e.g., this is deployed in a standalone environment), we will perform all
     :command:`find` commands directly on the remote catalog.
-    If this field AND ``$AGENT_CATALOG_CATALOG`` are specified, we will issue :command:`find` on both the remote and
-    local catalog (with local catalog entries taking precedence).
+    If this field AND ``$AGENT_CATALOG_PROJECT_PATH`` are specified, we will issue :command:`find` on both the remote
+    and local catalog (with local catalog entries taking precedence).
 
     This field **must** be specified with :py:attr:`username`, :py:attr:`password`, and  :py:attr:`bucket`.
     """
@@ -153,6 +153,12 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
                 "Please run 'export $AGENT_CATALOG_PASSWORD=...' or add "
                 "$AGENT_CATALOG_PASSWORD to your .env file and try again."
             )
+        if self.bucket is None:
+            raise ValueError(
+                "Could not find the environment variable $AGENT_CATALOG_BUCKET!\n"
+                "Please run 'export AGENT_CATALOG_BUCKET=...' or add "
+                "$AGENT_CATALOG_BUCKET to your .env file and try again."
+            )
 
         auth = (
             couchbase.auth.PasswordAuthenticator(self.username, self.password.get_secret_value())
@@ -176,7 +182,7 @@ class EmbeddingModelConfig(pydantic_settings.BaseSettings):
     model_config = pydantic_settings.SettingsConfigDict(env_prefix="AGENT_CATALOG_")
 
     embedding_model_name: str = DEFAULT_EMBEDDING_MODEL_NAME
-    """ The name of the embedding model that Agent Catalog will use when indexing and querying tools and model inputs.
+    """ The name of the embedding model that Agent Catalog will use when indexing and querying tools and prompts.
 
     By default, the ``sentence-transformers/all-MiniLM-L12-v2`` model is used.
     """

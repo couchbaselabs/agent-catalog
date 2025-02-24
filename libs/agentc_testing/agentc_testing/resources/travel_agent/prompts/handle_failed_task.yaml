@@ -1,4 +1,4 @@
-record_kind: model_input
+record_kind: prompt
 
 name: handle_failed_task
 

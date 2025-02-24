@@ -25,5 +25,5 @@ def validate_or_prompt_for_bucket(cfg: Config, bucket: str = None):
     elif cfg.bucket is None and not cfg.interactive:
         raise ValueError(
             "Bucket must be specified to publish to the database catalog."
-            "Add --bucket BUCKET_NAME to your command or run agentc init in interactive mode."
+            "Add --bucket BUCKET_NAME to your command or run your command in interactive mode."
         )

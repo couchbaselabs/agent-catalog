@@ -4,12 +4,12 @@ import pydantic
 import pytest
 import uuid
 
-from agentc_core.inputs.models import ModelInputDescriptor
+from agentc_core.prompt.models import PromptDescriptor
 from agentc_core.version import VersionDescriptor
 from agentc_core.version.identifier import VersionSystem
 
 
-def _get_model_inputs_descriptor_factory(cls, filename: pathlib.Path):
+def _get_prompt_descriptors_factory(cls, filename: pathlib.Path):
     filename_prefix = pathlib.Path(__file__).parent / "resources"
     factory_args = {
         "filename": filename_prefix / filename,
@@ -23,9 +23,9 @@ def _get_model_inputs_descriptor_factory(cls, filename: pathlib.Path):
 
 
 @pytest.mark.smoke
-def test_model_input():
-    positive_1_factory = _get_model_inputs_descriptor_factory(
-        cls=ModelInputDescriptor.Factory, filename=pathlib.Path("positive_1.yaml")
+def test_prompt():
+    positive_1_factory = _get_prompt_descriptors_factory(
+        cls=PromptDescriptor.Factory, filename=pathlib.Path("positive_1.yaml")
     )
     positive_1_inputs = list(positive_1_factory)
     assert len(positive_1_inputs) == 1
@@ -51,8 +51,8 @@ def test_model_input():
     assert positive_1_inputs[0].tools[1].limit == 2
 
     # Test the optional exclusion of tools and annotations.
-    positive_2_factory = _get_model_inputs_descriptor_factory(
-        cls=ModelInputDescriptor.Factory, filename=pathlib.Path("positive_2.yaml")
+    positive_2_factory = _get_prompt_descriptors_factory(
+        cls=PromptDescriptor.Factory, filename=pathlib.Path("positive_2.yaml")
     )
     positive_2_inputs = list(positive_2_factory)
     assert len(positive_2_inputs) == 1
@@ -61,15 +61,15 @@ def test_model_input():
     assert positive_2_inputs[0].tools is None
 
     # Test a bad record_kind (not raw_prompt).
-    negative_1_factory = _get_model_inputs_descriptor_factory(
-        cls=ModelInputDescriptor.Factory, filename=pathlib.Path("negative_1.yaml")
+    negative_1_factory = _get_prompt_descriptors_factory(
+        cls=PromptDescriptor.Factory, filename=pathlib.Path("negative_1.yaml")
     )
     with pytest.raises(pydantic.ValidationError):
         list(negative_1_factory)
 
     # Test a bad annotation query string.
-    negative_2_factory = _get_model_inputs_descriptor_factory(
-        cls=ModelInputDescriptor.Factory, filename=pathlib.Path("negative_2.yaml")
+    negative_2_factory = _get_prompt_descriptors_factory(
+        cls=PromptDescriptor.Factory, filename=pathlib.Path("negative_2.yaml")
     )
     with pytest.raises(pydantic.ValidationError):
         list(negative_2_factory)

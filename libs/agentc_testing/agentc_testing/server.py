@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 DEFAULT_COUCHBASE_CONN_STRING = "couchbase://localhost"
 DEFAULT_COUCHBASE_USERNAME = "Administrator"
 DEFAULT_COUCHBASE_PASSWORD = "password"
+DEFAULT_COUCHBASE_BUCKET = "travel-sample"
 
 # TODO (GLENN): We should move this to a more appropriate location.
 os.environ["AGENT_CATALOG_DEBUG"] = "true"
@@ -135,6 +136,7 @@ def isolated_server_factory() -> typing.Callable[[pathlib.Path], docker.models.c
     os.environ["AGENT_CATALOG_CONN_STRING"] = DEFAULT_COUCHBASE_CONN_STRING
     os.environ["AGENT_CATALOG_USERNAME"] = DEFAULT_COUCHBASE_USERNAME
     os.environ["AGENT_CATALOG_PASSWORD"] = DEFAULT_COUCHBASE_PASSWORD
+    os.environ["AGENT_CATALOG_BUCKET"] = DEFAULT_COUCHBASE_BUCKET
 
     container_instance = set()
     try:
@@ -149,11 +151,12 @@ def isolated_server_factory() -> typing.Callable[[pathlib.Path], docker.models.c
 
     # Execute our cleanup.
     finally:
+        del os.environ["AGENT_CATALOG_CONN_STRING"]
+        del os.environ["AGENT_CATALOG_USERNAME"]
+        del os.environ["AGENT_CATALOG_PASSWORD"]
+        del os.environ["AGENT_CATALOG_BUCKET"]
         if len(container_instance) > 0:
             _stop_couchbase(container_instance.pop())
-            os.unsetenv("AGENT_CATALOG_CONN_STRING")
-            os.unsetenv("AGENT_CATALOG_USERNAME")
-            os.unsetenv("AGENT_CATALOG_PASSWORD")
 
 
 if __name__ == "__main__":
@@ -173,7 +176,7 @@ if __name__ == "__main__":
             pass
 
         finally:
+            del os.environ["AGENT_CATALOG_CONN_STRING"]
+            del os.environ["AGENT_CATALOG_USERNAME"]
+            del os.environ["AGENT_CATALOG_PASSWORD"]
             _stop_couchbase(_container)
-            os.unsetenv("AGENT_CATALOG_CONN_STRING")
-            os.unsetenv("AGENT_CATALOG_USERNAME")
-            os.unsetenv("AGENT_CATALOG_PASSWORD")

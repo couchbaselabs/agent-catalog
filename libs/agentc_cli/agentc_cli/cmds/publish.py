@@ -17,10 +17,10 @@ from agentc_core.defaults import DEFAULT_ACTIVITY_FILE
 from agentc_core.defaults import DEFAULT_ACTIVITY_LOG_COLLECTION
 from agentc_core.defaults import DEFAULT_AUDIT_SCOPE
 from agentc_core.defaults import DEFAULT_CATALOG_METADATA_COLLECTION
-from agentc_core.defaults import DEFAULT_CATALOG_MODEL_INPUT_COLLECTION
+from agentc_core.defaults import DEFAULT_CATALOG_PROMPT_COLLECTION
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_CATALOG_TOOL_COLLECTION
-from agentc_core.defaults import DEFAULT_MODEL_INPUT_CATALOG_FILE
+from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
 from agentc_core.util.ddl import check_if_scope_collection_exist
 from agentc_core.util.models import CustomPublishEncoder
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 def cmd_publish(
     cfg: Config = None,
     *,
-    kind: list[typing.Literal["tool", "model-input", "log"]],
+    kind: list[typing.Literal["tools", "prompts", "logs"]],
     annotations: list[dict] = None,
 ):
     """Command to publish catalog items to user's Couchbase cluster"""
@@ -46,6 +46,9 @@ def cmd_publish(
     # Connect to our bucket.
     cluster: couchbase.cluster.Cluster = cfg.Cluster()
     cb: couchbase.cluster.Bucket = cluster.bucket(cfg.bucket)
+
+    # TODO (GLENN): Clean this up later (right now there are mixed references to "tool" and "tools").
+    kind = [k.removesuffix("s") for k in kind]
 
     # Publish logs to cluster
     if "log" in kind:
@@ -88,7 +91,7 @@ def cmd_publish(
         click.secho(f"Successfully upserted {len(log_messages)} local FS logs to cluster!")
         click.secho(DASHES, fg=KIND_COLORS[k])
 
-    # Publish tools and/or model-inputs
+    # Publish tools and/or prompts
     for k in [_k for _k in kind if _k != "log"]:
         click.secho(DASHES, fg=KIND_COLORS[k])
         click.secho(k.upper(), bold=True, fg=KIND_COLORS[k])
@@ -96,7 +99,7 @@ def cmd_publish(
         if k == "tool":
             catalog_path = cfg.CatalogPath() / DEFAULT_TOOL_CATALOG_FILE
         else:
-            catalog_path = cfg.CatalogPath() / DEFAULT_MODEL_INPUT_CATALOG_FILE
+            catalog_path = cfg.CatalogPath() / DEFAULT_PROMPT_CATALOG_FILE
         try:
             with catalog_path.open("r") as fp:
                 catalog_desc = CatalogDescriptor.model_validate_json(fp.read())
@@ -147,7 +150,7 @@ def cmd_publish(
         # ---------------------------------------------------------------------------------------- #
         #                               Catalog items collection                                   #
         # ---------------------------------------------------------------------------------------- #
-        catalog_col = DEFAULT_CATALOG_TOOL_COLLECTION if k == "tool" else DEFAULT_CATALOG_MODEL_INPUT_COLLECTION
+        catalog_col = DEFAULT_CATALOG_TOOL_COLLECTION if k == "tool" else DEFAULT_CATALOG_PROMPT_COLLECTION
         check_if_scope_collection_exist(bucket_manager, DEFAULT_CATALOG_SCOPE, catalog_col, True)
 
         # get collection ref

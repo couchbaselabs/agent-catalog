@@ -39,15 +39,15 @@ def test_local_inputs_provider(tmp_path):
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         initialize_repo(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.INDEXED_CLEAN_INPUTS_TRAVEL,
+            repo_kind=ExampleRepoKind.INDEXED_CLEAN_PROMPTS_TRAVEL,
             click_runner=click.testing.CliRunner(),
             click_command=click_main,
         )
         os.chdir(td)
         catalog = Catalog()
-        model_input = catalog.get("model-input", query="asking a user their location")
-        assert model_input.tools is None
-        assert model_input.meta.name == "get_user_location"
+        prompt = catalog.get("prompt", query="asking a user their location")
+        assert prompt.tools is None
+        assert prompt.meta.name == "get_user_location"
 
 
 @pytest.mark.smoke
@@ -62,12 +62,12 @@ def test_local_provider(tmp_path):
         )
         os.chdir(td)
         catalog = Catalog()
-        model_input = catalog.get("model-input", query="asking a user their location")
+        prompt = catalog.get("prompt", query="asking a user their location")
         tools = catalog.get("tool", query="searching travel blogs")
         assert len(tools) == 1
         assert tools[0].func.__name__ == "get_travel_blog_snippets_from_user_interests"
-        assert model_input.tools is None
-        assert model_input.meta.name == "get_user_location"
+        assert prompt.tools is None
+        assert prompt.meta.name == "get_user_location"
 
 
 @pytest.mark.regression

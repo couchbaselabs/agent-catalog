@@ -33,9 +33,9 @@ def _get_name_and_description() -> tuple[str, str]:
     return name, description
 
 
-def add_model_input(output: pathlib.Path, template_env: jinja2.Environment):
-    template = template_env.get_template("model_input.jinja")
-    click.echo("Type: model_input")
+def add_prompt(output: pathlib.Path, template_env: jinja2.Environment):
+    template = template_env.get_template("prompt.yaml")
+    click.echo("Type: prompt")
 
     # Prompt for our additional fields.
     name, description = _get_name_and_description()
@@ -48,7 +48,7 @@ def add_model_input(output: pathlib.Path, template_env: jinja2.Environment):
     output_file = output / f"{name}.yaml"
     with output_file.open("w") as fp:
         fp.write(rendered)
-    click.secho(f"Model input written to: {output_file}", fg="green")
+    click.secho(f"Prompt written to: {output_file}", fg="green")
     subprocess.run([default_editor, f"{output_file}"])
 
 
@@ -155,20 +155,19 @@ def cmd_add(
     cfg: Config = None,
     *,
     output: pathlib.Path,
-    kind: RecordKind
-    | typing.Literal["model_input", "http_request", "python_function", "semantic_search", "sqlpp_query"],
+    kind: RecordKind | typing.Literal["prompt", "http_request", "python_function", "semantic_search", "sqlpp_query"],
 ):
     if cfg is None:
         cfg = Config()
 
-    inputs_template_loader = jinja2.PackageLoader("agentc_core.inputs")
+    prompt_template_loader = jinja2.PackageLoader("agentc_core.prompt")
     tool_template_loader = jinja2.PackageLoader("agentc_core.tool")
-    template_env = jinja2.Environment(loader=jinja2.ChoiceLoader([inputs_template_loader, tool_template_loader]))
-    click.secho(f"Now building a new tool / input file. The output will be saved to: {output}", fg="yellow")
+    template_env = jinja2.Environment(loader=jinja2.ChoiceLoader([prompt_template_loader, tool_template_loader]))
+    click.secho(f"Now building a new tool / prompt file. The output will be saved to: {output}", fg="yellow")
 
     match kind:
-        case RecordKind.ModelInput | "model_input":
-            add_model_input(output, template_env)
+        case RecordKind.Prompt | "prompt":
+            add_prompt(output, template_env)
         case RecordKind.HTTPRequest | "http_request":
             add_http_request(output, template_env)
         case RecordKind.PythonFunction | "python_function":

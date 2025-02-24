@@ -19,10 +19,10 @@ from agentc_core.catalog.index import MetaVersion
 from agentc_core.catalog.index import index_catalog_start
 from agentc_core.config import Config
 from agentc_core.defaults import DEFAULT_CATALOG_METADATA_COLLECTION
-from agentc_core.defaults import DEFAULT_CATALOG_MODEL_INPUT_COLLECTION
+from agentc_core.defaults import DEFAULT_CATALOG_PROMPT_COLLECTION
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_CATALOG_TOOL_COLLECTION
-from agentc_core.defaults import DEFAULT_MODEL_INPUT_CATALOG_FILE
+from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
 from agentc_core.learned.embedding import EmbeddingModel
@@ -38,13 +38,16 @@ logger = logging.getLogger(__name__)
 def cmd_status(
     cfg: Config = None,
     *,
-    kind: list[typing.Literal["tool", "model-input"]],
+    kind: list[typing.Literal["tools", "prompts"]],
     include_dirty: bool = True,
     with_db: bool = True,
     with_local: bool = True,
 ):
     if cfg is None:
         cfg = Config()
+
+    # TODO (GLENN): Clean this up later (right now there are mixed references to "tool" and "tools").
+    kind = [k.removesuffix("s") for k in kind]
 
     cluster = cfg.Cluster() if with_db else None
     for k in kind:
@@ -95,7 +98,7 @@ class Section:
         level: str | None = None
 
     parts: list[Part]
-    kind: typing.Literal["model-input", "tool"]
+    kind: typing.Literal["prompt", "tool"]
     name: str | None = None
 
     def display(self):
@@ -114,9 +117,9 @@ class Section:
 
 
 def get_db_status(
-    kind: typing.Literal["tool", "model-input"], bucket: str, cluster: couchbase.cluster.Cluster, compare: bool
+    kind: typing.Literal["tool", "prompt"], bucket: str, cluster: couchbase.cluster.Cluster, compare: bool
 ) -> str | None:
-    collection = DEFAULT_CATALOG_TOOL_COLLECTION if kind == "tool" else DEFAULT_CATALOG_MODEL_INPUT_COLLECTION
+    collection = DEFAULT_CATALOG_TOOL_COLLECTION if kind == "tool" else DEFAULT_CATALOG_PROMPT_COLLECTION
     if compare:
         query_get_metadata = f"""
                 SELECT a.*, subquery.distinct_identifier_count
@@ -196,9 +199,7 @@ def get_db_status(
         )
 
 
-def get_local_status(
-    cfg: Config, kind: typing.Literal["tool", "model-input"], include_dirty: bool = True
-) -> list[Section]:
+def get_local_status(cfg: Config, kind: typing.Literal["tool", "prompt"], include_dirty: bool = True) -> list[Section]:
     # TODO: One day implement status checks also against a CatalogDB
     # backend -- such as by validating DDL and schema versions,
     # looking for outdated items versus the local catalog, etc?
@@ -207,7 +208,7 @@ def get_local_status(
     if kind == "tool":
         catalog_file = cfg.CatalogPath() / DEFAULT_TOOL_CATALOG_FILE
     else:
-        catalog_file = cfg.CatalogPath() / DEFAULT_MODEL_INPUT_CATALOG_FILE
+        catalog_file = cfg.CatalogPath() / DEFAULT_PROMPT_CATALOG_FILE
 
     if not catalog_file.exists():
         return [
@@ -323,11 +324,11 @@ def get_local_status(
         return sections
 
 
-def show_diff_between_commits(cfg: Config, commit_hash_2: str, kind: typing.Literal["tool", "model-input"]):
+def show_diff_between_commits(cfg: Config, commit_hash_2: str, kind: typing.Literal["tool", "prompt"]):
     if kind == "tool":
         catalog_path = cfg.CatalogPath() / DEFAULT_TOOL_CATALOG_FILE
     else:
-        catalog_path = cfg.CatalogPath() / DEFAULT_MODEL_INPUT_CATALOG_FILE
+        catalog_path = cfg.CatalogPath() / DEFAULT_PROMPT_CATALOG_FILE
     with catalog_path.open("r") as fp:
         catalog_desc = CatalogDescriptor.model_validate_json(fp.read())
     commit_hash_1 = catalog_desc.version.identifier

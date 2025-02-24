@@ -56,7 +56,7 @@ class Scope(pydantic.BaseModel):
             parent = parent.parent
         return list(reversed(name_stack))
 
-    def __enter__(self):
+    def enter(self) -> typing.Self:
         if self.state is not None:
             # We only need to log a transition if state is specified.
             self.log(
@@ -65,33 +65,33 @@ class Scope(pydantic.BaseModel):
             )
         return self
 
+    def exit(self):
+        self.log(
+            kind=Kind.Transition,
+            content=TransitionContent(to_state=None, from_state=self.state, extra=None),
+        )
+
+    def __enter__(self):
+        return self.enter()
+
     def __setitem__(self, key, value):
         self.log(kind=Kind.Custom, content=CustomContent(name=key, value=value, extra=self.kwargs))
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         # We will only record this transition if we are exiting cleanly.
         if self.state is not None and all(x is None for x in [exc_type, exc_val, exc_tb]):
-            self.log(
-                kind=Kind.Transition,
-                content=TransitionContent(to_state=None, from_state=self.state, extra=None),
-            )
+            self.exit()
 
 
 class GlobalScope(Scope):
     """An auditor of various events (e.g., LLM completions) given a catalog."""
 
+    # Note: this is more of a composite type rather than a union type.
     config: typing.Union[LocalCatalogConfig, RemoteCatalogConfig]
     """ Config (configuration) instance associated with this activity. """
 
     version: VersionDescriptor
     """ Catalog version to bind all messages logged within this auditor. """
-
-    annotations: typing.Optional[dict[str, typing.Any]] = None
-    """ Activity-level annotations to apply to all messages.
-
-    These annotations are applied to all messages that are recorded by this auditor.
-    To supply annotations to a specific message, use the `annotations` parameter in the `__setitem__` method.
-    """
 
     _local_logger: LocalLogger = None
     _db_logger: DBLogger = None

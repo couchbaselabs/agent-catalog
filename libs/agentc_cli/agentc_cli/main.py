@@ -151,14 +151,14 @@ def init(
     "--output",
     default=os.getcwd(),
     type=click.Path(exists=False, file_okay=False, dir_okay=True, path_type=pathlib.Path),
-    help="Location to save the generated tool / model-input to. Defaults to your current working directory.",
+    help="Location to save the generated tool / prompt to. Defaults to your current working directory.",
 )
 @click.option(
     "--kind", type=click.Choice([c for c in RecordKind], case_sensitive=False), default=None, show_default=True
 )
 @click.pass_context
 def add(ctx, output: pathlib.Path, kind: RecordKind):
-    """Interactively create a new tool or model-input and save it to the filesystem (output).
+    """Interactively create a new tool or prompt and save it to the filesystem (output).
     You MUST edit the generated file as per your requirements!"""
     cfg: Config = ctx.obj
     if not cfg.with_interaction:
@@ -202,10 +202,10 @@ def add(ctx, output: pathlib.Path, kind: RecordKind):
     show_default=True,
 )
 @click.option(
-    "--model-inputs/--no-model-inputs",
+    "--prompts/--no-prompts",
     default=True,
     is_flag=True,
-    help="Flag to clean / avoid-cleaning the model-input catalog.",
+    help="Flag to clean / avoid-cleaning the prompt-catalog.",
     show_default=True,
 )
 @click.option(
@@ -239,7 +239,7 @@ def clean(
     db: bool,
     local: bool,
     tools: bool,
-    model_inputs: bool,
+    prompts: bool,
     catalog_id: list[str] = None,
     bucket: str = None,
     yes: bool = False,
@@ -251,17 +251,16 @@ def clean(
     if not targets:
         targets = ["catalog", "activity"]
 
-    kind: list[typing.Literal["tool", "model-input"]] = list()
+    kind: list[typing.Literal["tool", "prompt"]] = list()
     if tools:
         kind.append("tool")
-    if model_inputs:
-        kind.append("model-input")
+    if prompts:
+        kind.append("prompt")
 
-    # If a user specifies both --no-tools and --no-model-inputs AND only "catalog", we have nothing to delete.
+    # If a user specifies both --no-tools and --no-prompts AND only "catalog", we have nothing to delete.
     if len(kind) == 0 and len(targets) == 1 and targets[0] == "catalog":
         click.secho(
-            'WARNING: No action taken. "catalog" with the flags --no-tools and --no-model-inputs have '
-            "been specified.",
+            'WARNING: No action taken. "catalog" with the flags --no-tools and --no-prompts have ' "been specified.",
             fg="yellow",
         )
         return
@@ -318,12 +317,12 @@ def env(ctx):
 @click_main.command()
 @click.argument(
     "kind",
-    type=click.Choice(["tool", "model-input"], case_sensitive=False),
+    type=click.Choice(["tools", "prompts"], case_sensitive=False),
 )
 @click.option(
     "--query",
     default=None,
-    help="User query describing the task for which tools / model-inputs are needed. "
+    help="User query describing the task for which tools / prompts are needed. "
     "This field or --name must be specified.",
     show_default=False,
 )
@@ -394,7 +393,7 @@ def env(ctx):
 @click.pass_context
 def find(
     ctx: click.Context,
-    kind: typing.Literal["tool", "model-input"],
+    kind: typing.Literal["tools", "prompts"],
     query: str = None,
     name: str = None,
     bucket: str = None,
@@ -438,10 +437,10 @@ def find(
 @click_main.command()
 @click.argument("sources", nargs=-1)
 @click.option(
-    "--model-inputs/--no-model-inputs",
+    "--prompts/--no-prompts",
     is_flag=True,
     default=True,
-    help="Flag to (avoid) ignoring model-inputs when indexing source files into the local catalog.",
+    help="Flag to (avoid) ignoring prompts when indexing source files into the local catalog.",
     show_default=True,
 )
 @click.option(
@@ -459,14 +458,14 @@ def find(
     show_default=True,
 )
 @click.pass_context
-def index(ctx: click.Context, sources: list[str], tools: bool, model_inputs: bool, dry_run: bool = False):
+def index(ctx: click.Context, sources: list[str], tools: bool, prompts: bool, dry_run: bool = False):
     """Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
     Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc."""
     kind = list()
     if tools:
         kind.append("tool")
-    if model_inputs:
-        kind.append("model-input")
+    if prompts:
+        kind.append("prompt")
 
     if not sources:
         click.secho(
@@ -476,10 +475,10 @@ def index(ctx: click.Context, sources: list[str], tools: bool, model_inputs: boo
         )
         return
 
-    # Both "--no-tools" and "--no-model-inputs" have been specified.
+    # Both "--no-tools" and "--no-prompts" have been specified.
     if len(kind) == 0:
         click.secho(
-            "WARNING: No action taken. Both flags --no-tools and --no-model-inputs have been specified.",
+            "WARNING: No action taken. Both flags --no-tools and --no-prompts have been specified.",
             fg="yellow",
         )
         return
@@ -496,7 +495,7 @@ def index(ctx: click.Context, sources: list[str], tools: bool, model_inputs: boo
 @click.argument(
     "kind",
     nargs=-1,
-    type=click.Choice(["tool", "model-input", "log"], case_sensitive=False),
+    type=click.Choice(["tools", "prompts", "logs"], case_sensitive=False),
 )
 @click.option(
     "--bucket",
@@ -515,12 +514,10 @@ def index(ctx: click.Context, sources: list[str], tools: bool, model_inputs: boo
     show_default=True,
 )
 @click.pass_context
-def publish(
-    ctx: click.Context, kind: list[typing.Literal["tool", "model-input", "log"]], bucket: str, annotations: str
-):
+def publish(ctx: click.Context, kind: list[typing.Literal["tools", "prompts", "logs"]], bucket: str, annotations: str):
     """Upload the local catalog and/or logs to a Couchbase instance.
-    By default, only tools and model-inputs are published unless log is explicitly specified."""
-    kind = ["tool", "model-input"] if len(kind) == 0 else kind
+    By default, only tools and prompts are published unless log is explicitly specified."""
+    kind = ["tools", "prompts"] if len(kind) == 0 else kind
 
     cfg: Config = ctx.obj
     validate_or_prompt_for_bucket(cfg, bucket)
@@ -534,7 +531,7 @@ def publish(
 @click_main.command()
 @click.argument(
     "kind",
-    type=click.Choice(["tool", "model-input"], case_sensitive=False),
+    type=click.Choice(["tools", "prompts"], case_sensitive=False),
     nargs=-1,
 )
 @click.option(
@@ -568,7 +565,7 @@ def publish(
 @click.pass_context
 def status(
     ctx: click.Context,
-    kind: list[typing.Literal["tool", "model-input"]],
+    kind: list[typing.Literal["tools", "prompts"]],
     dirty: bool,
     db: bool = None,
     local: bool = True,
@@ -577,7 +574,7 @@ def status(
     """Show the status of the local-FS / remote-DB catalog."""
     cfg: Config = ctx.obj
     if len(kind) == 0:
-        kind = ["tool", "model-input"]
+        kind = ["tools", "prompts"]
 
     # TODO (GLENN): We should perform the same best-effort work for status_local.
     # Perform a best-effort attempt to connect to the database if status_db is not raised.
@@ -610,7 +607,7 @@ def version(ctx):
 @click.option(
     "--query",
     default=None,
-    help="User query describing the task for which tools / model-inputs are needed. "
+    help="User query describing the task for which tools / prompts are needed. "
     "This field or --name must be specified.",
     show_default=False,
 )
@@ -715,7 +712,7 @@ def execute(
 @click.argument(
     "kind",
     nargs=-1,
-    type=click.Choice(["tool", "model-input"], case_sensitive=False),
+    type=click.Choice(["tools", "prompts"], case_sensitive=False),
 )
 @click.option(
     "--db/--no-db",
@@ -748,18 +745,18 @@ def execute(
 @click.pass_context
 def ls(
     ctx: click.Context,
-    kind: list[typing.Literal["tool", "model-input"]],
+    kind: list[typing.Literal["tools", "prompts"]],
     db: bool,
     local: bool,
     dirty: bool,
     bucket: str = None,
 ):
-    """List all indexed tools and/or model-inputs in the catalog."""
+    """List all indexed tools and/or prompts in the catalog."""
     cfg: Config = ctx.obj
 
     # By default, we'll list everything.
     if len(kind) == 0:
-        kind = ["tool", "model-input"]
+        kind = ["tools", "prompts"]
 
     # TODO (GLENN): We should perform the same best-effort work for status_local.
     # Perform a best-effort attempt to connect to the database if status_db is not raised.

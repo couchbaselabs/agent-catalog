@@ -12,7 +12,7 @@ name: search_for_relevant_products
 description: >
   Find product descriptions that are closely related to a collection of tags.
 
-# The inputs used to build a comparable representation for a semantic search.
+# The prompts used to build a comparable representation for a semantic search.
 # Inputs are described using a JSON object that follows the JSON schema standard.
 # This field is mandatory, and will be used to build a Pydantic model.
 # See https://json-schema.org/learn/getting-started-step-by-step for more info.

@@ -4,7 +4,7 @@
 Agent Catalog Record Entries
 ============================
 
-As of date, Agent Catalog supports five different types of records (four types of tools and the generic model-input).
+As of date, Agent Catalog supports five different types of records (four types of tools and the generic prompt).
 
 Tool Catalog Records
 --------------------
@@ -54,10 +54,10 @@ One tool is generated per specified endpoint.
 To know more on generating your OpenAPI spec, check out the schema `here <https://spec.openapis.org/oas/v3.1.0.html#schema>`_.
 For an example OpenAPI spec used in the ``travel-sample`` agent, see `here <https://github.com/couchbaselabs/agent-catalog-example/blob/master/travel_agent/src/endpoints/rewards_spec.json>`_.
 
-Model Input Records
--------------------
+Prompt Records
+--------------
 
-Model inputs in Agent Catalog refer to the aggregation of all **all** inputs (tool choices, prompts, output types,
-etc...) given to an LLM (or an agent framework).
+Prompts in Agent Catalog refer to the aggregation of all **all** inputs (tool choices, unstructured prompts, output
+types, etc...) given to an LLM (or an agent framework).
 
-.. literalinclude:: ../../templates/inputs/model_input.yaml
+.. literalinclude:: ../../templates/prompts/prompt.yaml

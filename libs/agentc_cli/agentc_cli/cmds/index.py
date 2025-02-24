@@ -16,7 +16,7 @@ from agentc_core.catalog.index import index_catalog
 from agentc_core.catalog.version import lib_version
 from agentc_core.config import Config
 from agentc_core.defaults import DEFAULT_MAX_ERRS
-from agentc_core.defaults import DEFAULT_MODEL_INPUT_CATALOG_FILE
+from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
 from agentc_core.learned.embedding import EmbeddingModel
@@ -30,10 +30,10 @@ def cmd_index(
     cfg: Config = None,
     *,
     source_dirs: list[str | os.PathLike],
-    kinds: list[typing.Literal["tool", "model-input"]],
+    kinds: list[typing.Literal["tool", "prompt"]],
     dry_run: bool = False,
 ):
-    assert all(k in {"tool", "model-input"} for k in kinds)
+    assert all(k in {"tool", "prompt"} for k in kinds)
     if cfg is None:
         cfg = Config()
 
@@ -95,7 +95,7 @@ def cmd_index(
         if kind == "tool":
             catalog_file = cfg.CatalogPath() / DEFAULT_TOOL_CATALOG_FILE
         else:
-            catalog_file = cfg.CatalogPath() / DEFAULT_MODEL_INPUT_CATALOG_FILE
+            catalog_file = cfg.CatalogPath() / DEFAULT_PROMPT_CATALOG_FILE
         printer(DASHES, fg=KIND_COLORS[kind])
         printer(kind.upper(), bold=True, fg=KIND_COLORS[kind])
         printer(DASHES, fg=KIND_COLORS[kind])

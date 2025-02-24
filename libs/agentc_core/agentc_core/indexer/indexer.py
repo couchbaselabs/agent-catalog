@@ -5,8 +5,8 @@ import pydantic
 import typing
 import yaml
 
-from ..inputs.models import ModelInputDescriptor
 from ..learned.embedding import EmbeddingModel
+from ..prompt.models import PromptDescriptor
 from ..record.descriptor import RecordDescriptor
 from ..record.descriptor import RecordKind
 from ..tool.descriptor import HTTPRequestToolDescriptor
@@ -100,7 +100,7 @@ class DotYamlFileIndexer(BaseFileIndexer):
 
     @property
     def kind(self) -> list[RecordKind]:
-        return [RecordKind.SemanticSearch, RecordKind.HTTPRequest, RecordKind.ModelInput]
+        return [RecordKind.SemanticSearch, RecordKind.HTTPRequest, RecordKind.Prompt]
 
     def start_descriptors(
         self, filename: pathlib.Path, get_version
@@ -128,8 +128,8 @@ class DotYamlFileIndexer(BaseFileIndexer):
             case RecordKind.HTTPRequest:
                 return None, list(HTTPRequestToolDescriptor.Factory(**factory_args))
 
-            case RecordKind.ModelInput:
-                return None, list(ModelInputDescriptor.Factory(**factory_args))
+            case RecordKind.Prompt:
+                return None, list(PromptDescriptor.Factory(**factory_args))
 
             case _:
                 logger.warning(

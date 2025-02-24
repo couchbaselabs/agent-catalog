@@ -1,22 +1,25 @@
 .PHONY: clean
 
+# Modify the path to the scripts directory as needed.
+SCRIPTS_DIRECTORY = ./scripts
+
 default: setup update activate
 
-pre-setup:
-	@./scripts/pre-setup.sh
+check:
+	@$(SCRIPTS_DIRECTORY)/pre-setup.sh
 
 setup:
-	@./scripts/pre-setup.sh
-	@./scripts/setup.sh dev
+	@$(SCRIPTS_DIRECTORY)/pre-setup.sh
+	@$(SCRIPTS_DIRECTORY)/setup.sh dev
 
 activate:
-	@./scripts/activate.sh
+	@$(SCRIPTS_DIRECTORY)/activate.sh
 
 update:
-	@./scripts/update.sh
+	@$(SCRIPTS_DIRECTORY)/update.sh
 
 docs:
-	@./scripts/docs.sh
+	@$(SCRIPTS_DIRECTORY)/docs.sh
 
 clean:
-	@./scripts/clean.sh
+	@$(SCRIPTS_DIRECTORY)/clean.sh

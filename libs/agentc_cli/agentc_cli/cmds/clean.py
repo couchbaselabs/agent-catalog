@@ -13,7 +13,7 @@ from agentc_core.defaults import DEFAULT_ACTIVITY_FOLDER
 from agentc_core.defaults import DEFAULT_AUDIT_SCOPE
 from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
 from agentc_core.defaults import DEFAULT_CATALOG_METADATA_COLLECTION
-from agentc_core.defaults import DEFAULT_CATALOG_MODEL_INPUT_COLLECTION
+from agentc_core.defaults import DEFAULT_CATALOG_PROMPT_COLLECTION
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_CATALOG_TOOL_COLLECTION
 from agentc_core.util.query import execute_query
@@ -43,7 +43,7 @@ def clean_local(cfg: Config, targets: list[Literal["catalog", "activity"]]):
 def clean_db(
     cfg: Config,
     catalog_ids: list[str],
-    kind: list[typing.Literal["tool", "model-input"]],
+    kind: list[typing.Literal["tool", "prompt"]],
     targets: list[Literal["catalog", "activity"]],
 ) -> int:
     cluster: couchbase.cluster.Cluster = cfg.Cluster()
@@ -67,7 +67,7 @@ def clean_db(
             if err is not None:
                 all_errs.append(err)
 
-            collection = DEFAULT_CATALOG_TOOL_COLLECTION if k == "tool" else DEFAULT_CATALOG_MODEL_INPUT_COLLECTION
+            collection = DEFAULT_CATALOG_TOOL_COLLECTION if k == "tool" else DEFAULT_CATALOG_PROMPT_COLLECTION
             catalog_condition = " AND ".join([f"catalog_identifier = '{catalog}'" for catalog in catalog_ids])
             remove_catalogs_query = f"""
                 DELETE FROM
@@ -111,7 +111,7 @@ def cmd_clean(
     is_local: bool,
     is_db: bool,
     catalog_ids: tuple[str],
-    kind: list[typing.Literal["tool", "model-input"]],
+    kind: list[typing.Literal["tool", "prompt"]],
     targets: list[Literal["catalog", "activity"]],
 ):
     if cfg is None:

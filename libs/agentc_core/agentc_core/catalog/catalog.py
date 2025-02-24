@@ -16,11 +16,11 @@ from agentc_core.config import LATEST_SNAPSHOT_VERSION
 from agentc_core.config import EmbeddingModelConfig
 from agentc_core.config import LocalCatalogConfig
 from agentc_core.config import RemoteCatalogConfig
-from agentc_core.defaults import DEFAULT_MODEL_INPUT_CATALOG_FILE
+from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
 from agentc_core.learned.embedding import EmbeddingModel
-from agentc_core.provider import ModelInputProvider
 from agentc_core.provider import ModelType
+from agentc_core.provider import PromptProvider
 from agentc_core.provider import PythonTarget
 from agentc_core.provider import ToolProvider
 from agentc_core.version import VersionDescriptor
@@ -34,12 +34,12 @@ SearchResult = SearchResult
 SchemaModel = ModelType
 
 # To support returning prompts with defined tools + the ability to utilize the tool schema, we export this model.
-ModelInput = ModelInputProvider.ModelInput
+Prompt = PromptProvider.PromptResult
 Tool = ToolProvider.ToolResult
 
 
 class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
-    """A provider of indexed "agent building blocks" (e.g., tools, model inputs, etc...)."""
+    """A provider of indexed "agent building blocks" (e.g., tools, prompts, etc...)."""
 
     refiner: typing.Optional[typing.Callable[[list[SearchResult]], list[SearchResult]]] = lambda results: results
     """ A Python function to post-process results (reranking, pruning, etc...) yielded by the catalog.
@@ -97,10 +97,10 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
     _tool_catalog: CatalogBase = None
     _tool_provider: ToolProvider = None
 
-    _local_model_input_catalog: CatalogMem = None
-    _remote_model_input_catalog: CatalogDB = None
-    _model_input_catalog: CatalogBase = None
-    _model_input_provider: ModelInputProvider = None
+    _local_prompt_catalog: CatalogMem = None
+    _remote_prompt_catalog: CatalogDB = None
+    _prompt_catalog: CatalogBase = None
+    _prompt_provider: PromptProvider = None
 
     @pydantic.model_validator(mode="after")
     def _find_local_catalog(self) -> typing.Self:
@@ -127,28 +127,15 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
         if tool_catalog_file.exists():
             logger.debug("Loading local tool catalog at %s.", str(tool_catalog_file.absolute()))
             self._local_tool_catalog = CatalogMem(catalog_file=tool_catalog_file, embedding_model=embedding_model)
-        model_input_catalog_file = self.catalog_path / DEFAULT_MODEL_INPUT_CATALOG_FILE
-        if model_input_catalog_file.exists():
-            logger.debug("Loading local model input catalog at %s.", str(model_input_catalog_file.absolute()))
-            self._local_model_input_catalog = CatalogMem(
-                catalog_file=model_input_catalog_file, embedding_model=embedding_model
-            )
+        prompt_catalog_file = self.catalog_path / DEFAULT_PROMPT_CATALOG_FILE
+        if prompt_catalog_file.exists():
+            logger.debug("Loading local prompt catalog at %s.", str(prompt_catalog_file.absolute()))
+            self._local_prompt_catalog = CatalogMem(catalog_file=prompt_catalog_file, embedding_model=embedding_model)
         return self
 
     @pydantic.model_validator(mode="after")
     def _find_remote_catalog(self) -> typing.Self:
         if self.conn_string is None:
-            return self
-
-        # Make sure we have {username, password, bucket}.
-        if self.username is None:
-            logger.warning("$AGENT_CATALOG_CONN_STRING is specified but $AGENT_CATALOG_USERNAME is missing.")
-            return self
-        if self.password is None:
-            logger.warning("$AGENT_CATALOG_CONN_STRING is specified but $AGENT_CATALOG_PASSWORD is missing.")
-            return self
-        if self.bucket is None:
-            logger.warning("$AGENT_CATALOG_CONN_STRING is specified but $AGENT_CATALOG_BUCKET is missing.")
             return self
 
         # Try to connect to our cluster.
@@ -162,7 +149,7 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
             return self
 
         # Validate the embedding models of our tool and prompt catalogs.
-        if self._local_tool_catalog is not None or self._local_model_input_catalog is not None:
+        if self._local_tool_catalog is not None or self._local_prompt_catalog is not None:
             embedding_model = EmbeddingModel(
                 cb_bucket=self.bucket,
                 cb_cluster=cluster,
@@ -193,15 +180,15 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
             )
             self._remote_tool_catalog = None
         try:
-            self._remote_model_input_catalog = CatalogDB(
-                cluster=cluster, bucket=self.bucket, kind="model-input", embedding_model=embedding_model
+            self._remote_prompt_catalog = CatalogDB(
+                cluster=cluster, bucket=self.bucket, kind="prompt", embedding_model=embedding_model
             )
         except pydantic.ValidationError as e:
             logger.debug(
-                "'agentc publish model-input' has not been run. "
-                f"Skipping remote model-input catalog and swallowing exception {str(e)}."
+                "'agentc publish prompt' has not been run. "
+                f"Skipping remote prompt catalog and swallowing exception {str(e)}."
             )
-            self._remote_model_input_catalog = None
+            self._remote_prompt_catalog = None
         return self
 
     # Note: this must be placed **after** _find_local_catalog and _find_remote_catalog.
@@ -257,24 +244,24 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
 
     # Note: this must be placed **after** _find_local_catalog and _find_remote_catalog.
     @pydantic.model_validator(mode="after")
-    def _initialize_model_input_provider(self) -> typing.Self:
+    def _initialize_prompt_provider(self) -> typing.Self:
         # Set our catalog.
-        if self._local_model_input_catalog is None and self._remote_model_input_catalog is None:
-            logger.info("No local or remote catalog found. Skipping model-input provider initialization.")
+        if self._local_prompt_catalog is None and self._remote_prompt_catalog is None:
+            logger.info("No local or remote catalog found. Skipping prompt provider initialization.")
             return self
-        if self._local_model_input_catalog is not None and self._remote_model_input_catalog is not None:
-            logger.info("A local catalog and a remote catalog have been found. Building a chained model-input catalog.")
-            self._model_input_catalog = CatalogChain(self._local_model_input_catalog, self._remote_model_input_catalog)
-        elif self._local_model_input_catalog is not None:
-            logger.info("Only a local catalog has been found. Using the local model-input catalog.")
-            self._model_input_catalog = self._local_model_input_catalog
-        else:  # self._remote_model_input_catalog is not None:
-            logger.info("Only a remote catalog has been found. Using the remote model-input catalog.")
-            self._model_input_catalog = self._remote_model_input_catalog
+        if self._local_prompt_catalog is not None and self._remote_prompt_catalog is not None:
+            logger.info("A local catalog and a remote catalog have been found. Building a chained prompt catalog.")
+            self._prompt_catalog = CatalogChain(self._local_prompt_catalog, self._remote_prompt_catalog)
+        elif self._local_prompt_catalog is not None:
+            logger.info("Only a local catalog has been found. Using the local prompt catalog.")
+            self._prompt_catalog = self._local_prompt_catalog
+        else:  # self._remote_prompt_catalog is not None:
+            logger.info("Only a remote catalog has been found. Using the remote prompt catalog.")
+            self._prompt_catalog = self._remote_prompt_catalog
 
-        # Initialize our model-input provider.
-        self._model_input_provider = ModelInputProvider(
-            catalog=self._model_input_catalog,
+        # Initialize our prompt provider.
+        self._prompt_provider = PromptProvider(
+            catalog=self._prompt_catalog,
             tool_provider=self._tool_provider,
             refiner=self.refiner,
         )
@@ -282,9 +269,9 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
 
     @pydantic.model_validator(mode="after")
     def _one_provider_should_exist(self) -> typing.Self:
-        if self._tool_provider is None and self._model_input_provider is None:
+        if self._tool_provider is None and self._prompt_provider is None:
             raise ValueError(
-                "Could not initialize a tool or model-input provider! "
+                "Could not initialize a tool or prompt provider! "
                 "If this is a new project, please run the command `agentc index` before instantiating a provider. "
                 "If you are intending to use a remote-only catalog, please ensure that all of the relevant variables "
                 "(i.e., conn_string, username, password, and bucket) are set."
@@ -300,39 +287,39 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
             version_tuples += [self._local_tool_catalog.version]
         if self._remote_tool_catalog is not None:
             version_tuples += [self._remote_tool_catalog.version]
-        if self._local_model_input_catalog is not None:
-            version_tuples += [self._local_model_input_catalog.version]
-        if self._remote_model_input_catalog is not None:
-            version_tuples += [self._remote_model_input_catalog.version]
+        if self._local_prompt_catalog is not None:
+            version_tuples += [self._local_prompt_catalog.version]
+        if self._remote_prompt_catalog is not None:
+            version_tuples += [self._remote_prompt_catalog.version]
         return sorted(version_tuples, key=lambda x: x.timestamp, reverse=True)[0]
 
-    def Scope(self, *args, **kwargs) -> "Scope":
+    def Scope(self, name: str, state: typing.Any = None, **kwargs) -> "Scope":
+        """A factory method to initialize a Scope instance.
+
+        :param name: Name to bind to each message logged within this scope.
+        :param state: A JSON-serializable object that will be logged on entering and exiting this scope.
+        :param kwargs: Additional keyword arguments to pass to the Scope constructor.
+        """
         """A factory method to initialize an Activity instance."""
         from agentc_core.activity import GlobalScope
 
-        if "version" in kwargs:
-            raise ValueError(
-                "The 'version' parameter is reserved for Agent Catalog logs. "
-                "Please use another name for your keyword argument."
-            )
-
-        return GlobalScope(*args, config=self, version=self.version, **kwargs)
+        return GlobalScope(config=self, version=self.version, name=name, state=state, kwargs=kwargs)
 
     def get(
         self,
-        kind: typing.Literal["tool", "model-input"],
+        kind: typing.Literal["tool", "prompt"],
         query: str = None,
         name: str = None,
         annotations: str = None,
         snapshot: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
-    ) -> typing.Union[list[Tool] | ModelInput | None]:
+    ) -> typing.Union[list[Tool] | Prompt | None]:
         if kind.lower() == "tool":
             return self.get_tools(query, name, annotations, snapshot, limit)
-        elif kind.lower() == "model-input":
-            return self.get_inputs(query, name, annotations, snapshot)
+        elif kind.lower() == "prompt":
+            return self.get_prompts(query, name, annotations, snapshot)
         else:
-            raise ValueError(f"Unknown item type: {kind}, expected 'tool' or 'model-input'.")
+            raise ValueError(f"Unknown item type: {kind}, expected 'tool' or 'prompt'.")
 
     def get_tools(
         self,
@@ -341,14 +328,16 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
         annotations: str = None,
         snapshot: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
-    ) -> list[Tool]:
+    ) -> list[ToolProvider.ToolResult]:
         """
         :param query: A query string (natural language) to search the catalog with.
         :param name: The specific name of the catalog entry to search for.
         :param annotations: An annotation query string in the form of ``KEY="VALUE" (AND|OR KEY="VALUE")*``.
         :param snapshot: The snapshot version to find the tools for. By default, we use the latest snapshot.
         :param limit: The maximum number of results to return.
-        :return: A list of tools (Python functions).
+        :return: A list of **Tool** instances, with the following attributes:
+            - **func** (Callable): A Python callable representing the function.
+            - **meta** (RecordDescriptor): The metadata associated with the tool.
         """
         if self._tool_provider is None:
             raise RuntimeError(
@@ -360,33 +349,31 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
         else:
             return [self._tool_provider.get(name=name, annotations=annotations, snapshot=snapshot)]
 
-    def get_inputs(
+    def get_prompts(
         self,
         query: str = None,
         name: str = None,
         annotations: str = None,
         snapshot: str = LATEST_SNAPSHOT_VERSION,
-    ) -> ModelInput | None:
+    ) -> PromptProvider.PromptResult | None:
         """
         :param query: A query string (natural language) to search the catalog with.
         :param name: The specific name of the catalog entry to search for.
         :param annotations: An annotation query string in the form of ``KEY="VALUE" (AND|OR KEY="VALUE")*``.
         :param snapshot: The snapshot version to find the tools for. By default, we use the latest snapshot.
 
-        :return: An instance of *ModelInput* class, with the following attributes:
+        :return: An instance of *Prompt*, with the following attributes:
             - **content** (str | dict): The content to be served to the model.
-            - **tools** (list): The list containing the tool functions associated with the model input.
-            - **output** (str): The output type of the model input, if it exists.
+            - **tools** (list): The list containing the tool functions associated with prompt.
+            - **output** (str): The output type of the prompt, if it exists.
         """
-        if self._model_input_provider is None:
+        if self._prompt_provider is None:
             raise RuntimeError(
-                "Model-input provider has not been initialized. "
-                "Please run 'agentc index [SOURCES] --model-inputs' to define a local FS catalog with model inputs."
+                "Prompt provider has not been initialized. "
+                "Please run 'agentc index [SOURCES] --prompts' to define a local FS catalog with prompts."
             )
         if query is not None:
-            results = self._model_input_provider.search(
-                query=query, annotations=annotations, snapshot=snapshot, limit=1
-            )
+            results = self._prompt_provider.search(query=query, annotations=annotations, snapshot=snapshot, limit=1)
             return results[0] if len(results) != 0 else None
         else:
-            return self._model_input_provider.get(name=name, annotations=annotations, snapshot=snapshot)
+            return self._prompt_provider.get(name=name, annotations=annotations, snapshot=snapshot)

@@ -8,7 +8,7 @@ from agentc_core.annotation import AnnotationPredicate
 from agentc_core.catalog.implementations.base import CatalogBase
 from agentc_core.catalog.implementations.base import SearchResult
 from agentc_core.config import LATEST_SNAPSHOT_VERSION
-from agentc_core.inputs.models import ModelInputDescriptor
+from agentc_core.prompt.models import PromptDescriptor
 from agentc_core.provider.loader import EntryLoader
 from agentc_core.provider.loader import ModelType
 from agentc_core.provider.loader import PythonTarget
@@ -112,9 +112,9 @@ class ToolProvider(BaseProvider):
         return [self._generate_result(x.entry) for x in results][0] if len(results) != 0 else None
 
 
-class ModelInputProvider(BaseProvider):
+class PromptProvider(BaseProvider):
     @dataclasses.dataclass
-    class ModelInput:
+    class PromptResult:
         content: str | dict
         tools: typing.Optional[list[ToolProvider.ToolResult]]
         output: typing.Optional[dict]
@@ -126,32 +126,32 @@ class ModelInputProvider(BaseProvider):
         tool_provider: ToolProvider = None,
         refiner: typing.Callable[[list[SearchResult]], list[SearchResult]] = None,
     ):
-        super(ModelInputProvider, self).__init__(catalog, refiner)
+        super(PromptProvider, self).__init__(catalog, refiner)
         self.tool_provider = tool_provider
         if self.tool_provider is None:
-            logger.warning("ModelInputProvider has been instantiated without a ToolProvider.")
+            logger.warning("PromptProvider has been instantiated without a ToolProvider.")
 
-    def _generate_result(self, model_input_descriptor: ModelInputDescriptor) -> ModelInput:
-        # If our model-input has defined tools, fetch them here.
+    def _generate_result(self, prompt_descriptor: PromptDescriptor) -> PromptResult:
+        # If our prompt has defined tools, fetch them here.
         tools = None
-        if model_input_descriptor.tools is not None:
+        if prompt_descriptor.tools is not None:
             if self.tool_provider is None:
                 raise ValueError(
-                    "Tool(s) have been defined in the model-input, but no ToolProvider has been provided. "
+                    "Tool(s) have been defined in the prompt, but no ToolProvider has been provided. "
                     "If this is a new repo, please run `agentc index tool` to first index your tools."
                 )
             tools = list()
-            for tool in model_input_descriptor.tools:
+            for tool in prompt_descriptor.tools:
                 if tool.query is not None:
                     tools += self.tool_provider.search(query=tool.query, annotations=tool.annotations, limit=tool.limit)
                 else:  # tool.name is not None
                     tools.append(self.tool_provider.get(name=tool.name, annotations=tool.annotations))
 
-        return ModelInputProvider.ModelInput(
-            content=model_input_descriptor.content,
-            output=model_input_descriptor.output,
+        return PromptProvider.PromptResult(
+            content=prompt_descriptor.content,
+            output=prompt_descriptor.output,
             tools=tools,
-            meta=model_input_descriptor,
+            meta=prompt_descriptor,
         )
 
     def search(
@@ -160,7 +160,7 @@ class ModelInputProvider(BaseProvider):
         annotations: str = None,
         snapshot: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
-    ) -> list[ModelInput]:
+    ) -> list[PromptResult]:
         annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
         results = self.refiner(
             self.catalog.find(query=query, snapshot=snapshot, annotations=annotation_predicate, limit=limit)
@@ -169,7 +169,7 @@ class ModelInputProvider(BaseProvider):
 
     def get(
         self, name: str, snapshot: str = LATEST_SNAPSHOT_VERSION, annotations: str = None
-    ) -> typing.Optional[ModelInput]:
+    ) -> typing.Optional[PromptResult]:
         annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
         results = self.catalog.find(name=name, snapshot=snapshot, annotations=annotation_predicate, limit=1)
         return [self._generate_result(r.entry) for r in results][0] if len(results) != 0 else None

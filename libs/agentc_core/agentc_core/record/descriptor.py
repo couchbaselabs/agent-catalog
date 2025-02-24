@@ -30,7 +30,7 @@ class RecordKind(enum.StrEnum):
     SQLPPQuery = "sqlpp_query"
     SemanticSearch = "semantic_search"
     HTTPRequest = "http_request"
-    ModelInput = "model_input"
+    Prompt = "prompt"
 
 
 class RecordDescriptor(pydantic.BaseModel):
@@ -43,8 +43,8 @@ class RecordDescriptor(pydantic.BaseModel):
         RecordKind.SQLPPQuery,
         RecordKind.SemanticSearch,
         RecordKind.HTTPRequest,
-        RecordKind.ModelInput,
-    ] = pydantic.Field(description="The type of catalog entry (python tool, model input, etc...).")
+        RecordKind.Prompt,
+    ] = pydantic.Field(description="The type of catalog entry (python tool, prompt, etc...).")
 
     name: str = pydantic.Field(
         description="A short (Python-identifier-valid) name for the tool, where multiple versions of the "

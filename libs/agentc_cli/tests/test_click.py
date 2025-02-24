@@ -14,7 +14,7 @@ from agentc_cli.main import click_main
 from agentc_core.defaults import DEFAULT_ACTIVITY_FOLDER
 from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
-from agentc_core.defaults import DEFAULT_MODEL_INPUT_CATALOG_FILE
+from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
 from agentc_testing.repo import ExampleRepoKind
 from agentc_testing.repo import initialize_repo
@@ -26,11 +26,6 @@ from unittest.mock import patch
 
 # This is to keep ruff from falsely flagging this as unused.
 _ = isolated_server_factory
-
-os.environ["AGENT_CATALOG_MAX_INDEX_PARTITION"] = "1"
-os.environ["AGENT_CATALOG_INDEX_PARTITION"] = "1"
-os.environ["AGENT_CATALOG_BUCKET"] = "travel-sample"
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
 @pytest.mark.smoke
@@ -62,7 +57,7 @@ def test_index(tmp_path):
             pathlib.Path(tool_folder / tool.parent.name).mkdir(exist_ok=True)
             shutil.copy(tool, tool_folder / tool.parent.name / (uuid.uuid4().hex + tool.suffix))
         shutil.copy(resources_folder / "_good_spec.json", tool_folder / "_good_spec.json")
-        invocation = runner.invoke(click_main, ["index", str(tool_folder.absolute()), "--no-model-inputs"])
+        invocation = runner.invoke(click_main, ["index", str(tool_folder.absolute()), "--no-prompts"])
 
         # We should see 11 files scanned and 12 tools indexed.
         output = invocation.output
@@ -82,7 +77,7 @@ def publish_catalog(runner, input_catalog: pathlib.Path, output_catalog: pathlib
     shutil.copy(input_catalog, output_catalog / new_catalog)
 
     # Extract catalog kind
-    kind = "tool" if "tools" in input_catalog.name else "model-input"
+    kind = "tools" if "tools" in input_catalog.name else "prompts"
 
     # Execute the command
     invocation = runner.invoke(
@@ -98,6 +93,7 @@ def publish_catalog(runner, input_catalog: pathlib.Path, output_catalog: pathlib
         assert invocation.exception is not None
         assert "Cannot publish a dirty catalog to the DB!" in str(invocation.exception)
     elif "positive" in input_catalog.name:
+        kind = kind.removesuffix("s")
         assert kind.upper() in invocation.stdout
         assert f"Uploading the {kind} catalog items to Couchbase" in invocation.stdout
 
@@ -156,7 +152,7 @@ def test_find(tmp_path, isolated_server_factory):
             click_main,
             [
                 "find",
-                "tool",
+                "tools",
                 "--db",
                 "--query",
                 "'get blogs of interest'",
@@ -171,7 +167,7 @@ def test_find(tmp_path, isolated_server_factory):
             click_main,
             [
                 "find",
-                "tool",
+                "tools",
                 "--db",
                 "--query",
                 "'get blogs of interest'",
@@ -188,7 +184,7 @@ def test_find(tmp_path, isolated_server_factory):
             click_main,
             [
                 "find",
-                "tool",
+                "tools",
                 "--local",
                 "--query",
                 "'get blogs of interest'",
@@ -201,7 +197,7 @@ def test_find(tmp_path, isolated_server_factory):
             click_main,
             [
                 "find",
-                "tool",
+                "tools",
                 "--local",
                 "--query",
                 "'get blogs of interest'",
@@ -237,16 +233,16 @@ def test_status(tmp_path, isolated_server_factory):
         publish_catalog(runner, catalog, catalog_folder)
 
         # Case 2 - tool catalog exists locally (testing for only one kind of catalog)
-        output = runner.invoke(click_main, ["status", "tool", "--dirty"]).stdout
+        output = runner.invoke(click_main, ["status", "tools", "--dirty"]).stdout
         assert "local catalog info:\n	path            :" in output
         assert ".agent-catalog/tools.json" in output
 
         # Case 3 - tool catalog exists in db (this test runs after publish test)
-        output = runner.invoke(click_main, ["status", "tool", "--dirty", "--db"]).stdout
+        output = runner.invoke(click_main, ["status", "tools", "--dirty", "--db"]).stdout
         assert "db catalog info" in output
 
         # Case 4 - compare the two catalogs
-        output = runner.invoke(click_main, ["status", "tool", "--local", "--db", "--dirty"]).stdout
+        output = runner.invoke(click_main, ["status", "tools", "--local", "--db", "--dirty"]).stdout
         assert "local catalog info:\n	path            :" in output
         assert ".agent-catalog/tools.json" in output
         assert "db catalog info" in output
@@ -269,7 +265,7 @@ def test_clean(tmp_path, isolated_server_factory):
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
 
         # Local clean
-        dummy_file_1 = catalog_folder / DEFAULT_MODEL_INPUT_CATALOG_FILE
+        dummy_file_1 = catalog_folder / DEFAULT_PROMPT_CATALOG_FILE
         dummy_file_2 = catalog_folder / DEFAULT_TOOL_CATALOG_FILE
         with dummy_file_1.open("w") as fp:
             fp.write("dummy content")
@@ -313,7 +309,7 @@ def test_clean(tmp_path, isolated_server_factory):
         assert not is_scope_present, f"Clean DB failed as scope {DEFAULT_CATALOG_SCOPE} is present in DB."
 
         # Test our status after clean
-        output = runner.invoke(click_main, ["status", "tool", "--dirty", "--db"]).stdout
+        output = runner.invoke(click_main, ["status", "tools", "--dirty", "--db"]).stdout
         expected_response_db = (
             "ERROR: db catalog of kind tool does not exist yet: please use the publish command by specifying the kind."
         )
@@ -374,9 +370,9 @@ def test_publish_different_versions(tmp_path, isolated_server_factory):
         runner.invoke(click_main, ["init", "catalog", "--local", "--db"])
 
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
-        catalog = pathlib.Path(__file__).parent / "resources" / "publish" / "inputs-positive-1.json"
+        catalog = pathlib.Path(__file__).parent / "resources" / "publish" / "prompts-positive-1.json"
         publish_catalog(runner, catalog, catalog_folder)
-        catalog = pathlib.Path(__file__).parent / "resources" / "publish" / "inputs-positive-2.json"
+        catalog = pathlib.Path(__file__).parent / "resources" / "publish" / "prompts-positive-2.json"
         publish_catalog(runner, catalog, catalog_folder)
         cluster = couchbase.cluster.Cluster(
             DEFAULT_COUCHBASE_CONN_STRING,
@@ -386,7 +382,7 @@ def test_publish_different_versions(tmp_path, isolated_server_factory):
                 ),
             ),
         )
-        query = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.inputs;")
+        query = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.prompts;")
         for row in query:
             assert row == 4
         query = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.metadata;")
@@ -428,14 +424,14 @@ def test_ls_local_only_tools(tmp_path):
             click_runner=runner,
             click_command=click_main,
         )
-        output = runner.invoke(click_main, ["ls", "tool", "--local"]).stdout
+        output = runner.invoke(click_main, ["-v", "ls", "tools", "--local"]).stdout
         assert "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 1
-        output = runner.invoke(click_main, ["ls", "model-input", "--local"]).stdout
-        assert "MODEL-INPUT" in output and len(re.findall(r"\b1\.\s.+", output)) == 0
+        output = runner.invoke(click_main, ["-v", "ls", "prompts", "--local"]).stdout
+        assert "PROMPT" in output and len(re.findall(r"\b1\.\s.+", output)) == 0
 
 
 @pytest.mark.smoke
-def test_ls_local_only_inputs(tmp_path):
+def test_ls_local_only_prompts(tmp_path):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         os.chdir(td)
@@ -443,13 +439,13 @@ def test_ls_local_only_inputs(tmp_path):
         # when only prompts are indexed
         initialize_repo(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.INDEXED_CLEAN_INPUTS_TRAVEL,
+            repo_kind=ExampleRepoKind.INDEXED_CLEAN_PROMPTS_TRAVEL,
             click_runner=runner,
             click_command=click_main,
         )
-        output = runner.invoke(click_main, ["ls", "model-input", "--local"]).stdout
-        assert "MODEL-INPUT" in output and len(re.findall(r"\b1\.\s.+", output)) == 1
-        output = runner.invoke(click_main, ["ls", "tool", "--local"]).stdout
+        output = runner.invoke(click_main, ["-v", "ls", "prompts", "--local"]).stdout
+        assert "PROMPT" in output and len(re.findall(r"\b1\.\s.+", output)) == 1
+        output = runner.invoke(click_main, ["-v", "ls", "tools", "--local"]).stdout
         assert "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 0
 
 
@@ -466,12 +462,12 @@ def test_ls_local_both_tools_prompts(tmp_path):
             click_runner=runner,
             click_command=click_main,
         )
-        output = runner.invoke(click_main, ["ls", "model-input", "--local"]).stdout
-        assert "MODEL-INPUT" in output and len(re.findall(r"\b1\.\s.+", output)) == 1
-        output = runner.invoke(click_main, ["ls", "tool", "--local"]).stdout
+        output = runner.invoke(click_main, ["-v", "ls", "prompts", "--local"]).stdout
+        assert "PROMPT" in output and len(re.findall(r"\b1\.\s.+", output)) == 1
+        output = runner.invoke(click_main, ["-v", "ls", "tools", "--local"]).stdout
         assert "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 1
-        output = runner.invoke(click_main, ["ls", "--local"]).stdout
-        assert "MODEL-INPUT" in output and "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 2
+        output = runner.invoke(click_main, ["-v", "ls", "--local"]).stdout
+        assert "PROMPT" in output and "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 2
 
 
 @pytest.mark.smoke

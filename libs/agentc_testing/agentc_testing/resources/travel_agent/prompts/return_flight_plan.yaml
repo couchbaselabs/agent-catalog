@@ -1,4 +1,4 @@
-record_kind: model_input
+record_kind: prompt
 
 name: return_flight_plan
 

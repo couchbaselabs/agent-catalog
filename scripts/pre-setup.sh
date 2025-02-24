@@ -1,9 +1,14 @@
 #!/bin/bash
 
 LINE_LENGTH=$(tput cols)
-printf '%*s\n' "$LINE_LENGTH" '' | tr ' ' '='
-echo "Running ./scripts/pre-setup.sh"
-printf '%*s\n' "$LINE_LENGTH" '' | tr ' ' '='
+print_separator() {
+  local char="$1"
+  printf '%*s\n' "$LINE_LENGTH" '' | tr ' ' "$char"
+}
+
+print_separator '='
+echo "Running scripts/pre-setup.sh"
+print_separator '-'
 
 # Check #1: Python must exist.
 if ! [ -x "$(command -v python)" ]; then
@@ -26,3 +31,5 @@ if ! [ -x "$(command -v poetry)" ]; then
   exit 1
 fi
 
+print_separator '='
+echo

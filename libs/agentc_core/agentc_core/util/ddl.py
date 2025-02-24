@@ -11,7 +11,7 @@ import typing
 from .query import execute_query
 from agentc_core.config import Config
 from agentc_core.defaults import DEFAULT_CATALOG_METADATA_COLLECTION
-from agentc_core.defaults import DEFAULT_CATALOG_MODEL_INPUT_COLLECTION
+from agentc_core.defaults import DEFAULT_CATALOG_PROMPT_COLLECTION
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_CATALOG_TOOL_COLLECTION
 from agentc_core.defaults import DEFAULT_HTTP_CLUSTER_ADMIN_PORT_NUMBER
@@ -332,7 +332,7 @@ def create_vector_index(
         return qualified_index_name, None
 
 
-def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "model-input"], print_progress):
+def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "prompt"], print_progress):
     """Creates required indexes at publish"""
     progress_bar = tqdm.tqdm(range(5))
     progress_bar_it = iter(progress_bar)
@@ -342,7 +342,7 @@ def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "model-input"],
 
     # Primary index on kind_catalog
     cluster = cfg.Cluster()
-    collection = DEFAULT_CATALOG_TOOL_COLLECTION if kind == "tool" else DEFAULT_CATALOG_MODEL_INPUT_COLLECTION
+    collection = DEFAULT_CATALOG_TOOL_COLLECTION if kind == "tool" else DEFAULT_CATALOG_PROMPT_COLLECTION
     primary_idx_name = f"v1_agent_catalog_primary_{kind}"
     primary_idx = f"""
         CREATE PRIMARY INDEX IF NOT EXISTS `{primary_idx_name}`

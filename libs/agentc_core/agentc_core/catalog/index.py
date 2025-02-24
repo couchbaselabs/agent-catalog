@@ -33,7 +33,7 @@ def index_catalog(
     meta_version: MetaVersion,
     catalog_version: str,
     get_path_version: typing.Callable[[str], str],
-    kind: typing.Literal["tool", "model-input"],
+    kind: typing.Literal["tool", "prompt"],
     catalog_file,
     source_dirs,
     scan_directory_opts: ScanDirectoryOpts = None,
@@ -94,7 +94,7 @@ def index_catalog_start(
     meta_version: MetaVersion,
     catalog_version: str,
     get_path_version: typing.Callable[[str], str],
-    kind: typing.Literal["tool", "model-input"],
+    kind: typing.Literal["tool", "prompt"],
     catalog_file,
     source_dirs,
     scan_directory_opts: ScanDirectoryOpts = None,
@@ -112,9 +112,9 @@ def index_catalog_start(
 
     source_files = list()
     if kind == "tool":
-        source_globs = [i.glob_pattern for i in AllIndexers if any(k != RecordKind.ModelInput for k in i.kind)]
-    elif kind == "model-input":
-        source_globs = [i.glob_pattern for i in AllIndexers if any(k == RecordKind.ModelInput for k in i.kind)]
+        source_globs = [i.glob_pattern for i in AllIndexers if any(k != RecordKind.Prompt for k in i.kind)]
+    elif kind == "prompt":
+        source_globs = [i.glob_pattern for i in AllIndexers if any(k == RecordKind.Prompt for k in i.kind)]
     else:
         raise ValueError(f"Unknown kind: {kind}")
     for source_dir in source_dirs:

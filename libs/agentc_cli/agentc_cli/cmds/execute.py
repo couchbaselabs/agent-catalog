@@ -143,7 +143,7 @@ def cmd_execute(
         click.secho(DASHES, fg="yellow")
         click.secho("Instructions:", fg="blue")
         click.secho(
-            message="\tPlease provide inputs for the prompted variables.\n"
+            message="\tPlease provide prompts for the prompted variables.\n"
             "\tThe types are shown for reference in parentheses.\n"
             "\tIf the input is of type list, please provide your list values in a comma-separated format.\n",
             fg="blue",
@@ -166,7 +166,7 @@ def cmd_execute(
             for k, v in cb_secrets_map.items():
                 put_secret(k, v)
 
-        # prompt user for inputs
+        # prompt user for prompts
         user_inputs = take_input_from_user(input_types)
 
         # if user has any variable which is of object type, create it from class

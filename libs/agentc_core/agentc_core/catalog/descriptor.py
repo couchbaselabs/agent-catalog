@@ -4,7 +4,7 @@ import json
 import pydantic
 import typing
 
-from ..inputs.models import ModelInputDescriptor
+from ..prompt.models import PromptDescriptor
 from ..record.descriptor import BEAUTIFY_OPTS
 from ..tool.descriptor.models import HTTPRequestToolDescriptor
 from ..tool.descriptor.models import PythonToolDescriptor
@@ -16,7 +16,7 @@ from agentc_core.learned.model import EmbeddingModel
 
 class CatalogKind(enum.StrEnum):
     Tool = "tool"
-    ModelInput = "model-input"
+    Prompt = "prompt"
 
     # TODO (GLENN): Include other classes.
 
@@ -26,7 +26,7 @@ RecordDescriptorUnionType = typing.Annotated[
     | SQLPPQueryToolDescriptor
     | SemanticSearchToolDescriptor
     | HTTPRequestToolDescriptor
-    | ModelInputDescriptor,
+    | PromptDescriptor,
     pydantic.Field(discriminator="record_kind"),
 ]
 
@@ -47,7 +47,7 @@ class CatalogDescriptor(pydantic.BaseModel):
     kind: CatalogKind = pydantic.Field(description="The type of items within the catalog.")
 
     embedding_model: EmbeddingModel = pydantic.Field(
-        description="Embedding model used for tool/model-input descriptions within the catalog.",
+        description="Embedding model used for tool/prompt descriptions within the catalog.",
     )
 
     version: VersionDescriptor = pydantic.Field(

@@ -9,11 +9,11 @@ from agentc_core.catalog.implementations.base import CatalogBase
 from agentc_core.catalog.implementations.base import SearchResult
 from agentc_core.config import LATEST_SNAPSHOT_VERSION
 from agentc_core.defaults import DEFAULT_CATALOG_METADATA_COLLECTION
-from agentc_core.defaults import DEFAULT_CATALOG_MODEL_INPUT_COLLECTION
+from agentc_core.defaults import DEFAULT_CATALOG_PROMPT_COLLECTION
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_CATALOG_TOOL_COLLECTION
-from agentc_core.inputs.models import ModelInputDescriptor
 from agentc_core.learned.embedding import EmbeddingModel
+from agentc_core.prompt.models import PromptDescriptor
 from agentc_core.record.descriptor import RecordDescriptor
 from agentc_core.record.descriptor import RecordKind
 from agentc_core.tool.descriptor import HTTPRequestToolDescriptor
@@ -37,11 +37,11 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
     embedding_model: EmbeddingModel
     cluster: couchbase.cluster.Cluster
     bucket: str
-    kind: typing.Literal["tool", "model-input"]
+    kind: typing.Literal["tool", "prompt"]
 
     @pydantic.model_validator(mode="after")
     def cluster_should_be_reachable(self) -> "CatalogDB":
-        collection = DEFAULT_CATALOG_TOOL_COLLECTION if self.kind == "tool" else DEFAULT_CATALOG_MODEL_INPUT_COLLECTION
+        collection = DEFAULT_CATALOG_TOOL_COLLECTION if self.kind == "tool" else DEFAULT_CATALOG_PROMPT_COLLECTION
         try:
             self.cluster.query(
                 f"""
@@ -63,7 +63,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
         annotations: AnnotationPredicate = None,
     ) -> list[SearchResult]:
         """Returns the catalog items that best match a query."""
-        collection = DEFAULT_CATALOG_TOOL_COLLECTION if self.kind == "tool" else DEFAULT_CATALOG_MODEL_INPUT_COLLECTION
+        collection = DEFAULT_CATALOG_TOOL_COLLECTION if self.kind == "tool" else DEFAULT_CATALOG_PROMPT_COLLECTION
         sqlpp_query = None
 
         # Catalog item has to be queried directly
@@ -186,8 +186,8 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                     descriptor = SQLPPQueryToolDescriptor.model_validate(row)
                 case RecordKind.HTTPRequest.value:
                     descriptor = HTTPRequestToolDescriptor.model_validate(row)
-                case RecordKind.ModelInput.value:
-                    descriptor = ModelInputDescriptor.model_validate(row)
+                case RecordKind.Prompt.value:
+                    descriptor = PromptDescriptor.model_validate(row)
                 case _:
                     kind = row["record_kind"]
                     raise LookupError(f"Unknown record encountered of kind = '{kind}'!")
@@ -203,7 +203,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
 
     def __iter__(self) -> typing.Iterator[RecordDescriptor]:
         """Return all items in a DB catalog."""
-        collection = DEFAULT_CATALOG_TOOL_COLLECTION if self.kind == "tool" else DEFAULT_CATALOG_MODEL_INPUT_COLLECTION
+        collection = DEFAULT_CATALOG_TOOL_COLLECTION if self.kind == "tool" else DEFAULT_CATALOG_PROMPT_COLLECTION
         query = f"""
             FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}` AS t
             SELECT t.*;
@@ -225,8 +225,8 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                     descriptor = SQLPPQueryToolDescriptor.model_validate(row)
                 case RecordKind.HTTPRequest.value:
                     descriptor = HTTPRequestToolDescriptor.model_validate(row)
-                case RecordKind.ModelInput.value:
-                    descriptor = ModelInputDescriptor.model_validate(row)
+                case RecordKind.Prompt.value:
+                    descriptor = PromptDescriptor.model_validate(row)
                 case _:
                     kind = row["record_kind"]
                     raise LookupError(f"Unknown record encountered of kind = '{kind}'!")
@@ -235,7 +235,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
     @property
     def version(self) -> VersionDescriptor:
         """Returns the latest version of the catalog."""
-        kind = CatalogKind.Tool if self.kind == "tool" else CatalogKind.ModelInput
+        kind = CatalogKind.Tool if self.kind == "tool" else CatalogKind.Prompt
         ts_query = f"""
             FROM     `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{DEFAULT_CATALOG_METADATA_COLLECTION}` AS t
             WHERE    t.kind = "{kind}"

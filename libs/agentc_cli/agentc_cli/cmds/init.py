@@ -16,7 +16,7 @@ from agentc_core.config import Config
 from agentc_core.defaults import DEFAULT_ACTIVITY_LOG_COLLECTION
 from agentc_core.defaults import DEFAULT_AUDIT_SCOPE
 from agentc_core.defaults import DEFAULT_CATALOG_METADATA_COLLECTION
-from agentc_core.defaults import DEFAULT_CATALOG_MODEL_INPUT_COLLECTION
+from agentc_core.defaults import DEFAULT_CATALOG_PROMPT_COLLECTION
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_CATALOG_TOOL_COLLECTION
 from agentc_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
@@ -106,7 +106,7 @@ def init_db_catalog(cfg: Config, cluster: couchbase.cluster.Cluster):
     for kind in CATALOG_KINDS:
         # Create the catalog collection if it does not exist
         click.secho(f"Now creating the catalog collection for the {kind} catalog.", fg="yellow")
-        catalog_col = DEFAULT_CATALOG_TOOL_COLLECTION if kind == "tool" else DEFAULT_CATALOG_MODEL_INPUT_COLLECTION
+        catalog_col = DEFAULT_CATALOG_TOOL_COLLECTION if kind == "tool" else DEFAULT_CATALOG_PROMPT_COLLECTION
         (msg, err) = create_scope_and_collection(bucket_manager, scope=DEFAULT_CATALOG_SCOPE, collection=catalog_col)
         if err is not None:
             raise ValueError(msg)
@@ -135,7 +135,7 @@ def init_db_catalog(cfg: Config, cluster: couchbase.cluster.Cluster):
         _, err = create_vector_index(
             cfg=cfg,
             scope=DEFAULT_CATALOG_SCOPE,
-            collection=DEFAULT_CATALOG_TOOL_COLLECTION if kind == "tool" else DEFAULT_CATALOG_MODEL_INPUT_COLLECTION,
+            collection=DEFAULT_CATALOG_TOOL_COLLECTION if kind == "tool" else DEFAULT_CATALOG_PROMPT_COLLECTION,
             index_name=f"v1_agent_catalog_{kind}_index",
             dim=dims,
         )

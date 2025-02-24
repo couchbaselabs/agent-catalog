@@ -19,7 +19,7 @@ from agentc_core.catalog.index import index_catalog
 from agentc_core.catalog.version import lib_version
 from agentc_core.config import Config
 from agentc_core.defaults import DEFAULT_MAX_ERRS
-from agentc_core.defaults import DEFAULT_MODEL_INPUT_CATALOG_FILE
+from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
 from agentc_core.learned.embedding import EmbeddingModel
@@ -28,9 +28,9 @@ from agentc_core.version import VersionDescriptor
 logger = logging.getLogger(__name__)
 
 # The following are used for colorizing output.
-CATALOG_KINDS = ["model-input", "tool"]
+CATALOG_KINDS = ["prompt", "tool"]
 LEVEL_COLORS = {"good": "green", "warn": "yellow", "error": "red"}
-KIND_COLORS = {"tool": "bright_magenta", "model-input": "blue", "log": "cyan"}
+KIND_COLORS = {"tool": "bright_magenta", "prompt": "blue", "log": "cyan"}
 try:
     DASHES = "-" * os.get_terminal_size().columns
 except OSError as _e:
@@ -101,15 +101,20 @@ def load_repository(top_dir: pathlib.Path = None):
 def get_catalog(
     cfg: Config,
     include_dirty: bool,
-    kind: typing.Literal["tool", "model-input"],
+    kind: typing.Literal["tool", "prompt"],
     force: typing.Literal["local", "db", "chain"] = None,
+    printer: typing.Callable[[str], None] = None,
 ):
+    # By default, we'll print using click.
+    if printer is None:
+        printer = click.secho
+
     # We have three options: (1) db catalog, (2) local catalog, or (3) both.
     repo, get_path_version = load_repository(pathlib.Path(os.getcwd()))
     if kind == "tool":
         catalog_file = cfg.CatalogPath() / DEFAULT_TOOL_CATALOG_FILE
-    elif kind == "model-input":
-        catalog_file = cfg.CatalogPath() / DEFAULT_MODEL_INPUT_CATALOG_FILE
+    elif kind == "prompt":
+        catalog_file = cfg.CatalogPath() / DEFAULT_PROMPT_CATALOG_FILE
     else:
         raise ValueError(f"Unknown catalog kind: {kind}")
     db_catalog, local_catalog = None, None
@@ -166,15 +171,17 @@ def get_catalog(
             # Create a CatalogMem on-the-fly that incorporates the dirty
             # source file items which we'll use instead of the local catalog file.
             meta_version = MetaVersion(schema_version=CATALOG_SCHEMA_VERSION, library_version=lib_version())
+
+            # If we are in debug mode, we'll print the dirty files.
+            indexer_printer = printer
             if logger.getEffectiveLevel() == logging.DEBUG:
 
                 def logging_printer(content: str, *args, **kwargs):
                     logger.debug(content)
-                    click.secho(content, *args, **kwargs)
+                    printer(content, *args, **kwargs)
 
-                printer = logging_printer
-            else:
-                printer = click.secho
+                indexer_printer = logging_printer
+
             local_catalog = index_catalog(
                 embedding_model,
                 meta_version,
@@ -184,31 +191,31 @@ def get_catalog(
                 catalog_file,
                 source_dirs,
                 scan_directory_opts=DEFAULT_SCAN_DIRECTORY_OPTS,
-                printer=printer,
+                printer=indexer_printer,
                 print_progress=True,
                 max_errs=DEFAULT_MAX_ERRS,
             )
-            click.secho("\n", nl=False)
+            printer("\n", nl=False)
 
     # Deliver our catalog.
     if force == "local" and local_catalog:
-        click.secho("Searching local catalog.")
+        printer("Searching local catalog.")
         return local_catalog
     elif force == "db" and db_catalog:
-        click.secho("Searching db catalog.")
+        printer("Searching db catalog.")
         return db_catalog
     elif force == "chain" and db_catalog and local_catalog:
-        click.secho("Searching both local and db catalogs.")
+        printer("Searching both local and db catalogs.")
         return CatalogChain(local_catalog, db_catalog)
     elif force is None:
         if local_catalog:
-            click.secho("Searching local catalog.")
+            printer("Searching local catalog.")
             return local_catalog
         elif db_catalog:
-            click.secho("Searching db catalog.")
+            printer("Searching db catalog.")
             return db_catalog
         elif local_catalog and db_catalog:
-            click.secho("Searching both local and db catalogs.")
+            printer("Searching both local and db catalogs.")
             return CatalogChain(local_catalog, db_catalog)
     raise ValueError("No catalog found!")
 

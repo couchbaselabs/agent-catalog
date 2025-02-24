@@ -11,7 +11,7 @@ from agentc_core.defaults import DEFAULT_CATALOG_METADATA_COLLECTION
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_EMBEDDING_MODEL_NAME
 from agentc_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
-from agentc_core.defaults import DEFAULT_MODEL_INPUT_CATALOG_FILE
+from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
 
 logger = logging.getLogger(__name__)
@@ -61,12 +61,12 @@ class EmbeddingModel(pydantic.BaseModel):
                     local_tool_catalog = CatalogDescriptor.model_validate_json(fp.read())
                 collected_embedding_models.add(local_tool_catalog.embedding_model)
 
-            # ...and now our local model-input embedding model.
-            local_model_input_catalog_path = self.catalog_path / DEFAULT_MODEL_INPUT_CATALOG_FILE
-            if local_model_input_catalog_path.exists():
-                with local_model_input_catalog_path.open("r") as fp:
-                    local_model_input_catalog = CatalogDescriptor.model_validate_json(fp.read())
-                collected_embedding_models.add(local_model_input_catalog.embedding_model)
+            # ...and now our local prompt embedding model.
+            local_prompt_catalog_path = self.catalog_path / DEFAULT_PROMPT_CATALOG_FILE
+            if local_prompt_catalog_path.exists():
+                with local_prompt_catalog_path.open("r") as fp:
+                    local_prompt_catalog = CatalogDescriptor.model_validate_json(fp.read())
+                collected_embedding_models.add(local_prompt_catalog.embedding_model)
 
             if len(collected_embedding_models) > 1:
                 raise ValueError(f"Multiple embedding models found in local catalogs: " f"{collected_embedding_models}")

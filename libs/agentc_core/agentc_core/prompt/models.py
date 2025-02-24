@@ -39,18 +39,18 @@ class ToolSearchMetadata(pydantic.BaseModel):
         return self
 
 
-class ModelInputDescriptor(RecordDescriptor):
+class PromptDescriptor(RecordDescriptor):
     content: str | dict[str, typing.Any]
 
     output: typing.Optional[str] = None
     tools: typing.Optional[list[ToolSearchMetadata] | None] = None
-    record_kind: typing.Literal[RecordKind.ModelInput]
+    record_kind: typing.Literal[RecordKind.Prompt]
 
     class Factory:
         class Metadata(pydantic.BaseModel, JSONSchemaValidatingMixin):
             model_config = pydantic.ConfigDict(frozen=True, use_enum_values=True, extra="allow")
 
-            record_kind: typing.Literal[RecordKind.ModelInput]
+            record_kind: typing.Literal[RecordKind.Prompt]
             name: str
             description: str
             content: str | dict[str, typing.Any]
@@ -102,9 +102,9 @@ class ModelInputDescriptor(RecordDescriptor):
             self.filename = filename
             self.version = version
 
-        def __iter__(self) -> typing.Iterable["ModelInputDescriptor"]:
+        def __iter__(self) -> typing.Iterable["PromptDescriptor"]:
             with self.filename.open("r") as fp:
-                metadata = ModelInputDescriptor.Factory.Metadata.model_validate(yaml.safe_load(fp))
+                metadata = PromptDescriptor.Factory.Metadata.model_validate(yaml.safe_load(fp))
                 if metadata.__pydantic_extra__:
                     logger.warning(
                         f"Extra fields found in {self.filename.name}: {metadata.__pydantic_extra__}. "
@@ -121,4 +121,4 @@ class ModelInputDescriptor(RecordDescriptor):
                     "version": self.version,
                     "annotations": metadata.annotations,
                 }
-                yield ModelInputDescriptor(**descriptor_args)
+                yield PromptDescriptor(**descriptor_args)

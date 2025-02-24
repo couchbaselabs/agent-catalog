@@ -45,7 +45,7 @@ class SearchOptions(pydantic.BaseModel):
 def cmd_find(
     cfg: Config = None,
     *,
-    kind: typing.Literal["tool", "model-input"],
+    kind: typing.Literal["tools", "prompts"],
     with_db: bool,
     with_local: bool,
     query: str = None,
@@ -58,6 +58,9 @@ def cmd_find(
 ):
     if cfg is None:
         cfg = Config()
+
+    # TODO (GLENN): Clean this up later (right now there are mixed references to "tool" and "tools").
+    kind = kind.removesuffix("s")
 
     # Validate that only query or only name is specified (error will be bubbled up).
     search_opt = SearchOptions(query=query, name=name)

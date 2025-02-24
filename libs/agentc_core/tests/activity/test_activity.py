@@ -128,6 +128,33 @@ def test_local_auditor_positive_2(tmp_path):
             assert log_entry.catalog_version == catalog.version
 
 
+@pytest.mark.smoke
+def test_local_auditor_positive_3(tmp_path):
+    runner = click.testing.CliRunner()
+    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        initialize_repo(
+            directory=pathlib.Path(td),
+            repo_kind=ExampleRepoKind.INDEXED_CLEAN_ALL_TRAVEL,
+            click_runner=click.testing.CliRunner(),
+            click_command=click_main,
+        )
+
+        # Note: flush is necessary for our tests, but this is not representative of a typical workflow.
+        catalog = Catalog()
+        global_scope: GlobalScope = catalog.Scope(name="my project")
+        logging_handler = global_scope._local_logger.rotating_handler
+
+        # Test our use of the __setitem__ dunder.
+        global_scope["metric"] = 2
+        logging_handler.flush()
+        with (catalog.ActivityPath() / DEFAULT_ACTIVITY_FILE).open("r") as fp:
+            log_entry = Log.model_validate_json(fp.readline())
+            assert log_entry.scope == ["my project"]
+            assert log_entry.kind == "custom"
+            assert log_entry.content["name"] == "metric"
+            assert log_entry.content["value"] == 2
+
+
 @pytest.mark.skip
 @pytest.mark.regression
 def test_db_auditor(tmp_path, isolated_server_factory):

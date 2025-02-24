@@ -41,20 +41,25 @@ The mono-repo for the Couchbase Agent Catalog project.
 4. Navigate to the `agent-catalog` directory and run `make`.
    This will a) create a new virtual environment using Poetry and b) install all required packages and CLI tools.
 
-5. Activate your newly created virtual environment using the outputs of `make activate` or `poetry env activate`.
+6. Activate your newly created virtual environment using the outputs of `make activate` or `poetry env activate`.
    If you do not want to copy-and-paste the output, you can run the command with `eval`:
 
    ```bash
    eval $(poetry env activate)
    ```
 
-   If your environment has been successfully activate, you should see `(Activated)` after running `poetry env list`.
+   If your environment has been successfully activated, you should see `(Activated)` after running `poetry env list`...
    ```bash
    poetry env list
-   agent-catalog-UEfqTvAT-py3.13 (Activated)
+   > agent-catalog-UEfqTvAT-py3.13 (Activated)
    ```
 
-   _Note that you must activate your environment before running any `agentc` commands!_
+   ...**and** you should see that your `python` now points to the python in your virtual environment (not your system
+   default).
+   ```bash
+   which python
+   > /Users/....../Library/Caches/pypoetry/virtualenvs/agent-catalog-UEfqTvAT-py3.13/bin/python
+   ```
 
 6. If you are interested in building a `.whl` file (for later use in `.whl`-based installation in other projects),
    run the following command:
@@ -97,8 +102,8 @@ Refer to [`docs/`](docs) to build our technical documentation
 before authoring your agent applications.
 We also provide some starter [`agents`](templates/agents) using different frameworks to understand the flow better.
 
-For more info on basic tool and model input definitions, please refer to the [`tool`](templates/tools) and
-[`model-input`](templates/inputs) templates that can be created using `agentc add` command.
+For more info on basic tool and prompt definitions, please refer to the [`tool`](templates/tools) and
+[`prompt`](templates/prompts) templates that can be created using `agentc add` command.
 
 ## For Contributors / Developers
 

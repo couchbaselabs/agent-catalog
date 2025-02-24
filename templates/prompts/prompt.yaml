@@ -1,14 +1,14 @@
 #
-# The following file is a template for a model input.
+# The following file is a template for a prompt.
 #
-record_kind: model_input
+record_kind: prompt
 
-# The name of the model input must be a valid Python identifier (e.g., no spaces).
-# This field is mandatory, and will be used when searching for model inputs by name.
+# The name of the prompt must be a valid Python identifier (e.g., no spaces).
+# This field is mandatory, and will be used when searching for prompts by name.
 name: route_finding_agent
 
-# A description of the model input's purpose (e.g., where this model input will be used).
-# This field is mandatory, and will be used (indirectly) when performing semantic search for model inputs.
+# A description of the prompt's purpose (e.g., where this prompt will be used).
+# This field is mandatory, and will be used (indirectly) when performing semantic search for prompts.
 description: >
   Instructions on how to find routes between two specific airports.
 
@@ -34,7 +34,7 @@ tools:
   - query: "finding flights by name"
     limit: 2
 
-# The output type (expressed in JSON-schema) associated with this model-input.
+# The output type (expressed in JSON-schema) associated with this prompt.
 # See https://json-schema.org/understanding-json-schema for more information.
 # This field is commonly supplied to an LLM to generate structured responses.
 # This field is optional, and does not have to be present.
