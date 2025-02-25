@@ -144,6 +144,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#which-couchbase-capella-or-server-version-should-i-use">Which Couchbase Capella or Server version should I use?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#do-i-need-to-use-a-specific-agent-framework-e-g-langchain-with-agent-catalog">Do I need to use a specific agent framework (e.g., LangChain) with Agent Catalog?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#what-services-do-i-need-to-enable-on-my-couchbase-cluster">What services do I need to enable on my Couchbase cluster?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-can-i-do-to-increase-log-ingestion-rate-into-my-cluster">What can I do to increase log ingestion rate into my Cluster?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#what-does-agent-catalog-add-to-my-couchbase-bucket">What does Agent Catalog add to my Couchbase bucket?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#do-i-need-couchbase-instance-to-run-agent-catalog">Do I need Couchbase instance to run Agent Catalog?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#what-is-agent-catalog-doing-when-i-run-agentc-index">What is Agent Catalog doing when I run <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">index</span></code>?</a></li>
@@ -213,6 +214,15 @@ For our examples (see <a class="reference external" href="https://github.com/cou
 </dd>
 </dl>
 </section>
+<section id="what-can-i-do-to-increase-log-ingestion-rate-into-my-cluster">
+<h2>What can I do to increase log ingestion rate into my Cluster?<a class="headerlink" href="#what-can-i-do-to-increase-log-ingestion-rate-into-my-cluster" title="Link to this heading"></a></h2>
+<p>When the auditor is initialized and the application runs, logs are continuously inserted into the Couchbase cluster.
+The ingestion rate depends on your Couchbase cluster configuration and can be adjusted by scaling your nodes—either
+horizontally by adding more data nodes or vertically by increasing the RAM per node. Additionally, increasing resources
+on your application infrastructure can also help optimize the rate at which logs are pushed.</p>
+<p>For more information on Cluster scaling, refer to the Couchbase documentation
+<a class="reference external" href="https://docs.couchbase.com/cloud/clusters/scale-database.html#events">here</a>.</p>
+</section>
 <section id="what-does-agent-catalog-add-to-my-couchbase-bucket">
 <h2>What does Agent Catalog add to my Couchbase bucket?<a class="headerlink" href="#what-does-agent-catalog-add-to-my-couchbase-bucket" title="Link to this heading"></a></h2>
 <p>When you publish catalog files using the <a class="reference external" href="cli.html#agentc-publish">agentc publish command</a>, Agent Catalog creates
@@ -221,8 +231,8 @@ Inside this scope, two collections are created:</p>
 <ol class="arabic">
 <li><p><code class="docutils literal notranslate"><span class="pre">&lt;kind&gt;_catalog</span></code>: This collection stores individual catalog items.
 The following is an example tool from the <code class="docutils literal notranslate"><span class="pre">travel-sample</span></code> example application:</p>
-<div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-text">tool_catalog collection - description of one tool from catalog</span><a class="headerlink" href="#id5" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">tool_catalog collection - description of one tool from catalog</span><a class="headerlink" href="#id6" title="Link to this code"></a></div>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;record_kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;semantic_search&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;get_travel_blog_snippets_from_user_interests&quot;</span><span class="p">,</span>
@@ -267,8 +277,8 @@ The following is an example tool from the <code class="docutils literal notransl
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">&lt;kind&gt;_metadata</span></code>: This collection contains metadata for each version of the catalog.
 The following is an example metadata record from the <code class="docutils literal notranslate"><span class="pre">travel-sample</span></code> example application:</p>
-<div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">tool_metadata collection - metadata associated with a catalog version</span><a class="headerlink" href="#id6" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">tool_metadata collection - metadata associated with a catalog version</span><a class="headerlink" href="#id7" title="Link to this code"></a></div>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;schema_version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.0.0&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;library_version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v0.0.0-0-g0&quot;</span><span class="p">,</span>
