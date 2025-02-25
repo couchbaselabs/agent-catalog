@@ -39,7 +39,6 @@ horizontally by adding more data nodes or vertically by increasing the RAM per n
 For more information on Cluster scaling, refer to the Couchbase documentation
 `here <https://docs.couchbase.com/cloud/clusters/scale-database.html#events>`_.
 
-
 What does Agent Catalog add to my Couchbase bucket?
 ---------------------------------------------------
 
