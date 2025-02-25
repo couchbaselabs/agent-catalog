@@ -32,9 +32,10 @@ Enable the following services on your Couchbase cluster:
 What can I do to increase log ingestion rate into my Cluster?
 -------------------------------------------------------------
 
-When the auditor is initialized and the application runs, logs are continuously inserted into the Couchbase cluster. The
-ingestion rate of these logs depends on your Couchbase cluster configuration and can be adjusted by scaling your nodes—either
-horizontally by adding more data nodes or vertically by increasing the RAM per node.
+When the auditor is initialized and the application runs, logs are continuously inserted into the Couchbase cluster.
+The ingestion rate depends on your Couchbase cluster configuration and can be adjusted by scaling your nodes—either
+horizontally by adding more data nodes or vertically by increasing the RAM per node. Additionally, increasing resources
+on your application infrastructure can also help optimize the rate at which logs are pushed.
 
 For more information on Cluster scaling, refer to the Couchbase documentation
 `here <https://docs.couchbase.com/cloud/clusters/scale-database.html#events>`_.
