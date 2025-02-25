@@ -24,7 +24,7 @@ print_separator '-'
 if [ "$1" == "user" ]; then
   poetry install
 else
-  poetry install --with docs
+  poetry install --with docs --with dev
 
   # Get the directory of this script (only used for dev-mode).
   SCRIPT_DIRECTORY=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )

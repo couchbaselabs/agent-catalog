@@ -300,7 +300,6 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
         :param state: A JSON-serializable object that will be logged on entering and exiting this scope.
         :param kwargs: Additional keyword arguments to pass to the Scope constructor.
         """
-        """A factory method to initialize an Activity instance."""
         from agentc_core.activity import GlobalScope
 
         return GlobalScope(config=self, version=self.version, name=name, state=state, kwargs=kwargs)

@@ -3,7 +3,7 @@ run-name: 👁️ ${{ github.actor }} has pushed a new commit!
 on: [ push ]
 
 jobs:
-  Tests:
+  Smoke Tests:
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -30,13 +30,12 @@ jobs:
           shell: "bash"
 
       - name: Install repository with Poetry
-        run: |
-          poetry install --with dev
+        run: scripts/setup.sh dev
 
       - name: Export OPENAI API KEY secret
-        run: echo "AGENT_CATALOG_EMBEDDING_MODEL_AUTH=${{ secrets.AGENT_CATALOG_EMBEDDING_MODEL_AUTH }}" >> $GITHUB_ENV
+        run: echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
 
-      - run: echo "🔥 Starting the core tests (🤞 please don't break!)."
+      - run: echo "🔥 Starting the smoke tests (🤞 please don't break!)."
       - name: Verify Pytest installation
         run: poetry show pytest
 
@@ -44,7 +43,47 @@ jobs:
         run: poetry run bash -c "cd libs/agentc_core && pytest -m smoke -v"
       - name: Run agentc-cli tests
         run: poetry run bash -c "cd libs/agentc_cli && pytest -m smoke -v"
-      - name: Run agentc tests
-        run: poetry run bash -c "cd libs/agentc && pytest -m smoke -v"
+
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+  Regression Tests:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+
+      - name: Verify toml files exist
+        uses: thebinaryfelix/check-file-existence-action@1.0.0
+        with:
+          files: "pyproject.toml,\
+            libs/agentc/pyproject.toml,\
+            libs/agentc_core/pyproject.toml,\
+            libs/agentc_cli/pyproject.toml,\
+            libs/agentc_langchain/pyproject.toml,\
+            libs/agentc_testing/pyproject.toml"
+
+      - name: Set up Python Poetry
+        uses: mishaga/action-poetry@1
+        with:
+          python-version: "3.12"
+          poetry-version: "latest"
+          shell: "bash"
+
+      - name: Install repository with Poetry
+        run: scripts/setup.sh dev
+
+      - name: Export OPENAI API KEY secret
+        run: echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
+
+      - run: echo "🔥 Starting the regression tests (🤞 please don't break!)."
+      - name: Verify Pytest installation
+        run: poetry show pytest
+
+      - name: Run agentc-core tests
+        run: poetry run bash -c "cd libs/agentc_core && pytest -m regression -v"
+      - name: Run agentc-cli tests
+        run: poetry run bash -c "cd libs/agentc_cli && pytest -m regression -v"
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
