@@ -7,6 +7,7 @@ import pydantic
 import pydantic_settings
 import typing
 
+from agentc_core.config import RemoteCatalogConfig
 from agentc_langchain.defaults import DEFAULT_COUCHBASE_CACHE_COLLECTION_NAME
 from agentc_langchain.defaults import DEFAULT_COUCHBASE_CACHE_INDEX_NAME
 from agentc_langchain.defaults import DEFAULT_COUCHBASE_CACHE_INDEX_SCORE_THRESHOLD
@@ -17,13 +18,13 @@ class CacheOptions(pydantic_settings.BaseSettings):
     model_config = pydantic_settings.SettingsConfigDict(env_prefix="AGENT_CATALOG_LANGCHAIN_CACHE_")
 
     # Connection-specific details.
-    conn_string: str
+    conn_string: str = None
     """ The connection string to the Couchbase cluster hosting the cache.
 
     This field **must** be specified.
     """
 
-    username: pydantic.SecretStr = None
+    username: str = None
     """ Username associated with the Couchbase instance hosting the cache.
 
     This field **must** be specified.
@@ -83,6 +84,21 @@ class CacheOptions(pydantic_settings.BaseSettings):
     :py:data:`agentc_langchain.defaults.DEFAULT_COUCHBASE_CACHE_INDEX_SCORE_THRESHOLD`.
     """
 
+    @pydantic.model_validator(mode="after")
+    def _pull_cluster_from_agent_catalog(self) -> typing.Self:
+        config = RemoteCatalogConfig()
+        if self.conn_string is None:
+            self.conn_string = config.conn_string
+        if self.username is None:
+            self.username = config.username
+        if self.password is None:
+            self.password = config.password
+        if self.conn_root_certificate:
+            self.conn_root_certificate = config.conn_root_certificate
+        if self.bucket is None:
+            self.bucket = config.bucket
+        return self
+
     @property
     @pydantic.computed_field
     def cluster(self):
@@ -95,7 +111,7 @@ class CacheOptions(pydantic_settings.BaseSettings):
             self.conn_string,
             couchbase.options.ClusterOptions(
                 couchbase.auth.PasswordAuthenticator(
-                    username=self.username.get_secret_value(),
+                    username=self.username,
                     password=self.password.get_secret_value(),
                     cert_path=conn_root_certificate,
                 )

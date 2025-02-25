@@ -11,7 +11,7 @@ from .setup import setup_semantic_cache
 def cache(
     chat_model: langchain_core.language_models.BaseChatModel,
     kind: typing.Literal["exact", "semantic"],
-    options: CacheOptions,
+    options: CacheOptions = None,
     embeddings: langchain_core.embeddings.Embeddings = None,
 ):
     """A method to attach a Couchbase-backed exact or semantic cache to a ChatModel.
@@ -22,6 +22,8 @@ def cache(
     :param embeddings: The embeddings to use when attaching a 'semantic' cache to the chat model.
     :return: The same LangChain chat model that was passed in, but with a cache attached.
     """
+    if options is None:
+        options = CacheOptions()
     if kind.lower() == "exact":
         setup_exact_cache(options)
         llm_cache = langchain_couchbase.cache.CouchbaseCache(

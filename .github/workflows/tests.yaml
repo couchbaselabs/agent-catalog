@@ -45,6 +45,7 @@ jobs:
         run: poetry run bash -c "cd libs/agentc_cli && pytest -m smoke -v"
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
+
   RegressionTests:
     runs-on: ubuntu-latest
     steps:
