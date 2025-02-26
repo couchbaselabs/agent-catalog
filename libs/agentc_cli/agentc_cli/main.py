@@ -100,7 +100,6 @@ def click_main(ctx: click.Context, verbose: int, interactive: bool):
 
 
 @click_main.command()
-@click.pass_context
 @click.argument("targets", type=click.Choice(["catalog", "activity"], case_sensitive=False), nargs=-1)
 @click.option(
     "--db/--no-db",
@@ -123,6 +122,7 @@ def click_main(ctx: click.Context, verbose: int, interactive: bool):
     help="Name of the Couchbase bucket to initialize in.",
     show_default=False,
 )
+@click.pass_context
 def init(
     ctx: click.Context, targets: list[typing.Literal["catalog", "activity"]], db: bool, local: bool, bucket: str = None
 ):

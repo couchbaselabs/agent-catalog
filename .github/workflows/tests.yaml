@@ -46,7 +46,7 @@ jobs:
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
-  RegressionTests:
+  SlowTests:
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -78,13 +78,13 @@ jobs:
       - name: Export OPENAI API KEY secret
         run: echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
 
-      - run: echo "🔥 Starting the regression tests (🤞 please don't break!)."
+      - run: echo "🔥 Starting the slow tests (🤞 please don't break!)."
       - name: Verify Pytest installation
         run: poetry show pytest
 
       - name: Run agentc-core tests
-        run: poetry run bash -c "cd libs/agentc_core && pytest -m regression -v"
+        run: poetry run bash -c "cd libs/agentc_core && pytest -m slow -v"
       - name: Run agentc-cli tests
-        run: poetry run bash -c "cd libs/agentc_cli && pytest -m regression -v"
+        run: poetry run bash -c "cd libs/agentc_cli && pytest -m slow -v"
 
       - run: echo "🍏 This job's status is ${{ job.status }}."

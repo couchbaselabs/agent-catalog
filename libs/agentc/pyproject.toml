@@ -43,7 +43,7 @@ develop = true
 [tool.pytest.ini_options]
 markers = [
     "smoke: marks tests for running on each git-push",
-    "regression: marks regression tests for running on each git-push",
+    "slow: marks slow tests for running on each git-push",
 ]
 
 [build-system]

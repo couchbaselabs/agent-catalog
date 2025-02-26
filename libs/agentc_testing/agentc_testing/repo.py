@@ -5,6 +5,7 @@ import logging
 import os
 import pathlib
 import shutil
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -107,9 +108,24 @@ def initialize_repo(
     ]:
         return output
 
-    # Initialize the DB catalog.
-    output.append(click_runner.invoke(click_command, ["init", "catalog", "--no-local", "--db"]))
-    output.append(click_runner.invoke(click_command, ["init", "activity", "--no-local", "--db"]))
+    # Initialize the DB catalog (we'll use three-tries).
+    for _ in range(3):
+        result = click_runner.invoke(click_command, ["init", "catalog", "--no-local", "--db"])
+        if result.exception is not None:
+            output.append(result.exception)
+            time.sleep(1)
+            continue
+        else:
+            output.append(result.output)
+
+        result = click_runner.invoke(click_command, ["init", "activity", "--no-local", "--db"])
+        if result.exception is not None:
+            output.append(result.exception)
+            time.sleep(1)
+            continue
+        else:
+            output.append(result.output)
+            break
 
     # Call our publish command. Note that this assumes a container / CB instance is active!
     os.environ["AGENT_CATALOG_MAX_INDEX_PARTITION"] = "1"

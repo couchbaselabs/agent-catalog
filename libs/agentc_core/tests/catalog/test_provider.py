@@ -70,7 +70,7 @@ def test_local_provider(tmp_path):
         assert prompt.meta.name == "get_user_location"
 
 
-@pytest.mark.regression
+@pytest.mark.slow
 def test_db_tool_provider(tmp_path, isolated_server_factory):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
@@ -90,21 +90,21 @@ def test_db_tool_provider(tmp_path, isolated_server_factory):
 
 
 @pytest.mark.skip
-@pytest.mark.regression
+@pytest.mark.slow
 def test_db_inputs_provider(tmp_path, isolated_server_factory):
     # TODO (GLENN): Finish me!
     pass
 
 
 @pytest.mark.skip
-@pytest.mark.regression
+@pytest.mark.slow
 def test_chain_tool_provider(tmp_path, isolated_server_factory):
     # TODO (GLENN): Finish me!
     pass
 
 
 @pytest.mark.skip
-@pytest.mark.regression
+@pytest.mark.slow
 def test_chain_inputs_provider(tmp_path, isolated_server_factory):
     # TODO (GLENN): Finish me!
     pass

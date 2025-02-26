@@ -98,7 +98,7 @@ def publish_catalog(runner, input_catalog: pathlib.Path, output_catalog: pathlib
         assert f"Uploading the {kind} catalog items to Couchbase" in invocation.stdout
 
 
-@pytest.mark.regression
+@pytest.mark.slow
 def test_publish(tmp_path, isolated_server_factory):
     """
     This test performs the following checks:
@@ -124,7 +124,7 @@ def test_publish(tmp_path, isolated_server_factory):
             publish_catalog(runner, catalog, catalog_folder)
 
 
-@pytest.mark.regression
+@pytest.mark.slow
 def test_find(tmp_path, isolated_server_factory):
     """
     This test performs the following checks:
@@ -209,7 +209,7 @@ def test_find(tmp_path, isolated_server_factory):
         assert "3 result(s) returned from the catalog." in output
 
 
-@pytest.mark.regression
+@pytest.mark.slow
 def test_status(tmp_path, isolated_server_factory):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
@@ -248,7 +248,7 @@ def test_status(tmp_path, isolated_server_factory):
         assert "db catalog info" in output
 
 
-@pytest.mark.regression
+@pytest.mark.slow
 def test_clean(tmp_path, isolated_server_factory):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
@@ -316,7 +316,7 @@ def test_clean(tmp_path, isolated_server_factory):
         assert expected_response_db in output
 
 
-@pytest.mark.regression
+@pytest.mark.slow
 def test_execute(tmp_path):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
@@ -349,13 +349,13 @@ def test_execute(tmp_path):
 
 
 @pytest.mark.skip
-@pytest.mark.regression
+@pytest.mark.slow
 def test_publish_multiple_nodes(tmp_path):
     # TODO: Setup multinode cluster for test environment
     pass
 
 
-@pytest.mark.regression
+@pytest.mark.slow
 def test_publish_different_versions(tmp_path, isolated_server_factory):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:

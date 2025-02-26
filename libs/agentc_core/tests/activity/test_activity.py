@@ -156,14 +156,14 @@ def test_local_auditor_positive_3(tmp_path):
 
 
 @pytest.mark.skip
-@pytest.mark.regression
+@pytest.mark.slow
 def test_db_auditor(tmp_path, isolated_server_factory):
     # TODO (GLENN): Finish me!
     pass
 
 
 @pytest.mark.skip
-@pytest.mark.regression
+@pytest.mark.slow
 def test_chain_auditor(tmp_path, isolated_server_factory):
     # TODO (GLENN): Finish me!
     pass
