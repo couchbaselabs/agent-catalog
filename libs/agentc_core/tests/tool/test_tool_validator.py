@@ -171,7 +171,7 @@ def test_semantic_search():
     assert positive_1_input_json["properties"]["user_interests"]["type"] == "array"
     assert positive_1_input_json["properties"]["user_interests"]["items"]["type"] == "string"
     assert positive_1_tools[0].vector_search.bucket == "travel-sample"
-    assert positive_1_tools[0].vector_search.span == "inventory"
+    assert positive_1_tools[0].vector_search.scope == "inventory"
     assert positive_1_tools[0].vector_search.collection == "article"
 
     # Test the serialization of annotations.

@@ -289,15 +289,14 @@ def test_status(tmp_path, isolated_server_factory):
 def test_local_clean(tmp_path):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        os.chdir(td)
-
-        runner.invoke(click_main, ["init", "catalog", "--local", "--db"])
         initialize_repo(
             directory=pathlib.Path(td),
             repo_kind=ExampleRepoKind.EMPTY,
             click_runner=runner,
             click_command=click_main,
         )
+        os.chdir(td)
+        runner.invoke(click_main, ["init", "catalog", "--no-db"])
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
 
         # Local clean
@@ -308,7 +307,7 @@ def test_local_clean(tmp_path):
         with dummy_file_2.open("w") as fp:
             fp.write("more dummy content")
 
-        assert runner.invoke(click_main, ["clean", "catalog", "-y"]).exit_code == 0
+        assert runner.invoke(click_main, ["clean", "catalog", "--no-db", "-y"]).exit_code == 0
         assert not dummy_file_1.exists()
         assert not dummy_file_2.exists()
 

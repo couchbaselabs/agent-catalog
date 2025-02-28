@@ -22,3 +22,6 @@ langchain>=0.3.4
 openai>=1.52.2
 sentence-transformers>=3.2.1
 langchain-openai>=0.2.3
+typing_extensions~=4.12.2
+gitignore_parser~=0.1.11
+llama-index-core~=0.12.20
