@@ -92,7 +92,7 @@ The mono-repo for the Couchbase Agent Catalog project.
    If you are interested in developing with LangChain or LangGraph, install the helper `agentc_langchain` package with
    the command below:
    ```bash
-   pip install libs/agentc_langchain
+   pip install libs/agentc_integrations/langchain
    ```
 
 ## Docs and Templates
@@ -114,7 +114,7 @@ Every project package is wrapped under [`libs`](libs). The following are sub-fol
 1. [`agentc`](libs/agentc), which contains the front-facing package for the Couchbase Agent Catalog project.
 2. [`agentc-cli`](libs/agentc_cli), which contains the command line interface for the Couchbase Agent Catalog project.
 3. [`agentc-core`](libs/agentc_core), which contains the core SDK package for the Couchbase Agent Catalog project.
-4. [`agentc-langchain`](libs/agentc_langchain), which contains additional tooling around building LangChain-specific
+4. [`agentc-langchain`](libs/agentc_integrations/langchain), which contains additional tooling around building LangChain-specific
    agents.
 
 ### Working with Poetry

@@ -43,8 +43,16 @@ class _BaseFactory(abc.ABC):
 
 
 class PythonToolDescriptor(RecordDescriptor):
+    class PythonContent(pydantic.BaseModel):
+        model_config = pydantic.ConfigDict(frozen=True)
+
+        file_content: str
+        func_content: str
+        line_no_start: int
+        line_no_end: int
+
     record_kind: typing.Literal[RecordKind.PythonFunction]
-    contents: str
+    content: "PythonToolDescriptor.PythonContent"
 
     class Factory(_BaseFactory):
         def __iter__(self) -> typing.Iterable["PythonToolDescriptor"]:
@@ -58,12 +66,20 @@ class PythonToolDescriptor(RecordDescriptor):
             for _, tool in inspect.getmembers(imported_module):
                 if not is_tool(tool):
                     continue
+
+                source_lines, start_line = inspect.getsourcelines(tool)
+                logger.debug("Found Python tool '%s' at line %d.", get_name(tool), start_line)
                 record_descriptor = PythonToolDescriptor(
                     record_kind=RecordKind.PythonFunction,
                     name=get_name(tool),
                     description=get_description(tool),
                     source=self.filename,
-                    contents=source_contents,
+                    content=PythonToolDescriptor.PythonContent(
+                        file_content=source_contents,
+                        func_content="".join(source_lines),
+                        line_no_start=start_line,
+                        line_no_end=start_line + len(source_lines) - 1,
+                    ),
                     version=self.version,
                     annotations=get_annotations(tool),
                 )

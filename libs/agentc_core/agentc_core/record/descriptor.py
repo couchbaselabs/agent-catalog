@@ -57,7 +57,6 @@ class RecordDescriptor(pydantic.BaseModel):
         "For a *.py tool, this is the python function's docstring. "
     )
 
-    # TODO: One day also track source line numbers?
     source: pathlib.Path = pydantic.Field(
         description="Source location of the file, relative to where index was called.",
         examples=[pathlib.Path("src/tools/finance.py")],

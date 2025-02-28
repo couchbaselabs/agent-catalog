@@ -19,9 +19,10 @@ class BaseLogger(abc.ABC):
     def log(
         self,
         kind: Kind,
-        scope: list[str],
         content: typing.Any,
-        identifier: typing.AnyStr = None,
+        span_name: list[str],
+        session_id: typing.AnyStr,
+        log_id: typing.AnyStr = None,
         timestamp: datetime.datetime = None,
         **kwargs,
     ):
@@ -30,9 +31,9 @@ class BaseLogger(abc.ABC):
             timestamp = datetime.datetime.now().astimezone()
 
         message = Log(
-            identifier=identifier or uuid.uuid4().hex,
+            identifier=log_id or uuid.uuid4().hex,
             timestamp=timestamp.isoformat(),
-            scope=scope,
+            span=Log.Span(name=span_name, session=session_id),
             kind=kind,
             content=content,
             catalog_version=self.catalog_version,

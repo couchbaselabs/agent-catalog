@@ -1,6 +1,6 @@
 from . import catalog
-from . import scope
-from agentc_core.activity.scope import Scope
+from . import span
+from agentc_core.activity.span import Span
 from agentc_core.catalog.catalog import Catalog
 
-__all__ = ["catalog", "Catalog", "scope", "Scope"]
+__all__ = ["catalog", "Catalog", "span", "Span"]

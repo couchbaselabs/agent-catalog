@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "agentc-llamaindex"
+version = "0.0.1"
+description = "Collection of LlamaIndex-specific classes and functions used with the Couchbase Agent Catalog project."
+authors = [
+  "Glenn Galvizo <glenn.galvizo@couchbase.com>"
+]
+packages = [
+  { include = "agentc_llamaindex" }
+]
+
+[tool.poetry.urls]
+Homepage = "https://couchbase.com"
+Documentation = "https://docs.couchbase.com"
+Repository = "https://github.com/couchbaselabs/agent-catalog"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+couchbase = "^4.3.0"
+joblib = "^1.4.2"
+llama-index = "^0.12.20"
+pydantic = "^2.10.6"
+requests = "^2.32.3"
+python-dotenv = "^1.0.1"
+pydantic-settings = "^2.7.1"
+
+[tool.poetry.dependencies.agentc-core]
+path = "../../agentc_core"
+develop = true
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.2.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

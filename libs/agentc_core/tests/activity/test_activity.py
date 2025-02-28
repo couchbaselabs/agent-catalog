@@ -5,8 +5,8 @@ import pytest
 
 from agentc import Catalog
 from agentc_cli.main import click_main
-from agentc_core.activity import GlobalScope
-from agentc_core.activity import Scope
+from agentc_core.activity import GlobalSpan
+from agentc_core.activity import Span
 from agentc_core.analytics import Log
 from agentc_core.defaults import DEFAULT_ACTIVITY_FILE
 from agentc_testing.repo import ExampleRepoKind
@@ -30,28 +30,28 @@ def test_local_auditor_positive_1(tmp_path):
 
         # Note: flush is necessary for our tests, but this is not representative of a typical workflow.
         catalog = Catalog()
-        global_scope: GlobalScope = catalog.Scope(name="my project")
-        logging_handler = global_scope._local_logger.rotating_handler
+        global_span: GlobalSpan = catalog.Span(name="my project")
+        logging_handler = global_span._local_logger.rotating_handler
         logging_handler.flush()
 
-        # Test our global scope logging.
-        global_scope.log("system", content="Hello world!", my_annotation="my annotation")
+        # Test our global span logging.
+        global_span.log("system", content="Hello world!", my_annotation="my annotation")
         with (catalog.ActivityPath() / DEFAULT_ACTIVITY_FILE).open("r") as fp:
             log_entry = Log.model_validate_json(fp.read())
-            assert log_entry.scope == ["my project"]
+            assert log_entry.span.name == ["my project"]
             assert log_entry.kind == "system"
             assert log_entry.content == "Hello world!"
             assert log_entry.catalog_version == catalog.version
             assert log_entry.annotations == {"my_annotation": "my annotation"}
 
-        # Test nested scope logging (level 1).
-        level_1_scope: Scope = global_scope.new(
+        # Test nested span logging (level 1).
+        level_1_span: Span = global_span.new(
             "my agent",
             my_annotation="my annotation",
             another_new_annotation="another new annotation",
             some_score=3,
         )
-        level_1_scope.log("system", content="Hello world again!", my_annotation="my new annotation")
+        level_1_span.log("system", content="Hello world again!", my_annotation="my new annotation")
         logging_handler.flush()
         with (catalog.ActivityPath() / DEFAULT_ACTIVITY_FILE).open("r") as fp:
             # We are interested in the last line of the file.
@@ -60,7 +60,7 @@ def test_local_auditor_positive_1(tmp_path):
 
             assert i == 1
             log_entry = Log.model_validate_json(line)
-            assert log_entry.scope == ["my project", "my agent"]
+            assert log_entry.span.name == ["my project", "my agent"]
             assert log_entry.kind == "system"
             assert log_entry.content == "Hello world again!"
             assert log_entry.catalog_version == catalog.version
@@ -70,9 +70,9 @@ def test_local_auditor_positive_1(tmp_path):
                 "some_score": 3,
             }
 
-        # Test nested scope logging (level 2).
-        level_2_scope: Scope = level_1_scope.new("my task", another_new_annotation="2")
-        level_2_scope.log("human", content="Hello world once more!", my_annotation="my newer annotation")
+        # Test nested span logging (level 2).
+        level_2_span: Span = level_1_span.new("my task", another_new_annotation="2")
+        level_2_span.log("human", content="Hello world once more!", my_annotation="my newer annotation")
         logging_handler.flush()
         with (catalog.ActivityPath() / DEFAULT_ACTIVITY_FILE).open("r") as fp:
             # We are interested in the last line of the file.
@@ -81,7 +81,7 @@ def test_local_auditor_positive_1(tmp_path):
 
             assert i == 2
             log_entry = Log.model_validate_json(line)
-            assert log_entry.scope == ["my project", "my agent", "my task"]
+            assert log_entry.span.name == ["my project", "my agent", "my task"]
             assert log_entry.kind == "human"
             assert log_entry.content == "Hello world once more!"
             assert log_entry.catalog_version == catalog.version
@@ -106,23 +106,23 @@ def test_local_auditor_positive_2(tmp_path):
         # Note: flush is necessary for our tests, but this is not representative of a typical workflow.
         my_state = dict(messages=[])
         catalog = Catalog()
-        global_scope: GlobalScope = catalog.Scope(name="my project", state=my_state)
-        logging_handler = global_scope._local_logger.rotating_handler
+        global_span: GlobalSpan = catalog.Span(name="my project", state=my_state)
+        logging_handler = global_span._local_logger.rotating_handler
 
         # Test our use of a context manager.
-        with global_scope:
+        with global_span:
             my_state["messages"].append("Hello world!")
         logging_handler.flush()
 
         # We expect two log messages.
         with (catalog.ActivityPath() / DEFAULT_ACTIVITY_FILE).open("r") as fp:
             log_entry = Log.model_validate_json(fp.readline())
-            assert log_entry.scope == ["my project"]
+            assert log_entry.span.name == ["my project"]
             assert log_entry.kind == "transition"
             assert log_entry.content["to_state"] == dict(messages=[])
             assert log_entry.catalog_version == catalog.version
             log_entry = Log.model_validate_json(fp.readline())
-            assert log_entry.scope == ["my project"]
+            assert log_entry.span.name == ["my project"]
             assert log_entry.kind == "transition"
             assert log_entry.content["from_state"] == dict(messages=["Hello world!"])
             assert log_entry.catalog_version == catalog.version
@@ -141,15 +141,15 @@ def test_local_auditor_positive_3(tmp_path):
 
         # Note: flush is necessary for our tests, but this is not representative of a typical workflow.
         catalog = Catalog()
-        global_scope: GlobalScope = catalog.Scope(name="my project")
-        logging_handler = global_scope._local_logger.rotating_handler
+        global_span: GlobalSpan = catalog.Span(name="my project")
+        logging_handler = global_span._local_logger.rotating_handler
 
         # Test our use of the __setitem__ dunder.
-        global_scope["metric"] = 2
+        global_span["metric"] = 2
         logging_handler.flush()
         with (catalog.ActivityPath() / DEFAULT_ACTIVITY_FILE).open("r") as fp:
             log_entry = Log.model_validate_json(fp.readline())
-            assert log_entry.scope == ["my project"]
+            assert log_entry.span.name == ["my project"]
             assert log_entry.kind == "custom"
             assert log_entry.content["name"] == "metric"
             assert log_entry.content["value"] == 2

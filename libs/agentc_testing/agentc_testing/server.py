@@ -1,3 +1,6 @@
+import couchbase.auth
+import couchbase.cluster
+import couchbase.options
 import docker
 import docker.models.containers
 import http
@@ -128,6 +131,18 @@ def _stop_couchbase(container: docker.models.containers.Container):
 
     # We'll keep this sleep here to account for the time it takes for the container to be removed.
     time.sleep(3)
+
+
+@pytest.fixture
+def connection_factory() -> typing.Callable[[], couchbase.cluster.Cluster]:
+    return lambda: couchbase.cluster.Cluster(
+        DEFAULT_COUCHBASE_CONN_STRING,
+        couchbase.options.ClusterOptions(
+            couchbase.auth.PasswordAuthenticator(
+                username=DEFAULT_COUCHBASE_USERNAME, password=DEFAULT_COUCHBASE_PASSWORD
+            )
+        ),
+    )
 
 
 # Fixture to start a Couchbase server instance via Docker (and subsequently remove this instance).

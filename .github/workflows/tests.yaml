@@ -19,7 +19,7 @@ jobs:
             libs/agentc/pyproject.toml,\
             libs/agentc_core/pyproject.toml,\
             libs/agentc_cli/pyproject.toml,\
-            libs/agentc_langchain/pyproject.toml,\
+            libs/agentc_integrations/langchain/pyproject.toml,\
             libs/agentc_testing/pyproject.toml"
 
       - name: Set up Python Poetry
@@ -35,14 +35,12 @@ jobs:
       - name: Export OPENAI API KEY secret
         run: echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
 
-      - run: echo "🔥 Starting the smoke tests (🤞 please don't break!)."
       - name: Verify Pytest installation
         run: poetry show pytest
 
-      - name: Run agentc-core tests
-        run: poetry run bash -c "cd libs/agentc_core && pytest -m smoke -v"
-      - name: Run agentc-cli tests
-        run: poetry run bash -c "cd libs/agentc_cli && pytest -m smoke -v"
+      - run: echo "🔥 Starting the smoke tests (🤞 please don't break!)."
+      - name: Run agentc smoke tests
+        run: poetry run bash -c "pytest -m smoke -v"
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
@@ -62,7 +60,7 @@ jobs:
             libs/agentc/pyproject.toml,\
             libs/agentc_core/pyproject.toml,\
             libs/agentc_cli/pyproject.toml,\
-            libs/agentc_langchain/pyproject.toml,\
+            libs/agentc_integrations/langchain/pyproject.toml,\
             libs/agentc_testing/pyproject.toml"
 
       - name: Set up Python Poetry
@@ -78,13 +76,11 @@ jobs:
       - name: Export OPENAI API KEY secret
         run: echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
 
-      - run: echo "🔥 Starting the slow tests (🤞 please don't break!)."
       - name: Verify Pytest installation
         run: poetry show pytest
 
-      - name: Run agentc-core tests
-        run: poetry run bash -c "cd libs/agentc_core && pytest -m slow -v"
-      - name: Run agentc-cli tests
-        run: poetry run bash -c "cd libs/agentc_cli && pytest -m slow -v"
+      - run: echo "🔥 Starting the slow tests (🤞 please don't break!)."
+      - name: Run agentc slow tests
+        run: poetry run bash -c "pytest -m slow -v"
 
       - run: echo "🍏 This job's status is ${{ job.status }}."

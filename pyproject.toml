@@ -21,7 +21,8 @@ python = "^3.12"
 agentc = { path = "libs/agentc", develop = true }
 agentc-core = { path = "libs/agentc_core", develop = true }
 agentc-cli = { path = "libs/agentc_cli", develop = true }
-agentc-langchain = { path = "libs/agentc_langchain", develop = true }
+agentc-langchain = { path = "libs/agentc_integrations/langchain", develop = true }
+agentc-llamaindex = { path = "libs/agentc_integrations/llamaindex", develop = true }
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
@@ -62,6 +63,7 @@ markers = [
 testpaths = [
     "libs/agentc_core/tests",
     "libs/agentc_cli/tests",
+    "libs/integrations/agentc_langchain/tests",
 ]
 
 [build-system]

@@ -285,24 +285,24 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
         version_tuples = list()
         if self._local_tool_catalog is not None:
             version_tuples += [self._local_tool_catalog.version]
-        if self._remote_tool_catalog is not None:
+        if self._remote_tool_catalog is not None and self._remote_tool_catalog.version is not None:
             version_tuples += [self._remote_tool_catalog.version]
         if self._local_prompt_catalog is not None:
             version_tuples += [self._local_prompt_catalog.version]
-        if self._remote_prompt_catalog is not None:
+        if self._remote_prompt_catalog is not None and self._remote_prompt_catalog.version is not None:
             version_tuples += [self._remote_prompt_catalog.version]
         return sorted(version_tuples, key=lambda x: x.timestamp, reverse=True)[0]
 
-    def Scope(self, name: str, state: typing.Any = None, **kwargs) -> "Scope":
-        """A factory method to initialize a Scope instance.
+    def Span(self, name: str, state: typing.Any = None, **kwargs) -> "Span":
+        """A factory method to initialize a Span instance.
 
-        :param name: Name to bind to each message logged within this scope.
-        :param state: A JSON-serializable object that will be logged on entering and exiting this scope.
-        :param kwargs: Additional keyword arguments to pass to the Scope constructor.
+        :param name: Name to bind to each message logged within this span.
+        :param state: A JSON-serializable object that will be logged on entering and exiting this span.
+        :param kwargs: Additional keyword arguments to pass to the Span constructor.
         """
-        from agentc_core.activity import GlobalScope
+        from agentc_core.activity import GlobalSpan
 
-        return GlobalScope(config=self, version=self.version, name=name, state=state, kwargs=kwargs)
+        return GlobalSpan(config=self, version=self.version, name=name, state=state, kwargs=kwargs)
 
     def get(
         self,

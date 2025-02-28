@@ -21,7 +21,7 @@ class Kind(enum.StrEnum):
        actually use this role, so application developers must manually log these messages.
     6. Transition refers to messages that are generated as a transition into a state / task / agent. This is
        application specific, and is used to trace the trajectory of a conversation.
-    7. Custom refers to messages that contain user-specified data that are to be logged under some scope."""
+    7. Custom refers to messages that contain user-specified data that are to be logged under some session."""
 
     System = "system"
     Tool = "tool"
@@ -35,6 +35,19 @@ class Kind(enum.StrEnum):
 
 
 class Log(pydantic.BaseModel):
+    class Span(pydantic.BaseModel):
+        model_config = pydantic.ConfigDict(use_enum_values=True, frozen=True)
+
+        session: typing.AnyStr = pydantic.Field(
+            description="The 'session' (a runtime identifier) that this span is associated with.",
+            default_factory=lambda: uuid.uuid4().hex,
+        )
+
+        name: list[str] = pydantic.Field(
+            description="The name of the span. This is a list of names that represent the span hierarchy.",
+            examples=[["my_application", "my_agent", "my_task"], ["my_application", "my_agent"]],
+        )
+
     model_config = pydantic.ConfigDict(use_enum_values=True, frozen=True)
 
     identifier: typing.AnyStr = pydantic.Field(
@@ -42,9 +55,8 @@ class Log(pydantic.BaseModel):
         default_factory=lambda: uuid.uuid4().hex,
     )
 
-    scope: list[str] = pydantic.Field(
-        description="The 'scope' (not to be confused with a Couchbase collection scope) that this record belongs to.",
-        default_factory=list,
+    span: "Log.Span" = pydantic.Field(
+        description="The span (i.e., a list of names and a session ID) that this record is associated with."
     )
 
     timestamp: pydantic.AwareDatetime = pydantic.Field(

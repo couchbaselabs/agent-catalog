@@ -1,7 +1,4 @@
 import click.testing
-import couchbase.auth
-import couchbase.cluster
-import couchbase.options
 import git
 import os
 import pathlib
@@ -18,14 +15,13 @@ from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
 from agentc_testing.repo import ExampleRepoKind
 from agentc_testing.repo import initialize_repo
-from agentc_testing.server import DEFAULT_COUCHBASE_CONN_STRING
-from agentc_testing.server import DEFAULT_COUCHBASE_PASSWORD
-from agentc_testing.server import DEFAULT_COUCHBASE_USERNAME
+from agentc_testing.server import connection_factory
 from agentc_testing.server import isolated_server_factory
 from unittest.mock import patch
 
 # This is to keep ruff from falsely flagging this as unused.
 _ = isolated_server_factory
+_ = connection_factory
 
 
 @pytest.mark.smoke
@@ -68,60 +64,117 @@ def test_index(tmp_path):
         assert "0/12" in output
 
 
-# Small helper function to publish to a Couchbase catalog.
-def publish_catalog(runner, input_catalog: pathlib.Path, output_catalog: pathlib.Path):
-    # Clean up file names (remove negative or positive from file name)
-    new_catalog = re.sub(r"-(positive|negative)-\d+\.json", ".json", input_catalog.name)
-
-    # Copy file to temp dir under new name
-    shutil.copy(input_catalog, output_catalog / new_catalog)
-
-    # Extract catalog kind
-    kind = "tools" if "tools" in input_catalog.name else "prompts"
-
-    # Execute the command
-    invocation = runner.invoke(
-        click_main,
-        [
-            "publish",
-            kind,
-            "--bucket",
-            "travel-sample",
-        ],
-    )
-    if "negative" in input_catalog.name:
-        assert invocation.exception is not None
-        assert "Cannot publish a dirty catalog to the DB!" in str(invocation.exception)
-    elif "positive" in input_catalog.name:
-        kind = kind.removesuffix("s")
-        assert kind.upper() in invocation.stdout
-        assert f"Uploading the {kind} catalog items to Couchbase" in invocation.stdout
-
-
 @pytest.mark.slow
-def test_publish(tmp_path, isolated_server_factory):
-    """
-    This test performs the following checks:
-        1. command does not publish to kv when catalog is dirty
-        2. command publishes to kv when catalog is clean
-        3. command publishes catalogs when kind=tool/prompt
-           but does not check for kind=all
-        4. command ensures data is upserted and indexes created
-    """
+def test_publish_positive_1(tmp_path, isolated_server_factory, connection_factory):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
         initialize_repo(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.EMPTY,
+            repo_kind=ExampleRepoKind.INDEXED_CLEAN_ALL_TRAVEL,
             click_runner=runner,
             click_command=click_main,
         )
         os.chdir(td)
-        runner.invoke(click_main, ["init", "catalog", "--local", "--db"])
-        catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
-        for catalog in (pathlib.Path(__file__).parent / "resources" / "publish").rglob("*-1.json"):
-            publish_catalog(runner, catalog, catalog_folder)
+
+        result = runner.invoke(click_main, ["init", "catalog", "--no-local", "--db"])
+        assert "Metadata collection for the catalog has been successfully created!" in result.output
+        assert "Vector index for the tool catalog has been successfully created!" in result.output
+        assert "Vector index for the prompt catalog has been successfully created!" in result.output
+
+        result = runner.invoke(click_main, ["publish"])
+        assert "Uploading the tool catalog items to Couchbase" in result.output
+        assert "Uploading the prompt catalog items to Couchbase" in result.output
+
+        cluster = connection_factory()
+        t1 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.tools;").execute()
+        t2 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.prompts;").execute()
+        assert t1[0] == 24
+        assert t2[0] == 12
+
+
+@pytest.mark.slow
+def test_publish_negative_1(tmp_path, isolated_server_factory, connection_factory):
+    runner = click.testing.CliRunner()
+    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        isolated_server_factory(pathlib.Path(td) / ".couchbase")
+        initialize_repo(
+            directory=pathlib.Path(td),
+            repo_kind=ExampleRepoKind.INDEXED_DIRTY_ALL_TRAVEL,
+            click_runner=runner,
+            click_command=click_main,
+        )
+        os.chdir(td)
+
+        result = runner.invoke(click_main, ["init", "catalog", "--no-local", "--db"])
+        assert "Metadata collection for the catalog has been successfully created!" in result.output
+        assert "Vector index for the tool catalog has been successfully created!" in result.output
+        assert "Vector index for the prompt catalog has been successfully created!" in result.output
+
+        result = runner.invoke(click_main, ["publish"])
+        assert "Cannot publish a dirty catalog to the DB!" in str(result.exception)
+
+        cluster = connection_factory()
+        t1 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.tools;").execute()
+        t2 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.prompts;").execute()
+        assert t1[0] == 0
+        assert t2[0] == 0
+
+
+@pytest.mark.slow
+def test_publish_positive_2(tmp_path, isolated_server_factory, connection_factory):
+    runner = click.testing.CliRunner()
+    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        isolated_server_factory(pathlib.Path(td) / ".couchbase")
+        initialize_repo(
+            directory=pathlib.Path(td),
+            repo_kind=ExampleRepoKind.INDEXED_CLEAN_ALL_TRAVEL,
+            click_runner=runner,
+            click_command=click_main,
+        )
+        os.chdir(td)
+
+        result = runner.invoke(click_main, ["init", "catalog", "--no-local", "--db"])
+        assert "Metadata collection for the catalog has been successfully created!" in result.output
+        assert "Vector index for the tool catalog has been successfully created!" in result.output
+        assert "Vector index for the prompt catalog has been successfully created!" in result.output
+
+        result = runner.invoke(click_main, ["publish", "tools"])
+        assert "Uploading the tool catalog items to Couchbase" in result.output
+
+        cluster = connection_factory()
+        t1 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.tools;").execute()
+        t2 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.prompts;").execute()
+        assert t1[0] == 24
+        assert t2[0] == 0
+
+
+@pytest.mark.slow
+def test_publish_positive_3(tmp_path, isolated_server_factory, connection_factory):
+    runner = click.testing.CliRunner()
+    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        isolated_server_factory(pathlib.Path(td) / ".couchbase")
+        initialize_repo(
+            directory=pathlib.Path(td),
+            repo_kind=ExampleRepoKind.INDEXED_CLEAN_ALL_TRAVEL,
+            click_runner=runner,
+            click_command=click_main,
+        )
+        os.chdir(td)
+
+        result = runner.invoke(click_main, ["init", "catalog", "--no-local", "--db"])
+        assert "Metadata collection for the catalog has been successfully created!" in result.output
+        assert "Vector index for the tool catalog has been successfully created!" in result.output
+        assert "Vector index for the prompt catalog has been successfully created!" in result.output
+
+        result = runner.invoke(click_main, ["publish", "prompts"])
+        assert "Uploading the prompt catalog items to Couchbase" in result.output
+
+        cluster = connection_factory()
+        t1 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.tools;").execute()
+        t2 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.prompts;").execute()
+        assert t1[0] == 0
+        assert t2[0] == 12
 
 
 @pytest.mark.slow
@@ -137,17 +190,15 @@ def test_find(tmp_path, isolated_server_factory):
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
         initialize_repo(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.EMPTY,
+            repo_kind=ExampleRepoKind.PUBLISHED_ALL_TRAVEL,
             click_runner=runner,
             click_command=click_main,
         )
         os.chdir(td)
-        runner.invoke(click_main, ["init", "catalog", "--local", "--db"])
-        catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
-        catalog = pathlib.Path(__file__).parent / "resources" / "find" / "tools-positive-1.json"
-        publish_catalog(runner, catalog, catalog_folder)
 
         # DB find
+        repo: git.Repo = git.Repo.init(td)
+        cid = repo.head.commit.binsha.hex()
         invocation = runner.invoke(
             click_main,
             [
@@ -157,7 +208,7 @@ def test_find(tmp_path, isolated_server_factory):
                 "--query",
                 "'get blogs of interest'",
                 "-cid",
-                "fafdf72735d9c60c0b5bfa3101b01f3be13f7cb3",
+                cid,
             ],
         )
         output = invocation.stdout
@@ -165,17 +216,7 @@ def test_find(tmp_path, isolated_server_factory):
 
         output = runner.invoke(
             click_main,
-            [
-                "find",
-                "tools",
-                "--db",
-                "--query",
-                "'get blogs of interest'",
-                "--limit",
-                "3",
-                "-cid",
-                "fafdf72735d9c60c0b5bfa3101b01f3be13f7cb3",
-            ],
+            ["find", "tools", "--db", "--query", "'get blogs of interest'", "--limit", "3", "-cid", cid],
         ).stdout
         assert "3 result(s) returned from the catalog." in output
 
@@ -223,14 +264,10 @@ def test_status(tmp_path, isolated_server_factory):
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
         initialize_repo(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.EMPTY,
+            repo_kind=ExampleRepoKind.INDEXED_CLEAN_TOOLS_TRAVEL,
             click_runner=runner,
             click_command=click_main,
         )
-        runner.invoke(click_main, ["init", "catalog", "--local", "--db"])
-        catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
-        catalog = pathlib.Path(__file__).parent / "resources" / "find" / "tools-positive-1.json"
-        publish_catalog(runner, catalog, catalog_folder)
 
         # Case 2 - tool catalog exists locally (testing for only one kind of catalog)
         output = runner.invoke(click_main, ["status", "tools", "--dirty"]).stdout
@@ -248,11 +285,10 @@ def test_status(tmp_path, isolated_server_factory):
         assert "db catalog info" in output
 
 
-@pytest.mark.slow
-def test_clean(tmp_path, isolated_server_factory):
+@pytest.mark.smoke
+def test_local_clean(tmp_path):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        isolated_server_factory(pathlib.Path(td) / ".couchbase")
         os.chdir(td)
 
         runner.invoke(click_main, ["init", "catalog", "--local", "--db"])
@@ -272,20 +308,27 @@ def test_clean(tmp_path, isolated_server_factory):
         with dummy_file_2.open("w") as fp:
             fp.write("more dummy content")
 
-        assert runner.invoke(click_main, ["clean", "catalog", "--no-db", "-y"]).exit_code == 0
+        assert runner.invoke(click_main, ["clean", "catalog", "-y"]).exit_code == 0
         assert not dummy_file_1.exists()
         assert not dummy_file_2.exists()
 
-        # DB clean
-        catalog_folder.mkdir()
-        catalog = pathlib.Path(__file__).parent / "resources" / "find" / "tools-positive-1.json"
-        publish_catalog(runner, catalog, catalog_folder)
+
+@pytest.mark.slow
+def test_db_clean(tmp_path, isolated_server_factory):
+    runner = click.testing.CliRunner()
+    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        isolated_server_factory(pathlib.Path(td) / ".couchbase")
+        initialize_repo(
+            directory=pathlib.Path(td),
+            repo_kind=ExampleRepoKind.PUBLISHED_ALL_TRAVEL,
+            click_runner=runner,
+            click_command=click_main,
+        )
         runner.invoke(
             click_main,
             [
                 "clean",
                 "catalog",
-                "--no-local",
                 "-y",
             ],
         )
@@ -356,38 +399,47 @@ def test_publish_multiple_nodes(tmp_path):
 
 
 @pytest.mark.slow
-def test_publish_different_versions(tmp_path, isolated_server_factory):
+def test_publish_different_versions(tmp_path, isolated_server_factory, connection_factory):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
         initialize_repo(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.EMPTY,
+            repo_kind=ExampleRepoKind.PUBLISHED_ALL_TRAVEL,
             click_runner=runner,
             click_command=click_main,
         )
         os.chdir(td)
-        runner.invoke(click_main, ["init", "catalog", "--local", "--db"])
 
-        catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
-        catalog = pathlib.Path(__file__).parent / "resources" / "publish" / "prompts-positive-1.json"
-        publish_catalog(runner, catalog, catalog_folder)
-        catalog = pathlib.Path(__file__).parent / "resources" / "publish" / "prompts-positive-2.json"
-        publish_catalog(runner, catalog, catalog_folder)
-        cluster = couchbase.cluster.Cluster(
-            DEFAULT_COUCHBASE_CONN_STRING,
-            couchbase.options.ClusterOptions(
-                authenticator=couchbase.auth.PasswordAuthenticator(
-                    DEFAULT_COUCHBASE_USERNAME, DEFAULT_COUCHBASE_PASSWORD
-                ),
-            ),
-        )
-        query = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.prompts;")
-        for row in query:
-            assert row == 4
-        query = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.metadata;")
-        for row in query:
-            assert row == 2
+        cluster = connection_factory()
+        q1 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.prompts;")
+        q2 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.tools;")
+        initial_prompt_count = q1.execute()[0]
+        initial_tool_count = q2.execute()[0]
+
+        # We will now go through another commit-index-publish sequence. First, our commit...
+        repo: git.Repo = git.Repo.init(td)
+        with (pathlib.Path(td) / "README.md").open("a") as f:
+            f.write("\nI'm dirty now!")
+        repo.index.add(["README.md"])
+        repo.index.commit("Next commit")
+
+        # ...now, our index...
+        result = runner.invoke(click_main, ["index"])
+        assert "Catalog successfully indexed" in result.output
+
+        # ...and finally, our publish.
+        result = runner.invoke(click_main, ["publish"])
+        assert "Uploading the prompt catalog items to Couchbase" in result.output
+        assert "Uploading the tool catalog items to Couchbase" in result.output
+
+        cluster = connection_factory()
+        q1 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.prompts;")
+        assert q1.execute()[0] == initial_prompt_count * 2
+        q2 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.tools;")
+        assert q2.execute()[0] == initial_tool_count * 2
+        q3 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.metadata;")
+        assert q3.execute()[0] == 2
 
 
 @pytest.mark.smoke
@@ -499,3 +551,28 @@ def test_init_local_all(tmp_path):
         runner.invoke(click_main, ["init", "catalog", "activity", "--local", "--no-db"])
         files_present = os.listdir()
         assert ".agent-catalog" in files_present and ".agent-activity" in files_present
+
+
+@pytest.mark.slow
+def test_init_db(tmp_path, isolated_server_factory, connection_factory):
+    runner = click.testing.CliRunner()
+    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+        isolated_server_factory(pathlib.Path(td) / ".couchbase")
+        initialize_repo(
+            directory=pathlib.Path(td),
+            repo_kind=ExampleRepoKind.EMPTY,
+            click_runner=runner,
+            click_command=click_main,
+        )
+        os.chdir(td)
+        result = runner.invoke(click_main, ["init", "catalog", "--db"])
+        assert result.exit_code == 0
+        assert "Metadata collection for the catalog has been successfully created!" in result.output
+        assert "Vector index for the tool catalog has been successfully created!" in result.output
+
+        # TODO (GLENN): Check if the proper indexes have been created.
+        cluster = connection_factory()
+        t1 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.tools;").execute()
+        t2 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.prompts;").execute()
+        assert t1[0] == 0
+        assert t2[0] == 0

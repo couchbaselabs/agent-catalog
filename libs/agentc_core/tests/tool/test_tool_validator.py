@@ -39,6 +39,8 @@ def test_python_function():
         "Calculate the travel costs based on distance, fuel efficiency, and fuel price."
         in positive_1_tools[0].description
     )
+    assert positive_1_tools[0].content.line_no_start == 13
+    assert positive_1_tools[0].content.line_no_end == 16
 
     positive_2_factory = _get_tool_descriptor_factory(
         cls=PythonToolDescriptor.Factory, filename=pathlib.Path("python_function/positive_2.py")
@@ -169,7 +171,7 @@ def test_semantic_search():
     assert positive_1_input_json["properties"]["user_interests"]["type"] == "array"
     assert positive_1_input_json["properties"]["user_interests"]["items"]["type"] == "string"
     assert positive_1_tools[0].vector_search.bucket == "travel-sample"
-    assert positive_1_tools[0].vector_search.scope == "inventory"
+    assert positive_1_tools[0].vector_search.span == "inventory"
     assert positive_1_tools[0].vector_search.collection == "article"
 
     # Test the serialization of annotations.

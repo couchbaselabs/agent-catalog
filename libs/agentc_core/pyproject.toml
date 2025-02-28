@@ -59,6 +59,11 @@ pytest = "^8.3.2"
 path = "../agentc_testing"
 develop = true
 
+# Note: we only depend on the CLI for tests.
+[tool.poetry.group.dev.dependencies.agentc-cli]
+path = "../agentc_cli"
+develop = true
+
 [tool.pytest.ini_options]
 markers = [
     "smoke: marks tests for running on each git-push",

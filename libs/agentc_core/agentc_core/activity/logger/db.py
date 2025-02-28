@@ -47,6 +47,7 @@ class DBLogger(BaseLogger):
         message_str = message.model_dump_json()
         message_json = json.loads(message_str)
 
+        # TODO (GLENN): There might be issues here if the key is too long.
         # upsert docs to CB collection
-        key = f"{message.timestamp}/{str(message.scope)}"
+        key = f"{message.timestamp}/{str(message.span)}"
         cb_coll.upsert(key, message_json)

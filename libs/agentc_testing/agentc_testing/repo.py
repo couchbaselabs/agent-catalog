@@ -84,6 +84,9 @@ def initialize_repo(
     # Commit our files.
     repo.index.add(files_to_commit)
     repo.index.commit("Initial commit")
+    if repo_kind == ExampleRepoKind.INDEXED_DIRTY_ALL_TRAVEL:
+        with (directory / "README.md").open("a") as f:
+            f.write("\nI'm dirty now!")
     output = list()
 
     # If we are not using the index command, we can return early...

@@ -6,7 +6,6 @@ authors = [
   "Kush Khanna <kush.khanna@couchbase.com>",
   "Glenn Galvizo <glenn.galvizo@couchbase.com>"
 ]
-readme = "README.md"
 packages = [
   { include = "agentc_langchain" }
 ]
@@ -30,11 +29,16 @@ python-dotenv = "^1.0.1"
 pydantic-settings = "^2.7.1"
 
 [tool.poetry.dependencies.agentc-core]
-path = "../agentc_core"
+path = "../../agentc_core"
 develop = true
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
+
+# Note: we only depend on the CLI for tests.
+[tool.poetry.group.dev.dependencies.agentc-cli]
+path = "../../agentc_cli"
+develop = true
 
 [build-system]
 requires = ["poetry-core"]

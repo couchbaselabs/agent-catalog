@@ -45,7 +45,7 @@ jobs:
 #
 #      - name: Build and publish the agentc_langchain package
 #        run: |
-#          cd libs/agentc_langchain
+#          cd libs/integrations/langchain
 #          poetry build
 #          poetry publish -r testpypi
 #
