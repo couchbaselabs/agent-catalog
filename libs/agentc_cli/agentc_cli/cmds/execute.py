@@ -116,19 +116,28 @@ def cmd_execute(
                 "Tool functions must have type hints that are compatible with Pydantic."
             ) from e
 
-        # TODO (GLENN): We should try to directly import from the source first before writing the content.
         # if it is python tool get code from tool metadata and dump it into a file and import modules
         if tool_metadata.record_kind == RecordKind.PythonFunction:
             # create a file and dump python tool code into it
             python_tool_metadata: PythonToolDescriptor = tool_metadata
-            file_name = python_tool_metadata.source.name
-            with (tmp_dir_path / file_name).open("w") as f:
-                f.write(python_tool_metadata.contents)
+            try:
+                logger.debug("Attempting to directly import the tool.")
+                if str(python_tool_metadata.source.absolute()) not in sys.path:
+                    sys.path.append(str(python_tool_metadata.source.absolute()))
+                gen_code_modules = importlib.import_module(python_tool_metadata.source.stem)
 
-            # add temp directory and it's content as modules
-            if str(tmp_dir_path.absolute()) not in sys.path:
-                sys.path.append(str(tmp_dir_path.absolute()))
-            gen_code_modules = importlib.import_module(python_tool_metadata.source.stem)
+            except Exception as e:
+                logger.warning(
+                    "Could not directly import the tool. Attempting to use the indexed contents.\n%s", str(e)
+                )
+                file_name = python_tool_metadata.source.name
+                with (tmp_dir_path / file_name).open("w") as f:
+                    f.write(python_tool_metadata.content.file_content)
+
+                # add temp directory and it's content as modules
+                if str(tmp_dir_path.absolute()) not in sys.path:
+                    sys.path.append(str(tmp_dir_path.absolute()))
+                gen_code_modules = importlib.import_module(python_tool_metadata.source.stem)
 
         # if it is sqlpp, yaml, jinja tools, provider dumps codes into a file by default, import that
         else:

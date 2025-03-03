@@ -350,7 +350,7 @@ def test_db_clean(tmp_path, isolated_server_factory):
         assert expected_response_db in output
 
 
-@pytest.mark.slow
+@pytest.mark.smoke
 def test_execute(tmp_path):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
