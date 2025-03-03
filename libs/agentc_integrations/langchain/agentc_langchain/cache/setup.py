@@ -9,7 +9,7 @@ from .options import CacheOptions
 
 
 def setup_exact_cache(options: CacheOptions):
-    cb = options.cluster.bucket(options.bucket)
+    cb = options.Cluster().bucket(bucket_name=options.bucket)
     bucket_manager = cb.collections()
     msg, err = agentc_core.util.ddl.create_scope_and_collection(
         bucket_manager=bucket_manager,

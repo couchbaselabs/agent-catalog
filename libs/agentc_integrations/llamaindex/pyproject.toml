@@ -31,7 +31,7 @@ develop = true
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
 pytest = "^8.3.2"
-pytest-rerunfailures = "^15.0"
+pytest-retry = "^1.7.0"
 
 [build-system]
 requires = ["poetry-core"]

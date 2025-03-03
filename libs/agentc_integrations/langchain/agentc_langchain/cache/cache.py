@@ -27,7 +27,7 @@ def cache(
     if kind.lower() == "exact":
         setup_exact_cache(options)
         llm_cache = langchain_couchbase.cache.CouchbaseCache(
-            cluster=options.cluster,
+            cluster=options.Cluster(),
             bucket_name=options.bucket,
             scope_name=options.scope,
             collection_name=options.collection,
@@ -37,7 +37,7 @@ def cache(
     elif kind.lower() == "semantic":
         setup_semantic_cache(options, embeddings)
         llm_cache = langchain_couchbase.cache.CouchbaseSemanticCache(
-            cluster=options.cluster,
+            cluster=options.Cluster(),
             embedding=embeddings,
             bucket_name=options.bucket,
             scope_name=options.scope,

@@ -18,19 +18,19 @@ class CacheOptions(pydantic_settings.BaseSettings):
     model_config = pydantic_settings.SettingsConfigDict(env_prefix="AGENT_CATALOG_LANGCHAIN_CACHE_")
 
     # Connection-specific details.
-    conn_string: str = None
+    conn_string: typing.Optional[str] = None
     """ The connection string to the Couchbase cluster hosting the cache.
 
     This field **must** be specified.
     """
 
-    username: str = None
+    username: typing.Optional[str] = None
     """ Username associated with the Couchbase instance hosting the cache.
 
     This field **must** be specified.
     """
 
-    password: pydantic.SecretStr = None
+    password: typing.Optional[pydantic.SecretStr] = None
     """ Password associated with the Couchbase instance hosting the cache.
 
     This field **must** be specified.
@@ -43,7 +43,7 @@ class CacheOptions(pydantic_settings.BaseSettings):
     """
 
     # Collection-specific details.
-    bucket: str = None
+    bucket: typing.Optional[str] = None
     """ The name of the Couchbase bucket hosting the cache.
 
     This field **must** be specified.
@@ -99,15 +99,13 @@ class CacheOptions(pydantic_settings.BaseSettings):
             self.bucket = config.bucket
         return self
 
-    @property
-    @pydantic.computed_field
-    def cluster(self):
+    def Cluster(self) -> couchbase.cluster.Cluster:
         if self.conn_root_certificate is not None and isinstance(self.conn_root_certificate, pathlib.Path):
             conn_root_certificate = self.conn_root_certificate.absolute()
         else:
             conn_root_certificate = self.conn_root_certificate
 
-        return couchbase.cluster.Cluster.connect(
+        return couchbase.cluster.Cluster(
             self.conn_string,
             couchbase.options.ClusterOptions(
                 couchbase.auth.PasswordAuthenticator(

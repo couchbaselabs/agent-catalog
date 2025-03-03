@@ -81,6 +81,6 @@ jobs:
 
       - run: echo "🔥 Starting the slow tests (🤞 please don't break!)."
       - name: Run agentc slow tests
-        run: poetry run bash -c "pytest -m slow -v --reruns 5 --reruns-delay 1"
+        run: poetry run bash -c "pytest -m slow -v --retries 5 --retry-delay 10"
 
       - run: echo "🍏 This job's status is ${{ job.status }}."

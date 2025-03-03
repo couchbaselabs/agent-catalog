@@ -4,7 +4,7 @@ import textwrap
 
 from ...analytics import Log
 from ...defaults import DEFAULT_ACTIVITY_LOG_COLLECTION
-from ...defaults import DEFAULT_AUDIT_SCOPE
+from ...defaults import DEFAULT_ACTIVITY_SCOPE
 from ...util.ddl import check_if_scope_collection_exist
 from .base import BaseLogger
 from agentc_core.config import RemoteCatalogConfig
@@ -25,19 +25,19 @@ class DBLogger(BaseLogger):
         bucket_manager = cb.collections()
 
         scope_collection_exist = check_if_scope_collection_exist(
-            bucket_manager, DEFAULT_AUDIT_SCOPE, DEFAULT_ACTIVITY_LOG_COLLECTION, False
+            bucket_manager, DEFAULT_ACTIVITY_SCOPE, DEFAULT_ACTIVITY_LOG_COLLECTION, False
         )
         if not scope_collection_exist:
             raise ValueError(
                 textwrap.dedent(f"""
-                The collection {cfg.bucket}.{DEFAULT_AUDIT_SCOPE}.{DEFAULT_ACTIVITY_LOG_COLLECTION} does not exist.\n
+                The collection {cfg.bucket}.{DEFAULT_ACTIVITY_SCOPE}.{DEFAULT_ACTIVITY_LOG_COLLECTION} does not exist.\n
                 Please use the 'agentc init' command to create this collection.\n
                 Execute 'agentc init --help' for more information.
             """)
             )
 
         # get collection ref
-        cb_coll = cb.scope(DEFAULT_AUDIT_SCOPE).collection(DEFAULT_ACTIVITY_LOG_COLLECTION)
+        cb_coll = cb.scope(DEFAULT_ACTIVITY_SCOPE).collection(DEFAULT_ACTIVITY_LOG_COLLECTION)
         self.cb_coll = cb_coll
 
     def _accept(self, message: Log):

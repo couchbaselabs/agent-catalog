@@ -14,7 +14,7 @@ from agentc_core.analytics.create import create_analytics_views
 from agentc_core.analytics.create import create_query_udfs
 from agentc_core.config import Config
 from agentc_core.defaults import DEFAULT_ACTIVITY_LOG_COLLECTION
-from agentc_core.defaults import DEFAULT_AUDIT_SCOPE
+from agentc_core.defaults import DEFAULT_ACTIVITY_SCOPE
 from agentc_core.defaults import DEFAULT_CATALOG_METADATA_COLLECTION
 from agentc_core.defaults import DEFAULT_CATALOG_PROMPT_COLLECTION
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
@@ -151,7 +151,7 @@ def init_db_auditor(cfg: Config, cluster: couchbase.cluster.Cluster):
 
     # Create the scope and collection for the auditor.
     log_col = DEFAULT_ACTIVITY_LOG_COLLECTION
-    log_scope = DEFAULT_AUDIT_SCOPE
+    log_scope = DEFAULT_ACTIVITY_SCOPE
     click.secho("Now creating scope and collections for the auditor.", fg="yellow")
     (msg, err) = create_scope_and_collection(bucket_manager, scope=log_scope, collection=log_col)
     if err is not None:

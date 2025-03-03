@@ -15,7 +15,7 @@ from agentc_core.catalog.descriptor import CatalogDescriptor
 from agentc_core.config import Config
 from agentc_core.defaults import DEFAULT_ACTIVITY_FILE
 from agentc_core.defaults import DEFAULT_ACTIVITY_LOG_COLLECTION
-from agentc_core.defaults import DEFAULT_AUDIT_SCOPE
+from agentc_core.defaults import DEFAULT_ACTIVITY_SCOPE
 from agentc_core.defaults import DEFAULT_CATALOG_METADATA_COLLECTION
 from agentc_core.defaults import DEFAULT_CATALOG_PROMPT_COLLECTION
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
@@ -77,8 +77,8 @@ def cmd_publish(
 
         # Connect to our log collection.
         bucket_manager = cb.collections()
-        check_if_scope_collection_exist(bucket_manager, DEFAULT_AUDIT_SCOPE, DEFAULT_ACTIVITY_LOG_COLLECTION, True)
-        cb_coll = cb.scope(DEFAULT_AUDIT_SCOPE).collection(DEFAULT_ACTIVITY_LOG_COLLECTION)
+        check_if_scope_collection_exist(bucket_manager, DEFAULT_ACTIVITY_SCOPE, DEFAULT_ACTIVITY_LOG_COLLECTION, True)
+        cb_coll = cb.scope(DEFAULT_ACTIVITY_SCOPE).collection(DEFAULT_ACTIVITY_LOG_COLLECTION)
 
         logger.debug("Upserting logs into the cluster.")
         for msg in log_messages:

@@ -10,7 +10,7 @@ import typing
 from .util import logging_command
 from agentc_core.config import Config
 from agentc_core.defaults import DEFAULT_ACTIVITY_FOLDER
-from agentc_core.defaults import DEFAULT_AUDIT_SCOPE
+from agentc_core.defaults import DEFAULT_ACTIVITY_SCOPE
 from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
 from agentc_core.defaults import DEFAULT_CATALOG_METADATA_COLLECTION
 from agentc_core.defaults import DEFAULT_CATALOG_PROMPT_COLLECTION
@@ -91,7 +91,7 @@ def clean_db(
                 all_errs.append(err)
 
         if "activity" in targets:
-            drop_scope_query = f"DROP SCOPE `{cfg.bucket}`.`{DEFAULT_AUDIT_SCOPE}` IF EXISTS;"
+            drop_scope_query = f"DROP SCOPE `{cfg.bucket}`.`{DEFAULT_ACTIVITY_SCOPE}` IF EXISTS;"
             res, err = execute_query(cluster, drop_scope_query)
             for r in res.rows():
                 logger.debug(r)
