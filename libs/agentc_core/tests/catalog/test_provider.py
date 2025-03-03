@@ -26,7 +26,6 @@ def test_local_tool_provider(tmp_path):
             click_runner=click.testing.CliRunner(),
             click_command=click_main,
         )
-        os.chdir(td)
         catalog = Catalog()
         tools = catalog.get("tool", query="searching travel blogs")
         assert len(tools) == 1
@@ -43,7 +42,6 @@ def test_local_inputs_provider(tmp_path):
             click_runner=click.testing.CliRunner(),
             click_command=click_main,
         )
-        os.chdir(td)
         catalog = Catalog()
         prompt = catalog.get("prompt", query="asking a user their location")
         assert prompt.tools is None
@@ -60,7 +58,6 @@ def test_local_provider(tmp_path):
             click_runner=click.testing.CliRunner(),
             click_command=click_main,
         )
-        os.chdir(td)
         catalog = Catalog()
         prompt = catalog.get("prompt", query="asking a user their location")
         tools = catalog.get("tool", query="searching travel blogs")
@@ -81,7 +78,6 @@ def test_db_tool_provider(tmp_path, isolated_server_factory):
             click_runner=click.testing.CliRunner(),
             click_command=click_main,
         )
-        os.chdir(td)
         os.remove((pathlib.Path(td) / DEFAULT_CATALOG_FOLDER / DEFAULT_TOOL_CATALOG_FILE).absolute())
         catalog = Catalog(bucket="travel-sample")
         tools = catalog.get("tool", query="searching travel blogs using user interests")

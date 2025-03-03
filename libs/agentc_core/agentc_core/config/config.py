@@ -267,6 +267,11 @@ class LocalCatalogConfig(pydantic_settings.BaseSettings):
             starting_path,
             DEFAULT_CATALOG_FOLDER,
         )
+        if logger.level <= logging.DEBUG:
+            items_in_directory = []
+            for file in starting_path.iterdir():
+                items_in_directory.append(file)
+            logger.debug("Items in directory: %s", items_in_directory)
 
         # Iteratively ascend our starting path until we find the catalog folder.
         working_path = starting_path
@@ -308,7 +313,7 @@ class LocalCatalogConfig(pydantic_settings.BaseSettings):
 class CommandLineConfig(pydantic_settings.BaseSettings):
     model_config = pydantic_settings.SettingsConfigDict(env_prefix="AGENT_CATALOG_")
 
-    verbosity_level: int = pydantic.Field(DEFAULT_VERBOSITY_LEVEL, ge=0, le=2)
+    verbosity_level: int = pydantic.Field(default=DEFAULT_VERBOSITY_LEVEL, ge=0, le=2)
     with_interaction: bool = True
 
 

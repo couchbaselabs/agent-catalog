@@ -1,6 +1,5 @@
 import click.testing
 import langchain_openai
-import os
 import pathlib
 import pytest
 
@@ -31,7 +30,6 @@ def test_audit(tmp_path, isolated_server_factory, connection_factory):
             click_runner=click.testing.CliRunner(),
             click_command=click_main,
         )
-        os.chdir(td)
         catalog = Catalog(bucket="travel-sample")
         span = catalog.Span(name="default")
 
@@ -63,7 +61,6 @@ def test_callback(tmp_path, isolated_server_factory, connection_factory):
             click_runner=click.testing.CliRunner(),
             click_command=click_main,
         )
-        os.chdir(td)
         catalog = Catalog(bucket="travel-sample")
         span = catalog.Span(name="default")
 

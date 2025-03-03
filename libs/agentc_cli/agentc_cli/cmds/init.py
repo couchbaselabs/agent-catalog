@@ -51,7 +51,6 @@ def cmd_init(
         cluster = cfg.Cluster()
         if "catalog" in targets:
             init_db_catalog(cfg, cluster)
-
         if "activity" in targets:
             init_db_auditor(cfg, cluster)
         cluster.close()

@@ -36,7 +36,6 @@ def test_index(tmp_path):
             click_runner=runner,
             click_command=click_main,
         )
-        os.chdir(td)
 
         repo = git.Repo.init(td)
         repo.index.commit("Initial commit")
@@ -77,7 +76,6 @@ def test_publish_positive_1(tmp_path, isolated_server_factory, connection_factor
             click_runner=runner,
             click_command=click_main,
         )
-        os.chdir(td)
 
         result = runner.invoke(click_main, ["init", "catalog", "--no-local", "--db"])
         assert "Metadata collection for the catalog has been successfully created!" in result.output
@@ -106,7 +104,6 @@ def test_publish_negative_1(tmp_path, isolated_server_factory, connection_factor
             click_runner=runner,
             click_command=click_main,
         )
-        os.chdir(td)
 
         result = runner.invoke(click_main, ["init", "catalog", "--no-local", "--db"])
         assert "Metadata collection for the catalog has been successfully created!" in result.output
@@ -134,7 +131,6 @@ def test_publish_positive_2(tmp_path, isolated_server_factory, connection_factor
             click_runner=runner,
             click_command=click_main,
         )
-        os.chdir(td)
 
         result = runner.invoke(click_main, ["init", "catalog", "--no-local", "--db"])
         assert "Metadata collection for the catalog has been successfully created!" in result.output
@@ -162,7 +158,6 @@ def test_publish_positive_3(tmp_path, isolated_server_factory, connection_factor
             click_runner=runner,
             click_command=click_main,
         )
-        os.chdir(td)
 
         result = runner.invoke(click_main, ["init", "catalog", "--no-local", "--db"])
         assert "Metadata collection for the catalog has been successfully created!" in result.output
@@ -196,7 +191,6 @@ def test_find(tmp_path, isolated_server_factory):
             click_runner=runner,
             click_command=click_main,
         )
-        os.chdir(td)
 
         # DB find
         repo: git.Repo = git.Repo.init(td)
@@ -297,7 +291,6 @@ def test_local_clean(tmp_path):
             click_runner=runner,
             click_command=click_main,
         )
-        os.chdir(td)
         runner.invoke(click_main, ["init", "catalog", "--no-db"])
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
 
@@ -367,7 +360,6 @@ def test_execute(tmp_path):
             click_runner=runner,
             click_command=click_main,
         )
-        os.chdir(td)
 
         output = runner.invoke(click_main, ["execute", "--name", "random_tool", "--local"]).stdout
         assert "No catalog items found" in output
@@ -407,7 +399,6 @@ def test_publish_different_versions(tmp_path, isolated_server_factory, connectio
             click_runner=runner,
             click_command=click_main,
         )
-        os.chdir(td)
 
         cluster = connection_factory()
         q1 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.prompts;")
@@ -468,8 +459,6 @@ def test_ls_local_empty_notindexed(tmp_path):
 def test_ls_local_only_tools(tmp_path):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        os.chdir(td)
-
         # when only tools are indexed
         initialize_repo(
             directory=pathlib.Path(td),
@@ -487,8 +476,6 @@ def test_ls_local_only_tools(tmp_path):
 def test_ls_local_only_prompts(tmp_path):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        os.chdir(td)
-
         # when only prompts are indexed
         initialize_repo(
             directory=pathlib.Path(td),
@@ -506,8 +493,6 @@ def test_ls_local_only_prompts(tmp_path):
 def test_ls_local_both_tools_prompts(tmp_path):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        os.chdir(td)
-
         # when there are both tools and prompts
         initialize_repo(
             directory=pathlib.Path(td),
@@ -565,7 +550,6 @@ def test_init_db(tmp_path, isolated_server_factory, connection_factory):
             click_runner=runner,
             click_command=click_main,
         )
-        os.chdir(td)
         result = runner.invoke(click_main, ["init", "catalog", "--db"])
         assert result.exit_code == 0
         assert "Metadata collection for the catalog has been successfully created!" in result.output

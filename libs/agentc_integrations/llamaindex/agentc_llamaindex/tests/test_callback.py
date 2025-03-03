@@ -1,7 +1,6 @@
 import click.testing
 import llama_index.core.llms
 import llama_index.llms.openai
-import os
 import pathlib
 import pytest
 
@@ -31,7 +30,6 @@ def test_complete(tmp_path, isolated_server_factory, connection_factory):
             click_runner=click.testing.CliRunner(),
             click_command=click_main,
         )
-        os.chdir(td)
         catalog = Catalog(bucket="travel-sample")
         span = catalog.Span(name="default")
 
@@ -65,7 +63,6 @@ def test_chat(tmp_path):
             click_runner=click.testing.CliRunner(),
             click_command=click_main,
         )
-        os.chdir(td)
         catalog = Catalog(bucket="travel-sample")
         span = catalog.Span(name="default")
 
