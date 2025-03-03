@@ -39,6 +39,9 @@ class CatalogBase(abc.ABC):
     def __iter__(self) -> typing.Iterator[RecordDescriptor]:
         raise NotImplementedError("CatalogBase.__iter__()")
 
+    def __len__(self):
+        return sum(1 for _ in self)
+
     @staticmethod
     def cosine_similarity(query: list[float], entry: list[float]) -> float:
         dot_product = sum(q * e for q, e in zip(query, entry))

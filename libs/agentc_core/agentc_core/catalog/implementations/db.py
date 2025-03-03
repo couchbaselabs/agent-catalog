@@ -232,6 +232,19 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                     raise LookupError(f"Unknown record encountered of kind = '{kind}'!")
             yield descriptor
 
+    def __len__(self):
+        collection = DEFAULT_CATALOG_TOOL_COLLECTION if self.kind == "tool" else DEFAULT_CATALOG_PROMPT_COLLECTION
+        query = f"""
+            FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}`
+            SELECT VALUE COUNT(*);
+        """
+        res, err = execute_query(self.cluster, query)
+        if err is not None:
+            logger.error(err)
+            raise err
+        for row in res:
+            return row
+
     @property
     def version(self) -> VersionDescriptor:
         """Returns the latest version of the catalog."""

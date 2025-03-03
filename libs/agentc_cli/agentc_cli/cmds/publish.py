@@ -22,6 +22,7 @@ from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_CATALOG_TOOL_COLLECTION
 from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
+from agentc_core.record.descriptor import RecordKind
 from agentc_core.util.ddl import check_if_scope_collection_exist
 from agentc_core.util.models import CustomPublishEncoder
 from couchbase.exceptions import CouchbaseException
@@ -160,6 +161,15 @@ def cmd_publish(
         logger.debug("Inserting catalog items...")
         progress_bar = tqdm.tqdm(catalog_desc.items)
         for item in progress_bar:
+            if (
+                k == "prompt"
+                and item.record_kind != RecordKind.Prompt
+                or k == "tool"
+                and item.record_kind == RecordKind.Prompt
+            ):
+                # If we reach here, then something went wrong during the indexing process.
+                raise ValueError(f"Invalid record kind for {k} catalog item!\n{item.record_kind}")
+
             try:
                 key = uuid.uuid4().hex
                 progress_bar.set_description(item.name)

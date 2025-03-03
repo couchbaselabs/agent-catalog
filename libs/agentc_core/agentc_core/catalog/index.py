@@ -18,6 +18,7 @@ from .implementations.mem import CatalogMem
 from .version import catalog_schema_version_compare
 from .version import lib_version_compare
 from agentc_core.record.descriptor import RecordKind
+from agentc_core.version import VersionDescriptor
 
 logger = logging.getLogger(__name__)
 
@@ -31,8 +32,8 @@ class MetaVersion:
 def index_catalog(
     embedding_model: EmbeddingModel,
     meta_version: MetaVersion,
-    catalog_version: str,
-    get_path_version: typing.Callable[[str], str],
+    catalog_version: VersionDescriptor,
+    get_path_version: typing.Callable[[str], VersionDescriptor],
     kind: typing.Literal["tool", "prompt"],
     catalog_file,
     source_dirs,
@@ -92,8 +93,8 @@ def index_catalog(
 def index_catalog_start(
     embedding_model: EmbeddingModel,
     meta_version: MetaVersion,
-    catalog_version: str,
-    get_path_version: typing.Callable[[str], str],
+    catalog_version: VersionDescriptor,
+    get_path_version: typing.Callable[[str], VersionDescriptor],
     kind: typing.Literal["tool", "prompt"],
     catalog_file,
     source_dirs,
@@ -137,12 +138,19 @@ def index_catalog_start(
                 is_description_length_valid = True
 
                 errs, descriptors = indexer.start_descriptors(source_file, get_path_version)
+                descriptors = [
+                    d
+                    for d in descriptors
+                    if (kind == "prompt" and d.record_kind == RecordKind.Prompt)
+                    or (kind == "tool" and d.record_kind != RecordKind.Prompt)
+                ]
                 for descriptor in descriptors:
                     # Validate description lengths
                     if len(descriptor.description) == 0:
                         printer(f"WARNING: Catalog item {descriptor.name} has an empty description.", fg="yellow")
                         is_description_empty = True
                         break
+
                     if len(descriptor.description.split()) > DEFAULT_ITEM_DESCRIPTION_MAX_LEN:
                         printer(
                             f"WARNING: Catalog item {descriptor.name} has a description with token size more"
@@ -156,6 +164,7 @@ def index_catalog_start(
                     raise ValueError(
                         "Catalog contains item(s) with empty description! Please provide a description and index again."
                     )
+                # TODO (GLENN): We can offer options here to (potentially) summarize the description in the future.
                 if not is_description_length_valid:
                     raise ValueError(
                         f"Catalog contains item(s) with description length more than the allowed limit of "
