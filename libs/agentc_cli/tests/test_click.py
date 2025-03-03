@@ -1,9 +1,11 @@
 import click.testing
 import git
+import json
 import os
 import pathlib
 import pytest
 import re
+import requests
 import shutil
 import uuid
 
@@ -264,7 +266,7 @@ def test_status(tmp_path, isolated_server_factory):
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
         initialize_repo(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.INDEXED_CLEAN_TOOLS_TRAVEL,
+            repo_kind=ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL,
             click_runner=runner,
             click_command=click_main,
         )
@@ -275,7 +277,7 @@ def test_status(tmp_path, isolated_server_factory):
         assert ".agent-catalog/tools.json" in output
 
         # Case 3 - tool catalog exists in db (this test runs after publish test)
-        output = runner.invoke(click_main, ["status", "tools", "--dirty", "--db"]).stdout
+        output = runner.invoke(click_main, ["status", "tools", "--dirty", "--no-local", "--db"]).stdout
         assert "db catalog info" in output
 
         # Case 4 - compare the two catalogs
@@ -331,9 +333,6 @@ def test_db_clean(tmp_path, isolated_server_factory):
                 "-y",
             ],
         )
-
-        import json
-        import requests
 
         # Get all scopes in bucket
         url = "http://localhost:8091/pools/default/buckets/travel-sample/scopes"
@@ -413,18 +412,21 @@ def test_publish_different_versions(tmp_path, isolated_server_factory, connectio
         cluster = connection_factory()
         q1 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.prompts;")
         q2 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.tools;")
-        initial_prompt_count = q1.execute()[0]
-        initial_tool_count = q2.execute()[0]
+        initial_prompt_count = int(q1.execute()[0])
+        initial_tool_count = int(q2.execute()[0])
 
         # We will now go through another commit-index-publish sequence. First, our commit...
         repo: git.Repo = git.Repo.init(td)
         with (pathlib.Path(td) / "README.md").open("a") as f:
             f.write("\nI'm dirty now!")
         repo.index.add(["README.md"])
+        n1 = len(list(repo.iter_commits()))
         repo.index.commit("Next commit")
+        n2 = len(list(repo.iter_commits()))
+        assert n1 < n2
 
         # ...now, our index...
-        result = runner.invoke(click_main, ["index"])
+        result = runner.invoke(click_main, ["index", "tools", "prompts"])
         assert "Catalog successfully indexed" in result.output
 
         # ...and finally, our publish.

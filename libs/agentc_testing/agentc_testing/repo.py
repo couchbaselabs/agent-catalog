@@ -96,14 +96,41 @@ def initialize_repo(
     # ...otherwise we need to initialize our catalog...
     output.append(click_runner.invoke(click_command, ["init", "catalog", "--local", "--no-db"]))
     output.append(click_runner.invoke(click_command, ["init", "activity", "--local", "--no-db"]))
+    if repo_kind in [
+        ExampleRepoKind.PUBLISHED_ALL_TRAVEL,
+        ExampleRepoKind.PUBLISHED_PROMPTS_TRAVEL,
+        ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL,
+    ]:
+        # Initialize the DB catalog (we'll use three-tries).
+        for _ in range(3):
+            result = click_runner.invoke(click_command, ["init", "catalog", "--no-local", "--db"])
+            if result.exception is not None:
+                output.append(result.exception)
+                time.sleep(1)
+                continue
+            else:
+                output.append(result.output)
+
+            result = click_runner.invoke(click_command, ["init", "activity", "--no-local", "--db"])
+            if result.exception is not None:
+                output.append(result.exception)
+                time.sleep(1)
+                continue
+            else:
+                output.append(result.output)
+                break
+
     if repo_kind == ExampleRepoKind.NON_INDEXED_ALL_TRAVEL:
         return output
 
     # ...and, call the index command.
-    if repo_kind not in [ExampleRepoKind.INDEXED_CLEAN_PROMPTS_TRAVEL, ExampleRepoKind.PUBLISHED_PROMPTS_TRAVEL]:
-        output.append(click_runner.invoke(click_command, ["index", "tools", "--no-prompts"] + (index_args or [])))
-    if repo_kind not in [ExampleRepoKind.INDEXED_CLEAN_TOOLS_TRAVEL, ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL]:
-        output.append(click_runner.invoke(click_command, ["index", "prompts", "--no-tools"] + (index_args or [])))
+    match repo_kind:
+        case ExampleRepoKind.INDEXED_CLEAN_PROMPTS_TRAVEL, ExampleRepoKind.PUBLISHED_PROMPTS_TRAVEL:
+            output.append(click_runner.invoke(click_command, ["index", "prompts", "--no-tools"] + (index_args or [])))
+        case ExampleRepoKind.INDEXED_CLEAN_TOOLS_TRAVEL, ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL:
+            output.append(click_runner.invoke(click_command, ["index", "tools", "--no-prompts"] + (index_args or [])))
+        case ExampleRepoKind.INDEXED_CLEAN_ALL_TRAVEL, ExampleRepoKind.PUBLISHED_ALL_TRAVEL:
+            output.append(click_runner.invoke(click_command, ["index", "tools", "prompts"] + (index_args or [])))
     if repo_kind not in [
         ExampleRepoKind.PUBLISHED_ALL_TRAVEL,
         ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL,
@@ -111,38 +138,16 @@ def initialize_repo(
     ]:
         return output
 
-    # Initialize the DB catalog (we'll use three-tries).
-    for _ in range(3):
-        result = click_runner.invoke(click_command, ["init", "catalog", "--no-local", "--db"])
-        if result.exception is not None:
-            output.append(result.exception)
-            time.sleep(1)
-            continue
-        else:
-            output.append(result.output)
-
-        result = click_runner.invoke(click_command, ["init", "activity", "--no-local", "--db"])
-        if result.exception is not None:
-            output.append(result.exception)
-            time.sleep(1)
-            continue
-        else:
-            output.append(result.output)
-            break
-
     # Call our publish command. Note that this assumes a container / CB instance is active!
     os.environ["AGENT_CATALOG_MAX_INDEX_PARTITION"] = "1"
     os.environ["AGENT_CATALOG_INDEX_PARTITION"] = "1"
-    if repo_kind != ExampleRepoKind.PUBLISHED_PROMPTS_TRAVEL:
-        output.append(
-            click_runner.invoke(click_command, ["publish", "tools", "--bucket", "travel-sample"] + (publish_args or []))
-        )
-    if repo_kind != ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL:
-        output.append(
-            click_runner.invoke(
-                click_command, ["publish", "prompts", "--bucket", "travel-sample"] + (publish_args or [])
-            )
-        )
+    match repo_kind:
+        case ExampleRepoKind.PUBLISHED_PROMPTS_TRAVEL:
+            output.append(click_runner.invoke(click_command, ["publish", "prompts"] + (publish_args or [])))
+        case ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL:
+            output.append(click_runner.invoke(click_command, ["publish", "tools"] + (publish_args or [])))
+        case ExampleRepoKind.PUBLISHED_ALL_TRAVEL:
+            output.append(click_runner.invoke(click_command, ["publish"] + (publish_args or [])))
     logger.info(output)
     return output
 
