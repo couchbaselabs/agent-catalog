@@ -1,5 +1,5 @@
-import agentc_core.defaults
 import contextlib
+import couchbase.bucket
 import couchbase.cluster
 import couchbase.exceptions
 import json
@@ -8,7 +8,6 @@ import requests
 import tqdm
 import typing
 
-from .query import execute_query
 from agentc_core.config import Config
 from agentc_core.defaults import DEFAULT_CATALOG_METADATA_COLLECTION
 from agentc_core.defaults import DEFAULT_CATALOG_PROMPT_COLLECTION
@@ -18,14 +17,28 @@ from agentc_core.defaults import DEFAULT_HTTP_CLUSTER_ADMIN_PORT_NUMBER
 from agentc_core.defaults import DEFAULT_HTTP_FTS_PORT_NUMBER
 from agentc_core.defaults import DEFAULT_HTTPS_CLUSTER_ADMIN_PORT_NUMBER
 from agentc_core.defaults import DEFAULT_HTTPS_FTS_PORT_NUMBER
-from agentc_core.util.connection import get_host_name
-from couchbase.bucket import CollectionManager
+from agentc_core.remote.util.query import execute_query
 
 logger = logging.getLogger(__name__)
 
 
-def is_index_present(
-    cfg: agentc_core.config.Config, index_to_create: str, fts_nodes_hostname: list[str] = None
+def get_host_name(url: str):
+    # exception is handled by Pydantic class for URL, so does not matter what is returned here for None
+    if url is None:
+        return ""
+
+    split_url = url.split("//")
+    num_elements = len(split_url)
+    if num_elements == 2:
+        return split_url[1]
+    elif num_elements == 1:
+        return split_url[0]
+    else:
+        return ""
+
+
+def is_fts_index_present(
+    cfg: Config, index_to_create: str, fts_nodes_hostname: list[str] = None
 ) -> tuple[bool | dict | None, Exception | None]:
     """Checks for existence of index_to_create in the given keyspace"""
     if fts_nodes_hostname is None:
@@ -127,13 +140,14 @@ def create_vector_index(
 
     if num_fts_nodes == 0:
         raise ValueError(
-            "No node with 'search' service found, cannot create vector index! Please ensure 'search' service is included in at least one node."
+            "No node with 'search' service found, cannot create vector index! "
+            "Please ensure 'search' service is included in at least one node."
         )
 
     # To be on safer side make request to connection string host
     fts_nodes_hostname.append(get_host_name(cfg.conn_string))
 
-    (index_present, err) = is_index_present(cfg, qualified_index_name, fts_nodes_hostname)
+    (index_present, err) = is_fts_index_present(cfg, qualified_index_name, fts_nodes_hostname)
     if err is not None:
         return None, err
     elif isinstance(index_present, bool) and not index_present:
@@ -332,18 +346,35 @@ def create_vector_index(
         return qualified_index_name, None
 
 
-def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "prompt"], print_progress):
+def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "prompt", "metadata"], print_progress):
     """Creates required indexes at publish"""
-    progress_bar = tqdm.tqdm(range(5))
+    progress_bar = tqdm.tqdm(range(3 if kind != "metadata" else 1))
     progress_bar_it = iter(progress_bar)
-
     completion_status = True
     all_errs = ""
 
-    # Primary index on kind_catalog
     cluster = cfg.Cluster()
+    if kind == "metadata":
+        # Primary index on kind_metadata
+        primary_idx_metadata_name = "v2_AgentCatalogMetadataPrimaryIndex"
+        primary_idx = f"""
+            CREATE PRIMARY INDEX IF NOT EXISTS `{primary_idx_metadata_name}`
+            ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{DEFAULT_CATALOG_METADATA_COLLECTION}` USING GSI;
+        """
+        if print_progress:
+            next(progress_bar_it)
+            progress_bar.set_description(primary_idx_metadata_name)
+        res, err = execute_query(cluster, primary_idx)
+        for r in res.rows():
+            logger.debug(r)
+        if err is not None:
+            all_errs += err
+            completion_status = False
+        return completion_status, all_errs
+
+    # Primary index on kind_catalog
     collection = DEFAULT_CATALOG_TOOL_COLLECTION if kind == "tool" else DEFAULT_CATALOG_PROMPT_COLLECTION
-    primary_idx_name = f"v1_agent_catalog_primary_{kind}"
+    primary_idx_name = f"v2_AgentCatalog{kind.capitalize()}sPrimaryIndex"
     primary_idx = f"""
         CREATE PRIMARY INDEX IF NOT EXISTS `{primary_idx_name}`
         ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}` USING GSI;
@@ -358,40 +389,8 @@ def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "prompt"], prin
         all_errs += err
         completion_status = False
 
-    # Primary index on kind_metadata
-    primary_idx_metadata_name = "v1_agent_catalog_primary_metadata"
-    primary_idx = f"""
-        CREATE PRIMARY INDEX IF NOT EXISTS `{primary_idx_metadata_name}`
-        ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{DEFAULT_CATALOG_METADATA_COLLECTION}` USING GSI;
-    """
-    if print_progress:
-        next(progress_bar_it)
-        progress_bar.set_description(primary_idx_name)
-    res, err = execute_query(cluster, primary_idx)
-    for r in res.rows():
-        logger.debug(r)
-    if err is not None:
-        all_errs += err
-        completion_status = False
-
-    # Secondary index on catalog_identifier
-    cat_idx_name = f"v1_agent_catalog_{kind}cat_version_identifier"
-    cat_idx = f"""
-        CREATE INDEX IF NOT EXISTS `{cat_idx_name}`
-        ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}`(catalog_identifier);
-    """
-    if print_progress:
-        next(progress_bar_it)
-        progress_bar.set_description(cat_idx_name)
-    res, err = execute_query(cluster, cat_idx)
-    for r in res.rows():
-        logger.debug(r)
-    if err is not None:
-        all_errs += err
-        completion_status = False
-
     # Secondary index on catalog_identifier + annotations
-    cat_ann_idx_name = f"v1_agent_catalog_{kind}cat_catalog_identifier_annotations"
+    cat_ann_idx_name = f"v2_AgentCatalog{kind.capitalize()}sCatalogIdentifierAnnotationsIndex"
     cat_ann_idx = f"""
         CREATE INDEX IF NOT EXISTS `{cat_ann_idx_name}`
         ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}`(catalog_identifier,annotations);
@@ -407,7 +406,7 @@ def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "prompt"], prin
         completion_status = False
 
     # Secondary index on annotations
-    ann_idx_name = f"v1_agent_catalog_{kind}cat_annotations"
+    ann_idx_name = f"v2_AgentCatalog{kind.capitalize()}sAnnotationsIndex"
     ann_idx = f"""
         CREATE INDEX IF NOT EXISTS `{ann_idx_name}`
         ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}`(`annotations`);
@@ -429,15 +428,17 @@ def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "prompt"], prin
 
 
 def check_if_scope_collection_exist(
-    bucket_manager: CollectionManager, scope: str, collection: str, raise_exception: bool
+    collection_manager: couchbase.bucket.CollectionManager, scope: str, collection: str, raise_exception: bool
 ) -> bool:
     """Check if the given scope and collection exist in the bucket"""
-    scopes = bucket_manager.get_all_scopes()
+    scopes = collection_manager.get_all_scopes()
     scope_exists = any(s.name == scope for s in scopes)
     if not scope_exists:
         if raise_exception:
             raise ValueError(
-                f"Scope {scope} not found in the given bucket!\nPlease use 'agentc init' command first.\nExecute 'agentc init --help' for more information."
+                f"Scope {scope} not found in the given bucket!\n"
+                f"Please use 'agentc init' command first.\n"
+                f"Execute 'agentc init --help' for more information."
             )
         return False
 
@@ -446,7 +447,9 @@ def check_if_scope_collection_exist(
     if not collection_exists:
         if raise_exception:
             raise ValueError(
-                f"Collection {scope}.{collection} not found in the given bucket!\nPlease use 'agentc init' command first.\nExecute 'agentc init --help' for more information."
+                f"Collection {scope}.{collection} not found in the given bucket!\n"
+                f"Please use 'agentc init' command first.\n"
+                f"Execute 'agentc init --help' for more information."
             )
         return False
 
@@ -455,8 +458,6 @@ def check_if_scope_collection_exist(
 
 def create_scope_and_collection(bucket_manager, scope, collection):
     """Create new Couchbase scope and collection within it if they do not exist"""
-    # TODO (GLENN): Refactor to just use cluster.query and CREATE SCOPE and CREATE COLLECTION statements
-    #               (you can use IF NOT EXISTS instead of checking if the scope / collection exists)
 
     # Create a new scope if it does not exist
     try:

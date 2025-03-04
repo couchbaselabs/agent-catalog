@@ -26,7 +26,7 @@ from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
 from agentc_core.learned.embedding import EmbeddingModel
-from agentc_core.util.query import execute_query
+from agentc_core.remote.util.query import execute_query
 from agentc_core.version import VersionDescriptor
 from couchbase.exceptions import KeyspaceNotFoundException
 from couchbase.exceptions import ScopeNotFoundException

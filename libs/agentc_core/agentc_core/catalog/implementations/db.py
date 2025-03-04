@@ -16,12 +16,12 @@ from agentc_core.learned.embedding import EmbeddingModel
 from agentc_core.prompt.models import PromptDescriptor
 from agentc_core.record.descriptor import RecordDescriptor
 from agentc_core.record.descriptor import RecordKind
+from agentc_core.remote.util.query import execute_query
+from agentc_core.remote.util.query import execute_query_with_parameters
 from agentc_core.tool.descriptor import HTTPRequestToolDescriptor
 from agentc_core.tool.descriptor import PythonToolDescriptor
 from agentc_core.tool.descriptor import SemanticSearchToolDescriptor
 from agentc_core.tool.descriptor import SQLPPQueryToolDescriptor
-from agentc_core.util.query import execute_query
-from agentc_core.util.query import execute_query_with_parameters
 from agentc_core.version import VersionDescriptor
 from couchbase.exceptions import KeyspaceNotFoundException
 from couchbase.exceptions import ScopeNotFoundException
@@ -95,7 +95,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             annotation_condition = annotations.__catalog_query_str__() if annotations is not None else "1==1"
 
             # Index used (in the future, we may need to condition on the catalog schema version).
-            idx = f"v1_agent_catalog_{self.kind}_index"
+            idx = f"v2_AgentCatalog{self.kind.capitalize()}sEmbeddingIndex"
 
             # User has specified a snapshot id
             if snapshot is not None:

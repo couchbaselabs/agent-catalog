@@ -44,10 +44,11 @@ def logging_command(parent_logger: logging.Logger):
     def decorator(func):
         @functools.wraps(func)
         def new_func(*args, **kwargs):
+            parent_logger.debug(f"Running command {func.__name__}.")
             try:
                 return func(*args, **kwargs)
             except Exception as e:
-                parent_logger.error(f"Command {func.__name__} failed with exception: {str(e)}")
+                parent_logger.error(f"Command {func.__name__} failed with exception: {str(e)}\n", stack_info=True)
                 raise e
 
         return new_func

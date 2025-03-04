@@ -1,7 +1,7 @@
 import agentc_core.config
-import agentc_core.util.connection
-import agentc_core.util.ddl
-import agentc_core.util.models
+import agentc_core.remote.connection
+import agentc_core.remote.util.ddl
+import agentc_core.remote.util.models
 import langchain_core.embeddings
 import os
 
@@ -11,7 +11,7 @@ from .options import CacheOptions
 def setup_exact_cache(options: CacheOptions):
     cb = options.Cluster().bucket(bucket_name=options.bucket)
     bucket_manager = cb.collections()
-    msg, err = agentc_core.util.ddl.create_scope_and_collection(
+    msg, err = agentc_core.remote.util.ddl.create_scope_and_collection(
         bucket_manager=bucket_manager,
         scope=options.scope,
         collection=options.collection,
@@ -56,7 +56,7 @@ def setup_semantic_cache(options: CacheOptions, embeddings: langchain_core.embed
         index_partition=index_partition,
     )
 
-    _, err = agentc_core.util.ddl.create_vector_index(
+    _, err = agentc_core.remote.util.ddl.create_vector_index(
         config,
         scope=options.scope,
         collection=options.collection,

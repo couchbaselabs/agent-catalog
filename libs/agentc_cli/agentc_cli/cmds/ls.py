@@ -2,17 +2,17 @@ import click
 import logging
 import typing
 
-from agentc_cli.cmds.util import DASHES
-from agentc_cli.cmds.util import KIND_COLORS
-from agentc_cli.cmds.util import get_catalog
-from agentc_cli.cmds.util import logging_command
+from .util import DASHES
+from .util import KIND_COLORS
+from .util import get_catalog
+from .util import logging_command
 from agentc_core.catalog import CatalogBase
 from agentc_core.config import Config
 
 logger = logging.getLogger(__name__)
 
 
-@logging_command(parent_logger=logger)
+@logging_command(logger)
 def cmd_ls(
     cfg: Config = None,
     *,

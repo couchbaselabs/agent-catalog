@@ -28,7 +28,6 @@ Repository = "https://github.com/couchbaselabs/agent-catalog"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-python-dotenv = "^1.0.1"
 requests = "^2.32.3"
 PyYAML = "^6.0.1"
 semantic_version = "^2.10.0"

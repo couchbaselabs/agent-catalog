@@ -21,7 +21,6 @@ joblib = "^1.4.2"
 llama-index = "^0.12.20"
 pydantic = "^2.10.6"
 requests = "^2.32.3"
-python-dotenv = "^1.0.1"
 pydantic-settings = "^2.7.1"
 
 [tool.poetry.dependencies.agentc-core]

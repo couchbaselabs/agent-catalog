@@ -16,7 +16,7 @@ from agentc_core.defaults import DEFAULT_CATALOG_METADATA_COLLECTION
 from agentc_core.defaults import DEFAULT_CATALOG_PROMPT_COLLECTION
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_CATALOG_TOOL_COLLECTION
-from agentc_core.util.query import execute_query
+from agentc_core.remote.util.query import execute_query
 from typing_extensions import Literal
 
 logger = logging.getLogger(__name__)
@@ -104,7 +104,7 @@ def clean_db(
     return len(all_errs)
 
 
-@logging_command(parent_logger=logger)
+@logging_command(logger)
 def cmd_clean(
     cfg: Config = None,
     *,

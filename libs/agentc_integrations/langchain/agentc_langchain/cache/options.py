@@ -15,7 +15,7 @@ from agentc_langchain.defaults import DEFAULT_COUCHBASE_CACHE_SCOPE_NAME
 
 
 class CacheOptions(pydantic_settings.BaseSettings):
-    model_config = pydantic_settings.SettingsConfigDict(env_prefix="AGENT_CATALOG_LANGCHAIN_CACHE_")
+    model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_LANGCHAIN_CACHE_")
 
     # Connection-specific details.
     conn_string: typing.Optional[str] = None

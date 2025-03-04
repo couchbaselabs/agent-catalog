@@ -5,9 +5,9 @@ import textwrap
 from ...analytics import Log
 from ...defaults import DEFAULT_ACTIVITY_LOG_COLLECTION
 from ...defaults import DEFAULT_ACTIVITY_SCOPE
-from ...util.ddl import check_if_scope_collection_exist
 from .base import BaseLogger
 from agentc_core.config import RemoteCatalogConfig
+from agentc_core.remote.util.ddl import check_if_scope_collection_exist
 from agentc_core.version import VersionDescriptor
 
 logger = logging.getLogger(__name__)

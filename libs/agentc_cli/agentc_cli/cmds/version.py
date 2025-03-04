@@ -9,7 +9,7 @@ from agentc_core.config import Config
 logger = logging.getLogger(__name__)
 
 
-@logging_command(parent_logger=logger)
+@logging_command(logger)
 def cmd_version(cfg: Config = None):
     if cfg is None:
         cfg = Config()

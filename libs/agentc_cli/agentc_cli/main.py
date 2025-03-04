@@ -1,7 +1,6 @@
 import click
 import couchbase.cluster
 import couchbase.exceptions
-import dotenv
 import logging
 import os
 import pathlib
@@ -27,21 +26,9 @@ from agentc_core.config.config import Config
 from agentc_core.defaults import DEFAULT_VERBOSITY_LEVEL
 from agentc_core.record.descriptor import RecordKind
 
-# Configure all logging here before we continue with our imports.
-# By default, we won't print any log messages below WARNING.
-logging.basicConfig(
-    level=logging.WARNING,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler()],
-)
-
 # Keeping this here, the logging these libraries do can be pretty verbose.
 logging.getLogger("sentence_transformers").setLevel(logging.ERROR)
 logging.getLogger("openapi_parser").setLevel(logging.ERROR)
-
-# TODO: Should we load from ".env.rosetta"?
-# TODO: Or, perhaps even stage specific, like from ".env.rosetta.prod"?
-dotenv.load_dotenv(dotenv.find_dotenv(usecwd=True))
 
 
 # Support abbreviated command aliases, ex: "agentc st" ==> "agentc status".

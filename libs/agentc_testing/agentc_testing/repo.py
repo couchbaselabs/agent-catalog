@@ -5,7 +5,6 @@ import logging
 import os
 import pathlib
 import shutil
-import time
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +36,9 @@ def initialize_repo(
     index_args: list = None,
     publish_args: list = None,
 ) -> list[click.testing.Result]:
+    logger.info("Initializing repo with kind: %s.", repo_kind)
+
+    # Create a new git repo in the directory.
     os.chdir(directory)
     repo: git.Repo = git.Repo.init(directory)
     with (directory / "README.md").open("w") as f:
@@ -116,23 +118,12 @@ def initialize_repo(
             | ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL
             | ExampleRepoKind.PUBLISHED_PROMPTS_TRAVEL
         ):
-            for _ in range(3):
-                result = click_runner.invoke(click_command, ["init", "catalog", "--local", "--db"])
-                if result.exception is not None:
-                    output.append(result.exception)
-                    time.sleep(1)
-                    continue
-                else:
-                    output.append(result.output)
+            output.append(click_runner.invoke(click_command, ["init", "catalog", "--local", "--db"]))
+            output.append(click_runner.invoke(click_command, ["init", "activity", "--local", "--db"]))
 
-                result = click_runner.invoke(click_command, ["init", "activity", "--local", "--db"])
-                if result.exception is not None:
-                    output.append(result.exception)
-                    time.sleep(1)
-                    continue
-                else:
-                    output.append(result.output)
-                    break
+        case _:
+            # We should not reach here.
+            raise ValueError(f"Cannot handle the repo_kind '{repo_kind}' at this point!")
 
     # ...and, call the index command.
     match repo_kind:
@@ -146,6 +137,9 @@ def initialize_repo(
             | ExampleRepoKind.PUBLISHED_ALL_TRAVEL
         ):
             output.append(click_runner.invoke(click_command, ["index", "tools", "prompts"] + (index_args or [])))
+        case _:
+            # We should not reach here.
+            raise ValueError(f"Cannot handle the repo_kind '{repo_kind}' at this point!")
     if repo_kind not in [
         ExampleRepoKind.PUBLISHED_ALL_TRAVEL,
         ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL,
@@ -164,6 +158,9 @@ def initialize_repo(
             output.append(click_runner.invoke(click_command, ["publish", "tools"] + (publish_args or [])))
         case ExampleRepoKind.PUBLISHED_ALL_TRAVEL:
             output.append(click_runner.invoke(click_command, ["publish"] + (publish_args or [])))
+        case _:
+            # We should not reach here.
+            raise ValueError(f"Cannot handle the repo_kind '{repo_kind}' at this point!")
     logger.info(f"{repo_kind}: %s", output)
     return output
 

@@ -150,7 +150,7 @@ def add_sqlpp_query(output: pathlib.Path, template_env: jinja2.Environment):
     subprocess.run([default_editor, f"{output_file}"])
 
 
-@logging_command(parent_logger=logger)
+@logging_command(logger)
 def cmd_add(
     cfg: Config = None,
     *,

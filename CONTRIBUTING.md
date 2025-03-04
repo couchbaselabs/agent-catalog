@@ -55,13 +55,27 @@ export AGENT_CATALOG_DEBUG=true
 
 ## Running Tests (Pytest)
 
-The workflow specified in
-
-To run all of the unit tests authored in `libs/agentc*/test`, use the following `pytest` command:
+To run the entire suite of unit tests, use the following `pytest` command in the project root:
 
 ```bash
-pytest libs/agentc_cli/tests libs/agentc_core/tests --log-file .output
+pytest --log-file .output --log-level DEBUG
 ```
 
-This command will run all tests and record the logger output to a `.output` file.
+This command will a) run all tests in the current working directory, b) record the logger output to a `.output` file,
+and c) set the logging level to DEBUG.
+
+To only run smoke tests, use the following `pytest` command (again, from the project root):
+
+```bash
+pytest -m smoke --log-file .output --log-level DEBUG
+```
+
+To run tests for a specific package, use the following `pytest` command (again, from the project root):
+
+```bash
+pytest libs/agentc_core --log-file .output --log-level DEBUG
+```
+
 Note that Click doesn't play too well with pytest's `log_cli=true` option, so we recommend logging to a file.
+For more information about our command line tool, see
+[here](https://docs.pytest.org/en/stable/reference/reference.html#command-line-flags).

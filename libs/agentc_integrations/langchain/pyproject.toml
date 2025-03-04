@@ -25,7 +25,6 @@ langchain-openai = ">=0.1.20"
 langchain_couchbase = "^0.2.4"
 pydantic = "^2.10.6"
 requests = "^2.32.3"
-python-dotenv = "^1.0.1"
 pydantic-settings = "^2.7.1"
 
 [tool.poetry.dependencies.agentc-core]

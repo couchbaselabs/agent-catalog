@@ -44,6 +44,7 @@ def _execute_with_retry(
 def _start_couchbase(
     volume_path: pathlib.Path, retry_count: int = 5, backoff_factor: float = 0.7
 ) -> docker.models.containers.Container:
+    logger.info("Creating Couchbase container with volume path: %s.", volume_path)
     volume_path.mkdir(exist_ok=True)
 
     # Start the Couchbase container.
@@ -56,6 +57,7 @@ def _start_couchbase(
         "11210/tcp": 11210,
         "11280/tcp": 11280,
     }
+    logger.info("Starting Couchbase container with ports: %s.", ports)
     container: docker.models.containers.Container = client.containers.run(
         image="couchbase",
         name=f"agentc_{uuid.uuid4().hex}",
@@ -81,6 +83,7 @@ def _start_couchbase(
                 },
             )
 
+        logger.info("Initializing Couchbase container %s (clusterInit).", container.name)
         _execute_with_retry(
             func=_init_cluster,
             condition=lambda r: r.status_code == http.HTTPStatus.OK,
@@ -96,6 +99,7 @@ def _start_couchbase(
                 data='["travel-sample"]',
             )
 
+        logger.info("Installing travel-sample bucket in Couchbase container %s.", container.name)
         _execute_with_retry(
             func=_install_bucket,
             condition=lambda r: r.status_code == http.HTTPStatus.ACCEPTED,
@@ -110,6 +114,7 @@ def _start_couchbase(
                 auth=(DEFAULT_COUCHBASE_USERNAME, DEFAULT_COUCHBASE_PASSWORD),
             )
 
+        logger.info("Waiting for travel-sample bucket to be ready in Couchbase container %s.", container.name)
         _execute_with_retry(
             func=_is_bucket_ready,
             condition=lambda r: r.status_code == http.HTTPStatus.OK,
@@ -126,7 +131,7 @@ def _start_couchbase(
 
 
 def _stop_couchbase(container: docker.models.containers.Container):
-    logger.debug("Stopping Couchbase container %s.", container.name)
+    logger.info("Stopping Couchbase container %s.", container.name)
     container.remove(force=True)
 
     # We'll keep this sleep here to account for the time it takes for the container to be removed.
