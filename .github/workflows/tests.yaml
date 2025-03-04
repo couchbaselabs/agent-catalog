@@ -40,7 +40,7 @@ jobs:
 
       - run: echo "🔥 Starting the smoke tests (🤞 please don't break!)."
       - name: Run agentc smoke tests
-        run: poetry run bash -c "pytest -m smoke -v"
+        run: poetry run bash -c "pytest -m smoke -v --log-level DEBUG"
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
 
@@ -81,6 +81,6 @@ jobs:
 
       - run: echo "🔥 Starting the slow tests (🤞 please don't break!)."
       - name: Run agentc slow tests
-        run: poetry run bash -c "pytest -m slow -v --retries 5 --retry-delay 10"
+        run: poetry run bash -c "pytest -m slow -v --retries 5 --retry-delay 10 --log-level DEBUG"
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
