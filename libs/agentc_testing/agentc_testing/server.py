@@ -1,6 +1,7 @@
 import couchbase.auth
 import couchbase.cluster
 import couchbase.options
+import datetime
 import docker
 import docker.models.containers
 import http
@@ -27,22 +28,42 @@ os.environ["AGENT_CATALOG_DEBUG"] = "true"
 
 # For whatever reason, the HTTP Retry adapter isn't working for me.
 def _execute_with_retry(
-    func: typing.Callable, condition: typing.Callable[..., bool], retry_count: int, backoff_factor: float = 0.1
+    func: typing.Callable,
+    condition: typing.Callable[..., bool],
+    result_str: typing.Callable[..., str],
+    retry_count: int,
+    container: docker.models.containers.Container,
+    backoff_factor: float = 0.1,
 ):
     for i in range(retry_count):
         try:
             result = func()
             if condition(result):
+                logger.debug(f"Function succeeded with result {result_str(result)}.")
                 return result
         except Exception as e:
             logger.debug(f"Function failed with error: {str(e)}")
             if i == retry_count - 1:
-                raise e
+                logger.error(f"Function failed after {retry_count} retries. Restarting container.")
+                container.restart()
+                time.sleep(30)
         time.sleep(backoff_factor * (2**i))
+
+    # If we reach here, we will attempt our function one last time.
+    try:
+        result = func()
+        if condition(result):
+            logger.debug(f"Function succeeded with result {result_str(result)}.")
+            return result
+        else:
+            raise ValueError(f"Function failed with result {result}.")
+    except Exception as e:
+        logger.debug(f"Function failed with error: {str(e)}")
+        raise e
 
 
 def _start_couchbase(
-    volume_path: pathlib.Path, retry_count: int = 5, backoff_factor: float = 0.7
+    volume_path: pathlib.Path, retry_count: int = 5, backoff_factor: float = 0.7, wait_for_ready: bool = True
 ) -> docker.models.containers.Container:
     logger.info("Creating Couchbase container with volume path: %s.", volume_path)
     volume_path.mkdir(exist_ok=True)
@@ -53,6 +74,7 @@ def _start_couchbase(
     ports |= {f"{port}/tcp": port for port in range(18091, 18098)}
     ports |= {
         "9123/tcp": 9123,
+        "9140/tcp": 9140,
         "11207/tcp": 11207,
         "11210/tcp": 11210,
         "11280/tcp": 11280,
@@ -62,9 +84,11 @@ def _start_couchbase(
         image="couchbase",
         name=f"agentc_{uuid.uuid4().hex}",
         ports=ports,
+        network_mode="bridge",
         detach=True,
         auto_remove=True,
         remove=True,
+        stderr=True,
         volumes={str(volume_path.absolute()): {"bind": "/opt/couchbase/var", "mode": "rw"}},
     )
 
@@ -86,7 +110,9 @@ def _start_couchbase(
         logger.info("Initializing Couchbase container %s (clusterInit).", container.name)
         _execute_with_retry(
             func=_init_cluster,
+            container=container,
             condition=lambda r: r.status_code == http.HTTPStatus.OK,
+            result_str=lambda r: r.text,
             retry_count=retry_count,
             backoff_factor=backoff_factor,
         )
@@ -102,36 +128,52 @@ def _start_couchbase(
         logger.info("Installing travel-sample bucket in Couchbase container %s.", container.name)
         _execute_with_retry(
             func=_install_bucket,
+            container=container,
             condition=lambda r: r.status_code == http.HTTPStatus.ACCEPTED,
+            result_str=lambda r: r.text,
             retry_count=retry_count,
             backoff_factor=backoff_factor,
         )
 
-        # Wait for the travel-sample bucket to be ready.
-        def _is_bucket_ready():
-            return requests.get(
-                "http://localhost:8091/pools/default/buckets/travel-sample",
-                auth=(DEFAULT_COUCHBASE_USERNAME, DEFAULT_COUCHBASE_PASSWORD),
+        # Wait for the travel-sample bucket to be ready. We'll do this by executing a query.
+        if wait_for_ready:
+
+            def _is_bucket_ready():
+                cluster = couchbase.cluster.Cluster(
+                    DEFAULT_COUCHBASE_CONN_STRING,
+                    couchbase.options.ClusterOptions(
+                        couchbase.auth.PasswordAuthenticator(
+                            username=DEFAULT_COUCHBASE_USERNAME, password=DEFAULT_COUCHBASE_PASSWORD
+                        )
+                    ),
+                )
+                cluster.wait_until_ready(datetime.timedelta(seconds=60))
+                query = cluster.query("SELECT VALUE 1 FROM `travel-sample`.inventory.airline LIMIT 1")
+                assert query.execute()[0] == 1
+                return cluster.cluster_info()
+
+            logger.info("Waiting for travel-sample bucket to be ready in Couchbase container %s.", container.name)
+            _execute_with_retry(
+                func=_is_bucket_ready,
+                container=container,
+                condition=lambda r: r.status_code == http.HTTPStatus.OK,
+                result_str=lambda q: q,
+                retry_count=retry_count,
+                backoff_factor=backoff_factor,
             )
-
-        logger.info("Waiting for travel-sample bucket to be ready in Couchbase container %s.", container.name)
-        _execute_with_retry(
-            func=_is_bucket_ready,
-            condition=lambda r: r.status_code == http.HTTPStatus.OK,
-            retry_count=retry_count,
-            backoff_factor=backoff_factor,
-        )
 
         logger.debug("Couchbase container %s is ready.", container.name)
         return container
 
     except Exception as e:
+        logger.error(container.logs())
         container.remove(force=True)
         raise e
 
 
 def _stop_couchbase(container: docker.models.containers.Container):
     logger.info("Stopping Couchbase container %s.", container.name)
+    logger.debug(container.logs())
     container.remove(force=True)
 
     # We'll keep this sleep here to account for the time it takes for the container to be removed.
@@ -157,7 +199,7 @@ def isolated_server_factory() -> typing.Callable[[pathlib.Path], docker.models.c
     os.environ["AGENT_CATALOG_USERNAME"] = DEFAULT_COUCHBASE_USERNAME
     os.environ["AGENT_CATALOG_PASSWORD"] = DEFAULT_COUCHBASE_PASSWORD
     os.environ["AGENT_CATALOG_BUCKET"] = DEFAULT_COUCHBASE_BUCKET
-    os.environ["AGENT_CATALOG_WAIT_UNTIL_READY_SECONDS"] = "30"
+    os.environ["AGENT_CATALOG_WAIT_UNTIL_READY_SECONDS"] = "60"
 
     container_instance = set()
     try:
@@ -187,9 +229,11 @@ if __name__ == "__main__":
     os.environ["AGENT_CATALOG_CONN_STRING"] = DEFAULT_COUCHBASE_CONN_STRING
     os.environ["AGENT_CATALOG_USERNAME"] = DEFAULT_COUCHBASE_USERNAME
     os.environ["AGENT_CATALOG_PASSWORD"] = DEFAULT_COUCHBASE_PASSWORD
+    os.environ["AGENT_CATALOG_BUCKET"] = DEFAULT_COUCHBASE_BUCKET
+    os.environ["AGENT_CATALOG_WAIT_UNTIL_READY_SECONDS"] = "60"
     with tempfile.TemporaryDirectory() as _tmp:
         try:
-            _container = _start_couchbase(pathlib.Path(_tmp))
+            _container = _start_couchbase(pathlib.Path(_tmp), wait_for_ready=False)
             print("Couchbase container started. Press Ctrl+C to stop.")
             while True:
                 pass
@@ -201,4 +245,6 @@ if __name__ == "__main__":
             del os.environ["AGENT_CATALOG_CONN_STRING"]
             del os.environ["AGENT_CATALOG_USERNAME"]
             del os.environ["AGENT_CATALOG_PASSWORD"]
+            del os.environ["AGENT_CATALOG_BUCKET"]
+            del os.environ["AGENT_CATALOG_WAIT_UNTIL_READY_SECONDS"]
             _stop_couchbase(_container)

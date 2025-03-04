@@ -1,17 +1,16 @@
-import agentc_core.config
-import agentc_core.remote.connection
-import agentc_core.remote.util.ddl
-import agentc_core.remote.util.models
 import langchain_core.embeddings
 import os
 
 from .options import CacheOptions
+from agentc_core.config import Config
+from agentc_core.remote.util.ddl import create_scope_and_collection
+from agentc_core.remote.util.ddl import create_vector_index
 
 
 def setup_exact_cache(options: CacheOptions):
     cb = options.Cluster().bucket(bucket_name=options.bucket)
     bucket_manager = cb.collections()
-    msg, err = agentc_core.remote.util.ddl.create_scope_and_collection(
+    msg, err = create_scope_and_collection(
         bucket_manager=bucket_manager,
         scope=options.scope,
         collection=options.collection,
@@ -46,7 +45,7 @@ def setup_semantic_cache(options: CacheOptions, embeddings: langchain_core.embed
             f"Update the environment variable 'AGENT_CATALOG_LANGCHAIN_CACHE_INDEX_PARTITION' to an integer value."
         ) from e
 
-    config = agentc_core.config.Config(
+    config = Config(
         bucket=options.bucket,
         conn_string=options.conn_string,
         username=options.username,
@@ -56,7 +55,7 @@ def setup_semantic_cache(options: CacheOptions, embeddings: langchain_core.embed
         index_partition=index_partition,
     )
 
-    _, err = agentc_core.remote.util.ddl.create_vector_index(
+    _, err = create_vector_index(
         config,
         scope=options.scope,
         collection=options.collection,
