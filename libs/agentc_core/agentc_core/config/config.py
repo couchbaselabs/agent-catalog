@@ -13,6 +13,8 @@ import urllib.parse
 
 from agentc_core.defaults import DEFAULT_ACTIVITY_FOLDER
 from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
+from agentc_core.defaults import DEFAULT_CLUSTER_DDL_RETRY_ATTEMPTS
+from agentc_core.defaults import DEFAULT_CLUSTER_DDL_RETRY_WAIT_SECONDS
 from agentc_core.defaults import DEFAULT_CLUSTER_WAIT_UNTIL_READY_SECONDS
 from agentc_core.defaults import DEFAULT_EMBEDDING_MODEL_NAME
 from agentc_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
@@ -84,10 +86,25 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
     `here <https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index-partitioning.html>`_.
     """
 
-    wait_until_ready_seconds: typing.Optional[int] = DEFAULT_CLUSTER_WAIT_UNTIL_READY_SECONDS
-    """ The default waiting time when connecting to a Couchbase cluster.
+    wait_until_ready_seconds: typing.Optional[float] = DEFAULT_CLUSTER_WAIT_UNTIL_READY_SECONDS
+    """ Maximum wait time before timing out when connecting to a Couchbase cluster.
 
     If you have a slow network connection, you may want to increase this value.
+    By default, this value is 5 seconds.
+    """
+
+    ddl_retry_attempts: typing.Optional[int] = DEFAULT_CLUSTER_DDL_RETRY_ATTEMPTS
+    """ Maximum number of attempts to retry DDL operations.
+
+    This field is only used by the :command:`init` command during scope, collection, and index creation.
+    If the number of attempts is exceeded, the command will fail.
+    By default, this value is 3 attempts.
+    """
+
+    ddl_retry_wait_seconds: typing.Optional[float] = DEFAULT_CLUSTER_DDL_RETRY_WAIT_SECONDS
+    """ Wait time (in seconds) between DDL operation retries.
+
+    This field is only used by the :command:`init` command during scope, collection, and index creation.
     By default, this value is 5 seconds.
     """
 

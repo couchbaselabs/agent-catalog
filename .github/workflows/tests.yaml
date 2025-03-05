@@ -29,6 +29,9 @@ jobs:
           poetry-version: "latest"
           shell: "bash"
 
+      - name: Run pre-commit
+        uses: pre-commit/action@v3.0.1
+
       - name: Install repository with Poetry
         run: scripts/setup.sh dev
 
@@ -69,6 +72,9 @@ jobs:
           python-version: "3.12"
           poetry-version: "latest"
           shell: "bash"
+
+      - name: Run pre-commit
+        uses: pre-commit/action@v3.0.1
 
       - name: Install repository with Poetry
         run: scripts/setup.sh dev

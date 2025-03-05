@@ -48,7 +48,7 @@ def logging_command(parent_logger: logging.Logger):
             try:
                 return func(*args, **kwargs)
             except Exception as e:
-                parent_logger.error(f"Command {func.__name__} failed with exception: {str(e)}\n", stack_info=True)
+                parent_logger.error(f"Command {func.__name__} failed with exception: {str(e)}\n{e.__traceback__}")
                 raise e
 
         return new_func

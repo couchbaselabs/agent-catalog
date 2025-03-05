@@ -6,6 +6,7 @@ def execute_query(cluster, exec_query) -> tuple[any, Exception | None]:
     """Execute a given query"""
 
     try:
+        # TODO (GLENN): Why are we catching an exception here? (we should catch exceptions on execute())
         result = cluster.query(exec_query, QueryOptions(metrics=True))
         return result, None
     except CouchbaseException as e:

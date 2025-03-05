@@ -11,9 +11,11 @@ def setup_exact_cache(options: CacheOptions):
     cb = options.Cluster().bucket(bucket_name=options.bucket)
     bucket_manager = cb.collections()
     msg, err = create_scope_and_collection(
-        bucket_manager=bucket_manager,
+        collection_manager=bucket_manager,
         scope=options.scope,
         collection=options.collection,
+        ddl_retry_attempts=options.ddl_retry_attempts,
+        ddl_retry_wait_seconds=options.ddl_retry_wait_seconds,
     )
     if err:
         raise ValueError(msg)

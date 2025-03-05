@@ -24,7 +24,6 @@ class EmbeddingModel(pydantic.BaseModel):
     embedding_model_name: typing.Optional[str] = DEFAULT_EMBEDDING_MODEL_NAME
     embedding_model_url: typing.Optional[str] = None
     embedding_model_auth: typing.Optional[str] = None
-    sentence_transformers_model_cache: typing.Optional[str] = DEFAULT_MODEL_CACHE_FOLDER
 
     # ...or implicitly (by path)...
     catalog_path: typing.Optional[pathlib.Path] = None
@@ -32,6 +31,10 @@ class EmbeddingModel(pydantic.BaseModel):
     # ...or implicitly (by Couchbase).
     cb_bucket: typing.Optional[str] = None
     cb_cluster: typing.Optional[couchbase.cluster.Cluster] = None
+
+    # Sentence-transformers-specific parameters.
+    sentence_transformers_model_cache: typing.Optional[str] = DEFAULT_MODEL_CACHE_FOLDER
+    sentence_transformers_retry_attempts: typing.Optional[int] = 3
 
     # The actual embedding model object (we won't type this to avoid the sentence transformers import).
     _embedding_model: None = None
@@ -152,7 +155,7 @@ class EmbeddingModel(pydantic.BaseModel):
 
             embedding_model = None
             last_error: Exception = None
-            for i in range(3):
+            for i in range(self.sentence_transformers_retry_attempts):
                 try:
                     embedding_model = sentence_transformers.SentenceTransformer(
                         self.embedding_model_name,

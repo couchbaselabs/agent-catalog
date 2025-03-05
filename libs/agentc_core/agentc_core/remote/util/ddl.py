@@ -2,9 +2,11 @@ import contextlib
 import couchbase.bucket
 import couchbase.cluster
 import couchbase.exceptions
+import couchbase.management.collections
 import json
 import logging
 import requests
+import time
 import tqdm
 import typing
 
@@ -364,12 +366,22 @@ def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "prompt", "meta
         if print_progress:
             next(progress_bar_it)
             progress_bar.set_description(primary_idx_metadata_name)
-        res, err = execute_query(cluster, primary_idx)
-        for r in res.rows():
-            logger.debug(r)
+        err = None
+        for _ in range(cfg.ddl_retry_attempts):
+            res, err = execute_query(cluster, primary_idx)
+            try:
+                for r in res.rows():
+                    logger.debug(r)
+                break
+            except couchbase.exceptions.CouchbaseException as e:
+                logger.debug("Could not create primary index. Retrying and swallowing exception %s.", e)
+                time.sleep(cfg.ddl_retry_wait_seconds)
+                err = e
         if err is not None:
             all_errs += err
             completion_status = False
+        with contextlib.suppress(StopIteration):
+            next(progress_bar_it)
         return completion_status, all_errs
 
     # Primary index on kind_catalog
@@ -382,9 +394,17 @@ def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "prompt", "meta
     if print_progress:
         next(progress_bar_it)
         progress_bar.set_description(primary_idx_name)
-    res, err = execute_query(cluster, primary_idx)
-    for r in res.rows():
-        logger.debug(r)
+    err = None
+    for _ in range(cfg.ddl_retry_attempts):
+        res, err = execute_query(cluster, primary_idx)
+        try:
+            for r in res.rows():
+                logger.debug(r)
+            break
+        except couchbase.exceptions.CouchbaseException as e:
+            logger.debug("Could not create primary index. Retrying and swallowing exception %s.", e)
+            time.sleep(cfg.ddl_retry_wait_seconds)
+            err = e
     if err is not None:
         all_errs += err
         completion_status = False
@@ -456,16 +476,22 @@ def check_if_scope_collection_exist(
     return True
 
 
-def create_scope_and_collection(bucket_manager, scope, collection):
+def create_scope_and_collection(
+    collection_manager: couchbase.management.collections.CollectionManager,
+    scope: str,
+    collection: str,
+    ddl_retry_attempts: int,
+    ddl_retry_wait_seconds: float,
+):
     """Create new Couchbase scope and collection within it if they do not exist"""
 
     # Create a new scope if it does not exist
     try:
-        scopes = bucket_manager.get_all_scopes()
+        scopes = collection_manager.get_all_scopes()
         scope_exists = any(s.name == scope for s in scopes)
         if not scope_exists:
             logger.debug(f"Scope {scope} not found. Attempting to create scope now.")
-            bucket_manager.create_scope(scope)
+            collection_manager.create_scope(scope_name=scope)
             logger.debug(f"Scope {scope} was created successfully.")
     except couchbase.exceptions.CouchbaseException as e:
         error_message = f"Encountered error while creating scope {scope}:\n{e.message}"
@@ -479,16 +505,23 @@ def create_scope_and_collection(bucket_manager, scope, collection):
             collection_exists = collection in collections
             if not collection_exists:
                 logger.debug(f"Collection {scope}.{collection} not found. Attempting to create collection now.")
-                bucket_manager.create_collection(scope, collection)
+                collection_manager.create_collection(scope_name=scope, collection_name=collection)
                 logger.debug(f"Collection {scope}.{collection} was created successfully.")
         else:
             logger.debug(f"Collection {scope}.{collection} not found. Attempting to create collection now.")
-            bucket_manager.create_collection(scope, collection)
+            collection_manager.create_collection(scope_name=scope, collection_name=collection)
             logger.debug(f"Collection {scope}.{collection} was created successfully.")
 
     except couchbase.exceptions.CouchbaseException as e:
         error_message = f"Encountered error while creating collection {scope}.{collection}:\n{e.message}"
         logger.error(error_message)
         return error_message, e
+
+    for _ in range(ddl_retry_attempts):
+        if not check_if_scope_collection_exist(collection_manager, scope, collection, raise_exception=False):
+            logger.debug("Scope and collection not found. Retrying...")
+            time.sleep(ddl_retry_wait_seconds)
+        else:
+            break
 
     return "Successfully created scope and collection", None

@@ -9,6 +9,8 @@ import typing
 
 from agentc_core.config import RemoteCatalogConfig
 from agentc_langchain.defaults import DEFAULT_COUCHBASE_CACHE_COLLECTION_NAME
+from agentc_langchain.defaults import DEFAULT_COUCHBASE_CACHE_DDL_RETRY_ATTEMPTS
+from agentc_langchain.defaults import DEFAULT_COUCHBASE_CACHE_DDL_RETRY_WAIT_SECONDS
 from agentc_langchain.defaults import DEFAULT_COUCHBASE_CACHE_INDEX_NAME
 from agentc_langchain.defaults import DEFAULT_COUCHBASE_CACHE_INDEX_SCORE_THRESHOLD
 from agentc_langchain.defaults import DEFAULT_COUCHBASE_CACHE_SCOPE_NAME
@@ -82,6 +84,21 @@ class CacheOptions(pydantic_settings.BaseSettings):
     This field will only be used if the cache is of type `semantic`.
     If the cache is of type `semantic` and this field is not specified, this field defaults to
     :py:data:`agentc_langchain.defaults.DEFAULT_COUCHBASE_CACHE_INDEX_SCORE_THRESHOLD`.
+    """
+
+    ddl_retry_attempts: typing.Optional[int] = DEFAULT_COUCHBASE_CACHE_DDL_RETRY_ATTEMPTS
+    """ Maximum number of attempts to retry DDL operations.
+
+    This value is only used on setup (i.e., the first time the cache is requested).
+    If the number of attempts is exceeded, the command will fail.
+    By default, this value is 3 attempts.
+    """
+
+    ddl_retry_wait_seconds: typing.Optional[float] = DEFAULT_COUCHBASE_CACHE_DDL_RETRY_WAIT_SECONDS
+    """ Wait time (in seconds) between DDL operation retries.
+
+    This value is only used on setup (i.e., the first time the cache is requested).
+    By default, this value is 5 seconds.
     """
 
     @pydantic.model_validator(mode="after")

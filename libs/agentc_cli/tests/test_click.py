@@ -78,7 +78,7 @@ def test_publish_positive_1(tmp_path, isolated_server_factory, connection_factor
         )
 
         result = runner.invoke(click_main, ["init", "catalog", "--no-local", "--db"])
-        assert "Metadata collection for the catalog has been successfully created!" in result.output
+        assert "GSI metadata index for the has been successfully created!" in result.output
         assert "Vector index for the tool catalog has been successfully created!" in result.output
         assert "Vector index for the prompt catalog has been successfully created!" in result.output
 
@@ -106,7 +106,7 @@ def test_publish_negative_1(tmp_path, isolated_server_factory, connection_factor
         )
 
         result = runner.invoke(click_main, ["init", "catalog", "--no-local", "--db"])
-        assert "Metadata collection for the catalog has been successfully created!" in result.output
+        assert "GSI metadata index for the has been successfully created!" in result.output
         assert "Vector index for the tool catalog has been successfully created!" in result.output
         assert "Vector index for the prompt catalog has been successfully created!" in result.output
 
@@ -133,7 +133,7 @@ def test_publish_positive_2(tmp_path, isolated_server_factory, connection_factor
         )
 
         result = runner.invoke(click_main, ["init", "catalog", "--no-local", "--db"])
-        assert "Metadata collection for the catalog has been successfully created!" in result.output
+        assert "GSI metadata index for the has been successfully created!" in result.output
         assert "Vector index for the tool catalog has been successfully created!" in result.output
         assert "Vector index for the prompt catalog has been successfully created!" in result.output
 
@@ -160,7 +160,7 @@ def test_publish_positive_3(tmp_path, isolated_server_factory, connection_factor
         )
 
         result = runner.invoke(click_main, ["init", "catalog", "--no-local", "--db"])
-        assert "Metadata collection for the catalog has been successfully created!" in result.output
+        assert "GSI metadata index for the has been successfully created!" in result.output
         assert "Vector index for the tool catalog has been successfully created!" in result.output
         assert "Vector index for the prompt catalog has been successfully created!" in result.output
 
@@ -552,7 +552,7 @@ def test_init_db(tmp_path, isolated_server_factory, connection_factory):
         )
         result = runner.invoke(click_main, ["init", "catalog", "--db"])
         assert result.exit_code == 0
-        assert "Metadata collection for the catalog has been successfully created!" in result.output
+        assert "GSI metadata index for the has been successfully created!" in result.output
         assert "Vector index for the tool catalog has been successfully created!" in result.output
 
         # TODO (GLENN): Check if the proper indexes have been created.

@@ -37,17 +37,18 @@ def test_audit(tmp_path, isolated_server_factory, connection_factory):
         chat_model = audit(langchain_openai.ChatOpenAI(name="gpt-4o"), span=span)
         chat_model.invoke("Hello, how are you doing today?")
 
-        # We should have two logs in our local FS...
+        # We should have six logs in our local FS...
         with (pathlib.Path(td) / DEFAULT_ACTIVITY_FOLDER / DEFAULT_ACTIVITY_FILE).open("r") as fp:
-            assert len(fp.readlines()) == 2
+            # ENTER + ENTER + HUMAN + EXIT + LLM + EXIT
+            assert len(fp.readlines()) == 6
 
-        # ...and two logs in our Couchbase instance.
+        # ...and six logs in our Couchbase instance.
         cluster = connection_factory()
         results = cluster.query("""
             FROM `travel-sample`.agent_activity.logs l
             SELECT VALUE l
         """).execute()
-        assert len(results) == 2
+        assert len(results) == 6
 
 
 @pytest.mark.slow

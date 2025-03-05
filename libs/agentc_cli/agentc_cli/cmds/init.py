@@ -87,6 +87,7 @@ def init_db_catalog(cfg: Config, cluster: couchbase.cluster.Cluster):
     # Get the bucket manager
     cb: couchbase.cluster.Bucket = cluster.bucket(cfg.bucket)
     collection_manager = cb.collections()
+    logger.debug("Using bucket: %s", cfg.bucket)
 
     init_metadata_collection(collection_manager, cfg, click.secho)
     embedding_model = EmbeddingModel(
@@ -108,7 +109,13 @@ def init_db_auditor(cfg: Config, cluster: couchbase.cluster.Cluster):
     log_col = DEFAULT_ACTIVITY_LOG_COLLECTION
     log_scope = DEFAULT_ACTIVITY_SCOPE
     click.secho("Now creating scope and collections for the auditor.", fg="yellow")
-    (msg, err) = create_scope_and_collection(bucket_manager, scope=log_scope, collection=log_col)
+    (msg, err) = create_scope_and_collection(
+        bucket_manager,
+        scope=log_scope,
+        collection=log_col,
+        ddl_retry_attempts=cfg.ddl_retry_attempts,
+        ddl_retry_wait_seconds=cfg.ddl_retry_wait_seconds,
+    )
     if err is not None:
         raise ValueError(msg)
     else:
