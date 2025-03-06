@@ -6,6 +6,7 @@ import pytest
 
 from agentc import Catalog
 from agentc_cli.main import click_main
+from agentc_core.catalog.catalog import Prompt
 from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
 from agentc_testing.repo import ExampleRepoKind
@@ -27,7 +28,7 @@ def test_local_tool_provider(tmp_path):
             click_command=click_main,
         )
         catalog = Catalog()
-        tools = catalog.get("tool", query="searching travel blogs")
+        tools = catalog.find("tool", query="searching travel blogs")
         assert len(tools) == 1
         assert tools[0].func.__name__ == "get_travel_blog_snippets_from_user_interests"
 
@@ -43,7 +44,7 @@ def test_local_inputs_provider(tmp_path):
             click_command=click_main,
         )
         catalog = Catalog()
-        prompt = catalog.get("prompt", query="asking a user their location")
+        prompt: Prompt = catalog.find("prompt", query="asking a user their location")[0]
         assert prompt.tools is None
         assert prompt.meta.name == "get_user_location"
 
@@ -59,12 +60,12 @@ def test_local_provider(tmp_path):
             click_command=click_main,
         )
         catalog = Catalog()
-        prompt = catalog.get("prompt", query="asking a user their location")
-        tools = catalog.get("tool", query="searching travel blogs")
+        prompt: list[Prompt] = catalog.find("prompt", query="asking a user their location")
+        tools = catalog.find("tool", query="searching travel blogs")
         assert len(tools) == 1
         assert tools[0].func.__name__ == "get_travel_blog_snippets_from_user_interests"
-        assert prompt.tools is None
-        assert prompt.meta.name == "get_user_location"
+        assert prompt[0].tools is None
+        assert prompt[0].meta.name == "get_user_location"
 
 
 @pytest.mark.slow
@@ -80,7 +81,7 @@ def test_db_tool_provider(tmp_path, isolated_server_factory):
         )
         os.remove((pathlib.Path(td) / DEFAULT_CATALOG_FOLDER / DEFAULT_TOOL_CATALOG_FILE).absolute())
         catalog = Catalog(bucket="travel-sample")
-        tools = catalog.get("tool", query="searching travel blogs using user interests")
+        tools = catalog.find("tool", query="searching travel blogs using user interests")
         assert len(tools) == 1
         assert tools[0].func.__name__ == "get_travel_blog_snippets_from_user_interests"
 

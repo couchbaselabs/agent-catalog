@@ -61,7 +61,7 @@ class EndpointFindingAgent:
         self.scope: agentc.Span = scope
 
         # Grab the prompt for our endpoint-finding node.
-        self.prompt: agentc_core.catalog.catalog.Prompt = self.catalog.get("prompt", name="endpoint_finding_node")
+        self.prompt: agentc_core.catalog.catalog.Prompt = self.catalog.find("prompt", name="endpoint_finding_node")
         self.chat_model: langchain_core.language_models.BaseChatModel = chat_model
 
         # All other keyword arguments are passed to our agent.

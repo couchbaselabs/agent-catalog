@@ -28,11 +28,11 @@ class BaseProvider(abc.ABC):
         self.refiner = refiner if refiner is not None else lambda s: s
 
     @abc.abstractmethod
-    def search(self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1):
+    def find_with_query(self, query: str, annotations: str = None, limit: typing.Union[int | None] = 1):
         pass
 
     @abc.abstractmethod
-    def get(self, name: str, annotations: str = None):
+    def find_with_name(self, name: str, annotations: str = None):
         pass
 
 
@@ -72,7 +72,7 @@ class ToolProvider(BaseProvider):
     def _generate_result(self, tool_descriptor: RecordDescriptor) -> typing.Any:
         return ToolProvider.ToolResult(func=self._tool_cache[tool_descriptor], meta=tool_descriptor)
 
-    def search(
+    def find_with_query(
         self,
         query: str,
         annotations: str = None,
@@ -99,7 +99,9 @@ class ToolProvider(BaseProvider):
         # Return the tools from the cache.
         return [self._generate_result(x.entry) for x in results]
 
-    def get(self, name: str, snapshot: str = LATEST_SNAPSHOT_VERSION, annotations: str = None) -> ToolResult | None:
+    def find_with_name(
+        self, name: str, snapshot: str = LATEST_SNAPSHOT_VERSION, annotations: str = None
+    ) -> ToolResult | None:
         annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
         results = self.catalog.find(name=name, snapshot=snapshot, annotations=annotation_predicate, limit=1)
 
@@ -109,7 +111,15 @@ class ToolProvider(BaseProvider):
             self._tool_cache[record_descriptor] = tool
 
         # Return the tools from the cache.
-        return [self._generate_result(x.entry) for x in results][0] if len(results) != 0 else None
+        match len(results):
+            case 0:
+                return None
+            case 1:
+                return self._generate_result(results[0].entry)
+            case _:
+                # TODO (GLENN): Should we check this on agentc index instead?
+                logger.warning("Multiple tools found with the same name. Returning the first one.")
+                return self._generate_result(results[0].entry)
 
 
 class PromptProvider(BaseProvider):
@@ -143,9 +153,11 @@ class PromptProvider(BaseProvider):
             tools = list()
             for tool in prompt_descriptor.tools:
                 if tool.query is not None:
-                    tools += self.tool_provider.search(query=tool.query, annotations=tool.annotations, limit=tool.limit)
+                    tools += self.tool_provider.find_with_query(
+                        query=tool.query, annotations=tool.annotations, limit=tool.limit
+                    )
                 else:  # tool.name is not None
-                    tools.append(self.tool_provider.get(name=tool.name, annotations=tool.annotations))
+                    tools.append(self.tool_provider.find_with_name(name=tool.name, annotations=tool.annotations))
 
         return PromptProvider.PromptResult(
             content=prompt_descriptor.content,
@@ -154,7 +166,7 @@ class PromptProvider(BaseProvider):
             meta=prompt_descriptor,
         )
 
-    def search(
+    def find_with_query(
         self,
         query: str,
         annotations: str = None,
@@ -167,9 +179,17 @@ class PromptProvider(BaseProvider):
         )
         return [self._generate_result(r.entry) for r in results]
 
-    def get(
+    def find_with_name(
         self, name: str, snapshot: str = LATEST_SNAPSHOT_VERSION, annotations: str = None
     ) -> typing.Optional[PromptResult]:
         annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
         results = self.catalog.find(name=name, snapshot=snapshot, annotations=annotation_predicate, limit=1)
-        return [self._generate_result(r.entry) for r in results][0] if len(results) != 0 else None
+        match len(results):
+            case 0:
+                return None
+            case 1:
+                return self._generate_result(results[0].entry)
+            case _:
+                # TODO (GLENN): Should we check this on agentc index instead?
+                logger.warning("Multiple prompts found with the same name. Returning the first one.")
+                return self._generate_result(results[0].entry)

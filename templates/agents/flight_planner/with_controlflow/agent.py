@@ -76,12 +76,12 @@ def run_flow(thread_id: str):
 
         # Write your agent logic (i.e., task graph) here!
         while True:
-            find_source_and_dest = catalog.get("prompt", name="find_source_and_dest")
+            find_source_and_dest = catalog.find("prompt", name="find_source_and_dest")
             endpoints = task_factory.run(find_source_and_dest)
 
             # We "draw" implicit dependency edges by using the results of previous tasks.
             # In this example all tasks are executed eagerly (though there is some limited support for lazy evaluation).
-            find_travel_routes = catalog.get("prompt", name="find_travel_routes")
+            find_travel_routes = catalog.find("prompt", name="find_travel_routes")
             travel_routes = task_factory.run(
                 find_travel_routes,
                 context={
@@ -91,7 +91,7 @@ def run_flow(thread_id: str):
                 result_type=str,
             )
             print(f"Your routes are: {travel_routes}")
-            ask_to_continue = catalog.get("prompt", name="ask_to_continue")
+            ask_to_continue = catalog.find("prompt", name="ask_to_continue")
             is_continue = task_factory.run(
                 ask_to_continue,
                 result_type=[True, False],

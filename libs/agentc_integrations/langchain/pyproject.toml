@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "agentc-langchain"
-version = "0.0.1"
+version = "0.2.0"
 description = "Collection of LangChain-specific classes and functions used with the Couchbase Agent Catalog project."
 authors = [
   "Kush Khanna <kush.khanna@couchbase.com>",
@@ -40,6 +40,11 @@ pytest-retry = "^1.7.0"
 [tool.poetry.group.dev.dependencies.agentc-cli]
 path = "../../agentc_cli"
 develop = true
+
+[tool.poetry-monoranger-plugin]
+enabled = true
+monorepo-root = "../../../"
+version-pinning-rule = '=='
 
 [build-system]
 requires = ["poetry-core"]

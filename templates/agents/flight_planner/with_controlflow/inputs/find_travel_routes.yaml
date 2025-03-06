@@ -12,7 +12,7 @@ description: Instructions on how to find routes between airports.
 # The values of these annotations MUST be strings (e.g., not 'true', but '"true"').
 # This field is optional, and does not have to be present.
 tools:
-  # Tools can be specified using the same parameters found in Catalog.get("tool", ...).
+  # Tools can be specified using the same parameters found in Catalog.find("tool", ...).
   - name: find_direct_routes_between_airports
   - name: find_routes_with_one_layover
 

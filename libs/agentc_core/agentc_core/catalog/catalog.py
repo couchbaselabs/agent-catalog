@@ -304,7 +304,7 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
 
         return GlobalSpan(config=self, version=self.version, name=name, state=state, kwargs=kwargs)
 
-    def get(
+    def find(
         self,
         kind: typing.Literal["tool", "prompt"],
         query: str = None,
@@ -312,28 +312,28 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
         annotations: str = None,
         snapshot: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
-    ) -> typing.Union[list[Tool] | Prompt | None]:
+    ) -> typing.Union[list[Tool] | list[Prompt] | None]:
         if kind.lower() == "tool":
-            return self.get_tools(query, name, annotations, snapshot, limit)
+            return self.find_tools(query, name, annotations, snapshot, limit)
         elif kind.lower() == "prompt":
-            return self.get_prompts(query, name, annotations, snapshot)
+            return self.find_prompts(query, name, annotations, snapshot)
         else:
             raise ValueError(f"Unknown item type: {kind}, expected 'tool' or 'prompt'.")
 
-    def get_tools(
+    def find_tools(
         self,
         query: str = None,
         name: str = None,
         annotations: str = None,
         snapshot: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
-    ) -> list[ToolProvider.ToolResult]:
+    ) -> list[ToolProvider.ToolResult] | ToolProvider.ToolResult | None:
         """
         :param query: A query string (natural language) to search the catalog with.
         :param name: The specific name of the catalog entry to search for.
         :param annotations: An annotation query string in the form of ``KEY="VALUE" (AND|OR KEY="VALUE")*``.
         :param snapshot: The snapshot version to find the tools for. By default, we use the latest snapshot.
-        :param limit: The maximum number of results to return.
+        :param limit: The maximum number of results to return (ignored if name is specified).
         :return: A list of **Tool** instances, with the following attributes:
             - **func** (Callable): A Python callable representing the function.
             - **meta** (RecordDescriptor): The metadata associated with the tool.
@@ -344,24 +344,27 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
                 "Please run 'agentc index [SOURCES] --tools' to define a local FS tool catalog."
             )
         if query is not None:
-            return self._tool_provider.search(query=query, annotations=annotations, snapshot=snapshot, limit=limit)
+            return self._tool_provider.find_with_query(
+                query=query, annotations=annotations, snapshot=snapshot, limit=limit
+            )
         else:
-            return [self._tool_provider.get(name=name, annotations=annotations, snapshot=snapshot)]
+            return self._tool_provider.find_with_name(name=name, annotations=annotations, snapshot=snapshot)
 
-    def get_prompts(
+    def find_prompts(
         self,
         query: str = None,
         name: str = None,
         annotations: str = None,
         snapshot: str = LATEST_SNAPSHOT_VERSION,
-    ) -> PromptProvider.PromptResult | None:
+        limit: typing.Union[int | None] = 1,
+    ) -> list[PromptProvider.PromptResult] | PromptProvider.PromptResult | None:
         """
         :param query: A query string (natural language) to search the catalog with.
         :param name: The specific name of the catalog entry to search for.
         :param annotations: An annotation query string in the form of ``KEY="VALUE" (AND|OR KEY="VALUE")*``.
         :param snapshot: The snapshot version to find the tools for. By default, we use the latest snapshot.
-
-        :return: An instance of *Prompt*, with the following attributes:
+        :param limit: The maximum number of results to return (ignored if name is specified).
+        :return: A list of *Prompt* instances, with the following attributes:
             - **content** (str | dict): The content to be served to the model.
             - **tools** (list): The list containing the tool functions associated with prompt.
             - **output** (str): The output type of the prompt, if it exists.
@@ -372,7 +375,8 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
                 "Please run 'agentc index [SOURCES] --prompts' to define a local FS catalog with prompts."
             )
         if query is not None:
-            results = self._prompt_provider.search(query=query, annotations=annotations, snapshot=snapshot, limit=1)
-            return results[0] if len(results) != 0 else None
+            return self._prompt_provider.find_with_query(
+                query=query, annotations=annotations, snapshot=snapshot, limit=limit
+            )
         else:
-            return self._prompt_provider.get(name=name, annotations=annotations, snapshot=snapshot)
+            return self._prompt_provider.find_with_name(name=name, annotations=annotations, snapshot=snapshot)

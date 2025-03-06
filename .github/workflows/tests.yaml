@@ -1,6 +1,11 @@
 name: tests
 run-name: 👁️ ${{ github.actor }} has pushed a new commit!
+
 on: [ push ]
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   SmokeTests:
@@ -64,6 +69,7 @@ jobs:
             libs/agentc_core/pyproject.toml,\
             libs/agentc_cli/pyproject.toml,\
             libs/agentc_integrations/langchain/pyproject.toml,\
+            libs/agentc_integrations/llamaindex/pyproject.toml,\
             libs/agentc_testing/pyproject.toml"
 
       - name: Set up Python Poetry

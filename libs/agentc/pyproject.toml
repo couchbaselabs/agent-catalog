@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "agentc"
-version = "0.0.1"
+version = "0.2.0"
 description = "The front-facing package for the Couchbase Agent Catalog project."
 repository = "https://github.com/couchbaselabs/agent-catalog"
 authors = [
@@ -45,6 +45,11 @@ markers = [
     "smoke: marks tests for running on each git-push",
     "slow: marks slow tests for running on each git-push",
 ]
+
+[tool.poetry-monoranger-plugin]
+enabled = true
+monorepo-root = "../../"
+version-pinning-rule = '=='
 
 [build-system]
 requires = ["poetry-core"]

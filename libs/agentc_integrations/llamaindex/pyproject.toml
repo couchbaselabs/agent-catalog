@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "agentc-llamaindex"
-version = "0.0.1"
+version = "0.1.0"
 description = "Collection of LlamaIndex-specific classes and functions used with the Couchbase Agent Catalog project."
 authors = [
   "Glenn Galvizo <glenn.galvizo@couchbase.com>"
@@ -31,6 +31,11 @@ develop = true
 pre-commit = "^3.2.2"
 pytest = "^8.3.2"
 pytest-retry = "^1.7.0"
+
+[tool.poetry-monoranger-plugin]
+enabled = true
+monorepo-root = "../../../"
+version-pinning-rule = '=='
 
 [build-system]
 requires = ["poetry-core"]

@@ -76,11 +76,11 @@ def cmd_execute(
 
         # based on name or query get appropriate tool
         if name is not None:
-            tool = provider.get(name, snapshot=catalog_id, annotations=annotations)
+            tool = provider.find_with_name(name, snapshot=catalog_id, annotations=annotations)
             if tool is None:
                 raise ValueError(f"Tool {name} not found!") from None
         else:
-            tools = provider.search(query, snapshot=catalog_id, annotations=annotations, limit=1)
+            tools = provider.find_with_query(query, snapshot=catalog_id, annotations=annotations, limit=1)
             if len(tools) == 0:
                 raise ValueError(f"No tool available for query {query}!")
             elif len(tools) > 1:
