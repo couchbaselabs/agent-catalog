@@ -1,0 +1,18 @@
+record_kind: prompt
+
+name: manage_rewards
+
+description: Instructions on how to manage a user's travel rewards.
+
+tools:
+  - query: "creating a new travel rewards member"
+    limit: 1
+  - query: "getting the rewards associated with a member"
+    limit: 1
+
+annotations:
+  framework: "controlflow"
+
+content:
+  Help the user with their rewards.
+  Do not hallucinate, always use the tools you were given.

@@ -137,9 +137,10 @@ class EntryLoader:
                     source_file = entries[0].source
                     try:
                         self._load_module_from_filename(source_file)
-                    except ModuleNotFoundError:
+                    except ModuleNotFoundError as e:
+                        logger.debug(f"Swallowing exception {str(e)} (raised while trying to import {source_file}).")
                         logger.warning(f"Module {source_file} not found. Attempting to use the indexed contents.")
-                        self._load_module_from_string(source_file.stem, entries[0].contents)
+                        self._load_module_from_string(source_file.stem, entries[0].content.file_content)
                     for entry in entries:
                         loaded_entry = self._get_tool_from_module(source_file.stem, entry)
                         yield (

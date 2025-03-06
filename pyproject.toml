@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "agent-catalog"
-version = "0.0.1"
+version = "0.2.0"
 description = "The mono-repo for the Couchbase Agent Catalog project."
 repository = "https://github.com/couchbaselabs/agent-catalog"
 authors = [
@@ -21,11 +21,13 @@ python = "^3.12"
 agentc = { path = "libs/agentc", develop = true }
 agentc-core = { path = "libs/agentc_core", develop = true }
 agentc-cli = { path = "libs/agentc_cli", develop = true }
-agentc-langchain = { path = "libs/agentc_langchain", develop = true }
+agentc-langchain = { path = "libs/agentc_integrations/langchain", develop = true }
+agentc-llamaindex = { path = "libs/agentc_integrations/llamaindex", develop = true }
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
 pytest = "^8.3.2"
+pytest-retry = "^1.7.0"
 
 # An internal testing package for the Agent Catalog.
 [tool.poetry.group.dev.dependencies.agentc-testing]
@@ -57,11 +59,18 @@ split-on-trailing-comma = false
 [tool.pytest.ini_options]
 markers = [
     "smoke: marks smoke tests for running on each git-push",
-    "regression: marks regression tests for running on each git-push",
+    "slow: marks slow tests for running on each git-push",
 ]
 testpaths = [
-    "libs/agentc_core/tests"
+    "libs/agentc_core/tests",
+    "libs/agentc_cli/tests",
+    "libs/integrations/agentc_langchain/tests",
+    "libs/integrations/agentc_llamaindex/tests",
 ]
+
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">=1.8"
+poetry-monoranger-plugin = "^0.4.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

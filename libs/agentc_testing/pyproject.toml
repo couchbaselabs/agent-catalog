@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "agentc-testing"
-version = "0.0.1"
+version = "0.2.0"
 description = "An internal library for running agent-catalog tests."
 repository = "https://github.com/couchbaselabs/agent-catalog"
 authors = [
@@ -20,8 +20,13 @@ docker = "^7.1.0"
 [tool.pytest.ini_options]
 markers = [
     "smoke: marks tests for running on each git-push",
-    "regression: marks regression tests for running on each git-push",
+    "slow: marks slow tests for running on each git-push",
 ]
+
+[tool.poetry-monoranger-plugin]
+enabled = true
+monorepo-root = "../../"
+version-pinning-rule = '=='
 
 [build-system]
 requires = ["poetry-core"]

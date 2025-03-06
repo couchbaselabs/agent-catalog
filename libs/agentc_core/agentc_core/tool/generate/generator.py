@@ -1,4 +1,5 @@
 import abc
+import agentc_core.defaults
 import dataclasses
 import datamodel_code_generator
 import datetime
@@ -7,6 +8,7 @@ import json
 import logging
 import openapi_parser.parser
 import openapi_schema_to_json_schema
+import os
 import pathlib
 import pydantic
 import typing
@@ -15,6 +17,8 @@ from ...record.descriptor import RecordDescriptor
 from ..descriptor import HTTPRequestToolDescriptor
 from ..descriptor import SemanticSearchToolDescriptor
 from ..descriptor import SQLPPQueryToolDescriptor
+from ..descriptor.secrets import CouchbaseSecrets
+from ..descriptor.secrets import EmbeddingModelSecrets
 from .common import INPUT_MODEL_CLASS_NAME_IN_TEMPLATES
 from .common import OUTPUT_MODEL_CLASS_NAME_IN_TEMPLATES
 from .common import GeneratedCode
@@ -114,13 +118,32 @@ class SemanticSearchCodeGenerator(_BaseCodeGenerator):
         with (self.template_directory / "semantic_q.jinja").open("r") as tmpl_fp:
             template = jinja2.Template(source=tmpl_fp.read(), autoescape=True)
             generation_time = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
+
+            cluster_secrets = None
+            for secret in self.record_descriptor.secrets:
+                if isinstance(secret, CouchbaseSecrets):
+                    cluster_secrets = secret
+                    break
+            embedding_secrets = None
+            for secret in self.record_descriptor.secrets:
+                if isinstance(secret, EmbeddingModelSecrets):
+                    embedding_secrets = secret
+                    break
+
             rendered_code = template.render(
                 {
                     "time": generation_time,
                     "tool": self.record_descriptor,
                     "input": input_model,
                     "vector_search": self.record_descriptor.vector_search,
-                    "secrets": self.record_descriptor.secrets[0].couchbase,
+                    "cluster_secrets": cluster_secrets.couchbase if cluster_secrets is not None else None,
+                    "embedding_model": {
+                        "secrets": embedding_secrets.embedding if embedding_secrets is not None else None,
+                        "cache": os.getenv(
+                            "AGENT_CATALOG_SENTENCE_TRANSFORMERS_MODEL_CACHE",
+                            agentc_core.defaults.DEFAULT_MODEL_CACHE_FOLDER,
+                        ),
+                    },
                 }
             )
             logger.debug("The following code has been generated:\n" + rendered_code)

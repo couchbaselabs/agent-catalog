@@ -4,5 +4,5 @@
 .. automodule:: agentc
     :members:
 
-.. automodule:: agentc.langchain
+.. automodule:: agentc_langchain
     :members:

@@ -12,7 +12,7 @@ name: search_for_relevant_products
 description: >
   Find product descriptions that are closely related to a collection of tags.
 
-# The inputs used to build a comparable representation for a semantic search.
+# The prompts used to build a comparable representation for a semantic search.
 # Inputs are described using a JSON object that follows the JSON schema standard.
 # This field is mandatory, and will be used to build a Pydantic model.
 # See https://json-schema.org/learn/getting-started-step-by-step for more info.
@@ -66,9 +66,12 @@ vector_search:
   text_field: text
 
   # The embedding model used to generate the vector_field.
-  # This embedding model field value is directly passed to sentence transformers.
-  # In the future, we will add support for other types of embedding models.
-  embedding_model: sentence-transformers/all-MiniLM-L12-v2
+  # If a URL is specified, we will assume the URL serves as the base of an OpenAI-client-compatible endpoint.
+  # If a URL is not specified (the default), we will assume the embedding model is a sentence-transformers model
+  # that can be downloaded from HuggingFace.
+  embedding_model:
+    name: sentence-transformers/all-MiniLM-L12-v2
+    # url:
 
   # The number of candidates (i.e., the K value) to request for when performing a vector top-k search.
   # This field is optional, and defaults to k=3 if not specified.

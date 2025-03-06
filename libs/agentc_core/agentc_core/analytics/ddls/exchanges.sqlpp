@@ -1,13 +1,12 @@
 -- Note: all_sessions.sqlpp should be run before this script.
--- TODO (GLENN): The purpose of this view is to aid in using Ragas, but we should use the raw_logs instead.
 CREATE OR REPLACE ANALYTICS VIEW `[BUCKET_NAME]`.`[SCOPE_NAME]`.LatestMessages AS
 WITH LatestGenerations AS (
     FROM
         `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]` AS s
     WHERE
-        s.`grouping` IS NOT NULL
+        s.generation IS NOT NULL
     GROUP BY
-        s.`grouping`,
+        s.generation,
         s.session
         GROUP AS g
     LETTING

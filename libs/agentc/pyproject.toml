@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "agentc"
-version = "0.0.1"
+version = "0.2.0"
 description = "The front-facing package for the Couchbase Agent Catalog project."
 repository = "https://github.com/couchbaselabs/agent-catalog"
 authors = [
@@ -22,7 +22,7 @@ agentc = "agentc.__main__:main"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-pydantic-settings = "^2.4.0"
+pydantic-settings = "^2.7.1"
 
 [tool.poetry.dependencies.agentc-core]
 path = "../agentc_core"
@@ -30,10 +30,6 @@ develop = true
 
 [tool.poetry.dependencies.agentc-cli]
 path = "../agentc_cli"
-develop = true
-
-[tool.poetry.dependencies.agentc-langchain]
-path = "../agentc_langchain"
 develop = true
 
 [tool.poetry.group.dev.dependencies]
@@ -47,8 +43,13 @@ develop = true
 [tool.pytest.ini_options]
 markers = [
     "smoke: marks tests for running on each git-push",
-    "regression: marks regression tests for running on each git-push",
+    "slow: marks slow tests for running on each git-push",
 ]
+
+[tool.poetry-monoranger-plugin]
+enabled = true
+monorepo-root = "../../"
+version-pinning-rule = '=='
 
 [build-system]
 requires = ["poetry-core"]

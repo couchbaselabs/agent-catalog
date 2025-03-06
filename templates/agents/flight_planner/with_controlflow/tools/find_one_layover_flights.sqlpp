@@ -1,0 +1,78 @@
+-- All SQL++ query tools are specified using a valid SQL++ (.sqlpp) file.
+-- The tool metadata must be specified with YAML inside a multi-line C-style comment.
+/*
+# The name of the tool must be a valid Python identifier (e.g., no spaces).
+# This field is mandatory, and will be used as the name of a Python function.
+name: find_routes_with_one_layover
+
+# A description for the function bound to this tool.
+# This field is mandatory, and will be used in the docstring of a Python function.
+description: >
+    Find a list of routes between two airports with one layover.
+    The routes always start at source_airport and end at destination_airport.
+
+# The inputs used to resolve the named parameters in the SQL++ query below.
+# Inputs are described using a JSON object that follows the JSON schema standard.
+# This field is mandatory, and will be used to build a Pydantic model.
+# See https://json-schema.org/learn/getting-started-step-by-step for more info.
+input:
+  type: object
+  properties:
+    source_airport:
+      type: string
+    destination_airport:
+      type: string
+
+# The outputs used describe the structure of the SQL++ query result.
+# Outputs are described using a JSON object that follows the JSON schema standard.
+# This field is mandatory, and will be used to build a Pydantic model.
+# We recommend using the 'INFER' command to build a JSON schema from your query results.
+# See https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/infer.html.
+# In the future, this field will be optional (we will INFER the query automatically for you).
+output:
+  type: array
+  items:
+    type: object
+    properties:
+      airlines:
+        type: array
+        items:
+          type: string
+      layovers:
+        type: array
+        items:
+          type: string
+      from_airport:
+        type: string
+      to_airport:
+        type: string
+
+# The "secrets" field defines search keys that will be used to query a "secrets" manager.
+# Note that these values are NOT the secrets themselves, rather they are used to lookup secrets.
+secrets:
+    # All Couchbase tools (e.g., semantic search, SQL++) must specify conn_string, username, and password.
+    - couchbase:
+        conn_string: CB_CONN_STRING
+        username: CB_USERNAME
+        password: CB_PASSWORD
+        certificate: CB_CERTIFICATE
+*/
+
+FROM
+    `travel-sample`.inventory.route r1,
+    `travel-sample`.inventory.route r2
+WHERE
+    -- Parameters specified in the input field of the tool metadata above correspond to named parameters here.
+    -- The '$' syntax is used to denote a named parameter.
+    -- See https://docs.couchbase.com/server/current/n1ql/n1ql-rest-api/exnamed.html for more details.
+    r1.sourceairport = $source_airport AND
+    r1.destinationairport = r2.sourceairport AND
+    r2.destinationairport = $destination_airport
+SELECT VALUE {
+    "airlines"     : [r1.airline, r2.airline],
+    "layovers"     : [r1.destinationairport],
+    "from_airport" : r1.sourceairport,
+    "to_airport"   : r2.destinationairport
+}
+LIMIT
+    10;

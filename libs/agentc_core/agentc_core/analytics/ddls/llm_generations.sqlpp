@@ -1,11 +1,11 @@
 CREATE OR REPLACE ANALYTICS VIEW `[BUCKET_NAME]`.`[SCOPE_NAME]`.LLMGenerations AS
     SELECT
         session,
-        grouping_id,
+        generation,
         ( FROM g gi SELECT VALUE gi.rl ) AS generation
     FROM
         `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]` AS rl
     GROUP BY
         rl.session AS session,
-        rl.`grouping` AS grouping_id
+        rl.generation AS generation
         GROUP AS g;

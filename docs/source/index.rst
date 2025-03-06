@@ -16,11 +16,12 @@ Table of Contents
    :maxdepth: 2
 
    Getting Agent Catalog <install>
-   Agent Catalog User Guide <guide>
+   Agent Catalog Quick Start <quick>
+   Agent Catalog Concepts <concept>
    Command Line Tool <cli>
    Agent Catalog API <api>
    Provider Configuration <provider>
-   Environment Variables <env>
+   Parameters & Configuration <config>
    On Catalog Entries <entry>
    Frequently Asked Questions <faqs>
 

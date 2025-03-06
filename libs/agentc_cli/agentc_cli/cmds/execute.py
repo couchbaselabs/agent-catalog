@@ -1,5 +1,4 @@
 import click
-import couchbase.cluster
 import importlib
 import logging
 import os
@@ -7,11 +6,12 @@ import pathlib
 import sys
 import tempfile
 
-from ..models import Context
-from ..models.find import SearchOptions
+from .find import SearchOptions
 from .util import DASHES
 from .util import KIND_COLORS
 from .util import get_catalog
+from agentc_cli.cmds.util import logging_command
+from agentc_core.config import Config
 from agentc_core.provider import ToolProvider
 from agentc_core.record.descriptor import RecordDescriptor
 from agentc_core.record.descriptor import RecordKind
@@ -28,44 +28,59 @@ types_mapping = {"array": list, "integer": int, "number": float, "string": str}
 logger = logging.getLogger(__name__)
 
 
+@logging_command(logger)
 def cmd_execute(
-    ctx: Context = None,
+    cfg: Config = None,
+    *,
     query: str = None,
     name: str = None,
-    bucket: str = None,
     include_dirty: bool = True,
     refiner: str = None,
     annotations: str = None,
     catalog_id: str = None,
-    cluster: couchbase.cluster.Cluster = None,
-    force_db=False,
+    with_db: bool = False,
+    with_local: bool = False,
 ):
-    if ctx is None:
-        ctx = Context()
+    if cfg is None:
+        cfg = Config()
+
+    # Validate our search options.
     search_opt = SearchOptions(query=query, name=name)
     query, name = search_opt.query, search_opt.name
     click.secho(DASHES, fg=KIND_COLORS["tool"])
-    catalog = get_catalog(ctx.catalog, bucket, cluster, force_db, include_dirty, "tool")
+
+    # Determine what type of catalog we want.
+    if with_local and with_db:
+        force = "chain"
+    elif with_db:
+        force = "db"
+    elif with_local:
+        force = "local"
+    else:
+        raise ValueError("Either local FS or DB catalog must be specified!")
+
+    # Initialize a catalog instance.
+    catalog = get_catalog(cfg=cfg, force=force, include_dirty=include_dirty, kind="tool")
 
     # create temp directory for code dump
-    with tempfile.TemporaryDirectory(prefix="exec_code", dir=os.getcwd()) as tmp_dir:
+    _dir = cfg.codegen_output if cfg.codegen_output is not None else os.getcwd()
+    with tempfile.TemporaryDirectory(dir=_dir) as tmp_dir:
         tmp_dir_path = pathlib.Path(tmp_dir)
 
         # initialize tool provider
         provider = ToolProvider(
             catalog=catalog,
             output=tmp_dir_path,
-            decorator=lambda x: x,
             refiner=refiner,
         )
 
         # based on name or query get appropriate tool
         if name is not None:
-            tool = provider.get(name, snapshot=catalog_id, annotations=annotations)
+            tool = provider.find_with_name(name, snapshot=catalog_id, annotations=annotations)
             if tool is None:
                 raise ValueError(f"Tool {name} not found!") from None
         else:
-            tools = provider.search(query, snapshot=catalog_id, annotations=annotations, limit=1)
+            tools = provider.find_with_query(query, snapshot=catalog_id, annotations=annotations, limit=1)
             if len(tools) == 0:
                 raise ValueError(f"No tool available for query {query}!")
             elif len(tools) > 1:
@@ -101,19 +116,28 @@ def cmd_execute(
                 "Tool functions must have type hints that are compatible with Pydantic."
             ) from e
 
-        # TODO (GLENN): We should try to directly import from the source first before writing the content.
         # if it is python tool get code from tool metadata and dump it into a file and import modules
         if tool_metadata.record_kind == RecordKind.PythonFunction:
             # create a file and dump python tool code into it
             python_tool_metadata: PythonToolDescriptor = tool_metadata
-            file_name = python_tool_metadata.source.name
-            with (tmp_dir_path / file_name).open("w") as f:
-                f.write(python_tool_metadata.contents)
+            try:
+                logger.debug("Attempting to directly import the tool.")
+                if str(python_tool_metadata.source.absolute()) not in sys.path:
+                    sys.path.append(str(python_tool_metadata.source.absolute()))
+                gen_code_modules = importlib.import_module(python_tool_metadata.source.stem)
 
-            # add temp directory and it's content as modules
-            if str(tmp_dir_path.absolute()) not in sys.path:
-                sys.path.append(str(tmp_dir_path.absolute()))
-            gen_code_modules = importlib.import_module(python_tool_metadata.source.stem)
+            except Exception as e:
+                logger.warning(
+                    "Could not directly import the tool. Attempting to use the indexed contents.\n%s", str(e)
+                )
+                file_name = python_tool_metadata.source.name
+                with (tmp_dir_path / file_name).open("w") as f:
+                    f.write(python_tool_metadata.content.file_content)
+
+                # add temp directory and it's content as modules
+                if str(tmp_dir_path.absolute()) not in sys.path:
+                    sys.path.append(str(tmp_dir_path.absolute()))
+                gen_code_modules = importlib.import_module(python_tool_metadata.source.stem)
 
         # if it is sqlpp, yaml, jinja tools, provider dumps codes into a file by default, import that
         else:
@@ -128,7 +152,7 @@ def cmd_execute(
         click.secho(DASHES, fg="yellow")
         click.secho("Instructions:", fg="blue")
         click.secho(
-            message="\tPlease provide inputs for the prompted variables.\n"
+            message="\tPlease provide prompts for the prompted variables.\n"
             "\tThe types are shown for reference in parentheses.\n"
             "\tIf the input is of type list, please provide your list values in a comma-separated format.\n",
             fg="blue",
@@ -151,7 +175,7 @@ def cmd_execute(
             for k, v in cb_secrets_map.items():
                 put_secret(k, v)
 
-        # prompt user for inputs
+        # prompt user for prompts
         user_inputs = take_input_from_user(input_types)
 
         # if user has any variable which is of object type, create it from class
@@ -235,7 +259,8 @@ def take_verify_list_inputs(entered_val, input_name, input_type, inp_type_to_sho
     try:
         conv_inps = split_and_convert(entered_val, types_mapping[list_type])
         return conv_inps
-    except ValueError:
+    except ValueError as e:
+        logger.debug(f"Error {str(e)} is being swallowed.")
         is_correct = False
 
     while not is_correct:
@@ -245,5 +270,6 @@ def take_verify_list_inputs(entered_val, input_name, input_type, inp_type_to_sho
             conv_inps = split_and_convert(entered_val, types_mapping[list_type])
             is_correct = True
             return conv_inps
-        except ValueError:
+        except ValueError as e:
+            logger.debug(f"Error {str(e)} is being swallowed.")
             is_correct = False

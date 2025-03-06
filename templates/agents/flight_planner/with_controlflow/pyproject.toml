@@ -1,0 +1,57 @@
+[tool.poetry]
+name = "my-agent"
+version = "0.2.0"
+description = "A starter agent built with Couchbase Agent Catalog and ControlFlow."
+repository = "https://github.com/couchbaselabs/agent-catalog"
+authors = [
+    "Glenn Galvizo <glenn.galvizo@couchbase.com>"
+]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+controlflow = "^0.12.1"
+
+# TODO (GLENN): Replace this with the PyPI package once it's available.
+# The agentc project (the front-facing parts)!
+[tool.poetry.dependencies.agentc]
+path = "../../../../libs/agentc"
+develop = true
+
+# TODO (GLENN): Replace this with the PyPI package once it's available.
+# The agentc-langchain extras package!
+[tool.poetry.dependencies.agentc_langchain]
+path = "../../../../libs/agentc_langchain"
+develop = true
+
+# All agent analysis related packages.
+[tool.poetry.group.analysis]
+optional = false
+
+[tool.poetry.group.analysis.dependencies]
+ragas = "^0.2.1"
+jupyterlab = "^4.2.5"
+langchain-openai = "^0.3.6"
+ipywidgets = "^8.1.5"
+llama-index = "^0.12.0"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.0.0"
+pytest = "^8.3.4"
+
+[tool.ruff]
+line-length = 120
+lint.select = ["F", "B", "I", "SIM"]
+show-fixes = true
+
+[tool.ruff.lint.isort]
+no-sections = true
+force-single-line = true
+lines-between-types = 1
+force-wrap-aliases = true
+split-on-trailing-comma = false
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

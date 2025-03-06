@@ -39,6 +39,8 @@ def test_python_function():
         "Calculate the travel costs based on distance, fuel efficiency, and fuel price."
         in positive_1_tools[0].description
     )
+    assert positive_1_tools[0].content.line_no_start == 13
+    assert positive_1_tools[0].content.line_no_end == 16
 
     positive_2_factory = _get_tool_descriptor_factory(
         cls=PythonToolDescriptor.Factory, filename=pathlib.Path("python_function/positive_2.py")
