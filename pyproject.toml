@@ -43,6 +43,7 @@ sphinx-autobuild = "^2024.10.3"
 autodoc-pydantic = "^2.2.0"
 sphinx-click = "^6.0.0"
 sphinx-rtd-theme = "^3.0.1"
+enum-tools = { version = "^0.12.0", extras = ["sphinx"] }
 
 [tool.ruff]
 line-length = 120

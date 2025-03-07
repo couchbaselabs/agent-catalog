@@ -6,28 +6,16 @@ import typing
 import uuid
 
 from agentc_core.activity import Span
-from agentc_core.analytics import ToolCallContent
-from agentc_core.analytics import ToolResultContent
-from agentc_core.analytics.log import Kind
+from agentc_core.activity.models.content import ChatCompletionContent
+from agentc_core.activity.models.content import SystemContent
+from agentc_core.activity.models.content import ToolCallContent
+from agentc_core.activity.models.content import ToolResultContent
+from agentc_core.activity.models.content import UserContent
 from llama_index.core import BaseCallbackHandler
 from llama_index.core.callbacks import CBEventType
 from llama_index.core.callbacks import EventPayload
 
 logger = logging.getLogger(__name__)
-
-_TYPE_TO_KIND_MAPPING = {
-    llama_index.core.llms.MessageRole.SYSTEM: Kind.System,
-    llama_index.core.llms.MessageRole.USER: Kind.Human,
-    llama_index.core.llms.MessageRole.ASSISTANT: Kind.Assistant,
-    llama_index.core.llms.MessageRole.TOOL: Kind.Tool,
-    llama_index.core.llms.MessageRole.FUNCTION: Kind.Tool,
-    llama_index.core.llms.MessageRole.MODEL: Kind.LLM,
-    llama_index.core.llms.MessageRole.CHATBOT: Kind.Assistant,
-}
-
-
-def _get_kind_from_message(message: llama_index.core.llms.ChatMessage) -> Kind:
-    return _TYPE_TO_KIND_MAPPING[message.role]
 
 
 class Callback(BaseCallbackHandler):
@@ -49,10 +37,10 @@ class Callback(BaseCallbackHandler):
 
     @staticmethod
     def _handle_unknown_payload(span: Span, payload: dict[str, typing.Any], **kwargs) -> None:
-        logger.debug("Encountered unknown payload %s.", payload)
+        logger.debug("Encountered unknown payload %s. Logging as System content.", payload)
         for key, value in payload.items():
             try:
-                span.log(kind=Kind.System, content=value, **kwargs)
+                span.log(content=SystemContent(value=value, extra={"key": key}), **kwargs)
             except Exception as e:
                 logger.error("Error logging payload %s!", key)
                 logger.error(e)
@@ -76,7 +64,7 @@ class Callback(BaseCallbackHandler):
         match event_type:
             case CBEventType.LLM:
                 if EventPayload.PROMPT in payload:
-                    span.log(kind=Kind.System, content=payload[EventPayload.PROMPT], **annotations)
+                    span.log(content=SystemContent(value=payload[EventPayload.PROMPT]), **annotations)
                     unhandled_payloads.remove(EventPayload.PROMPT)
 
                 # Note: we shouldn't expect both MESSAGES and PROMPT to exist at the same time...
@@ -84,16 +72,26 @@ class Callback(BaseCallbackHandler):
                     for message in payload[EventPayload.MESSAGES]:
                         # This is just to get some typing for our IDEs.
                         message: llama_index.core.llms.ChatMessage = message
-                        span.log(kind=_get_kind_from_message(message), content=message.content, **annotations)
+                        match message.role:
+                            case llama_index.core.llms.MessageRole.USER:
+                                span.log(content=UserContent(value=message.content), **annotations)
+                            case llama_index.core.llms.MessageRole.SYSTEM:
+                                span.log(content=SystemContent(value=message.content), **annotations)
+                            case _:
+                                logger.debug("Unknown message role '%s'. Recording as System.", message.role)
+                                span.log(content=SystemContent(value=message.content), **annotations)
                     unhandled_payloads.remove(EventPayload.MESSAGES)
 
                 if EventPayload.COMPLETION in payload:
                     completion_payload: llama_index.core.llms.CompletionResponse = payload[EventPayload.COMPLETION]
                     span.log(
-                        kind=Kind.LLM,
-                        content=completion_payload.text,
-                        logprobs=completion_payload.logprobs,
-                        delta=completion_payload.delta,
+                        content=ChatCompletionContent(
+                            output=completion_payload.text,
+                            extra={
+                                "logprobs": completion_payload.logprobs,
+                                "delta": completion_payload.delta,
+                            },
+                        ),
                         **annotations,
                     )
                     unhandled_payloads.remove(EventPayload.COMPLETION)
@@ -102,11 +100,14 @@ class Callback(BaseCallbackHandler):
                 if EventPayload.RESPONSE in payload:
                     response_payload: llama_index.core.llms.ChatResponse = payload[EventPayload.RESPONSE]
                     span.log(
-                        kind=Kind.LLM,
-                        content=response_payload.message.content,
-                        meta=response_payload.message,
-                        logprobs=response_payload.logprobs,
-                        delta=response_payload.delta,
+                        content=ChatCompletionContent(
+                            output=response_payload.message.content,
+                            meta=dict(response_payload.message),
+                            extra={
+                                "logprobs": response_payload.logprobs,
+                                "delta": response_payload.delta,
+                            },
+                        ),
                         **annotations,
                     )
                     unhandled_payloads.remove(EventPayload.RESPONSE)
@@ -123,22 +124,25 @@ class Callback(BaseCallbackHandler):
                     tool: llama_index.core.tools.ToolMetadata = payload[EventPayload.TOOL]
                     func: dict[str, typing.Any] = payload[EventPayload.FUNCTION_CALL]
                     span.log(
-                        kind=Kind.Tool,
                         content=ToolCallContent(
-                            tool_name=tool.name, tool_args=func, tool_call_id=tool_call_id, status="success", extra=tool
+                            tool_name=tool.name,
+                            tool_args=func,
+                            tool_call_id=tool_call_id,
+                            status="success",
+                            extra={"meta": tool},
                         ),
+                        **annotations,
                     )
                     unhandled_payloads.remove(EventPayload.FUNCTION_CALL)
                     unhandled_payloads.remove(EventPayload.TOOL)
                 if EventPayload.FUNCTION_OUTPUT in payload:
                     span.log(
-                        kind=Kind.Tool,
                         content=ToolResultContent(
                             tool_call_id=tool_call_id,
                             tool_result=payload[EventPayload.FUNCTION_OUTPUT],
                             status="success",
-                            extra=None,
                         ),
+                        **annotations,
                     )
                     unhandled_payloads.remove(EventPayload.FUNCTION_OUTPUT)
 
@@ -148,8 +152,8 @@ class Callback(BaseCallbackHandler):
                 )
 
             case _:
-                logger.debug("Unknown event type encounter '%s'. Recording as SYSTEM.", event_type)
-                span.log(kind=Kind.System, content=payload)
+                logger.debug("Unknown event type encounter '%s'. Recording as System.", event_type)
+                span.log(content=SystemContent(value=str(payload)), **annotations)
 
     def on_event_start(
         self,

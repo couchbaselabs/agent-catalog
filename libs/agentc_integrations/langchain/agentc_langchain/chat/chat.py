@@ -5,75 +5,43 @@ import typing_extensions
 import uuid
 
 from agentc_core.activity import Span
-from agentc_core.analytics import Kind
-from agentc_core.analytics.content import ToolCallContent
-from agentc_core.analytics.content import ToolResultContent
+from agentc_core.activity.models.content import ChatCompletionContent
+from agentc_core.activity.models.content import Content
+from agentc_core.activity.models.content import RequestHeaderContent
+from agentc_core.activity.models.content import SystemContent
+from agentc_core.activity.models.content import ToolCallContent
+from agentc_core.activity.models.content import ToolResultContent
+from agentc_core.activity.models.content import UserContent
 from langchain_core.callbacks import AsyncCallbackManagerForLLMRun
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.language_models import BaseChatModel
-from langchain_core.load.dump import default
 from langchain_core.messages import AIMessage
-from langchain_core.messages import AIMessageChunk
 from langchain_core.messages import BaseMessage
 from langchain_core.messages import FunctionMessage
-from langchain_core.messages import FunctionMessageChunk
 from langchain_core.messages import HumanMessage
-from langchain_core.messages import HumanMessageChunk
 from langchain_core.messages import SystemMessage
-from langchain_core.messages import SystemMessageChunk
 from langchain_core.messages import ToolMessage
-from langchain_core.messages import ToolMessageChunk
 from langchain_core.outputs import ChatGenerationChunk
 from langchain_core.outputs import ChatResult
 from langchain_core.outputs import LLMResult
+from langchain_core.tools import Tool
 
 logger = logging.getLogger(__name__)
 
-_TYPE_TO_KIND_MAPPING = {
-    HumanMessage.__name__: Kind.Human,
-    HumanMessageChunk.__name__: Kind.Human,
-    AIMessage.__name__: Kind.LLM,
-    AIMessageChunk.__name__: Kind.LLM,
-    SystemMessage.__name__: Kind.System,
-    SystemMessageChunk.__name__: Kind.System,
-    ToolMessage.__name__: Kind.Tool,
-    ToolMessageChunk.__name__: Kind.Tool,
-    FunctionMessage.__name__: Kind.Tool,
-    FunctionMessageChunk.__name__: Kind.Tool,
-}
 
-
-def _determine_kind_from_type(message: BaseMessage) -> Kind:
-    message_type_name = type(message).__name__
-    if message_type_name in _TYPE_TO_KIND_MAPPING:
-        return _TYPE_TO_KIND_MAPPING[message_type_name]
-    else:
-        logger.debug(f'Unknown message type encountered: {message.type}. Tagging as "system".')
-        return Kind.System
-
-
-def _content_from_message(message: BaseMessage) -> typing.Iterable[typing.Any]:
-    match _determine_kind_from_type(message):
-        case Kind.Tool:
-            tool_message: ToolMessage = message
-            yield ToolResultContent(
-                tool_call_id=tool_message.tool_call_id,
-                tool_result=tool_message.content,
-                status=tool_message.status,
-                extra=default(message),
-            )
-        case Kind.LLM:
+def _content_from_message(message: BaseMessage) -> typing.Iterable[Content]:
+    match message.type:
+        case "ai" | "AIMessageChunk":
             ai_message: AIMessage = message
-            if ai_message.content is not None and ai_message.content != "":
-                yield ai_message.content
+            yield ChatCompletionContent(output=str(ai_message.content), meta=ai_message.response_metadata)
+
             for tool_call in ai_message.tool_calls:
                 yield ToolCallContent(
                     tool_name=tool_call["name"],
                     tool_args=tool_call["args"],
                     tool_call_id=tool_call["id"],
                     status="success",
-                    extra=default(message),
                 )
             for invalid_tool_call in ai_message.invalid_tool_calls:
                 yield ToolCallContent(
@@ -81,10 +49,45 @@ def _content_from_message(message: BaseMessage) -> typing.Iterable[typing.Any]:
                     tool_args=invalid_tool_call["args"],
                     tool_call_id=invalid_tool_call["id"],
                     status="error",
-                    extra=default(message),
+                    extra={
+                        "error": invalid_tool_call["error"],
+                    },
                 )
+
+        case "function" | "FunctionMessageChunk":
+            function_message: FunctionMessage = message
+            yield ToolResultContent(
+                tool_result=function_message.content,
+                status="success",
+            )
+
+        case "tool" | "ToolMessageChunk":
+            tool_message: ToolMessage = message
+            yield ToolResultContent(
+                tool_call_id=tool_message.tool_call_id,
+                tool_result=tool_message.content,
+                status=tool_message.status,
+            )
+
+        case "human" | "HumanMessageChunk":
+            human_message: HumanMessage = message
+            yield UserContent(value=human_message.content)
+
+        case "system" | "SystemMessageChunk":
+            system_message: SystemMessage = message
+            yield SystemContent(value=system_message.content, extra={"meta": system_message})
+
         case _:
-            yield message.content
+            logger.debug("Unknown message type encountered: %s. Logging as System.", message.type)
+            base_message: BaseMessage = message
+            yield SystemContent(
+                value=base_message.content,
+                extra={
+                    "meta": base_message,
+                    "id": base_message.id,
+                    "type": message.type,
+                },
+            )
 
 
 def _model_from_message(message: BaseMessage, chat_model: BaseChatModel) -> dict | None:
@@ -100,7 +103,7 @@ def _accept_messages(messages: typing.List[BaseMessage], span: Span, **kwargs) -
     for message in messages:
         for content in _content_from_message(message):
             with span.new(name=message.type) as content_span:
-                content_span.log(kind=_determine_kind_from_type(message), content=content, **kwargs)
+                content_span.log(content=content, **kwargs)
 
 
 class Callback(BaseCallbackHandler):
@@ -131,9 +134,23 @@ class Callback(BaseCallbackHandler):
             internal_node.children[run_id] = Callback.LeafNode(span=internal_node.span.new(name=str(run_id)))
         return internal_node.children[run_id]
 
-    def __init__(self, span: Span):
+    def __init__(self, span: Span, tools: list[Tool] = None, output: dict = None):
+        """
+        :param span: The root span to bind to the chat model messages.
+        :param tools: The tools that being used by the chat model (i.e., those passed in :py:BaseChatModel.bind_tools).
+        :param output: The output type that being used by the chat model (i.e., those passed in
+                       :py:BaseChatModel.with_structured_output).
+        """
         self.node_map: dict[uuid.UUID | typing.Literal["_"], Callback.InternalNode] = dict()
         self.root_span = span
+        self.output: dict = output or dict()
+
+        self.tools: list[RequestHeaderContent.Tool] = list()
+        if tools is not None:
+            for tool in tools:
+                self.tools.append(
+                    RequestHeaderContent.Tool(name=tool.name, description=tool.description, args_schema=tool.args)
+                )
         super().__init__()
 
     def on_chat_model_start(
@@ -150,6 +167,13 @@ class Callback(BaseCallbackHandler):
         node = self.Node(run_id, parent_run_id)
         node.model = serialized
         node.span.enter()
+        node.span.log(
+            RequestHeaderContent(
+                tools=self.tools,
+                output=self.output,
+                meta=serialized,
+            )
+        )
         for message_set in messages:
             _accept_messages(message_set, node.span)
         return super().on_chat_model_start(
@@ -168,7 +192,14 @@ class Callback(BaseCallbackHandler):
         for generation_set in response.generations:
             logger.debug(f"LLM has returned the message: {generation_set}")
             for generation in generation_set:
-                node.span.log(kind=Kind.LLM, content=generation.message.text(), model_name=node.model)
+                node.span.log(
+                    ChatCompletionContent(
+                        output=generation.message.text(),
+                        meta=generation.message.response_metadata,
+                        extra={"additional_kwargs": generation.message.additional_kwargs},
+                    ),
+                    model=node.model,
+                )
         node.span.exit()
         return super().on_llm_end(response, run_id=run_id, parent_run_id=parent_run_id, **kwargs)
 
@@ -201,11 +232,11 @@ def audit(chat_model: BaseChatModel, span: Span) -> BaseChatModel:
         for result in results.generations:
             logger.debug(f"LLM has returned the message: {result}")
             with span.new(name="_generate") as generation:
+                # Each generation gets its own span.
                 _accept_messages(messages, generation)
                 generation.log(
-                    kind=Kind.LLM,
-                    content=_content_from_message(result.message),
-                    model_name=_model_from_message(result.message, chat_model),
+                    list(_content_from_message(result.message))[0],
+                    model=_model_from_message(result.message, chat_model),
                 )
 
         return results
@@ -233,9 +264,8 @@ def audit(chat_model: BaseChatModel, span: Span) -> BaseChatModel:
         with span.new(name="_stream") as generation:
             _accept_messages(messages, generation)
             generation.log(
-                kind=Kind.LLM,
-                content=_content_from_message(result_chunk.message),
-                model_name=_model_from_message(result_chunk.message, chat_model),
+                content=list(_content_from_message(result_chunk.message))[0],
+                model=_model_from_message(result_chunk.message, chat_model),
             )
 
     async def _agenerate(
@@ -247,13 +277,13 @@ def audit(chat_model: BaseChatModel, span: Span) -> BaseChatModel:
     ):
         results = await agenerate_dispatch(messages, stop, run_manager, **kwargs)
         for result in results.generations:
+            # Each generation gets its own span.
             logger.debug(f"LLM has returned the message: {result}")
             with span.new(name="_agenerate") as generation:
                 _accept_messages(messages, generation)
                 generation.log(
-                    kind=Kind.LLM,
-                    content=_content_from_message(result.message),
-                    model_name=_model_from_message(result.message, chat_model),
+                    content=list(_content_from_message(result.message))[0],
+                    model=_model_from_message(result.message, chat_model),
                 )
 
         return results
@@ -281,9 +311,8 @@ def audit(chat_model: BaseChatModel, span: Span) -> BaseChatModel:
         with span.new(name="_astream") as generation:
             _accept_messages(messages, generation)
             generation.log(
-                kind=Kind.LLM,
-                content=_content_from_message(result_chunk.message),
-                model_name=_model_from_message(result_chunk.message, chat_model),
+                content=list(_content_from_message(result_chunk.message))[0],
+                model=_model_from_message(result_chunk.message, chat_model),
             )
 
     # Note: Pydantic fiddles around with __setattr__, so we need to skirt around this.

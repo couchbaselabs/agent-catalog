@@ -39,7 +39,7 @@ def test_audit(tmp_path, isolated_server_factory, connection_factory):
 
         # We should have six logs in our local FS...
         with (pathlib.Path(td) / DEFAULT_ACTIVITY_FOLDER / DEFAULT_ACTIVITY_FILE).open("r") as fp:
-            # ENTER + ENTER + HUMAN + EXIT + LLM + EXIT
+            # BEGIN + BEGIN + USER + END + CHAT-COMPLETION + END
             assert len(fp.readlines()) == 6
 
         # ...and six logs in our Couchbase instance.
@@ -69,10 +69,10 @@ def test_callback(tmp_path, isolated_server_factory, connection_factory):
         chat_model = langchain_openai.ChatOpenAI(name="gpt-4o", callbacks=[Callback(span=span)])
         chat_model.invoke("Hello, how are you doing today?")
 
-        # We should have six logs in our local FS...
+        # We should have seven logs in our local FS...
         with (pathlib.Path(td) / DEFAULT_ACTIVITY_FOLDER / DEFAULT_ACTIVITY_FILE).open("r") as fp:
-            # ENTER + ENTER + HUMAN + EXIT + LLM + EXIT
-            assert len(fp.readlines()) == 6
+            # BEGIN + REQUEST-HEADER + BEGIN + USER + END + CHAT-COMPLETION + END
+            assert len(fp.readlines()) == 7
 
         # ...and six logs in our Couchbase instance.
         cluster = connection_factory()
@@ -80,4 +80,4 @@ def test_callback(tmp_path, isolated_server_factory, connection_factory):
             FROM `travel-sample`.agent_activity.logs l
             SELECT VALUE l
         """).execute()
-        assert len(results) == 6
+        assert len(results) == 7

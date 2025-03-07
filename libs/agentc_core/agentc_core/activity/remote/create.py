@@ -2,8 +2,8 @@ import couchbase.cluster
 import logging
 import pathlib
 
-from ..defaults import DEFAULT_ACTIVITY_LOG_COLLECTION
-from ..defaults import DEFAULT_ACTIVITY_SCOPE
+from agentc_core.defaults import DEFAULT_ACTIVITY_LOG_COLLECTION
+from agentc_core.defaults import DEFAULT_ACTIVITY_SCOPE
 
 logger = logging.getLogger(__name__)
 

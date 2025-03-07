@@ -7,7 +7,10 @@ from agentc import Catalog
 from agentc_cli.main import click_main
 from agentc_core.activity import GlobalSpan
 from agentc_core.activity import Span
-from agentc_core.analytics import Log
+from agentc_core.activity.models.content import KeyValueContent
+from agentc_core.activity.models.content import SystemContent
+from agentc_core.activity.models.content import UserContent
+from agentc_core.activity.models.log import Log
 from agentc_core.defaults import DEFAULT_ACTIVITY_FILE
 from agentc_testing.repo import ExampleRepoKind
 from agentc_testing.repo import initialize_repo
@@ -35,12 +38,12 @@ def test_local_auditor_positive_1(tmp_path):
         logging_handler.flush()
 
         # Test our global span logging.
-        global_span.log("system", content="Hello world!", my_annotation="my annotation")
+        global_span.log(SystemContent(value="Hello world!"), my_annotation="my annotation")
         with (catalog.ActivityPath() / DEFAULT_ACTIVITY_FILE).open("r") as fp:
             log_entry = Log.model_validate_json(fp.read())
             assert log_entry.span.name == ["my project"]
-            assert log_entry.kind == "system"
-            assert log_entry.content == "Hello world!"
+            assert log_entry.content.kind == "system"
+            assert log_entry.content.value == "Hello world!"
             assert log_entry.catalog_version == catalog.version
             assert log_entry.annotations == {"my_annotation": "my annotation"}
 
@@ -51,7 +54,9 @@ def test_local_auditor_positive_1(tmp_path):
             another_new_annotation="another new annotation",
             some_score=3,
         )
-        level_1_span.log("system", content="Hello world again!", my_annotation="my new annotation")
+        level_1_span.log(
+            KeyValueContent(key="key", value={"text": "Hello world again!"}), my_annotation="my new annotation"
+        )
         logging_handler.flush()
         with (catalog.ActivityPath() / DEFAULT_ACTIVITY_FILE).open("r") as fp:
             # We are interested in the last line of the file.
@@ -61,8 +66,9 @@ def test_local_auditor_positive_1(tmp_path):
             assert i == 1
             log_entry = Log.model_validate_json(line)
             assert log_entry.span.name == ["my project", "my agent"]
-            assert log_entry.kind == "system"
-            assert log_entry.content == "Hello world again!"
+            assert log_entry.content.kind == "key-value"
+            assert log_entry.content.key == "key"
+            assert log_entry.content.value["text"] == "Hello world again!"
             assert log_entry.catalog_version == catalog.version
             assert log_entry.annotations == {
                 "my_annotation": "my new annotation",
@@ -72,7 +78,7 @@ def test_local_auditor_positive_1(tmp_path):
 
         # Test nested span logging (level 2).
         level_2_span: Span = level_1_span.new("my task", another_new_annotation="2")
-        level_2_span.log("human", content="Hello world once more!", my_annotation="my newer annotation")
+        level_2_span.log(UserContent(value="Hello world once more!"), my_annotation="my newer annotation")
         logging_handler.flush()
         with (catalog.ActivityPath() / DEFAULT_ACTIVITY_FILE).open("r") as fp:
             # We are interested in the last line of the file.
@@ -82,8 +88,8 @@ def test_local_auditor_positive_1(tmp_path):
             assert i == 2
             log_entry = Log.model_validate_json(line)
             assert log_entry.span.name == ["my project", "my agent", "my task"]
-            assert log_entry.kind == "human"
-            assert log_entry.content == "Hello world once more!"
+            assert log_entry.content.kind == "user"
+            assert log_entry.content.value == "Hello world once more!"
             assert log_entry.catalog_version == catalog.version
             assert log_entry.annotations == {
                 "my_annotation": "my newer annotation",
@@ -118,13 +124,13 @@ def test_local_auditor_positive_2(tmp_path):
         with (catalog.ActivityPath() / DEFAULT_ACTIVITY_FILE).open("r") as fp:
             log_entry = Log.model_validate_json(fp.readline())
             assert log_entry.span.name == ["my project"]
-            assert log_entry.kind == "transition"
-            assert log_entry.content["to_state"] == dict(messages=[])
+            assert log_entry.content.kind == "begin"
+            assert log_entry.content.state == dict(messages=[])
             assert log_entry.catalog_version == catalog.version
             log_entry = Log.model_validate_json(fp.readline())
             assert log_entry.span.name == ["my project"]
-            assert log_entry.kind == "transition"
-            assert log_entry.content["from_state"] == dict(messages=["Hello world!"])
+            assert log_entry.content.kind == "end"
+            assert log_entry.content.state == dict(messages=["Hello world!"])
             assert log_entry.catalog_version == catalog.version
 
 
@@ -150,9 +156,9 @@ def test_local_auditor_positive_3(tmp_path):
         with (catalog.ActivityPath() / DEFAULT_ACTIVITY_FILE).open("r") as fp:
             log_entry = Log.model_validate_json(fp.readline())
             assert log_entry.span.name == ["my project"]
-            assert log_entry.kind == "custom"
-            assert log_entry.content["name"] == "metric"
-            assert log_entry.content["value"] == 2
+            assert log_entry.content.kind == "key-value"
+            assert log_entry.content.key == "metric"
+            assert log_entry.content.value == 2
 
 
 @pytest.mark.skip

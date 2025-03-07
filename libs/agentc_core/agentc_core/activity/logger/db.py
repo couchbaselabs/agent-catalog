@@ -1,11 +1,10 @@
-import json
 import logging
 import textwrap
 
-from ...analytics import Log
 from ...defaults import DEFAULT_ACTIVITY_LOG_COLLECTION
 from ...defaults import DEFAULT_ACTIVITY_SCOPE
 from .base import BaseLogger
+from agentc_core.activity.models.log import Log
 from agentc_core.config import RemoteCatalogConfig
 from agentc_core.remote.util.ddl import check_if_scope_collection_exist
 from agentc_core.version import VersionDescriptor
@@ -40,14 +39,5 @@ class DBLogger(BaseLogger):
         cb_coll = cb.scope(DEFAULT_ACTIVITY_SCOPE).collection(DEFAULT_ACTIVITY_LOG_COLLECTION)
         self.cb_coll = cb_coll
 
-    def _accept(self, message: Log):
-        cb_coll = self.cb_coll
-
-        # serialise message object to str
-        message_str = message.model_dump_json()
-        message_json = json.loads(message_str)
-
-        # TODO (GLENN): There might be issues here if the key is too long.
-        # upsert docs to CB collection
-        key = f"{message.timestamp}/{str(message.span)}"
-        cb_coll.upsert(key, message_json)
+    def _accept(self, log_obj: Log, log_json: dict):
+        self.cb_coll.insert(log_obj.identifier, log_json)

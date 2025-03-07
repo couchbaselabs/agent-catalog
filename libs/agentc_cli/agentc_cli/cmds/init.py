@@ -11,8 +11,8 @@ import typing
 
 from .util import CATALOG_KINDS
 from .util import logging_command
-from agentc_core.analytics.create import create_analytics_views
-from agentc_core.analytics.create import create_query_udfs
+from agentc_core.activity.remote.create import create_analytics_views
+from agentc_core.activity.remote.create import create_query_udfs
 from agentc_core.config import Config
 from agentc_core.defaults import DEFAULT_ACTIVITY_LOG_COLLECTION
 from agentc_core.defaults import DEFAULT_ACTIVITY_SCOPE

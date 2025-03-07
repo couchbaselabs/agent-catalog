@@ -10,7 +10,7 @@ Building From Package
 .. important::
 
     This part is in-the-works!
-    For now, please refer to the `Building From Source (with pip)`_ section below.
+    For now, please refer to the `Installing from Source (with Makefile)`_ section below.
 
 Installing from Source (with Makefile)
 --------------------------------------
@@ -87,4 +87,10 @@ Installing from Source (with Anaconda)
 
    .. code-block:: bash
 
-      pip install libs/agentc_langchain
+      pip install libs/agentc_integrations/langchain
+
+   Similarly, for LlamaIndex Developers:
+
+   .. code-block:: bash
+
+      pip install libs/agentc_integrations/llamaindex

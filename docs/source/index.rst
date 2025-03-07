@@ -15,15 +15,19 @@ Table of Contents
 .. toctree::
    :maxdepth: 2
 
-   Getting Agent Catalog <install>
-   Agent Catalog Quick Start <quick>
-   Agent Catalog Concepts <concept>
-   Command Line Tool <cli>
-   Agent Catalog API <api>
-   Provider Configuration <provider>
-   Parameters & Configuration <config>
-   On Catalog Entries <entry>
-   Frequently Asked Questions <faqs>
+   Installation <install>
+   Quick Start <quick>
+   Concepts <concept>
+   CLI Tool <cli>
+   Library <api>
+   Catalog Records <catalog>
+   Log Records <log>
+   Configuration <config>
+
+.. Frequently Asked Questions <faqs>
+
+.. Provider Configuration <provider>
+
 
 Indices and Tables
 ------------------

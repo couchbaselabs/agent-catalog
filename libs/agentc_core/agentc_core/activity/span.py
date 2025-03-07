@@ -5,11 +5,12 @@ import textwrap
 import typing
 import uuid
 
-from ..analytics import CustomContent
-from ..analytics import Kind
-from ..analytics import TransitionContent
 from .logger import DBLogger
 from .logger import LocalLogger
+from agentc_core.activity.models.content import BeginContent
+from agentc_core.activity.models.content import Content
+from agentc_core.activity.models.content import EndContent
+from agentc_core.activity.models.content import KeyValueContent
 from agentc_core.config import LocalCatalogConfig
 from agentc_core.config import RemoteCatalogConfig
 from agentc_core.version import VersionDescriptor
@@ -38,7 +39,7 @@ class Span(pydantic.BaseModel):
     kwargs: typing.Optional[dict[str, typing.Any]] = pydantic.Field(default_factory=dict)
     """ Annotations to apply to all messages logged within this span. """
 
-    def new(self, name: typing.AnyStr, state: typing.Any = None, **kwargs):
+    def new(self, name: str, state: typing.Any = None, **kwargs):
         new_kwargs = {**self.kwargs, **kwargs}
         return Span(
             logger=self.logger,
@@ -48,10 +49,10 @@ class Span(pydantic.BaseModel):
             kwargs=new_kwargs,
         )
 
-    def log(self, kind: Kind, content: typing.Any, **kwargs):
+    def log(self, content: Content, **kwargs):
         new_kwargs = {**self.kwargs, **kwargs}
         identifier: Span.Identifier = self.identifier
-        self.logger(kind=kind, content=content, session_id=identifier.session, span_name=identifier.name, **new_kwargs)
+        self.logger(content=content, session_id=identifier.session, span_name=identifier.name, **new_kwargs)
 
     @pydantic.computed_field
     @property
@@ -64,23 +65,17 @@ class Span(pydantic.BaseModel):
         return Span.Identifier(name=list(reversed(name_stack)), session=working.session)
 
     def enter(self) -> typing.Self:
-        self.log(
-            kind=Kind.Transition,
-            content=TransitionContent(to_state=self.state or self.identifier, from_state=None, extra=None),
-        )
+        self.log(content=BeginContent() if self.state is None else BeginContent(state=self.state))
         return self
 
     def exit(self):
-        self.log(
-            kind=Kind.Transition,
-            content=TransitionContent(to_state=None, from_state=self.state or self.identifier, extra=None),
-        )
+        self.log(content=EndContent() if self.state is None else EndContent(state=self.state))
 
     def __enter__(self):
         return self.enter()
 
-    def __setitem__(self, key, value):
-        self.log(kind=Kind.Custom, content=CustomContent(name=key, value=value, extra=self.kwargs))
+    def __setitem__(self, key: str, value: typing.Any):
+        self.log(content=KeyValueContent(key=key, value=value))
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         # We will only record this transition if we are exiting cleanly.
@@ -95,7 +90,7 @@ class GlobalSpan(Span):
     config: typing.Union[LocalCatalogConfig, RemoteCatalogConfig]
     """ Config (configuration) instance associated with this activity. """
 
-    session: typing.AnyStr = pydantic.Field(default_factory=lambda: uuid.uuid4().hex, frozen=True)
+    session: str = pydantic.Field(default_factory=lambda: uuid.uuid4().hex, frozen=True)
     """ The run (alternative: session) that this span is associated with. """
 
     version: VersionDescriptor = pydantic.Field(frozen=True)
@@ -162,7 +157,7 @@ class GlobalSpan(Span):
             raise ValueError("Could not instantiate an auditor.")
         return self
 
-    def new(self, name: typing.AnyStr, state: typing.Any = None, **kwargs) -> Span:
+    def new(self, name: str, state: typing.Any = None, **kwargs) -> Span:
         """Create a new span under the current activity.
 
         :param name: The name of the span.

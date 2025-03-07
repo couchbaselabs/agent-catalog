@@ -5,9 +5,9 @@ import logging.handlers
 import os
 import shutil
 
-from ...analytics import Log
 from ...config import LocalCatalogConfig
 from .base import BaseLogger
+from agentc_core.activity.models.log import Log
 from agentc_core.version import VersionDescriptor
 
 logger = logging.getLogger(__name__)
@@ -42,5 +42,5 @@ class LocalLogger(BaseLogger):
         self.rotating_handler.setFormatter(logging.Formatter("%(message)s"))
         self.audit_logger.addHandler(self.rotating_handler)
 
-    def _accept(self, message: Log):
-        self.audit_logger.info(message.model_dump_json())
+    def _accept(self, log_obj: Log, log_json: dict):
+        self.audit_logger.info(log_json)

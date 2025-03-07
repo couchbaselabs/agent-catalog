@@ -52,7 +52,7 @@ One tool is generated per specified endpoint.
 .. literalinclude:: ../../templates/tools/http_request.yaml
 
 To know more on generating your OpenAPI spec, check out the schema `here <https://spec.openapis.org/oas/v3.1.0.html#schema>`_.
-For an example OpenAPI spec used in the ``travel-sample`` agent, see `here <https://github.com/couchbaselabs/agent-catalog-example/blob/master/travel_agent/src/endpoints/rewards_spec.json>`_.
+For an example OpenAPI spec used in the ``travel-sample`` agent, see `here <https://github.com/couchbaselabs/agent-catalog/blob/master/libs/agentc_testing/agentc_testing/resources/travel_agent/rewards_spec.json>`_.
 
 Prompt Records
 --------------

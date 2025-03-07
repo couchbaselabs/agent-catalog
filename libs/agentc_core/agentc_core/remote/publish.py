@@ -9,7 +9,7 @@ import tqdm
 import typing
 import uuid
 
-from agentc_core.analytics import Log
+from agentc_core.activity.models.log import Log
 from agentc_core.catalog.descriptor import CatalogDescriptor
 from agentc_core.config import Config
 from agentc_core.defaults import DEFAULT_ACTIVITY_LOG_COLLECTION
