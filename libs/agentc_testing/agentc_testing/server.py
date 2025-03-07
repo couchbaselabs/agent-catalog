@@ -194,6 +194,7 @@ def isolated_server_factory() -> typing.Callable[[pathlib.Path], docker.models.c
     os.environ["AGENT_CATALOG_PASSWORD"] = DEFAULT_COUCHBASE_PASSWORD
     os.environ["AGENT_CATALOG_BUCKET"] = DEFAULT_COUCHBASE_BUCKET
     os.environ["AGENT_CATALOG_WAIT_UNTIL_READY_SECONDS"] = "60"
+    os.environ["AGENT_CATALOG_DDL_RETRY_WAIT_SECONDS"] = "60"
 
     container_instance = set()
     try:
@@ -213,6 +214,7 @@ def isolated_server_factory() -> typing.Callable[[pathlib.Path], docker.models.c
         del os.environ["AGENT_CATALOG_PASSWORD"]
         del os.environ["AGENT_CATALOG_BUCKET"]
         del os.environ["AGENT_CATALOG_WAIT_UNTIL_READY_SECONDS"]
+        del os.environ["AGENT_CATALOG_DDL_RETRY_WAIT_SECONDS"]
         if len(container_instance) > 0:
             _stop_couchbase(container_instance.pop())
 

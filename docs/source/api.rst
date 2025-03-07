@@ -1,8 +1,18 @@
 Package Documentation
 =====================
 
-.. automodule:: agentc
+`agentc` Package
+----------------
+
+.. automodule:: agentc.catalog
     :members:
+
+.. automodule:: agentc.span
+    :members:
+
+.. automodule:: agentc.cmd
+    :members:
+
 
 Integration Packages
 --------------------
