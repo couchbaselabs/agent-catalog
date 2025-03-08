@@ -30,7 +30,7 @@ LATEST_SNAPSHOT_VERSION = "__LATEST__"
 
 
 class RemoteCatalogConfig(pydantic_settings.BaseSettings):
-    model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_")
+    model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_", extra="ignore")
 
     conn_string: typing.Optional[str] = None
     """ Couchbase connection string that points to the catalog.
@@ -151,6 +151,10 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
             return v
         return None
 
+    @pydantic.field_serializer("password")
+    def serialize_password(self, _: pydantic.SecretStr, _info):
+        return "***"
+
     def Cluster(self) -> couchbase.cluster.Cluster:
         if self.conn_string is None:
             raise ValueError(
@@ -196,7 +200,7 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
 
 
 class EmbeddingModelConfig(pydantic_settings.BaseSettings):
-    model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_")
+    model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_", extra="ignore")
 
     embedding_model_name: str = DEFAULT_EMBEDDING_MODEL_NAME
     """ The name of the embedding model that Agent Catalog will use when indexing and querying tools and prompts.
@@ -227,7 +231,7 @@ class EmbeddingModelConfig(pydantic_settings.BaseSettings):
 
 
 class LocalCatalogConfig(pydantic_settings.BaseSettings):
-    model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_")
+    model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_", extra="ignore")
 
     project_path: typing.Optional[pathlib.Path] = None
     catalog_path: typing.Optional[pathlib.Path] = None
@@ -328,14 +332,14 @@ class LocalCatalogConfig(pydantic_settings.BaseSettings):
 
 
 class CommandLineConfig(pydantic_settings.BaseSettings):
-    model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_")
+    model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_", extra="ignore")
 
     verbosity_level: int = pydantic.Field(default=DEFAULT_VERBOSITY_LEVEL, ge=0, le=2)
     with_interaction: bool = True
 
 
 class VersioningConfig(pydantic_settings.BaseSettings):
-    model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_")
+    model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_", extra="ignore")
 
     snapshot: str = LATEST_SNAPSHOT_VERSION
     """ The snapshot version to find the tools and prompts for.
@@ -350,7 +354,7 @@ class VersioningConfig(pydantic_settings.BaseSettings):
 
 # We'll take a mix-in approach here.
 class Config(LocalCatalogConfig, RemoteCatalogConfig, CommandLineConfig, VersioningConfig, EmbeddingModelConfig):
-    model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_")
+    model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_", extra="ignore")
 
     debug: bool = False
 

@@ -45,7 +45,7 @@ def test_local_inputs_provider(tmp_path):
         )
         catalog = Catalog()
         prompt: Prompt = catalog.find("prompt", query="asking a user their location")[0]
-        assert prompt.tools is None
+        assert prompt.tools == []
         assert prompt.meta.name == "get_user_location"
 
 
@@ -64,7 +64,7 @@ def test_local_provider(tmp_path):
         tools = catalog.find("tool", query="searching travel blogs")
         assert len(tools) == 1
         assert tools[0].func.__name__ == "get_travel_blog_snippets_from_user_interests"
-        assert prompt[0].tools is None
+        assert prompt[0].tools == []
         assert prompt[0].meta.name == "get_user_location"
 
 

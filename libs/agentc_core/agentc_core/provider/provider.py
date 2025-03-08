@@ -126,7 +126,7 @@ class PromptProvider(BaseProvider):
     @dataclasses.dataclass
     class PromptResult:
         content: str | dict
-        tools: typing.Optional[list[ToolProvider.ToolResult]]
+        tools: list[ToolProvider.ToolResult]
         output: typing.Optional[dict]
         meta: RecordDescriptor
 
@@ -143,21 +143,19 @@ class PromptProvider(BaseProvider):
 
     def _generate_result(self, prompt_descriptor: PromptDescriptor) -> PromptResult:
         # If our prompt has defined tools, fetch them here.
-        tools = None
-        if prompt_descriptor.tools is not None:
-            if self.tool_provider is None:
-                raise ValueError(
-                    "Tool(s) have been defined in the prompt, but no ToolProvider has been provided. "
-                    "If this is a new repo, please run `agentc index tool` to first index your tools."
+        tools = list()
+        if len(prompt_descriptor.tools) > 0 and self.tool_provider is None:
+            raise ValueError(
+                "Tool(s) have been defined in the prompt, but no ToolProvider has been provided. "
+                "If this is a new repo, please run `agentc index tool` to first index your tools."
+            )
+        for tool in prompt_descriptor.tools:
+            if tool.query is not None:
+                tools += self.tool_provider.find_with_query(
+                    query=tool.query, annotations=tool.annotations, limit=tool.limit
                 )
-            tools = list()
-            for tool in prompt_descriptor.tools:
-                if tool.query is not None:
-                    tools += self.tool_provider.find_with_query(
-                        query=tool.query, annotations=tool.annotations, limit=tool.limit
-                    )
-                else:  # tool.name is not None
-                    tools.append(self.tool_provider.find_with_name(name=tool.name, annotations=tool.annotations))
+            else:  # tool.name is not None
+                tools.append(self.tool_provider.find_with_name(name=tool.name, annotations=tool.annotations))
 
         return PromptProvider.PromptResult(
             content=prompt_descriptor.content,

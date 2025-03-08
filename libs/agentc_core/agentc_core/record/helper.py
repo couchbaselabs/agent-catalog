@@ -62,9 +62,12 @@ JSON_META_SCHEMA = {
 
 class JSONSchemaValidatingMixin:
     @staticmethod
-    def check_if_valid_json_schema_dict(input_dict: dict):
+    def check_if_valid_json_schema_dict(input_dict: dict) -> dict:
         jsonschema.validate(input_dict, JSON_META_SCHEMA)
+        return input_dict
 
     @staticmethod
-    def check_if_valid_json_schema_str(input_dict_as_str: str):
-        JSONSchemaValidatingMixin.check_if_valid_json_schema_dict(json.loads(input_dict_as_str))
+    def check_if_valid_json_schema_str(input_dict_as_str: str) -> dict:
+        input_dict_as_dict = json.loads(input_dict_as_str)
+        JSONSchemaValidatingMixin.check_if_valid_json_schema_dict(input_dict_as_dict)
+        return input_dict_as_dict

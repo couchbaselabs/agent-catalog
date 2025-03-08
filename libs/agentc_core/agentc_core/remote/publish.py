@@ -109,7 +109,7 @@ def publish_catalog(
     metadata["version"]["timestamp"] = str(metadata["version"]["timestamp"])
     logger.debug(f"Now processing the metadata for the {k} catalog.")
     try:
-        key = metadata["version"]["identifier"]
+        key = f'{metadata["version"]["identifier"]}/{metadata["kind"]}'
         cb_coll.upsert(key, metadata)
     except couchbase.exceptions.CouchbaseException as e:
         raise ValueError(f"Couldn't insert metadata!\n{e.message}") from e

@@ -10,8 +10,7 @@ _This README is intended for all `agent-catalog` contributors._
 - [On Packages (inside `libs`)](#on-packages-inside-libs)
 - [How to Contribute](#how-to-contribute)
 - [Working with Poetry](#working-with-poetry)
-- [Enabling Debug Mode](#enabling-debug-mode)
-- [Running Tests (Pytest)](#running-tests-pytest)
+- [On Testing (Pytest)](#on-testing-pytest)
 - [Publishing Packages](#publishing-packages)
 - [Generating `requirements.txt`](#generating-requirementstxt)
 
@@ -112,7 +111,9 @@ Below, we list out some notes that developers might find useful w.r.t. Poetry:
 3. Because these are a collection of libraries, we do not commit individual lock files for each sub-package.
    **Do not commit `poetry.lock` files.**
 
-## Enabling Debug Mode
+## On Testing (Pytest)
+
+### Enabling Debug Mode
 
 To enable debug mode, execute the following command:
 
@@ -120,7 +121,7 @@ To enable debug mode, execute the following command:
 export AGENT_CATALOG_DEBUG=true
 ```
 
-## Running Tests (Pytest)
+### Running Unit Tests
 
 To run the entire suite of unit tests, use the following `pytest` command in the project root:
 

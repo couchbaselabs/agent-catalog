@@ -1,5 +1,4 @@
 import enum
-import json
 import logging
 import pydantic
 import textwrap
@@ -107,16 +106,38 @@ class BaseContent(pydantic.BaseModel):
     )
 
     @staticmethod
-    def _json_or_string(v: typing.Any, name: str):
-        try:
-            return json.loads(json.dumps(v))
-        except TypeError as e:
-            logger.warning("Failed to serialize %s: %s. Recording as string.", name, e)
-            return str(v)
+    def _safe_serialize(obj):
+        """Source available at: https://stackoverflow.com/a/74923639"""
+
+        def _safe_serialize_impl(inner_obj):
+            if isinstance(inner_obj, list):
+                result = list()
+                for element in inner_obj:
+                    result.append(_safe_serialize_impl(element))
+                return result
+            elif isinstance(inner_obj, dict):
+                result = dict()
+                for key, value in inner_obj.items():
+                    result[key] = _safe_serialize_impl(value)
+                return result
+            elif hasattr(inner_obj, "__dict__"):
+                if hasattr(inner_obj, "__repr__"):
+                    result = inner_obj.__repr__()
+                else:
+                    # noinspection PyBroadException
+                    try:
+                        result = inner_obj.__class__.__name__
+                    except:
+                        result = "object"
+                return result
+            else:
+                return inner_obj
+
+        return _safe_serialize_impl(obj)
 
     @pydantic.field_serializer("extra", when_used="json")
     def serialize_extra(self, extra: dict, _info):
-        return self._json_or_string(extra, "extra")
+        return self._safe_serialize(extra)
 
 
 class SystemContent(BaseContent):
@@ -147,7 +168,7 @@ class ToolCallContent(BaseContent):
 
     @pydantic.field_serializer("tool_args", when_used="json")
     def serialize_tool_args(self, tool_args: dict[str, typing.Any], _info):
-        return self._json_or_string(tool_args, "tool_args")
+        return self._safe_serialize(tool_args)
 
 
 class ToolResultContent(BaseContent):
@@ -170,7 +191,7 @@ class ToolResultContent(BaseContent):
 
     @pydantic.field_serializer("tool_result", when_used="json")
     def serialize_tool_result(self, tool_result: typing.Any, _info):
-        return self._json_or_string(tool_result, "tool_result")
+        return self._safe_serialize(tool_result)
 
 
 class ChatCompletionContent(BaseContent):
@@ -185,7 +206,7 @@ class ChatCompletionContent(BaseContent):
 
     @pydantic.field_serializer("meta", when_used="json")
     def serialize_meta(self, meta: dict, _info):
-        return self._json_or_string(meta, "meta")
+        return self._safe_serialize(meta)
 
 
 class RequestHeaderContent(BaseContent):
@@ -215,7 +236,7 @@ class RequestHeaderContent(BaseContent):
 
     @pydantic.field_serializer("meta", when_used="json")
     def serialize_meta(self, meta: dict, _info):
-        return self._json_or_string(meta, "meta")
+        return self._safe_serialize(meta)
 
 
 class UserContent(BaseContent):
@@ -259,7 +280,7 @@ class KeyValueContent(BaseContent):
 
     @pydantic.field_serializer("value", when_used="json")
     def serialize_value(self, value: typing.Any, _info):
-        return self._json_or_string(value, "value")
+        return self._safe_serialize(value)
 
 
 Content = typing.Union[

@@ -39,7 +39,7 @@ class Span(pydantic.BaseModel):
     kwargs: typing.Optional[dict[str, typing.Any]] = pydantic.Field(default_factory=dict)
     """ Annotations to apply to all messages logged within this span. """
 
-    def new(self, name: str, state: typing.Any = None, **kwargs):
+    def new(self, name: str, state: typing.Any = None, **kwargs) -> "Span":
         new_kwargs = {**self.kwargs, **kwargs}
         return Span(
             logger=self.logger,

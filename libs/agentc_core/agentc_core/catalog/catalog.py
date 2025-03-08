@@ -41,6 +41,8 @@ Tool = ToolProvider.ToolResult
 class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
     """A provider of indexed "agent building blocks" (e.g., tools, prompts, etc...)."""
 
+    model_config = pydantic.ConfigDict(extra="ignore")
+
     refiner: typing.Optional[typing.Callable[[list[SearchResult]], list[SearchResult]]] = lambda results: results
     """ A Python function to post-process results (reranking, pruning, etc...) yielded by the catalog.
 

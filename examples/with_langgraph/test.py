@@ -42,7 +42,7 @@ def test_irrelevant_greetings(
             # The following will replace all uses of "input" with our test input.
             monkeypatch.setattr("builtins.input", test_input)
             with suite_session.Span(name=f"{i}") as test_session:
-                graph = Graph(catalog=catalog, scope=test_session)
+                graph = Graph(catalog=catalog, span=test_session)
                 result = graph.invoke(input=dict())
 
                 # If our application set the endpoints or routes, this is a failing test.

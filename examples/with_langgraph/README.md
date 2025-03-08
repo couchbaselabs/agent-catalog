@@ -11,13 +11,12 @@ This directory contains a starter project for building agents with Couchbase, La
 
    ```bash
    git clone https://github.com/couchbaselabs/agent-catalog
-   cd templates/agents/flight_planner/with_langgraph
+   cd examples/with_langgraph
    ```
 
 3. Agent Catalog uses Git for its versioning.
 
-   Run the command below to initialize a new Git repository within the `templates/agents/flight_planner/with_langgraph`
-   directory.
+   Run the command below to initialize a new Git repository within the `examples/with_langgraph` directory.
 
    ```bash
    git init
@@ -101,10 +100,8 @@ This directory contains a starter project for building agents with Couchbase, La
 
     - For those interested in using Capella, see [here](https://cloud.couchbase.com/sign-up).
 
-      Once Couchbase instance is running, enable the following services on your Couchbase cluster:
-        - Data, Query, Index: For storing items and searching them.
-        - Search: For performing vector search on items.
-        - Analytics: For creating views on audit logs and to query the views for better insights on logs.
+      Once your Couchbase instance is running, be sure to enable the following services on your Couchbase cluster:
+      i) Data, ii) Query, iii) Index, iv) Search, and v) Analytics.
 
       This specific agent also uses the `travel-sample` bucket.
       You'll need to navigate to your instance's UI (for local instances, this is on http://localhost:8091) to install

@@ -1,4 +1,3 @@
-import json
 import logging
 import pathlib
 import pydantic
@@ -42,8 +41,8 @@ class ToolSearchMetadata(pydantic.BaseModel):
 class PromptDescriptor(RecordDescriptor):
     content: str | dict[str, typing.Any]
 
-    output: typing.Optional[str] = None
-    tools: typing.Optional[list[ToolSearchMetadata] | None] = None
+    output: typing.Optional[dict] = None
+    tools: typing.Optional[list[ToolSearchMetadata]] = pydantic.Field(default_factory=list)
     record_kind: typing.Literal[RecordKind.Prompt]
 
     class Factory:
@@ -62,10 +61,9 @@ class PromptDescriptor(RecordDescriptor):
             @classmethod
             def value_should_be_valid_json_schema(cls, v: str | dict):
                 if v is not None and isinstance(v, str):
-                    cls.check_if_valid_json_schema_str(v)
+                    v = cls.check_if_valid_json_schema_str(v)
                 elif v is not None and isinstance(v, dict):
-                    cls.check_if_valid_json_schema_dict(v)
-                    v = json.dumps(v)
+                    v = cls.check_if_valid_json_schema_dict(v)
                 else:
                     raise ValueError("Type must be either a string or a YAML dictionary.")
                 return v

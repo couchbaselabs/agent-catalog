@@ -69,6 +69,11 @@ class PythonToolDescriptor(RecordDescriptor):
 
                 source_lines, start_line = inspect.getsourcelines(tool)
                 logger.debug("Found Python tool '%s' at line %d.", get_name(tool), start_line)
+                if get_description(tool) is None:
+                    raise ValueError(
+                        f"Description must be specified for tool {get_name(tool)}! "
+                        f"Please give this tool a docstring."
+                    )
                 record_descriptor = PythonToolDescriptor(
                     record_kind=RecordKind.PythonFunction,
                     name=get_name(tool),
@@ -92,9 +97,9 @@ class PythonToolDescriptor(RecordDescriptor):
 
 
 class SQLPPQueryToolDescriptor(RecordDescriptor):
-    input: str
+    input: dict
     query: str
-    output: typing.Optional[str] = None
+    output: typing.Optional[dict] = None
     secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
     record_kind: typing.Literal[RecordKind.SQLPPQuery]
 
@@ -115,10 +120,9 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
             @classmethod
             def value_should_be_valid_json_schema(cls, v: str | dict):
                 if v is not None and isinstance(v, str):
-                    cls.check_if_valid_json_schema_str(v)
+                    v = cls.check_if_valid_json_schema_str(v)
                 elif v is not None and isinstance(v, dict):
-                    cls.check_if_valid_json_schema_dict(v)
-                    v = json.dumps(v)
+                    v = cls.check_if_valid_json_schema_dict(v)
                 else:
                     raise ValueError("Type must be either a string or a YAML dictionary.")
                 return v
@@ -171,7 +175,7 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
         embedding_model: agentc_core.learned.model.EmbeddingModel
         num_candidates: int = 3
 
-    input: str
+    input: dict
     vector_search: VectorSearchMetadata
     secrets: list[CouchbaseSecrets | EmbeddingModelSecrets] = pydantic.Field(min_length=1, max_length=2)
     record_kind: typing.Literal[RecordKind.SemanticSearch]
@@ -184,7 +188,7 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
             record_kind: typing.Literal[RecordKind.SemanticSearch]
             name: str
             description: str
-            input: str
+            input: str | dict
             secrets: list[CouchbaseSecrets | EmbeddingModelSecrets] = pydantic.Field(min_length=1, max_length=2)
             annotations: typing.Optional[dict[str, str] | None] = None
             vector_search: "SemanticSearchToolDescriptor.VectorSearchMetadata"
@@ -194,19 +198,17 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
             @classmethod
             def value_should_be_valid_json_schema(cls, v: str | dict):
                 if v is not None and isinstance(v, str):
-                    cls.check_if_valid_json_schema_str(v)
+                    v = cls.check_if_valid_json_schema_str(v)
                 elif v is not None and isinstance(v, dict):
-                    cls.check_if_valid_json_schema_dict(v)
-                    v = json.dumps(v)
+                    v = cls.check_if_valid_json_schema_dict(v)
                 else:
                     raise ValueError("Type must be either a string or a YAML dictionary.")
                 return v
 
             @pydantic.field_validator("input")
             @classmethod
-            def value_should_be_non_empty(cls, v: str):
-                input_dict = json.loads(v)
-                if len(input_dict) == 0:
+            def value_should_be_non_empty(cls, v: dict):
+                if len(v) == 0:
                     raise ValueError("SemanticSearch cannot have an empty input!")
                 return v
 

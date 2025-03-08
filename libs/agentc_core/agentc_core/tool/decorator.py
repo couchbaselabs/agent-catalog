@@ -22,6 +22,7 @@ def get_description(func: typing.Callable) -> str:
     return getattr(func, _TOOL_DESCRIPTION_ATTRIBUTE, func.__doc__)
 
 
+# TODO (GLENN): Add Sphinx-compatible docstrings here.
 def tool(
     func: typing.Callable = None,
     *,
