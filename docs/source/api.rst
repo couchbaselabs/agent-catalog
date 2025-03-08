@@ -1,8 +1,33 @@
-`agentc` Package Documentation
-==============================
+Package Documentation
+=====================
 
-.. automodule:: agentc
+`agentc` Package
+----------------
+
+.. automodule:: agentc.catalog
     :members:
 
-.. automodule:: agentc.langchain
+.. automodule:: agentc.span
+    :members:
+
+.. automodule:: agentc.cmd
+    :members:
+
+
+Integration Packages
+--------------------
+
+LangChain / LangGraph
+^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: agentc_langchain.cache
+    :members:
+
+.. automodule:: agentc_langchain.chat
+    :members:
+
+LlamaIndex
+^^^^^^^^^^
+
+.. automodule:: agentc_llamaindex.chat
     :members:

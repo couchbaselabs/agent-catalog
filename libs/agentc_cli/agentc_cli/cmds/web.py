@@ -1,4 +1,4 @@
-from ..models.context import Context
+from agentc_core.config import Config
 
 
 def register_blueprints(app):
@@ -17,12 +17,12 @@ def register_blueprints(app):
     app.register_blueprint(version_blueprint)
 
 
-def cmd_web(ctx: Context, host_port: str, debug: bool = True):
+def cmd_web(cfg: Config = None, *, host_port: str, debug: bool = True):
     import flask
 
     app = flask.Flask(__name__)
 
-    app.config["ctx"] = ctx
+    app.config["ctx"] = cfg
 
     register_blueprints(app)
 

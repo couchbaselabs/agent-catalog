@@ -30,6 +30,13 @@ secrets:
       password: CB_PASSWORD
       certificate: CB_CERTIFICATE
 
+  # For cloud-hosted embedding models, a Bearer token is required.
+  # If your embedding model is hosted on Capella, provide the username and password below.
+  - embedding_model:
+      # auth: OPENAI_API_KEY
+      username: CB_USERNAME
+      password: CB_PASSWORD
+
 # Couchbase semantic search tools always involve a vector search.
 vector_search:
 
@@ -54,7 +61,9 @@ vector_search:
   # The embedding model used to generate the vector_field.
   # This embedding model field value is directly passed to sentence transformers.
   # In the future, we will add support for other types of embedding models.
-  embedding_model: {{ embedding_model }}
+  embedding_model:
+    name: {{ embedding_model_name }}
+    {% if embedding_model_url is not none %}base_url: {{ embedding_model_url }}{% endif %}
 
   # The number of candidates (i.e., the K value) to request for when performing a vector top-k search.
   # This field is optional, and defaults to k=3 if not specified.

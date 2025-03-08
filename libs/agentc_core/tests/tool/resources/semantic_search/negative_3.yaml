@@ -16,7 +16,8 @@ vector_search:
   index: articles-index
   vector_field: vec
   text_field: text
-  embedding_model: sentence-transformers/all-MiniLM-L12-v2
+  embedding_model:
+    name: sentence-transformers/all-MiniLM-L12-v2
 
 secrets:
   - couchbase:

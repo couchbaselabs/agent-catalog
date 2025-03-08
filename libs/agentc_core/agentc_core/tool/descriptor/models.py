@@ -1,4 +1,5 @@
 import abc
+import agentc_core.learned.model
 import dataclasses
 import enum
 import importlib
@@ -22,6 +23,7 @@ from ..decorator import get_description
 from ..decorator import get_name
 from ..decorator import is_tool
 from .secrets import CouchbaseSecrets
+from .secrets import EmbeddingModelSecrets
 
 logger = logging.getLogger(__name__)
 
@@ -41,8 +43,16 @@ class _BaseFactory(abc.ABC):
 
 
 class PythonToolDescriptor(RecordDescriptor):
+    class PythonContent(pydantic.BaseModel):
+        model_config = pydantic.ConfigDict(frozen=True)
+
+        file_content: str
+        func_content: str
+        line_no_start: int
+        line_no_end: int
+
     record_kind: typing.Literal[RecordKind.PythonFunction]
-    contents: str
+    content: "PythonToolDescriptor.PythonContent"
 
     class Factory(_BaseFactory):
         def __iter__(self) -> typing.Iterable["PythonToolDescriptor"]:
@@ -56,12 +66,25 @@ class PythonToolDescriptor(RecordDescriptor):
             for _, tool in inspect.getmembers(imported_module):
                 if not is_tool(tool):
                     continue
+
+                source_lines, start_line = inspect.getsourcelines(tool)
+                logger.debug("Found Python tool '%s' at line %d.", get_name(tool), start_line)
+                if get_description(tool) is None:
+                    raise ValueError(
+                        f"Description must be specified for tool {get_name(tool)}! "
+                        f"Please give this tool a docstring."
+                    )
                 record_descriptor = PythonToolDescriptor(
                     record_kind=RecordKind.PythonFunction,
                     name=get_name(tool),
                     description=get_description(tool),
                     source=self.filename,
-                    contents=source_contents,
+                    content=PythonToolDescriptor.PythonContent(
+                        file_content=source_contents,
+                        func_content="".join(source_lines),
+                        line_no_start=start_line,
+                        line_no_end=start_line + len(source_lines) - 1,
+                    ),
                     version=self.version,
                     annotations=get_annotations(tool),
                 )
@@ -74,9 +97,9 @@ class PythonToolDescriptor(RecordDescriptor):
 
 
 class SQLPPQueryToolDescriptor(RecordDescriptor):
-    input: str
+    input: dict
     query: str
-    output: typing.Optional[str] = None
+    output: typing.Optional[dict] = None
     secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
     record_kind: typing.Literal[RecordKind.SQLPPQuery]
 
@@ -87,17 +110,21 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
             # Below, we enumerate all fields that appear in a .sqlpp file.
             name: str
             description: str
-            input: str
-            output: typing.Optional[str] = None
+            input: str | dict
+            output: typing.Optional[str | dict] = None
             secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
             record_kind: typing.Optional[typing.Literal[RecordKind.SQLPPQuery] | None] = None
             annotations: typing.Optional[dict[str, str] | None] = None
 
             @pydantic.field_validator("input", "output")
             @classmethod
-            def value_should_be_valid_json_schema(cls, v: str):
-                if v is not None:
-                    cls.check_if_valid_json_schema(v)
+            def value_should_be_valid_json_schema(cls, v: str | dict):
+                if v is not None and isinstance(v, str):
+                    v = cls.check_if_valid_json_schema_str(v)
+                elif v is not None and isinstance(v, dict):
+                    v = cls.check_if_valid_json_schema_dict(v)
+                else:
+                    raise ValueError("Type must be either a string or a YAML dictionary.")
                 return v
 
             @pydantic.field_validator("name")
@@ -139,19 +166,18 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
 
 class SemanticSearchToolDescriptor(RecordDescriptor):
     class VectorSearchMetadata(pydantic.BaseModel):
-        # TODO (GLENN): Copy all vector-search-specific validations here.
         bucket: str
         scope: str
         collection: str
         index: str
         vector_field: str
         text_field: str
-        embedding_model: str
+        embedding_model: agentc_core.learned.model.EmbeddingModel
         num_candidates: int = 3
 
-    input: str
+    input: dict
     vector_search: VectorSearchMetadata
-    secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
+    secrets: list[CouchbaseSecrets | EmbeddingModelSecrets] = pydantic.Field(min_length=1, max_length=2)
     record_kind: typing.Literal[RecordKind.SemanticSearch]
 
     class Factory(_BaseFactory):
@@ -162,23 +188,27 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
             record_kind: typing.Literal[RecordKind.SemanticSearch]
             name: str
             description: str
-            input: str
-            secrets: list[CouchbaseSecrets] = pydantic.Field(min_length=1, max_length=1)
+            input: str | dict
+            secrets: list[CouchbaseSecrets | EmbeddingModelSecrets] = pydantic.Field(min_length=1, max_length=2)
             annotations: typing.Optional[dict[str, str] | None] = None
             vector_search: "SemanticSearchToolDescriptor.VectorSearchMetadata"
             num_candidates: typing.Optional[pydantic.PositiveInt] = 3
 
             @pydantic.field_validator("input")
             @classmethod
-            def value_should_be_valid_json_schema(cls, v: str):
-                cls.check_if_valid_json_schema(v)
+            def value_should_be_valid_json_schema(cls, v: str | dict):
+                if v is not None and isinstance(v, str):
+                    v = cls.check_if_valid_json_schema_str(v)
+                elif v is not None and isinstance(v, dict):
+                    v = cls.check_if_valid_json_schema_dict(v)
+                else:
+                    raise ValueError("Type must be either a string or a YAML dictionary.")
                 return v
 
             @pydantic.field_validator("input")
             @classmethod
-            def value_should_be_non_empty(cls, v: str):
-                input_dict = json.loads(v)
-                if len(input_dict) == 0:
+            def value_should_be_non_empty(cls, v: dict):
+                if len(v) == 0:
                     raise ValueError("SemanticSearch cannot have an empty input!")
                 return v
 
