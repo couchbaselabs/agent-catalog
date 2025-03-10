@@ -1,4 +1,5 @@
 import click.testing
+import couchbase.cluster
 import git
 import json
 import os
@@ -7,6 +8,7 @@ import pytest
 import re
 import requests
 import shutil
+import typing
 import uuid
 
 from agentc_cli.main import click_main
@@ -15,8 +17,12 @@ from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
 from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
-from agentc_testing.repo import ExampleRepoKind
-from agentc_testing.repo import initialize_repo
+from agentc_testing.catalog import Environment
+from agentc_testing.catalog import EnvironmentKind
+from agentc_testing.catalog import environment_factory
+from agentc_testing.server import DEFAULT_COUCHBASE_BUCKET
+from agentc_testing.server import DEFAULT_COUCHBASE_PASSWORD
+from agentc_testing.server import DEFAULT_COUCHBASE_USERNAME
 from agentc_testing.server import connection_factory
 from agentc_testing.server import isolated_server_factory
 from unittest.mock import patch
@@ -24,21 +30,25 @@ from unittest.mock import patch
 # This is to keep ruff from falsely flagging this as unused.
 _ = isolated_server_factory
 _ = connection_factory
+_ = environment_factory
 
 
 @pytest.mark.smoke
-def test_index(tmp_path):
+def test_index(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        initialize_repo(
+        env = environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.EMPTY,
+            env_kind=EnvironmentKind.EMPTY,
             click_runner=runner,
             click_command=click_main,
         )
 
-        repo = git.Repo.init(td)
-        repo.index.commit("Initial commit")
+        env.repository = git.Repo.init(td)
+        env.repository.index.commit("Initial commit")
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
         activity_folder = pathlib.Path(td) / DEFAULT_ACTIVITY_FOLDER
         tool_folder = pathlib.Path(td) / "tools"
@@ -66,13 +76,18 @@ def test_index(tmp_path):
 
 
 @pytest.mark.slow
-def test_publish_positive_1(tmp_path, isolated_server_factory, connection_factory):
+def test_publish_positive_1(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.INDEXED_CLEAN_ALL_TRAVEL,
+            env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
             click_runner=runner,
             click_command=click_main,
         )
@@ -94,13 +109,18 @@ def test_publish_positive_1(tmp_path, isolated_server_factory, connection_factor
 
 
 @pytest.mark.slow
-def test_publish_negative_1(tmp_path, isolated_server_factory, connection_factory):
+def test_publish_negative_1(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.INDEXED_DIRTY_ALL_TRAVEL,
+            env_kind=EnvironmentKind.INDEXED_DIRTY_ALL_TRAVEL,
             click_runner=runner,
             click_command=click_main,
         )
@@ -121,13 +141,18 @@ def test_publish_negative_1(tmp_path, isolated_server_factory, connection_factor
 
 
 @pytest.mark.slow
-def test_publish_positive_2(tmp_path, isolated_server_factory, connection_factory):
+def test_publish_positive_2(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.INDEXED_CLEAN_ALL_TRAVEL,
+            env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
             click_runner=runner,
             click_command=click_main,
         )
@@ -148,13 +173,18 @@ def test_publish_positive_2(tmp_path, isolated_server_factory, connection_factor
 
 
 @pytest.mark.slow
-def test_publish_positive_3(tmp_path, isolated_server_factory, connection_factory):
+def test_publish_positive_3(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.INDEXED_CLEAN_ALL_TRAVEL,
+            env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
             click_runner=runner,
             click_command=click_main,
         )
@@ -175,7 +205,11 @@ def test_publish_positive_3(tmp_path, isolated_server_factory, connection_factor
 
 
 @pytest.mark.slow
-def test_find(tmp_path, isolated_server_factory):
+def test_find(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+):
     """
     This test performs the following checks:
     1. command executes only for kind=tool assuming same behaviour for prompt
@@ -185,16 +219,15 @@ def test_find(tmp_path, isolated_server_factory):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
-        initialize_repo(
+        env = environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.PUBLISHED_ALL_TRAVEL,
+            env_kind=EnvironmentKind.PUBLISHED_ALL_TRAVEL,
             click_runner=runner,
             click_command=click_main,
         )
 
         # DB find
-        repo: git.Repo = git.Repo.init(td)
-        cid = repo.head.commit.binsha.hex()
+        cid = env.repository.head.commit.binsha.hex()
         invocation = runner.invoke(
             click_main,
             [
@@ -247,7 +280,11 @@ def test_find(tmp_path, isolated_server_factory):
 
 
 @pytest.mark.slow
-def test_status(tmp_path, isolated_server_factory):
+def test_status(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         os.chdir(td)
@@ -258,9 +295,9 @@ def test_status(tmp_path, isolated_server_factory):
         assert isinstance(output.exception, ValueError)
 
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL,
+            env_kind=EnvironmentKind.PUBLISHED_TOOLS_TRAVEL,
             click_runner=runner,
             click_command=click_main,
         )
@@ -282,12 +319,12 @@ def test_status(tmp_path, isolated_server_factory):
 
 
 @pytest.mark.smoke
-def test_local_clean(tmp_path):
+def test_local_clean(tmp_path: typing.Generator[pathlib.Path], environment_factory: typing.Callable[..., Environment]):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.EMPTY,
+            env_kind=EnvironmentKind.EMPTY,
             click_runner=runner,
             click_command=click_main,
         )
@@ -308,13 +345,17 @@ def test_local_clean(tmp_path):
 
 
 @pytest.mark.slow
-def test_db_clean(tmp_path, isolated_server_factory):
+def test_db_clean(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.PUBLISHED_ALL_TRAVEL,
+            env_kind=EnvironmentKind.PUBLISHED_ALL_TRAVEL,
             click_runner=runner,
             click_command=click_main,
         )
@@ -328,9 +369,12 @@ def test_db_clean(tmp_path, isolated_server_factory):
         )
 
         # Get all scopes in bucket
-        url = "http://localhost:8091/pools/default/buckets/travel-sample/scopes"
-        auth = ("Administrator", "password")
-        response = requests.request("GET", url, auth=auth, verify=False)
+        response = requests.request(
+            "GET",
+            f"http://localhost:8091/pools/default/buckets/{DEFAULT_COUCHBASE_BUCKET}/scopes",
+            auth=(DEFAULT_COUCHBASE_USERNAME, DEFAULT_COUCHBASE_PASSWORD),
+            verify=False,
+        )
         scopes = json.loads(response.text)["scopes"]
 
         # Verify DEFAULT_CATALOG_SCOPE is deleted
@@ -351,12 +395,15 @@ def test_db_clean(tmp_path, isolated_server_factory):
 
 
 @pytest.mark.smoke
-def test_execute(tmp_path):
+def test_execute(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.INDEXED_CLEAN_TOOLS_TRAVEL,
+            env_kind=EnvironmentKind.INDEXED_CLEAN_TOOLS_TRAVEL,
             click_runner=runner,
             click_command=click_main,
         )
@@ -383,19 +430,27 @@ def test_execute(tmp_path):
 
 @pytest.mark.skip
 @pytest.mark.slow
-def test_publish_multiple_nodes(tmp_path):
+def test_publish_multiple_nodes(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+):
     # TODO: Setup multinode cluster for test environment
     pass
 
 
 @pytest.mark.slow
-def test_publish_different_versions(tmp_path, isolated_server_factory, connection_factory):
+def test_publish_different_versions(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.PUBLISHED_ALL_TRAVEL,
+            env_kind=EnvironmentKind.PUBLISHED_ALL_TRAVEL,
             click_runner=runner,
             click_command=click_main,
         )
@@ -431,11 +486,14 @@ def test_publish_different_versions(tmp_path, isolated_server_factory, connectio
         q2 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.tools;")
         assert q2.execute()[0] == initial_tool_count * 2
         q3 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.metadata;")
-        assert q3.execute()[0] == 2
+        assert q3.execute()[0] == 4
 
 
 @pytest.mark.smoke
-def test_ls_local_empty_notindexed(tmp_path):
+def test_ls_local_empty_notindexed(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         os.chdir(td)
@@ -445,9 +503,9 @@ def test_ls_local_empty_notindexed(tmp_path):
         assert "Searching" not in output
 
         # when there are tools and prompts, but are not indexed
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.NON_INDEXED_ALL_TRAVEL,
+            env_kind=EnvironmentKind.NON_INDEXED_ALL_TRAVEL,
             click_runner=runner,
             click_command=click_main,
         )
@@ -456,13 +514,16 @@ def test_ls_local_empty_notindexed(tmp_path):
 
 
 @pytest.mark.smoke
-def test_ls_local_only_tools(tmp_path):
+def test_ls_local_only_tools(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         # when only tools are indexed
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.INDEXED_CLEAN_TOOLS_TRAVEL,
+            env_kind=EnvironmentKind.INDEXED_CLEAN_TOOLS_TRAVEL,
             click_runner=runner,
             click_command=click_main,
         )
@@ -473,13 +534,16 @@ def test_ls_local_only_tools(tmp_path):
 
 
 @pytest.mark.smoke
-def test_ls_local_only_prompts(tmp_path):
+def test_ls_local_only_prompts(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         # when only prompts are indexed
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.INDEXED_CLEAN_PROMPTS_TRAVEL,
+            env_kind=EnvironmentKind.INDEXED_CLEAN_PROMPTS_TRAVEL,
             click_runner=runner,
             click_command=click_main,
         )
@@ -490,13 +554,16 @@ def test_ls_local_only_prompts(tmp_path):
 
 
 @pytest.mark.smoke
-def test_ls_local_both_tools_prompts(tmp_path):
+def test_ls_local_both_tools_prompts(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         # when there are both tools and prompts
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.INDEXED_CLEAN_ALL_TRAVEL,
+            env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
             click_runner=runner,
             click_command=click_main,
         )
@@ -509,7 +576,12 @@ def test_ls_local_both_tools_prompts(tmp_path):
 
 
 @pytest.mark.smoke
-def test_init_local(tmp_path):
+def test_init_local(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         os.chdir(td)
@@ -527,7 +599,9 @@ def test_init_local(tmp_path):
 
 
 @pytest.mark.smoke
-def test_init_local_all(tmp_path):
+def test_init_local_all(
+    tmp_path: typing.Generator[pathlib.Path],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         os.chdir(td)
@@ -540,13 +614,18 @@ def test_init_local_all(tmp_path):
 
 
 @pytest.mark.slow
-def test_init_db(tmp_path, isolated_server_factory, connection_factory):
+def test_init_db(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.EMPTY,
+            env_kind=EnvironmentKind.EMPTY,
             click_runner=runner,
             click_command=click_main,
         )

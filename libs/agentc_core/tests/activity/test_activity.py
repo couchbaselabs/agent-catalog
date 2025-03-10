@@ -1,7 +1,9 @@
 import click
 import click.testing
+import couchbase.cluster
 import pathlib
 import pytest
+import typing
 
 from agentc import Catalog
 from agentc_cli.main import click_main
@@ -12,21 +14,28 @@ from agentc_core.activity.models.content import SystemContent
 from agentc_core.activity.models.content import UserContent
 from agentc_core.activity.models.log import Log
 from agentc_core.defaults import DEFAULT_ACTIVITY_FILE
-from agentc_testing.repo import ExampleRepoKind
-from agentc_testing.repo import initialize_repo
+from agentc_testing.catalog import Environment
+from agentc_testing.catalog import EnvironmentKind
+from agentc_testing.catalog import environment_factory
+from agentc_testing.server import connection_factory
 from agentc_testing.server import isolated_server_factory
 
 # This is to keep ruff from falsely flagging this as unused.
 _ = isolated_server_factory
+_ = environment_factory
+_ = connection_factory
 
 
 @pytest.mark.smoke
-def test_local_auditor_positive_1(tmp_path):
+def test_local_auditor_positive_1(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.INDEXED_CLEAN_ALL_TRAVEL,
+            env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
             click_runner=click.testing.CliRunner(),
             click_command=click_main,
         )
@@ -99,12 +108,14 @@ def test_local_auditor_positive_1(tmp_path):
 
 
 @pytest.mark.smoke
-def test_local_auditor_positive_2(tmp_path):
+def test_local_auditor_positive_2(
+    tmp_path: typing.Generator[pathlib.Path], environment_factory: typing.Callable[..., Environment]
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.INDEXED_CLEAN_ALL_TRAVEL,
+            env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
             click_runner=click.testing.CliRunner(),
             click_command=click_main,
         )
@@ -135,12 +146,14 @@ def test_local_auditor_positive_2(tmp_path):
 
 
 @pytest.mark.smoke
-def test_local_auditor_positive_3(tmp_path):
+def test_local_auditor_positive_3(
+    tmp_path: typing.Generator[pathlib.Path], environment_factory: typing.Callable[..., Environment]
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.INDEXED_CLEAN_ALL_TRAVEL,
+            env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
             click_runner=click.testing.CliRunner(),
             click_command=click_main,
         )
@@ -163,13 +176,23 @@ def test_local_auditor_positive_3(tmp_path):
 
 @pytest.mark.skip
 @pytest.mark.slow
-def test_db_auditor(tmp_path, isolated_server_factory):
+def test_db_auditor(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
+):
     # TODO (GLENN): Finish me!
     pass
 
 
 @pytest.mark.skip
 @pytest.mark.slow
-def test_chain_auditor(tmp_path, isolated_server_factory):
+def test_chain_auditor(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
+):
     # TODO (GLENN): Finish me!
     pass

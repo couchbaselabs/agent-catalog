@@ -48,9 +48,7 @@ def _execute_with_retry(
         time.sleep(backoff_factor * (2**i))
 
 
-def _start_couchbase(
-    volume_path: pathlib.Path, retry_count: int = 5, backoff_factor: float = 0.7, wait_for_ready: bool = True
-) -> docker.models.containers.Container:
+def _start_container(volume_path: pathlib.Path) -> docker.models.containers.Container:
     logger.info("Creating Couchbase container with volume path: %s.", volume_path)
     volume_path.mkdir(exist_ok=True)
 
@@ -66,7 +64,7 @@ def _start_couchbase(
         "11280/tcp": 11280,
     }
     logger.info("Starting Couchbase container with ports: %s.", ports)
-    container: docker.models.containers.Container = client.containers.run(
+    return client.containers.run(
         image="couchbase",
         name=f"agentc_{uuid.uuid4().hex}",
         ports=ports,
@@ -76,6 +74,13 @@ def _start_couchbase(
         volumes={str(volume_path.absolute()): {"bind": "/opt/couchbase/var", "mode": "rw"}},
     )
 
+
+def _start_couchbase(
+    container: docker.models.containers.Container,
+    retry_count: int = 5,
+    backoff_factor: float = 0.7,
+    wait_for_ready: bool = True,
+) -> None:
     try:
         # Initialize the cluster.
         def _init_cluster():
@@ -117,7 +122,7 @@ def _start_couchbase(
             backoff_factor=backoff_factor,
         )
         if not wait_for_ready:
-            return container
+            return
 
         # Wait for the travel-sample bucket to be ready.
         def _is_bucket_ready():
@@ -157,7 +162,7 @@ def _start_couchbase(
             backoff_factor=backoff_factor,
         )
         logger.debug("Couchbase container %s is ready.", container.name)
-        return container
+        return
 
     except Exception as e:
         logger.error(container.logs())
@@ -165,13 +170,17 @@ def _start_couchbase(
         raise e
 
 
-def _stop_couchbase(container: docker.models.containers.Container):
+def _stop_container(container: docker.models.containers.Container):
     logger.info("Stopping Couchbase container %s.", container.name)
-    logger.debug(container.logs())
-    container.remove(force=True)
+    try:
+        logger.debug(container.logs())
+        container.remove(force=True)
 
-    # We'll keep this sleep here to account for the time it takes for the container to be removed.
-    time.sleep(3)
+        # We'll keep this sleep here to account for the time it takes for the container to be removed.
+        time.sleep(3)
+
+    except Exception as e:
+        logger.exception(e, exc_info=True, stack_info=True)
 
 
 @pytest.fixture
@@ -200,8 +209,9 @@ def isolated_server_factory() -> typing.Callable[[pathlib.Path], docker.models.c
     try:
         # (we need to capture the container we spawn).
         def get_isolated_server(volume_path: pathlib.Path) -> docker.models.containers.Container:
-            container = _start_couchbase(volume_path)
+            container = _start_container(volume_path)
             container_instance.add(container)
+            _start_couchbase(container)
             return container
 
         # Enter our test.
@@ -216,7 +226,7 @@ def isolated_server_factory() -> typing.Callable[[pathlib.Path], docker.models.c
         del os.environ["AGENT_CATALOG_WAIT_UNTIL_READY_SECONDS"]
         del os.environ["AGENT_CATALOG_DDL_RETRY_WAIT_SECONDS"]
         if len(container_instance) > 0:
-            _stop_couchbase(container_instance.pop())
+            _stop_container(container_instance.pop())
 
 
 if __name__ == "__main__":
@@ -248,4 +258,4 @@ if __name__ == "__main__":
             del os.environ["AGENT_CATALOG_BUCKET"]
             del os.environ["AGENT_CATALOG_WAIT_UNTIL_READY_SECONDS"]
             if _container is not None:
-                _stop_couchbase(_container)
+                _stop_container(_container)

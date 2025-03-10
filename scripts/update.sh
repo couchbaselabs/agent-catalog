@@ -10,5 +10,6 @@ print_separator '='
 echo "Running scripts/update.sh"
 print_separator '-'
 poetry update
+pre-commit run --all-files
 print_separator '='
 echo

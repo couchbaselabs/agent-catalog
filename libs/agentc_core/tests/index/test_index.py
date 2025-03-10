@@ -3,6 +3,7 @@ import os
 import pathlib
 import pytest
 import shutil
+import typing
 
 from agentc_core.catalog import CatalogMem
 from agentc_core.catalog.index import MetaVersion
@@ -13,7 +14,7 @@ from agentc_core.version import VersionDescriptor
 
 
 @pytest.mark.smoke
-def test_index_tools(tmp_path):
+def test_index_tools(tmp_path: typing.Generator[pathlib.Path]):
     project_dir = pathlib.Path(tmp_path)
     project_dir.mkdir(exist_ok=True)
 
@@ -49,7 +50,7 @@ def test_index_tools(tmp_path):
 
 
 @pytest.mark.smoke
-def test_index_prompts(tmp_path):
+def test_index_prompts(tmp_path: typing.Generator[pathlib.Path]):
     project_dir = pathlib.Path(tmp_path)
     project_dir.mkdir(exist_ok=True)
 

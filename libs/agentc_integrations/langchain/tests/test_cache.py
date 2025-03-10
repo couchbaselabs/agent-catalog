@@ -5,24 +5,25 @@ import pytest
 
 from agentc_cli.main import click_main
 from agentc_langchain.cache import cache
-from agentc_testing.repo import ExampleRepoKind
-from agentc_testing.repo import initialize_repo
+from agentc_testing.catalog import EnvironmentKind
+from agentc_testing.catalog import environment_factory
 from agentc_testing.server import connection_factory
 from agentc_testing.server import isolated_server_factory
 
 # This is to keep ruff from falsely flagging this as unused.
 _ = isolated_server_factory
 _ = connection_factory
+_ = environment_factory
 
 
 @pytest.mark.slow
-def test_exact_cache(tmp_path, isolated_server_factory, connection_factory):
+def test_exact_cache(tmp_path, environment_factory, isolated_server_factory, connection_factory):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL,
+            env_kind=EnvironmentKind.PUBLISHED_TOOLS_TRAVEL,
             click_runner=click.testing.CliRunner(),
             click_command=click_main,
         )
@@ -43,13 +44,13 @@ def test_exact_cache(tmp_path, isolated_server_factory, connection_factory):
 
 
 @pytest.mark.slow
-def test_semantic_cache(tmp_path, isolated_server_factory, connection_factory):
+def test_semantic_cache(tmp_path, environment_factory, isolated_server_factory, connection_factory):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL,
+            env_kind=EnvironmentKind.PUBLISHED_TOOLS_TRAVEL,
             click_runner=click.testing.CliRunner(),
             click_command=click_main,
         )

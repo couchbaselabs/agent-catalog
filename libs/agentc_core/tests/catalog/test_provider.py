@@ -3,27 +3,33 @@ import click.testing
 import os
 import pathlib
 import pytest
+import typing
 
 from agentc import Catalog
 from agentc_cli.main import click_main
 from agentc_core.catalog.catalog import Prompt
 from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
-from agentc_testing.repo import ExampleRepoKind
-from agentc_testing.repo import initialize_repo
+from agentc_testing.catalog import Environment
+from agentc_testing.catalog import EnvironmentKind
+from agentc_testing.catalog import environment_factory
 from agentc_testing.server import isolated_server_factory
 
 # This is to keep ruff from falsely flagging this as unused.
 _ = isolated_server_factory
+_ = environment_factory
 
 
 @pytest.mark.smoke
-def test_local_tool_provider(tmp_path):
+def test_local_tool_provider(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.INDEXED_CLEAN_TOOLS_TRAVEL,
+            env_kind=EnvironmentKind.INDEXED_CLEAN_TOOLS_TRAVEL,
             click_runner=click.testing.CliRunner(),
             click_command=click_main,
         )
@@ -34,12 +40,15 @@ def test_local_tool_provider(tmp_path):
 
 
 @pytest.mark.smoke
-def test_local_inputs_provider(tmp_path):
+def test_local_inputs_provider(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.INDEXED_CLEAN_PROMPTS_TRAVEL,
+            env_kind=EnvironmentKind.INDEXED_CLEAN_PROMPTS_TRAVEL,
             click_runner=click.testing.CliRunner(),
             click_command=click_main,
         )
@@ -50,12 +59,15 @@ def test_local_inputs_provider(tmp_path):
 
 
 @pytest.mark.smoke
-def test_local_provider(tmp_path):
+def test_local_provider(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.INDEXED_CLEAN_ALL_TRAVEL,
+            env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
             click_runner=click.testing.CliRunner(),
             click_command=click_main,
         )
@@ -69,13 +81,17 @@ def test_local_provider(tmp_path):
 
 
 @pytest.mark.slow
-def test_db_tool_provider(tmp_path, isolated_server_factory):
+def test_db_tool_provider(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
-        initialize_repo(
+        environment_factory(
             directory=pathlib.Path(td),
-            repo_kind=ExampleRepoKind.PUBLISHED_TOOLS_TRAVEL,
+            env_kind=EnvironmentKind.PUBLISHED_TOOLS_TRAVEL,
             click_runner=click.testing.CliRunner(),
             click_command=click_main,
         )
@@ -88,20 +104,32 @@ def test_db_tool_provider(tmp_path, isolated_server_factory):
 
 @pytest.mark.skip
 @pytest.mark.slow
-def test_db_inputs_provider(tmp_path, isolated_server_factory):
+def test_db_inputs_provider(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+):
     # TODO (GLENN): Finish me!
     pass
 
 
 @pytest.mark.skip
 @pytest.mark.slow
-def test_chain_tool_provider(tmp_path, isolated_server_factory):
+def test_chain_tool_provider(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+):
     # TODO (GLENN): Finish me!
     pass
 
 
 @pytest.mark.skip
 @pytest.mark.slow
-def test_chain_inputs_provider(tmp_path, isolated_server_factory):
+def test_chain_inputs_provider(
+    tmp_path: typing.Generator[pathlib.Path],
+    environment_factory: typing.Callable[..., Environment],
+    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+):
     # TODO (GLENN): Finish me!
     pass

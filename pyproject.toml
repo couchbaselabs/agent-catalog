@@ -17,7 +17,6 @@ package-mode = false
 python = "^3.12"
 
 # All of our Agent Catalog packages.
-jsons = "^1.6.3"
 [tool.poetry.group.agent-catalog.dependencies]
 agentc = { path = "libs/agentc", develop = true }
 agentc-core = { path = "libs/agentc_core", develop = true }
