@@ -22,7 +22,7 @@ _ = environment_factory
 
 @pytest.mark.smoke
 def test_local_tool_provider(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
     runner = click.testing.CliRunner()
@@ -41,7 +41,7 @@ def test_local_tool_provider(
 
 @pytest.mark.smoke
 def test_local_inputs_provider(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
     runner = click.testing.CliRunner()
@@ -60,7 +60,7 @@ def test_local_inputs_provider(
 
 @pytest.mark.smoke
 def test_local_provider(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
     runner = click.testing.CliRunner()
@@ -82,7 +82,7 @@ def test_local_provider(
 
 @pytest.mark.slow
 def test_db_tool_provider(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
 ):
@@ -105,7 +105,7 @@ def test_db_tool_provider(
 @pytest.mark.skip
 @pytest.mark.slow
 def test_db_inputs_provider(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
 ):
@@ -116,7 +116,7 @@ def test_db_inputs_provider(
 @pytest.mark.skip
 @pytest.mark.slow
 def test_chain_tool_provider(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
 ):
@@ -127,7 +127,7 @@ def test_chain_tool_provider(
 @pytest.mark.skip
 @pytest.mark.slow
 def test_chain_inputs_provider(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
 ):

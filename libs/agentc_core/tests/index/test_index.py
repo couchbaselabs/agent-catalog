@@ -14,7 +14,7 @@ from agentc_core.version import VersionDescriptor
 
 
 @pytest.mark.smoke
-def test_index_tools(tmp_path: typing.Generator[pathlib.Path]):
+def test_index_tools(tmp_path: typing.Generator[pathlib.Path, None, None]):
     project_dir = pathlib.Path(tmp_path)
     project_dir.mkdir(exist_ok=True)
 
@@ -50,7 +50,7 @@ def test_index_tools(tmp_path: typing.Generator[pathlib.Path]):
 
 
 @pytest.mark.smoke
-def test_index_prompts(tmp_path: typing.Generator[pathlib.Path]):
+def test_index_prompts(tmp_path: typing.Generator[pathlib.Path, None, None]):
     project_dir = pathlib.Path(tmp_path)
     project_dir.mkdir(exist_ok=True)
 

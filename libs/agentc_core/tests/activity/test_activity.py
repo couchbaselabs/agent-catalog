@@ -28,7 +28,7 @@ _ = connection_factory
 
 @pytest.mark.smoke
 def test_local_auditor_positive_1(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
     runner = click.testing.CliRunner()
@@ -109,7 +109,7 @@ def test_local_auditor_positive_1(
 
 @pytest.mark.smoke
 def test_local_auditor_positive_2(
-    tmp_path: typing.Generator[pathlib.Path], environment_factory: typing.Callable[..., Environment]
+    tmp_path: typing.Generator[pathlib.Path, None, None], environment_factory: typing.Callable[..., Environment]
 ):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
@@ -147,7 +147,7 @@ def test_local_auditor_positive_2(
 
 @pytest.mark.smoke
 def test_local_auditor_positive_3(
-    tmp_path: typing.Generator[pathlib.Path], environment_factory: typing.Callable[..., Environment]
+    tmp_path: typing.Generator[pathlib.Path, None, None], environment_factory: typing.Callable[..., Environment]
 ):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
@@ -177,7 +177,7 @@ def test_local_auditor_positive_3(
 @pytest.mark.skip
 @pytest.mark.slow
 def test_db_auditor(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
@@ -189,7 +189,7 @@ def test_db_auditor(
 @pytest.mark.skip
 @pytest.mark.slow
 def test_chain_auditor(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],

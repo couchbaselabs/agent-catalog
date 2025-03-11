@@ -35,7 +35,7 @@ _ = environment_factory
 
 @pytest.mark.smoke
 def test_index(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
     runner = click.testing.CliRunner()
@@ -77,7 +77,7 @@ def test_index(
 
 @pytest.mark.slow
 def test_publish_positive_1(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
@@ -110,7 +110,7 @@ def test_publish_positive_1(
 
 @pytest.mark.slow
 def test_publish_negative_1(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
@@ -142,7 +142,7 @@ def test_publish_negative_1(
 
 @pytest.mark.slow
 def test_publish_positive_2(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
@@ -174,7 +174,7 @@ def test_publish_positive_2(
 
 @pytest.mark.slow
 def test_publish_positive_3(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
@@ -206,7 +206,7 @@ def test_publish_positive_3(
 
 @pytest.mark.slow
 def test_find(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
 ):
@@ -281,7 +281,7 @@ def test_find(
 
 @pytest.mark.slow
 def test_status(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
 ):
@@ -319,7 +319,9 @@ def test_status(
 
 
 @pytest.mark.smoke
-def test_local_clean(tmp_path: typing.Generator[pathlib.Path], environment_factory: typing.Callable[..., Environment]):
+def test_local_clean(
+    tmp_path: typing.Generator[pathlib.Path, None, None], environment_factory: typing.Callable[..., Environment]
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         environment_factory(
@@ -346,7 +348,7 @@ def test_local_clean(tmp_path: typing.Generator[pathlib.Path], environment_facto
 
 @pytest.mark.slow
 def test_db_clean(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
 ):
@@ -396,7 +398,7 @@ def test_db_clean(
 
 @pytest.mark.smoke
 def test_execute(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
     runner = click.testing.CliRunner()
@@ -431,7 +433,7 @@ def test_execute(
 @pytest.mark.skip
 @pytest.mark.slow
 def test_publish_multiple_nodes(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
     # TODO: Setup multinode cluster for test environment
@@ -440,7 +442,7 @@ def test_publish_multiple_nodes(
 
 @pytest.mark.slow
 def test_publish_different_versions(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
@@ -491,7 +493,7 @@ def test_publish_different_versions(
 
 @pytest.mark.smoke
 def test_ls_local_empty_notindexed(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
     runner = click.testing.CliRunner()
@@ -515,7 +517,7 @@ def test_ls_local_empty_notindexed(
 
 @pytest.mark.smoke
 def test_ls_local_only_tools(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
     runner = click.testing.CliRunner()
@@ -535,7 +537,7 @@ def test_ls_local_only_tools(
 
 @pytest.mark.smoke
 def test_ls_local_only_prompts(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
     runner = click.testing.CliRunner()
@@ -555,7 +557,7 @@ def test_ls_local_only_prompts(
 
 @pytest.mark.smoke
 def test_ls_local_both_tools_prompts(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
     runner = click.testing.CliRunner()
@@ -577,7 +579,7 @@ def test_ls_local_both_tools_prompts(
 
 @pytest.mark.smoke
 def test_init_local(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
@@ -600,7 +602,7 @@ def test_init_local(
 
 @pytest.mark.smoke
 def test_init_local_all(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
 ):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
@@ -615,7 +617,7 @@ def test_init_local_all(
 
 @pytest.mark.slow
 def test_init_db(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],

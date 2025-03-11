@@ -25,7 +25,7 @@ _ = environment_factory
 
 @pytest.mark.slow
 def test_complete(
-    tmp_path: typing.Generator[pathlib.Path],
+    tmp_path: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
@@ -63,7 +63,9 @@ def test_complete(
 
 # We test remote logging in the test above, so we'll stick to local log testing from here out.
 @pytest.mark.smoke
-def test_chat(tmp_path: typing.Generator[pathlib.Path], environment_factory: typing.Callable[..., Environment]):
+def test_chat(
+    tmp_path: typing.Generator[pathlib.Path, None, None], environment_factory: typing.Callable[..., Environment]
+):
     runner = click.testing.CliRunner()
     with runner.isolated_filesystem(temp_dir=tmp_path) as td:
         environment_factory(
