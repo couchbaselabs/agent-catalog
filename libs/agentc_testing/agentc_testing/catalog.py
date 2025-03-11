@@ -249,8 +249,10 @@ def environment_factory() -> typing.Callable[..., Environment]:
 
     finally:
         # Clean up the environment.
-        repository_instance.pop().close()
-        shutil.rmtree(directory_instance.pop(), ignore_errors=True)
+        if repository_instance:
+            repository_instance.pop().close()
+        if directory_instance:
+            shutil.rmtree(directory_instance.pop(), ignore_errors=True)
 
 
 if __name__ == "__main__":

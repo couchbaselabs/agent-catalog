@@ -37,7 +37,7 @@ class BaseLogger(abc.ABC):
             # Note: The accept call annotations take precedence over init-time annotations.
             annotations={**self.annotations, **kwargs},
         )
-        self._accept(message, message.model_dump_json(exclude_none=True))
+        self._accept(message, message.model_dump(exclude_none=True, mode="json"))
 
         # For debug, we'll pretty-print what we log.
         if logger.isEnabledFor(logging.DEBUG):

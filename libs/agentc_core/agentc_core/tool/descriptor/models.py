@@ -56,13 +56,12 @@ class PythonToolDescriptor(RecordDescriptor):
 
     class Factory(_BaseFactory):
         def __iter__(self) -> typing.Iterable["PythonToolDescriptor"]:
-            # Note: this **does not** load the tools themselves into memory.
             # TODO (GLENN): We should avoid blindly putting things in our path.
             if str(self.filename.parent.absolute()) not in sys.path:
                 sys.path.append(str(self.filename.parent.absolute()))
             with open(self.filename, "r") as fp:
                 source_contents = fp.read()
-            imported_module = importlib.import_module(self.filename.stem)
+            imported_module = importlib.reload(importlib.import_module(self.filename.stem))
             for _, tool in inspect.getmembers(imported_module):
                 if not is_tool(tool):
                     continue

@@ -4,7 +4,7 @@ This directory contains a starter project for building agents with Couchbase, La
 
 ## Getting Started
 
-### Running Your Agent
+### Installing Agent Catalog
 
 1. Make sure you have Python 3.12 and [Poetry](https://python-poetry.org/docs/#installation) installed!
 2. Clone this repository and navigate to this directory (we will assume all subsequent commands are run from here).
@@ -73,7 +73,9 @@ This directory contains a starter project for building agents with Couchbase, La
      See: https://docs.couchbase.com or https://couchbaselabs.github.io/agent-catalog/index.html# for more information.
    ```
 
-7. Create a `.env` file from the `.env.example` file and tweak this to your environment.
+### Running Your Agent
+
+1. Create a `.env` file from the `.env.example` file and tweak this to your environment.
 
    ```bash
    cp .env.example .env
@@ -83,7 +85,7 @@ This directory contains a starter project for building agents with Couchbase, La
    If you are using Capella, you'll need to download a security certificate and set the
    `AGENT_CATALOG_CONN_ROOT_CERTIFICATE` and `CB_CERTIFICATE` variables appropriately.
 
-8. Start up a Couchbase instance.
+2. Start up a Couchbase instance.
 
     - For those interested in using a local Couchbase instance, see
       [here](https://docs.couchbase.com/server/current/install/install-intro.html).
@@ -107,136 +109,141 @@ This directory contains a starter project for building agents with Couchbase, La
       You'll need to navigate to your instance's UI (for local instances, this is on http://localhost:8091) to install
       this sample bucket.
 
-9. Initialize your local and Couchbase-hosted Agent Catalog instance by running the `agentc init` command.
+3. Initialize your local and Couchbase-hosted Agent Catalog instance by running the `agentc init` command.
 
    ```bash
-   agentc init local all
-   agentc init db all --bucket travel-sample
+   agentc init
    ```
 
-10. Make sure your Git repo is clean, and run `agentc index` to index your tools and model inputs.
-    Note that `tools` and `inputs` are _relative paths_ to the `tools` and `inputs` folder.
+4. Make sure your Git repo is clean, and run `agentc index` to index your tools and prompts.
+   Note that `tools` and `prompts` are _relative paths_ to the `tools` and `prompts` folder.
 
-    ```bash
-    # agentc index $PATH_TO_TOOLS_FOLDER $PATH_TO_MODEL_INPUTS_FOLDER
-    agentc index tools prompts
-    ```
+   ```bash
+   # agentc index $PATH_TO_TOOLS_FOLDER $PATH_TO_PROMPTS_FOLDER
+   agentc index tools prompts
+   ```
 
-    The command will subsequently crawl the `tools` and `inputs` folder for both tools and model-inputs.
+   This command will subsequently crawl the `tools` and `prompts` folder for both tool and prompt files.
 
-    _Hint: if you've made changes but want to keep the same commit ID for the later "publish" step, use
-    `git add $MY_FILES` followed by `git commit --amend`!_
+   _Hint: if you've made changes but want to keep the same commit ID for the later "publish" step, use
+   `git add $MY_FILES` followed by `git commit --amend`!_
 
-11. Publish your local agent catalog to your Couchbase instance with `agentc publish`.
-    Your Couchbase instance details in the `.env` file will be used for authentication.
-    Again, this specific starter agent uses the `travel-sample` bucket.
+5. Publish your local agent catalog to your Couchbase instance with `agentc publish`.
+   Your Couchbase instance details in the `.env` file will be used for authentication.
+   Again, this specific starter agent uses the `travel-sample` bucket.
 
-    ```bash
-    agentc publish tool prompt --bucket travel-sample
-    ```
+   ```bash
+   agentc publish
+   ```
 
-12. Run your agent!
+    _Hint: feel free to install `agentc` as a post-commit hook!
+    Run `pre-commit install --hook-type post-commit` to install this project's post-commit hooks and run
+    `agentc index` + `agentc publish` after `git commit [--amend]`!_
 
-    ```bash
-    python agent.py
-    ```
+6. Run your agent!
 
-13. Let's now talk with our agent!
-    In the examples below, we initiate three conversations: two "positive" and one "negative".
-    The first positive case is given below:
+   ```bash
+   python main.py
+   ```
 
-    ```text
-    Agent: Please provide the names of the source and destination airports, so I can find
-      their IATA codes for you.
+7. Let's now talk with our agent!
+   In the examples below, we initiate three conversations: two "positive" and one "negative".
+   The first positive case is given below:
 
-    User: Let's go to LAX. I'm in SFO.
+   ```text
+   Agent: Please provide the names of the source and destination airports, so I can find
+     their IATA codes for you.
 
-    Agent Tool Call: find_direct_routes_between_airports(
-      {'argument_input': {'source_airport': 'SFO', 'dest_airport': 'LAX'}}
-    )
+   User: Let's go to LAX. I'm in SFO.
 
-    Agent Task Result: Direct routes found between SFO and LAX with the following airlines:
-      AS, DL, UA, US, VX, WN, AA.
+   Agent Tool Call: find_direct_routes_between_airports(
+     {'argument_input': {'source_airport': 'SFO', 'dest_airport': 'LAX'}}
+   )
 
-    Agent: Your routes are: Direct routes found between SFO and LAX with the following airlines: AS, DL, UA, US,
-      VX, WN, AA.
+   Agent Task Result: Direct routes found between SFO and LAX with the following airlines:
+     AS, DL, UA, US, VX, WN, AA.
 
-    Agent: Do you want to continue? Please respond with 'yes' or 'no'.
+   Agent: Your routes are: Direct routes found between SFO and LAX with the following airlines: AS, DL, UA, US,
+     VX, WN, AA.
 
-    User: no
-    ```
+   Agent: Do you want to continue? Please respond with 'yes' or 'no'.
 
-    The second positive case is given below:
+   User: no
+   ```
 
-       ```text
-       Agent: Please provide the names of the source and destination airports, so I can find
-         their IATA codes for you.
+   The second positive case is given below:
 
-       User: I need to go to LAX from YNW
+      ```text
+      Agent: Please provide the names of the source and destination airports, so I can find
+        their IATA codes for you.
 
-       Agent Tool Call: find_direct_routes_between_airports(
-         {'argument_input': {'source_airport': 'YNW', 'dest_airport': 'LAX'}}
-       )
+      User: I need to go to LAX from YNW
 
-       Agent Tool Call: find_routes_with_one_layover(
-         {'argument_input': {'source_airport': 'YNW', 'dest_airport': 'LAX'}}
-       )
+      Agent Tool Call: find_direct_routes_between_airports(
+        {'argument_input': {'source_airport': 'YNW', 'dest_airport': 'LAX'}}
+      )
 
-       Agent Task Result: I couldn't find any direct or one-layover routes from YNW to LAX. Could you
-         please provide another source airport that is close to YNW?
+      Agent Tool Call: find_routes_with_one_layover(
+        {'argument_input': {'source_airport': 'YNW', 'dest_airport': 'LAX'}}
+      )
 
-       User: SFO
+      Agent Task Result: I couldn't find any direct or one-layover routes from YNW to LAX. Could you
+        please provide another source airport that is close to YNW?
 
-       Agent Tool Call: find_direct_routes_between_airports(
-         {'argument_input': {'source_airport': 'SFO', 'dest_airport': 'LAX'}}
-       )
+      User: SFO
 
-       Agent Tool Call: find_routes_with_one_layover(
-         {'argument_input': {'source_airport': 'SFO', 'dest_airport': 'LAX'}}
-       )
+      Agent Tool Call: find_direct_routes_between_airports(
+        {'argument_input': {'source_airport': 'SFO', 'dest_airport': 'LAX'}}
+      )
 
-       Agent: Your routes are: I found several direct routes from SFO to LAX:
-          1. Airline: AS, From: SFO, To: LAX
-          2. Airline: DL, From: SFO, To: LAX
-          3. Airline: UA, From: SFO, To: LAX
-          4. Airline: US, From: SFO, To: LAX
-          5. Airline: VX, From: SFO, To: LAX
-          6. Airline: WN, From: SFO, To: LAX
-          7. Airline: AA, From: SFO, To: LAX
+      Agent Tool Call: find_routes_with_one_layover(
+        {'argument_input': {'source_airport': 'SFO', 'dest_airport': 'LAX'}}
+      )
 
-       Additionally, there are routes with one layover:
-       1. Airlines: AI, CX, From: SFO, Layover: HKG, To: LAX
-          2. Airlines: AI, AA, From: SFO, Layover: HKG, To: LAX
-          3. Airlines: AI, DL, From: SFO, Layover: ICN, To: LAX
-          4. Airlines: AI, KE, From: SFO, Layover: ICN, To: LAX
-          5. Airlines: AI, OZ, From: SFO, Layover: ICN, To: LAX
-          6. Airlines: AI, TG, From: SFO, Layover: ICN, To: LAX
-          7. Airlines: AI, UA, From: SFO, Layover: ICN, To: LAX
-          8. Airlines: AM, AS, From: SFO, Layover: ATL, To: LAX
-          9. Airlines: AM, AZ, From: SFO, Layover: ATL, To: LAX
-          10. Airlines: AM, CI, From: SFO, Layover: ATL, To: LAX
+      Agent: Your routes are: I found several direct routes from SFO to LAX:
+         1. Airline: AS, From: SFO, To: LAX
+         2. Airline: DL, From: SFO, To: LAX
+         3. Airline: UA, From: SFO, To: LAX
+         4. Airline: US, From: SFO, To: LAX
+         5. Airline: VX, From: SFO, To: LAX
+         6. Airline: WN, From: SFO, To: LAX
+         7. Airline: AA, From: SFO, To: LAX
 
-       Agent: Do you want to continue? Please respond with 'yes' or 'no'.
+      Additionally, there are routes with one layover:
+      1. Airlines: AI, CX, From: SFO, Layover: HKG, To: LAX
+         2. Airlines: AI, AA, From: SFO, Layover: HKG, To: LAX
+         3. Airlines: AI, DL, From: SFO, Layover: ICN, To: LAX
+         4. Airlines: AI, KE, From: SFO, Layover: ICN, To: LAX
+         5. Airlines: AI, OZ, From: SFO, Layover: ICN, To: LAX
+         6. Airlines: AI, TG, From: SFO, Layover: ICN, To: LAX
+         7. Airlines: AI, UA, From: SFO, Layover: ICN, To: LAX
+         8. Airlines: AM, AS, From: SFO, Layover: ATL, To: LAX
+         9. Airlines: AM, AZ, From: SFO, Layover: ATL, To: LAX
+         10. Airlines: AM, CI, From: SFO, Layover: ATL, To: LAX
 
-       User: no
-       ```
+      Agent: Do you want to continue? Please respond with 'yes' or 'no'.
 
-    The negative case is given below:
+      User: no
+      ```
 
-       ```text
-       Agent: Please provide the names of the source and destination airports, so I can find
-         their IATA codes for you.
+   The negative case is given below:
 
-       User: i want to go to Mars, I'm from Saturn
+      ```text
+      Agent: Please provide the names of the source and destination airports, so I can find
+        their IATA codes for you.
 
-       Agent: It seems like you're mentioning planets! For this task, I need the names of
-         actual airports on Earth. Could you please provide the name of the source
-         airport and the destination airport?
+      User: i want to go to Mars, I'm from Saturn
 
-       User: no
+      Agent: It seems like you're mentioning planets! For this task, I need the names of
+        actual airports on Earth. Could you please provide the name of the source
+        airport and the destination airport?
 
-       Error: The user did not provide valid source and destination airports, which are necessary to
-         complete the task of returning IATA codes.
-       ```
+      User: no
 
-    For some ideas on how to quantify the quality of your agent, see the `notebook.ipynb` file!
+      Error: The user did not provide valid source and destination airports, which are necessary to
+        complete the task of returning IATA codes.
+      ```
+
+   For some ideas on how to quantify the quality of your agent, see the `notebook.ipynb` file!
+
+

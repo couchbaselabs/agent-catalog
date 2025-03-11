@@ -1,5 +1,6 @@
 import agentc_core.defaults
 import gzip
+import json
 import logging
 import logging.handlers
 import os
@@ -43,4 +44,4 @@ class LocalLogger(BaseLogger):
         self.audit_logger.addHandler(self.rotating_handler)
 
     def _accept(self, log_obj: Log, log_json: dict):
-        self.audit_logger.info(log_json)
+        self.audit_logger.info(json.dumps(log_json))

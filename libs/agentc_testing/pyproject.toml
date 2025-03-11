@@ -17,6 +17,10 @@ pre-commit = "^3.2.2"
 pytest = "^8.3.2"
 docker = "^7.1.0"
 
+[tool.poetry.group.dev.dependencies.agentc-cli]
+path = "../agentc_cli"
+develop = true
+
 [tool.pytest.ini_options]
 markers = [
     "smoke: marks tests for running on each git-push",

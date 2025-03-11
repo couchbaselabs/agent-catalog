@@ -36,7 +36,6 @@ class Graph:
         workflow.add_node("endpoint_finding_agent", endpoint_finding_agent)
         workflow.add_node("route_finding_agent", route_finding_agent)
         workflow.set_entry_point("front_desk_agent")
-        workflow.add_edge("front_desk_agent", "endpoint_finding_agent")
         workflow.add_conditional_edges(
             "front_desk_agent",
             out_talk_to_user_edge,
@@ -47,7 +46,7 @@ class Graph:
         self.graph = workflow.compile(*args, **kwargs)
 
     def invoke(self, *args, **kwargs) -> State:
-        state = State(messages=[], endpoints=None, route=None, is_last_step=False)
+        state = State(messages=[], endpoints=None, routes=None, is_last_step=False)
         self.span.state = state
         with self.span:
             return self.graph.invoke(*args, input=state, **kwargs)

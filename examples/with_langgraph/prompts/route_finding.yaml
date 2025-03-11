@@ -32,21 +32,28 @@ tools:
 output:
   title: Routes
   description: A list of a sequence of flights (source and destinations) that connect two airports.
-  type: array
-  items:
-    type: object
-    properties:
-      source:
-        type: string
-        description: "The IATA code for the source airport."
-      dest:
-        type: string
-        description: "The IATA code for the destination airport."
+  type: object
+  properties:
+    routes:
+      type: array
+      items:
+        type: object
+        properties:
+          source:
+            type: string
+            description: "The IATA code for the source airport."
+          dest:
+            type: string
+            description: "The IATA code for the destination airport."
 
 # The main content of the prompt.
 # This field is mandatory and must be specified as a string OR a YAML object.
 content:
-  Your task is to use the provided tools to find a route that connects the source and destination airports.
-  You will be given the source and destination cities.
-  You MUST use the provided tools.
-  Use routes with fewer layovers (e.g., if a direct flight and a one-layover flight exists, choose the direct flight).
+  agent_instructions: >
+    Your task is to use the provided tools to find a route that connects the source and destination airports.
+    You will be given the source and destination cities.
+    You MUST use the provided tools.
+    Use routes with fewer layovers (e.g., if a direct flight and a one-layover flight exists, choose the direct flight).
+
+  output_format_instructions: >
+    Ensure that each IATA code is a string and is capitalized for all routes returned.

@@ -48,7 +48,7 @@ def logging_command(parent_logger: logging.Logger):
             try:
                 return func(*args, **kwargs)
             except Exception as e:
-                parent_logger.error(f"Command {func.__name__} failed with exception: {str(e)}\n{e.__traceback__}")
+                parent_logger.error(f"Command {func.__name__} failed with exception: {str(e)}", stack_info=True)
                 raise e
 
         return new_func
@@ -183,7 +183,7 @@ def get_catalog(
 
                 indexer_printer = logging_printer
 
-            local_catalog = index_catalog(
+            local_catalog, _ = index_catalog(
                 embedding_model,
                 meta_version,
                 version,

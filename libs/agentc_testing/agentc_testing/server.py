@@ -81,93 +81,87 @@ def _start_couchbase(
     backoff_factor: float = 0.7,
     wait_for_ready: bool = True,
 ) -> None:
-    try:
-        # Initialize the cluster.
-        def _init_cluster():
-            return requests.post(
-                "http://localhost:8091/clusterInit",
-                data={
-                    "username": DEFAULT_COUCHBASE_USERNAME,
-                    "password": DEFAULT_COUCHBASE_PASSWORD,
-                    "services": "kv,index,n1ql,fts,cbas",
-                    "clusterName": "agentc",
-                    "indexerStorageMode": "plasma",
-                    "port": "SAME",
-                },
-            )
-
-        logger.info("Initializing Couchbase container %s (clusterInit).", container.name)
-        _execute_with_retry(
-            func=_init_cluster,
-            condition=lambda r: r.status_code == http.HTTPStatus.OK,
-            result_str=lambda r: r.text,
-            retry_count=retry_count,
-            backoff_factor=backoff_factor,
+    # Initialize the cluster.
+    def _init_cluster():
+        return requests.post(
+            "http://localhost:8091/clusterInit",
+            data={
+                "username": DEFAULT_COUCHBASE_USERNAME,
+                "password": DEFAULT_COUCHBASE_PASSWORD,
+                "services": "kv,index,n1ql,fts,cbas",
+                "clusterName": "agentc",
+                "indexerStorageMode": "plasma",
+                "port": "SAME",
+            },
         )
 
-        # Install the travel-sample bucket.
-        def _install_bucket():
-            return requests.post(
-                "http://localhost:8091/sampleBuckets/install",
-                auth=(DEFAULT_COUCHBASE_USERNAME, DEFAULT_COUCHBASE_PASSWORD),
-                data='["travel-sample"]',
-            )
+    logger.info("Initializing Couchbase container %s (clusterInit).", container.name)
+    _execute_with_retry(
+        func=_init_cluster,
+        condition=lambda r: r.status_code == http.HTTPStatus.OK,
+        result_str=lambda r: r.text,
+        retry_count=retry_count,
+        backoff_factor=backoff_factor,
+    )
 
-        logger.info("Installing travel-sample bucket in Couchbase container %s.", container.name)
-        _execute_with_retry(
-            func=_install_bucket,
-            condition=lambda r: r.status_code == http.HTTPStatus.ACCEPTED,
-            result_str=lambda r: r.text,
-            retry_count=retry_count,
-            backoff_factor=backoff_factor,
-        )
-        if not wait_for_ready:
-            return
-
-        # Wait for the travel-sample bucket to be ready.
-        def _is_bucket_ready():
-            return requests.get(
-                "http://localhost:8091/pools/default/buckets/travel-sample",
-                auth=(DEFAULT_COUCHBASE_USERNAME, DEFAULT_COUCHBASE_PASSWORD),
-            )
-
-        logger.info("Waiting for travel-sample bucket to be ready in Couchbase container %s.", container.name)
-        _execute_with_retry(
-            func=_is_bucket_ready,
-            condition=lambda r: r.status_code == http.HTTPStatus.OK,
-            result_str=lambda r: r.text,
-            retry_count=retry_count,
-            backoff_factor=backoff_factor,
+    # Install the travel-sample bucket.
+    def _install_bucket():
+        return requests.post(
+            "http://localhost:8091/sampleBuckets/install",
+            auth=(DEFAULT_COUCHBASE_USERNAME, DEFAULT_COUCHBASE_PASSWORD),
+            data='["travel-sample"]',
         )
 
-        # As a sanity check, we should now be able to use our SDK to connect to our cluster.
-        def _is_client_ready():
-            cluster = couchbase.cluster.Cluster(
-                DEFAULT_COUCHBASE_CONN_STRING,
-                couchbase.options.ClusterOptions(
-                    authenticator=couchbase.auth.PasswordAuthenticator(
-                        username=DEFAULT_COUCHBASE_USERNAME, password=DEFAULT_COUCHBASE_PASSWORD
-                    ),
-                ),
-            )
-            cluster.wait_until_ready(datetime.timedelta(seconds=60))
-            return cluster.cluster_info()
-
-        logger.info("Checking if SDK can reach our cluster in container %s.", container.name)
-        _execute_with_retry(
-            func=_is_client_ready,
-            condition=lambda _: True,
-            result_str=lambda q: q,
-            retry_count=retry_count,
-            backoff_factor=backoff_factor,
-        )
-        logger.debug("Couchbase container %s is ready.", container.name)
+    logger.info("Installing travel-sample bucket in Couchbase container %s.", container.name)
+    _execute_with_retry(
+        func=_install_bucket,
+        condition=lambda r: r.status_code == http.HTTPStatus.ACCEPTED,
+        result_str=lambda r: r.text,
+        retry_count=retry_count,
+        backoff_factor=backoff_factor,
+    )
+    if not wait_for_ready:
         return
 
-    except Exception as e:
-        logger.error(container.logs())
-        container.remove(force=True)
-        raise e
+    # Wait for the travel-sample bucket to be ready.
+    def _is_bucket_ready():
+        return requests.get(
+            "http://localhost:8091/pools/default/buckets/travel-sample",
+            auth=(DEFAULT_COUCHBASE_USERNAME, DEFAULT_COUCHBASE_PASSWORD),
+        )
+
+    logger.info("Waiting for travel-sample bucket to be ready in Couchbase container %s.", container.name)
+    _execute_with_retry(
+        func=_is_bucket_ready,
+        condition=lambda r: r.status_code == http.HTTPStatus.OK,
+        result_str=lambda r: r.text,
+        retry_count=retry_count,
+        backoff_factor=backoff_factor,
+    )
+
+    # As a sanity check, we should now be able to use our SDK to connect to our cluster.
+    def _is_client_ready():
+        cluster = couchbase.cluster.Cluster(
+            DEFAULT_COUCHBASE_CONN_STRING,
+            couchbase.options.ClusterOptions(
+                authenticator=couchbase.auth.PasswordAuthenticator(
+                    username=DEFAULT_COUCHBASE_USERNAME, password=DEFAULT_COUCHBASE_PASSWORD
+                ),
+            ),
+        )
+        cluster.wait_until_ready(datetime.timedelta(seconds=60))
+        return cluster.cluster_info()
+
+    logger.info("Checking if SDK can reach our cluster in container %s.", container.name)
+    _execute_with_retry(
+        func=_is_client_ready,
+        condition=lambda _: True,
+        result_str=lambda q: q,
+        retry_count=retry_count,
+        backoff_factor=backoff_factor,
+    )
+    logger.debug("Couchbase container %s is ready.", container.name)
+    return
 
 
 def _stop_container(container: docker.models.containers.Container):
@@ -241,9 +235,9 @@ if __name__ == "__main__":
     with tempfile.TemporaryDirectory() as _tmp:
         logging.getLogger().setLevel(logging.DEBUG)
         logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
-        _container = None
+        _container = _start_container(pathlib.Path(_tmp))
         try:
-            _container = _start_couchbase(pathlib.Path(_tmp), wait_for_ready=True)
+            _start_couchbase(pathlib.Path(_tmp), wait_for_ready=True)
             print("Couchbase container started. Press Ctrl+C to stop.")
             while True:
                 pass
@@ -257,5 +251,4 @@ if __name__ == "__main__":
             del os.environ["AGENT_CATALOG_PASSWORD"]
             del os.environ["AGENT_CATALOG_BUCKET"]
             del os.environ["AGENT_CATALOG_WAIT_UNTIL_READY_SECONDS"]
-            if _container is not None:
-                _stop_container(_container)
+            _stop_container(_container)

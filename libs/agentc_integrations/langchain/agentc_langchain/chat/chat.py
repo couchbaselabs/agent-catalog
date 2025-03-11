@@ -1,4 +1,3 @@
-import dataclasses
 import logging
 import typing
 import typing_extensions
@@ -109,31 +108,6 @@ def _accept_messages(messages: typing.List[BaseMessage], span: Span, **kwargs) -
 class Callback(BaseCallbackHandler):
     """A callback that will log all LLM calls using the given span as the root."""
 
-    @dataclasses.dataclass
-    class LeafNode:
-        span: Span
-        model: dict | None = None
-
-    @dataclasses.dataclass
-    class InternalNode:
-        span: Span
-        children: dict[uuid.UUID, "Callback.LeafNode"]
-
-    def Node(self, run_id: uuid.UUID, parent_run_id: typing.Optional[uuid.UUID] = None) -> LeafNode:
-        # First, our parent span...
-        if parent_run_id is None:
-            parent_run_id = "_"
-        if parent_run_id not in self.node_map:
-            self.node_map[parent_run_id] = Callback.InternalNode(
-                span=self.root_span.new(name=str(parent_run_id)), children=dict()
-            )
-        internal_node: Callback.InternalNode = self.node_map[parent_run_id]
-
-        # ...now, our child span.
-        if run_id not in internal_node.children:
-            internal_node.children[run_id] = Callback.LeafNode(span=internal_node.span.new(name=str(run_id)))
-        return internal_node.children[run_id]
-
     def __init__(self, span: Span, tools: list[Tool] = None, output: dict = None):
         """
         :param span: The root span to bind to the chat model messages.
@@ -141,16 +115,17 @@ class Callback(BaseCallbackHandler):
         :param output: The output type that being used by the chat model (i.e., those passed in
                        :py:BaseChatModel.with_structured_output).
         """
-        self.node_map: dict[uuid.UUID | typing.Literal["_"], Callback.InternalNode] = dict()
-        self.root_span = span
+        self.span: Span = span
         self.output: dict = output or dict()
-
         self.tools: list[RequestHeaderContent.Tool] = list()
         if tools is not None:
             for tool in tools:
                 self.tools.append(
                     RequestHeaderContent.Tool(name=tool.name, description=tool.description, args_schema=tool.args)
                 )
+
+        # The following is set on chat completion.
+        self.serialized_model = dict()
         super().__init__()
 
     def on_chat_model_start(
@@ -164,18 +139,22 @@ class Callback(BaseCallbackHandler):
         metadata: typing.Optional[dict[str, typing.Any]] = None,
         **kwargs: typing.Any,
     ) -> typing.Any:
-        node = self.Node(run_id, parent_run_id)
-        node.model = serialized
-        node.span.enter()
-        node.span.log(
+        self.span.enter()
+        self.serialized_model = serialized
+        self.span.log(
             RequestHeaderContent(
                 tools=self.tools,
                 output=self.output,
                 meta=serialized,
+                extra={
+                    "run_id": str(run_id),
+                    "parent_run_id": str(parent_run_id) if parent_run_id is not None else None,
+                    "tags": tags,
+                },
             )
         )
         for message_set in messages:
-            _accept_messages(message_set, node.span)
+            _accept_messages(message_set, self.span)
         return super().on_chat_model_start(
             serialized, messages, run_id=run_id, parent_run_id=parent_run_id, tags=tags, metadata=metadata, **kwargs
         )
@@ -188,19 +167,19 @@ class Callback(BaseCallbackHandler):
         parent_run_id: typing.Optional[uuid.UUID] = None,
         **kwargs: typing.Any,
     ) -> typing.Any:
-        node = self.Node(run_id, parent_run_id)
         for generation_set in response.generations:
             logger.debug(f"LLM has returned the message: {generation_set}")
             for generation in generation_set:
-                node.span.log(
+                self.span.log(
                     ChatCompletionContent(
                         output=generation.message.text(),
                         meta=generation.message.response_metadata,
                         extra={"additional_kwargs": generation.message.additional_kwargs},
                     ),
-                    model=node.model,
+                    run_id=str(run_id),
+                    parent_run_id=str(parent_run_id) if parent_run_id is not None else None,
                 )
-        node.span.exit()
+        self.span.exit()
         return super().on_llm_end(response, run_id=run_id, parent_run_id=parent_run_id, **kwargs)
 
 

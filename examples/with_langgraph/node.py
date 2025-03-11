@@ -5,6 +5,7 @@ import agentc_langchain
 import langchain_core.language_models.chat_models
 import langchain_core.messages
 import langchain_core.runnables
+import langchain_core.tools
 import langchain_openai
 import langgraph.graph
 import langgraph.prebuilt
@@ -14,7 +15,7 @@ import typing
 class State(typing.TypedDict):
     messages: list[langchain_core.messages.BaseMessage]
     endpoints: typing.Optional[dict]
-    route: typing.Optional[dict]
+    routes: typing.Optional[list[dict]]
     is_last_step: bool
 
 
@@ -26,21 +27,29 @@ class BaseAgent:
         # Grab the prompt for our agent.
         self.prompt: agentc_core.catalog.catalog.Prompt = self.catalog.find("prompt", name=prompt_name)
 
-        # All other keyword arguments are passed to our agent.
-        self.agent_kwargs: dict = kwargs
-
-    def _initialize_chat_model(self):
         # Initialize a chat model with OpenAI's GPT-4o model.
         self.chat_model: langchain_core.language_models.BaseChatModel = langchain_openai.chat_models.ChatOpenAI(
             model="gpt-4o", temperature=0, callbacks=[]
         )
 
+        # All other keyword arguments are passed to our agent.
+        self.agent_kwargs: dict = kwargs
+
     def _create_agent(self, span: agentc.Span):
+        # LangChain agents expect LangChain tools, so we will convert the *pure Python functions* we get from Agent
+        # Catalog into LangChain tools here.
+        tools: list[langchain_core.tools.StructuredTool] = list()
+        for tool in self.prompt.tools:
+            tools.append(langchain_core.tools.StructuredTool.from_function(tool.func))
+
+        # Add a callback to our chat model.
+        callback = agentc_langchain.chat.Callback(span=span, tools=tools, output=self.prompt.output)
+        self.chat_model.callbacks.append(callback)
+
         # A new agent object is created for each invocation of this node.
-        self.chat_model.callbacks.append(agentc_langchain.chat.Callback(span=span))
         return langgraph.prebuilt.create_react_agent(
             model=self.chat_model,
-            tools=self.prompt.tools,
+            tools=tools,
             prompt=self.prompt.content["agent_instructions"],
             response_format=(self.prompt.content["output_format_instructions"], self.prompt.output),
             **self.agent_kwargs,
@@ -50,7 +59,7 @@ class BaseAgent:
 class FrontDeskAgent(BaseAgent):
     def __init__(self, catalog: agentc.Catalog, span: agentc.Span, **kwargs):
         super().__init__(catalog=catalog, span=span, prompt_name="front_desk_node", **kwargs)
-        self.introductory_message: str = "Please provide the source and destination airports.\n>"
+        self.introductory_message: str = "Please provide the source and destination airports.\n> "
 
     def __call__(self, state: State, config: langchain_core.runnables.RunnableConfig) -> State:
         if len(state["messages"]) == 0:
@@ -59,28 +68,35 @@ class FrontDeskAgent(BaseAgent):
             state["messages"].append(langchain_core.messages.HumanMessage(content=response))
             return state
 
-        else:
-            # Display the last message in our conversation to our user.
-            last_message = state["messages"][-1]
-            response = input(last_message.content + "\n>")
-            state["messages"].append(langchain_core.messages.HumanMessage(content=response))
-            self._initialize_chat_model()
+        if state["routes"] is not None:
+            print("---")
+            print("Routes found: ")
+            for route in state["routes"]:
+                print(route)
+            print("---")
 
-            # Below, we build a Span instance which will bind all logs to the name "front_desk_agent".
-            # The "state" parameter is expected to be modified by the code in the WITH block.
-            with self.span.new(name="front_desk_node", state=state) as span:
-                agent = self._create_agent(span)
+        # Display the last message in our conversation to our user.
+        last_message = state["messages"][-1]
+        response = input(last_message.content + "\n> ")
+        state["messages"].append(langchain_core.messages.HumanMessage(content=response))
 
-                # Give the working state to our agent.
-                response = agent.invoke(input=state, config=config)
+        # Below, we build a Span instance which will bind all logs to the name "front_desk_agent".
+        # The "state" parameter is expected to be modified by the code in the WITH block.
+        with self.span.new(name="front_desk_node", state=state) as span:
+            agent = self._create_agent(span)
 
-                # 'should_continue' and 'response' comes from the prompt's output format.
-                # Note this is a direct mutation on the "state" given to the Span!
-                structured_response = response["structured_response"]
-                state["is_last_step"] = structured_response["should_continue"]
-                state["messages"].append(langchain_core.messages.AIMessage(structured_response["response"]))
+            # Give the working state to our agent.
+            response = agent.invoke(input=state, config=config)
 
-            return state
+            # 'should_continue' and 'response' comes from the prompt's output format.
+            # Note this is a direct mutation on the "state" given to the Span!
+            structured_response = response["structured_response"]
+            state["messages"].append(langchain_core.messages.AIMessage(structured_response["response"]))
+            state["is_last_step"] = structured_response["should_continue"] is False
+            if state["is_last_step"]:
+                print(structured_response["response"])
+
+        return state
 
 
 class EndpointFindingAgent(BaseAgent):
@@ -88,8 +104,6 @@ class EndpointFindingAgent(BaseAgent):
         super().__init__(catalog=catalog, span=span, prompt_name="endpoint_finding_node", **kwargs)
 
     def __call__(self, state: State, config: langchain_core.runnables.RunnableConfig) -> State:
-        self._initialize_chat_model()
-
         # Below, we build a Span instance which will bind all logs to the name "endpoint_finding_node".
         # The "state" parameter is expected to be modified by the code in the WITH block.
         with self.span.new(name="endpoint_finding_node", state=state) as span:
@@ -112,8 +126,6 @@ class RouteFindingAgent(BaseAgent):
         super().__init__(catalog=catalog, span=span, prompt_name="route_finding_node", **kwargs)
 
     def __call__(self, state: State, config: langchain_core.runnables.RunnableConfig) -> State:
-        self._initialize_chat_model()
-
         # Below, we build a Span instance which will bind all logs to the name "route_finding_node".
         # The "state" parameter is expected to be modified by the code in the WITH block.
         with self.span.new(name="route_finding_node", state=state) as span:
@@ -126,6 +138,6 @@ class RouteFindingAgent(BaseAgent):
             # Note this is a direct mutation on the "state" given to the Span!
             structured_response = response["structured_response"]
             state["messages"].append(response["messages"][-1])
-            state["route"] = structured_response
+            state["routes"] = structured_response["routes"]
 
         return state
