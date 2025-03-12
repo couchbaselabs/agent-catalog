@@ -1,8 +1,10 @@
 import agentc
 import dotenv
 import langgraph.graph
+import typing
 
-from edge import out_talk_to_user_edge
+from edge import out_front_desk_edge
+from edge import out_route_finding_edge
 from node import EndpointFindingAgent
 from node import FrontDeskAgent
 from node import RouteFindingAgent
@@ -38,15 +40,30 @@ class Graph:
         workflow.set_entry_point("front_desk_agent")
         workflow.add_conditional_edges(
             "front_desk_agent",
-            out_talk_to_user_edge,
-            {"ENDPOINT_FINDING": "endpoint_finding_agent", "END": langgraph.graph.END},
+            out_front_desk_edge,
+            {
+                "ENDPOINT_FINDING": "endpoint_finding_agent",
+                "FRONT_DESK": "front_desk_agent",
+                "END": langgraph.graph.END,
+            },
         )
         workflow.add_edge("endpoint_finding_agent", "route_finding_agent")
-        workflow.add_edge("route_finding_agent", "front_desk_agent")
+        workflow.add_conditional_edges(
+            "route_finding_agent",
+            out_route_finding_edge,
+            {"FRONT_DESK": "front_desk_agent", "ENDPOINT_FINDING": "endpoint_finding_agent"},
+        )
         self.graph = workflow.compile(*args, **kwargs)
+        # print(self.graph.get_graph().draw_mermaid())
+
+    def stream(self, *args, **kwargs) -> typing.Iterator[State]:
+        state = State(messages=[], endpoints=None, routes=None, needs_clarification=False, is_last_step=False)
+        self.span.state = state
+        with self.span:
+            yield from self.graph.stream(*args, input=state, **kwargs)
 
     def invoke(self, *args, **kwargs) -> State:
-        state = State(messages=[], endpoints=None, routes=None, is_last_step=False)
+        state = State(messages=[], endpoints=None, routes=None, needs_clarification=False, is_last_step=False)
         self.span.state = state
         with self.span:
             return self.graph.invoke(*args, input=state, **kwargs)

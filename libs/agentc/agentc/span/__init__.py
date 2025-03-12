@@ -4,6 +4,7 @@ from agentc_core.activity.models.content import ChatCompletionContent
 from agentc_core.activity.models.content import Content
 from agentc_core.activity.models.content import EndContent
 from agentc_core.activity.models.content import KeyValueContent
+from agentc_core.activity.models.content import Kind as ContentKind
 from agentc_core.activity.models.content import RequestHeaderContent
 from agentc_core.activity.models.content import SystemContent
 from agentc_core.activity.models.content import ToolCallContent
@@ -18,6 +19,7 @@ __all__ = [
     "Content",
     "EndContent",
     "KeyValueContent",
+    "ContentKind",
     "RequestHeaderContent",
     "SystemContent",
     "ToolCallContent",

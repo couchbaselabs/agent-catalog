@@ -31,6 +31,7 @@ output:
     dest:
       type: string
       description: "The IATA code for the destination airport."
+  required: [source, dest]
 
 # The main content of the prompt.
 # This field is mandatory and must be specified as a string OR a YAML object.
@@ -39,6 +40,9 @@ content:
     Your task is to find the source and destination airports for a flight.
     The user will provide you with the source and destination cities.
     You need to find the IATA codes for the source and destination airports.
+    Another agent will use these IATA codes to find a route between the two airports.
+    If a route cannot be found, suggest alternate airports (preferring airports that are more likely to have routes
+    between them).
 
   output_format_instructions: >
     Ensure that each IATA code is a string and is capitalized.

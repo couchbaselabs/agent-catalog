@@ -23,7 +23,9 @@ tools:
 
     # ...or semantically via query.
     # You can verify this search on the command line using `agentc find`.
+    # (i.e., `agentc find --query 'finding indirect flights (those with layovers)' --limit 2`)
   - query: "finding indirect flights (those with layovers)"
+    limit: 2
 
 # The output type (expressed in JSON-schema) associated with this prompt.
 # See https://json-schema.org/understanding-json-schema for more information.
@@ -45,15 +47,25 @@ output:
           dest:
             type: string
             description: "The IATA code for the destination airport."
+        required: [ source, dest ]
+    is_last_step:
+      type: boolean
+      description: "Whether the agent should continue to find routes between new source and destination cities."
+  required: [ routes, is_last_step ]
 
 # The main content of the prompt.
 # This field is mandatory and must be specified as a string OR a YAML object.
 content:
-  agent_instructions: >
-    Your task is to use the provided tools to find a route that connects the source and destination airports.
-    You will be given the source and destination cities.
-    You MUST use the provided tools.
-    Use routes with fewer layovers (e.g., if a direct flight and a one-layover flight exists, choose the direct flight).
+  agent_instructions:
+    - >
+      Your task is to use the provided tools to find a route that connects the source and destination airports.
+      You will be given the source and destination cities.
+      You MUST use the provided tools.
+      Use routes with fewer layovers (e.g., if a direct flight and a one-layover flight exists, choose the direct flight).
+    - >
+      If no routes exist, return an empty list.
+      You will then be given new source and destination cities to find routes between.
+      If you cannot find a route after the second attempt, set the `is_last_step` flag to True.
 
   output_format_instructions: >
     Ensure that each IATA code is a string and is capitalized for all routes returned.

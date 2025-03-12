@@ -183,7 +183,7 @@ def get_catalog(
 
                 indexer_printer = logging_printer
 
-            local_catalog, _ = index_catalog(
+            local_catalog = index_catalog(
                 embedding_model,
                 meta_version,
                 version,

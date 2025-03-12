@@ -81,6 +81,7 @@ class AliasedGroup(click.Group):
 def click_main(ctx: click.Context, verbose: int, interactive: bool):
     """The Couchbase Agent Catalog command line tool."""
     ctx.obj = Config(
+        # TODO (GLENN): We really need to use this "verbosity_level" parameter more.
         verbosity_level=verbose,
         with_interaction=interactive,
     )
@@ -372,7 +373,7 @@ def env(ctx):
 )
 @click.option(
     "--local/--no-local",
-    default=None,
+    default=True,
     is_flag=True,
     help="Flag to include / exclude items from the local-FS-catalog while searching.",
     show_default=True,
@@ -390,7 +391,7 @@ def find(
     annotations: str = None,
     catalog_id: str = LATEST_SNAPSHOT_VERSION,
     db: bool | None = None,
-    local: bool | None = None,
+    local: bool | None = True,
 ):
     """Find items from the catalog based on a natural language QUERY string or by name."""
     cfg: Config = ctx.obj
@@ -650,7 +651,7 @@ def version(ctx):
 )
 @click.option(
     "--local/--no-local",
-    default=None,
+    default=True,
     is_flag=True,
     help="Flag to include / exclude items from the local-FS-catalog while searching.",
     show_default=True,
@@ -665,7 +666,7 @@ def execute(
     refiner: typing.Literal["ClosestCluster", "None"] = "None",
     annotations: str = None,
     catalog_id: list[str] = None,
-    db: bool = True,
+    db: bool = None,
     local: bool = True,
 ):
     """Search and execute a specific tool."""
@@ -703,7 +704,7 @@ def execute(
 )
 @click.option(
     "--db/--no-db",
-    default=False,
+    default=None,
     is_flag=True,
     help="Flag to force a DB-only search.",
     show_default=True,
@@ -733,9 +734,9 @@ def execute(
 def ls(
     ctx: click.Context,
     kind: list[typing.Literal["tools", "prompts"]],
-    db: bool,
-    local: bool,
-    dirty: bool,
+    db: bool = None,
+    local: bool = True,
+    dirty: bool = True,
     bucket: str = None,
 ):
     """List all indexed tools and/or prompts in the catalog."""

@@ -1,29 +1,11 @@
 import agentc
 import json
-import langchain_openai
-import pytest
 import ragas.dataset_schema
 import ragas.embeddings
 import ragas.llms
 import ragas.metrics
 
 from main import Graph
-
-
-@pytest.fixture
-def evaluator_llm() -> ragas.llms.LangchainLLMWrapper:
-    chat_model = langchain_openai.chat_models.ChatOpenAI(model_name="gpt-4o", temperature=0)
-    return ragas.llms.LangchainLLMWrapper(chat_model)
-
-
-@pytest.fixture
-def evaluator_embedding() -> ragas.embeddings.HuggingfaceEmbeddings:
-    return ragas.embeddings.HuggingfaceEmbeddings(model_name=...)
-
-
-@pytest.fixture
-def catalog() -> agentc.Catalog:
-    return agentc.Catalog()
 
 
 def test_irrelevant_greetings(

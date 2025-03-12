@@ -1,6 +1,42 @@
-# A Starter Agent
+# A Starter Multi-Agent System
 
 This directory contains a starter project for building agents with Couchbase, LangGraph, and Agent Catalog.
+
+## A 3-Agent System
+
+_We assume some familiarity with the
+[Travel Sample Data Model](https://docs.couchbase.com/python-sdk/current/ref/travel-app-data-model.html) and the core
+concepts of [LangGraph](https://langchain-ai.github.io/langgraph/)._
+
+This starter project is meant to get new users familiar with the processes of building agents in a _principled_ manner.
+In this project, there are three agents:
+
+1. "Front Desk" -- Purposed to interact with the user and the "Endpoint Finding" agent.
+2. "Endpoint Finding" -- Purposed to translate the user's input into IATA airport codes and interact with the
+   "Route Finding" agent.
+3. "Route Finding" -- Purposed to find routes using Couchbase tools between the endpoints provided by the
+   "Endpoint Finding" and to i) interact with the "Endpoint Finding" agent to provide new endpoints if no routes are
+   found or ii) send the routes (or lack of routes) to the "Front Desk" agent to give back to the user.
+
+```mermaid
+%%{init: {'flowchart': {'curve': 'linear'}}}%%
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	front_desk_agent(front_desk_agent)
+	endpoint_finding_agent(endpoint_finding_agent)
+	route_finding_agent(route_finding_agent)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> front_desk_agent;
+	endpoint_finding_agent --> route_finding_agent;
+	front_desk_agent -. &nbsp;ENDPOINT_FINDING&nbsp; .-> endpoint_finding_agent;
+	front_desk_agent -. &nbsp;END&nbsp; .-> __end__;
+	route_finding_agent -. &nbsp;FRONT_DESK&nbsp; .-> front_desk_agent;
+	route_finding_agent -. &nbsp;ENDPOINT_FINDING&nbsp; .-> endpoint_finding_agent;
+	front_desk_agent -. &nbsp;FRONT_DESK&nbsp; .-> front_desk_agent;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc
+```
 
 ## Getting Started
 
@@ -20,7 +56,7 @@ This directory contains a starter project for building agents with Couchbase, La
 
    ```bash
    git init
-   git add * ; git add .gitignore .env.example
+   git add * ; git add .gitignore .env.example .pre-commit-config.yaml
    git commit -m "Initial commit"
    ```
 
@@ -73,7 +109,7 @@ This directory contains a starter project for building agents with Couchbase, La
      See: https://docs.couchbase.com or https://couchbaselabs.github.io/agent-catalog/index.html# for more information.
    ```
 
-### Running Your Agent
+### Running Your Agent System
 
 1. Create a `.env` file from the `.env.example` file and tweak this to your environment.
 
@@ -130,120 +166,24 @@ This directory contains a starter project for building agents with Couchbase, La
 
 5. Publish your local agent catalog to your Couchbase instance with `agentc publish`.
    Your Couchbase instance details in the `.env` file will be used for authentication.
-   Again, this specific starter agent uses the `travel-sample` bucket.
+   Again, this specific starter agent system uses the `travel-sample` bucket.
 
    ```bash
    agentc publish
    ```
 
     _Hint: feel free to install `agentc` as a post-commit hook!
-    Run `pre-commit install --hook-type post-commit` to install this project's post-commit hooks and run
-    `agentc index` + `agentc publish` after `git commit [--amend]`!_
+    Run `pre-commit install --hook-type post-commit --hook-type pre-commit` to install this project's (pre|post)-commit
+    hooks and run `agentc index` + `agentc publish` after `git commit [--amend]`!_
 
-6. Run your agent!
+6. Run your agent system!
 
    ```bash
    python main.py
    ```
 
-7. Let's now talk with our agent!
-   In the examples below, we initiate three conversations: two "positive" and one "negative".
-   The first positive case is given below:
+7. Let's now talk with the "Front Desk" agent!
 
-   ```text
-   Agent: Please provide the names of the source and destination airports, so I can find
-     their IATA codes for you.
 
-   User: Let's go to LAX. I'm in SFO.
-
-   Agent Tool Call: find_direct_routes_between_airports(
-     {'argument_input': {'source_airport': 'SFO', 'dest_airport': 'LAX'}}
-   )
-
-   Agent Task Result: Direct routes found between SFO and LAX with the following airlines:
-     AS, DL, UA, US, VX, WN, AA.
-
-   Agent: Your routes are: Direct routes found between SFO and LAX with the following airlines: AS, DL, UA, US,
-     VX, WN, AA.
-
-   Agent: Do you want to continue? Please respond with 'yes' or 'no'.
-
-   User: no
-   ```
-
-   The second positive case is given below:
-
-      ```text
-      Agent: Please provide the names of the source and destination airports, so I can find
-        their IATA codes for you.
-
-      User: I need to go to LAX from YNW
-
-      Agent Tool Call: find_direct_routes_between_airports(
-        {'argument_input': {'source_airport': 'YNW', 'dest_airport': 'LAX'}}
-      )
-
-      Agent Tool Call: find_routes_with_one_layover(
-        {'argument_input': {'source_airport': 'YNW', 'dest_airport': 'LAX'}}
-      )
-
-      Agent Task Result: I couldn't find any direct or one-layover routes from YNW to LAX. Could you
-        please provide another source airport that is close to YNW?
-
-      User: SFO
-
-      Agent Tool Call: find_direct_routes_between_airports(
-        {'argument_input': {'source_airport': 'SFO', 'dest_airport': 'LAX'}}
-      )
-
-      Agent Tool Call: find_routes_with_one_layover(
-        {'argument_input': {'source_airport': 'SFO', 'dest_airport': 'LAX'}}
-      )
-
-      Agent: Your routes are: I found several direct routes from SFO to LAX:
-         1. Airline: AS, From: SFO, To: LAX
-         2. Airline: DL, From: SFO, To: LAX
-         3. Airline: UA, From: SFO, To: LAX
-         4. Airline: US, From: SFO, To: LAX
-         5. Airline: VX, From: SFO, To: LAX
-         6. Airline: WN, From: SFO, To: LAX
-         7. Airline: AA, From: SFO, To: LAX
-
-      Additionally, there are routes with one layover:
-      1. Airlines: AI, CX, From: SFO, Layover: HKG, To: LAX
-         2. Airlines: AI, AA, From: SFO, Layover: HKG, To: LAX
-         3. Airlines: AI, DL, From: SFO, Layover: ICN, To: LAX
-         4. Airlines: AI, KE, From: SFO, Layover: ICN, To: LAX
-         5. Airlines: AI, OZ, From: SFO, Layover: ICN, To: LAX
-         6. Airlines: AI, TG, From: SFO, Layover: ICN, To: LAX
-         7. Airlines: AI, UA, From: SFO, Layover: ICN, To: LAX
-         8. Airlines: AM, AS, From: SFO, Layover: ATL, To: LAX
-         9. Airlines: AM, AZ, From: SFO, Layover: ATL, To: LAX
-         10. Airlines: AM, CI, From: SFO, Layover: ATL, To: LAX
-
-      Agent: Do you want to continue? Please respond with 'yes' or 'no'.
-
-      User: no
-      ```
-
-   The negative case is given below:
-
-      ```text
-      Agent: Please provide the names of the source and destination airports, so I can find
-        their IATA codes for you.
-
-      User: i want to go to Mars, I'm from Saturn
-
-      Agent: It seems like you're mentioning planets! For this task, I need the names of
-        actual airports on Earth. Could you please provide the name of the source
-        airport and the destination airport?
-
-      User: no
-
-      Error: The user did not provide valid source and destination airports, which are necessary to
-        complete the task of returning IATA codes.
-      ```
-
-   For some ideas on how to quantify the quality of your agent, see the `notebook.ipynb` file!
-
+### Evaluating Your Agent System
 

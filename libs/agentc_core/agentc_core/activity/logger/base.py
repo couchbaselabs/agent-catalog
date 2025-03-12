@@ -43,6 +43,8 @@ class BaseLogger(abc.ABC):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"Logging message: {message.model_dump_json(indent=2)}")
 
+        return message
+
     @abc.abstractmethod
     def _accept(self, log_obj: Log, log_json: dict):
         pass

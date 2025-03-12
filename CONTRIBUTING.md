@@ -80,6 +80,8 @@ Our current process for contributors is as follows:
    ```
 
 5. Ensure all of your changes are commited, and push your changes to Github.
+   _If you have any nested Git repositories due to working with examples, be sure to remove these before commiting!
+   (e.g., `rm -r examples/with_langgraph/.git`)._
 
    ```bash
    git add $MODIFIED_FILES
@@ -126,16 +128,16 @@ export AGENT_CATALOG_DEBUG=true
 To run the entire suite of unit tests, use the following `pytest` command in the project root:
 
 ```bash
-pytest . --log-file .output --log-level DEBUG
+pytest --log-file .output --log-level DEBUG
 ```
 
-This command will a) run all tests in the current working directory, b) record the logger output to a `.output` file,
-and c) set the logging level to DEBUG.
+This command will a) run all tests according to the whitelist in `pyproject.toml` (i.e., `testpaths`), b) record the
+logger output to a `.output` file, and c) set the logging level to DEBUG.
 
 To only run smoke tests, use the following `pytest` command (again, from the project root):
 
 ```bash
-pytest . -m smoke --log-file .output --log-level DEBUG
+pytest -m smoke --log-file .output --log-level DEBUG
 ```
 
 To run tests for a specific package, use the following `pytest` command (again, from the project root):

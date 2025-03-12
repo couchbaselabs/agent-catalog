@@ -1,7 +1,9 @@
 import agentc
+import agentc_core.activity.models.content
 import agentc_core.catalog.catalog
 import agentc_core.prompt.models
 import agentc_langchain
+import langchain_core
 import langchain_core.language_models.chat_models
 import langchain_core.messages
 import langchain_core.runnables
@@ -14,9 +16,10 @@ import typing
 
 class State(typing.TypedDict):
     messages: list[langchain_core.messages.BaseMessage]
+    is_last_step: bool
+    needs_clarification: bool
     endpoints: typing.Optional[dict]
     routes: typing.Optional[list[dict]]
-    is_last_step: bool
 
 
 class BaseAgent:
@@ -47,10 +50,18 @@ class BaseAgent:
         self.chat_model.callbacks.append(callback)
 
         # A new agent object is created for each invocation of this node.
+        if isinstance(self.prompt.content["agent_instructions"], str):
+            prompt_content = langchain_core.messages.SystemMessage(content=self.prompt.content["agent_instructions"])
+        elif isinstance(self.prompt.content["agent_instructions"], list):
+            prompt_content: list[langchain_core.messages.BaseMessage] = list()
+            for part in self.prompt.content["agent_instructions"]:
+                prompt_content.append(langchain_core.messages.SystemMessage(content=part))
+        else:
+            raise ValueError("Prompt content must be a string or a list of strings.")
         return langgraph.prebuilt.create_react_agent(
             model=self.chat_model,
             tools=tools,
-            prompt=self.prompt.content["agent_instructions"],
+            prompt=prompt_content,
             response_format=(self.prompt.content["output_format_instructions"], self.prompt.output),
             **self.agent_kwargs,
         )
@@ -61,42 +72,44 @@ class FrontDeskAgent(BaseAgent):
         super().__init__(catalog=catalog, span=span, prompt_name="front_desk_node", **kwargs)
         self.introductory_message: str = "Please provide the source and destination airports.\n> "
 
+    @staticmethod
+    def _talk_to_user(span: agentc.Span, message: str, requires_response: bool = True):
+        # We use "Assistant" to differentiate between the "internal" AI messages and what the user sees.
+        span.log(agentc.span.AssistantContent(value=message))
+        if requires_response:
+            response = input(message + "\n> ")
+            span.log(agentc.span.UserContent(value=response))
+            return response
+        else:
+            print(message)
+
     def __call__(self, state: State, config: langchain_core.runnables.RunnableConfig) -> State:
-        if len(state["messages"]) == 0:
-            # This is the first message in the conversation.
-            response = input(self.introductory_message)
-            state["messages"].append(langchain_core.messages.HumanMessage(content=response))
-            return state
-
-        if state["routes"] is not None:
-            print("---")
-            print("Routes found: ")
-            for route in state["routes"]:
-                print(route)
-            print("---")
-
-        # Display the last message in our conversation to our user.
-        last_message = state["messages"][-1]
-        response = input(last_message.content + "\n> ")
-        state["messages"].append(langchain_core.messages.HumanMessage(content=response))
-
         # Below, we build a Span instance which will bind all logs to the name "front_desk_agent".
         # The "state" parameter is expected to be modified by the code in the WITH block.
         with self.span.new(name="front_desk_node", state=state) as span:
-            agent = self._create_agent(span)
+            if len(state["messages"]) == 0:
+                # This is the first message in the conversation.
+                response = self._talk_to_user(span, self.introductory_message)
+                state["messages"].append(langchain_core.messages.HumanMessage(content=response))
+            else:
+                # Display the last message in our conversation to our user.
+                response = self._talk_to_user(span, state["messages"][-1].content)
+                state["messages"].append(langchain_core.messages.HumanMessage(content=response))
 
             # Give the working state to our agent.
+            agent = self._create_agent(span)
             response = agent.invoke(input=state, config=config)
 
-            # 'should_continue' and 'response' comes from the prompt's output format.
+            # 'is_last_step' and 'response' comes from the prompt's output format.
             # Note this is a direct mutation on the "state" given to the Span!
             structured_response = response["structured_response"]
             state["messages"].append(langchain_core.messages.AIMessage(structured_response["response"]))
-            state["is_last_step"] = structured_response["should_continue"] is False
+            state["is_last_step"] = structured_response["is_last_step"]
+            state["needs_clarification"] = structured_response["needs_clarification"]
+            print(structured_response)
             if state["is_last_step"]:
-                print(structured_response["response"])
-
-        return state
+                self._talk_to_user(span, structured_response["response"], requires_response=False)
+            return state
 
 
 class EndpointFindingAgent(BaseAgent):
@@ -117,8 +130,7 @@ class EndpointFindingAgent(BaseAgent):
             structured_response = response["structured_response"]
             state["endpoints"] = {"source": structured_response["source"], "destination": structured_response["dest"]}
             state["messages"].append(response["messages"][-1])
-
-        return state
+            return state
 
 
 class RouteFindingAgent(BaseAgent):
@@ -139,5 +151,5 @@ class RouteFindingAgent(BaseAgent):
             structured_response = response["structured_response"]
             state["messages"].append(response["messages"][-1])
             state["routes"] = structured_response["routes"]
-
-        return state
+            state["is_last_step"] = structured_response["is_last_step"] is True
+            return state

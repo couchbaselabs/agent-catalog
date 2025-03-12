@@ -101,8 +101,7 @@ def _model_from_message(message: BaseMessage, chat_model: BaseChatModel) -> dict
 def _accept_messages(messages: typing.List[BaseMessage], span: Span, **kwargs) -> None:
     for message in messages:
         for content in _content_from_message(message):
-            with span.new(name=message.type) as content_span:
-                content_span.log(content=content, **kwargs)
+            span.log(content=content, **kwargs)
 
 
 class Callback(BaseCallbackHandler):
@@ -115,7 +114,7 @@ class Callback(BaseCallbackHandler):
         :param output: The output type that being used by the chat model (i.e., those passed in
                        :py:BaseChatModel.with_structured_output).
         """
-        self.span: Span = span
+        self.span: Span = span.new(name="agentc_langchain.chat.Callback")
         self.output: dict = output or dict()
         self.tools: list[RequestHeaderContent.Tool] = list()
         if tools is not None:

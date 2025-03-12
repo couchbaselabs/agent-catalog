@@ -501,8 +501,8 @@ def test_ls_local_empty_notindexed(
         os.chdir(td)
 
         # when the repo is empty
-        output = runner.invoke(click_main, ["ls", "--local"]).stdout
-        assert "Searching" not in output
+        output = runner.invoke(click_main, ["ls", "--local", "--no-db"]).stdout
+        assert "Could not find .git directory. Please run agentc within a git repository." in output
 
         # when there are tools and prompts, but are not indexed
         environment_factory(
@@ -511,8 +511,8 @@ def test_ls_local_empty_notindexed(
             click_runner=runner,
             click_command=click_main,
         )
-        output = runner.invoke(click_main, ["ls", "--local"]).stdout
-        assert "Searching" not in output
+        output = runner.invoke(click_main, ["ls", "--local", "--no-db"]).stdout
+        assert "Could not find local catalog at" in output
 
 
 @pytest.mark.smoke
@@ -529,9 +529,9 @@ def test_ls_local_only_tools(
             click_runner=runner,
             click_command=click_main,
         )
-        output = runner.invoke(click_main, ["-v", "ls", "tools", "--local"]).stdout
+        output = runner.invoke(click_main, ["-v", "ls", "tools", "--local", "--no-db"]).stdout
         assert "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 1
-        output = runner.invoke(click_main, ["-v", "ls", "prompts", "--local"]).stdout
+        output = runner.invoke(click_main, ["-v", "ls", "prompts", "--local", "--no-db"]).stdout
         assert "PROMPT" in output and len(re.findall(r"\b1\.\s.+", output)) == 0
 
 
@@ -549,9 +549,9 @@ def test_ls_local_only_prompts(
             click_runner=runner,
             click_command=click_main,
         )
-        output = runner.invoke(click_main, ["-v", "ls", "prompts", "--local"]).stdout
+        output = runner.invoke(click_main, ["-v", "ls", "prompts", "--local", "--no-db"]).stdout
         assert "PROMPT" in output and len(re.findall(r"\b1\.\s.+", output)) == 1
-        output = runner.invoke(click_main, ["-v", "ls", "tools", "--local"]).stdout
+        output = runner.invoke(click_main, ["-v", "ls", "tools", "--local", "--no-db"]).stdout
         assert "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 0
 
 
@@ -569,9 +569,9 @@ def test_ls_local_both_tools_prompts(
             click_runner=runner,
             click_command=click_main,
         )
-        output = runner.invoke(click_main, ["-v", "ls", "prompts", "--local"]).stdout
+        output = runner.invoke(click_main, ["-v", "ls", "prompts", "--local", "--no-db"]).stdout
         assert "PROMPT" in output and len(re.findall(r"\b1\.\s.+", output)) == 1
-        output = runner.invoke(click_main, ["-v", "ls", "tools", "--local"]).stdout
+        output = runner.invoke(click_main, ["-v", "ls", "tools", "--local", "--no-db"]).stdout
         assert "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 1
         output = runner.invoke(click_main, ["-v", "ls", "--local"]).stdout
         assert "PROMPT" in output and "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 2

@@ -358,11 +358,24 @@ class Config(LocalCatalogConfig, RemoteCatalogConfig, CommandLineConfig, Version
 
     debug: bool = False
 
+    @pydantic.model_validator(mode="after")
+    def _use_verbosity_level_for_debug(self) -> typing.Self:
+        if self.debug:
+            self.verbosity_level = 2
+        elif self.verbosity_level == 2:
+            self.debug = True
+        return self
+
     def model_post_init(self, __context: typing.Any) -> None:
         if self.debug:
-            logging.getLogger("agentc").setLevel(logging.DEBUG)
-            logging.getLogger("agentc_core").setLevel(logging.DEBUG)
-            logging.getLogger("agentc_cli").setLevel(logging.DEBUG)
-            logging.getLogger("agentc_langchain").setLevel(logging.DEBUG)
-            logging.getLogger("agentc_llamaindex").setLevel(logging.DEBUG)
-            logging.getLogger("agentc_testing").setLevel(logging.DEBUG)
+            for _logger_name in [
+                "agentc",
+                "agentc_core",
+                "agentc_cli",
+                "agentc_langchain",
+                "agentc_llamaindex",
+                "agentc_testing",
+            ]:
+                _logger = logging.getLogger(_logger_name)
+                _logger.setLevel(logging.DEBUG)
+                _logger.addHandler(logging.StreamHandler())
