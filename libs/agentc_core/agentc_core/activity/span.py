@@ -66,6 +66,10 @@ class Span(pydantic.BaseModel):
 
         return self
 
+    @pydantic.field_serializer("kwargs")
+    def _serialize_kwargs_if_non_empty(self, kwargs: dict, _info) -> dict | None:
+        return kwargs if len(kwargs) > 0 else None
+
     def new(self, name: str, state: typing.Any = None, iterable: bool = False, **kwargs) -> "Span":
         new_kwargs = {**self.kwargs, **kwargs}
         return Span(

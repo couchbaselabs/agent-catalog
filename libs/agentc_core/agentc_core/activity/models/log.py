@@ -48,3 +48,7 @@ class Log(pydantic.BaseModel):
     catalog_version: VersionDescriptor = pydantic.Field(
         description="A unique identifier that defines a catalog version / snapshot / commit."
     )
+
+    @pydantic.field_serializer("annotations")
+    def _serialize_annotations_if_non_empty(self, annotations: dict, _info) -> dict | None:
+        return annotations if len(annotations) > 0 else None

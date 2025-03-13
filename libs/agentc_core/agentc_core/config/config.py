@@ -150,7 +150,7 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
         return None
 
     @pydantic.field_serializer("password")
-    def serialize_password(self, _: pydantic.SecretStr, _info):
+    def _serialize_password_as_stars(self, _: pydantic.SecretStr, _info):
         return "***"
 
     def Cluster(self) -> couchbase.cluster.Cluster:

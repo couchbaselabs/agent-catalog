@@ -40,7 +40,7 @@ class EmbeddingModel(pydantic.BaseModel):
     _embedding_model: None = None
 
     @pydantic.model_validator(mode="after")
-    def validate_bucket_cluster(self) -> "EmbeddingModel":
+    def _bucket_and_cluster_must_be_specified_together(self) -> "EmbeddingModel":
         if self.cb_bucket is not None and self.cb_cluster is None:
             raise ValueError("cb_cluster must be specified if cb_bucket is specified.")
         if self.cb_bucket is None and self.cb_cluster is not None:

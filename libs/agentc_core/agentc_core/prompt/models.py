@@ -30,7 +30,7 @@ class ToolSearchMetadata(pydantic.BaseModel):
 
     # TODO (GLENN): There is similar validation being done in agentc_cli/find... converge these?
     @pydantic.model_validator(mode="after")
-    def name_or_query_must_be_specified(self):
+    def _name_or_query_must_be_specified(self):
         if self.name is None and self.query is None:
             raise ValueError("Either name or query must be specified!")
         elif self.name is not None and self.query is not None:

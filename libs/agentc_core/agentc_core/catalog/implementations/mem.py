@@ -24,7 +24,7 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
     catalog_descriptor: typing.Optional[CatalogDescriptor] = None
 
     @pydantic.model_validator(mode="after")
-    def catalog_path_or_descriptor_should_exist(self) -> "CatalogMem":
+    def _catalog_path_or_descriptor_should_exist(self) -> "CatalogMem":
         if self.catalog_descriptor is not None:
             return self
 

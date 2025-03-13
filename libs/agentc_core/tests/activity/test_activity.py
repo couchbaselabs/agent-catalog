@@ -55,7 +55,7 @@ def test_local_auditor_positive_1(
             assert log_entry.span.name == ["my project"]
             assert log_entry.content.kind == "system"
             assert log_entry.content.value == "Hello world!"
-            assert log_entry.catalog_version == catalog.version
+            assert log_entry.catalog_version.identifier == catalog.version.identifier
             assert log_entry.annotations == {"my_annotation": "my annotation"}
 
         # Test nested span logging (level 1).
@@ -80,7 +80,7 @@ def test_local_auditor_positive_1(
             assert log_entry.content.kind == "key-value"
             assert log_entry.content.key == "key"
             assert log_entry.content.value["text"] == "Hello world again!"
-            assert log_entry.catalog_version == catalog.version
+            assert log_entry.catalog_version.identifier == catalog.version.identifier
             assert log_entry.annotations == {
                 "my_annotation": "my new annotation",
                 "another_new_annotation": "another new annotation",
@@ -101,7 +101,7 @@ def test_local_auditor_positive_1(
             assert log_entry.span.name == ["my project", "my agent", "my task"]
             assert log_entry.content.kind == "user"
             assert log_entry.content.value == "Hello world once more!"
-            assert log_entry.catalog_version == catalog.version
+            assert log_entry.catalog_version.identifier == catalog.version.identifier
             assert log_entry.annotations == {
                 "my_annotation": "my newer annotation",
                 "another_new_annotation": "2",
@@ -140,12 +140,12 @@ def test_local_auditor_positive_2(
             assert log_entry.span.name == ["my project"]
             assert log_entry.content.kind == "begin"
             assert log_entry.content.state == dict(messages=[])
-            assert log_entry.catalog_version == catalog.version
+            assert log_entry.catalog_version.identifier == catalog.version.identifier
             log_entry = Log.model_validate_json(fp.readline())
             assert log_entry.span.name == ["my project"]
             assert log_entry.content.kind == "end"
             assert log_entry.content.state == dict(messages=["Hello world!"])
-            assert log_entry.catalog_version == catalog.version
+            assert log_entry.catalog_version.identifier == catalog.version.identifier
 
 
 @pytest.mark.smoke

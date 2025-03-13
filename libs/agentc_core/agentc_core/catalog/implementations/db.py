@@ -40,7 +40,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
     kind: typing.Literal["tool", "prompt"]
 
     @pydantic.model_validator(mode="after")
-    def cluster_should_be_reachable(self) -> "CatalogDB":
+    def _cluster_should_be_reachable(self) -> "CatalogDB":
         collection = DEFAULT_CATALOG_TOOL_COLLECTION if self.kind == "tool" else DEFAULT_CATALOG_PROMPT_COLLECTION
         try:
             self.cluster.query(

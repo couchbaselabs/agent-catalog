@@ -23,7 +23,7 @@ class BaseLogger(abc.ABC):
         log_id: str = None,
         timestamp: datetime.datetime = None,
         **kwargs,
-    ):
+    ) -> Log:
         # If the timestamp is not given, generate this value ourselves.
         if timestamp is None:
             timestamp = datetime.datetime.now().astimezone()

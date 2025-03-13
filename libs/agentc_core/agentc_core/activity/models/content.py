@@ -136,8 +136,8 @@ class BaseContent(pydantic.BaseModel):
         return _safe_serialize_impl(obj)
 
     @pydantic.field_serializer("extra", when_used="json")
-    def serialize_extra(self, extra: dict, _info):
-        return self._safe_serialize(extra)
+    def _serialize_extra_if_non_empty(self, extra: dict, _info):
+        return self._safe_serialize(extra) if len(extra) > 0 else None
 
 
 class SystemContent(BaseContent):
@@ -167,7 +167,7 @@ class ToolCallContent(BaseContent):
     status: typing.Optional[typing.Literal["success", "error"]] = "success"
 
     @pydantic.field_serializer("tool_args", when_used="json")
-    def serialize_tool_args(self, tool_args: dict[str, typing.Any], _info):
+    def _serialize_tool_args(self, tool_args: dict[str, typing.Any], _info):
         return self._safe_serialize(tool_args)
 
 
@@ -190,7 +190,7 @@ class ToolResultContent(BaseContent):
     )
 
     @pydantic.field_serializer("tool_result", when_used="json")
-    def serialize_tool_result(self, tool_result: typing.Any, _info):
+    def _serialize_tool_result(self, tool_result: typing.Any, _info):
         return self._safe_serialize(tool_result)
 
 
@@ -205,8 +205,8 @@ class ChatCompletionContent(BaseContent):
     )
 
     @pydantic.field_serializer("meta", when_used="json")
-    def serialize_meta(self, meta: dict, _info):
-        return self._safe_serialize(meta)
+    def _serialize_meta_if_non_empty(self, meta: dict, _info):
+        return self._safe_serialize(meta) if len(meta) > 0 else None
 
 
 class RequestHeaderContent(BaseContent):
@@ -235,8 +235,8 @@ class RequestHeaderContent(BaseContent):
     )
 
     @pydantic.field_serializer("meta", when_used="json")
-    def serialize_meta(self, meta: dict, _info):
-        return self._safe_serialize(meta)
+    def _serialize_meta_if_non_empty(self, meta: dict, _info):
+        return self._safe_serialize(meta) if len(meta) > 0 else None
 
 
 class UserContent(BaseContent):
@@ -279,7 +279,7 @@ class KeyValueContent(BaseContent):
     )
 
     @pydantic.field_serializer("value", when_used="json")
-    def serialize_value(self, value: typing.Any, _info):
+    def _serialize_value(self, value: typing.Any, _info):
         return self._safe_serialize(value)
 
 
