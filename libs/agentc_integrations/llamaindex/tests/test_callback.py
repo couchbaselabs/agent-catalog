@@ -14,6 +14,7 @@ from agentc_llamaindex.chat import Callback
 from agentc_testing.catalog import Environment
 from agentc_testing.catalog import EnvironmentKind
 from agentc_testing.catalog import environment_factory
+from agentc_testing.directory import temporary_directory
 from agentc_testing.server import connection_factory
 from agentc_testing.server import isolated_server_factory
 
@@ -21,17 +22,18 @@ from agentc_testing.server import isolated_server_factory
 _ = isolated_server_factory
 _ = connection_factory
 _ = environment_factory
+_ = temporary_directory
 
 
 @pytest.mark.slow
 def test_complete(
-    tmp_path: typing.Generator[pathlib.Path, None, None],
+    temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
 ):
     runner = click.testing.CliRunner()
-    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+    with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
         environment_factory(
             directory=pathlib.Path(td),
@@ -64,10 +66,11 @@ def test_complete(
 # We test remote logging in the test above, so we'll stick to local log testing from here out.
 @pytest.mark.smoke
 def test_chat(
-    tmp_path: typing.Generator[pathlib.Path, None, None], environment_factory: typing.Callable[..., Environment]
+    temporary_directory: typing.Generator[pathlib.Path, None, None],
+    environment_factory: typing.Callable[..., Environment],
 ):
     runner = click.testing.CliRunner()
-    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+    with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,

@@ -13,20 +13,22 @@ from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
 from agentc_testing.catalog import Environment
 from agentc_testing.catalog import EnvironmentKind
 from agentc_testing.catalog import environment_factory
+from agentc_testing.directory import temporary_directory
 from agentc_testing.server import isolated_server_factory
 
 # This is to keep ruff from falsely flagging this as unused.
 _ = isolated_server_factory
 _ = environment_factory
+_ = temporary_directory
 
 
 @pytest.mark.smoke
 def test_local_tool_provider(
-    tmp_path: typing.Generator[pathlib.Path, None, None],
+    temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
     runner = click.testing.CliRunner()
-    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+    with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_TOOLS_TRAVEL,
@@ -41,11 +43,11 @@ def test_local_tool_provider(
 
 @pytest.mark.smoke
 def test_local_inputs_provider(
-    tmp_path: typing.Generator[pathlib.Path, None, None],
+    temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
     runner = click.testing.CliRunner()
-    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+    with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_PROMPTS_TRAVEL,
@@ -60,11 +62,11 @@ def test_local_inputs_provider(
 
 @pytest.mark.smoke
 def test_local_provider(
-    tmp_path: typing.Generator[pathlib.Path, None, None],
+    temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
     runner = click.testing.CliRunner()
-    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+    with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
@@ -82,12 +84,12 @@ def test_local_provider(
 
 @pytest.mark.slow
 def test_db_tool_provider(
-    tmp_path: typing.Generator[pathlib.Path, None, None],
+    temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
 ):
     runner = click.testing.CliRunner()
-    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+    with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
         environment_factory(
             directory=pathlib.Path(td),
@@ -105,7 +107,7 @@ def test_db_tool_provider(
 @pytest.mark.skip
 @pytest.mark.slow
 def test_db_inputs_provider(
-    tmp_path: typing.Generator[pathlib.Path, None, None],
+    temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
 ):
@@ -116,7 +118,7 @@ def test_db_inputs_provider(
 @pytest.mark.skip
 @pytest.mark.slow
 def test_chain_tool_provider(
-    tmp_path: typing.Generator[pathlib.Path, None, None],
+    temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
 ):
@@ -127,7 +129,7 @@ def test_chain_tool_provider(
 @pytest.mark.skip
 @pytest.mark.slow
 def test_chain_inputs_provider(
-    tmp_path: typing.Generator[pathlib.Path, None, None],
+    temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
 ):

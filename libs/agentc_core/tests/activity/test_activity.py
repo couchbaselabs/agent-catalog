@@ -17,6 +17,7 @@ from agentc_core.defaults import DEFAULT_ACTIVITY_FILE
 from agentc_testing.catalog import Environment
 from agentc_testing.catalog import EnvironmentKind
 from agentc_testing.catalog import environment_factory
+from agentc_testing.directory import temporary_directory
 from agentc_testing.server import connection_factory
 from agentc_testing.server import isolated_server_factory
 
@@ -24,15 +25,16 @@ from agentc_testing.server import isolated_server_factory
 _ = isolated_server_factory
 _ = environment_factory
 _ = connection_factory
+_ = temporary_directory
 
 
 @pytest.mark.smoke
 def test_local_auditor_positive_1(
-    tmp_path: typing.Generator[pathlib.Path, None, None],
+    temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
     runner = click.testing.CliRunner()
-    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+    with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
@@ -109,10 +111,11 @@ def test_local_auditor_positive_1(
 
 @pytest.mark.smoke
 def test_local_auditor_positive_2(
-    tmp_path: typing.Generator[pathlib.Path, None, None], environment_factory: typing.Callable[..., Environment]
+    temporary_directory: typing.Generator[pathlib.Path, None, None],
+    environment_factory: typing.Callable[..., Environment],
 ):
     runner = click.testing.CliRunner()
-    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+    with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
@@ -147,10 +150,11 @@ def test_local_auditor_positive_2(
 
 @pytest.mark.smoke
 def test_local_auditor_positive_3(
-    tmp_path: typing.Generator[pathlib.Path, None, None], environment_factory: typing.Callable[..., Environment]
+    temporary_directory: typing.Generator[pathlib.Path, None, None],
+    environment_factory: typing.Callable[..., Environment],
 ):
     runner = click.testing.CliRunner()
-    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+    with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
@@ -177,7 +181,7 @@ def test_local_auditor_positive_3(
 @pytest.mark.skip
 @pytest.mark.slow
 def test_db_auditor(
-    tmp_path: typing.Generator[pathlib.Path, None, None],
+    temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
@@ -189,7 +193,7 @@ def test_db_auditor(
 @pytest.mark.skip
 @pytest.mark.slow
 def test_chain_auditor(
-    tmp_path: typing.Generator[pathlib.Path, None, None],
+    temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],

@@ -79,7 +79,7 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
     """ The maximum number of index partitions across all nodes for your cluster.
 
     This parameter is used by the Search service to build vector indexes on :command:`init`.
-    By default, this value is ``2 * number of FTS nodes in your cluster``.
+    By default, this value is :math:`2 \times \text{number of FTS nodes in your cluster}`.
     More information on index partitioning can be found
     `here <https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index-partitioning.html>`_.
     """
@@ -205,14 +205,15 @@ class LocalCatalogConfig(pydantic_settings.BaseSettings):
 
     If specified, we expect the ``.agent-catalog`` and ``.agent-activity`` folders to exist under this directory.
     If not specified, the project path is the parent folder of the working Git repository root.
-    A typical project structure is as follows:
-    MY_PROJECT
-    |- .agent-catalog
-    |- .agent-activity
-    |- .git
+    A typical project structure is as follows::
 
-    To directly specify the catalog or activity paths, specify values for the $AGENT_CATALOG_CATALOG_PATH and/or
-    $AGENT_CATALOG_ACTIVITY_PATH fields.
+        MY_PROJECT
+        |- .agent-catalog
+        |- .agent-activity
+        |- .git
+
+    To directly specify the catalog or activity paths, specify values for the ``$AGENT_CATALOG_CATALOG_PATH`` and/or
+    ``$AGENT_CATALOG_ACTIVITY_PATH`` fields.
     """
 
     catalog_path: typing.Optional[pathlib.Path] = None

@@ -11,6 +11,7 @@ from agentc_langchain.chat import Callback
 from agentc_langchain.chat import audit
 from agentc_testing.catalog import EnvironmentKind
 from agentc_testing.catalog import environment_factory
+from agentc_testing.directory import temporary_directory
 from agentc_testing.server import connection_factory
 from agentc_testing.server import isolated_server_factory
 
@@ -18,12 +19,13 @@ from agentc_testing.server import isolated_server_factory
 _ = isolated_server_factory
 _ = connection_factory
 _ = environment_factory
+_ = temporary_directory
 
 
 @pytest.mark.slow
-def test_audit(tmp_path, environment_factory, isolated_server_factory, connection_factory):
+def test_audit(temporary_directory, environment_factory, isolated_server_factory, connection_factory):
     runner = click.testing.CliRunner()
-    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+    with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
         environment_factory(
             directory=pathlib.Path(td),
@@ -53,9 +55,9 @@ def test_audit(tmp_path, environment_factory, isolated_server_factory, connectio
 
 
 @pytest.mark.slow
-def test_callback(tmp_path, environment_factory, isolated_server_factory, connection_factory):
+def test_callback(temporary_directory, environment_factory, isolated_server_factory, connection_factory):
     runner = click.testing.CliRunner()
-    with runner.isolated_filesystem(temp_dir=tmp_path) as td:
+    with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
         environment_factory(
             directory=pathlib.Path(td),

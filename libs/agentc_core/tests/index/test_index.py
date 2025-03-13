@@ -11,11 +11,15 @@ from agentc_core.catalog.index import index_catalog
 from agentc_core.learned.embedding import EmbeddingModel
 from agentc_core.record.descriptor import RecordKind
 from agentc_core.version import VersionDescriptor
+from agentc_testing.directory import temporary_directory
+
+# This is to keep ruff from falsely flagging this as unused.
+_ = temporary_directory
 
 
 @pytest.mark.smoke
-def test_index_tools(tmp_path: typing.Generator[pathlib.Path, None, None]):
-    project_dir = pathlib.Path(tmp_path)
+def test_index_tools(temporary_directory: typing.Generator[pathlib.Path, None, None]):
+    project_dir = pathlib.Path(temporary_directory)
     project_dir.mkdir(exist_ok=True)
 
     # Copy files from resources/{tools|prompts} to our temporary directory.
@@ -28,7 +32,7 @@ def test_index_tools(tmp_path: typing.Generator[pathlib.Path, None, None]):
     )
 
     # Index our catalog.
-    os.chdir(tmp_path)
+    os.chdir(temporary_directory)
     catalog_version = VersionDescriptor(
         timestamp=datetime.datetime.now(tz=datetime.timezone.utc), identifier="SOME_CATALOG_VERSION"
     )
@@ -50,8 +54,8 @@ def test_index_tools(tmp_path: typing.Generator[pathlib.Path, None, None]):
 
 
 @pytest.mark.smoke
-def test_index_prompts(tmp_path: typing.Generator[pathlib.Path, None, None]):
-    project_dir = pathlib.Path(tmp_path)
+def test_index_prompts(temporary_directory: typing.Generator[pathlib.Path, None, None]):
+    project_dir = pathlib.Path(temporary_directory)
     project_dir.mkdir(exist_ok=True)
 
     # Copy files from resources/{tools|prompts} to our temporary directory.
@@ -64,7 +68,7 @@ def test_index_prompts(tmp_path: typing.Generator[pathlib.Path, None, None]):
     )
 
     # Index our catalog.
-    os.chdir(tmp_path)
+    os.chdir(temporary_directory)
     catalog_version = VersionDescriptor(
         timestamp=datetime.datetime.now(tz=datetime.timezone.utc), identifier="SOME_CATALOG_VERSION"
     )
