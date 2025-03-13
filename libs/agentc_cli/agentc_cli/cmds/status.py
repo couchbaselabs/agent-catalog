@@ -25,7 +25,6 @@ from agentc_core.defaults import DEFAULT_CATALOG_TOOL_COLLECTION
 from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
-from agentc_core.learned.embedding import EmbeddingModel
 from agentc_core.remote.util.query import execute_query
 from agentc_core.version import VersionDescriptor
 from couchbase.exceptions import KeyspaceNotFoundException
@@ -272,11 +271,7 @@ def get_local_status(cfg: Config, kind: typing.Literal["tool", "prompt"], includ
                 # Start a CatalogMem on-the-fly that incorporates the dirty
                 # source file items which we'll use instead of the local catalog file.
                 errs, catalog, uninitialized_items = index_catalog_start(
-                    EmbeddingModel(
-                        embedding_model_name=cfg.embedding_model_name,
-                        embedding_model_auth=cfg.embedding_model_auth,
-                        embedding_model_url=cfg.embedding_model_url,
-                    ),
+                    cfg.EmbeddingModel(),
                     MetaVersion(
                         schema_version=catalog_desc.schema_version, library_version=catalog_desc.library_version
                     ),

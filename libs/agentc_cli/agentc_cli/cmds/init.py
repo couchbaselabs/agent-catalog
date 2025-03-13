@@ -17,7 +17,6 @@ from agentc_core.config import Config
 from agentc_core.defaults import DEFAULT_ACTIVITY_LOG_COLLECTION
 from agentc_core.defaults import DEFAULT_ACTIVITY_SCOPE
 from agentc_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
-from agentc_core.learned.embedding import EmbeddingModel
 from agentc_core.remote.init import init_catalog_collection
 from agentc_core.remote.init import init_metadata_collection
 from agentc_core.remote.util.ddl import create_scope_and_collection
@@ -90,13 +89,7 @@ def init_db_catalog(cfg: Config, cluster: couchbase.cluster.Cluster):
     logger.debug("Using bucket: %s", cfg.bucket)
 
     init_metadata_collection(collection_manager, cfg, click.secho)
-    embedding_model = EmbeddingModel(
-        embedding_model_name=cfg.embedding_model_name,
-        embedding_model_url=cfg.embedding_model_url,
-        embedding_model_auth=cfg.embedding_model_auth,
-        sentence_transformers_model_cache=cfg.sentence_transformers_model_cache,
-    )
-    dims = len(embedding_model.encode("test"))
+    dims = len(cfg.EmbeddingModel("NAME").encode("test"))
     for kind in CATALOG_KINDS:
         init_catalog_collection(collection_manager, cfg, kind, dims, click.secho)
 

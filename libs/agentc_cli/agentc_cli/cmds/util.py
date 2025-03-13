@@ -22,7 +22,6 @@ from agentc_core.defaults import DEFAULT_MAX_ERRS
 from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
-from agentc_core.learned.embedding import EmbeddingModel
 from agentc_core.version import VersionDescriptor
 
 logger = logging.getLogger(__name__)
@@ -133,15 +132,7 @@ def get_catalog(
         raise ValueError("Must provide a bucket and cluster to search the DB catalog.")
     if cfg.bucket is not None and cluster is not None:
         try:
-            embedding_model = EmbeddingModel(
-                catalog_path=cfg.CatalogPath(),
-                cb_bucket=cfg.bucket,
-                cb_cluster=cluster,
-                embedding_model_name=cfg.embedding_model_name,
-                embedding_model_url=cfg.embedding_model_url,
-                embedding_model_auth=cfg.embedding_model_auth,
-                sentence_transformers_model_cache=cfg.sentence_transformers_model_cache,
-            )
+            embedding_model = cfg.EmbeddingModel("NAME", "LOCAL", "DB")
             db_catalog = CatalogDB(cluster=cluster, bucket=cfg.bucket, kind=kind, embedding_model=embedding_model)
         except pydantic.ValidationError as e:
             if force == "db":
@@ -153,13 +144,7 @@ def get_catalog(
     if force == "local" and not catalog_file.exists():
         raise ValueError(f"Could not find local catalog at {catalog_file}.")
     if catalog_file.exists():
-        embedding_model = EmbeddingModel(
-            catalog_path=cfg.CatalogPath(),
-            embedding_model_name=cfg.embedding_model_name,
-            embedding_model_url=cfg.embedding_model_url,
-            embedding_model_auth=cfg.embedding_model_auth,
-            sentence_transformers_model_cache=cfg.sentence_transformers_model_cache,
-        )
+        embedding_model = cfg.EmbeddingModel("NAME", "LOCAL")
         local_catalog = CatalogMem(catalog_file=catalog_file, embedding_model=embedding_model)
 
         if include_dirty and repo and repo.is_dirty():

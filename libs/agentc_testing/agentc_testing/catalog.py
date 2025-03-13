@@ -218,7 +218,6 @@ def _build_environment(
 @pytest.fixture
 def environment_factory() -> typing.Callable[..., Environment]:
     repository_instance: list[git.Repo] = list()
-    directory_instance: list[pathlib.Path] = list()
     try:
         # We need to capture the environment we spawn.
         def get_environment(
@@ -232,7 +231,6 @@ def environment_factory() -> typing.Callable[..., Environment]:
         ) -> Environment:
             _repository = git.Repo.init(directory)
             repository_instance.append(_repository)
-            directory_instance.append(directory)
             return _build_environment(
                 directory=directory,
                 repo=_repository,
@@ -251,8 +249,6 @@ def environment_factory() -> typing.Callable[..., Environment]:
         # Clean up the environment.
         if repository_instance:
             repository_instance.pop().close()
-        if directory_instance:
-            shutil.rmtree(directory_instance.pop(), ignore_errors=True)
 
 
 if __name__ == "__main__":

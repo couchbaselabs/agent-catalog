@@ -19,14 +19,12 @@ from agentc_core.defaults import DEFAULT_CLUSTER_WAIT_UNTIL_READY_SECONDS
 from agentc_core.defaults import DEFAULT_EMBEDDING_MODEL_NAME
 from agentc_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
 from agentc_core.defaults import DEFAULT_VERBOSITY_LEVEL
+from agentc_core.learned.embedding import EmbeddingModel
 
 logger = logging.getLogger(__name__)
 
 # Constant to represent the latest snapshot version.
 LATEST_SNAPSHOT_VERSION = "__LATEST__"
-
-
-# TODO (GLENN): Add descriptions to each field.
 
 
 class RemoteCatalogConfig(pydantic_settings.BaseSettings):
@@ -73,14 +71,14 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
     max_index_partition: int = 1024
     """ The maximum number of index partitions across all nodes for your cluster.
 
-    This parameter is used by the Search service to build vector indexes on ``agentc init``.
+    This parameter is used by the Search service to build vector indexes on :command:`init`.
     By default, this value is 1024.
     """
 
     index_partition: typing.Optional[int] = None
     """ The maximum number of index partitions across all nodes for your cluster.
 
-    This parameter is used by the Search service to build vector indexes on ``agentc init``.
+    This parameter is used by the Search service to build vector indexes on :command:`init`.
     By default, this value is ``2 * number of FTS nodes in your cluster``.
     More information on index partitioning can be found
     `here <https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index-partitioning.html>`_.
@@ -199,48 +197,40 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
         return cluster
 
 
-class EmbeddingModelConfig(pydantic_settings.BaseSettings):
-    model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_", extra="ignore")
-
-    embedding_model_name: str = DEFAULT_EMBEDDING_MODEL_NAME
-    """ The name of the embedding model that Agent Catalog will use when indexing and querying tools and prompts.
-
-    By default, the ``sentence-transformers/all-MiniLM-L12-v2`` model is used.
-    """
-
-    embedding_model_url: typing.Optional[str] = None
-    """ The base URL of an OpenAI-client-compatible endpoint.
-
-    This field is optional, but if specified we will assume that the model specified by ``embedding_model_name`` is
-    accessible by this endpoint.
-    """
-
-    embedding_model_auth: typing.Optional[str] = None
-    """ The authentication token for the endpoint specified by ``embedding_model_url``.
-
-    For endpoints hosted by OpenAI, this is the API key.
-    For endpoints hosted on Capella, this is your JWT.
-    """
-
-    sentence_transformers_model_cache: typing.Optional[str] = DEFAULT_MODEL_CACHE_FOLDER
-    """ The path to the folder where sentence-transformer embedding models will be cached.
-
-    By default, this is ``.model-cache``.
-    For OpenAI embedding models, this field is ignored.
-    """
-
-
 class LocalCatalogConfig(pydantic_settings.BaseSettings):
     model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_", extra="ignore")
 
     project_path: typing.Optional[pathlib.Path] = None
+    """ Location of the project root.
+
+    If specified, we expect the ``.agent-catalog`` and ``.agent-activity`` folders to exist under this directory.
+    If not specified, the project path is the parent folder of the working Git repository root.
+    A typical project structure is as follows:
+    MY_PROJECT
+    |- .agent-catalog
+    |- .agent-activity
+    |- .git
+
+    To directly specify the catalog or activity paths, specify values for the $AGENT_CATALOG_CATALOG_PATH and/or
+    $AGENT_CATALOG_ACTIVITY_PATH fields.
+    """
+
     catalog_path: typing.Optional[pathlib.Path] = None
+    """ Location of the catalog folder.
+
+    By default, this value is ``$AGENT_CATALOG_PROJECT_PATH/.agent-catalog``.
+    """
+
     activity_path: typing.Optional[pathlib.Path] = None
+    """ Location of the activity folder.
+
+    By default, this value is ``$AGENT_CATALOG_ACTIVITY_PATH/.agent-activity``.
+    """
 
     codegen_output: typing.Optional[pathlib.Path | tempfile.TemporaryDirectory | os.PathLike] = None
     """ Location to save generated Python stubs to, if desired.
 
-    On :py:meth:`_get_tools_for`, tools are dynamically generated and served as annotated Python callables.
+    On :py:meth:`find_tools`, tools are dynamically generated and served as annotated Python callables.
     By default, this code is never written to disk.
     If this field is specified, we will write all generated files to the given output directory and serve the generated
     Python callables from these files with a "standard import".
@@ -331,11 +321,87 @@ class LocalCatalogConfig(pydantic_settings.BaseSettings):
         return self.activity_path
 
 
+class EmbeddingModelConfig(LocalCatalogConfig, RemoteCatalogConfig):
+    model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_", extra="ignore")
+
+    embedding_model_name: str = DEFAULT_EMBEDDING_MODEL_NAME
+    """ The name of the embedding model that Agent Catalog will use when indexing and querying tools and prompts.
+
+    By default, the ``sentence-transformers/all-MiniLM-L12-v2`` model is used.
+    """
+
+    embedding_model_url: typing.Optional[str] = None
+    """ The base URL of an OpenAI-client-compatible endpoint.
+
+    This field is optional, but if specified we will assume that the model specified by ``embedding_model_name`` is
+    accessible by this endpoint.
+    """
+
+    embedding_model_auth: typing.Optional[str] = None
+    """ The authentication token for the endpoint specified by ``embedding_model_url``.
+
+    For endpoints hosted by OpenAI, this is the API key.
+    For endpoints hosted on Capella, this is your JWT.
+    """
+
+    sentence_transformers_model_cache: typing.Optional[str] = DEFAULT_MODEL_CACHE_FOLDER
+    """ The path to the folder where sentence-transformer embedding models will be cached.
+
+    By default, this is ``$AGENT_CATALOG_PROJECT_PATH/.model-cache``.
+    For OpenAI embedding models, this field is ignored.
+    """
+
+    sentence_transformers_retry_attempts: typing.Optional[int] = 3
+    """ The number of times to retry fetching a sentence-transformers model.
+
+    On the first attempt, we will always try to fetch the model from the cache.
+    For all subsequent attempts, we will try to fetch the model from HuggingFace.
+    If this field is set to 1, we will error out if the model is not found in the cache.
+    By default, this value is 3.
+    """
+
+    def EmbeddingModel(self, *load_from: typing.Literal["NAME", "LOCAL", "DB"]) -> EmbeddingModel:
+        if len(load_from) == 0:
+            load_from = (
+                "NAME",
+                "LOCAL",
+            )
+        params = {
+            "sentence_transformers_model_cache": self.sentence_transformers_model_cache,
+            "sentence_transformers_retry_attempts": self.sentence_transformers_retry_attempts,
+        }
+        for source in set(load_from):
+            match source.upper():
+                case "NAME":
+                    params["embedding_model_name"] = self.embedding_model_name
+                    params["embedding_model_url"] = self.embedding_model_url
+                    params["embedding_model_auth"] = self.embedding_model_auth
+                case "LOCAL":
+                    params["catalog_path"] = self.CatalogPath()
+                case "DB":
+                    params["cb_bucket"] = self.bucket
+                    params["cb_cluster"] = self.Cluster()
+                    params["catalog_path"] = self.CatalogPath()
+        return EmbeddingModel(**params)
+
+
 class CommandLineConfig(pydantic_settings.BaseSettings):
     model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_", extra="ignore")
 
     verbosity_level: int = pydantic.Field(default=DEFAULT_VERBOSITY_LEVEL, ge=0, le=2)
+    """ Verbosity level of the :command:`agentc` command line tool.
+
+    By default, this value is 0.
+    If ``AGENT_CATALOG_DEBUG`` exists, this value is set to 2.
+    """
+
     with_interaction: bool = True
+    """ Whether to enable the interaction mode for the :command:`agentc` command line tool.
+
+    By default, this value is True.
+    Set this value to False to raise errors when the command line tool requires user input (e.g., when developing
+    scripts).
+    """
 
 
 class VersioningConfig(pydantic_settings.BaseSettings):
@@ -347,16 +413,21 @@ class VersioningConfig(pydantic_settings.BaseSettings):
     By default, we use the latest snapshot version if the repo is clean.
     This snapshot version is retrieved directly from Git (if the repo is clean).
     If the repo is dirty, we will fetch all tools and prompts from the local catalog (by default).
-    If snapshot is specified at search time (i.e., with :py:meth:`_get_tools_for` or :py:meth:`_get_prompt_for`), we
+    If snapshot is specified at search time (i.e., with :py:meth:`find_tools` or :py:meth:`find_prompts`), we
     will use that snapshot version instead.
     """
 
 
 # We'll take a mix-in approach here.
-class Config(LocalCatalogConfig, RemoteCatalogConfig, CommandLineConfig, VersioningConfig, EmbeddingModelConfig):
+class Config(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig, CommandLineConfig, VersioningConfig):
     model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_", extra="ignore")
 
     debug: bool = False
+    """ Whether or not to display debug messages from all Agent Catalog components.
+
+    By default, this value is False.
+    If ``AGENT_CATALOG_VERBOSITY_LEVEL`` is set to 2, this value is set to True.
+    """
 
     @pydantic.model_validator(mode="after")
     def _use_verbosity_level_for_debug(self) -> typing.Self:

@@ -19,7 +19,6 @@ from agentc_core.defaults import DEFAULT_MAX_ERRS
 from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
-from agentc_core.learned.embedding import EmbeddingModel
 from agentc_core.version import VersionDescriptor
 
 logger = logging.getLogger(__name__)
@@ -51,13 +50,7 @@ def cmd_index(
     # need to be provided the file blob streams from the repo instead of our current
     # approach of opening & reading file contents directly,
     repo, get_path_version = load_repository(pathlib.Path(os.getcwd()))
-    embedding_model = EmbeddingModel(
-        embedding_model_name=cfg.embedding_model_name,
-        embedding_model_url=cfg.embedding_model_url,
-        embedding_model_auth=cfg.embedding_model_auth,
-        sentence_transformers_model_cache=cfg.sentence_transformers_model_cache,
-        catalog_path=cfg.CatalogPath(),
-    )
+    embedding_model = cfg.EmbeddingModel()
 
     # The version for the repo's HEAD commit.
     try:

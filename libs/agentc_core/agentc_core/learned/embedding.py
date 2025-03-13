@@ -129,11 +129,7 @@ class EmbeddingModel(pydantic.BaseModel):
         self._embedding_model = None
         return self
 
-    @property
-    def name(self) -> str:
-        return self.embedding_model_name
-
-    def load(self) -> None:
+    def _load(self) -> None:
         if self.embedding_model_url is not None:
             import openai
 
@@ -180,9 +176,14 @@ class EmbeddingModel(pydantic.BaseModel):
 
                 self._embedding_model = _encode
 
+    @property
+    def name(self) -> str:
+        return self.embedding_model_name
+
+    # TODO (GLENN): Leverage batch encoding for performance here.
     def encode(self, text: str) -> list[float]:
         if self._embedding_model is None:
-            self.load()
+            self._load()
 
         # Normalize embeddings to unit length (only dot-product is computed with Couchbase, so...).
         return self._embedding_model(text)

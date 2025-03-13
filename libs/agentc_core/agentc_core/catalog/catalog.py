@@ -18,7 +18,6 @@ from agentc_core.config import LocalCatalogConfig
 from agentc_core.config import RemoteCatalogConfig
 from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
-from agentc_core.learned.embedding import EmbeddingModel
 from agentc_core.provider import ModelType
 from agentc_core.provider import PromptProvider
 from agentc_core.provider import PythonTarget
@@ -38,7 +37,7 @@ Prompt = PromptProvider.PromptResult
 Tool = ToolProvider.ToolResult
 
 
-class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
+class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
     """A provider of indexed "agent building blocks" (e.g., tools, prompts, etc...)."""
 
     model_config = pydantic.ConfigDict(extra="ignore")
@@ -116,13 +115,7 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
             return self
 
         # Note: we will defer embedding model mismatches to the remote catalog validator.
-        embedding_model = EmbeddingModel(
-            embedding_model_name=self.embedding_model_name,
-            embedding_model_auth=self.embedding_model_auth,
-            embedding_model_url=self.embedding_model_url,
-            sentence_transformers_model_cache=self.sentence_transformers_model_cache,
-            catalog_path=self.catalog_path,
-        )
+        embedding_model = self.EmbeddingModel()
 
         # Set our local catalog if it exists.
         tool_catalog_file = self.catalog_path / DEFAULT_TOOL_CATALOG_FILE
@@ -152,24 +145,9 @@ class Catalog(RemoteCatalogConfig, LocalCatalogConfig, EmbeddingModelConfig):
 
         # Validate the embedding models of our tool and prompt catalogs.
         if self._local_tool_catalog is not None or self._local_prompt_catalog is not None:
-            embedding_model = EmbeddingModel(
-                cb_bucket=self.bucket,
-                cb_cluster=cluster,
-                catalog_path=self.CatalogPath(),
-                embedding_model_name=self.embedding_model_name,
-                embedding_model_auth=self.embedding_model_auth,
-                embedding_model_url=self.embedding_model_url,
-                sentence_transformers_model_cache=self.sentence_transformers_model_cache,
-            )
+            embedding_model = self.EmbeddingModel("NAME", "LOCAL", "DB")
         else:
-            embedding_model = EmbeddingModel(
-                cb_bucket=self.bucket,
-                cb_cluster=cluster,
-                embedding_model_name=self.embedding_model_name,
-                embedding_model_auth=self.embedding_model_auth,
-                embedding_model_url=self.embedding_model_url,
-                sentence_transformers_model_cache=self.sentence_transformers_model_cache,
-            )
+            embedding_model = self.EmbeddingModel("NAME", "DB")
 
         try:
             self._remote_tool_catalog = CatalogDB(
