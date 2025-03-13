@@ -42,13 +42,9 @@ class Log(pydantic.BaseModel):
     )
 
     annotations: typing.Optional[typing.Dict] = pydantic.Field(
-        description="Additional annotations that can be added to the message.", default_factory=dict
+        description="Additional annotations that can be added to the message.", default=None
     )
 
     catalog_version: VersionDescriptor = pydantic.Field(
         description="A unique identifier that defines a catalog version / snapshot / commit."
     )
-
-    @pydantic.field_serializer("annotations")
-    def _serialize_annotations_if_non_empty(self, annotations: dict, _info) -> dict | None:
-        return annotations if len(annotations) > 0 else None

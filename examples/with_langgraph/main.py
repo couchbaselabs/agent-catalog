@@ -1,7 +1,6 @@
 import agentc
 import dotenv
 import langgraph.graph
-import typing
 
 from edge import out_front_desk_edge
 from edge import out_route_finding_edge
@@ -56,7 +55,7 @@ class Graph:
         self.graph = workflow.compile(*args, **kwargs)
         # print(self.graph.get_graph().draw_mermaid())
 
-    def stream(self, *args, **kwargs) -> typing.Iterator[State]:
+    def stream(self, *args, **kwargs):
         state = State(messages=[], endpoints=None, routes=None, needs_clarification=False, is_last_step=False)
         self.span.state = state
         with self.span:

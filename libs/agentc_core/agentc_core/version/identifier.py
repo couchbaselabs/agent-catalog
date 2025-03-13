@@ -30,7 +30,7 @@ class VersionDescriptor(pydantic.BaseModel):
     )
     metadata: typing.Optional[dict[str, str]] = pydantic.Field(
         description="A set of system-defined annotations that are used to identify records.",
-        default_factory=dict,
+        default=None,
     )
 
     @pydantic.field_serializer("metadata")

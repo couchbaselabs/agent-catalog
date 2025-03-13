@@ -42,7 +42,7 @@ class Span(pydantic.BaseModel):
     iterable: typing.Optional[bool] = False
     """ Flag to indicate whether or not this span should be iterable. """
 
-    kwargs: typing.Optional[dict[str, typing.Any]] = pydantic.Field(default_factory=dict)
+    kwargs: typing.Optional[dict[str, typing.Any]] = None
     """ Annotations to apply to all messages logged within this span. """
 
     _logs: list[Log] = None
@@ -66,12 +66,17 @@ class Span(pydantic.BaseModel):
 
         return self
 
-    @pydantic.field_serializer("kwargs")
-    def _serialize_kwargs_if_non_empty(self, kwargs: dict, _info) -> dict | None:
-        return kwargs if len(kwargs) > 0 else None
-
     def new(self, name: str, state: typing.Any = None, iterable: bool = False, **kwargs) -> "Span":
-        new_kwargs = {**self.kwargs, **kwargs}
+        # **kwargs take precedence over self.kwargs.
+        if self.kwargs is not None and len(kwargs) > 0:
+            new_kwargs = {**self.kwargs, **kwargs}
+        elif self.kwargs is not None:
+            new_kwargs = self.kwargs
+        elif len(kwargs) > 0:
+            new_kwargs = kwargs
+        else:
+            new_kwargs = None
+
         return Span(
             logger=self.logger,
             name=name,
@@ -82,7 +87,7 @@ class Span(pydantic.BaseModel):
         )
 
     def log(self, content: Content, **kwargs):
-        new_kwargs = {**self.kwargs, **kwargs}
+        new_kwargs = {**self.kwargs, **kwargs} if self.kwargs is not None else kwargs
         identifier: Span.Identifier = self.identifier
         _log = self.logger(content=content, session_id=identifier.session, span_name=identifier.name, **new_kwargs)
         if self.iterable:

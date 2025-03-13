@@ -22,7 +22,7 @@ class ToolSearchMetadata(pydantic.BaseModel):
 
     @pydantic.field_validator("annotations")
     @classmethod
-    def annotations_must_be_valid_string(cls, v: str | None):
+    def _annotations_must_be_valid_string(cls, v: str | None):
         # We raise an error on instantiation here if v is not valid.
         if v is not None:
             AnnotationPredicate(v)
@@ -59,7 +59,7 @@ class PromptDescriptor(RecordDescriptor):
 
             @pydantic.field_validator("output")
             @classmethod
-            def value_should_be_valid_json_schema(cls, v: str | dict):
+            def _value_should_be_valid_json_schema(cls, v: str | dict):
                 if v is not None and isinstance(v, str):
                     v = cls.check_if_valid_json_schema_str(v)
                 elif v is not None and isinstance(v, dict):
@@ -70,14 +70,14 @@ class PromptDescriptor(RecordDescriptor):
 
             @pydantic.field_validator("name")
             @classmethod
-            def name_should_be_valid_identifier(cls, v: str):
+            def _name_should_be_valid_identifier(cls, v: str):
                 if not v.isidentifier():
                     raise ValueError(f"name {v} is not a valid identifier!")
                 return v
 
             @pydantic.field_validator("content")
             @classmethod
-            def content_must_only_contain_strings(cls, v: str | dict):
+            def _content_must_only_contain_strings(cls, v: str | dict):
                 if isinstance(v, dict):
 
                     def traverse_dict(working_dict: dict):
@@ -86,8 +86,16 @@ class PromptDescriptor(RecordDescriptor):
                                 return traverse_dict(_v)
                             elif isinstance(_v, str):
                                 return
+                            elif isinstance(_v, list):
+                                for _item in _v:
+                                    if isinstance(_item, dict):
+                                        return traverse_dict(_item)
+                                    elif isinstance(_item, str):
+                                        return
+                                    else:
+                                        raise ValueError("Content must only contain objects, lists, and string values.")
                             else:
-                                raise ValueError("Content must only contain objects and string values.")
+                                raise ValueError("Content must only contain objects, lists, and string values.")
 
                     traverse_dict(v)
                 return v

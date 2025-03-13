@@ -102,7 +102,7 @@ class BaseContent(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(frozen=True, use_enum_values=True)
 
     extra: typing.Optional[dict] = pydantic.Field(
-        description="Additional data that is associated with the content. This field is optional.", default_factory=dict
+        description="Additional data that is associated with the content. This field is optional.", default=None
     )
 
     @staticmethod
@@ -136,8 +136,8 @@ class BaseContent(pydantic.BaseModel):
         return _safe_serialize_impl(obj)
 
     @pydantic.field_serializer("extra", when_used="json")
-    def _serialize_extra_if_non_empty(self, extra: dict, _info):
-        return self._safe_serialize(extra) if len(extra) > 0 else None
+    def _serialize_extra(self, extra: dict, _info):
+        return self._safe_serialize(extra)
 
 
 class SystemContent(BaseContent):
@@ -201,11 +201,11 @@ class ChatCompletionContent(BaseContent):
 
     meta: typing.Optional[dict] = pydantic.Field(
         description="The raw response associated with the chat completion. This must be JSON-serializable.",
-        default_factory=dict,
+        default=None,
     )
 
     @pydantic.field_serializer("meta", when_used="json")
-    def _serialize_meta_if_non_empty(self, meta: dict, _info):
+    def _serialize_meta(self, meta: dict, _info):
         return self._safe_serialize(meta) if len(meta) > 0 else None
 
 
@@ -226,16 +226,16 @@ class RequestHeaderContent(BaseContent):
 
     output: typing.Optional[dict] = pydantic.Field(
         description="The output type of the model (in JSON schema) response. This field is optional.",
-        default_factory=dict,
+        default=None,
     )
 
     meta: typing.Optional[dict] = pydantic.Field(
         description="All request parameters associated with the model input. This must be JSON-serializable.",
-        default_factory=dict,
+        default=None,
     )
 
     @pydantic.field_serializer("meta", when_used="json")
-    def _serialize_meta_if_non_empty(self, meta: dict, _info):
+    def _serialize_meta(self, meta: dict, _info):
         return self._safe_serialize(meta) if len(meta) > 0 else None
 
 

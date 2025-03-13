@@ -167,7 +167,7 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
 
     @pydantic.field_validator("record_descriptors")
     @classmethod
-    def record_descriptors_must_share_the_same_source(cls, v: list[RecordDescriptor]):
+    def _record_descriptors_must_share_the_same_source(cls, v: list[RecordDescriptor]):
         if any(td.source != v[0].source for td in v):
             raise ValueError("Grouped HTTP-Request descriptors must share the same source!")
         return v

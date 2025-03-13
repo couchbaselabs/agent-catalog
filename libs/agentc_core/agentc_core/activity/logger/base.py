@@ -28,20 +28,29 @@ class BaseLogger(abc.ABC):
         if timestamp is None:
             timestamp = datetime.datetime.now().astimezone()
 
+        # Note: The accept call annotations take precedence over init-time annotations.
+        if len(self.annotations) > 0 and len(kwargs) > 0:
+            annotations = {**self.annotations, **kwargs}
+        elif len(self.annotations) > 0:
+            annotations = self.annotations
+        elif len(kwargs) > 0:
+            annotations = kwargs
+        else:
+            annotations = None
+
         message = Log(
             identifier=log_id or uuid.uuid4().hex,
             timestamp=timestamp.isoformat(),
             span=Log.Span(name=span_name, session=session_id),
             content=content,
             catalog_version=self.catalog_version,
-            # Note: The accept call annotations take precedence over init-time annotations.
-            annotations={**self.annotations, **kwargs},
+            annotations=annotations,
         )
         self._accept(message, message.model_dump(exclude_none=True, mode="json"))
 
         # For debug, we'll pretty-print what we log.
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f"Logging message: {message.model_dump_json(indent=2)}")
+            logger.debug(f"Logging message: {message.model_dump_json(indent=2, exclude_none=True)}")
 
         return message
 

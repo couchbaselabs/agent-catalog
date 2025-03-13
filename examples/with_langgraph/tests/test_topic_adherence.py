@@ -3,6 +3,7 @@ import json
 import langchain_openai
 import pathlib
 import ragas.dataset_schema
+import ragas.llms
 import ragas.messages
 import ragas.metrics
 
@@ -16,18 +17,16 @@ catalog: agentc.Catalog = agentc.Catalog()
 root_span: agentc.Span = catalog.Span(name=pathlib.Path(__file__).stem)
 
 # For these tests, we will use OpenAI's GPT-4o model to evaluate the topic adherence of our agents.
-evaluator_llm = langchain_openai.chat_models.ChatOpenAI(name="gpt-4o", temperature=0)
+evaluator_llm = ragas.llms.LangchainLLMWrapper(langchain_openai.chat_models.ChatOpenAI(name="gpt-4o", temperature=0))
 scorer = ragas.metrics.TopicAdherenceScore(llm=evaluator_llm, mode="precision")
 
 
 def test_irrelevant_greetings(monkeypatch):
     with (pathlib.Path("tests") / "resources" / "irrelevant.jsonl").open() as fp:
         for i, line in enumerate(fp):
-            token = list()
 
             def _test_input(_):
-                token.append(1)  # noqa: B023
-                return json.loads(line)["input"] if len(token) == 1 else "\n"  # noqa: B023
+                return json.loads(line)["input"]  # noqa: B023
 
             # To mock user input, we will use Pytest's monkeypatch fixture to return the input from our JSONL file.
             monkeypatch.setattr("builtins.input", _test_input)
@@ -35,10 +34,12 @@ def test_irrelevant_greetings(monkeypatch):
             # To identify individual tests, we will use their line number + add their content as an annotation.
             with root_span.new(f"Test_{i}", iterable=True, test_input=line) as test_span:
                 graph: Graph = Graph(catalog=catalog, span=test_span)
-                for _ in graph.stream(stream_mode="updates"):
-                    # Run our app until the first input is received.
-                    if len(token) == 2:
-                        break
+                for event in graph.stream(stream_mode="updates"):
+                    if "front_desk_agent" in event:
+                        # Run our app until the first response is given.
+                        state = event["front_desk_agent"]
+                        if len(state["messages"]) > 0 and any(m.type == "ai" for m in state["messages"]):
+                            break
 
                 # Convert the content we logged into Ragas-friendly list.
                 ragas_input: list[ragas.messages.Message] = list()
@@ -58,5 +59,4 @@ def test_irrelevant_greetings(monkeypatch):
                 # To record the results of this run, we will log the topic adherence score using our test_span.
                 score = scorer.multi_turn_score(sample)
                 test_span["topic_adherence"] = score
-                print(score)
                 break

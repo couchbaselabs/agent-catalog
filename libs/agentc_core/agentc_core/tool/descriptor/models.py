@@ -117,7 +117,7 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
 
             @pydantic.field_validator("input", "output")
             @classmethod
-            def value_should_be_valid_json_schema(cls, v: str | dict):
+            def _value_should_be_valid_json_schema(cls, v: str | dict):
                 if v is not None and isinstance(v, str):
                     v = cls.check_if_valid_json_schema_str(v)
                 elif v is not None and isinstance(v, dict):
@@ -128,7 +128,7 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
 
             @pydantic.field_validator("name")
             @classmethod
-            def name_should_be_valid_identifier(cls, v: str):
+            def _name_should_be_valid_identifier(cls, v: str):
                 if not v.isidentifier():
                     raise ValueError(f"name {v} is not a valid identifier!")
                 return v
@@ -195,7 +195,7 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
 
             @pydantic.field_validator("input")
             @classmethod
-            def value_should_be_valid_json_schema(cls, v: str | dict):
+            def _value_should_be_valid_json_schema(cls, v: str | dict):
                 if v is not None and isinstance(v, str):
                     v = cls.check_if_valid_json_schema_str(v)
                 elif v is not None and isinstance(v, dict):
@@ -206,14 +206,14 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
 
             @pydantic.field_validator("input")
             @classmethod
-            def value_should_be_non_empty(cls, v: dict):
+            def _value_should_be_non_empty(cls, v: dict):
                 if len(v) == 0:
                     raise ValueError("SemanticSearch cannot have an empty input!")
                 return v
 
             @pydantic.field_validator("name")
             @classmethod
-            def name_should_be_valid_identifier(cls, v: str):
+            def _name_should_be_valid_identifier(cls, v: str):
                 if not v.isidentifier():
                     raise ValueError(f"name {v} is not a valid identifier!")
                 return v

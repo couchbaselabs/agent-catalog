@@ -53,9 +53,10 @@ class BaseAgent:
         if isinstance(self.prompt.content["agent_instructions"], str):
             prompt_content = langchain_core.messages.SystemMessage(content=self.prompt.content["agent_instructions"])
         elif isinstance(self.prompt.content["agent_instructions"], list):
-            prompt_content: list[langchain_core.messages.BaseMessage] = list()
+            prompt_parts: list[langchain_core.messages.BaseMessage] = list()
             for part in self.prompt.content["agent_instructions"]:
-                prompt_content.append(langchain_core.messages.SystemMessage(content=part))
+                prompt_parts.append(langchain_core.messages.SystemMessage(content=part))
+            prompt_content = lambda _m: prompt_parts + _m["messages"]
         else:
             raise ValueError("Prompt content must be a string or a list of strings.")
         return langgraph.prebuilt.create_react_agent(
