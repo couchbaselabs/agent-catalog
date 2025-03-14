@@ -206,7 +206,7 @@ class ChatCompletionContent(BaseContent):
 
     @pydantic.field_serializer("meta", when_used="json")
     def _serialize_meta(self, meta: dict, _info):
-        return self._safe_serialize(meta) if len(meta) > 0 else None
+        return self._safe_serialize(meta)
 
 
 class RequestHeaderContent(BaseContent):
@@ -236,7 +236,7 @@ class RequestHeaderContent(BaseContent):
 
     @pydantic.field_serializer("meta", when_used="json")
     def _serialize_meta(self, meta: dict, _info):
-        return self._safe_serialize(meta) if len(meta) > 0 else None
+        return self._safe_serialize(meta)
 
 
 class UserContent(BaseContent):

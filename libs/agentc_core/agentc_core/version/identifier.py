@@ -33,10 +33,6 @@ class VersionDescriptor(pydantic.BaseModel):
         default=None,
     )
 
-    @pydantic.field_serializer("metadata")
-    def _serialize_metadata_if_non_empty(self, metadata: dict, _info) -> dict | None:
-        return metadata if len(metadata) > 0 else None
-
     @pydantic.model_validator(mode="after")
     def _non_dirty_must_have_identifier(self) -> typing.Self:
         if self.identifier is None and not self.is_dirty:

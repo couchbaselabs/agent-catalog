@@ -40,18 +40,18 @@ def test_audit(temporary_directory, environment_factory, isolated_server_factory
         chat_model = audit(langchain_openai.ChatOpenAI(name="gpt-4o"), span=span)
         chat_model.invoke("Hello, how are you doing today?")
 
-        # We should have six logs in our local FS...
+        # We should have four logs in our local FS...
         with (pathlib.Path(td) / DEFAULT_ACTIVITY_FOLDER / DEFAULT_ACTIVITY_FILE).open("r") as fp:
-            # BEGIN + BEGIN + USER + END + CHAT-COMPLETION + END
-            assert len(fp.readlines()) == 6
+            # BEGIN + USER + CHAT-COMPLETION + END
+            assert len(fp.readlines()) == 4
 
-        # ...and six logs in our Couchbase instance.
+        # ...and four logs in our Couchbase instance.
         cluster = connection_factory()
         results = cluster.query("""
             FROM `travel-sample`.agent_activity.logs l
             SELECT VALUE l
         """).execute()
-        assert len(results) == 6
+        assert len(results) == 4
 
 
 @pytest.mark.slow
@@ -72,15 +72,15 @@ def test_callback(temporary_directory, environment_factory, isolated_server_fact
         chat_model = langchain_openai.ChatOpenAI(name="gpt-4o", callbacks=[Callback(span=span)])
         chat_model.invoke("Hello, how are you doing today?")
 
-        # We should have seven logs in our local FS...
+        # We should have five logs in our local FS...
         with (pathlib.Path(td) / DEFAULT_ACTIVITY_FOLDER / DEFAULT_ACTIVITY_FILE).open("r") as fp:
-            # BEGIN + REQUEST-HEADER + BEGIN + USER + END + CHAT-COMPLETION + END
-            assert len(fp.readlines()) == 7
+            # BEGIN + REQUEST-HEADER + USER + CHAT-COMPLETION + END
+            assert len(fp.readlines()) == 5
 
-        # ...and six logs in our Couchbase instance.
+        # ...and five logs in our Couchbase instance.
         cluster = connection_factory()
         results = cluster.query("""
             FROM `travel-sample`.agent_activity.logs l
             SELECT VALUE l
         """).execute()
-        assert len(results) == 7
+        assert len(results) == 5
