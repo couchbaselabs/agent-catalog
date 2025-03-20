@@ -10,7 +10,6 @@ from agentc_core.activity.models.content import ChatCompletionContent
 from agentc_core.activity.models.content import SystemContent
 from agentc_core.activity.models.content import ToolCallContent
 from agentc_core.activity.models.content import ToolResultContent
-from agentc_core.activity.models.content import UserContent
 from llama_index.core import BaseCallbackHandler
 from llama_index.core.callbacks import CBEventType
 from llama_index.core.callbacks import EventPayload
@@ -72,14 +71,7 @@ class Callback(BaseCallbackHandler):
                     for message in payload[EventPayload.MESSAGES]:
                         # This is just to get some typing for our IDEs.
                         message: llama_index.core.llms.ChatMessage = message
-                        match message.role:
-                            case llama_index.core.llms.MessageRole.USER:
-                                span.log(content=UserContent(value=message.content), **annotations)
-                            case llama_index.core.llms.MessageRole.SYSTEM:
-                                span.log(content=SystemContent(value=message.content), **annotations)
-                            case _:
-                                logger.debug("Unknown message role '%s'. Recording as System.", message.role)
-                                span.log(content=SystemContent(value=message.content), **annotations)
+                        span.log(content=SystemContent(value=message.content), **annotations)
                     unhandled_payloads.remove(EventPayload.MESSAGES)
 
                 if EventPayload.COMPLETION in payload:

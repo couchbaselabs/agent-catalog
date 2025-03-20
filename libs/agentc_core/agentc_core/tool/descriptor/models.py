@@ -2,7 +2,6 @@ import abc
 import agentc_core.learned.model
 import dataclasses
 import enum
-import importlib
 import inspect
 import json
 import logging
@@ -10,13 +9,13 @@ import openapi_parser
 import pathlib
 import pydantic
 import re
-import sys
 import typing
 import yaml
 
 from ...record.descriptor import RecordDescriptor
 from ...record.descriptor import RecordKind
 from ...record.helper import JSONSchemaValidatingMixin
+from ...security import import_module
 from ...version import VersionDescriptor
 from ..decorator import get_annotations
 from ..decorator import get_description
@@ -56,12 +55,9 @@ class PythonToolDescriptor(RecordDescriptor):
 
     class Factory(_BaseFactory):
         def __iter__(self) -> typing.Iterable["PythonToolDescriptor"]:
-            # TODO (GLENN): We should avoid blindly putting things in our path.
-            if str(self.filename.parent.absolute()) not in sys.path:
-                sys.path.append(str(self.filename.parent.absolute()))
+            imported_module = import_module(self.filename)
             with open(self.filename, "r") as fp:
                 source_contents = fp.read()
-            imported_module = importlib.reload(importlib.import_module(self.filename.stem))
             for _, tool in inspect.getmembers(imported_module):
                 if not is_tool(tool):
                     continue

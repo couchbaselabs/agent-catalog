@@ -11,6 +11,7 @@ import uuid
 
 from agentc_core.record.descriptor import RecordDescriptor
 from agentc_core.record.descriptor import RecordKind
+from agentc_core.security import import_module
 from agentc_core.tool.decorator import is_tool
 from agentc_core.tool.generate import HTTPRequestCodeGenerator
 from agentc_core.tool.generate import SemanticSearchCodeGenerator
@@ -83,12 +84,9 @@ class EntryLoader:
         sys.meta_path.append(_ModuleFinder(self._loader))
 
     def _load_module_from_filename(self, filename: pathlib.Path):
-        # TODO (GLENN): We should avoid blindly putting things in our path.
-        if str(filename.parent.absolute()) not in sys.path:
-            sys.path.append(str(filename.parent.absolute()))
         if filename.stem not in self._modules:
             logger.debug(f"Loading module {filename.stem}.")
-            self._modules[filename.stem] = importlib.import_module(filename.stem)
+            self._modules[filename.stem] = import_module(filename)
 
     def _load_module_from_string(self, module_name: str, module_content: str) -> typing.Callable:
         if module_name not in self._modules:

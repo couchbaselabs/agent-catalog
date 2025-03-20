@@ -38,7 +38,8 @@ content:
   agent_instructions:
     - >
       Your task is to respond to the user AND decide if the conversation should end based on the user's response.
-      If you have routes, respond to the user in Markdown illustrating the routes.
+      If you have any routes that have been given to by another agent, respond to the user in Markdown illustrating
+      the routes.
 
     - >
       If the user asks for help with flight planning but there are no source and destination cities provided, set the
@@ -59,6 +60,11 @@ content:
       - Thanks! That's all I need. ==> is_last_step: True
       - I'm done for now. ==> is_last_step: True
       - That's all for today. ==> is_last_step: True
+
+    #- >
+    #  If the user asks for flights / routes from obscure or small airports, DO NOT assume that no routes exist.
+    #  Even you think there are no direct flights, you are to continue the conversation.
+    #  In this case, set 'is_last_step' to False and 'needs_clarification' to False.
 
   output_format_instructions: >
     Be polite and professional in your responses. Err on the side of caution when deciding whether to continue the

@@ -194,7 +194,8 @@ For more information about Pytest's command line tool, see
    In the "Describe This Release" text box, describe how this release is different from the previous release as a
    Markdown list.
    You can use the "Generate Release Notes" to help you, but do your best to summarize the changes.
-   See [here](https://github.com/couchbaselabs/agent-catalog/releases/tag/v0.1.0) for an example.
+   See [here](https://gist.github.com/andreasonny83/24c733ae50cadf00fcf83bc8beaa8e6a) for an example.
+   You should include i) Upgrade Steps, ii) Breaking Changes, iii) New Features, iv) Bug Fixes, and v) Improvements.
 
    If this release is non-production-ready, check the "Set as a Pre-Release" box.
    When you are finished with your changes, hit "Publish Release".

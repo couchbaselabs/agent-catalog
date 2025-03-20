@@ -11,6 +11,7 @@ from agentc_core.activity.models.content import ToolCallContent
 from agentc_core.activity.models.content import ToolResultContent
 from agentc_core.activity.models.content import UserContent
 from agentc_core.activity.span import Span
+from agentc_core.evaluation.decorator import evaluation
 
 __all__ = [
     "AssistantContent",
@@ -26,4 +27,5 @@ __all__ = [
     "ToolResultContent",
     "UserContent",
     "Span",
+    "evaluation",
 ]

@@ -10,21 +10,24 @@ import unittest.mock
 
 
 # Note: these tests should be run from the root of the project!
-from main import Graph
+from graph import Graph
 
 # Our Agent Catalog objects (the same ones used for our application are used for tests as well).
 # To denote that the following logs are associated with tests, we will name the Span after our test file.
 catalog: agentc.Catalog = agentc.Catalog()
 root_span: agentc.Span = catalog.Span(name=pathlib.Path(__file__).stem)
 
-# For these tests, we will use OpenAI's GPT-4o model to evaluate the topic adherence of our agents.
+# For these tests, we will GPT-4o to evaluate the similarity of our agent's response and our reference.
 evaluator_llm = ragas.llms.LangchainLLMWrapper(langchain_openai.chat_models.ChatOpenAI(name="gpt-4o", temperature=0))
-scorer = ragas.metrics.TopicAdherenceScore(llm=evaluator_llm, mode="precision")
+scorer = ragas.metrics.SimpleCriteriaScore(
+    name="coarse_grained_score", llm=evaluator_llm, definition="Score 0 to 5 by similarity."
+)
 
 
-def eval_irrelevant_greetings():
+@agentc.span.evaluation
+def eval_bad_intro():
     with (
-        (pathlib.Path("evals") / "resources" / "irrelevant.jsonl").open() as fp,
+        (pathlib.Path("evals") / "resources" / "bad-intro.jsonl").open() as fp,
         # To identify groups of evals (i.e., suites), we will use the name 'IrrelevantGreetings'.
         root_span.new("IrrelevantGreetings") as suite_span,
     ):
@@ -32,8 +35,10 @@ def eval_irrelevant_greetings():
             with (
                 # To mock user input, we will use UnitTest's mock.patch to return the input from our JSONL file.
                 unittest.mock.patch("builtins.input", lambda _: json.loads(line)["input"]),  # noqa: B023
+                # We will also swallow any output that the FrontDeskAgent may produce.
+                unittest.mock.patch("builtins.print", lambda *args, **kwargs: None),  # noqa: B023
                 # To identify individual evals, we will use their line number + add their content as an annotation.
-                suite_span.new(f"Test_{i}", test_input=line) as eval_span,
+                suite_span.new(f"Eval_{i}", test_input=line) as eval_span,
             ):
                 graph: Graph = Graph(catalog=catalog, span=eval_span)
                 for event in graph.stream(stream_mode="updates"):
@@ -47,19 +52,23 @@ def eval_irrelevant_greetings():
                 eval_span["correctly_set_is_last_step"] = event["front_desk_agent"]["is_last_step"]
 
 
-def eval_relevant_greetings():
+@agentc.span.evaluation
+def eval_short_threads():
     with (
-        (pathlib.Path("evals") / "resources" / "relevant.jsonl").open() as fp,
-        # To identify groups of evals (i.e., suites), we will use the name 'RelevantGreetings'.
-        root_span.new("RelevantGreetings") as suite_span,
+        (pathlib.Path("evals") / "resources" / "short-thread.jsonl").open() as fp,
+        # To identify groups of evals (i.e., suites), we will use the name 'ShortThreads'.
+        root_span.new("ShortThreads") as suite_span,
     ):
         for i, line in enumerate(fp):
             input_iter = iter(json.loads(line)["input"])
+            reference = json.loads(line)["reference"]
             with (
                 # To mock user input, we will use UnitTest's mock.patch to return the input from our JSONL file.
                 unittest.mock.patch("builtins.input", lambda _: next(input_iter)),  # noqa: B023
+                # We will also swallow any output that the FrontDeskAgent may produce.
+                unittest.mock.patch("builtins.print", lambda *args, **kwargs: None),  # noqa: B023
                 # To identify individual evals, we will use their line number + add their content as an annotation.
-                suite_span.new(f"Test_{i}", iterable=True, test_input=line) as eval_span,
+                suite_span.new(f"Eval_{i}", iterable=True, test_input=line) as eval_span,
             ):
                 graph: Graph = Graph(catalog=catalog, span=eval_span)
                 try:
@@ -81,11 +90,14 @@ def eval_relevant_greetings():
                                 ragas_input.append(ragas.messages.HumanMessage(content=user_message.value))
                             case _:
                                 pass
-                    sample = ragas.MultiTurnSample(user_input=ragas_input, reference_topics=["flights", "airports"])
+                    sample = ragas.MultiTurnSample(user_input=ragas_input, reference=reference)
 
-                    # To record the results of this run, we will log the topic adherence score using our test_span.
+                    # To record the results of this run, we will log the goal accuracy score using our eval_span.
                     score = scorer.multi_turn_score(sample)
-                    eval_span["topic_adherence"] = score
+                    eval_span["goal_accuracy"] = {
+                        "score": score,
+                        "reference": reference,
+                    }
 
                 except StopIteration:
                     eval_span["correctly_set_is_last_step"] = False

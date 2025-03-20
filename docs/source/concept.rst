@@ -103,7 +103,7 @@ Both tool builders and prompt builders (i.e., agent builders) will follow this w
 
       .. tip::
 
-        If you've made minor changes to your repository and don't want to use an entirely new commit ID before
+        If you've made minor changes to your repository and don't want to use an entirely new commit before
         publishing, add your files to Git with :command:`git add $MY_FILES` and amend your changes to the last commit
         with :command:`git commit --amend`!
 

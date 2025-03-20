@@ -9,8 +9,6 @@ from agentc_core.activity.models.content import Content
 from agentc_core.activity.models.content import RequestHeaderContent
 from agentc_core.activity.models.content import SystemContent
 from agentc_core.activity.models.content import ToolCallContent
-from agentc_core.activity.models.content import ToolResultContent
-from agentc_core.activity.models.content import UserContent
 from langchain_core.callbacks import AsyncCallbackManagerForLLMRun
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.callbacks import CallbackManagerForLLMRun
@@ -29,62 +27,78 @@ from langchain_core.tools import Tool
 logger = logging.getLogger(__name__)
 
 
+def _ai_content_from_generation(message: BaseMessage) -> typing.Iterable[Content]:
+    if isinstance(message, AIMessage):
+        yield ChatCompletionContent(output=str(message.content), meta=message.response_metadata)
+        for tool_call in message.tool_calls:
+            yield ToolCallContent(
+                tool_name=tool_call["name"],
+                tool_args=tool_call["args"],
+                tool_call_id=tool_call["id"],
+                status="success",
+            )
+        for invalid_tool_call in message.invalid_tool_calls:
+            yield ToolCallContent(
+                tool_name=invalid_tool_call["name"],
+                tool_args=invalid_tool_call["args"],
+                tool_call_id=invalid_tool_call["id"],
+                status="error",
+                extra={
+                    "error": invalid_tool_call["error"],
+                },
+            )
+
+
 def _content_from_message(message: BaseMessage) -> typing.Iterable[Content]:
     match message.type:
         case "ai" | "AIMessageChunk":
             ai_message: AIMessage = message
-            yield ChatCompletionContent(output=str(ai_message.content), meta=ai_message.response_metadata)
-
-            for tool_call in ai_message.tool_calls:
-                yield ToolCallContent(
-                    tool_name=tool_call["name"],
-                    tool_args=tool_call["args"],
-                    tool_call_id=tool_call["id"],
-                    status="success",
-                )
-            for invalid_tool_call in ai_message.invalid_tool_calls:
-                yield ToolCallContent(
-                    tool_name=invalid_tool_call["name"],
-                    tool_args=invalid_tool_call["args"],
-                    tool_call_id=invalid_tool_call["id"],
-                    status="error",
-                    extra={
-                        "error": invalid_tool_call["error"],
-                    },
-                )
+            yield SystemContent(
+                value=str(ai_message.content),
+                extra={
+                    "kind": message.type,
+                    "response_metadata": ai_message.response_metadata,
+                    "tool_calls": ai_message.tool_calls,
+                    "invalid_tool_calls": ai_message.invalid_tool_calls,
+                },
+            )
 
         case "function" | "FunctionMessageChunk":
             function_message: FunctionMessage = message
-            yield ToolResultContent(
-                tool_result=function_message.content,
-                status="success",
+            yield SystemContent(
+                value=function_message.content,
+                extra={
+                    "kind": message.type,
+                },
             )
 
         case "tool" | "ToolMessageChunk":
             tool_message: ToolMessage = message
-            yield ToolResultContent(
-                tool_call_id=tool_message.tool_call_id,
-                tool_result=tool_message.content,
-                status=tool_message.status,
+            yield SystemContent(
+                value=tool_message.content,
+                extra={
+                    "kind": message.type,
+                    "tool_call_id": tool_message.tool_call_id,
+                    "status": tool_message.status,
+                },
             )
 
         case "human" | "HumanMessageChunk":
             human_message: HumanMessage = message
-            yield UserContent(value=human_message.content)
+            yield SystemContent(value=human_message.content, extra={"kind": message.type, "meta": human_message})
 
         case "system" | "SystemMessageChunk":
             system_message: SystemMessage = message
-            yield SystemContent(value=system_message.content, extra={"meta": system_message})
+            yield SystemContent(value=system_message.content, extra={"kind": message.type, "meta": system_message})
 
         case _:
-            logger.debug("Unknown message type encountered: %s. Logging as System.", message.type)
             base_message: BaseMessage = message
             yield SystemContent(
                 value=base_message.content,
                 extra={
                     "meta": base_message,
                     "id": base_message.id,
-                    "type": message.type,
+                    "kind": message.type,
                 },
             )
 
@@ -98,7 +112,7 @@ def _model_from_message(message: BaseMessage, chat_model: BaseChatModel) -> dict
     return None
 
 
-def _accept_messages(messages: typing.List[BaseMessage], span: Span, **kwargs) -> None:
+def _accept_input_messages(messages: typing.List[BaseMessage], span: Span, **kwargs) -> None:
     for message in messages:
         for content in _content_from_message(message):
             span.log(content=content, **kwargs)
@@ -153,7 +167,7 @@ class Callback(BaseCallbackHandler):
             )
         )
         for message_set in messages:
-            _accept_messages(message_set, self.span)
+            _accept_input_messages(message_set, self.span)
         return super().on_chat_model_start(
             serialized, messages, run_id=run_id, parent_run_id=parent_run_id, tags=tags, metadata=metadata, **kwargs
         )
@@ -169,15 +183,12 @@ class Callback(BaseCallbackHandler):
         for generation_set in response.generations:
             logger.debug(f"LLM has returned the message: {generation_set}")
             for generation in generation_set:
-                self.span.log(
-                    ChatCompletionContent(
-                        output=generation.message.text(),
-                        meta=generation.message.response_metadata,
-                        extra={"additional_kwargs": generation.message.additional_kwargs},
-                    ),
-                    run_id=str(run_id),
-                    parent_run_id=str(parent_run_id) if parent_run_id is not None else None,
-                )
+                for content in _ai_content_from_generation(generation.message):
+                    self.span.log(
+                        content=content,
+                        run_id=str(run_id),
+                        parent_run_id=str(parent_run_id) if parent_run_id is not None else None,
+                    )
         self.span.exit()
         return super().on_llm_end(response, run_id=run_id, parent_run_id=parent_run_id, **kwargs)
 
@@ -211,7 +222,7 @@ def audit(chat_model: BaseChatModel, span: Span) -> BaseChatModel:
             logger.debug(f"LLM has returned the message: {result}")
             with span.new(name="_generate") as generation:
                 # Each generation gets its own span.
-                _accept_messages(messages, generation)
+                _accept_input_messages(messages, generation)
                 generation.log(
                     list(_content_from_message(result.message))[0],
                     model=_model_from_message(result.message, chat_model),
@@ -240,7 +251,7 @@ def audit(chat_model: BaseChatModel, span: Span) -> BaseChatModel:
 
         # We have exhausted our iterator. Log the resultant chunk.
         with span.new(name="_stream") as generation:
-            _accept_messages(messages, generation)
+            _accept_input_messages(messages, generation)
             generation.log(
                 content=list(_content_from_message(result_chunk.message))[0],
                 model=_model_from_message(result_chunk.message, chat_model),
@@ -258,7 +269,7 @@ def audit(chat_model: BaseChatModel, span: Span) -> BaseChatModel:
             # Each generation gets its own span.
             logger.debug(f"LLM has returned the message: {result}")
             with span.new(name="_agenerate") as generation:
-                _accept_messages(messages, generation)
+                _accept_input_messages(messages, generation)
                 generation.log(
                     content=list(_content_from_message(result.message))[0],
                     model=_model_from_message(result.message, chat_model),
@@ -287,7 +298,7 @@ def audit(chat_model: BaseChatModel, span: Span) -> BaseChatModel:
 
         # We have exhausted our iterator. Log the resultant chunk.
         with span.new(name="_astream") as generation:
-            _accept_messages(messages, generation)
+            _accept_input_messages(messages, generation)
             generation.log(
                 content=list(_content_from_message(result_chunk.message))[0],
                 model=_model_from_message(result_chunk.message, chat_model),

@@ -209,7 +209,7 @@ class GlobalSpan(Span):
 
         :param name: The name of the span.
         :param state: The starting state of the span. This will be recorded upon entering and exiting the span.
-        :param iterable: Whether or not this new span should be iterable.
+        :param iterable: Whether this new span should be iterable.
         :param kwargs: Additional annotations to apply to the span.
         """
         return Span(logger=self.logger, name=name, parent=self, state=state, iterable=iterable, kwargs=kwargs)

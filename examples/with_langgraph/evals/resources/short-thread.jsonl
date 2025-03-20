@@ -1,0 +1,2 @@
+{"input": ["I want to go to San Francisco.", "I am in LA.", "I'm done, goodbye."], "reference": "List of airlines that serve flights from Los Angeles International Airport (LAX) to San Francisco International Airport (SFO)."}
+{"input": ["Source: SFO, Dest: NRT", "Bye, that's all"], "reference":  "List of airlines that serve flights from San Francisco Internal Airport (SFO) to Tokyo Narita Airport (NRT)."}

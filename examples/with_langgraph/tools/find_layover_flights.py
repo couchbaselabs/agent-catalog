@@ -5,7 +5,6 @@ import couchbase.options
 import dotenv
 import os
 import pydantic
-import typing
 
 dotenv.load_dotenv()
 
@@ -30,7 +29,7 @@ class Route(pydantic.BaseModel):
 
 
 @agentc.catalog.tool
-def find_one_layover_flights(source_airport: str, destination_airport: str) -> typing.Iterable[Route]:
+def find_one_layover_flights(source_airport: str, destination_airport: str) -> list[Route]:
     """Find all one-layover (indirect) flights between two airports."""
     query = cluster.query(
         """
@@ -54,12 +53,14 @@ def find_one_layover_flights(source_airport: str, destination_airport: str) -> t
             named_parameters={"source_airport": source_airport, "destination_airport": destination_airport}
         ),
     )
+    results: list[Route] = list()
     for result in query.rows():
-        yield Route(**result)
+        results.append(Route(**result))
+    return results
 
 
 @agentc.catalog.tool
-def find_two_layover_flights(source_airport: str, destination_airport: str) -> typing.Iterable[Route]:
+def find_two_layover_flights(source_airport: str, destination_airport: str) -> list[Route]:
     """Find all two-layover (indirect) flights between two airports."""
     query = cluster.query(
         """
@@ -85,5 +86,7 @@ def find_two_layover_flights(source_airport: str, destination_airport: str) -> t
             named_parameters={"source_airport": source_airport, "destination_airport": destination_airport}
         ),
     )
+    results: list[Route] = list()
     for result in query.rows():
-        yield Route(**result)
+        results.append(Route(**result))
+    return results

@@ -1,7 +1,4 @@
 import agentc
-import agentc_core.activity.models.content
-import agentc_core.catalog.catalog
-import agentc_core.prompt.models
 import agentc_langchain
 import langchain_core
 import langchain_core.language_models.chat_models
@@ -28,7 +25,7 @@ class BaseAgent:
         self.span: agentc.Span = span
 
         # Grab the prompt for our agent.
-        self.prompt: agentc_core.catalog.catalog.Prompt = self.catalog.find("prompt", name=prompt_name)
+        self.prompt: agentc.catalog.Prompt = self.catalog.find("prompt", name=prompt_name)
 
         # Initialize a chat model with OpenAI's GPT-4o model.
         self.chat_model: langchain_core.language_models.BaseChatModel = langchain_openai.chat_models.ChatOpenAI(
@@ -49,6 +46,36 @@ class BaseAgent:
         callback = agentc_langchain.chat.Callback(span=span, tools=tools, output=self.prompt.output)
         self.chat_model.callbacks.append(callback)
 
+        # Our callback only handles ChatCompletions, to record our tool calls we will provide a custom ToolNode.
+        class ToolNodeWithSpan(langgraph.prebuilt.ToolNode):
+            def _run_one(
+                self,
+                call: langchain_core.messages.ToolCall,
+                input_type: typing.Literal["list", "dict", "tool_calls"],
+                config: langchain_core.runnables.RunnableConfig,
+            ) -> langchain_core.messages.ToolMessage:
+                result = super(ToolNodeWithSpan, self)._run_one(call, input_type, config)
+                span.log(
+                    content=agentc.span.ToolResultContent(
+                        tool_call_id=result.tool_call_id, tool_result=result.content, status=result.status
+                    )
+                )
+                return result
+
+            async def _arun_one(
+                self,
+                call: langchain_core.messages.ToolCall,
+                input_type: typing.Literal["list", "dict", "tool_calls"],
+                config: langchain_core.runnables.RunnableConfig,
+            ) -> langchain_core.messages.ToolMessage:
+                result = await super(ToolNodeWithSpan, self)._arun_one(call, input_type, config)
+                span.log(
+                    content=agentc.span.ToolResultContent(
+                        tool_call_id=result.tool_call_id, tool_result=result.content, status=result.status
+                    )
+                )
+                return result
+
         # A new agent object is created for each invocation of this node.
         if isinstance(self.prompt.content["agent_instructions"], str):
             prompt_content = langchain_core.messages.SystemMessage(content=self.prompt.content["agent_instructions"])
@@ -61,7 +88,7 @@ class BaseAgent:
             raise ValueError("Prompt content must be a string or a list of strings.")
         return langgraph.prebuilt.create_react_agent(
             model=self.chat_model,
-            tools=tools,
+            tools=ToolNodeWithSpan(tools=tools),
             prompt=prompt_content,
             response_format=(self.prompt.content["output_format_instructions"], self.prompt.output),
             **self.agent_kwargs,
@@ -71,21 +98,22 @@ class BaseAgent:
 class FrontDeskAgent(BaseAgent):
     def __init__(self, catalog: agentc.Catalog, span: agentc.Span, **kwargs):
         super().__init__(catalog=catalog, span=span, prompt_name="front_desk_node", **kwargs)
-        self.introductory_message: str = "Please provide the source and destination airports.\n> "
+        self.introductory_message: str = "Please provide the source and destination airports."
 
     @staticmethod
     def _talk_to_user(span: agentc.Span, message: str, requires_response: bool = True):
         # We use "Assistant" to differentiate between the "internal" AI messages and what the user sees.
         span.log(agentc.span.AssistantContent(value=message))
         if requires_response:
-            response = input(message + "\n> ")
+            print("> Assistant: " + message)
+            response = input("> User: ")
             span.log(agentc.span.UserContent(value=response))
             return response
         else:
-            print(message)
+            print("> Assistant: " + message)
 
     def __call__(self, state: State, config: langchain_core.runnables.RunnableConfig) -> State:
-        # Below, we build a Span instance which will bind all logs to the name "front_desk_agent".
+        # Below, we build a Span instance which will bind all logs to the name "front_desk_node".
         # The "state" parameter is expected to be modified by the code in the WITH block.
         with self.span.new(name="front_desk_node", state=state) as span:
             if len(state["messages"]) == 0:
@@ -97,17 +125,17 @@ class FrontDeskAgent(BaseAgent):
                 response = self._talk_to_user(span, state["messages"][-1].content)
                 state["messages"].append(langchain_core.messages.HumanMessage(content=response))
 
-            # Give the working state to our agent.
-            agent = self._create_agent(span)
-            response = agent.invoke(input=state, config=config)
+            # Give the working state to our "agent" (in this case, just an LLM call).
+            callback = agentc_langchain.chat.Callback(span=span, output=self.prompt.output)
+            self.chat_model.callbacks.append(callback)
+            chat_model = self.chat_model.with_structured_output(self.prompt.output)
+            structured_response = chat_model.invoke(state["messages"], config=config)
 
             # 'is_last_step' and 'response' comes from the prompt's output format.
             # Note this is a direct mutation on the "state" given to the Span!
-            structured_response = response["structured_response"]
             state["messages"].append(langchain_core.messages.AIMessage(structured_response["response"]))
             state["is_last_step"] = structured_response["is_last_step"]
             state["needs_clarification"] = structured_response["needs_clarification"]
-            print(structured_response)
             if state["is_last_step"]:
                 self._talk_to_user(span, structured_response["response"], requires_response=False)
             return state
