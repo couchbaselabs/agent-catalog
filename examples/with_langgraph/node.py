@@ -1,5 +1,6 @@
 import agentc
 import agentc_langchain
+import agentc_langgraph
 import langchain_core
 import langchain_core.language_models.chat_models
 import langchain_core.messages
@@ -47,34 +48,7 @@ class BaseAgent:
         self.chat_model.callbacks.append(callback)
 
         # Our callback only handles ChatCompletions, to record our tool calls we will provide a custom ToolNode.
-        class ToolNodeWithSpan(langgraph.prebuilt.ToolNode):
-            def _run_one(
-                self,
-                call: langchain_core.messages.ToolCall,
-                input_type: typing.Literal["list", "dict", "tool_calls"],
-                config: langchain_core.runnables.RunnableConfig,
-            ) -> langchain_core.messages.ToolMessage:
-                result = super(ToolNodeWithSpan, self)._run_one(call, input_type, config)
-                span.log(
-                    content=agentc.span.ToolResultContent(
-                        tool_call_id=result.tool_call_id, tool_result=result.content, status=result.status
-                    )
-                )
-                return result
-
-            async def _arun_one(
-                self,
-                call: langchain_core.messages.ToolCall,
-                input_type: typing.Literal["list", "dict", "tool_calls"],
-                config: langchain_core.runnables.RunnableConfig,
-            ) -> langchain_core.messages.ToolMessage:
-                result = await super(ToolNodeWithSpan, self)._arun_one(call, input_type, config)
-                span.log(
-                    content=agentc.span.ToolResultContent(
-                        tool_call_id=result.tool_call_id, tool_result=result.content, status=result.status
-                    )
-                )
-                return result
+        tool_node = agentc_langgraph.tools.ToolNode(span=span, tools=tools)
 
         # A new agent object is created for each invocation of this node.
         if isinstance(self.prompt.content["agent_instructions"], str):
@@ -88,7 +62,7 @@ class BaseAgent:
             raise ValueError("Prompt content must be a string or a list of strings.")
         return langgraph.prebuilt.create_react_agent(
             model=self.chat_model,
-            tools=ToolNodeWithSpan(tools=tools),
+            tools=tool_node,
             prompt=prompt_content,
             response_format=(self.prompt.content["output_format_instructions"], self.prompt.output),
             **self.agent_kwargs,

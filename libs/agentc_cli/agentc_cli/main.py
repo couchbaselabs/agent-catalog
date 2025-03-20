@@ -12,7 +12,6 @@ import typing
 from .cmds import cmd_add
 from .cmds import cmd_clean
 from .cmds import cmd_env
-from .cmds import cmd_evaluate
 from .cmds import cmd_execute
 from .cmds import cmd_find
 from .cmds import cmd_index
@@ -759,35 +758,6 @@ def ls(
             db = False
 
     cmd_ls(cfg=cfg, kind=kind, include_dirty=dirty, with_local=local, with_db=db)
-
-
-@click_main.command()
-@click.argument("sources", nargs=-1)
-@click.option(
-    "--name",
-    multiple=True,
-    type=str,
-    default=None,
-    help="Glob patterns to filter evaluations by (applied to evaluation names).",
-)
-@click.pass_context
-def evaluate(
-    ctx: click.Context,
-    sources: list[str],
-    name: list[str] = None,
-):
-    """Run all evaluations using the specified sources."""
-    cfg: Config = ctx.obj
-
-    if not sources:
-        click.secho(
-            "WARNING: No action taken. No source directories have been specified. "
-            "Please use the command 'agentc evaluate --help' for more information.",
-            fg="yellow",
-        )
-        return
-
-    cmd_evaluate(cfg=cfg, source_dirs=sources, name_globs=name)
 
 
 # @click_main.command()

@@ -9,7 +9,7 @@ import ragas.metrics
 import unittest.mock
 
 
-# Note: these tests should be run from the root of the project!
+# Note: these evals should be run from the root of the project!
 from graph import Graph
 
 # Our Agent Catalog objects (the same ones used for our application are used for tests as well).
@@ -24,7 +24,6 @@ scorer = ragas.metrics.SimpleCriteriaScore(
 )
 
 
-@agentc.span.evaluation
 def eval_bad_intro():
     with (
         (pathlib.Path("evals") / "resources" / "bad-intro.jsonl").open() as fp,
@@ -52,7 +51,6 @@ def eval_bad_intro():
                 eval_span["correctly_set_is_last_step"] = event["front_desk_agent"]["is_last_step"]
 
 
-@agentc.span.evaluation
 def eval_short_threads():
     with (
         (pathlib.Path("evals") / "resources" / "short-thread.jsonl").open() as fp,

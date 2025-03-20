@@ -77,7 +77,7 @@ classDef last fill: #bfb6fc
    In your shell, you should now see something similar below if you run `which python`:
    ```bash
    which python
-   > /Users/$USER/Library/Caches/pypoetry/virtualenvs/my-agent-gJ1RHvkw-py3.12/bin/python
+   > /Users/$USER/Library/Caches/pypoetry/virtualenvs/my-agent-system-gJ1RHvkw-py3.12/bin/python
    ```
 
 6. Run `agentc` to make sure this project has installed correctly (note that your first run will take a couple of
@@ -283,12 +283,6 @@ In this section, we will illustrate how you can "tune" your agent system in an a
 
       ...and it seems our fix has worked!
 
-One of the benefits to binding each change we make to a unique Git SHA is that we can always pinpoint exactly what
-change was helpful using Git.
-If we observe an agent system instance at some time $t$ with a (catalog) version $v=$"d91e324...", then we can run
-`git diff d91e324...` to find the exact differences between our current agent system and the agent system at time $t$.
-While seemingly simple, versioning like this is invaluable for building complex agent systems.
-
 ### Evaluating Your Agent System
 
 In this section, we will now illustrate some building blocks for authoring your own set of evaluations.
@@ -296,18 +290,8 @@ In this section, we will now illustrate some building blocks for authoring your 
 1. First, enter the command below to execute two prebuilt evaluation suites (`eval_bad_intro` and `eval_short_threads`):
 
    ```bash
-   agentc evaluate evals
+   pytest evals
    ```
-
-   You should get the following output:
-
-   ```text
-   Evaluation 'eval_goal_accuracy.eval_bad_intro' is starting...
-   Evaluation 'eval_goal_accuracy.eval_bad_intro' has completed successfully.
-   Evaluation 'eval_goal_accuracy.eval_short_threads' is starting...
-   Evaluation 'eval_goal_accuracy.eval_short_threads' has completed successfully.
-   ```
-
 
 
 

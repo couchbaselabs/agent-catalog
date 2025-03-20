@@ -23,6 +23,10 @@ develop = true
 path = "../../libs/agentc_integrations/langchain"
 develop = true
 
+[tool.poetry.dependencies.agentc_langgraph]
+path = "../../libs/agentc_integrations/langgraph"
+develop = true
+
 # All agent analysis related packages.
 [tool.poetry.group.analysis]
 optional = true
@@ -31,6 +35,7 @@ optional = true
 ragas = "^0.2.14"
 jupyterlab = "^4.2.5"
 ipywidgets = "^8.1.5"
+pytest = "^8.3.4"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.0.0"

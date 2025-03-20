@@ -22,6 +22,7 @@ agentc = { path = "libs/agentc", develop = true }
 agentc-core = { path = "libs/agentc_core", develop = true }
 agentc-cli = { path = "libs/agentc_cli", develop = true }
 agentc-langchain = { path = "libs/agentc_integrations/langchain", develop = true }
+agentc-langgraph = { path = "libs/agentc_integrations/langgraph", develop = true }
 agentc-llamaindex = { path = "libs/agentc_integrations/llamaindex", develop = true }
 
 [tool.poetry.group.dev.dependencies]
@@ -73,8 +74,9 @@ markers = [
 testpaths = [
     "libs/agentc_core/tests",
     "libs/agentc_cli/tests",
-    "libs/integrations/agentc_langchain/tests",
-    "libs/integrations/agentc_llamaindex/tests",
+    "libs/agentc_integrations/langchain/tests",
+    "libs/agentc_integrations/llamaindex/tests",
+    # "/libs/agentc_integrations/langgraph/tests"
 ]
 # addopts = "--retries 5 --retry-delay 300"
 norecursedirs = [
