@@ -6,7 +6,7 @@ on:
     types: [published]
 
 jobs:
-  Pages:
+  Publish:
     runs-on: ubuntu-latest
 
     steps:

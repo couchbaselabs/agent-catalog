@@ -7,7 +7,7 @@ on:
       - master
 
 jobs:
-  Pages:
+  Docs:
     runs-on: ubuntu-latest
 
     steps:
