@@ -4,10 +4,8 @@
 Agent Catalog Configuration
 ===========================
 
-Agent Catalog can be configured on a per-instance-basis (for :python:`Catalog` and :python:`Span` instances) **or**
-globally using environment variables.
-If you have a ``.env`` file in the same working directory as Agent Catalog, the environment variables will additionally
-be read from there.
+Agent Catalog can be configured 1) on a per-instance-basis (for :python:`Catalog` and :python:`Span` instances),
+2) globally using environment variables, or 3) globally using a ``.env`` file.
 
 
 .. autopydantic_model:: agentc_core.config.config.RemoteCatalogConfig

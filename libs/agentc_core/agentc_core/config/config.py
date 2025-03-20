@@ -16,6 +16,7 @@ from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
 from agentc_core.defaults import DEFAULT_CLUSTER_DDL_RETRY_ATTEMPTS
 from agentc_core.defaults import DEFAULT_CLUSTER_DDL_RETRY_WAIT_SECONDS
 from agentc_core.defaults import DEFAULT_CLUSTER_WAIT_UNTIL_READY_SECONDS
+from agentc_core.defaults import DEFAULT_DDL_CREATE_INDEX_INTERVAL_SECONDS
 from agentc_core.defaults import DEFAULT_EMBEDDING_MODEL_NAME
 from agentc_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
 from agentc_core.defaults import DEFAULT_VERBOSITY_LEVEL
@@ -33,10 +34,10 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
     conn_string: typing.Optional[str] = None
     """ Couchbase connection string that points to the catalog.
 
-    This Couchbase instance refers to the CB instance used with the :command:`publish` command.
+    This Couchbase instance refers to the CB instance used with the :code:`publish` command.
     If there exists no local catalog (e.g., this is deployed in a standalone environment), we will perform all
-    :command:`find` commands directly on the remote catalog.
-    If this field AND ``$AGENT_CATALOG_PROJECT_PATH`` are specified, we will issue :command:`find` on both the remote
+    :code:`find` commands directly on the remote catalog.
+    If this field AND ``$AGENT_CATALOG_PROJECT_PATH`` are specified, we will issue :code:`find` on both the remote
     and local catalog (with local catalog entries taking precedence).
 
     This field **must** be specified with :py:attr:`username`, :py:attr:`password`, and  :py:attr:`bucket`.
@@ -71,14 +72,14 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
     max_index_partition: int = 1024
     """ The maximum number of index partitions across all nodes for your cluster.
 
-    This parameter is used by the Search service to build vector indexes on :command:`init`.
+    This parameter is used by the Search service to build vector indexes on :code:`init`.
     By default, this value is 1024.
     """
 
     index_partition: typing.Optional[int] = None
     """ The maximum number of index partitions across all nodes for your cluster.
 
-    This parameter is used by the Search service to build vector indexes on :command:`init`.
+    This parameter is used by the Search service to build vector indexes on :code:`init`.
     By default, this value is :math:`2 \times \text{number of FTS nodes in your cluster}`.
     More information on index partitioning can be found
     `here <https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index-partitioning.html>`_.
@@ -91,10 +92,19 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
     By default, this value is 5 seconds.
     """
 
+    ddl_create_index_interval_seconds: typing.Optional[float] = DEFAULT_DDL_CREATE_INDEX_INTERVAL_SECONDS
+    """ Wait time (in seconds) between individual :code:`CREATE INDEX` operations.
+
+    This field is only used by the :code:`init` command during index creation.
+    Multiple index creation operations may raise a transient error from the Index Service.
+    If you keep running into this issue, raise this value.
+    By default, this value is 1 second.
+    """
+
     ddl_retry_attempts: typing.Optional[int] = DEFAULT_CLUSTER_DDL_RETRY_ATTEMPTS
     """ Maximum number of attempts to retry DDL operations.
 
-    This field is only used by the :command:`init` command during scope, collection, and index creation.
+    This field is only used by the :code:`init` command during scope, collection, and index creation.
     If the number of attempts is exceeded, the command will fail.
     By default, this value is 3 attempts.
     """
@@ -102,7 +112,7 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
     ddl_retry_wait_seconds: typing.Optional[float] = DEFAULT_CLUSTER_DDL_RETRY_WAIT_SECONDS
     """ Wait time (in seconds) between DDL operation retries.
 
-    This field is only used by the :command:`init` command during scope, collection, and index creation.
+    This field is only used by the :code:`init` command during scope, collection, and index creation.
     By default, this value is 5 seconds.
     """
 
@@ -390,14 +400,14 @@ class CommandLineConfig(pydantic_settings.BaseSettings):
     model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_", extra="ignore")
 
     verbosity_level: int = pydantic.Field(default=DEFAULT_VERBOSITY_LEVEL, ge=0, le=2)
-    """ Verbosity level of the :command:`agentc` command line tool.
+    """ Verbosity level of the :code:`agentc` command line tool.
 
     By default, this value is 0.
     If ``AGENT_CATALOG_DEBUG`` exists, this value is set to 2.
     """
 
     with_interaction: bool = True
-    """ Whether to enable the interaction mode for the :command:`agentc` command line tool.
+    """ Whether to enable the interaction mode for the :code:`agentc` command line tool.
 
     By default, this value is True.
     Set this value to False to raise errors when the command line tool requires user input (e.g., when developing

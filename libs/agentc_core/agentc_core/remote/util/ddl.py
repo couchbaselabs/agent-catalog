@@ -359,92 +359,112 @@ def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "prompt", "meta
     if kind == "metadata":
         # Primary index on kind_metadata
         primary_idx_metadata_name = "v2_AgentCatalogMetadataPrimaryIndex"
-        primary_idx = f"""
-            CREATE PRIMARY INDEX IF NOT EXISTS `{primary_idx_metadata_name}`
-            ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{DEFAULT_CATALOG_METADATA_COLLECTION}` USING GSI;
-        """
-        if print_progress:
-            next(progress_bar_it)
-            progress_bar.set_description(primary_idx_metadata_name)
-        err = None
-        for _ in range(cfg.ddl_retry_attempts):
-            res, err = execute_query(cluster, primary_idx)
-            try:
-                for r in res.rows():
-                    logger.debug(r)
-                break
-            except couchbase.exceptions.CouchbaseException as e:
-                logger.debug("Could not create primary index. Retrying and swallowing exception %s.", e)
-                time.sleep(cfg.ddl_retry_wait_seconds)
-                err = e
-        if err is not None:
-            all_errs += err
-            completion_status = False
-        with contextlib.suppress(StopIteration):
-            next(progress_bar_it)
+        completion_status = create_index(
+            all_errs,
+            cfg,
+            cluster,
+            completion_status,
+            f"""
+                CREATE PRIMARY INDEX IF NOT EXISTS `{primary_idx_metadata_name}`
+                ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{DEFAULT_CATALOG_METADATA_COLLECTION}` USING GSI;
+            """,
+            primary_idx_metadata_name,
+            print_progress,
+            progress_bar,
+            progress_bar_it,
+        )
         return completion_status, all_errs
 
     # Primary index on kind_catalog
     collection = DEFAULT_CATALOG_TOOL_COLLECTION if kind == "tool" else DEFAULT_CATALOG_PROMPT_COLLECTION
     primary_idx_name = f"v2_AgentCatalog{kind.capitalize()}sPrimaryIndex"
-    primary_idx = f"""
-        CREATE PRIMARY INDEX IF NOT EXISTS `{primary_idx_name}`
-        ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}` USING GSI;
-    """
-    if print_progress:
-        next(progress_bar_it)
-        progress_bar.set_description(primary_idx_name)
-    err = None
-    for _ in range(cfg.ddl_retry_attempts):
-        res, err = execute_query(cluster, primary_idx)
-        try:
-            for r in res.rows():
-                logger.debug(r)
-            break
-        except couchbase.exceptions.CouchbaseException as e:
-            logger.debug("Could not create primary index. Retrying and swallowing exception %s.", e)
-            time.sleep(cfg.ddl_retry_wait_seconds)
-            err = e
-    if err is not None:
-        all_errs += err
-        completion_status = False
+    completion_status |= create_index(
+        all_errs,
+        cfg,
+        cluster,
+        completion_status,
+        f"""
+            CREATE PRIMARY INDEX IF NOT EXISTS `{primary_idx_name}`
+            ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}` USING GSI;
+        """,
+        primary_idx_name,
+        print_progress,
+        progress_bar,
+        progress_bar_it,
+    )
 
     # Secondary index on catalog_identifier + annotations
     cat_ann_idx_name = f"v2_AgentCatalog{kind.capitalize()}sCatalogIdentifierAnnotationsIndex"
-    cat_ann_idx = f"""
-        CREATE INDEX IF NOT EXISTS `{cat_ann_idx_name}`
-        ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}`(catalog_identifier,annotations);
-    """
-    if print_progress:
-        next(progress_bar_it)
-        progress_bar.set_description(cat_ann_idx_name)
-    res, err = execute_query(cluster, cat_ann_idx)
-    for r in res.rows():
-        logger.debug(r)
-    if err is not None:
-        all_errs += err
-        completion_status = False
+    completion_status |= create_index(
+        all_errs,
+        cfg,
+        cluster,
+        completion_status,
+        f"""
+            CREATE INDEX IF NOT EXISTS `{cat_ann_idx_name}`
+            ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}`(catalog_identifier,annotations);
+        """,
+        cat_ann_idx_name,
+        print_progress,
+        progress_bar,
+        progress_bar_it,
+    )
 
     # Secondary index on annotations
     ann_idx_name = f"v2_AgentCatalog{kind.capitalize()}sAnnotationsIndex"
-    ann_idx = f"""
-        CREATE INDEX IF NOT EXISTS `{ann_idx_name}`
-        ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}`(`annotations`);
-    """
-    if print_progress:
-        next(progress_bar_it)
-        progress_bar.set_description(ann_idx_name)
-    res, err = execute_query(cluster, ann_idx)
-    for r in res.rows():
-        logger.debug(r)
-    if err is not None:
-        all_errs += err
-        completion_status = False
+    completion_status |= create_index(
+        all_errs,
+        cfg,
+        cluster,
+        completion_status,
+        f"""
+            CREATE INDEX IF NOT EXISTS `{ann_idx_name}`
+            ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}`(`annotations`);
+    """,
+        ann_idx_name,
+        print_progress,
+        progress_bar,
+        progress_bar_it,
+    )
 
     # This is to ensure that the progress bar reaches 100% even if there are no errors.
     with contextlib.suppress(StopIteration):
         next(progress_bar_it)
     return completion_status, all_errs
+
+
+def create_index(
+    all_errs,
+    cfg: Config,
+    cluster: couchbase.cluster.Cluster,
+    completion_status,
+    idx_creation_statement: str,
+    idx_metadata_name: str,
+    print_progress: bool,
+    progress_bar,
+    progress_bar_it,
+):
+    if print_progress:
+        next(progress_bar_it)
+        progress_bar.set_description(idx_metadata_name)
+    err = None
+    for _ in range(cfg.ddl_retry_attempts):
+        res, err = execute_query(cluster, idx_creation_statement)
+        try:
+            for r in res.rows():
+                logger.debug(r)
+            break
+        except couchbase.exceptions.CouchbaseException as e:
+            logger.debug("Could not create index %s. Retrying and swallowing exception %s.", idx_metadata_name, e)
+            time.sleep(cfg.ddl_retry_wait_seconds)
+            err = e
+    if err is not None:
+        all_errs += err
+        completion_status = False
+    with contextlib.suppress(StopIteration):
+        next(progress_bar_it)
+    time.sleep(cfg.ddl_create_index_interval_seconds)
+    return completion_status
 
 
 def check_if_scope_collection_exist(

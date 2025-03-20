@@ -197,6 +197,7 @@ def isolated_server_factory() -> typing.Callable[[pathlib.Path], docker.models.c
     os.environ["AGENT_CATALOG_PASSWORD"] = DEFAULT_COUCHBASE_PASSWORD
     os.environ["AGENT_CATALOG_BUCKET"] = DEFAULT_COUCHBASE_BUCKET
     os.environ["AGENT_CATALOG_WAIT_UNTIL_READY_SECONDS"] = "60"
+    os.environ["AGENT_CATALOG_DDL_CREATE_INDEX_INTERVAL_SECONDS"] = "30"
     os.environ["AGENT_CATALOG_DDL_RETRY_WAIT_SECONDS"] = "60"
 
     container_instance = set()

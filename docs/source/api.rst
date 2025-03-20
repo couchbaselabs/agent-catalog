@@ -26,6 +26,9 @@ LangChain / LangGraph
 .. automodule:: agentc_langchain.chat
     :members:
 
+.. automodule:: agentc_langgraph.node
+    :members:
+
 LlamaIndex
 ^^^^^^^^^^
 

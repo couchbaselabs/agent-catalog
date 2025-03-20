@@ -35,7 +35,7 @@ For example, if the project structure is as below:
 :file:`src/agent.py` contains the code for agent which uses the tools and prompts present in the project.
 :file:`src` directory contains the code for the agent along with the tools.
 
-While indexing using the command :command:`agentc index --tools src`, :file:`src/agent.py` will be indexed along with the tools present in the :file:`src` directory.
+While indexing using the command :code:`agentc index --tools src`, :file:`src/agent.py` will be indexed along with the tools present in the :file:`src` directory.
 
 Inorder to avoid that, :file:`.agentcignore` file can be added in :file:`src` directory with the following content to avoid indexing the file containing agent code:
 

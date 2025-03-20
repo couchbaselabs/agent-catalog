@@ -126,7 +126,7 @@ Do I need Couchbase instance to run Agent Catalog?
 No, you do not need a Couchbase instance to run Agent Catalog.
 
 If couchbase credentials are not provided in the environment variables file, Agent Catalog will use only the local catalog.
-For functionalities such as :command:`find`, :command:`execute` if couchbase credentials are not mentioned, only the local catalog will be used for searching tools/prompts.
+For functionalities such as :code:`find`, :code:`execute` if couchbase credentials are not mentioned, only the local catalog will be used for searching tools/prompts.
 
 What is Agent Catalog doing when I run ``agentc index``?
 --------------------------------------------------------
@@ -186,7 +186,7 @@ versions of your agent or rolling back your agent due to some regression.
 Catalog versions are Git commit hashes.
 To roll back to a previous catalog version, follow these steps:
 
-1. **List Catalog Versions** : Start by running the :command:`agentc status` command with the ``-db`` flag to
+1. **List Catalog Versions** : Start by running the :code:`agentc status` command with the ``-db`` flag to
    list all the published catalog versions of tools in your bucket (here, we are checking in ``travel-sample``):
 
    .. code-block:: bash
@@ -229,14 +229,14 @@ To roll back to a previous catalog version, follow these steps:
 
 2. **Browse Git Commits**: Next, check the ``catalog id`` from the above output for the Git commit hash at which the
    catalogs were published to the database.
-   Open your repository commit history on Github or run the :command:`git log` command in your terminal to view the
+   Open your repository commit history on Github or run the :code:`git log` command in your terminal to view the
    commit history for your project.
    Once you have a comprehensive list of commits, you can decide which catalog version to roll back to.
 
 3. **Perform Rollback**: When you decide which catalog version you want to roll back to, you can move forward
    (or rather, "backward") in three ways:
 
-   a. To revert your changes to a specific commit in a non-destructive manner, run :command:`git revert`.
+   a. To revert your changes to a specific commit in a non-destructive manner, run :code:`git revert`.
 
       .. code-block:: bash
 
@@ -246,7 +246,7 @@ To roll back to a previous catalog version, follow these steps:
       This is a safe way to rollback to a previous version without losing your current work, as your existing
       Git commit history will be preserved.
 
-   b. To checkout a particular commit (i.e., all changes associated with some commit), run :command:`git checkout`.
+   b. To checkout a particular commit (i.e., all changes associated with some commit), run :code:`git checkout`.
 
       .. code-block:: bash
 
@@ -254,7 +254,7 @@ To roll back to a previous catalog version, follow these steps:
 
       This command will checkout the commit `<commit_hash>` without creating a new commit.
 
-   c. To revert your changes to a specific commit in a **destructive** manner, run :command:`git reset`.
+   c. To revert your changes to a specific commit in a **destructive** manner, run :code:`git reset`.
 
       .. code-block:: bash
 
@@ -272,8 +272,8 @@ What environment variables are required to use Agent Catalog?
 -------------------------------------------------------------
 
 To get started with Agent Catalog, you'll need to initialize certain environment variables.
-These can be in a ``.env`` file located at the root of your project (where all of your :command:`agentc` commands are
-run) *or* manually using :command:`export`.
+These can be in a ``.env`` file located at the root of your project (where all of your :code:`agentc` commands are
+run) *or* manually using :code:`export`.
 
 Make sure to review the required variables and populate them with appropriate values before starting your project.
 
@@ -340,19 +340,19 @@ Examples of multiple tools existing within a single file are shown below:
 Do CLI commands need to be executed in a certain order?
 -------------------------------------------------------
 
-With the exception of the :command:`agentc publish` command, all other commands can be executed in any order.
+With the exception of the :code:`agentc publish` command, all other commands can be executed in any order.
 
 **Indexing**:
    After creating your tools and/or prompts, you first need to generate a local catalog with the
-   :command:`agentc index` command.
+   :code:`agentc index` command.
    This will build a file-based catalog that you can immediately use (without needing to connect to a Couchbase
    instance).
 
 **Publishing**:
-   To persist your catalog entries on Couchbase, use the :command:`agentc publish` command.
+   To persist your catalog entries on Couchbase, use the :code:`agentc publish` command.
 
 Publishing can only be done after indexing the catalog.
-To publish new changes, you must first commit your changes to Git and then run the :command:`agentc index` command
+To publish new changes, you must first commit your changes to Git and then run the :code:`agentc index` command
 again with a clean Git repository.
 
 For the complete set of Agent Catalog CLI commands, refer to the documentation `here <cli.html>`_.
