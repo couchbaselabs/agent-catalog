@@ -12,7 +12,7 @@ import typing
 logger = logging.getLogger(__name__)
 
 # TODO (GLENN): We should move this to a more appropriate location.
-os.environ["AGENT_CATALOG_DEBUG"] = "true"
+# os.environ["AGENT_CATALOG_DEBUG"] = "true"
 
 
 class EnvironmentKind(enum.StrEnum):
