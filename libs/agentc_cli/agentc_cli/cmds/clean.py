@@ -1,4 +1,4 @@
-import click
+import click_extra
 import couchbase.cluster
 import importlib.util
 import logging
@@ -52,7 +52,7 @@ def clean_db(
     all_errs = list()
     if len(catalog_ids) > 0:
         for k in kind:
-            click.secho(f"Removing catalog(s): {[catalog for catalog in catalog_ids]}", fg="yellow")
+            click_extra.secho(f"Removing catalog(s): {[catalog for catalog in catalog_ids]}", fg="yellow")
             meta_catalog_condition = " AND ".join([f"version.identifier = '{catalog}'" for catalog in catalog_ids])
             remove_metadata_query = f"""
                 DELETE FROM
@@ -119,14 +119,14 @@ def cmd_clean(
 
     if is_local:
         clean_local(cfg, targets)
-        click.secho("Local FS catalog/metadata has been deleted!", fg="green")
+        click_extra.secho("Local FS catalog/metadata has been deleted!", fg="green")
 
     if is_db:
         num_errs = clean_db(cfg, catalog_ids, kind, targets)
         if num_errs > 0:
             raise ValueError("Failed to cleanup DB catalog/metadata!")
         else:
-            click.secho("Database catalog/metadata has been deleted!", fg="green")
+            click_extra.secho("Database catalog/metadata has been deleted!", fg="green")
 
 
 # Note: flask is an optional dependency.

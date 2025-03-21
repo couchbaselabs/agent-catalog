@@ -43,9 +43,9 @@ sphinx-hoverxref = "^1.4.1"
 linkify-it-py = "^2.0.3"
 sphinx-autobuild = "^2024.10.3"
 autodoc-pydantic = "^2.2.0"
-sphinx-click = "^6.0.0"
 sphinx-rtd-theme = "^3.0.1"
 enum-tools = { version = "^0.12.0", extras = ["sphinx"] }
+click_extra = { version = "^4.15.0", extras = ["sphinx"] }
 
 # All packages for our examples (mainly here for convenience).
 [tool.poetry.group.examples.dependencies]

@@ -1,4 +1,4 @@
-import click
+import click_extra
 import couchbase.cluster
 import couchbase.exceptions
 import logging
@@ -20,7 +20,7 @@ def validate_or_prompt_for_bucket(cfg: Config, bucket: str = None):
         buckets = set([b.name for b in cluster.buckets().get_all_buckets()])
         cluster.close()
         if cfg.bucket is None and cfg.interactive:
-            cfg.bucket = click.prompt("Bucket", type=click.Choice(buckets), show_choices=True)
+            cfg.bucket = click_extra.prompt("Bucket", type=click_extra.Choice(buckets), show_choices=True)
 
         elif cfg.bucket is not None and cfg.bucket not in buckets:
             raise ValueError(

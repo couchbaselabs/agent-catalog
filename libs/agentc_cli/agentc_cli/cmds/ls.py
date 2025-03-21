@@ -1,4 +1,4 @@
-import click
+import click_extra
 import logging
 import typing
 
@@ -44,15 +44,17 @@ def cmd_ls(
                 cfg, force=force, include_dirty=include_dirty, kind=k, printer=lambda x: None
             )
             for catalog_item in catalog:
-                click.echo(f"{click.style(catalog_item.name, bold=True)}")
+                click_extra.echo(f"{click_extra.style(catalog_item.name, bold=True)}")
 
     # Otherwise, we will print the items with their descriptions (and with more format).
     else:
         for k in kind:
-            click.secho(DASHES, fg=KIND_COLORS[k])
-            click.secho(k.upper(), bold=True, fg=KIND_COLORS[k])
-            click.secho(DASHES, fg=KIND_COLORS[k])
+            click_extra.secho(DASHES, fg=KIND_COLORS[k])
+            click_extra.secho(k.upper(), bold=True, fg=KIND_COLORS[k])
+            click_extra.secho(DASHES, fg=KIND_COLORS[k])
             catalog: CatalogBase = get_catalog(cfg, force=force, include_dirty=include_dirty, kind=k)
             for i, catalog_item in enumerate(catalog):
-                click.echo(f"{i+1}. {click.style(catalog_item.name, bold=True)}\n\t{catalog_item.description}")
-            click.secho(DASHES, fg=KIND_COLORS[k])
+                click_extra.echo(
+                    f"{i+1}. {click_extra.style(catalog_item.name, bold=True)}\n\t{catalog_item.description}"
+                )
+            click_extra.secho(DASHES, fg=KIND_COLORS[k])

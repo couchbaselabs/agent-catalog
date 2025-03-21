@@ -219,6 +219,7 @@ def isolated_server_factory() -> typing.Callable[[pathlib.Path], docker.models.c
         del os.environ["AGENT_CATALOG_PASSWORD"]
         del os.environ["AGENT_CATALOG_BUCKET"]
         del os.environ["AGENT_CATALOG_WAIT_UNTIL_READY_SECONDS"]
+        del os.environ["AGENT_CATALOG_DDL_CREATE_INDEX_INTERVAL_SECONDS"]
         del os.environ["AGENT_CATALOG_DDL_RETRY_WAIT_SECONDS"]
         if len(container_instance) > 0:
             _stop_container(container_instance.pop())

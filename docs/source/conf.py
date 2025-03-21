@@ -25,8 +25,8 @@ extensions = [
     "enum_tools.autoenum",
     "sphinxcontrib.autodoc_pydantic",
     "sphinx_copybutton",
-    "sphinx_click",
     "sphinx.ext.githubpages",
+    "click_extra.sphinx",
 ]
 pygments_style = "sphinx"
 templates_path = ["_templates"]

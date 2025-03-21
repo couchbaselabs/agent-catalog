@@ -51,6 +51,12 @@ Installing from Source (with Makefile)
 
       Note that you must activate your environment before running any :code:`agentc` commands!
 
+   If your environment has been activated properly, you should see the following output:
+
+   .. click:run::
+      from agentc_cli.main import agentc
+      invoke(agentc)
+
 6. If you are interested in building a ``.whl`` file (for later use in ``.whl``-based installation in other projects),
    run the following command:
 

@@ -1,4 +1,4 @@
-import click
+import click_extra
 import couchbase.exceptions
 import datetime
 import functools
@@ -105,9 +105,9 @@ def get_catalog(
     force: typing.Literal["local", "db", "chain"] = None,
     printer: typing.Callable[[str], None] = None,
 ):
-    # By default, we'll print using click.
+    # By default, we'll print using click_extra.
     if printer is None:
-        printer = click.secho
+        printer = click_extra.secho
 
     # We have three options: (1) db catalog, (2) local catalog, or (3) both.
     repo, get_path_version = load_repository(pathlib.Path(os.getcwd()))

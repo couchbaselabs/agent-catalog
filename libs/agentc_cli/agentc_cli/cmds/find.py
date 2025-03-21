@@ -1,4 +1,4 @@
-import click
+import click_extra
 import logging
 import pydantic
 import textwrap
@@ -65,9 +65,9 @@ def cmd_find(
     # Validate that only query or only name is specified (error will be bubbled up).
     search_opt = SearchOptions(query=query, name=name)
     query, name = search_opt.query, search_opt.name
-    click.secho(DASHES, fg=KIND_COLORS[kind])
-    click.secho(kind.upper(), bold=True, fg=KIND_COLORS[kind])
-    click.secho(DASHES, fg=KIND_COLORS[kind])
+    click_extra.secho(DASHES, fg=KIND_COLORS[kind])
+    click_extra.secho(kind.upper(), bold=True, fg=KIND_COLORS[kind])
+    click_extra.secho(DASHES, fg=KIND_COLORS[kind])
 
     # Check if a refiner is specified.
     if refiner == "None":
@@ -103,13 +103,13 @@ def cmd_find(
 
     if refiner is not None:
         search_results = refiners[refiner]()(search_results)
-    click.secho(f"\n{len(search_results)} result(s) returned from the catalog.", bold=True, bg="green")
+    click_extra.secho(f"\n{len(search_results)} result(s) returned from the catalog.", bold=True, bg="green")
     if cfg.verbosity_level > 0:
         for i, result in enumerate(search_results):
-            click.secho(f"  {i + 1}. (delta = {result.delta}, higher is better): ", bold=True)
-            click.echo(textwrap.indent(str(result.entry), "  "))
+            click_extra.secho(f"  {i + 1}. (delta = {result.delta}, higher is better): ", bold=True)
+            click_extra.echo(textwrap.indent(str(result.entry), "  "))
     else:
         for i, result in enumerate(search_results):
-            click.secho(f"  {i + 1}. (delta = {result.delta}, higher is better): ", nl=False, bold=True)
-            click.echo(str(result.entry.identifier))
-    click.secho(DASHES, fg=KIND_COLORS[kind])
+            click_extra.secho(f"  {i + 1}. (delta = {result.delta}, higher is better): ", nl=False, bold=True)
+            click_extra.echo(str(result.entry.identifier))
+    click_extra.secho(DASHES, fg=KIND_COLORS[kind])

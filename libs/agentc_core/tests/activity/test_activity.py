@@ -1,12 +1,12 @@
-import click
-import click.testing
+import click_extra
+import click_extra.testing
 import couchbase.cluster
 import pathlib
 import pytest
 import typing
 
 from agentc import Catalog
-from agentc_cli.main import click_main
+from agentc_cli.main import agentc
 from agentc_core.activity import GlobalSpan
 from agentc_core.activity import Span
 from agentc_core.activity.models.content import KeyValueContent
@@ -33,13 +33,13 @@ def test_local_auditor_positive_1(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
-            click_runner=click.testing.CliRunner(),
-            click_command=click_main,
+            click_runner=click_extra.testing.ExtraCliRunner(),
+            click_command=agentc,
         )
 
         # Note: flush is necessary for our tests, but this is not representative of a typical workflow.
@@ -114,13 +114,13 @@ def test_local_auditor_positive_2(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
-            click_runner=click.testing.CliRunner(),
-            click_command=click_main,
+            click_runner=click_extra.testing.ExtraCliRunner(),
+            click_command=agentc,
         )
 
         # Note: flush is necessary for our tests, but this is not representative of a typical workflow.
@@ -153,13 +153,13 @@ def test_local_auditor_positive_3(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
-            click_runner=click.testing.CliRunner(),
-            click_command=click_main,
+            click_runner=click_extra.testing.ExtraCliRunner(),
+            click_command=agentc,
         )
 
         # Note: flush is necessary for our tests, but this is not representative of a typical workflow.

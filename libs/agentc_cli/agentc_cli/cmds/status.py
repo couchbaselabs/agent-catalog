@@ -1,4 +1,4 @@
-import click
+import click_extra
 import couchbase.cluster
 import dataclasses
 import datetime
@@ -50,40 +50,40 @@ def cmd_status(
 
     cluster = cfg.Cluster() if with_db else None
     for k in kind:
-        click.secho(DASHES, fg=KIND_COLORS[k])
-        click.secho(k.upper(), fg=KIND_COLORS[k], bold=True)
+        click_extra.secho(DASHES, fg=KIND_COLORS[k])
+        click_extra.secho(k.upper(), fg=KIND_COLORS[k], bold=True)
 
         # Display items from our DB catalog only.
         if with_db and not with_local:
             get_db_status(k, cfg.bucket, cluster, False)
-            click.secho(DASHES, fg=KIND_COLORS[k])
+            click_extra.secho(DASHES, fg=KIND_COLORS[k])
 
         # Display items from both our DB and local FS catalog (and compare the two).
         elif with_db and with_local:
             # Grab our commit ID.
             commit_hash_db = get_db_status(k, cfg.bucket, cluster, True)
-            click.secho(DASHES, fg=KIND_COLORS[k])
+            click_extra.secho(DASHES, fg=KIND_COLORS[k])
 
             # Display our status.
             sections: list[Section] = get_local_status(cfg, k, include_dirty=include_dirty)
             for section in sections:
                 section.display()
-            click.secho(DASHES, fg=KIND_COLORS[k])
+            click_extra.secho(DASHES, fg=KIND_COLORS[k])
             if commit_hash_db is not None:
                 show_diff_between_commits(commit_hash_db, cfg, k)
             else:
-                click.secho(DASHES, fg=KIND_COLORS[k])
-                click.secho(
+                click_extra.secho(DASHES, fg=KIND_COLORS[k])
+                click_extra.secho(
                     "DB catalog missing! To compare local FS and DB catalogs, please publish your catalog!", fg="yellow"
                 )
-            click.secho(DASHES, fg=KIND_COLORS[k])
+            click_extra.secho(DASHES, fg=KIND_COLORS[k])
 
         # Display items from our local FS catalog only.
         elif with_local and not with_db:
             sections: list[Section] = get_local_status(cfg, k, include_dirty=include_dirty)
             for section in sections:
                 section.display()
-            click.secho(DASHES, fg=KIND_COLORS[k])
+            click_extra.secho(DASHES, fg=KIND_COLORS[k])
 
         else:
             raise ValueError("Either local FS or DB catalog must be specified!")
@@ -101,18 +101,18 @@ class Section:
     name: str | None = None
 
     def display(self):
-        click.secho(DASHES, fg=KIND_COLORS[self.kind])
+        click_extra.secho(DASHES, fg=KIND_COLORS[self.kind])
         if self.name is not None:
-            click.echo(self.name + ":")
+            click_extra.echo(self.name + ":")
             indent = "\t"
         else:
             indent = ""
 
         for part in self.parts:
             if part.level is not None and part.level in LEVEL_COLORS:
-                click.secho(indent + part.msg, fg=LEVEL_COLORS[part.level])
+                click_extra.secho(indent + part.msg, fg=LEVEL_COLORS[part.level])
             else:
-                click.echo(indent + part.msg)
+                click_extra.echo(indent + part.msg)
 
 
 def get_db_status(
@@ -158,17 +158,17 @@ def get_db_status(
 
         # If result set is empty
         if len(resp) == 0:
-            click.secho(
+            click_extra.secho(
                 f"No {kind} catalog found in the specified bucket...please run agentc publish to push catalogs to the DB.",
                 fg="red",
             )
             logger.error("No catalogs published...")
             return None
 
-        click.secho(DASHES, fg=KIND_COLORS[kind])
-        click.secho("db catalog info:")
+        click_extra.secho(DASHES, fg=KIND_COLORS[kind])
+        click_extra.secho("db catalog info:")
         for row in resp:
-            click.secho(
+            click_extra.secho(
                 f"""\tcatalog id: {row["version"]["identifier"]}
      \t\tpath            : {bucket}.{DEFAULT_CATALOG_SCOPE}.{kind}
      \t\tschema version  : {row['schema_version']}
@@ -184,15 +184,15 @@ def get_db_status(
         return None
     except KeyspaceNotFoundException as e:
         logger.debug(f"Swallowing exception {str(e)}.")
-        click.secho(DASHES, fg=KIND_COLORS[kind])
-        click.secho(
+        click_extra.secho(DASHES, fg=KIND_COLORS[kind])
+        click_extra.secho(
             f"ERROR: db catalog of kind {kind} does not exist yet: please use the publish command by specifying the kind.",
             fg="red",
         )
     except ScopeNotFoundException as e:
         logger.debug(f"Swallowing exception {str(e)}.")
-        click.secho(DASHES, fg=KIND_COLORS[kind])
-        click.secho(
+        click_extra.secho(DASHES, fg=KIND_COLORS[kind])
+        click_extra.secho(
             f"ERROR: db catalog of kind {kind} does not exist yet: please use the publish command by specifying the kind.",
             fg="red",
         )
@@ -335,24 +335,24 @@ def show_diff_between_commits(cfg: Config, commit_hash_2: str, kind: typing.Lite
     commit1 = repo.commit(commit_hash_1)
     commit2 = repo.commit(commit_hash_2)
 
-    click.secho(DASHES, fg=KIND_COLORS[kind])
+    click_extra.secho(DASHES, fg=KIND_COLORS[kind])
     # Get the diff between the two commits
     diff = commit1.diff(commit2)
     if len(diff) > 0:
-        click.echo("Git diff from last catalog publish...")
+        click_extra.echo("Git diff from last catalog publish...")
         # Iterate through the diff to show changes
         for change in diff:
             if change.a_path != change.b_path:
-                click.secho(f"File renamed or changed: {change.a_path} -> {change.b_path}", fg="yellow")
+                click_extra.secho(f"File renamed or changed: {change.a_path} -> {change.b_path}", fg="yellow")
 
             if change.change_type == "A":
-                click.secho(f"{change.a_path} was added.", fg="green")
+                click_extra.secho(f"{change.a_path} was added.", fg="green")
             elif change.change_type == "D":
-                click.secho(f"{change.a_path} was deleted.", fg="red")
+                click_extra.secho(f"{change.a_path} was deleted.", fg="red")
             elif change.change_type == "M":
-                click.secho(f"{change.a_path} was modified.", fg="yellow")
+                click_extra.secho(f"{change.a_path} was modified.", fg="yellow")
     else:
-        click.secho(f"No changes to {kind} catalog from last commit..")
+        click_extra.secho(f"No changes to {kind} catalog from last commit..")
 
 
 # Note: flask is an optional dependency.

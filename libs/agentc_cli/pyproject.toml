@@ -23,7 +23,7 @@ agentc = "agentc_cli.main:main"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-click = "^8.1.7"
+click-extra = "^4.15.0"
 tqdm = "^4.66.5"
 
 [tool.poetry.dependencies.agentc-core]

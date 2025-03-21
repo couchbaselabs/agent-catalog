@@ -1,4 +1,4 @@
-import click
+import click_extra
 import datetime
 import logging
 import os
@@ -78,11 +78,11 @@ def cmd_index(
 
         def logging_printer(content: str, *args, **kwargs):
             logger.debug(content)
-            click.secho(content, *args, **kwargs)
+            click_extra.secho(content, *args, **kwargs)
 
         printer = logging_printer
     else:
-        printer = click.secho
+        printer = click_extra.secho
 
     for kind in kinds:
         if kind == "tool":
@@ -107,5 +107,5 @@ def cmd_index(
         )
         if not dry_run and len(next_catalog.catalog_descriptor.items) > 0:
             next_catalog.dump(catalog_file)
-            click.secho("\nCatalog successfully indexed!", fg="green")
-        click.secho(DASHES, fg=KIND_COLORS[kind])
+            click_extra.secho("\nCatalog successfully indexed!", fg="green")
+        click_extra.secho(DASHES, fg=KIND_COLORS[kind])

@@ -1,4 +1,4 @@
-import click
+import click_extra
 import logging
 import pathlib
 import pydantic
@@ -66,7 +66,7 @@ class CatalogMem(pydantic.BaseModel, CatalogBase):
             if len(catalog) != 0:
                 return [SearchResult(entry=catalog[0], delta=1)]
             else:
-                click.secho(f"No catalog items found with name '{name}'", fg="yellow")
+                click_extra.secho(f"No catalog items found with name '{name}'", fg="yellow")
                 return []
 
         # If annotations have been specified, prune all tools that do not possess these annotations.

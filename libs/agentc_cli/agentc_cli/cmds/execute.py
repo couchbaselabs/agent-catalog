@@ -1,4 +1,4 @@
-import click
+import click_extra
 import importlib
 import logging
 import os
@@ -47,7 +47,7 @@ def cmd_execute(
     # Validate our search options.
     search_opt = SearchOptions(query=query, name=name)
     query, name = search_opt.query, search_opt.name
-    click.secho(DASHES, fg=KIND_COLORS["tool"])
+    click_extra.secho(DASHES, fg=KIND_COLORS["tool"])
 
     # Determine what type of catalog we want.
     if with_local and with_db:
@@ -149,9 +149,9 @@ def cmd_execute(
             file_stem = file_stems[1] if file_stems[0] == "__pycache__" else file_stems[0]
             gen_code_modules = importlib.import_module(file_stem)
 
-        click.secho(DASHES, fg="yellow")
-        click.secho("Instructions:", fg="blue")
-        click.secho(
+        click_extra.secho(DASHES, fg="yellow")
+        click_extra.secho("Instructions:", fg="blue")
+        click_extra.secho(
             message="\tPlease provide prompts for the prompted variables.\n"
             "\tThe types are shown for reference in parentheses.\n"
             "\tIf the input is of type list, please provide your list values in a comma-separated format.\n",
@@ -162,14 +162,14 @@ def cmd_execute(
             cb_tool_metadata: SQLPPQueryToolDescriptor | SemanticSearchToolDescriptor = tool_metadata
             cb_secrets: CouchbaseSecrets = cb_tool_metadata.secrets[0]
             cb_secrets_map = {
-                cb_secrets.couchbase.conn_string: click.prompt(
-                    click.style(cb_secrets.couchbase.conn_string + " (str)", fg="blue")
+                cb_secrets.couchbase.conn_string: click_extra.prompt(
+                    click_extra.style(cb_secrets.couchbase.conn_string + " (str)", fg="blue")
                 ),
-                cb_secrets.couchbase.username: click.prompt(
-                    click.style(cb_secrets.couchbase.username + " (str)", fg="blue")
+                cb_secrets.couchbase.username: click_extra.prompt(
+                    click_extra.style(cb_secrets.couchbase.username + " (str)", fg="blue")
                 ),
-                cb_secrets.couchbase.password: click.prompt(
-                    click.style(cb_secrets.couchbase.password + " (secret str)", fg="blue"), hide_input=True
+                cb_secrets.couchbase.password: click_extra.prompt(
+                    click_extra.style(cb_secrets.couchbase.password + " (secret str)", fg="blue"), hide_input=True
                 ),
             }
             for k, v in cb_secrets_map.items():
@@ -190,10 +190,10 @@ def cmd_execute(
 
         # call tool function
         res = tool.func(**modified_user_inputs)
-        click.secho(DASHES, fg="yellow")
-        click.secho("Result:", fg="green")
-        click.echo(res)
-        click.secho(DASHES, fg=KIND_COLORS["tool"])
+        click_extra.secho(DASHES, fg="yellow")
+        click_extra.secho("Result:", fg="green")
+        click_extra.echo(res)
+        click_extra.secho(DASHES, fg=KIND_COLORS["tool"])
 
 
 # gets all class variable types present in all custom defined classes in code
@@ -224,8 +224,8 @@ def take_input_from_user(input_types: dict) -> dict:
                 else inp_type.__name__
             )
 
-            entered_val = click.prompt(
-                click.style(f"{inp} ({inp_type_to_show_user})", fg="blue"), type=str if is_list else inp_type
+            entered_val = click_extra.prompt(
+                click_extra.style(f"{inp} ({inp_type_to_show_user})", fg="blue"), type=str if is_list else inp_type
             )
 
             if not is_list:
@@ -264,8 +264,10 @@ def take_verify_list_inputs(entered_val, input_name, input_type, inp_type_to_sho
         is_correct = False
 
     while not is_correct:
-        click.secho(f"Given value is not of type {list_type}. Please enter the correct values", fg="red")
-        entered_val = click.prompt(click.style(f"{input_name} ({inp_type_to_show_user})", fg="blue"), type=str)
+        click_extra.secho(f"Given value is not of type {list_type}. Please enter the correct values", fg="red")
+        entered_val = click_extra.prompt(
+            click_extra.style(f"{input_name} ({inp_type_to_show_user})", fg="blue"), type=str
+        )
         try:
             conv_inps = split_and_convert(entered_val, types_mapping[list_type])
             is_correct = True

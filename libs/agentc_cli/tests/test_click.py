@@ -1,4 +1,4 @@
-import click.testing
+import click_extra.testing
 import couchbase.cluster
 import git
 import json
@@ -11,7 +11,7 @@ import shutil
 import typing
 import uuid
 
-from agentc_cli.main import click_main
+from agentc_cli.main import agentc
 from agentc_core.defaults import DEFAULT_ACTIVITY_FOLDER
 from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
@@ -40,13 +40,13 @@ def test_index(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         env = environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.EMPTY,
             click_runner=runner,
-            click_command=click_main,
+            click_command=agentc,
         )
 
         env.repository = git.Repo.init(td)
@@ -66,7 +66,7 @@ def test_index(
             pathlib.Path(tool_folder / tool.parent.name).mkdir(exist_ok=True)
             shutil.copy(tool, tool_folder / tool.parent.name / (uuid.uuid4().hex + tool.suffix))
         shutil.copy(resources_folder / "_good_spec.json", tool_folder / "_good_spec.json")
-        invocation = runner.invoke(click_main, ["index", str(tool_folder.absolute()), "--no-prompts"])
+        invocation = runner.invoke(agentc, ["index", str(tool_folder.absolute()), "--no-prompts"])
 
         # We should see 11 files scanned and 12 tools indexed.
         output = invocation.output
@@ -84,22 +84,22 @@ def test_publish_positive_1(
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
             click_runner=runner,
-            click_command=click_main,
+            click_command=agentc,
         )
 
-        result = runner.invoke(click_main, ["init", "catalog", "--no-local", "--db"])
+        result = runner.invoke(agentc, ["init", "catalog", "--no-local", "--db"])
         assert "GSI metadata index for the has been successfully created!" in result.output
         assert "Vector index for the tool catalog has been successfully created!" in result.output
         assert "Vector index for the prompt catalog has been successfully created!" in result.output
 
-        result = runner.invoke(click_main, ["publish"])
+        result = runner.invoke(agentc, ["publish"])
         assert "Uploading the tool catalog items to Couchbase" in result.output
         assert "Uploading the prompt catalog items to Couchbase" in result.output
 
@@ -117,22 +117,22 @@ def test_publish_negative_1(
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_DIRTY_ALL_TRAVEL,
             click_runner=runner,
-            click_command=click_main,
+            click_command=agentc,
         )
 
-        result = runner.invoke(click_main, ["init", "catalog", "--no-local", "--db"])
+        result = runner.invoke(agentc, ["init", "catalog", "--no-local", "--db"])
         assert "GSI metadata index for the has been successfully created!" in result.output
         assert "Vector index for the tool catalog has been successfully created!" in result.output
         assert "Vector index for the prompt catalog has been successfully created!" in result.output
 
-        result = runner.invoke(click_main, ["publish"])
+        result = runner.invoke(agentc, ["publish"])
         assert "Cannot publish a dirty catalog to the DB!" in str(result.exception)
 
         cluster = connection_factory()
@@ -149,22 +149,22 @@ def test_publish_positive_2(
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
             click_runner=runner,
-            click_command=click_main,
+            click_command=agentc,
         )
 
-        result = runner.invoke(click_main, ["init", "catalog", "--no-local", "--db"])
+        result = runner.invoke(agentc, ["init", "catalog", "--no-local", "--db"])
         assert "GSI metadata index for the has been successfully created!" in result.output
         assert "Vector index for the tool catalog has been successfully created!" in result.output
         assert "Vector index for the prompt catalog has been successfully created!" in result.output
 
-        result = runner.invoke(click_main, ["publish", "tools"])
+        result = runner.invoke(agentc, ["publish", "tools"])
         assert "Uploading the tool catalog items to Couchbase" in result.output
 
         cluster = connection_factory()
@@ -181,22 +181,22 @@ def test_publish_positive_3(
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
             click_runner=runner,
-            click_command=click_main,
+            click_command=agentc,
         )
 
-        result = runner.invoke(click_main, ["init", "catalog", "--no-local", "--db"])
+        result = runner.invoke(agentc, ["init", "catalog", "--no-local", "--db"])
         assert "GSI metadata index for the has been successfully created!" in result.output
         assert "Vector index for the tool catalog has been successfully created!" in result.output
         assert "Vector index for the prompt catalog has been successfully created!" in result.output
 
-        result = runner.invoke(click_main, ["publish", "prompts"])
+        result = runner.invoke(agentc, ["publish", "prompts"])
         assert "Uploading the prompt catalog items to Couchbase" in result.output
 
         cluster = connection_factory()
@@ -218,20 +218,20 @@ def test_find(
     2. command includes search for dirty versions of tool
     3. command tests the find capability and not recall/accuracy
     """
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
         env = environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.PUBLISHED_ALL_TRAVEL,
             click_runner=runner,
-            click_command=click_main,
+            click_command=agentc,
         )
 
         # DB find
         cid = env.repository.head.commit.binsha.hex()
         invocation = runner.invoke(
-            click_main,
+            agentc,
             [
                 "find",
                 "tools",
@@ -246,14 +246,14 @@ def test_find(
         assert "1 result(s) returned from the catalog." in output
 
         output = runner.invoke(
-            click_main,
+            agentc,
             ["find", "tools", "--db", "--query", "'get blogs of interest'", "--limit", "3", "-cid", cid],
         ).stdout
         assert "3 result(s) returned from the catalog." in output
 
         # Local find
         output = runner.invoke(
-            click_main,
+            agentc,
             [
                 "find",
                 "tools",
@@ -266,7 +266,7 @@ def test_find(
         assert "1 result(s) returned from the catalog." in output
 
         output = runner.invoke(
-            click_main,
+            agentc,
             [
                 "find",
                 "tools",
@@ -287,12 +287,12 @@ def test_status(
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         os.chdir(td)
 
         # Case 1 - catalog does not exist locally
-        output = runner.invoke(click_main, ["status"])
+        output = runner.invoke(agentc, ["status"])
         assert "Local catalog not found " in str(output.exception)
         assert isinstance(output.exception, ValueError)
 
@@ -301,20 +301,20 @@ def test_status(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.PUBLISHED_TOOLS_TRAVEL,
             click_runner=runner,
-            click_command=click_main,
+            click_command=agentc,
         )
 
         # Case 2 - tool catalog exists locally (testing for only one kind of catalog)
-        output = runner.invoke(click_main, ["status", "tools", "--dirty"]).stdout
+        output = runner.invoke(agentc, ["status", "tools", "--dirty"]).stdout
         assert "local catalog info:\n	path            :" in output
         assert ".agent-catalog/tools.json" in output
 
         # Case 3 - tool catalog exists in db (this test runs after publish test)
-        output = runner.invoke(click_main, ["status", "tools", "--dirty", "--no-local", "--db"]).stdout
+        output = runner.invoke(agentc, ["status", "tools", "--dirty", "--no-local", "--db"]).stdout
         assert "db catalog info" in output
 
         # Case 4 - compare the two catalogs
-        output = runner.invoke(click_main, ["status", "tools", "--local", "--db", "--dirty"]).stdout
+        output = runner.invoke(agentc, ["status", "tools", "--local", "--db", "--dirty"]).stdout
         assert "local catalog info:\n	path            :" in output
         assert ".agent-catalog/tools.json" in output
         assert "db catalog info" in output
@@ -325,15 +325,15 @@ def test_local_clean(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.EMPTY,
             click_runner=runner,
-            click_command=click_main,
+            click_command=agentc,
         )
-        runner.invoke(click_main, ["init", "catalog", "--no-db"])
+        runner.invoke(agentc, ["init", "catalog", "--no-db"])
         catalog_folder = pathlib.Path(td) / DEFAULT_CATALOG_FOLDER
 
         # Local clean
@@ -344,7 +344,7 @@ def test_local_clean(
         with dummy_file_2.open("w") as fp:
             fp.write("more dummy content")
 
-        assert runner.invoke(click_main, ["clean", "catalog", "--no-db", "-y"]).exit_code == 0
+        assert runner.invoke(agentc, ["clean", "catalog", "--no-db", "-y"]).exit_code == 0
         assert not dummy_file_1.exists()
         assert not dummy_file_2.exists()
 
@@ -355,17 +355,17 @@ def test_db_clean(
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.PUBLISHED_ALL_TRAVEL,
             click_runner=runner,
-            click_command=click_main,
+            click_command=agentc,
         )
         runner.invoke(
-            click_main,
+            agentc,
             [
                 "clean",
                 "catalog",
@@ -392,7 +392,7 @@ def test_db_clean(
         assert not is_scope_present, f"Clean DB failed as scope {DEFAULT_CATALOG_SCOPE} is present in DB."
 
         # Test our status after clean
-        output = runner.invoke(click_main, ["status", "tools", "--dirty", "--db"]).stdout
+        output = runner.invoke(agentc, ["status", "tools", "--dirty", "--db"]).stdout
         expected_response_db = (
             "ERROR: db catalog of kind tool does not exist yet: please use the publish command by specifying the kind."
         )
@@ -404,32 +404,32 @@ def test_execute(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_TOOLS_TRAVEL,
             click_runner=runner,
-            click_command=click_main,
+            click_command=agentc,
         )
 
-        output = runner.invoke(click_main, ["execute", "--name", "random_tool", "--local"]).stdout
+        output = runner.invoke(agentc, ["execute", "--name", "random_tool", "--local"]).stdout
         assert "No catalog items found" in output
 
-        with patch("click.prompt", side_effect=["BVC"]):
-            output = runner.invoke(click_main, ["execute", "--name", "check_if_airport_exists", "--local"]).stdout
+        with patch("click_extra.prompt", side_effect=["BVC"]):
+            output = runner.invoke(agentc, ["execute", "--name", "check_if_airport_exists", "--local"]).stdout
             assert "True" in output
 
-        with patch("click.prompt", side_effect=["ABC"]):
-            output = runner.invoke(click_main, ["execute", "--name", "check_if_airport_exists", "--local"]).stdout
+        with patch("click_extra.prompt", side_effect=["ABC"]):
+            output = runner.invoke(agentc, ["execute", "--name", "check_if_airport_exists", "--local"]).stdout
             assert "False" in output
 
-        with patch("click.prompt", side_effect=["BVC"]):
-            output = runner.invoke(click_main, ["execute", "--query", "is airport valid", "--local"]).stdout
+        with patch("click_extra.prompt", side_effect=["BVC"]):
+            output = runner.invoke(agentc, ["execute", "--query", "is airport valid", "--local"]).stdout
             assert "True" in output
 
-        with patch("click.prompt", side_effect=["ABC"]):
-            output = runner.invoke(click_main, ["execute", "--query", "is airport valid", "--local"]).stdout
+        with patch("click_extra.prompt", side_effect=["ABC"]):
+            output = runner.invoke(agentc, ["execute", "--query", "is airport valid", "--local"]).stdout
             assert "False" in output
 
 
@@ -450,14 +450,14 @@ def test_publish_different_versions(
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.PUBLISHED_ALL_TRAVEL,
             click_runner=runner,
-            click_command=click_main,
+            click_command=agentc,
         )
 
         cluster = connection_factory()
@@ -477,11 +477,11 @@ def test_publish_different_versions(
         assert n1 < n2
 
         # ...now, our index...
-        result = runner.invoke(click_main, ["index", "tools", "prompts"])
+        result = runner.invoke(agentc, ["index", "tools", "prompts"])
         assert "Catalog successfully indexed" in result.output
 
         # ...and finally, our publish.
-        result = runner.invoke(click_main, ["publish"])
+        result = runner.invoke(agentc, ["publish"])
         assert "Uploading the prompt catalog items to Couchbase" in result.output
         assert "Uploading the tool catalog items to Couchbase" in result.output
 
@@ -499,12 +499,12 @@ def test_ls_local_empty_notindexed(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         os.chdir(td)
 
         # when the repo is empty
-        output = runner.invoke(click_main, ["ls", "--local", "--no-db"]).stdout
+        output = runner.invoke(agentc, ["ls", "--local", "--no-db"]).stderr
         assert "Could not find .git directory. Please run agentc within a git repository." in output
 
         # when there are tools and prompts, but are not indexed
@@ -512,9 +512,9 @@ def test_ls_local_empty_notindexed(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.NON_INDEXED_ALL_TRAVEL,
             click_runner=runner,
-            click_command=click_main,
+            click_command=agentc,
         )
-        output = runner.invoke(click_main, ["ls", "--local", "--no-db"]).stdout
+        output = runner.invoke(agentc, ["ls", "--local", "--no-db"]).stderr
         assert "Could not find local catalog at" in output
 
 
@@ -523,18 +523,18 @@ def test_ls_local_only_tools(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         # when only tools are indexed
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_TOOLS_TRAVEL,
             click_runner=runner,
-            click_command=click_main,
+            click_command=agentc,
         )
-        output = runner.invoke(click_main, ["-v", "ls", "tools", "--local", "--no-db"]).stdout
+        output = runner.invoke(agentc, ["-v", "ls", "tools", "--local", "--no-db"]).stdout
         assert "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 1
-        output = runner.invoke(click_main, ["-v", "ls", "prompts", "--local", "--no-db"]).stdout
+        output = runner.invoke(agentc, ["-v", "ls", "prompts", "--local", "--no-db"]).stdout
         assert "PROMPT" in output and len(re.findall(r"\b1\.\s.+", output)) == 0
 
 
@@ -543,18 +543,18 @@ def test_ls_local_only_prompts(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         # when only prompts are indexed
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_PROMPTS_TRAVEL,
             click_runner=runner,
-            click_command=click_main,
+            click_command=agentc,
         )
-        output = runner.invoke(click_main, ["-v", "ls", "prompts", "--local", "--no-db"]).stdout
+        output = runner.invoke(agentc, ["-v", "ls", "prompts", "--local", "--no-db"]).stdout
         assert "PROMPT" in output and len(re.findall(r"\b1\.\s.+", output)) == 1
-        output = runner.invoke(click_main, ["-v", "ls", "tools", "--local", "--no-db"]).stdout
+        output = runner.invoke(agentc, ["-v", "ls", "tools", "--local", "--no-db"]).stdout
         assert "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 0
 
 
@@ -563,20 +563,20 @@ def test_ls_local_both_tools_prompts(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         # when there are both tools and prompts
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
             click_runner=runner,
-            click_command=click_main,
+            click_command=agentc,
         )
-        output = runner.invoke(click_main, ["-v", "ls", "prompts", "--local", "--no-db"]).stdout
+        output = runner.invoke(agentc, ["-v", "ls", "prompts", "--local", "--no-db"]).stdout
         assert "PROMPT" in output and len(re.findall(r"\b1\.\s.+", output)) == 1
-        output = runner.invoke(click_main, ["-v", "ls", "tools", "--local", "--no-db"]).stdout
+        output = runner.invoke(agentc, ["-v", "ls", "tools", "--local", "--no-db"]).stdout
         assert "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 1
-        output = runner.invoke(click_main, ["-v", "ls", "--local"]).stdout
+        output = runner.invoke(agentc, ["-v", "ls", "--local"]).stdout
         assert "PROMPT" in output and "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 2
 
 
@@ -587,18 +587,18 @@ def test_init_local(
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         os.chdir(td)
 
         files_present = os.listdir()
         assert ".agent-catalog" not in files_present and ".agent-activity" not in files_present
 
-        runner.invoke(click_main, ["init", "catalog", "--local", "--no-db"])
+        runner.invoke(agentc, ["init", "catalog", "--local", "--no-db"])
         files_present = os.listdir()
         assert ".agent-catalog" in files_present and ".agent-activity" not in files_present
 
-        runner.invoke(click_main, ["init", "activity", "--local", "--no-db"])
+        runner.invoke(agentc, ["init", "activity", "--local", "--no-db"])
         files_present = os.listdir()
         assert ".agent-catalog" in files_present and ".agent-activity" in files_present
 
@@ -607,13 +607,13 @@ def test_init_local(
 def test_init_local_all(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         os.chdir(td)
         files_present = os.listdir()
         assert ".agent-catalog" not in files_present and ".agent-activity" not in files_present
 
-        runner.invoke(click_main, ["init", "catalog", "activity", "--local", "--no-db"])
+        runner.invoke(agentc, ["init", "catalog", "activity", "--local", "--no-db"])
         files_present = os.listdir()
         assert ".agent-catalog" in files_present and ".agent-activity" in files_present
 
@@ -625,16 +625,16 @@ def test_init_db(
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.EMPTY,
             click_runner=runner,
-            click_command=click_main,
+            click_command=agentc,
         )
-        result = runner.invoke(click_main, ["init", "catalog", "--db"])
+        result = runner.invoke(agentc, ["init", "catalog", "--db"])
         assert result.exit_code == 0
         assert "GSI metadata index for the has been successfully created!" in result.output
         assert "Vector index for the tool catalog has been successfully created!" in result.output

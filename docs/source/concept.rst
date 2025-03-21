@@ -176,6 +176,7 @@ Both tool builders and prompt builders (i.e., agent builders) will follow this w
    following *standard* Git commands:
 
    .. code-block::
+
      # Commit your changes. `agentc index` + `agentc publish` will run after `git commit`.
      git add [CHANGED_FILES]
      git commit -m "My changes"

@@ -1,4 +1,4 @@
-import click
+import click_extra
 import importlib.util
 import json
 import logging
@@ -16,9 +16,9 @@ def cmd_env(cfg: Config = None):
         cfg = Config()
     for line in json.dumps(cfg.model_dump(), indent=4).split("\n"):
         if re.match(r'\s*"AGENT_CATALOG_.*": (?!null)', line):
-            click.secho(line, fg="green")
+            click_extra.secho(line, fg="green")
         else:
-            click.echo(line)
+            click_extra.echo(line)
 
 
 # Note: flask is an optional dependency.

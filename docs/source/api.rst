@@ -10,9 +10,6 @@ Package Documentation
 .. automodule:: agentc.span
     :members:
 
-.. automodule:: agentc.cmd
-    :members:
-
 
 Integration Packages
 --------------------
@@ -26,7 +23,7 @@ LangChain / LangGraph
 .. automodule:: agentc_langchain.chat
     :members:
 
-.. automodule:: agentc_langgraph.node
+.. automodule:: agentc_langgraph.tools
     :members:
 
 LlamaIndex

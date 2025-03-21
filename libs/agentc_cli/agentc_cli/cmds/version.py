@@ -1,4 +1,4 @@
-import click
+import click_extra
 import importlib.util
 import logging
 
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 def cmd_version(cfg: Config = None):
     if cfg is None:
         cfg = Config()
-    click.secho(core_version.lib_version(), bold=True)
+    click_extra.secho(core_version.lib_version(), bold=True)
 
 
 # Note: flask is an optional dependency.

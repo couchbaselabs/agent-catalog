@@ -1,4 +1,4 @@
-import click
+import click_extra
 import couchbase.cluster
 import logging
 import pathlib
@@ -38,19 +38,19 @@ def cmd_publish(
     # Publish logs to cluster
     if "log" in kind:
         k = "log"
-        click.secho(DASHES, fg=KIND_COLORS[k])
-        click.secho(k.upper(), bold=True, fg=KIND_COLORS[k])
-        click.secho(DASHES, fg=KIND_COLORS[k])
+        click_extra.secho(DASHES, fg=KIND_COLORS[k])
+        click_extra.secho(k.upper(), bold=True, fg=KIND_COLORS[k])
+        click_extra.secho(DASHES, fg=KIND_COLORS[k])
         log_path = pathlib.Path(cfg.activity_folder) / DEFAULT_ACTIVITY_FILE
         logger.debug("Local FS log path: ", log_path)
         log_messages = publish_logs(cb, log_path)
-        click.secho(f"Successfully upserted {len(log_messages)} local FS logs to cluster!")
-        click.secho(DASHES, fg=KIND_COLORS[k])
+        click_extra.secho(f"Successfully upserted {len(log_messages)} local FS logs to cluster!")
+        click_extra.secho(DASHES, fg=KIND_COLORS[k])
 
     # Publish tools and/or prompts
     for k in [_k for _k in kind if _k != "log"]:
-        click.secho(DASHES, fg=KIND_COLORS[k])
-        click.secho(k.upper(), bold=True, fg=KIND_COLORS[k])
-        click.secho(DASHES, fg=KIND_COLORS[k])
-        publish_catalog(cb, cfg, k, annotations, click.secho)
-        click.secho(f"{k.capitalize()} catalog items successfully uploaded to Couchbase!\n", fg="green")
+        click_extra.secho(DASHES, fg=KIND_COLORS[k])
+        click_extra.secho(k.upper(), bold=True, fg=KIND_COLORS[k])
+        click_extra.secho(DASHES, fg=KIND_COLORS[k])
+        publish_catalog(cb, cfg, k, annotations, click_extra.secho)
+        click_extra.secho(f"{k.capitalize()} catalog items successfully uploaded to Couchbase!\n", fg="green")

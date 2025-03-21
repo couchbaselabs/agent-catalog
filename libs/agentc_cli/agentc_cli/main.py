@@ -1,4 +1,4 @@
-import click
+import click_extra
 import couchbase.cluster
 import couchbase.exceptions
 import logging
@@ -32,10 +32,10 @@ logging.getLogger("openapi_parser").setLevel(logging.ERROR)
 
 
 # Support abbreviated command aliases, ex: "agentc st" ==> "agentc status".
-# From: https://click.palletsprojects.com/en/8.1.x/advanced/#command-aliases
-class AliasedGroup(click.Group):
+# From: https://click_extra.palletsprojects.com/en/8.1.x/advanced/#command-aliases
+class AliasedGroup(click_extra.ExtraGroup):
     def get_command(self, ctx, cmd_name):
-        rv = click.Group.get_command(self, ctx, cmd_name)
+        rv = click_extra.Group.get_command(self, ctx, cmd_name)
         if rv is not None:
             return rv
 
@@ -44,7 +44,7 @@ class AliasedGroup(click.Group):
             return None
 
         if len(matches) == 1:
-            return click.Group.get_command(self, ctx, matches[0])
+            return click_extra.Group.get_command(self, ctx, matches[0])
 
         ctx.fail(f"Too many matches: {', '.join(sorted(matches))}")
 
@@ -54,22 +54,21 @@ class AliasedGroup(click.Group):
         return cmd.name, cmd, args
 
 
-@click.group(
+@click_extra.group(
     cls=AliasedGroup,
-    epilog="See: https://docs.couchbase.com or https://couchbaselabs.github.io/agent-catalog/index.html# for more "
-    "information.",
+    epilog="See https://couchbaselabs.github.io/agent-catalog/index.html for more information.",
     context_settings=dict(max_content_width=800),
 )
-@click.option(
+@click_extra.option(
     "-v",
     "--verbose",
     default=DEFAULT_VERBOSITY_LEVEL,
-    type=click.IntRange(min=0, max=2, clamp=True),
+    type=click_extra.IntRange(min=0, max=2, clamp=True),
     count=True,
     help="Flag to enable verbose output.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "-i/-ni",
     "--interactive/--no-interactive",
     is_flag=True,
@@ -77,9 +76,11 @@ class AliasedGroup(click.Group):
     help="Flag to enable interactive mode.",
     show_default=True,
 )
-@click.pass_context
-def click_main(ctx: click.Context, verbose: int, interactive: bool):
-    """The Couchbase Agent Catalog command line tool."""
+@click_extra.pass_context
+def agentc(ctx: click_extra.Context, verbose: int, interactive: bool):
+    """
+    The Couchbase Agent Catalog command line tool.
+    """
     ctx.obj = Config(
         # TODO (GLENN): We really need to use this "verbosity_level" parameter more.
         verbosity_level=verbose,
@@ -87,34 +88,40 @@ def click_main(ctx: click.Context, verbose: int, interactive: bool):
     )
 
 
-@click_main.command()
-@click.argument("targets", type=click.Choice(["catalog", "activity"], case_sensitive=False), nargs=-1)
-@click.option(
+@agentc.command()
+@click_extra.argument("targets", type=click_extra.Choice(["catalog", "activity"], case_sensitive=False), nargs=-1)
+@click_extra.option(
     "--db/--no-db",
     default=True,
     is_flag=True,
     help="Flag to enable / disable DB initialization.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--local/--no-local",
     default=True,
     is_flag=True,
     help="Flag to enable / disable local FS initialization.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--bucket",
     default=None,
     type=str,
     help="Name of the Couchbase bucket to initialize in.",
     show_default=False,
 )
-@click.pass_context
+@click_extra.pass_context
 def init(
-    ctx: click.Context, targets: list[typing.Literal["catalog", "activity"]], db: bool, local: bool, bucket: str = None
+    ctx: click_extra.Context,
+    targets: list[typing.Literal["catalog", "activity"]],
+    db: bool,
+    local: bool,
+    bucket: str = None,
 ):
-    """Initialize the necessary files/collections for local/database catalog."""
+    """
+    Initialize the necessary files/collections for local/database catalog.
+    """
     cfg: Config = ctx.obj
 
     # By default, we will initialize everything.
@@ -133,24 +140,26 @@ def init(
     )
 
 
-@click_main.command()
-@click.option(
+@agentc.command()
+@click_extra.option(
     "-o",
     "--output",
     default=os.getcwd(),
-    type=click.Path(exists=False, file_okay=False, dir_okay=True, path_type=pathlib.Path),
+    type=click_extra.Path(exists=False, file_okay=False, dir_okay=True, path_type=pathlib.Path),
     help="Location to save the generated tool / prompt to. Defaults to your current working directory.",
 )
-@click.option(
-    "--kind", type=click.Choice([c for c in RecordKind], case_sensitive=False), default=None, show_default=True
+@click_extra.option(
+    "--kind", type=click_extra.Choice([c for c in RecordKind], case_sensitive=False), default=None, show_default=True
 )
-@click.pass_context
+@click_extra.pass_context
 def add(ctx, output: pathlib.Path, kind: RecordKind):
-    """Interactively create a new tool or prompt and save it to the filesystem (output).
-    You MUST edit the generated file as per your requirements!"""
+    """
+    Interactively create a new tool or prompt and save it to the filesystem (output).
+    You MUST edit the generated file as per your requirements!
+    """
     cfg: Config = ctx.obj
     if not cfg.with_interaction:
-        click.secho(
+        click_extra.secho(
             "ERROR: Cannot run agentc add in non-interactive mode! "
             "Specify your command without the non-interactive flag. ",
             fg="red",
@@ -158,52 +167,52 @@ def add(ctx, output: pathlib.Path, kind: RecordKind):
         return
 
     if kind is None:
-        kind = click.prompt("Record Kind", type=click.Choice([c for c in RecordKind], case_sensitive=False))
+        kind = click_extra.prompt("Record Kind", type=click_extra.Choice([c for c in RecordKind], case_sensitive=False))
     cmd_add(cfg=cfg, output=output, kind=kind)
 
 
-@click_main.command()
-@click.argument(
+@agentc.command()
+@click_extra.argument(
     "targets",
-    type=click.Choice(["catalog", "activity"], case_sensitive=False),
+    type=click_extra.Choice(["catalog", "activity"], case_sensitive=False),
     nargs=-1,
 )
-@click.option(
+@click_extra.option(
     "--db/--no-db",
     default=True,
     is_flag=True,
     help="Flag to perform / not-perform a DB clean.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--local/--no-local",
     default=True,
     is_flag=True,
     help="Flag to perform / not-perform a local FS clean.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--tools/--no-tools",
     default=True,
     is_flag=True,
     help="Flag to clean / avoid-cleaning the tool-catalog.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--prompts/--no-prompts",
     default=True,
     is_flag=True,
     help="Flag to clean / avoid-cleaning the prompt-catalog.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--bucket",
     default=None,
     type=str,
     help="Name of the Couchbase bucket to remove Agent Catalog from.",
     show_default=False,
 )
-@click.option(
+@click_extra.option(
     "-cid",
     "--catalog-id",
     multiple=True,
@@ -212,7 +221,7 @@ def add(ctx, output: pathlib.Path, kind: RecordKind):
     help="Catalog ID used to remove a specific catalog version from the DB catalog.",
     show_default=False,
 )
-@click.option(
+@click_extra.option(
     "-y",
     "--yes",
     default=False,
@@ -220,9 +229,9 @@ def add(ctx, output: pathlib.Path, kind: RecordKind):
     help="Flag to delete local-FS and DB catalog data without confirmation.",
     show_default=False,
 )
-@click.pass_context
+@click_extra.pass_context
 def clean(
-    ctx: click.Context,
+    ctx: click_extra.Context,
     targets: list[typing.Literal["catalog", "activity"]],
     db: bool,
     local: bool,
@@ -247,7 +256,7 @@ def clean(
 
     # If a user specifies both --no-tools and --no-prompts AND only "catalog", we have nothing to delete.
     if len(kind) == 0 and len(targets) == 1 and targets[0] == "catalog":
-        click.secho(
+        click_extra.secho(
             'WARNING: No action taken. "catalog" with the flags --no-tools and --no-prompts have ' "been specified.",
             fg="yellow",
         )
@@ -255,7 +264,7 @@ def clean(
 
     # If a user specifies non-interactive AND does not specify yes, we will exit here.
     if not cfg.with_interaction and not yes:
-        click.secho(
+        click_extra.secho(
             "WARNING: No action taken. Specify -y to delete catalogs without confirmation, "
             "or specify your command with interactive mode.",
             fg="yellow",
@@ -265,7 +274,7 @@ def clean(
     # Similar to the rm command, we will prompt the user for each catalog to delete.
     if local:
         if not yes:
-            click.confirm(
+            click_extra.confirm(
                 "Are you sure you want to delete catalogs and/or audit logs from your filesystem?", abort=True
             )
         cmd_clean(
@@ -279,7 +288,9 @@ def clean(
 
     if db:
         if not yes:
-            click.confirm("Are you sure you want to delete catalogs and/or audit logs from the database?", abort=True)
+            click_extra.confirm(
+                "Are you sure you want to delete catalogs and/or audit logs from the database?", abort=True
+            )
 
         # Set our bucket (if it is not already set).
         validate_or_prompt_for_bucket(cfg, bucket)
@@ -295,60 +306,60 @@ def clean(
         )
 
 
-@click_main.command()
-@click.pass_context
+@agentc.command()
+@click_extra.pass_context
 def env(ctx):
     """Return all agentc related environment and configuration parameters as a JSON object."""
     cmd_env(cfg=ctx.obj)
 
 
-@click_main.command()
-@click.argument(
+@agentc.command()
+@click_extra.argument(
     "kind",
-    type=click.Choice(["tools", "prompts"], case_sensitive=False),
+    type=click_extra.Choice(["tools", "prompts"], case_sensitive=False),
 )
-@click.option(
+@click_extra.option(
     "--query",
     default=None,
     help="User query describing the task for which tools / prompts are needed. "
     "This field or --name must be specified.",
     show_default=False,
 )
-@click.option(
+@click_extra.option(
     "--name",
     default=None,
     help="Name of catalog item to retrieve from the catalog directly. This field or --query must be specified.",
     show_default=False,
 )
-@click.option(
+@click_extra.option(
     "--bucket",
     default=None,
     type=str,
     help="Name of the Couchbase bucket to search.",
     show_default=False,
 )
-@click.option(
+@click_extra.option(
     "--limit",
     default=1,
     type=int,
     help="Maximum number of results to show.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--dirty/--no-dirty",
     default=True,
     is_flag=True,
     help="Flag to process and search amongst dirty source files.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--refiner",
-    type=click.Choice(["ClosestCluster", "None"], case_sensitive=False),
+    type=click_extra.Choice(["ClosestCluster", "None"], case_sensitive=False),
     default=None,
     help="Class to post-process (rerank, prune, etc...) find results.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "-an",
     "--annotations",
     type=str,
@@ -356,7 +367,7 @@ def env(ctx):
     help='Tool-specific annotations to filter by, specified using KEY="VALUE" (AND|OR KEY="VALUE")*.',
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "-cid",
     "--catalog-id",
     type=str,
@@ -364,23 +375,23 @@ def env(ctx):
     help="Catalog ID that uniquely specifies a catalog version / snapshot (git commit id).",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--db/--no-db",
     default=None,
     is_flag=True,
     help="Flag to include / exclude items from the DB-catalog while searching.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--local/--no-local",
     default=True,
     is_flag=True,
     help="Flag to include / exclude items from the local-FS-catalog while searching.",
     show_default=True,
 )
-@click.pass_context
+@click_extra.pass_context
 def find(
-    ctx: click.Context,
+    ctx: click_extra.Context,
     kind: typing.Literal["tools", "prompts"],
     query: str = None,
     name: str = None,
@@ -422,31 +433,31 @@ def find(
     )
 
 
-@click_main.command()
-@click.argument("sources", nargs=-1)
-@click.option(
+@agentc.command()
+@click_extra.argument("sources", nargs=-1)
+@click_extra.option(
     "--prompts/--no-prompts",
     is_flag=True,
     default=True,
     help="Flag to (avoid) ignoring prompts when indexing source files into the local catalog.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--tools/--no-tools",
     is_flag=True,
     default=True,
     help="Flag to (avoid) ignoring tools when indexing source files into the local catalog.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--dry-run",
     default=False,
     is_flag=True,
     help="Flag to prevent catalog changes.",
     show_default=True,
 )
-@click.pass_context
-def index(ctx: click.Context, sources: list[str], tools: bool, prompts: bool, dry_run: bool = False):
+@click_extra.pass_context
+def index(ctx: click_extra.Context, sources: list[str], tools: bool, prompts: bool, dry_run: bool = False):
     """Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
     Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc."""
     kind = list()
@@ -456,7 +467,7 @@ def index(ctx: click.Context, sources: list[str], tools: bool, prompts: bool, dr
         kind.append("prompt")
 
     if not sources:
-        click.secho(
+        click_extra.secho(
             "WARNING: No action taken. No source directories have been specified. "
             "Please use the command 'agentc index --help' for more information.",
             fg="yellow",
@@ -465,7 +476,7 @@ def index(ctx: click.Context, sources: list[str], tools: bool, prompts: bool, dr
 
     # Both "--no-tools" and "--no-prompts" have been specified.
     if len(kind) == 0:
-        click.secho(
+        click_extra.secho(
             "WARNING: No action taken. Both flags --no-tools and --no-prompts have been specified.",
             fg="yellow",
         )
@@ -479,30 +490,32 @@ def index(ctx: click.Context, sources: list[str], tools: bool, prompts: bool, dr
     )
 
 
-@click_main.command()
-@click.argument(
+@agentc.command()
+@click_extra.argument(
     "kind",
     nargs=-1,
-    type=click.Choice(["tools", "prompts", "logs"], case_sensitive=False),
+    type=click_extra.Choice(["tools", "prompts", "logs"], case_sensitive=False),
 )
-@click.option(
+@click_extra.option(
     "--bucket",
     default=None,
     type=str,
     help="Name of the Couchbase bucket to publish to.",
     show_default=False,
 )
-@click.option(
+@click_extra.option(
     "-an",
     "--annotations",
     multiple=True,
-    type=click.Tuple([str, str]),
+    type=click_extra.Tuple([str, str]),
     default=[],
     help="Snapshot level annotations to be added while publishing catalogs.",
     show_default=True,
 )
-@click.pass_context
-def publish(ctx: click.Context, kind: list[typing.Literal["tools", "prompts", "logs"]], bucket: str, annotations: str):
+@click_extra.pass_context
+def publish(
+    ctx: click_extra.Context, kind: list[typing.Literal["tools", "prompts", "logs"]], bucket: str, annotations: str
+):
     """Upload the local catalog and/or logs to a Couchbase instance.
     By default, only tools and prompts are published unless log is explicitly specified."""
     kind = ["tools", "prompts"] if len(kind) == 0 else kind
@@ -516,43 +529,43 @@ def publish(ctx: click.Context, kind: list[typing.Literal["tools", "prompts", "l
     )
 
 
-@click_main.command()
-@click.argument(
+@agentc.command()
+@click_extra.argument(
     "kind",
-    type=click.Choice(["tools", "prompts"], case_sensitive=False),
+    type=click_extra.Choice(["tools", "prompts"], case_sensitive=False),
     nargs=-1,
 )
-@click.option(
+@click_extra.option(
     "--dirty/--no-dirty",
     default=True,
     is_flag=True,
     help="Flag to process and compare against dirty source files.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--db/--no-db",
     default=None,
     is_flag=True,
     help="Flag to include / exclude items from the DB-catalog while displaying status.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--local/--no-local",
     default=True,
     is_flag=True,
     help="Flag to include / exclude items from the local-FS-catalog while displaying status.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--bucket",
     default=None,
     type=str,
     help="Name of the Couchbase bucket hosting the Agent Catalog.",
     show_default=False,
 )
-@click.pass_context
+@click_extra.pass_context
 def status(
-    ctx: click.Context,
+    ctx: click_extra.Context,
     kind: list[typing.Literal["tools", "prompts"]],
     dirty: bool,
     db: bool = None,
@@ -584,49 +597,49 @@ def status(
     )
 
 
-@click_main.command()
-@click.pass_context
+@agentc.command()
+@click_extra.pass_context
 def version(ctx):
     """Show the current version of Agent Catalog."""
     cmd_version(ctx.obj)
 
 
-@click_main.command()
-@click.option(
+@agentc.command()
+@click_extra.option(
     "--query",
     default=None,
     help="User query describing the task for which tools / prompts are needed. "
     "This field or --name must be specified.",
     show_default=False,
 )
-@click.option(
+@click_extra.option(
     "--name",
     default=None,
     help="Name of catalog item to retrieve from the catalog directly. This field or --query must be specified.",
     show_default=False,
 )
-@click.option(
+@click_extra.option(
     "--bucket",
     default=None,
     type=str,
     help="Name of the Couchbase bucket to search.",
     show_default=False,
 )
-@click.option(
+@click_extra.option(
     "--dirty/--no-dirty",
     default=True,
     is_flag=True,
     help="Flag to process and search amongst dirty source files.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--refiner",
-    type=click.Choice(["ClosestCluster", "None"], case_sensitive=False),
+    type=click_extra.Choice(["ClosestCluster", "None"], case_sensitive=False),
     default=None,
     help="Class to post-process (rerank, prune, etc...) find results.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "-an",
     "--annotations",
     type=str,
@@ -634,7 +647,7 @@ def version(ctx):
     help='Tool-specific annotations to filter by, specified using KEY="VALUE" (AND|OR KEY="VALUE")*.',
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "-cid",
     "--catalog-id",
     type=str,
@@ -642,23 +655,23 @@ def version(ctx):
     help="Catalog ID that uniquely specifies a catalog version / snapshot (git commit id).",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--db/--no-db",
     default=None,
     is_flag=True,
     help="Flag to include / exclude items from the DB-catalog while searching.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--local/--no-local",
     default=True,
     is_flag=True,
     help="Flag to include / exclude items from the local-FS-catalog while searching.",
     show_default=True,
 )
-@click.pass_context
+@click_extra.pass_context
 def execute(
-    ctx: click.Context,
+    ctx: click_extra.Context,
     query: str,
     name: str,
     dirty: bool = True,
@@ -696,43 +709,43 @@ def execute(
     )
 
 
-@click_main.command()
-@click.argument(
+@agentc.command()
+@click_extra.argument(
     "kind",
     nargs=-1,
-    type=click.Choice(["tools", "prompts"], case_sensitive=False),
+    type=click_extra.Choice(["tools", "prompts"], case_sensitive=False),
 )
-@click.option(
+@click_extra.option(
     "--db/--no-db",
     default=None,
     is_flag=True,
     help="Flag to force a DB-only search.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--local/--no-local",
     default=True,
     is_flag=True,
     help="Flag to force a local-only search.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--dirty/--no-dirty",
     default=True,
     is_flag=True,
     help="Flag to process and search amongst dirty source files.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--bucket",
     default=None,
     type=str,
     help="Name of Couchbase bucket that is being used for Agent Catalog.",
     show_default=True,
 )
-@click.pass_context
+@click_extra.pass_context
 def ls(
-    ctx: click.Context,
+    ctx: click_extra.Context,
     kind: list[typing.Literal["tools", "prompts"]],
     db: bool = None,
     local: bool = True,
@@ -761,21 +774,21 @@ def ls(
 
 
 # @click_main.command()
-# @click.option(
+# @click_extra.option(
 #     "--host-port",
 #     default=DEFAULT_WEB_HOST_PORT,
 #     envvar="AGENT_CATALOG_WEB_HOST_PORT",
 #     help="The host:port to listen on.",
 #     show_default=True,
 # )
-# @click.option(
+# @click_extra.option(
 #     "--debug/--no-debug",
 #     envvar="AGENT_CATALOG_WEB_DEBUG",
 #     default=True,
 #     help="Debug mode.",
 #     show_default=True,
 # )
-# @click.pass_context
+# @click_extra.pass_context
 # def web(ctx, host_port, debug):
 #     """Start a local web server to view our tools."""
 #     cmd_web(ctx.obj, host_port, debug)
@@ -783,25 +796,25 @@ def ls(
 
 def main():
     try:
-        click_main()
+        agentc()
     except Exception as e:
         if isinstance(e, pydantic.ValidationError):
             for err in e.errors():
                 err_it = iter(err["msg"].splitlines())
-                click.secho(f"ERROR: {next(err_it)}", fg="red", err=True)
+                click_extra.secho(f"ERROR: {next(err_it)}", fg="red", err=True)
                 try:
                     while True:
-                        click.secho(textwrap.indent(next(err_it), "       "), fg="red", err=True)
+                        click_extra.secho(textwrap.indent(next(err_it), "       "), fg="red", err=True)
 
                 except StopIteration:
                     pass
 
         else:
             err_it = iter(str(e).splitlines())
-            click.secho(f"ERROR: {next(err_it)}", fg="red", err=True)
+            click_extra.secho(f"ERROR: {next(err_it)}", fg="red", err=True)
             try:
                 while True:
-                    click.secho(textwrap.indent(next(err_it), "       "), fg="red", err=True)
+                    click_extra.secho(textwrap.indent(next(err_it), "       "), fg="red", err=True)
 
             except StopIteration:
                 pass

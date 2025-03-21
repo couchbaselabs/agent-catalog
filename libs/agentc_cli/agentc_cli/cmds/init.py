@@ -1,6 +1,6 @@
 import agentc_core.defaults
 import agentc_core.remote.init
-import click
+import click_extra
 import contextlib
 import couchbase.cluster
 import couchbase.exceptions
@@ -88,10 +88,10 @@ def init_db_catalog(cfg: Config, cluster: couchbase.cluster.Cluster):
     collection_manager = cb.collections()
     logger.debug("Using bucket: %s", cfg.bucket)
 
-    init_metadata_collection(collection_manager, cfg, click.secho)
+    init_metadata_collection(collection_manager, cfg, click_extra.secho)
     dims = len(cfg.EmbeddingModel("NAME").encode("test"))
     for kind in CATALOG_KINDS:
-        init_catalog_collection(collection_manager, cfg, kind, dims, click.secho)
+        init_catalog_collection(collection_manager, cfg, kind, dims, click_extra.secho)
 
 
 def init_db_auditor(cfg: Config, cluster: couchbase.cluster.Cluster):
@@ -101,7 +101,7 @@ def init_db_auditor(cfg: Config, cluster: couchbase.cluster.Cluster):
     # Create the scope and collection for the auditor.
     log_col = DEFAULT_ACTIVITY_LOG_COLLECTION
     log_scope = DEFAULT_ACTIVITY_SCOPE
-    click.secho("Now creating scope and collections for the auditor.", fg="yellow")
+    click_extra.secho("Now creating scope and collections for the auditor.", fg="yellow")
     (msg, err) = create_scope_and_collection(
         bucket_manager,
         scope=log_scope,
@@ -112,24 +112,24 @@ def init_db_auditor(cfg: Config, cluster: couchbase.cluster.Cluster):
     if err is not None:
         raise ValueError(msg)
     else:
-        click.secho("Scope and collection for the auditor have been successfully created!\n", fg="green")
+        click_extra.secho("Scope and collection for the auditor have been successfully created!\n", fg="green")
 
     # Create our query UDFs for the auditor.
-    click.secho("Now creating the query UDFs for the auditor.", fg="yellow")
+    click_extra.secho("Now creating the query UDFs for the auditor.", fg="yellow")
     try:
         create_query_udfs(cluster, cfg.bucket)
-        click.secho("All query UDFs for the auditor have been successfully created!\n", fg="green")
+        click_extra.secho("All query UDFs for the auditor have been successfully created!\n", fg="green")
     except couchbase.exceptions.CouchbaseException as e:
-        click.secho("Query UDFs could not be created.", fg="red")
+        click_extra.secho("Query UDFs could not be created.", fg="red")
         logger.warning("Query UDFs could not be created: %s", e)
         raise e
 
     # Create the analytics views for the auditor.
-    click.secho("Now creating the analytics views for the auditor.", fg="yellow")
+    click_extra.secho("Now creating the analytics views for the auditor.", fg="yellow")
     try:
         create_analytics_views(cluster, cfg.bucket)
-        click.secho("All analytics views for the auditor have been successfully created!\n", fg="green")
+        click_extra.secho("All analytics views for the auditor have been successfully created!\n", fg="green")
     except couchbase.exceptions.CouchbaseException as e:
-        click.secho("Analytics views could not be created.", fg="red")
+        click_extra.secho("Analytics views could not be created.", fg="red")
         logger.warning("Analytics views could not be created: %s", e)
         raise e

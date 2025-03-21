@@ -1,4 +1,4 @@
-import click.testing
+import click_extra.testing
 import dataclasses
 import enum
 import git
@@ -33,7 +33,7 @@ class EnvironmentKind(enum.StrEnum):
 
 @dataclasses.dataclass
 class Environment:
-    build_results: list[click.testing.Result]
+    build_results: list[click_extra.testing.ExtraResult]
     repository: git.Repo
 
 
@@ -86,7 +86,10 @@ def _initialize_git(
 
 
 def _initialize_catalog(
-    env_kind: EnvironmentKind, click_runner: click.testing.CliRunner, click_command: click.Command, *args
+    env_kind: EnvironmentKind,
+    click_runner: click_extra.testing.ExtraCliRunner,
+    click_command: click_extra.Command,
+    *args,
 ):
     output = list()
     match env_kind:
@@ -116,7 +119,10 @@ def _initialize_catalog(
 
 
 def _index_catalog(
-    env_kind: EnvironmentKind, click_runner: click.testing.CliRunner, click_command: click.Command, *args
+    env_kind: EnvironmentKind,
+    click_runner: click_extra.testing.ExtraCliRunner,
+    click_command: click_extra.Command,
+    *args,
 ):
     output = list()
     match env_kind:
@@ -137,7 +143,10 @@ def _index_catalog(
 
 
 def _publish_catalog(
-    env_kind: EnvironmentKind, click_runner: click.testing.CliRunner, click_command: click.Command, *args
+    env_kind: EnvironmentKind,
+    click_runner: click_extra.testing.ExtraCliRunner,
+    click_command: click_extra.Command,
+    *args,
 ):
     os.environ["AGENT_CATALOG_MAX_INDEX_PARTITION"] = "1"
     os.environ["AGENT_CATALOG_INDEX_PARTITION"] = "1"
@@ -159,8 +168,8 @@ def _build_environment(
     repo: git.Repo,
     directory: pathlib.Path,
     env_kind: EnvironmentKind,
-    click_runner: click.testing.CliRunner,
-    click_command: click.Command,
+    click_runner: click_extra.testing.ExtraCliRunner,
+    click_command: click_extra.Command,
     init_args: list = None,
     index_args: list = None,
     publish_args: list = None,
@@ -223,8 +232,8 @@ def environment_factory() -> typing.Callable[..., Environment]:
         def get_environment(
             directory: pathlib.Path,
             env_kind: EnvironmentKind,
-            click_runner: click.testing.CliRunner,
-            click_command: click.Command,
+            click_runner: click_extra.testing.ExtraCliRunner,
+            click_command: click_extra.Command,
             init_args: list = None,
             index_args: list = None,
             publish_args: list = None,
@@ -253,9 +262,9 @@ def environment_factory() -> typing.Callable[..., Environment]:
 
 if __name__ == "__main__":
     # Note: agentc_testing should never have an explicit dependency on agentc_cli!
-    from agentc_cli.main import click_main as _click_main
+    from agentc_cli.main import agentc as _click_main
 
-    _runner = click.testing.CliRunner()
+    _runner = click_extra.testing.ExtraCliRunner()
     with _runner.isolated_filesystem() as td:
         _results = _build_environment(
             directory=pathlib.Path(td),

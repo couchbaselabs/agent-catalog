@@ -1,12 +1,12 @@
-import click
-import click.testing
+import click_extra
+import click_extra.testing
 import os
 import pathlib
 import pytest
 import typing
 
 from agentc import Catalog
-from agentc_cli.main import click_main
+from agentc_cli.main import agentc
 from agentc_core.catalog.catalog import Prompt
 from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
@@ -27,13 +27,13 @@ def test_local_tool_provider(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_TOOLS_TRAVEL,
-            click_runner=click.testing.CliRunner(),
-            click_command=click_main,
+            click_runner=click_extra.testing.ExtraCliRunner(),
+            click_command=agentc,
         )
         catalog = Catalog()
         tools = catalog.find("tool", query="searching travel blogs")
@@ -46,13 +46,13 @@ def test_local_inputs_provider(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_PROMPTS_TRAVEL,
-            click_runner=click.testing.CliRunner(),
-            click_command=click_main,
+            click_runner=click_extra.testing.ExtraCliRunner(),
+            click_command=agentc,
         )
         catalog = Catalog()
         prompt: Prompt = catalog.find("prompt", query="asking a user their location")[0]
@@ -65,13 +65,13 @@ def test_local_provider(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
-            click_runner=click.testing.CliRunner(),
-            click_command=click_main,
+            click_runner=click_extra.testing.ExtraCliRunner(),
+            click_command=agentc,
         )
         catalog = Catalog()
         prompt: list[Prompt] = catalog.find("prompt", query="asking a user their location")
@@ -88,14 +88,14 @@ def test_db_tool_provider(
     environment_factory: typing.Callable[..., Environment],
     isolated_server_factory: typing.Callable[[pathlib.Path], ...],
 ):
-    runner = click.testing.CliRunner()
+    runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
         isolated_server_factory(pathlib.Path(td) / ".couchbase")
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.PUBLISHED_TOOLS_TRAVEL,
-            click_runner=click.testing.CliRunner(),
-            click_command=click_main,
+            click_runner=click_extra.testing.ExtraCliRunner(),
+            click_command=agentc,
         )
         os.remove((pathlib.Path(td) / DEFAULT_CATALOG_FOLDER / DEFAULT_TOOL_CATALOG_FILE).absolute())
         catalog = Catalog(bucket="travel-sample")
