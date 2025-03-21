@@ -373,6 +373,9 @@ def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "prompt", "meta
             progress_bar,
             progress_bar_it,
         )
+        # This is to ensure that the progress bar reaches 100% even if there are no errors.
+        with contextlib.suppress(StopIteration):
+            next(progress_bar_it)
         return completion_status, all_errs
 
     # Primary index on kind_catalog
@@ -461,8 +464,6 @@ def create_index(
     if err is not None:
         all_errs += err
         completion_status = False
-    with contextlib.suppress(StopIteration):
-        next(progress_bar_it)
     time.sleep(cfg.ddl_create_index_interval_seconds)
     return completion_status
 
