@@ -7,6 +7,17 @@ from agentc_core.version import VersionDescriptor
 
 
 class Log(pydantic.BaseModel):
+    """A :py:class:`Log` instance represents a single log record that is bound to a part of the application
+    **versioned** according to :py:attr:`catalog_version`.
+
+    .. attention::
+
+        :py:class:`Log` instances are **immutable** and should not be instantiated directly.
+        Only :py:class`Content` instances should be created directly, and then passed to a :py:class:`Span` instance
+        via the :py:meth:`agentc.span.Span.log` method.
+
+    """
+
     class Span(pydantic.BaseModel):
         model_config = pydantic.ConfigDict(use_enum_values=True, frozen=True)
 

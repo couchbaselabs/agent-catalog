@@ -1,0 +1,125 @@
+CREATE OR REPLACE ANALYTICS VIEW `[BUCKET_NAME]`.`[SCOPE_NAME]`.Exchanges AS
+    WITH
+        RowOrderedLogs AS (
+            FROM
+                `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]` AS l
+            SELECT
+                l.content.kind AS kind,
+                l.span.session AS sid,
+                l.*,
+                ROW_NUMBER()
+                    OVER (
+                        PARTITION BY
+                            sid
+                        ORDER BY
+                            STR_TO_MILLIS(l.timestamp) ASC
+                    ) AS rn
+        ),
+        UserToAssistantRows AS (
+            FROM
+                RowOrderedLogs rol
+            GROUP BY
+                rol.sid
+                GROUP AS g
+            LETTING
+                input_rows = (
+                    FROM
+                        g AS gi
+                    WHERE
+                        gi.rol.kind = "user"
+                    SELECT VALUE
+                        gi.rol.rn
+                    ORDER BY
+                        gi.rol.rn ASC
+                ),
+                output_rows = (
+                    FROM
+                        g AS gi
+                    WHERE
+                        gi.rol.kind = "assistant"
+                    SELECT VALUE
+                        gi.rol.rn
+                    ORDER BY
+                        gi.rol.rn ASC
+                ),
+                -- We are looking for the row numbers corresponding to user -- assistant pairs here.
+                input_output_pairs = (
+                    FROM
+                       input_rows AS iro,
+                       output_rows AS oro
+                    WHERE
+                        iro < oro
+                    GROUP BY
+                        iro
+                        GROUP AS gi
+                    -- We are interested in the closest assistant message to the user message.
+                    LETTING
+                        ordered_output = (
+                            FROM
+                                gi AS gii
+                            SELECT VALUE
+                                gii.oro
+                            ORDER BY
+                                gii.oro ASC
+                        )
+                    SELECT
+                        iro               AS input_row,
+                        ordered_output[0] AS output_row
+                )
+            SELECT
+                rol.sid            AS sid,
+                input_output_pairs AS pairs
+        ),
+        UserToAssistantUnnested AS (
+            FROM
+                UserToAssistantRows AS u2a,
+                u2a.pairs AS p
+            SELECT
+                u2a.sid      AS sid,
+                p.input_row  AS inp_rn,
+                p.output_row AS out_rn
+        )
+    FROM
+        UserToAssistantUnnested AS u2au,
+        RowOrderedLogs AS rol
+    WHERE
+        rol.sid = u2au.sid AND
+        rol.rn >= u2au.inp_rn AND
+        rol.rn <= u2au.out_rn
+    GROUP BY
+        rol.sid     AS sid,
+        u2au.inp_rn AS inp_rn,
+        u2au.out_rn AS out_rn
+        GROUP AS g
+    LETTING
+        content = (
+            FROM
+                g AS gi
+            SELECT VALUE
+                gi.rol
+            ORDER BY
+                gi.rol.timestamp ASC
+        ),
+        input_content = (
+            FROM
+                g AS gi
+            WHERE
+                gi.rol.rn = inp_rn
+            SELECT VALUE
+                gi.rol
+            LIMIT 1
+        )[0],
+        output_content = (
+            FROM
+                g AS gi
+            WHERE
+                gi.rol.rn = out_rn
+            SELECT VALUE
+                gi.rol
+            LIMIT 1
+        )[0]
+    SELECT
+        sid            AS sid,
+        input_content  AS `input`,
+        output_content AS `output`,
+        content        AS content;

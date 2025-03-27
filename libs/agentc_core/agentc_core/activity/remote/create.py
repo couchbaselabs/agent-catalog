@@ -27,8 +27,8 @@ def create_analytics_views(cluster: couchbase.cluster.Cluster, bucket: str) -> N
     for _ in ddl_result.rows():
         pass
 
-    # Onto to our UDF DDLs...
-    ddls_folder = pathlib.Path(__file__).parent / "ddls"
+    # Onto to our View DDLs...
+    ddls_folder = pathlib.Path(__file__).parent / "analytics"
     ddl_files = sorted(file for file in ddls_folder.iterdir())
     for ddl_file in ddl_files:
         with open(ddl_file, "r") as fp:
@@ -46,7 +46,7 @@ def create_analytics_views(cluster: couchbase.cluster.Cluster, bucket: str) -> N
 
 
 def create_query_udfs(cluster: couchbase.cluster.Cluster, bucket: str) -> None:
-    udfs_folder = pathlib.Path(__file__).parent / "udfs"
+    udfs_folder = pathlib.Path(__file__).parent / "query"
     udfs_files = sorted(file for file in udfs_folder.iterdir())
     for udf_file in udfs_files:
         with open(udf_file, "r") as fp:

@@ -1,4 +1,5 @@
 import click_extra
+import cloup
 import couchbase.cluster
 import couchbase.exceptions
 import logging
@@ -57,7 +58,16 @@ class AliasedGroup(click_extra.ExtraGroup):
 @click_extra.group(
     cls=AliasedGroup,
     epilog="See https://couchbaselabs.github.io/agent-catalog/index.html for more information.",
-    context_settings=dict(max_content_width=800),
+    context_settings={
+        "formatter_settings": click_extra.HelpExtraFormatter.settings(
+            theme=click_extra.HelpExtraTheme.dark().with_(
+                # "click_extra" at the moment only supports dark themes -- but unfortunately this does not play well
+                # with light backgrounds (e.g., our docs).
+                # TODO (GLENN): When click_extra gets around to making an actual light theme, use that instead.
+                invoked_command=cloup.Style(fg=cloup.Color.cyan, italic=True)
+            )
+        )
+    },
 )
 @click_extra.option(
     "-v",
@@ -120,7 +130,7 @@ def init(
     bucket: str = None,
 ):
     """
-    Initialize the necessary files/collections for local/database catalog.
+    Initialize the necessary files/collections for your working Agent Catalog environment.
     """
     cfg: Config = ctx.obj
 
@@ -145,6 +155,7 @@ def init(
     "-o",
     "--output",
     default=os.getcwd(),
+    show_default=False,
     type=click_extra.Path(exists=False, file_okay=False, dir_okay=True, path_type=pathlib.Path),
     help="Location to save the generated tool / prompt to. Defaults to your current working directory.",
 )
@@ -241,7 +252,7 @@ def clean(
     bucket: str = None,
     yes: bool = False,
 ):
-    """Delete all or specific (catalog and/or activity) agent related files / collections."""
+    """Delete all or specific (catalog and/or activity) Agent Catalog related files / collections."""
     cfg: Config = ctx.obj
 
     # By default, we will clean everything.
@@ -309,7 +320,7 @@ def clean(
 @agentc.command()
 @click_extra.pass_context
 def env(ctx):
-    """Return all agentc related environment and configuration parameters as a JSON object."""
+    """Return all Agent Catalog related environment and configuration parameters as a JSON object."""
     cmd_env(cfg=ctx.obj)
 
 
@@ -404,7 +415,7 @@ def find(
     db: bool | None = None,
     local: bool | None = True,
 ):
-    """Find items from the catalog based on a natural language QUERY string or by name."""
+    """Find items from the catalog based on a natural language string (query) or by name."""
     cfg: Config = ctx.obj
 
     # TODO (GLENN): We should perform the same best-effort work for search_local.
@@ -439,14 +450,14 @@ def find(
     "--prompts/--no-prompts",
     is_flag=True,
     default=True,
-    help="Flag to (avoid) ignoring prompts when indexing source files into the local catalog.",
+    help="Flag to look for / ignore prompts when indexing source files into the local catalog.",
     show_default=True,
 )
 @click_extra.option(
     "--tools/--no-tools",
     is_flag=True,
     default=True,
-    help="Flag to (avoid) ignoring tools when indexing source files into the local catalog.",
+    help="Flag to look for / ignore tools when indexing source files into the local catalog.",
     show_default=True,
 )
 @click_extra.option(
@@ -458,7 +469,7 @@ def find(
 )
 @click_extra.pass_context
 def index(ctx: click_extra.Context, sources: list[str], tools: bool, prompts: bool, dry_run: bool = False):
-    """Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
+    """Walk the source directory trees (sources) to index source files into the local catalog.
     Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc."""
     kind = list()
     if tools:
@@ -572,7 +583,7 @@ def status(
     local: bool = True,
     bucket: str = None,
 ):
-    """Show the status of the local-FS / remote-DB catalog."""
+    """Show the (aggregate) status of your Agent Catalog environment."""
     cfg: Config = ctx.obj
     if len(kind) == 0:
         kind = ["tools", "prompts"]
@@ -682,7 +693,7 @@ def execute(
     db: bool = None,
     local: bool = True,
 ):
-    """Search and execute a specific tool."""
+    """Search for and subsequently execute a specific tool."""
     cfg: Config = ctx.obj
 
     # TODO (GLENN): We should perform the same best-effort work for status_local.

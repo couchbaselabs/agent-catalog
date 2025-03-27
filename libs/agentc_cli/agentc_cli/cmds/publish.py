@@ -1,7 +1,6 @@
 import click_extra
 import couchbase.cluster
 import logging
-import pathlib
 import typing
 
 from .util import DASHES
@@ -41,7 +40,7 @@ def cmd_publish(
         click_extra.secho(DASHES, fg=KIND_COLORS[k])
         click_extra.secho(k.upper(), bold=True, fg=KIND_COLORS[k])
         click_extra.secho(DASHES, fg=KIND_COLORS[k])
-        log_path = pathlib.Path(cfg.activity_folder) / DEFAULT_ACTIVITY_FILE
+        log_path = cfg.ActivityPath() / DEFAULT_ACTIVITY_FILE
         logger.debug("Local FS log path: ", log_path)
         log_messages = publish_logs(cb, log_path)
         click_extra.secho(f"Successfully upserted {len(log_messages)} local FS logs to cluster!")

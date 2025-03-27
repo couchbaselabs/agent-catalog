@@ -61,7 +61,7 @@ jobs:
           poetry-version: "latest"
           shell: "bash"
 
-      - name: Run pre-commit
+      - name: Run pre-commit checks
         uses: pre-commit/action@v3.0.1
 
       - name: Install repository with Poetry
@@ -106,7 +106,7 @@ jobs:
           poetry-version: "latest"
           shell: "bash"
 
-      - name: Run pre-commit
+      - name: Run pre-commit checks
         uses: pre-commit/action@v3.0.1
 
       - name: Install repository with Poetry

@@ -44,15 +44,15 @@ HTTP Request Tools
 
 HTTP request tools are used to interact with external services via REST API calls.
 The details on how to interface with these external services are detailed in a standard OpenAPI spec (see
-`here <https://swagger.io/specification/>`_ for more details).
+`here <https://swagger.io/specification/>`__ for more details).
 To create an HTTP request tool, you must author a ``.yaml`` file with the ``record_kind`` field populated with
 ``http_request``.
 One tool is generated per specified endpoint.
 
 .. literalinclude:: ../../templates/tools/http_request.yaml
 
-To know more on generating your OpenAPI spec, check out the schema `here <https://spec.openapis.org/oas/v3.1.0.html#schema>`_.
-For an example OpenAPI spec used in the ``travel-sample`` agent, see `here <https://github.com/couchbaselabs/agent-catalog/blob/master/libs/agentc_testing/agentc_testing/resources/travel_agent/rewards_spec.json>`_.
+To know more on generating your OpenAPI spec, check out the schema `here <https://spec.openapis.org/oas/v3.1.0.html#schema>`__.
+For an example OpenAPI spec used in the ``travel-sample`` agent, see `here <https://github.com/couchbaselabs/agent-catalog/blob/master/libs/agentc_testing/agentc_testing/resources/travel_agent/rewards_spec.json>`__.
 
 Prompt Records
 --------------
@@ -61,3 +61,42 @@ Prompts in Agent Catalog refer to the aggregation of all **all** inputs (tool ch
 types, etc...) given to an LLM (or an agent framework).
 
 .. literalinclude:: ../../templates/prompts/prompt.yaml
+
+.. tip::
+
+    The ``content`` field of Agent Catalog prompt entries can be either be completely unstructured (e.g., persisted
+    as a single string) or as a YAML object (of arbitrary nesting) structuring specific parts of your prompt.
+    For example, suppose we are given the prompt record below:
+
+    .. code-block:: yaml
+
+        name: my_prompt
+
+        description: A prompt for validating the output of another agent.
+
+        content:
+            agent_instructions: |
+                Your task is to validate the line of thinking using
+                the previous messages.
+            format_instructions: |
+                You MUST return your answer in all caps.
+
+    Upon fetching this prompt from the catalog, we can access the ``content`` field as a dictionary.
+    This is useful for agent frameworks that require specific small snippets of text (e.g., "instructions",
+    "objective", etc...)
+
+    .. code-block:: python
+
+        import agentc
+        import your_favorite_agent_framework
+
+        catalog = agentc.Catalog()
+        my_prompt = catalog.find("prompt", name="my_prompt")
+        my_agent = your_favorite_agent_framework.Agent(
+            instructions=my_prompt.content["agent_instructions"],
+            output={
+                "type": [True, False],
+                "instructions": my_prompt.content["format_instructions"]
+            }
+        )
+

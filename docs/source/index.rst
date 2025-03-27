@@ -16,17 +16,13 @@ Table of Contents
    :maxdepth: 2
 
    Installation <install>
-   Quick Start <quick>
    Concepts <concept>
-   CLI Tool <cli>
-   Library <api>
-   Catalog Records <catalog>
-   Log Records <log>
+   agentc CLI Tool <cli>
+   Package Reference <api>
+   Tool / Prompt Records <catalog>
+   Spans and Log Records <log>
+   Log Analysis <analysis>
    Configuration <config>
-
-.. Frequently Asked Questions <faqs>
-
-.. Provider Configuration <provider>
 
 
 Indices and Tables

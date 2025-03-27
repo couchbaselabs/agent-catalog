@@ -262,3 +262,6 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             raise LookupError(f"No results found? -- Error: {err}")
         for row in res:
             return VersionDescriptor.model_validate(row)
+        raise LookupError(
+            f"Catalog version not found for kind = '{kind}'!" f"Please run 'agentc publish' to create the catalog."
+        )

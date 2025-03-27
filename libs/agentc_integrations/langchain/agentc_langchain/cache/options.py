@@ -54,13 +54,13 @@ class CacheOptions(pydantic_settings.BaseSettings):
     scope: typing.Optional[str] = pydantic.Field(default=DEFAULT_COUCHBASE_CACHE_SCOPE_NAME)
     """ The name of the Couchbase scope hosting the cache.
 
-    This field is optional and defaults to :py:data:`agentc_langchain.defaults.DEFAULT_COUCHBASE_CACHE_SCOPE_NAME`.
+    This field is optional and defaults to ``agent_activity``.
     """
 
     collection: typing.Optional[str] = pydantic.Field(default=DEFAULT_COUCHBASE_CACHE_COLLECTION_NAME)
     """ The name of the Couchbase collection hosting the cache.
 
-    This field is optional and defaults to :py:data:`agentc_langchain.defaults.DEFAULT_COUCHBASE_CACHE_COLLECTION_NAME`.
+    This field is optional and defaults to ``langchain_llm_cache``.
     """
 
     index_name: typing.Optional[str] = pydantic.Field(default=DEFAULT_COUCHBASE_CACHE_INDEX_NAME)
@@ -68,7 +68,7 @@ class CacheOptions(pydantic_settings.BaseSettings):
 
     This field will only be used if the cache is of type `semantic`.
     If the cache is of type `semantic` and this field is not specified, this field defaults to
-    :py:data:`agentc_langchain.defaults.DEFAULT_COUCHBASE_CACHE_INDEX_NAME`.
+    ``langchain_llm_cache_index``.
     """
 
     ttl: typing.Optional[datetime.timedelta] = None
@@ -82,8 +82,7 @@ class CacheOptions(pydantic_settings.BaseSettings):
     """ The score threshold used to quantify what constitutes as a "good" match.
 
     This field will only be used if the cache is of type `semantic`.
-    If the cache is of type `semantic` and this field is not specified, this field defaults to
-    :py:data:`agentc_langchain.defaults.DEFAULT_COUCHBASE_CACHE_INDEX_SCORE_THRESHOLD`.
+    If the cache is of type `semantic` and this field is not specified, this field defaults to 0.8.
     """
 
     ddl_retry_attempts: typing.Optional[int] = DEFAULT_COUCHBASE_CACHE_DDL_RETRY_ATTEMPTS

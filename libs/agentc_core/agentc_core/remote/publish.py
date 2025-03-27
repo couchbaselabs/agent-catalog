@@ -62,7 +62,7 @@ def publish_logs(cb: couchbase.cluster.Bucket, log_path: pathlib.Path):
         try:
             msg_str = msg.model_dump_json()
             msg_dict = json.loads(msg_str)
-            key = msg_dict["timestamp"] + msg_dict["session"]
+            key = msg_dict["identifier"]
             cb_coll.upsert(key, msg_dict)
         except couchbase.exceptions.CouchbaseException as e:
             raise ValueError(f"Couldn't insert log!\n{e.message}") from e

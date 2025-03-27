@@ -1,0 +1,30 @@
+CREATE OR REPLACE ANALYTICS VIEW `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions AS
+    FROM
+        `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]` AS l
+    LETTING
+        sid = l.span.session,
+        cid = {
+            "identifier": l.catalog_version.identifier,
+            "timestamp": l.catalog_version.timestamp
+        }
+    GROUP BY
+        sid,
+        cid
+        GROUP AS g
+    LETTING
+        content = (
+            FROM
+                g AS gi
+            SELECT
+                gi.l.content   AS event,
+                gi.l.timestamp AS timestamp
+            ORDER BY
+                STR_TO_MILLIS(gi.l.timestamp) ASC
+        )
+    SELECT
+        sid                  AS sid,
+        cid                  AS cid,
+        content              AS content,
+        content[0].timestamp AS start_t
+    ORDER BY
+        STR_TO_MILLIS(start_t) ASC;

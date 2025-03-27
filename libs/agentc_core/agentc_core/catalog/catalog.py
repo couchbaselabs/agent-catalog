@@ -38,59 +38,96 @@ Tool = ToolProvider.ToolResult
 
 
 class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
-    """A provider of indexed "agent building blocks" (e.g., tools, prompts, etc...)."""
+    """A provider of indexed "agent building blocks" (e.g., tools, prompts, spans...).
+
+    .. card:: Class Description
+
+        A :py:class:`Catalog` instance can be configured in three ways (listed in order of precedence):
+
+        1. Directly (as arguments to the constructor).
+        2. Via the environment (though environment variables).
+        3. Via a :file:`.env` configuration file.
+
+        In most cases, you'll want to configure your catalog via a :file:`.env` file.
+        This style of configuration means you can instantiate a :py:class:`Catalog` instance as such:
+
+        .. code-block:: python
+
+            import agentc
+            catalog = agentc.Catalog()
+
+        Some custom configurations can only be specified via the constructor (e.g., ``secrets``).
+        For example, if your secrets are managed by some external service (defined below as ``my_secrets_manager``),
+        you can specify them as such:
+
+        .. code-block:: python
+
+            import agentc
+            catalog = agentc.Catalog(secrets={
+                "CB_CONN_STRING": os.getenv("CB_CONN_STRING"),
+                "CB_USERNAME": os.getenv("CB_USERNAME"),
+                "CB_PASSWORD": my_secrets_manager.get("THE_CB_PASSWORD"),
+                "CB_CERTIFICATE": my_secrets_manager.get("PATH_TO_CERT"),
+            })
+
+    """
 
     model_config = pydantic.ConfigDict(extra="ignore")
 
-    refiner: typing.Optional[typing.Callable[[list[SearchResult]], list[SearchResult]]] = lambda results: results
+    refiner: typing.Optional[typing.Callable] = lambda results: results
     """ A Python function to post-process results (reranking, pruning, etc...) yielded by the catalog.
 
-    By default, we perform a strict top-K nearest neighbor search for relevant results.
-    This function serves to perform any additional reranking and **pruning** before the code generation occurs.
-    This function should accept a list of :py:class:`SearchResult` instances (a model with the fields ``entry`` and
-    ``delta``) and return a list of :py:class:`SearchResult` instances.
+    .. card:: Field Description
 
-    We offer an experimental post-processor to cluster closely related results (using delta as the loss function) and
-    subsequently yield the closest cluster (see :py:class:`agentc_core.provider.refiner.ClosestClusterRefiner`).
+        By default, we perform a strict top-K nearest neighbor search for relevant results.
+        This function serves to perform any additional reranking and **pruning** before the code generation occurs.
+        This function should accept a list of :py:class:`agentc_core.catalog.SearchResult` instances (a model with the
+        fields ``entry`` and ``delta``) and return a list of :py:class:`agentc_core.catalog.SearchResult` instances.
+
+        We offer an experimental post-processor to cluster closely related results (using delta as the loss function)
+        and subsequently yield the closest cluster (see :py:class:`agentc_core.provider.refiner.ClosestClusterRefiner`).
     """
 
     secrets: typing.Optional[dict[str, pydantic.SecretStr]] = pydantic.Field(default_factory=dict, frozen=True)
     """
     A map of identifiers to secret values (e.g., Couchbase usernames, passwords, etc...).
 
-    Some tools require access to values that cannot be hard-coded into the tool themselves (for security reasons).
-    As an example, SQL++ tools require a connection string, username, and password.
-    Instead of capturing these raw values in the tool metadata, tool descriptors mandate the specification of a
-    map whose values are secret keys.
-    These identifiers are read either from the environment or from this ``secrets`` field.
+    .. card:: Field Description
 
-    .. code-block:: yaml
+        Some tools require access to values that cannot be hard-coded into the tool themselves (for security reasons).
+        As an example, SQL++ tools require a connection string, username, and password.
+        Instead of capturing these raw values in the tool metadata, tool descriptors mandate the specification of a
+        map whose values are secret keys.
+        These identifiers are read either from the environment or from this ``secrets`` field.
 
-        secrets:
-            - couchbase:
-                conn_string: MY_CB_CONN_STRING
-                username: MY_CB_USERNAME
-                password: MY_CB_PASSWORD
+        .. code-block:: yaml
 
-    To map the secret keys to values explicitly, users will specify their secrets using this field (secrets).
+            secrets:
+                - couchbase:
+                    conn_string: MY_CB_CONN_STRING
+                    username: MY_CB_USERNAME
+                    password: MY_CB_PASSWORD
 
-    .. code-block:: python
+        To map the secret keys to values explicitly, users will specify their secrets using this field (secrets).
 
-        provider = agentc.Catalog(secrets={
-            "CB_CONN_STRING": "couchbase//23.52.12.254",
-            "CB_USERNAME": "admin_7823",
-            "CB_PASSWORD": os.getenv("THE_CB_PASSWORD"),
-            "CB_CERTIFICATE": "path/to/cert.pem",
-        })
+        .. code-block:: python
+
+            provider = agentc.Catalog(secrets={
+                "CB_CONN_STRING": "couchbase//23.52.12.254",
+                "CB_USERNAME": "admin_7823",
+                "CB_PASSWORD": os.getenv("THE_CB_PASSWORD"),
+                "CB_CERTIFICATE": "path/to/cert.pem",
+            })
     """
 
     tool_model: SchemaModel = SchemaModel.TypingTypedDict
     """ The target model type for the generated (schema) code for tools.
 
-    By default, we generate :py:type:`TypedDict` models and attach these as type hints to the generated Python
-    functions.
-    Other options include Pydantic (V2 and V1) models and dataclasses, though these may not be supported by all agent
-    frameworks.
+    .. card:: Field Description
+
+        By default, we generate ``TypedDict`` models and attach these as type hints to the generated Python functions.
+        Other options include Pydantic (V2 and V1) models and dataclasses, though these may not be supported by all
+        agent frameworks.
     """
 
     _local_tool_catalog: CatalogMem = None
@@ -261,6 +298,11 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
     @pydantic.computed_field
     @property
     def version(self) -> VersionDescriptor:
+        """The version of the catalog currently being served (i.e., the latest version).
+
+        :returns: An :py:class:`agentc_core.version.VersionDescriptor` instance.
+        """
+
         # We will take the latest version across all catalogs.
         version_tuples = list()
         if self._local_tool_catalog is not None:
@@ -274,7 +316,7 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
         return sorted(version_tuples, key=lambda x: x.timestamp, reverse=True)[0]
 
     def Span(self, name: str, state: typing.Any = None, **kwargs) -> "Span":
-        """A factory method to initialize a Span instance.
+        """A factory method to initialize a :py:class:`Span` (more specifically, a :py:class:`GlobalSpan`) instance.
 
         :param name: Name to bind to each message logged within this span.
         :param state: A JSON-serializable object that will be logged on entering and exiting this span.
@@ -293,6 +335,41 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
         snapshot: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
     ) -> typing.Union[list[Tool] | list[Prompt] | None]:
+        """Return a list of tools or prompts based on the specified search criteria.
+
+        .. card:: Method Description
+
+            This method is meant to act as the programmatic equivalent of the :code:`agentc find` command.
+            Whether (or not) the results are fetched from the local catalog *or* the remote catalog depends on the
+            configuration of this :py:class:`agentc_core.catalog.Catalog` instance.
+
+            For example, to find a tool named "get_sentiment_of_text", you would author:
+
+            .. code-block:: python
+
+                results = catalog.find(kind="tool", name="get_sentiment_of_text")
+                sentiment_score = results[0].func("I love this product!")
+
+            To find a prompt named "summarize_article_instructions", you would author:
+
+            .. code-block:: python
+
+                results = catalog.find(kind="prompt", name="summarize_article_instructions")
+                prompt_for_agent = summarize_article_instructions.content
+
+        :param kind: The type of item to search for, either 'tool' or 'prompt'.
+        :param query: A query string (natural language) to search the catalog with.
+        :param name: The specific name of the catalog entry to search for.
+        :param annotations: An annotation query string in the form of ``KEY="VALUE" (AND|OR KEY="VALUE")*``.
+        :param snapshot: The snapshot version to find the tools for. By default, we use the latest snapshot.
+        :param limit: The maximum number of results to return (ignored if name is specified).
+        :return:
+            One of the following:
+
+            * :python:`None` if no results are found by name.
+            * A list of :py:class:`Tool` instances if `kind` is "tool" (see :py:meth:`find_tools` for details).
+            * A list of :py:class:`Prompt` instances if `kind` is "prompt" (see :py:meth:`find_prompts` for details).
+        """
         if kind.lower() == "tool":
             return self.find_tools(query, name, annotations, snapshot, limit)
         elif kind.lower() == "prompt":
@@ -307,16 +384,19 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
         annotations: str = None,
         snapshot: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
-    ) -> list[ToolProvider.ToolResult] | ToolProvider.ToolResult | None:
-        """
+    ) -> list[Tool] | Tool | None:
+        """Return a list of tools based on the specified search criteria.
+
         :param query: A query string (natural language) to search the catalog with.
         :param name: The specific name of the catalog entry to search for.
         :param annotations: An annotation query string in the form of ``KEY="VALUE" (AND|OR KEY="VALUE")*``.
         :param snapshot: The snapshot version to find the tools for. By default, we use the latest snapshot.
         :param limit: The maximum number of results to return (ignored if name is specified).
-        :return: A list of **Tool** instances, with the following attributes:
-            - **func** (Callable): A Python callable representing the function.
-            - **meta** (RecordDescriptor): The metadata associated with the tool.
+        :return:
+            A list of :py:class:`Tool` instances, with the following attributes:
+
+            1. **func** (``typing.Callable``): A Python callable representing the function.
+            2. **meta** (:py:type:`RecordDescriptor`): The metadata associated with the tool.
         """
         if self._tool_provider is None:
             raise RuntimeError(
@@ -337,17 +417,21 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
         annotations: str = None,
         snapshot: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
-    ) -> list[PromptProvider.PromptResult] | PromptProvider.PromptResult | None:
-        """
+    ) -> list[Prompt] | Prompt | None:
+        """Return a list of prompts based on the specified search criteria.
+
         :param query: A query string (natural language) to search the catalog with.
         :param name: The specific name of the catalog entry to search for.
         :param annotations: An annotation query string in the form of ``KEY="VALUE" (AND|OR KEY="VALUE")*``.
         :param snapshot: The snapshot version to find the tools for. By default, we use the latest snapshot.
         :param limit: The maximum number of results to return (ignored if name is specified).
-        :return: A list of *Prompt* instances, with the following attributes:
-            - **content** (str | dict): The content to be served to the model.
-            - **tools** (list): The list containing the tool functions associated with prompt.
-            - **output** (str): The output type of the prompt, if it exists.
+        :return:
+            A list of :py:class:`Prompt` instances, with the following attributes:
+
+            1. **content** (``str`` | ``dict``): The content to be served to the model.
+            2. **tools** (``list``): The list containing the tool functions associated with prompt.
+            3. **output** (``dict``): The output type of the prompt, if it exists.
+            4. **meta** (:py:type:`RecordDescriptor`): The metadata associated with the prompt.
         """
         if self._prompt_provider is None:
             raise RuntimeError(

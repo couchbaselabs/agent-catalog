@@ -18,9 +18,36 @@ logger = logging.getLogger(__name__)
 
 
 class Callback(BaseCallbackHandler):
-    class TraceNode(pydantic.BaseModel):
+    """All callback that will log all LlamaIndex events using the given span as the root.
+
+    .. card:: Class Description
+
+        This class is a callback handler that will log :py:class:`ChatCompletionContent`, :py:class:`ToolCallContent`,
+        and :py:class:`ToolResultContent` using events yielded from LlamaIndex (with the given span as the root).
+        Below, we provide an example of how to use this class.
+
+        .. code-block:: python
+
+            import agentc
+            import llama_index.core.llms
+            import llama_index.llms.openai
+
+            catalog = agentc.Catalog()
+            root_span = catalog.Span(name="root_span")
+            my_prompt = catalog.find("prompt", name="talk_like_a_pirate")
+            chat_model = llama_index.llms.openai.OpenAI(model="gpt-4o")
+            chat_model.callback_manager.add_handler(Callback(span=span))
+            result = chat_model.chat(
+                [
+                    llama_index.core.llms.ChatMessage(role="system", content=my_prompt.content),
+                    llama_index.core.llms.ChatMessage(role="user", content="What is your name"),
+                ]
+            )
+    """
+
+    class _TraceNode(pydantic.BaseModel):
         span: Span
-        children: dict[llama_index.core.llms.MessageRole, "Callback.TraceNode"]
+        children: dict[llama_index.core.llms.MessageRole, "Callback._TraceNode"]
 
     def __init__(
         self,
@@ -31,7 +58,7 @@ class Callback(BaseCallbackHandler):
         super().__init__(event_starts_to_ignore or list(), event_ends_to_ignore or list())
 
         # We'll use a stack to store our active traces.
-        self.active_traces: list[Callback.TraceNode] = list()
+        self.active_traces: list[Callback._TraceNode] = list()
         self.root_span = span
 
     @staticmethod
@@ -155,7 +182,7 @@ class Callback(BaseCallbackHandler):
         parent_id: str = "",
         **kwargs: typing.Any,
     ) -> str:
-        trace: Callback.TraceNode = self.active_traces[-1]
+        trace: Callback._TraceNode = self.active_traces[-1]
 
         annotations = dict()
         if parent_id != "":
@@ -182,7 +209,7 @@ class Callback(BaseCallbackHandler):
     def start_trace(self, trace_id: typing.Optional[str] = None) -> None:
         new_span = self.root_span.new(name="start_trace", trace_id=trace_id)
         self.active_traces += [
-            Callback.TraceNode(
+            Callback._TraceNode(
                 span=new_span,
                 children=dict(),
             )

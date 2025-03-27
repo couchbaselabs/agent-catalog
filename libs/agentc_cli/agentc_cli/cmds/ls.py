@@ -41,7 +41,7 @@ def cmd_ls(
     if cfg.verbosity_level == 0:
         for k in kind:
             catalog: CatalogBase = get_catalog(
-                cfg, force=force, include_dirty=include_dirty, kind=k, printer=lambda x: None
+                cfg, force=force, include_dirty=include_dirty, kind=k, printer=lambda *args, **kwargs: None
             )
             for catalog_item in catalog:
                 click_extra.echo(f"{click_extra.style(catalog_item.name, bold=True)}")

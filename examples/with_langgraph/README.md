@@ -153,14 +153,13 @@ classDef last fill: #bfb6fc
    ```
 
 4. Make sure your Git repo is clean, and run `agentc index` to index your tools and prompts.
-   Note that `tools` and `prompts` are _relative paths_ to the `tools` and `prompts` folder.
 
    ```bash
-   # agentc index $PATH_TO_TOOLS_FOLDER $PATH_TO_PROMPTS_FOLDER
-   agentc index tools prompts
+   # agentc index
+   agentc index .
    ```
 
-   This command will subsequently crawl the `tools` and `prompts` folder for both tool and prompt files.
+   This command will subsequently crawl the current working directory for both tool and prompt files.
 
    _Hint: if you've made changes but want to keep the "same" commit within your local branch, use
    `git add $MY_FILES` followed by `git commit --amend`!_

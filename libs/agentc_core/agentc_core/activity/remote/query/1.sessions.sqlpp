@@ -1,0 +1,34 @@
+CREATE OR REPLACE FUNCTION `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions() {
+    (
+        FROM
+            `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]` AS l
+        GROUP BY
+            l.span.session
+            GROUP AS g
+        LETTING
+            content = (
+                FROM
+                    g AS gi
+                SELECT
+                    gi.l.content   AS event,
+                    gi.l.timestamp AS timestamp
+                ORDER BY
+                    STR_TO_MILLIS(gi.l.timestamp) ASC
+            ),
+            cid = (
+                FROM
+                    g AS gi
+                SELECT
+                    gi.l.catalog_version.identifier,
+                    gi.l.catalog_version.timestamp
+                LIMIT 1
+            )[0]
+        SELECT
+            l.span.session       AS sid,
+            cid                  AS cid,
+            content              AS content,
+            content[0].timestamp AS start_t
+        ORDER BY
+            STR_TO_MILLIS(start_t) ASC
+    )
+};

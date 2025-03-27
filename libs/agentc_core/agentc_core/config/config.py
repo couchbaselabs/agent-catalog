@@ -400,14 +400,14 @@ class CommandLineConfig(pydantic_settings.BaseSettings):
     model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_", extra="ignore")
 
     verbosity_level: int = pydantic.Field(default=DEFAULT_VERBOSITY_LEVEL, ge=0, le=2)
-    """ Verbosity level of the :code:`agentc` command line tool.
+    """ Verbosity level of the :command:`agentc` command line tool.
 
     By default, this value is 0.
     If ``AGENT_CATALOG_DEBUG`` exists, this value is set to 2.
     """
 
     with_interaction: bool = True
-    """ Whether to enable the interaction mode for the :code:`agentc` command line tool.
+    """ Whether to enable the interaction mode for the :command:`agentc` command line tool.
 
     By default, this value is True.
     Set this value to False to raise errors when the command line tool requires user input (e.g., when developing

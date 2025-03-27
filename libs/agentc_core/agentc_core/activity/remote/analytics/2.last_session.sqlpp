@@ -1,0 +1,12 @@
+CREATE OR REPLACE ANALYTICS FUNCTION `[BUCKET_NAME]`.`[SCOPE_NAME]`.LastSession() {
+    -- This function returns the session with the most recent activity, not necessarily the most recent started session.
+    (
+        FROM
+            `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]` AS l
+        SELECT VALUE
+            l.span.session
+        ORDER BY
+            STR_TO_MILLIS(l.timestamp) DESC
+        LIMIT 1
+    )[0]
+};

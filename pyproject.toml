@@ -43,7 +43,8 @@ sphinx-hoverxref = "^1.4.1"
 linkify-it-py = "^2.0.3"
 sphinx-autobuild = "^2024.10.3"
 autodoc-pydantic = "^2.2.0"
-sphinx-rtd-theme = "^3.0.1"
+piccolo_theme = "^0.24.0"
+sphinx_design = "^0.6.1"
 enum-tools = { version = "^0.12.0", extras = ["sphinx"] }
 click_extra = { version = "^4.15.0", extras = ["sphinx"] }
 

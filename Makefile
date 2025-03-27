@@ -2,6 +2,7 @@
 
 # Modify the path to the scripts directory as needed.
 SCRIPTS_DIRECTORY = ./scripts
+AGENT_CATALOG_SETUP_TYPE = user
 
 default: setup update activate
 
@@ -10,7 +11,7 @@ check:
 
 setup:
 	@$(SCRIPTS_DIRECTORY)/pre-setup.sh
-	@$(SCRIPTS_DIRECTORY)/setup.sh dev
+	@$(SCRIPTS_DIRECTORY)/setup.sh $(AGENT_CATALOG_SETUP_TYPE)
 
 activate:
 	@$(SCRIPTS_DIRECTORY)/activate.sh
