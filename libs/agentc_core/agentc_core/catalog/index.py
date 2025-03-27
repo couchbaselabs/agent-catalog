@@ -84,7 +84,7 @@ def index_catalog(
         all_errs += errs or []
 
     if all_errs:
-        logger.error("Encountered error(s) during embedding generation: " + "\n".join([str(e) for e in all_errs]))
+        logger.warning("Encountered error(s) during embedding generation: " + "\n".join([str(e) for e in all_errs]))
         raise all_errs[0]
 
     return next_catalog
@@ -175,7 +175,9 @@ def index_catalog_start(
                 break
 
     if all_errs:
-        logger.error("Encountered error(s) while crawling source directories: " + "\n".join([str(e) for e in all_errs]))
+        logger.warning(
+            "Encountered error(s) while crawling source directories: " + "\n".join([str(e) for e in all_errs])
+        )
         raise all_errs[0]
 
     catalog_descriptor_embedding_model = (

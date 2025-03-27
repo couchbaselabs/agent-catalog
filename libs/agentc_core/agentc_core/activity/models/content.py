@@ -153,7 +153,6 @@ class SystemContent(BaseContent):
         A system message has a single required field, ``value``, which contains the content of the system message.
         If extra data is associated with the system message (e.g., LangGraph's ``run_id`` fields), it can be stored in
         the optional ``extra`` field.
-
     """
 
     kind: typing.Literal[Kind.System] = Kind.System
@@ -178,12 +177,19 @@ class ToolCallContent(BaseContent):
 
         Optional fields for a tool call message include ``tool_call_id``, ``status``, and ``extra``.
         The ``tool_call_id`` field is an optional unique identifier associated with a tool call instance and is used
-        to correlate the call to the result of its execution (i.e., the :py:class`ToolResult` message) by the
+        to correlate the call to the result of its execution (i.e., the :py:class:`ToolResult` message) by the
         application.
         The ``status`` field is an optional field that indicates the status of *generating* the tool call message
         (e.g., the generated output does not adhere to the function signature).
         If extra data is associated with the tool call (e.g., the log-probabilities), it can be stored in the optional
         ``extra`` field.
+
+    .. tip::
+
+        If ``tool_call_id`` is not specified *but* your application calls and executes tools sequentially, you can still
+        link the tool call to the corresponding tool result by using the order of the messages in the log.
+        This is the approach taken by the :sql:`ToolInvocations` view (more information can be found
+        `here <analysis.html#toolinvocations-view>`__).
 
     """
 
@@ -255,11 +261,25 @@ class ToolResultContent(BaseContent):
 
 
 class ChatCompletionContent(BaseContent):
-    """ChatCompletion refers to messages that are generated using a language model."""
+    """ChatCompletion refers to messages that are generated using a language model.
+
+    .. card:: Class Description
+
+        Chat completion messages refer to the output "predicted" text of a language model.
+        In the context of "agentic" applications, these messages are distinct from :py:class:`ToolCallContent` messages
+        (even though both are generated using LLMs).
+
+        A chat completion message has one required field: ``output``.
+        The ``output`` field refers to the unstructured generated text returned by the language model.
+
+        To capture the breadth of LLM-provider metadata, chat completion messages may also contain a ``meta`` field
+        (used to capture the raw response associated with the chat completion).
+        Finally, any extra data that exists outside the raw response can be stored in the optional ``extra`` field.
+    """
 
     kind: typing.Literal[Kind.ChatCompletion] = Kind.ChatCompletion
 
-    output: typing.Optional[str] = pydantic.Field(description="The output of the model.", default=None)
+    output: str = pydantic.Field(description="The output of the model.")
 
     meta: typing.Optional[dict] = pydantic.Field(
         description="The raw response associated with the chat completion. This must be JSON-serializable.",
@@ -275,7 +295,57 @@ class RequestHeaderContent(BaseContent):
     """RequestHeader refers to messages that *specifically* capture tools and output types used in a request to a
     language model.
 
+    .. card:: Class Description
 
+        Request header messages are used to record "setup" information for subsequent chat-completion and/or tool-call
+        events.
+        These primarily include tools (dictionaries of names, descriptions, and function schemas) and output types.
+
+        All fields of a request header message are optional: ``tools``, ``output``, ``meta``, and ``extra``.
+        The ``tools`` field is a list of :py:class:`RequestHeaderContent.Tool` instances made available to subsequent
+        LLM calls.
+        The ``output`` field refers to the output type that subsequent LLM calls must adhere to (most commonly expressed
+        in JSON schema).
+        The ``meta`` field refers to a JSON-serializable object containing the request information.
+        Finally, ``extra`` is used to capture any other data that does not belong in ``meta``.
+
+    .. tip::
+
+        Pydantic enables the specification of their objects using dictionaries.
+        The code snippet below demonstrates two equivalent approaches to specifying the :py:attr:`tools` attribute:
+        First, users can create :py:class:`RequestHeaderContent.Tool` instances by referencing the subclass directly:
+
+        .. code-block:: python
+
+            from agentc.span import RequestHeaderContent
+
+            request_header_content = RequestHeaderContent(
+                tools=[
+                    RequestHeaderContent.Tool(
+                        name="get_user_by_id",
+                        description="Lookup a user by their ID field.",
+                        args_schema={"type": "object", "properties": {"id": {"type": "integer"}}}
+                    )
+                ]
+            )
+
+        Second, users can specify a dictionary:
+
+        .. code-block:: python
+
+            from agentc.span import RequestHeaderContent
+
+            request_header_content = RequestHeaderContent(
+                tools=[
+                    {
+                        "name": "get_user_by_id",
+                        "description": "Lookup a user by their ID field.",
+                        "args_schema": {"type": "object", "properties": {"id": {"type": "integer"}}}
+                    }
+                ]
+            )
+
+        For most cases though, we recommend the former (as this enables most IDEs to catch name errors before runtime).
     """
 
     class Tool(pydantic.BaseModel):
@@ -308,7 +378,17 @@ class RequestHeaderContent(BaseContent):
 
 
 class UserContent(BaseContent):
-    """User refers to messages that are directly sent by (none other than) the user."""
+    """User refers to messages that are directly sent by (none other than) the user.
+
+    .. card:: Class Description
+
+        User messages are used to capture a user's input into your application.
+        User messages exclude those generated by a prior LLM call for the purpose of "mocking" an intelligent actor
+        (e.g., multi-agent applications).
+
+        A user message has a single required field, ``value``, which contains the direct input given by the user.
+        If extra data is associated with the user message, it can be stored in the optional ``extra`` field.
+    """
 
     kind: typing.Literal[Kind.User] = Kind.User
 
@@ -320,7 +400,18 @@ class UserContent(BaseContent):
 
 
 class AssistantContent(BaseContent):
-    """Assistant refers to messages that are directly served back to the user."""
+    """Assistant refers to messages that are directly served back to the user.
+
+    .. card:: Class Description
+
+        Assistant messages are used to capture the direct output of your application (i.e., the messages served back to
+        the user).
+        These messages are *not* strictly :py:class:`ChatCompletionContent` messages, as your application may utilize
+        multiple LLM calls before returning some message back to the user.
+
+        An assistant message has a single required field, ``value``, which contains the direct output back to the user.
+        If extra data is associated with the assistant message, it can be stored in the optional ``extra`` field.
+    """
 
     kind: typing.Literal[Kind.Assistant] = Kind.Assistant
 
@@ -328,7 +419,19 @@ class AssistantContent(BaseContent):
 
 
 class BeginContent(BaseContent):
-    """Begin refers to marker messages that are used to indicate the start of a span (e.g., a task, agent, state, etc...)."""
+    """Begin refers to marker messages that are used to indicate the start of a span (e.g., a task, agent, state,
+    etc...).
+
+    .. card:: Card Description
+
+        Begin messages denote the start of a span *and* (perhaps just as important) record the entrance state of a span.
+        Log analysts can use this information to trace the trajectory of a multi-agent application (e.g., where the
+        "exit state" of one span equals the "enter state" of another span).
+        For more information on tracing this trajectory, see :py:class:`EndContent`.
+
+        Begin messages have two optional fields: i) the ``state`` field (used to record the starting state of a span)
+        and ii) ``extra`` (used to record any extra information pertaining to the start of a span).
+    """
 
     kind: typing.Literal[Kind.Begin] = Kind.Begin
 
@@ -338,7 +441,48 @@ class BeginContent(BaseContent):
 
 
 class EndContent(BaseContent):
-    """End refers to marker messages that are used to indicate the end of a span (e.g., a task, agent, state, etc...)."""
+    r"""End refers to marker messages that are used to indicate the end of a span (e.g., a task, agent, state, etc...).
+
+    .. card:: Class Description
+
+        End messages denote the end of a span *and* (perhaps just as important) record the exit state of a span.
+        Log analysts can use this information to trace the trajectory of a multi-agent application (e.g., where the
+        "exit state" of one span equals the "enter state" of another span).
+
+        End messages have two optional fields: i) the ``state`` field (used to record the ending state of a span)
+        and ii) ``extra`` (used to record any extra information pertaining to the end of a span).
+
+        Given a set of spans (i.e., nodes) :math:`S_G` and our logs :math:`L`, we can define the set of edges
+        :math:`E_G` that belong to your application's span graph :math:`G` with the set / query below:
+
+        .. tab-set::
+
+            .. tab-item:: Formal Set
+
+                .. math::
+
+                    E_G = \{& \ \ell[i]_\text{content.state} = \ell[j]_\text{content.state} \ \land \\
+                        &\ell[i]_\text{kind} = \text{begin} \ \land \\
+                        &\ell[j]_\text{kind} = \text{end} \ \land \\
+                        &\ell[i]_\text{timestamp} < \ell[j]_\text{timestamp} \\
+                        | \ &\ell[i]_\text{span.name} \in S_G, \ \ell[j]_\text{span.name} \in S_G \ \}
+
+            .. tab-item:: SQL++ Query
+
+                .. code-block:: sql
+
+                    FROM
+                        [MY_BUCKET].agent_activity.logs l_i,
+                        [MY_BUCKET].agent_activity.logs l_j
+                    WHERE
+                        l_i.content.state = l_j.content.state AND
+                        l_i.kind = "begin" AND
+                        l_j.kind = "end" AND
+                        l_i.timestamp < l_j.timestamp
+                    SELECT DISTINCT
+                        l_i.span.name AS starting_span,
+                        l_j.span.name AS ending_span;
+    """
 
     kind: typing.Literal[Kind.End] = Kind.End
 
@@ -346,7 +490,31 @@ class EndContent(BaseContent):
 
 
 class KeyValueContent(BaseContent):
-    """KeyValue refers to messages that contain user-specified data that are to be logged under some span."""
+    """KeyValue refers to messages that contain user-specified data that are to be logged under some span.
+
+    .. card:: Class Description
+
+        Key-value messages serve as the catch-all container for user-defined data that belong to some span.
+        We distinguish key-value messages from log-level *annotations*, which are used to attach information to a log
+        entry with existing content.
+
+        Key-value messages have two required fields: i) the ``key`` field (used to record the name of the entry)
+        and ii) ``value`` (used to record the value of the entry).
+        Extra data can also be passed in through the optional ``extra`` field (as with other messages).
+
+        Using the :python:`[]` syntax with a :py:class:`agentc.span.Span` instance generates one key-value entry per
+        call.
+        For example, the following code snippet generates two logs with the same key but different values:
+
+        .. code-block:: python
+
+            my_span = catalog.Span(name="my_span")
+            my_span["alpha"] = alpha_value_1
+            my_span["alpha"] = alpha_value_2
+
+        These messages are commonly purposed for recording evaluation data, as seen in our example application
+        `here <TODO REPLACE ME WITH THE GITHUB LINK>`__.
+    """
 
     kind: typing.Literal[Kind.KeyValue] = Kind.KeyValue
 

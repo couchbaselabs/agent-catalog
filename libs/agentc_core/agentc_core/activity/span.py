@@ -422,7 +422,7 @@ class GlobalSpan(Span):
                 If you are intending to use a remote-only auditor, please ensure that all of the relevant variables
                 (i.e., conn_string, username, password, and bucket) are set.
             """)
-            logger.error(error_message)
+            logger.debug(error_message)
             raise ValueError(error_message)
 
         # Finally, instantiate our auditors.

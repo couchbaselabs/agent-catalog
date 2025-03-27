@@ -70,7 +70,7 @@ def cmd_status(
                 section.display()
             click_extra.secho(DASHES, fg=KIND_COLORS[k])
             if commit_hash_db is not None:
-                show_diff_between_commits(commit_hash_db, cfg, k)
+                show_diff_between_commits(cfg, commit_hash_db, k)
             else:
                 click_extra.secho(DASHES, fg=KIND_COLORS[k])
                 click_extra.secho(
@@ -150,7 +150,7 @@ def get_db_status(
     # Execute query after filtering by catalog_identifier if provided
     res, err = execute_query(cluster, query_get_metadata)
     if err is not None:
-        logger.error(err)
+        logger.warning(err)
         return None
 
     try:
@@ -162,7 +162,7 @@ def get_db_status(
                 f"No {kind} catalog found in the specified bucket...please run agentc publish to push catalogs to the DB.",
                 fg="red",
             )
-            logger.error("No catalogs published...")
+            logger.warning("No catalogs published...")
             return None
 
         click_extra.secho(DASHES, fg=KIND_COLORS[kind])
@@ -332,11 +332,23 @@ def show_diff_between_commits(cfg: Config, commit_hash_2: str, kind: typing.Lite
     repo = git.Repo(os.getcwd(), search_parent_directories=True)
 
     # Get the two commits by their hashes
-    commit1 = repo.commit(commit_hash_1)
-    commit2 = repo.commit(commit_hash_2)
+    try:
+        commit1 = repo.commit(commit_hash_1)
+    except (git.GitError, ValueError) as e:
+        logger.warning(
+            f"Could not retrieve commit {commit_hash_1}!\n{str(e)}",
+        )
+        raise ValueError(f"Unable to find the commit {commit_hash_1} in your Git repository!") from e
+    try:
+        commit2 = repo.commit(commit_hash_2)
+    except (git.GitError, ValueError) as e:
+        logger.warning(
+            f"Could not retrieve commit {commit_hash_2}!\n{str(e)}",
+        )
+        raise ValueError(f"Unable to find the commit {commit_hash_2} in your Git repository!") from e
 
-    click_extra.secho(DASHES, fg=KIND_COLORS[kind])
     # Get the diff between the two commits
+    click_extra.secho(DASHES, fg=KIND_COLORS[kind])
     diff = commit1.diff(commit2)
     if len(diff) > 0:
         click_extra.echo("Git diff from last catalog publish...")

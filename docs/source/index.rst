@@ -23,6 +23,7 @@ Table of Contents
    Spans and Log Records <log>
    Log Analysis <analysis>
    Configuration <config>
+   FAQs <faqs>
 
 
 Indices and Tables

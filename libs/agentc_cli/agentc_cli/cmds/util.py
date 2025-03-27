@@ -8,6 +8,7 @@ import os
 import pathlib
 import pydantic
 import re
+import traceback
 import typing
 
 from agentc_core.catalog import CatalogChain
@@ -47,7 +48,8 @@ def logging_command(parent_logger: logging.Logger):
             try:
                 return func(*args, **kwargs)
             except Exception as e:
-                parent_logger.error(f"Command {func.__name__} failed with exception: {str(e)}", stack_info=True)
+                parent_logger.debug(f"Command {func.__name__} failed with exception: {str(e)}")
+                parent_logger.debug(traceback.format_exception(e))
                 raise e
 
         return new_func

@@ -1,0 +1,178 @@
+.. role:: python(code)
+   :language: python
+
+.. role:: sql(code)
+   :language: sql
+
+Frequently Asked Questions
+==========================
+
+Welcome to the FAQ section of the project documentation!
+This section provides answers to common questions about the Agent Catalog project (key concepts, solutions to common
+issues, guidance on using various features, etc...).
+For additional information, please consult the documentation or community resources.
+
+Couchbase & Capella Questions
+-----------------------------
+
+Which Couchbase Capella or Server version should I use?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Agent Catalog uses Vector search at its base, so any Couchbase version above and inclusive of ``7.6`` should be used.
+If you are a new user, we recommend using the latest version!
+
+What services do I need to enable on my Couchbase cluster?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+At a minimum, Agent Catalog requires the following services:
+
+       - *Data*, *Query*, *Index*: For storing records (tools, prompts, logs) and subsequently searching for them.
+       - *Search*: To enable semantic search of your catalog items (tools and prompts).
+
+To perform analysis of your logs, we also recommend enabling the *Analytics Service* to efficiently compute aggregate
+information about your application's performance.
+
+What can I do to increase log ingestion rate into my Couchbase cluster?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When a :py:class:`agentc.Span` instance is used, logs are continuously inserted into your Couchbase cluster.
+The ingestion rate ultimately depends on your Couchbase cluster configuration and can be adjusted by scaling your
+nodes -- either horizontally by adding more data nodes or vertically by increasing the RAM per node.
+
+For more information on Cluster scaling, refer to the Couchbase documentation
+`here <https://docs.couchbase.com/cloud/clusters/scale-database.html#events>`__.
+
+What does Agent Catalog add to my Couchbase bucket?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+On :code:`agentc init`, Agent Catalog creates two scopes: 1) :sql:`agent_activity` and 2) :sql:`agent_catalog`.
+The former holds all logs captured by :py:class:`agentc.Span` instances` in the :sql:`agent_activity.logs` collection
+(see `here <analysis.html>`__ for more information).
+The latter contains three collections:
+
+1. :sql:`agent_catalog.tools`, which holds all tool records across all snapshots yielded by :code:`agentc publish`.
+2. :sql:`agent_catalog.prompts`, which holds all prompt records across all snapshots yielded by :code:`agentc publish`.
+3. :sql:`agent_catalog.metadata`, which holds all snapshot-related info across :sql:`agent_catalog.tools` and
+   :sql:`agent_catalog.prompts`.
+
+:code:`agentc init` will also create several GSI and vector indexes for collections within the :sql:`agent_catalog`
+scope to assist in tool and prompt searching.
+
+Do I need Couchbase instance to run Agent Catalog?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+No, you do not need a Couchbase instance to get started with Agent Catalog.
+A Couchbase instance, however, is required for the :code:`agentc publish` command.
+
+Git Versioning Questions
+------------------------
+
+How do I roll back to a previous catalog version?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Agent Catalog was built on the principle of application *snapshots*.
+Consequently, it is possible to roll back to a previous catalog version :math:`v` if you have :math:`v`'s version ID.
+Some common use cases for rolling back to a previous catalog version include performing A/B testing on different
+versions of your application or rolling back your application due to some regression.
+
+Catalog versions are Git commit hashes.
+To roll back to a previous catalog version (and ultimately, a previous version of your application), follow these steps
+below:
+
+1. **List Catalog Versions** : Start by running the :code:`agentc status` command with the ``--db`` and ``--no-local``
+   flags to list all the published catalog versions of tools (or prompts) in your bucket.
+   For this example, we will focus on tools:
+
+   .. code-block:: ansi-shell-session
+
+       $ # run agentc status --help for all options
+       $ agentc status tools --db --no-local
+
+   Running the command above will return a list of all the tool catalog snapshots you have published to Couchbase.
+
+   .. code-block:: console
+       :emphasize-lines: 5, 16
+
+       --------------------------------------------------------------------------------------------------
+       TOOL
+       --------------------------------------------------------------------------------------------------
+       db catalog info:
+           catalog id: 53010a92d74e96851fb36fc2c69b9c3337140890
+                   path            : travel-sample.agent_catalog.tool
+                   schema version  : 0.0.0
+                   kind of catalog : tool
+                   repo version    :
+                           time of publish: 2024-10-23 07:16:15.058405+00:00
+                           catalog identifier: 53010a92d74e96851fb36fc2c69b9c3337140890
+                   embedding model : {'base_url': None, 'name': 'sentence-transformers/all-MiniLM-L12-v2'}
+                   source dirs     : ['src/resources/agent_c/tools']
+                   number of items : 24
+
+           catalog id: fe25a5755bfa9af68e1f1fae9ac45e9e37b37611
+                   path            : travel-sample.agent_catalog.tool
+                   schema version  : 0.0.0
+                   kind of catalog : tool
+                   repo version    :
+                           time of publish: 2024-10-16 05:34:38.523755+00:00
+                           catalog identifier: fe25a5755bfa9af68e1f1fae9ac45e9e37b37611
+                   embedding model : {'base_url': None, 'name': 'sentence-transformers/all-MiniLM-L12-v2'}
+                   source dirs     : ['src/resources/tools']
+                   number of items : 2
+
+       -----------------------------------------------------------------
+
+2. **Browse Git Commits**: Next, check the ``catalog id`` from the above output for the Git commit hash at which the
+   catalogs were published to the database.
+   Open your repository commit history on Github or run the :code:`git log` command in your terminal to view the
+   commit history for your project.
+   Once you have a comprehensive list of commits, you can decide which catalog version to roll back to.
+
+3. **Perform Rollback**: When you decide which catalog version you want to roll back to, you can move forward
+   (or rather, "backward") in three ways:
+
+   a. To revert your changes to a specific commit in a non-destructive manner, run :code:`git revert`.
+
+      .. code-block:: ansi-shell-session
+
+          $ git revert <commit_hash>..HEAD
+
+      This command will rollback your repository to `<commit_hash>` *but* with a new commit hash.
+      This is a safe way to rollback to a previous version without losing your current work, as your existing
+      Git commit history will be preserved.
+
+   b. To checkout a particular commit (i.e., all changes associated with some commit), run :code:`git checkout`.
+
+      .. code-block:: ansi-shell-session
+
+          $ git checkout <commit_hash>
+
+      This command will checkout the commit `<commit_hash>` without creating a new commit.
+
+   c. To revert your changes to a specific commit in a **destructive** manner, run :code:`git reset`.
+
+      .. code-block:: ansi-shell-session
+
+          $ git reset --hard <commit_hash>
+
+      This command will reset your working Git HEAD to the provided commit if you have not published your changes so
+      far.
+      **This command is destructive, so make sure all your changes have been committed or are stashed beforehand!**
+
+   For further information on Git, please refer to git documentation
+   `here <https://training.github.com/downloads/github-git-cheat-sheet>`_ .
+
+
+
+Installation Questions
+----------------------
+
+Why am I getting a PyTorch error on installation?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When installing Agent Catalog, you may face a dependency clash between the PyTorch version installed globally in your
+system and the PyTorch version being installed by the :python:`sentence_transformers` library of :python:`agentc_core`.
+
+This issue can be resolved by using virtual environments (e.g., Poetry, Anaconda, :python:`venv`, etc...).
+We detail the use of Poetry and Anaconda in our installation instructions `here <install.html>`__.
+If this does not solve the issue and you are on an older OS, considering using a virtual machine to run your
+application.

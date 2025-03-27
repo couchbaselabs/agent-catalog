@@ -78,7 +78,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             """
             res, err = execute_query_with_parameters(self.cluster, sqlpp_query, {"name": name, "snapshot": snapshot})
             if err is not None:
-                logger.error(err)
+                logger.debug(err)
                 return []
             query_embeddings = None
 
@@ -263,5 +263,5 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
         for row in res:
             return VersionDescriptor.model_validate(row)
         raise LookupError(
-            f"Catalog version not found for kind = '{kind}'!" f"Please run 'agentc publish' to create the catalog."
+            f"Catalog version not found for kind = '{kind}'! Please run 'agentc publish' to create the catalog."
         )

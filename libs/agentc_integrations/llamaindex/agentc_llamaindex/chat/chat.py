@@ -69,7 +69,7 @@ class Callback(BaseCallbackHandler):
                 span.log(content=SystemContent(value=value, extra={"key": key}), **kwargs)
             except Exception as e:
                 logger.error("Error logging payload %s!", key)
-                logger.error(e)
+                logger.debug(e)
 
     @staticmethod
     def _handle_payload(span: Span, event_type: CBEventType, payload: dict[str, typing.Any]) -> None:
@@ -120,7 +120,7 @@ class Callback(BaseCallbackHandler):
                     response_payload: llama_index.core.llms.ChatResponse = payload[EventPayload.RESPONSE]
                     span.log(
                         content=ChatCompletionContent(
-                            output=response_payload.message.content,
+                            output=response_payload.message.content or "",
                             meta=dict(response_payload.message),
                             extra={
                                 "logprobs": response_payload.logprobs,

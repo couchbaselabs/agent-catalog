@@ -77,7 +77,7 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
     """
 
     index_partition: typing.Optional[int] = None
-    """ The maximum number of index partitions across all nodes for your cluster.
+    r""" The maximum number of index partitions across all nodes for your cluster.
 
     This parameter is used by the Search service to build vector indexes on :code:`init`.
     By default, this value is :math:`2 \times \text{number of FTS nodes in your cluster}`.

@@ -307,11 +307,11 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
         version_tuples = list()
         if self._local_tool_catalog is not None:
             version_tuples += [self._local_tool_catalog.version]
-        if self._remote_tool_catalog is not None and self._remote_tool_catalog.version is not None:
+        if self._remote_tool_catalog is not None and len(self._remote_tool_catalog) > 0:
             version_tuples += [self._remote_tool_catalog.version]
         if self._local_prompt_catalog is not None:
             version_tuples += [self._local_prompt_catalog.version]
-        if self._remote_prompt_catalog is not None and self._remote_prompt_catalog.version is not None:
+        if self._remote_prompt_catalog is not None and len(self._remote_prompt_catalog) > 0:
             version_tuples += [self._remote_prompt_catalog.version]
         return sorted(version_tuples, key=lambda x: x.timestamp, reverse=True)[0]
 
