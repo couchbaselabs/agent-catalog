@@ -71,11 +71,15 @@ Each session record contains:
 
 i) the session ID :sql:`sid`,
 
-ii) the session start time :sql:`start_t`,
+ii) the catalog version :sql:`cid`,
 
-iii) the catalog version :sql:`cid`, and
+iii) the span root name :sql:`root`,
 
-iv) a list of content entries :sql:`content`.
+iv) the session start time :sql:`start_t`,
+
+v) a list of content entries :sql:`content`, and
+
+vi) a list of annotations grouped by span names :sql:`ann`.
 
 The :sql:`content` field details all events that occurred during the session (e.g., the user's messages, the
 response to the user, the internal "thinking" performed by some agent, etc...).
@@ -94,9 +98,11 @@ named :python:`cluster`) to access this view for both the Analytics Service and 
                     `{bucket}`.agent_activity.Sessions s
                 SELECT
                     s.sid,
-                    s.start_t,
                     s.cid,
-                    s.content
+                    s.root,
+                    s.start_t,
+                    s.content,
+                    s.ann
                 LIMIT 10;
             """)
             for result in query:
@@ -112,9 +118,11 @@ named :python:`cluster`) to access this view for both the Analytics Service and 
                     `{bucket}`.agent_activity.Sessions() s
                 SELECT
                     s.sid,
-                    s.start_t,
                     s.cid,
-                    s.content
+                    s.root,
+                    s.start_t,
+                    s.content,
+                    s.ann
                 LIMIT 10;
             """)
             for result in query:
@@ -139,12 +147,14 @@ Each exchange record contains:
 
 i) the session ID :sql:`sid`,
 
-ii) the user's input :sql:`input`,
+ii) the span root name :sql:`root`,
 
-iii) an assistant's response :sql:`output`, and
+iii) the user's input :sql:`input`,
 
-iv) all intermediate logs :sql:`content` between the input and output events (e.g., the messages sent to the
-    LLMs, the tools executed, etc...).
+iv) an assistant's response :sql:`output`, and
+
+v) all intermediate logs :sql:`content` between the input and output events (e.g., the messages sent to the
+   LLMs, the tools executed, etc...).
 
 Below we give code snippets to access the most recent exchange for both the Analytics Service and the Query Service:
 
@@ -160,6 +170,7 @@ Below we give code snippets to access the most recent exchange for both the Anal
                     `{bucket}`.agent_activity.Exchanges e
                 SELECT
                     e.sid,
+                    e.root,
                     e.input,
                     e.output,
                     e.content
@@ -180,6 +191,7 @@ Below we give code snippets to access the most recent exchange for both the Anal
                     `{bucket}`.agent_activity.Exchanges() e
                 SELECT
                     e.sid,
+                    e.root,
                     e.input,
                     e.output,
                     e.content
@@ -202,9 +214,11 @@ Each tool-invocation record contains:
 
 i) the session ID :sql:`sid`,
 
-ii) the tool call entry :sql:`tool_call`, and
+ii) the span root name :sql:`root`,
 
-iii) the corresponding tool result entry :sql:`tool_result`.
+iii) the tool call entry :sql:`tool_call`, and
+
+iv) the corresponding tool result entry :sql:`tool_result`.
 
 Below we give code snippets to access the most recent tool invocation for both the Analytics Service and the Query
 Service:
@@ -221,6 +235,7 @@ Service:
                     `{bucket}`.agent_activity.ToolInvocations ti
                 SELECT
                     ti.sid,
+                    ti.root,
                     ti.tool_call,
                     ti.tool_result
                 ORDER BY
@@ -239,6 +254,7 @@ Service:
                     `{bucket}`.agent_activity.ToolInvocations() ti
                 SELECT
                     ti.sid,
+                    ti.root,
                     ti.tool_call,
                     ti.tool_result
                 ORDER BY
@@ -248,11 +264,73 @@ Service:
             for result in query:
                 print(result)
 
+:sql:`Handoffs` View
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Siblings under the same parent span may share / communicate state with one another.
+In multi-agent applications, we can draw an analogy to how one agent communicates with another.
+:py:class:`Span` instances facilitate this observability through the use of :py:class:`BeginContent` and
+:py:class:`EndContent` messages.
+The :sql:`Handoffs` view provides one record per "handoff", where one span concludes and *potentially* forwards
+its state to another sibling span.
+Each :sql:`Handoff` record contains:
+
+i) the session ID :sql:`sid`,
+
+ii) the parent span name :sql:`parent`,
+
+iii) the source span name (suffix) :sql:`source`,
+
+iv) the destination span name (suffix) :sql:`dest`, and
+
+v) the start time of the destination span :sql:`timestamp`.
+
+Below we give code snippets to access the 10 most recent handoffs for both the Analytics Service and the Query Service:
+
+.. tab-set::
+
+    .. tab-item:: Analytics Service
+
+        .. code-block:: python
+
+            bucket = "MY_BUCKET"
+            query = cluster.analytics_query(f"""
+                FROM
+                    `{bucket}`.agent_activity.Handoffs h
+                SELECT
+                    h.sid,
+                    h.parent,
+                    h.source,
+                    h.dest,
+                    h.timestamp
+                ORDER BY
+                    h.timestamp DESC
+                LIMIT 10;
+            """)
+            for result in query:
+                print(result)
+
+    .. tab-item:: Query Service
+
+        .. code-block:: python
+
+            query = cluster.query(f"""
+                FROM
+                    `{bucket}`.agent_activity.Handoffs() h
+                SELECT
+                    h.sid,
+                    h.parent,
+                    h.source,
+                    h.dest,
+                    h.timestamp
+                ORDER BY
+                    h.timestamp DESC
+                LIMIT 10;
+            """)
+            for result in query:
+                print(result)
+
 .. [1] The Query Service is targeted towards more operational use cases and thus does not support non-materialized views
        like the Analytics Service.
        The Query Service does support user-defined-functions (UDFs) though, thus all Agent Catalog Analytics Service
        views can also be expressed using Query Service UDFs.
-
-
-
-

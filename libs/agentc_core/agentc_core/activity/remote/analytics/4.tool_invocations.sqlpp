@@ -102,13 +102,17 @@ CREATE OR REPLACE ANALYTICS VIEW `[BUCKET_NAME]`.`[SCOPE_NAME]`.ToolInvocations 
                 CallToResultRowsUnnested AS c2ru,
                 RowOrderedToolLogs AS rol1,
                 RowOrderedToolLogs AS rol2
+            LETTING
+                tool_call = OBJECT_REMOVE(rol1, "rn"),
+                tool_result = OBJECT_REMOVE(rol2, "rn")
             WHERE
                 rol1.rn = c2ru.inp_rn AND
                 rol2.rn = c2ru.out_rn
             SELECT
-                c2ru.sid AS sid,
-                rol1     AS tool_call,
-                rol2     AS tool_result
+                c2ru.sid       AS sid,
+                c2ru.span.name AS root,
+                tool_call      AS tool_call,
+                tool_result    AS tool_result
             UNION ALL
             FROM
                 ToolCalls AS tc,
@@ -117,6 +121,7 @@ CREATE OR REPLACE ANALYTICS VIEW `[BUCKET_NAME]`.`[SCOPE_NAME]`.ToolInvocations 
                 tc.content.tool_call_id = tr.content.tool_call_id
             SELECT
                 tc.span.session AS sid,
+                tc.span.name    AS root,
                 tc              AS tool_call,
                 tr              AS tool_result
         ) AS ti

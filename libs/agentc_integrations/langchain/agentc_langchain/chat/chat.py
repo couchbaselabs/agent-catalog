@@ -29,12 +29,14 @@ logger = logging.getLogger(__name__)
 
 def _ai_content_from_generation(message: BaseMessage) -> typing.Iterable[Content]:
     if isinstance(message, AIMessage):
-        yield ChatCompletionContent(output=str(message.content), meta=message.response_metadata)
+        if message.text != "":
+            yield ChatCompletionContent(output=str(message.text), meta=message.response_metadata)
         for tool_call in message.tool_calls:
             yield ToolCallContent(
                 tool_name=tool_call["name"],
                 tool_args=tool_call["args"],
                 tool_call_id=tool_call["id"],
+                meta=message.response_metadata,
                 status="success",
             )
         for invalid_tool_call in message.invalid_tool_calls:
@@ -43,6 +45,7 @@ def _ai_content_from_generation(message: BaseMessage) -> typing.Iterable[Content
                 tool_args=invalid_tool_call["args"],
                 tool_call_id=invalid_tool_call["id"],
                 status="error",
+                meta=message.response_metadata,
                 extra={
                     "error": invalid_tool_call["error"],
                 },

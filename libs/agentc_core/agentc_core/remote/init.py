@@ -1,3 +1,4 @@
+import couchbase.cluster
 import couchbase.management.collections
 import logging
 import typing
@@ -80,3 +81,31 @@ def init_catalog_collection(
         raise ValueError(f"Vector index could not be created \n{err}")
     else:
         printer(f"Vector index for the {kind} catalog has been successfully created!\n", fg="green")
+
+
+def init_analytics_collection(
+    cluster: couchbase.cluster.Cluster,
+    bucket: str,
+):
+    logger.debug("Creating analytics catalog scope.")
+    ddl_result = cluster.analytics_query(f"""
+        CREATE ANALYTICS SCOPE `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`
+        IF NOT EXISTS;
+    """)
+    for _ in ddl_result.rows():
+        pass
+
+    for name in [
+        DEFAULT_CATALOG_METADATA_COLLECTION,
+        DEFAULT_CATALOG_TOOL_COLLECTION,
+        DEFAULT_CATALOG_PROMPT_COLLECTION,
+    ]:
+        logger.debug(f"Creating analytics catalog collection {name}.")
+        ddl_result = cluster.analytics_query(f"""
+            CREATE ANALYTICS COLLECTION
+            IF NOT EXISTS
+            `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{name}`
+            ON `{bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{name}`;
+        """)
+        for _ in ddl_result.rows():
+            pass

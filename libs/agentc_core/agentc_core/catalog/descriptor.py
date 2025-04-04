@@ -32,7 +32,7 @@ RecordDescriptorUnionType = typing.Annotated[
 
 
 class CatalogDescriptor(pydantic.BaseModel):
-    """This model represents a persistable tool catalog for local and in-memory catalog representations."""
+    """This model represents a persistable tool/prompt catalog for local and in-memory catalog representations."""
 
     model_config = pydantic.ConfigDict(use_enum_values=True)
 

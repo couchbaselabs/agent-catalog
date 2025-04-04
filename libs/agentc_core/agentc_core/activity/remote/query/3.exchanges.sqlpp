@@ -87,6 +87,7 @@ CREATE OR REPLACE FUNCTION `[BUCKET_NAME]`.`[SCOPE_NAME]`.Exchanges() {
             rol.rn <= u2au.out_rn
         GROUP BY
             rol.sid,
+            rol.span.name[0],
             u2au.inp_rn,
             u2au.out_rn
             GROUP AS g
@@ -95,7 +96,7 @@ CREATE OR REPLACE FUNCTION `[BUCKET_NAME]`.`[SCOPE_NAME]`.Exchanges() {
                 FROM
                     g AS gi
                 SELECT VALUE
-                    gi.rol
+                    OBJECT_REMOVE(gi.rol, "rn")
                 ORDER BY
                     gi.rol.timestamp ASC
             ),
@@ -105,7 +106,7 @@ CREATE OR REPLACE FUNCTION `[BUCKET_NAME]`.`[SCOPE_NAME]`.Exchanges() {
                 WHERE
                     gi.rol.rn = gi.u2au.inp_rn
                 SELECT VALUE
-                    gi.rol
+                    OBJECT_REMOVE(gi.rol, "rn")
                 LIMIT 1
             )[0],
             output_content = (
@@ -114,13 +115,14 @@ CREATE OR REPLACE FUNCTION `[BUCKET_NAME]`.`[SCOPE_NAME]`.Exchanges() {
                 WHERE
                     gi.rol.rn = gi.u2au.out_rn
                 SELECT VALUE
-                    gi.rol
+                    OBJECT_REMOVE(gi.rol, "rn")
                 LIMIT 1
             )[0]
         SELECT
-            rol.sid        AS sid,
-            input_content  AS `input`,
-            output_content AS `output`,
-            content        AS content
+            rol.sid          AS sid,
+            rol.span.name[0] AS root,
+            input_content    AS `input`,
+            output_content   AS `output`,
+            content          AS content
     )
 };

@@ -13,7 +13,7 @@ class Log(pydantic.BaseModel):
     .. attention::
 
         :py:class:`Log` instances are **immutable** and should not be instantiated directly.
-        Only :py:class`Content` instances should be created directly, and then passed to a :py:class:`Span` instance
+        Only :py:class:`Content` instances should be created directly, and then passed to a :py:class:`Span` instance
         via the :py:meth:`agentc.span.Span.log` method.
 
     """

@@ -105,9 +105,10 @@ CREATE OR REPLACE FUNCTION `[BUCKET_NAME]`.`[SCOPE_NAME]`.ToolInvocations() {
                     rol1.rn = c2ru.inp_rn AND
                     rol2.rn = c2ru.out_rn
                 SELECT
-                    c2ru.sid AS sid,
-                    rol1     AS tool_call,
-                    rol2     AS tool_result
+                    c2ru.sid                  AS sid,
+                    c2ru.span.name            AS root,
+                    OBJECT_REMOVE(rol1, "rn") AS tool_call,
+                    OBJECT_REMOVE(rol2, "rn") AS tool_result
                 UNION ALL
                 FROM
                     ToolCalls AS tc,
@@ -116,6 +117,7 @@ CREATE OR REPLACE FUNCTION `[BUCKET_NAME]`.`[SCOPE_NAME]`.ToolInvocations() {
                     tc.content.tool_call_id = tr.content.tool_call_id
                 SELECT
                     tc.span.session AS sid,
+                    tc.span.name    AS root,
                     tc              AS tool_call,
                     tr              AS tool_result
             ) AS ti

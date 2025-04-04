@@ -23,8 +23,8 @@ The following are sub-folders that you can explore:
 2. [`agentc-cli`](libs/agentc_cli), which contains the command line interface for the Couchbase Agent Catalog project.
 3. [`agentc-core`](libs/agentc_core), which contains the core SDK package for the Couchbase Agent Catalog project.
 4. [`agentc-integrations`](libs/agentc_integrations), which contains additional tooling around building both
-   LangChain-specific (`libs/agentc_integrations/langchain`) and LlamaIndex-specific
-   (`libs/agentc_integrations/llamaindex`) agents.
+   LangChain-specific (`libs/agentc_integrations/langchain`), LangGraph-specific (`libs/agentc_integrations/langgraph`),
+   and LlamaIndex-specific (`libs/agentc_integrations/llamaindex`) applications.
 
 ## How to Contribute
 

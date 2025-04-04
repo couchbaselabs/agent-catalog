@@ -27,7 +27,7 @@ fi
 # Check #3: Poetry must exist.
 if ! [ -x "$(command -v poetry)" ]; then
   echo "Poetry is not installed. Please install Poetry and try again."
-  echo "You can install Poetry by running 'pip install poetry'"
+  echo "You can install Poetry by running 'pipx install poetry' or 'pip install poetry'."
   exit 1
 fi
 

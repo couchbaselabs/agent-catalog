@@ -175,12 +175,14 @@ class ToolCallContent(BaseContent):
         The ``tool_args`` field contains the arguments that are going to be passed to the tool (represented as a
         dictionary keyed by parameter names whose entries are the parameter values).
 
-        Optional fields for a tool call message include ``tool_call_id``, ``status``, and ``extra``.
+        Optional fields for a tool call message include ``tool_call_id``, ``status``, ``meta``, and ``extra``.
         The ``tool_call_id`` field is an optional unique identifier associated with a tool call instance and is used
         to correlate the call to the result of its execution (i.e., the :py:class:`ToolResult` message) by the
         application.
         The ``status`` field is an optional field that indicates the status of *generating* the tool call message
         (e.g., the generated output does not adhere to the function signature).
+        To capture the breadth of LLM-provider metadata, tool call messages may also contain a ``meta`` field
+        (used to capture the raw response associated with the tool call message).
         If extra data is associated with the tool call (e.g., the log-probabilities), it can be stored in the optional
         ``extra`` field.
 
@@ -211,6 +213,11 @@ class ToolCallContent(BaseContent):
     )
 
     status: typing.Optional[typing.Literal["success", "error"]] = "success"
+
+    meta: typing.Optional[dict] = pydantic.Field(
+        description="The raw response associated with the tool call. This must be JSON-serializable.",
+        default=None,
+    )
 
     @pydantic.field_serializer("tool_args", when_used="json")
     def _serialize_tool_args(self, tool_args: dict[str, typing.Any], _info):
@@ -462,26 +469,26 @@ class EndContent(BaseContent):
                 .. math::
 
                     E_G = \{& \ \ell[i]_\text{content.state} = \ell[j]_\text{content.state} \ \land \\
-                        &\ell[i]_\text{kind} = \text{begin} \ \land \\
-                        &\ell[j]_\text{kind} = \text{end} \ \land \\
+                        &\texttt{are_siblings}\left(\ell[i]_\text{span.session.name},
+                                                    \ell[j]_\text{span.session.name}\right) \ \land \\
+                        &\ell[i]_\text{kind} = \text{end} \ \land \\
+                        &\ell[j]_\text{kind} = \text{begin} \ \land \\
                         &\ell[i]_\text{timestamp} < \ell[j]_\text{timestamp} \\
                         | \ &\ell[i]_\text{span.name} \in S_G, \ \ell[j]_\text{span.name} \in S_G \ \}
+
+                Where ``are_siblings`` refers to a boolean function that returns true if the two spans share the same
+                parent (i.e., possess the same name prefix) and false otherwise.
 
             .. tab-item:: SQL++ Query
 
                 .. code-block:: sql
 
                     FROM
-                        [MY_BUCKET].agent_activity.logs l_i,
-                        [MY_BUCKET].agent_activity.logs l_j
-                    WHERE
-                        l_i.content.state = l_j.content.state AND
-                        l_i.kind = "begin" AND
-                        l_j.kind = "end" AND
-                        l_i.timestamp < l_j.timestamp
+                        [MY_BUCKET].agent_activity.Handoffs h
                     SELECT DISTINCT
-                        l_i.span.name AS starting_span,
-                        l_j.span.name AS ending_span;
+                        h.source,
+                        h.dest;
+
     """
 
     kind: typing.Literal[Kind.End] = Kind.End

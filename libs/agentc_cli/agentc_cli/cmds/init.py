@@ -1,5 +1,6 @@
 import agentc_core.defaults
 import agentc_core.remote.init
+import agentc_core.remote.util.ddl
 import click_extra
 import contextlib
 import couchbase.cluster
@@ -17,8 +18,10 @@ from agentc_core.config import Config
 from agentc_core.defaults import DEFAULT_ACTIVITY_LOG_COLLECTION
 from agentc_core.defaults import DEFAULT_ACTIVITY_SCOPE
 from agentc_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
+from agentc_core.remote.init import init_analytics_collection
 from agentc_core.remote.init import init_catalog_collection
 from agentc_core.remote.init import init_metadata_collection
+from agentc_core.remote.util.ddl import create_gsi_indexes
 from agentc_core.remote.util.ddl import create_scope_and_collection
 
 logger = logging.getLogger(__name__)
@@ -93,6 +96,16 @@ def init_db_catalog(cfg: Config, cluster: couchbase.cluster.Cluster):
     for kind in CATALOG_KINDS:
         init_catalog_collection(collection_manager, cfg, kind, dims, click_extra.secho)
 
+    # Create the analytics collections.
+    click_extra.secho("Now creating the analytics collections for our catalog.", fg="yellow")
+    try:
+        init_analytics_collection(cluster, cfg.bucket)
+        click_extra.secho("All analytics collections for the catalog have been successfully created!\n", fg="green")
+    except couchbase.exceptions.CouchbaseException as e:
+        click_extra.secho("Analytics collections could not be created.", fg="red")
+        logger.warning("Analytics collections could not be created: %s", e)
+        raise e
+
 
 def init_db_auditor(cfg: Config, cluster: couchbase.cluster.Cluster):
     cb: couchbase.cluster.Bucket = cluster.bucket(cfg.bucket)
@@ -113,6 +126,14 @@ def init_db_auditor(cfg: Config, cluster: couchbase.cluster.Cluster):
         raise ValueError(msg)
     else:
         click_extra.secho("Scope and collection for the auditor have been successfully created!\n", fg="green")
+
+    # Create the primary index for our logs collection.
+    click_extra.secho("Now creating the primary index for the auditor.", fg="yellow")
+    (completion_status, err) = create_gsi_indexes(cfg, "log", True)
+    if err:
+        raise ValueError(f"GSI index could not be created.\n{err}")
+    else:
+        click_extra.secho("Primary index for the auditor has been successfully created!\n", fg="green")
 
     # Create our query UDFs for the auditor.
     click_extra.secho("Now creating the query UDFs for the auditor.", fg="yellow")

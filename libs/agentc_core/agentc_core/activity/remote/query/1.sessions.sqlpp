@@ -3,7 +3,8 @@ CREATE OR REPLACE FUNCTION `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions() {
         FROM
             `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]` AS l
         GROUP BY
-            l.span.session
+            l.span.session,
+            l.span.name[0]
             GROUP AS g
         LETTING
             content = (
@@ -11,9 +12,15 @@ CREATE OR REPLACE FUNCTION `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions() {
                     g AS gi
                 SELECT
                     gi.l.content   AS event,
-                    gi.l.timestamp AS timestamp
+                    gi.l.timestamp AS timestamp,
+                    gi.l.span.name AS name,
+                    ROW_NUMBER()
+                        OVER (
+                            ORDER BY
+                                STR_TO_MILLIS(gi.l.timestamp) ASC
+                        ) AS seq_num
                 ORDER BY
-                    STR_TO_MILLIS(gi.l.timestamp) ASC
+                    seq_num
             ),
             cid = (
                 FROM
@@ -22,12 +29,23 @@ CREATE OR REPLACE FUNCTION `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions() {
                     gi.l.catalog_version.identifier,
                     gi.l.catalog_version.timestamp
                 LIMIT 1
-            )[0]
+            )[0],
+            annotations = (
+                FROM
+                    g AS gi
+                WHERE
+                    gi.l.annotations IS NOT UNKNOWN
+                SELECT DISTINCT
+                    gi.l.span.name,
+                    gi.l.annotations
+            )
         SELECT
             l.span.session       AS sid,
+            l.span.name[0]       AS root,
             cid                  AS cid,
             content              AS content,
-            content[0].timestamp AS start_t
+            content[0].timestamp AS start_t,
+            annotations          AS ann
         ORDER BY
             STR_TO_MILLIS(start_t) ASC
     )

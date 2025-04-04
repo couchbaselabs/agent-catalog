@@ -97,5 +97,11 @@ def eval_short_threads():
                         "reference": reference,
                     }
 
-                except StopIteration:
+                except (StopIteration, RuntimeError):
                     eval_span["correctly_set_is_last_step"] = False
+                    eval_span["goal_accuracy"] = {"score": 0, "reference": reference}
+
+
+if __name__ == "__main__":
+    eval_bad_intro()
+    eval_short_threads()

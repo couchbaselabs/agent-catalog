@@ -6,10 +6,12 @@ CREATE OR REPLACE ANALYTICS VIEW `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions AS
         cid = {
             "identifier": l.catalog_version.identifier,
             "timestamp": l.catalog_version.timestamp
-        }
+        },
+        root = l.span.name[0]
     GROUP BY
         sid,
-        cid
+        cid,
+        root
         GROUP AS g
     LETTING
         content = (
@@ -17,14 +19,31 @@ CREATE OR REPLACE ANALYTICS VIEW `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions AS
                 g AS gi
             SELECT
                 gi.l.content   AS event,
-                gi.l.timestamp AS timestamp
+                gi.l.timestamp AS timestamp,
+                gi.l.span.name AS name,
+                ROW_NUMBER()
+                    OVER (
+                        ORDER BY
+                            STR_TO_MILLIS(gi.l.timestamp) ASC
+                    ) AS seq_num
             ORDER BY
-                STR_TO_MILLIS(gi.l.timestamp) ASC
+                seq_num
+        ),
+        annotations = (
+            FROM
+                g AS gi
+            WHERE
+                gi.l.annotations IS NOT UNKNOWN
+            SELECT DISTINCT
+                gi.l.span.name,
+                gi.l.annotations
         )
     SELECT
         sid                  AS sid,
         cid                  AS cid,
+        root                 AS root,
         content              AS content,
-        content[0].timestamp AS start_t
+        content[0].timestamp AS start_t,
+        annotations          AS ann
     ORDER BY
         STR_TO_MILLIS(start_t) ASC;

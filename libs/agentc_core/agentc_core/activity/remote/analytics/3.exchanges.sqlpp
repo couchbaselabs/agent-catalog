@@ -87,16 +87,17 @@ CREATE OR REPLACE ANALYTICS VIEW `[BUCKET_NAME]`.`[SCOPE_NAME]`.Exchanges AS
         rol.rn >= u2au.inp_rn AND
         rol.rn <= u2au.out_rn
     GROUP BY
-        rol.sid     AS sid,
-        u2au.inp_rn AS inp_rn,
-        u2au.out_rn AS out_rn
+        rol.sid          AS sid,
+        rol.span.name[0] AS root,
+        u2au.inp_rn      AS inp_rn,
+        u2au.out_rn      AS out_rn
         GROUP AS g
     LETTING
         content = (
             FROM
                 g AS gi
             SELECT VALUE
-                gi.rol
+                OBJECT_REMOVE(gi.rol, "rn")
             ORDER BY
                 gi.rol.timestamp ASC
         ),
@@ -106,7 +107,7 @@ CREATE OR REPLACE ANALYTICS VIEW `[BUCKET_NAME]`.`[SCOPE_NAME]`.Exchanges AS
             WHERE
                 gi.rol.rn = inp_rn
             SELECT VALUE
-                gi.rol
+                OBJECT_REMOVE(gi.rol, "rn")
             LIMIT 1
         )[0],
         output_content = (
@@ -115,11 +116,12 @@ CREATE OR REPLACE ANALYTICS VIEW `[BUCKET_NAME]`.`[SCOPE_NAME]`.Exchanges AS
             WHERE
                 gi.rol.rn = out_rn
             SELECT VALUE
-                gi.rol
+                OBJECT_REMOVE(gi.rol, "rn")
             LIMIT 1
         )[0]
     SELECT
         sid            AS sid,
+        root           AS root,
         input_content  AS `input`,
         output_content AS `output`,
         content        AS content;

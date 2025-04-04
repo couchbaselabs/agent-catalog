@@ -1,6 +1,9 @@
 .. role:: python(code)
    :language: python
 
+.. role:: sql(code)
+   :language: sql
+
 Log Records
 ===========
 

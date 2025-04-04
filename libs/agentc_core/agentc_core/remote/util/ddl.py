@@ -11,6 +11,8 @@ import tqdm
 import typing
 
 from agentc_core.config import Config
+from agentc_core.defaults import DEFAULT_ACTIVITY_LOG_COLLECTION
+from agentc_core.defaults import DEFAULT_ACTIVITY_SCOPE
 from agentc_core.defaults import DEFAULT_CATALOG_METADATA_COLLECTION
 from agentc_core.defaults import DEFAULT_CATALOG_PROMPT_COLLECTION
 from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
@@ -348,9 +350,9 @@ def create_vector_index(
         return qualified_index_name, None
 
 
-def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "prompt", "metadata"], print_progress):
-    """Creates required indexes at publish"""
-    progress_bar = tqdm.tqdm(range(3 if kind != "metadata" else 1))
+def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "prompt", "metadata", "log"], print_progress):
+    """Creates required indexes for runtime"""
+    progress_bar = tqdm.tqdm(range(3 if kind not in {"metadata", "log"} else 1))
     progress_bar_it = iter(progress_bar)
     completion_status = True
     all_errs = ""
@@ -367,6 +369,27 @@ def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "prompt", "meta
             f"""
                 CREATE PRIMARY INDEX IF NOT EXISTS `{primary_idx_metadata_name}`
                 ON `{cfg.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{DEFAULT_CATALOG_METADATA_COLLECTION}` USING GSI;
+            """,
+            primary_idx_metadata_name,
+            print_progress,
+            progress_bar,
+            progress_bar_it,
+        )
+        # This is to ensure that the progress bar reaches 100% even if there are no errors.
+        with contextlib.suppress(StopIteration):
+            next(progress_bar_it)
+        return completion_status, all_errs
+    elif kind == "log":
+        # Primary index for logs.
+        primary_idx_metadata_name = "v2_AgentCatalogLogsPrimaryIndex"
+        completion_status = create_index(
+            all_errs,
+            cfg,
+            cluster,
+            completion_status,
+            f"""
+                CREATE PRIMARY INDEX IF NOT EXISTS `{primary_idx_metadata_name}`
+                ON `{cfg.bucket}`.`{DEFAULT_ACTIVITY_SCOPE}`.`{DEFAULT_ACTIVITY_LOG_COLLECTION}` USING GSI;
             """,
             primary_idx_metadata_name,
             print_progress,
