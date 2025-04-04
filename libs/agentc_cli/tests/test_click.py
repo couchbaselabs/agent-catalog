@@ -349,6 +349,16 @@ def test_local_clean(
         assert not dummy_file_2.exists()
 
 
+@pytest.mark.skip
+@pytest.mark.smoke
+def test_local_clean_with_date(
+    temporary_directory: typing.Generator[pathlib.Path, None, None],
+    environment_factory: typing.Callable[..., Environment],
+):
+    # TODO (GLENN): Implement me!
+    pass
+
+
 @pytest.mark.slow
 def test_db_clean(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
@@ -397,6 +407,17 @@ def test_db_clean(
             "ERROR: db catalog of kind tool does not exist yet: please use the publish command by specifying the kind."
         )
         assert expected_response_db in output
+
+
+@pytest.mark.skip
+@pytest.mark.smoke
+def test_db_clean_with_date(
+    temporary_directory: typing.Generator[pathlib.Path, None, None],
+    environment_factory: typing.Callable[..., Environment],
+    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+):
+    # TODO (GLENN): Implement me!
+    pass
 
 
 @pytest.mark.smoke
