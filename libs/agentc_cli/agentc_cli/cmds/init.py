@@ -70,6 +70,9 @@ def init_local_catalog(cfg: Config):
     with contextlib.suppress(FileExistsError):
         os.mkdir(DEFAULT_MODEL_CACHE_FOLDER)
 
+    # We will also download our embedding model here.
+    cfg.EmbeddingModel()
+
 
 def init_local_activity(cfg: Config):
     # Init directories.
