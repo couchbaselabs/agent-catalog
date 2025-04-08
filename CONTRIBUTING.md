@@ -165,11 +165,7 @@ For more information about Pytest's command line tool, see
    Agent Catalog follows [semantic versioning](https://semver.org/), so be sure to increment accordingly.
    As a summary, version numbers follow a `MAJOR.MINOR.PATCH` format.
 
-2. For all packages that need to be published, increment their version number in their respective `pyproject.toml`
-   files (i.e., their `version` field in the `tool.poetry` section).
-   Again, use semantic versioning here.
-
-3. Commit these changes to your local repository and add a lightweight tag to your repository's HEAD.
+2. Commit these changes to your local repository and add a lightweight tag to your repository's HEAD.
 
    ```bash
    git tag vMAJOR.MINOR.PATCH
@@ -177,19 +173,19 @@ For more information about Pytest's command line tool, see
 
    Again, replace `MAJOR.MINOR.PATCH` with the version you used in step 1.
 
-4. Push your branch to Github _with the new tag_:
+3. Push your branch to Github _with the new tag_:
 
    ```bash
    git push origin vMAJOR.MINOR.PATCH
    ```
 
-5. Create a PR for your changes and merge your PR to master (see [How to Contribute](#how-to-contribute)).
+4. Create a PR for your changes and merge your PR to master (see [How to Contribute](#how-to-contribute)).
 
-6. Finally, create a Github release (which will trigger a workflow to publish to PyPI).
+5. Finally, create a Github release (which will trigger a workflow to publish to PyPI).
    On the Github page for this repo ([here](https://github.com/couchbaselabs/agent-catalog)), click
    "Create a New Release" under the "Releases" section.
 
-   Choose the tag you published in step 4, and use this tag as the release title (e.g., the tag v0.1.0 has a release
+   Choose the tag you published in step 3, and use this tag as the release title (e.g., the tag v0.1.0 has a release
    title of v.0.1.0).
    In the "Describe This Release" text box, describe how this release is different from the previous release as a
    Markdown list.

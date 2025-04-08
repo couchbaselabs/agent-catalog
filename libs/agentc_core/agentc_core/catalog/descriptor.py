@@ -18,8 +18,6 @@ class CatalogKind(enum.StrEnum):
     Tool = "tool"
     Prompt = "prompt"
 
-    # TODO (GLENN): Include other classes.
-
 
 RecordDescriptorUnionType = typing.Annotated[
     PythonToolDescriptor

@@ -19,7 +19,7 @@ class ClosestClusterRefiner(pydantic.BaseModel, BaseRefiner):
     kde_distribution_n: int = pydantic.Field(default=10000, gt=0)
     deepening_factor: float = pydantic.Field(default=0.1, gt=0)
     max_deepen_steps: int = pydantic.Field(default=10, gt=0)
-    no_more_than_k: typing.Optional[int] = pydantic.Field(None, gt=0)
+    no_more_than_k: typing.Optional[int] = pydantic.Field(default=None, gt=0)
 
     def __call__(self, ordered_entries: list[SearchResult]):
         try:

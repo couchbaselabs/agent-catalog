@@ -116,6 +116,9 @@ class PromptDescriptor(RecordDescriptor):
                         f"Extra fields found in {self.filename.name}: {metadata.__pydantic_extra__}. "
                         f"We will ignore these."
                     )
+
+                # Re-read the entire file into a string (for the raw field).
+                fp.seek(0)
                 descriptor_args = {
                     "name": metadata.name,
                     "description": metadata.description,
@@ -124,6 +127,7 @@ class PromptDescriptor(RecordDescriptor):
                     "output": metadata.output,
                     "tools": metadata.tools,
                     "source": self.filename,
+                    "raw": fp.read(),
                     "version": self.version,
                     "annotations": metadata.annotations,
                 }

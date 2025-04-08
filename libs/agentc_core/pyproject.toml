@@ -1,30 +1,33 @@
+[project]
+name = "agentc-core"
+description = "The core for the Couchbase Agent Catalog project."
+authors = [
+    { name = "Glenn Galvizo", email = "glenn.galvizo@couchbase.com" },
+    { name = "Steve Yen", email = "steve.yen@couchbase.com" },
+    { name = "Tanvi Johari", email = "tanvi.johari@couchbase.com" },
+    { name = "Thejas N U", email = "thejas.nu@couchbase.com" }
+]
+license = "Apache-2.0"
+dynamic = ["version"]
+requires-python = ">=3.12"
+
+[project.urls]
+repository = "https://github.com/couchbaselabs/agent-catalog"
+documentation = "https://couchbaselabs.github.io/agent-catalog/api.html"
+
+# Version is dynamically pulled from Git.
 [tool.poetry]
 name = "agentc-core"
-version = "0.2.0"
-description = "The core for the Couchbase Agent Catalog project."
-repository = "https://github.com/couchbaselabs/agent-catalog"
-authors = [
-    "Glenn Galvizo <glenn.galvizo@couchbase.com>",
-    "Steve Yen <steve.yen@couchbase.com>",
-    "Tanvi Johari <tanvi.johari@couchbase.com>",
-    "Thejas N U <thejas.nu@couchbase.com>"
-]
-readme = "README.md"
+version = "0.0.0"
 packages = [
-    { include = "agentc_core" },
+    { include = "agentc_core" }
 ]
-
 include = [
     "agentc_core/tool/generate/templates/*",
     "agentc_core/analytics/ddls/*",
     "agentc_core/tool/templates/*",
     "agentc_core/prompt/templates/*"
 ]
-
-[tool.poetry.urls]
-Homepage = "https://couchbase.com"
-Documentation = "https://docs.couchbase.com"
-Repository = "https://github.com/couchbaselabs/agent-catalog"
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -76,6 +79,17 @@ enabled = true
 monorepo-root = "../../"
 version-pinning-rule = '=='
 
+[tool.poetry-dynamic-versioning]
+enable = true
+format = "v{major}.{minor}.{patch}+{commit}"
+
+[tool.poetry.requires-plugins]
+poetry-monoranger-plugin = ">=0.4.1"
+poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
+
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = [
+    "poetry-core>=2.1.0",
+    "poetry-dynamic-versioning>=1.8.2"
+]
+build-backend = "poetry_dynamic_versioning.backend"

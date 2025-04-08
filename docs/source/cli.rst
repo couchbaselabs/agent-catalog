@@ -1,6 +1,9 @@
 .. role:: python(code)
    :language: python
 
+.. role:: sql(code)
+   :language: sql
+
 ``agentc`` Command Documentation
 ================================
 
@@ -256,7 +259,16 @@ The purpose of the :code:`ls` command is to list out all items in the latest ver
   from agentc_cli.main import agentc
   invoke(agentc, args=["ls", "--help"])
 
-TODO
+By default, the :code:`ls` command will only list items in a local and potentially *dirty* catalog instance.
+To list out all items in your Couchbase instance requires the ``--db`` flag.
+A common use case for this command involves running this command after :code:`index` to see whether or not a certain
+tool exists in your local catalog.
+
+.. warning::
+
+    This command is the equivalent to a :sql:`SELECT * FROM agent_catalog.[tools|prompts];` and should be used sparingly
+    with the ``--db`` flag.
+    To view aggregate information about your catalog, use the :code:`status` command instead.
 
 ``publish`` Command
 -------------------

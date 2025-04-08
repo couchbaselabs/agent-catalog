@@ -138,7 +138,7 @@ class EntryLoader:
                     except ModuleNotFoundError as e:
                         logger.debug(f"Swallowing exception {str(e)} (raised while trying to import {source_file}).")
                         logger.warning(f"Module {source_file} not found. Attempting to use the indexed contents.")
-                        self._load_module_from_string(source_file.stem, entries[0].content.file_content)
+                        self._load_module_from_string(source_file.stem, entries[0].raw)
                     for entry in entries:
                         loaded_entry = self._get_tool_from_module(source_file.stem, entry)
                         yield (
@@ -157,7 +157,7 @@ class EntryLoader:
                 case _:
                     raise ValueError("Unexpected tool-kind encountered!")
 
-            for entry, code in zip(entries, generator()):
+            for entry, code in zip(entries, generator(), strict=False):
                 module_id = uuid.uuid4().hex.replace("-", "")
                 self._load_module_from_string(module_id, code)
                 loaded_entry = self._get_tool_from_module(module_id, entry)

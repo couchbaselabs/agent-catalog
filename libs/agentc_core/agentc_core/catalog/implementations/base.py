@@ -44,7 +44,7 @@ class CatalogBase(abc.ABC):
 
     @staticmethod
     def cosine_similarity(query: list[float], entry: list[float]) -> float:
-        dot_product = sum(q * e for q, e in zip(query, entry))
+        dot_product = sum(q * e for q, e in zip(query, entry, strict=False))
         query_magnitude = math.sqrt(sum(q**2 for q in query))
         entry_magnitude = math.sqrt(sum(e**2 for e in entry))
         return dot_product / (query_magnitude * entry_magnitude)

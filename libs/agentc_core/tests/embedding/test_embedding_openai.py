@@ -4,7 +4,7 @@ import pytest
 from agentc_core.learned.embedding import EmbeddingModel
 
 
-@pytest.mark.slow
+@pytest.mark.smoke
 def test_embedding_openai():
     embedding_model = EmbeddingModel(
         embedding_model_name="text-embedding-3-small",

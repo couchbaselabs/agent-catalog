@@ -1,23 +1,31 @@
+[project]
+name = "agent-catalog"
+description = "The mono-repo for the Couchbase Agent Catalog project."
+authors = [
+    { name = "Glenn Galvizo", email = "glenn.galvizo@couchbase.com" },
+    { name = "Tanvi Johari", email = "tanvi.johari@couchbase.com" },
+    { name = "Steve Yen", email = "steve.yen@couchbase.com" },
+    { name = "Thejas N U", email = "thejas.nu@couchbase.com" }
+]
+license = "Apache-2.0"
+readme = "README.md"
+dynamic = ["version"]
+requires-python = ">=3.12"
+
+[project.urls]
+repository = "https://github.com/couchbaselabs/agent-catalog"
+documentation = "https://couchbaselabs.github.io/agent-catalog/index.html"
+
+# Version is dynamically pulled from Git.
 [tool.poetry]
 name = "agent-catalog"
-version = "0.2.0"
-description = "The mono-repo for the Couchbase Agent Catalog project."
-repository = "https://github.com/couchbaselabs/agent-catalog"
-authors = [
-    "Glenn Galvizo <glenn.galvizo@couchbase.com>",
-    "Tanvi Johari <tanvi.johari@couchbase.com>",
-    "Steve Yen <steve.yen@couchbase.com>",
-    "Thejas N U <thejas.nu@couchbase.com>"
-]
-license = "Apache 2.0"
-readme = "README.md"
+version = "0.0.0"
 package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
 
 # All of our Agent Catalog packages.
-[tool.poetry.group.agent-catalog.dependencies]
 agentc = { path = "libs/agentc", develop = true }
 agentc-core = { path = "libs/agentc_core", develop = true }
 agentc-cli = { path = "libs/agentc_cli", develop = true }
@@ -42,6 +50,7 @@ sphinx-copybutton = "^0.5.2"
 sphinx-hoverxref = "^1.4.1"
 linkify-it-py = "^2.0.3"
 sphinx-autobuild = "^2024.10.3"
+sphinxcontrib-mermaid = "^1.0.0"
 autodoc-pydantic = "^2.2.0"
 piccolo_theme = "^0.24.0"
 sphinx_design = "^0.6.1"
@@ -84,10 +93,18 @@ norecursedirs = [
     "examples"
 ]
 
+[tool.poetry-dynamic-versioning]
+enable = false
+format = "v{major}.{minor}.{patch}+{commit}"
+
 [tool.poetry.requires-plugins]
 poetry-plugin-export = ">=1.8"
-poetry-monoranger-plugin = "^0.4.0"
+poetry-monoranger-plugin = ">=0.4.1"
+poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
 
 [build-system]
-requires = ["poetry-core>=2.1.0"]
-build-backend = "poetry.core.masonry.api"
+requires = [
+    "poetry-core>=2.1.0",
+    "poetry-dynamic-versioning>=1.8.2"
+]
+build-backend = "poetry_dynamic_versioning.backend"

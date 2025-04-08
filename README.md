@@ -84,10 +84,11 @@ The mono-repo for the Couchbase Agent Catalog project.
    pip install libs/agentc
    ```
 
-   If you are interested in developing with LangChain or LangGraph, install the helper `agentc_langchain` package with
-   the command below:
+   If you are interested in developing with LangChain or LangGraph, install the helper `agentc_langchain` and/or
+   `agentc_langgraph` packages with the command below:
    ```bash
    pip install libs/agentc_integrations/langchain
+   pip install libs/agentc_integrations/langgraph
    ```
 
    ...and for those working with LlamaIndex:

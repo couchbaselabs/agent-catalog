@@ -1,10 +1,20 @@
-[tool.poetry]
+[project]
 name = "agentc-llamaindex"
-version = "0.1.0"
 description = "Collection of LlamaIndex-specific classes and functions used with the Couchbase Agent Catalog project."
 authors = [
-  "Glenn Galvizo <glenn.galvizo@couchbase.com>"
+    { name = "Glenn Galvizo", email = "glenn.galvizo@couchbase.com" }
 ]
+license = "Apache-2.0"
+dynamic = ["version"]
+requires-python = ">=3.12"
+
+[project.urls]
+repository = "https://github.com/couchbaselabs/agent-catalog"
+documentation = "https://couchbaselabs.github.io/agent-catalog/api.html#llamaindex"
+
+[tool.poetry]
+name = "agentc-llamaindex"
+version = "0.0.0"
 packages = [
   { include = "agentc_llamaindex" }
 ]
@@ -23,9 +33,8 @@ pydantic = "^2.10.6"
 requests = "^2.32.3"
 pydantic-settings = "^2.7.1"
 
-[tool.poetry.dependencies.agentc-core]
-path = "../../agentc_core"
-develop = true
+# The version of this package will be updated dynamically.
+agentc-core = { path = "../../agentc_core", develop = true }
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
@@ -37,6 +46,13 @@ enabled = true
 monorepo-root = "../../../"
 version-pinning-rule = '=='
 
+[tool.poetry.requires-plugins]
+poetry-monoranger-plugin = ">=0.4.1"
+poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
+
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = [
+    "poetry-core>=2.1.0",
+    "poetry-dynamic-versioning>=1.8.2"
+]
+build-backend = "poetry_dynamic_versioning.backend"

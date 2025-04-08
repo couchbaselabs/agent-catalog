@@ -19,8 +19,8 @@ In this project, there are three agents:
    found or ii) send the routes (or lack of routes) to the "Front Desk" agent to give back to the user.
 
 ```mermaid
-%%{init: {'flowchart': {'curve': 'linear'}}}%%
-graph TD
+%%{init: {'flowchart': {'curve': 'linear', 'defaultRenderer': 'elk'}}}%%
+graph BT
 ;
     __start__([<p>__start__</p>]):::first
     front_desk_agent(front_desk_agent)
@@ -29,11 +29,11 @@ graph TD
     __end__([<p>__end__</p>]):::last
     __start__ --> front_desk_agent;
     endpoint_finding_agent --> route_finding_agent;
-    front_desk_agent -. &nbsp ;ENDPOINT_FINDING&nbsp ; .-> endpoint_finding_agent;
-front_desk_agent -. &nbsp ;END&nbsp ; .-> __end__;
-route_finding_agent -. &nbsp ;FRONT_DESK&nbsp ; .-> front_desk_agent;
-route_finding_agent -. &nbsp ;ENDPOINT_FINDING&nbsp ; .-> endpoint_finding_agent;
-front_desk_agent -. &nbsp ;FRONT_DESK&nbsp ; .-> front_desk_agent;
+    front_desk_agent -. ENDPOINT_FINDING .-> endpoint_finding_agent;
+front_desk_agent -. END .-> __end__;
+route_finding_agent -. FRONT_DESK .-> front_desk_agent;
+route_finding_agent -. ENDPOINT_FINDING .-> endpoint_finding_agent;
+front_desk_agent -. FRONT_DESK .-> front_desk_agent;
 classDef default fill:#f2f0ff, line-height: 1.2
 classDef first fill-opacity:0
 classDef last fill: #bfb6fc

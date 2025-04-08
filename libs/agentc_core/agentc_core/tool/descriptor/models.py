@@ -43,7 +43,6 @@ class PythonToolDescriptor(RecordDescriptor):
     class PythonContent(pydantic.BaseModel):
         model_config = pydantic.ConfigDict(frozen=True)
 
-        file_content: str
         func_content: str
         line_no_start: int
         line_no_end: int
@@ -72,8 +71,8 @@ class PythonToolDescriptor(RecordDescriptor):
                     name=get_name(tool),
                     description=get_description(tool),
                     source=self.filename,
+                    raw=source_contents,
                     content=PythonToolDescriptor.PythonContent(
-                        file_content=source_contents,
                         func_content="".join(source_lines),
                         line_no_start=start_line,
                         line_no_end=start_line + len(source_lines) - 1,
@@ -142,12 +141,17 @@ class SQLPPQueryToolDescriptor(RecordDescriptor):
                         f"We will ignore these."
                     )
 
+                # Grab all of our source as a string.
+                fp.seek(0)
+                raw = fp.read()
+
             # Now, generate a single SQL++ tool descriptor.
             yield SQLPPQueryToolDescriptor(
                 record_kind=RecordKind.SQLPPQuery,
                 name=metadata.name,
                 description=metadata.description,
                 source=self.filename,
+                raw=raw,
                 version=self.version,
                 secrets=metadata.secrets,
                 input=metadata.input,
@@ -220,11 +224,15 @@ class SemanticSearchToolDescriptor(RecordDescriptor):
                         f"Extra fields found in {self.filename.name}: {metadata.__pydantic_extra__}. "
                         f"We will ignore these."
                     )
+
+                # Re-read the entire file into a string (for the raw field).
+                fp.seek(0)
                 yield SemanticSearchToolDescriptor(
                     record_kind=RecordKind.SemanticSearch,
                     name=metadata.name,
                     description=metadata.description,
                     source=self.filename,
+                    raw=fp.read(),
                     version=self.version,
                     secrets=metadata.secrets,
                     input=metadata.input,
@@ -411,6 +419,11 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
                         f"Extra fields found in {self.filename.name}: {metadata.__pydantic_extra__}. "
                         f"We will ignore these."
                     )
+
+                # Grab all of our source as a string.
+                fp.seek(0)
+                raw = fp.read()
+
                 for operation in metadata.open_api.operations:
                     operation_handle = HTTPRequestToolDescriptor.validate_operation(
                         source_filename=self.filename,
@@ -423,6 +436,7 @@ class HTTPRequestToolDescriptor(RecordDescriptor):
                         name=operation_handle.operation_id,
                         description=operation_handle.description,
                         source=self.filename,
+                        raw=raw,
                         version=self.version,
                         operation=operation,
                         specification=HTTPRequestToolDescriptor.SpecificationMetadata(

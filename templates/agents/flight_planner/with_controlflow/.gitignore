@@ -1,8 +1,0 @@
-.agent-catalog
-.agent-activity
-.data
-.model-cache
-__pycache__
-.env
-poetry.lock
-*.pem

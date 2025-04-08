@@ -1,6 +1,5 @@
 import re
 import semantic_version
-import subprocess
 
 from .. import __version__ as LIB_VERSION
 
@@ -10,20 +9,7 @@ def lib_version():
     # Ex: "v0.1.0-alpha-4-g6f9305e".
     # Ex: "v0.1.0-beta2-17-gf63950e".
     # Ex: "v0.1.0-cbse1234-5-g269f05e".
-    v = LIB_VERSION
-    if v == "vMajor.Minor.Micro-N-GITSHA":
-        return "v0.0.0-0-g0"
-
-        # TODO: BUG: This does not work unless we're in agentc_core.
-
-        # Default to output of `git describe --long --always`.
-        v = (
-            subprocess.check_output(["git", "describe", "--long", "--always"], stderr=subprocess.STDOUT)
-            .decode("utf-8")
-            .strip()
-        )
-
-    return v
+    return LIB_VERSION
 
 
 def lib_version_parse(s):

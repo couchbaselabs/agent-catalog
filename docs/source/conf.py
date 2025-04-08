@@ -24,6 +24,7 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.githubpages",
     "sphinxcontrib.autodoc_pydantic",
+    "sphinxcontrib.mermaid",
     "sphinx_copybutton",
     "sphinx_design",
     "enum_tools.autoenum",

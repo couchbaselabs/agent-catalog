@@ -746,7 +746,7 @@ def execute(
 )
 @click_extra.option(
     "--db/--no-db",
-    default=None,
+    default=False,
     is_flag=True,
     help="Flag to force a DB-only search.",
     show_default=True,
@@ -788,16 +788,9 @@ def ls(
     if len(kind) == 0:
         kind = ["tools", "prompts"]
 
-    # TODO (GLENN): We should perform the same best-effort work for status_local.
-    # Perform a best-effort attempt to connect to the database if status_db is not raised.
-    if db is None or db is True:
-        try:
-            validate_or_prompt_for_bucket(cfg, bucket)
-
-        except (couchbase.exceptions.CouchbaseException, ValueError) as e:
-            if db is True:
-                raise e
-            db = False
+    if db:
+        # In contrast to the other commands, we do not perform a best effort attempt to connect to Couchbase here.
+        validate_or_prompt_for_bucket(cfg, bucket)
 
     cmd_ls(cfg=cfg, kind=kind, include_dirty=dirty, with_local=local, with_db=db)
 

@@ -132,7 +132,7 @@ def cmd_execute(
                 )
                 file_name = python_tool_metadata.source.name
                 with (tmp_dir_path / file_name).open("w") as f:
-                    f.write(python_tool_metadata.content.file_content)
+                    f.write(python_tool_metadata.raw)
 
                 # add temp directory and it's content as modules
                 if str(tmp_dir_path.absolute()) not in sys.path:

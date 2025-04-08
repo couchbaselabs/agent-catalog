@@ -26,7 +26,7 @@ for package in agentc_core agentc_cli agentc; do
 done
 
 # Next, our integration packages.
-for package in langchain llamaindex; do
+for package in langchain langgraph llamaindex; do
   echo "Publishing '$package' integration package..."
   cd "libs/agentc_integrations/$package" || exit
   poetry build

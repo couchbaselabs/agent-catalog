@@ -62,6 +62,8 @@ class RecordDescriptor(pydantic.BaseModel):
         examples=[pathlib.Path("src/tools/finance.py")],
     )
 
+    raw: str = pydantic.Field(description="The raw contents of the file this tool was sourced from.")
+
     version: VersionDescriptor = pydantic.Field(
         description="A low water-mark that defines the earliest version this record is valid under.",
     )

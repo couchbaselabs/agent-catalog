@@ -28,7 +28,7 @@ class AnnotationPredicate:
         self.values = list()
         self.operators = list()
         captures = matches.capturesdict()
-        for k, v in zip(captures["key"], captures["value"]):
+        for k, v in zip(captures["key"], captures["value"], strict=False):
             logger.debug(f"Found key[{k}] = value[{v}] in (annotations) query string.")
             self.keys.append(k)
             self.values.append(v)
@@ -61,7 +61,7 @@ class AnnotationPredicate:
 
         else:
             # If we are given a full list of conjuncts, we can consolidate all of our key-values into a single dict.
-            return [{k: v for k, v in zip(self.keys, self.values)}]
+            return [{k: v for k, v in zip(self.keys, self.values, strict=False)}]
 
     def __str__(self):
         return " OR ".join("(" + " AND ".join(f"{k} = '{v}'" for k, v in d.items()) + ")" for d in self.disjuncts)
