@@ -18,9 +18,9 @@ class ToolNode(langgraph.prebuilt.ToolNode):
         This class does *not* log tool calls (i.e., :py:class:`ToolCallContent` log entries) as these are typically
         logged with :py:class:`ChatCompletionContent` log entries.
 
-        Below, we illustrate a minimal example of how to use this class with :py:class:`agentc_langchain.chat.Callback`
-        to record :py:class:`ChatCompletionContent` log entries, :py:class:`ToolCallContent` log entries, and
-        :py:class:`ToolResultContent` log entries.
+        Below, we illustrate a minimal working example of how to use this class with
+        :py:class:`agentc_langchain.chat.Callback` to record :py:class:`ChatCompletionContent` log entries,
+        :py:class:`ToolCallContent` log entries, and :py:class:`ToolResultContent` log entries.
 
         .. code-block:: python
 
@@ -45,7 +45,7 @@ class ToolNode(langgraph.prebuilt.ToolNode):
 
             # Grab the correct tools and output from the catalog.
             my_agent_prompt = catalog.find("prompt", name="my_agent")
-            my_agent_tools = agentc_langgraph.tools.ToolNode(
+            my_agent_tools = agentc_langgraph.tool.ToolNode(
                 span=my_agent_span,
                 tools=[
                     langchain_core.tools.StructuredTool.from_function(tool.func) for tool in my_agent_prompt.tools

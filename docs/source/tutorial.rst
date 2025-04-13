@@ -67,12 +67,83 @@ Specifically, in Figure 1 (below) we define an architecture of three agents to h
     classDef first fill-opacity:0
     classDef last fill: #bfb6fc
 
+Building our Agent Graph
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Let's now realize the graph above in Figure 1 (above).
+We will build up the agents, state, and edges in the next step.
+
+.. code-block:: python
+
+    # We define these in the following steps!
+    FrontDeskAgent = ...
+    EndpointFindingAgent = ...
+    RouteFindingAgent = ...
+    State = ...
+    out_front_desk_edge = ...
+    out_route_finding_edge = ...
+
+    # Define our agents.
+    front_desk_agent = FrontDeskAgent()
+    endpoint_finding_agent = EndpointFindingAgent()
+    route_finding_agent = RouteFindingAgent()
+
+    # Create a workflow graph.
+    workflow = langgraph.graph.StateGraph(State)
+    workflow.add_node("front_desk_agent", front_desk_agent)
+    workflow.add_node("endpoint_finding_agent", endpoint_finding_agent)
+    workflow.add_node("route_finding_agent", route_finding_agent)
+    workflow.set_entry_point("front_desk_agent")
+    workflow.add_conditional_edges(
+        "front_desk_agent",
+        out_front_desk_edge,
+        {
+            "ENDPOINT_FINDING": "endpoint_finding_agent",
+            "FRONT_DESK": "front_desk_agent",
+            "END": langgraph.graph.END,
+        },
+    )
+    workflow.add_edge("endpoint_finding_agent", "route_finding_agent")
+    workflow.add_conditional_edges(
+        "route_finding_agent",
+        out_route_finding_edge,
+        {"FRONT_DESK": "front_desk_agent", "ENDPOINT_FINDING": "endpoint_finding_agent"},
+    )
+    graph = workflow.compile()
+
+
 Defining a Contract: The State
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Similar to how humans communicate, agents require... (TODO)
+Similar to how humans communicate, agents require some sort of contract before communicating.
+As an example, you *typically* don't start a conversation with your barista by summarizing the intricacies of bread
+tabs (at least where we are from :-)).
+In LangGraph, this contract exists in the form of a ``State`` class.
+Let's define our state class as such:
+
+..code-block:: python
+
+    import typing
+    import langchain_core.messages
+
+    class State(typing.TypedDict):
+        messages: list[langchain_core.messages.BaseMessage]
+        is_last_step: bool
+        needs_clarification: bool
+        endpoints: typing.Optional[dict]
+        routes: typing.Optional[list[dict]]
+
+Our state class, defined as a typed dictionary, has the following attributes:
+
+1. A ``messages`` field, used to hold the history for the current conversation / session.
+   This field is standard across most LangGraph application.
+2. A ``is_last_step`` field, used to signal to the terminating agent (in our case, the "Front Desk") that the current
+   session should end.
+3. A ``needs_clarification`` field, primarily a control field used by the "Front Desk" agent to repeat the "Front Desk"
+   agent code block.
 
 
+TODO
 
 
 

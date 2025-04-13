@@ -1,4 +1,4 @@
-import agentc
+import agentc_langgraph
 import dotenv
 import langgraph.graph
 
@@ -13,21 +13,19 @@ from node import State
 dotenv.load_dotenv()
 
 
-class Graph:
-    def __init__(self, *args, catalog: agentc.Catalog, span: agentc.Span = None, **kwargs):
-        self.span = catalog.Span(name="flight_planner") if span is None else span.new(name="flight_planner")
-
+class FlightPlanner(agentc_langgraph.graph.GraphRunnable):
+    def compile(self) -> langgraph.graph.graph.CompiledGraph:
         # Build our nodes and agents.
         front_desk_agent = FrontDeskAgent(
-            catalog=catalog,
+            catalog=self.catalog,
             span=self.span,
         )
         endpoint_finding_agent = EndpointFindingAgent(
-            catalog=catalog,
+            catalog=self.catalog,
             span=self.span,
         )
         route_finding_agent = RouteFindingAgent(
-            catalog=catalog,
+            catalog=self.catalog,
             span=self.span,
         )
 
@@ -52,17 +50,4 @@ class Graph:
             out_route_finding_edge,
             {"FRONT_DESK": "front_desk_agent", "ENDPOINT_FINDING": "endpoint_finding_agent"},
         )
-        self.graph = workflow.compile(*args, **kwargs)
-        # print(self.graph.get_graph().draw_mermaid())
-
-    def stream(self, *args, **kwargs):
-        state = State(messages=[], endpoints=None, routes=None, needs_clarification=False, is_last_step=False)
-        self.span.state = state
-        with self.span:
-            yield from self.graph.stream(*args, input=state, **kwargs)
-
-    def invoke(self, *args, **kwargs) -> State:
-        state = State(messages=[], endpoints=None, routes=None, needs_clarification=False, is_last_step=False)
-        self.span.state = state
-        with self.span:
-            return self.graph.invoke(*args, input=state, **kwargs)
+        return workflow.compile()

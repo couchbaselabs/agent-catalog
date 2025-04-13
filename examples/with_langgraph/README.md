@@ -139,12 +139,12 @@ classDef last fill: #bfb6fc
 
    - For those interested in using Capella, see [here](https://cloud.couchbase.com/sign-up).
 
-     Once your Couchbase instance is running, be sure to enable the following services on your Couchbase cluster:
-     i) Data, ii) Query, iii) Index, iv) Search, and v) Analytics.
+   Once your Couchbase instance is running, be sure to enable the following services on your Couchbase cluster:
+   i) Data, ii) Query, iii) Index, iv) Search, and v) Analytics.
 
-     This specific agent also uses the `travel-sample` bucket.
-     You'll need to navigate to your instance's UI (for local instances, this is on http://localhost:8091) to install
-     this sample bucket.
+   This specific agent also uses the `travel-sample` bucket.
+   You'll need to navigate to your instance's UI (for local instances, this is on http://localhost:8091) to install
+   this sample bucket.
 
 3. Initialize your local and Couchbase-hosted Agent Catalog instance by running the `agentc init` command.
 

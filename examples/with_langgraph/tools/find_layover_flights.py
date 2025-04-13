@@ -1,6 +1,7 @@
 import agentc
 import couchbase.auth
 import couchbase.cluster
+import couchbase.exceptions
 import couchbase.options
 import dotenv
 import os
@@ -10,14 +11,24 @@ dotenv.load_dotenv()
 
 # Agent Catalog imports this file once (even if both tools are requested).
 # To share (and reuse) Couchbase connections, we can use a global variable.
-cluster = couchbase.cluster.Cluster(
-    os.getenv("CB_CONN_STRING"),
-    couchbase.options.ClusterOptions(
-        authenticator=couchbase.auth.PasswordAuthenticator(
-            username=os.getenv("CB_USERNAME"), password=os.getenv("CB_PASSWORD")
-        )
-    ),
-)
+try:
+    cluster = couchbase.cluster.Cluster(
+        os.getenv("CB_CONN_STRING"),
+        couchbase.options.ClusterOptions(
+            authenticator=couchbase.auth.PasswordAuthenticator(
+                username=os.getenv("CB_USERNAME"), password=os.getenv("CB_PASSWORD")
+            )
+        ),
+    )
+except couchbase.exceptions.CouchbaseException as e:
+    print(f"""
+        Could not connect to Couchbase cluster!
+        This error is going to be swallowed by 'agentc index .', but you will run into issues if you decide to
+        run your app!
+        Make sure that all Python tools (not just the ones defined in this) are free from unwanted side-effects on
+        import.
+        {str(e)}
+    """)
 
 
 # Define a Pydantic model to provide more information to the LLM when analyzing a tool's output.

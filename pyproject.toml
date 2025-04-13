@@ -95,7 +95,7 @@ norecursedirs = [
 
 [tool.poetry-dynamic-versioning]
 enable = false
-format = "v{major}.{minor}.{patch}+{commit}"
+format-jinja = "{% if distance == 0 %}{{ base }}{% else %}{{ base }}.post{{ distance }}{% endif %}+g{{ commit }}"
 
 [tool.poetry.requires-plugins]
 poetry-plugin-export = ">=1.8"

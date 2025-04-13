@@ -51,5 +51,8 @@ Content in Logs
 .. autopydantic_model:: agentc_core.activity.models.content.EndContent
     :inherited-members: BaseModel
 
+.. autopydantic_model:: agentc_core.activity.models.content.EdgeContent
+    :inherited-members: BaseModel
+
 .. autopydantic_model:: agentc_core.activity.models.content.KeyValueContent
     :inherited-members: BaseModel

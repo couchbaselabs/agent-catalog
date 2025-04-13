@@ -34,6 +34,13 @@ LangChain / LangGraph
 .. automodule:: agentc_langgraph.tools
     :members:
 
+.. automodule:: agentc_langgraph.agent
+    :members:
+
+.. automodule:: agentc_langgraph.graph
+    :members:
+    :exclude-members: name, ainvoke, astream, invoke, stream
+
 .. autopydantic_settings:: agentc_langchain.cache.CacheOptions
     :settings-show-validator-summary: False
     :settings-show-validator-members: False

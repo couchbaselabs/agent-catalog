@@ -71,7 +71,7 @@ def init_local_catalog(cfg: Config):
         os.mkdir(DEFAULT_MODEL_CACHE_FOLDER)
 
     # We will also download our embedding model here.
-    cfg.EmbeddingModel()
+    cfg.EmbeddingModel()._load()
 
 
 def init_local_activity(cfg: Config):

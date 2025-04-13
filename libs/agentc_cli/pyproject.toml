@@ -57,7 +57,7 @@ version-pinning-rule = '=='
 
 [tool.poetry-dynamic-versioning]
 enable = false
-format = "v{major}.{minor}.{patch}+{commit}"
+format-jinja = "{% if distance == 0 %}{{ base }}{% else %}{{ base }}.post{{ distance }}{% endif %}+g{{ commit }}"
 
 [tool.poetry.requires-plugins]
 poetry-monoranger-plugin = ">=0.4.1"

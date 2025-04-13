@@ -78,7 +78,8 @@ class Kind(enum.StrEnum):
         """
         Begin refers to marker messages that are used to indicate the start of a span (e.g., a task, agent, state,
         etc...).
-        These messages are typically used to trace the trajectory of a conversation, and are application specific.
+        These messages are typically used to trace how one unit of work mutates some state, and are application
+        specific.
         """,
     )
 
@@ -86,7 +87,17 @@ class Kind(enum.StrEnum):
         "end",
         """
         End refers to marker messages that are used to indicate the end of a span (e.g., a task, agent, state, etc...).
-        These messages are typically used to trace the trajectory of a conversation, and are application specific.
+        These messages are typically used to trace how one unit of work mutates some state, and are application
+        specific.
+        """,
+    )
+
+    Edge = (
+        "edge",
+        """
+        Edge refers to marker messages that are used to indicate one unit of work (essentially) invoking another unit
+        of work.
+        These messages can be used to trace 'handoffs' and 'agent-to-agent' communication.
         """,
     )
 
@@ -425,6 +436,43 @@ class AssistantContent(BaseContent):
     value: str = pydantic.Field(description="The response served back to the user.")
 
 
+class EdgeContent(BaseContent):
+    """Edge refers to messages used to capture a caller's intent to 'handoff' some state to another span.
+
+    .. card:: Card Description
+
+        Edge messages denote the explicit intent to invoke another unit of work.
+        In the case of multi-agent applications, this type of message can be used to capture how one agent might call
+        another agent.
+
+        Edge messages have two required fields: i) ``source``, the fully qualified name of the source :py:class:`Span`,
+        and ii) ``dest``, the fully qualified name of the destination :py:class:`Span`.
+        A ``payload`` field can optionally be recorded in an edge message to model spans as a functional unit of work
+        (which they are in most cases).
+        If extra data is associated with the edge message, it can be stored in the optional ``extra`` field.
+
+        There are two paradigms around span to span "communication": a) *horizontal* and b) *vertical*.
+        Horizontal communication refers to (span) graphs that are managed by some orchestrator (e.g., LangGraph, CrewAI,
+        etc...), while vertical communication refers to (span) graphs that are built by directly invoking other spans
+        (ultimately building a call stack).
+
+        .. note::
+
+            In the case of our :py:class:`agentc_langgraph.agent.ReActAgent` helper class, a ``previous_node`` field is
+            used to help build these edges for horizontal communication.
+    """
+
+    kind: typing.Literal[Kind.Edge] = Kind.Edge
+
+    source: list[str] = pydantic.Field(description="Name of the source span associated with this edge.")
+
+    dest: list[str] = pydantic.Field(description="Name of the destination span associated with this edge.")
+
+    payload: typing.Optional[typing.Any] = pydantic.Field(
+        description="A (JSON-serializable) item being sent from the source span to the destination span.", default=None
+    )
+
+
 class BeginContent(BaseContent):
     """Begin refers to marker messages that are used to indicate the start of a span (e.g., a task, agent, state,
     etc...).
@@ -432,9 +480,8 @@ class BeginContent(BaseContent):
     .. card:: Card Description
 
         Begin messages denote the start of a span *and* (perhaps just as important) record the entrance state of a span.
-        Log analysts can use this information to trace the trajectory of a multi-agent application (e.g., where the
-        "exit state" of one span equals the "enter state" of another span).
-        For more information on tracing this trajectory, see :py:class:`EndContent`.
+        In certain applications, log analysts are able to use this information to model how the state of an application
+        mutates over time.
 
         Begin messages have two optional fields: i) the ``state`` field (used to record the starting state of a span)
         and ii) ``extra`` (used to record any extra information pertaining to the start of a span).
@@ -453,42 +500,11 @@ class EndContent(BaseContent):
     .. card:: Class Description
 
         End messages denote the end of a span *and* (perhaps just as important) record the exit state of a span.
-        Log analysts can use this information to trace the trajectory of a multi-agent application (e.g., where the
-        "exit state" of one span equals the "enter state" of another span).
+        In certain applications, log analysts are able to use this information to model how the state of an application
+        mutates over time.
 
         End messages have two optional fields: i) the ``state`` field (used to record the ending state of a span)
         and ii) ``extra`` (used to record any extra information pertaining to the end of a span).
-
-        Given a set of spans (i.e., nodes) :math:`S_G` and our logs :math:`L`, we can define the set of edges
-        :math:`E_G` that belong to your application's span graph :math:`G` with the set / query below:
-
-        .. tab-set::
-
-            .. tab-item:: Formal Set
-
-                .. math::
-
-                    E_G = \{& \ \ell[i]_\text{content.state} = \ell[j]_\text{content.state} \ \land \\
-                        &\texttt{are_siblings}\left(\ell[i]_\text{span.session.name},
-                                                    \ell[j]_\text{span.session.name}\right) \ \land \\
-                        &\ell[i]_\text{kind} = \text{end} \ \land \\
-                        &\ell[j]_\text{kind} = \text{begin} \ \land \\
-                        &\ell[i]_\text{timestamp} < \ell[j]_\text{timestamp} \\
-                        | \ &\ell[i]_\text{span.name} \in S_G, \ \ell[j]_\text{span.name} \in S_G \ \}
-
-                Where ``are_siblings`` refers to a boolean function that returns true if the two spans share the same
-                parent (i.e., possess the same name prefix) and false otherwise.
-
-            .. tab-item:: SQL++ Query
-
-                .. code-block:: sql
-
-                    FROM
-                        [MY_BUCKET].agent_activity.Handoffs h
-                    SELECT DISTINCT
-                        h.source,
-                        h.dest;
-
     """
 
     kind: typing.Literal[Kind.End] = Kind.End
