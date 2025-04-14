@@ -14,6 +14,12 @@ dotenv.load_dotenv()
 
 
 class FlightPlanner(agentc_langgraph.graph.GraphRunnable):
+    @staticmethod
+    def build_starting_state() -> State:
+        return State(
+            messages=[], endpoints=None, routes=None, needs_clarification=False, is_last_step=False, previous_node=None
+        )
+
     def compile(self) -> langgraph.graph.graph.CompiledGraph:
         # Build our nodes and agents.
         front_desk_agent = FrontDeskAgent(

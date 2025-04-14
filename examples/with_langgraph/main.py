@@ -1,7 +1,6 @@
 if __name__ == "__main__":
     import agentc
     import graph
-    import node
 
     # The Agent Catalog 'catalog' object serves versioned tools and prompts.
     # For a comprehensive list of what parameters can be set here, see the class documentation.
@@ -9,7 +8,5 @@ if __name__ == "__main__":
     _catalog = agentc.Catalog()
 
     # Start our application.
-    state = node.State(
-        messages=[], endpoints=None, routes=None, needs_clarification=False, is_last_step=False, previous_node=None
-    )
-    graph.FlightPlanner(catalog=_catalog).invoke(input=state)
+    _state = graph.FlightPlanner.build_starting_state()
+    graph.FlightPlanner(catalog=_catalog).invoke(input=_state)

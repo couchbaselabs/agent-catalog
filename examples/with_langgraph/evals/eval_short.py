@@ -10,7 +10,7 @@ import unittest.mock
 
 
 # Note: these evals should be run from the root of the project!
-from graph import Graph
+from graph import FlightPlanner
 
 # Our Agent Catalog objects (the same ones used for our application are used for tests as well).
 # To denote that the following logs are associated with tests, we will name the Span after our test file.
@@ -39,8 +39,9 @@ def eval_bad_intro():
                 # To identify individual evals, we will use their line number + add their content as an annotation.
                 suite_span.new(f"Eval_{i}", test_input=line) as eval_span,
             ):
-                graph: Graph = Graph(catalog=catalog, span=eval_span)
-                for event in graph.stream(stream_mode="updates"):
+                graph: FlightPlanner = FlightPlanner(catalog=catalog, span=eval_span)
+                state = FlightPlanner.build_starting_state()
+                for event in graph.stream(input=state, stream_mode="updates"):
                     if "front_desk_agent" in event:
                         # Run our app until the first response is given.
                         state = event["front_desk_agent"]
@@ -68,9 +69,10 @@ def eval_short_threads():
                 # To identify individual evals, we will use their line number + add their content as an annotation.
                 suite_span.new(f"Eval_{i}", iterable=True, test_input=line) as eval_span,
             ):
-                graph: Graph = Graph(catalog=catalog, span=eval_span)
+                graph: FlightPlanner = FlightPlanner(catalog=catalog, span=eval_span)
                 try:
-                    graph.invoke()
+                    state = FlightPlanner.build_starting_state()
+                    graph.invoke(input=state)
 
                     # If we have reached here, then our agent system has correctly processed our input!
                     eval_span["correctly_set_is_last_step"] = True

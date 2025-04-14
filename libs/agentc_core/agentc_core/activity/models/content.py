@@ -562,5 +562,6 @@ Content = typing.Union[
     AssistantContent,
     BeginContent,
     EndContent,
+    EdgeContent,
     KeyValueContent,
 ]
