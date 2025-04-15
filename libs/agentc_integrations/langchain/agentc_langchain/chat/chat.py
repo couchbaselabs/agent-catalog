@@ -29,8 +29,8 @@ logger = logging.getLogger(__name__)
 
 def _ai_content_from_generation(message: BaseMessage) -> typing.Iterable[Content]:
     if isinstance(message, AIMessage):
-        if message.text != "":
-            yield ChatCompletionContent(output=str(message.text), meta=message.response_metadata)
+        if message.text() != "":
+            yield ChatCompletionContent(output=str(message.text()), meta=message.response_metadata)
         for tool_call in message.tool_calls:
             yield ToolCallContent(
                 tool_name=tool_call["name"],

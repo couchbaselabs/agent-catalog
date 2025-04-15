@@ -77,7 +77,7 @@ classDef last fill: #bfb6fc
    In your shell, you should now see something similar below if you run `which python`:
    ```bash
    which python
-   > /Users/$USER/Library/Caches/pypoetry/virtualenvs/my-agent-system-gJ1RHvkw-py3.12/bin/python
+   > /Users/$USER/Library/Caches/pypoetry/virtualenvs/with-langgraph-example-gJ1RHvkw-py3.12/bin/python
    ```
 
 6. Run `agentc` to make sure this project has installed correctly (note that your first run will take a couple of

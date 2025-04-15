@@ -82,6 +82,12 @@ class GraphRunnable[S](langchain_core.runnables.Runnable):
     def compile(self) -> langgraph.graph.graph.CompiledGraph:
         pass
 
+    def get_graph(
+        self, config: typing.Optional[langchain_core.runnables.RunnableConfig] = None
+    ) -> langgraph.graph.graph.DrawableGraph:
+        graph = self.compile()
+        return graph.get_graph(config=config)
+
     def invoke(self, input: S, config: typing.Optional[langchain_core.runnables.RunnableConfig] = None, **kwargs) -> S:
         graph = self.compile()
         self.span.state = input

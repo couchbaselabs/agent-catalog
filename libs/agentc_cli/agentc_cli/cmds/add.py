@@ -34,7 +34,7 @@ def _get_name_and_description() -> tuple[str, str]:
 
 
 def add_prompt(output: pathlib.Path, template_env: jinja2.Environment):
-    template = template_env.get_template("prompt.yaml")
+    template = template_env.get_template("prompt.jinja")
     click_extra.echo("Type: prompt")
 
     # Prompt for our additional fields.

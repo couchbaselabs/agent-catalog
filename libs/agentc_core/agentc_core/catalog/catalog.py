@@ -332,7 +332,7 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
         query: str = None,
         name: str = None,
         annotations: str = None,
-        snapshot: str = LATEST_SNAPSHOT_VERSION,
+        catalog_id: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
     ) -> typing.Union[list[Tool] | list[Prompt] | None]:
         """Return a list of tools or prompts based on the specified search criteria.
@@ -361,7 +361,7 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
         :param query: A query string (natural language) to search the catalog with.
         :param name: The specific name of the catalog entry to search for.
         :param annotations: An annotation query string in the form of ``KEY="VALUE" (AND|OR KEY="VALUE")*``.
-        :param snapshot: The snapshot version to find the tools for. By default, we use the latest snapshot.
+        :param catalog_id: The snapshot version to find the tools for. By default, we use the latest snapshot.
         :param limit: The maximum number of results to return (ignored if name is specified).
         :return:
             One of the following:
@@ -371,9 +371,9 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
             * A list of :py:class:`Prompt` instances if `kind` is "prompt" (see :py:meth:`find_prompts` for details).
         """
         if kind.lower() == "tool":
-            return self.find_tools(query, name, annotations, snapshot, limit)
+            return self.find_tools(query, name, annotations, catalog_id, limit)
         elif kind.lower() == "prompt":
-            return self.find_prompts(query, name, annotations, snapshot)
+            return self.find_prompts(query, name, annotations, catalog_id)
         else:
             raise ValueError(f"Unknown item type: {kind}, expected 'tool' or 'prompt'.")
 
@@ -382,7 +382,7 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
         query: str = None,
         name: str = None,
         annotations: str = None,
-        snapshot: str = LATEST_SNAPSHOT_VERSION,
+        catalog_id: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
     ) -> list[Tool] | Tool | None:
         """Return a list of tools based on the specified search criteria.
@@ -390,7 +390,7 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
         :param query: A query string (natural language) to search the catalog with.
         :param name: The specific name of the catalog entry to search for.
         :param annotations: An annotation query string in the form of ``KEY="VALUE" (AND|OR KEY="VALUE")*``.
-        :param snapshot: The snapshot version to find the tools for. By default, we use the latest snapshot.
+        :param catalog_id: The snapshot version to find the tools for. By default, we use the latest snapshot.
         :param limit: The maximum number of results to return (ignored if name is specified).
         :return:
             A list of :py:class:`Tool` instances, with the following attributes:
@@ -405,17 +405,17 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
             )
         if query is not None:
             return self._tool_provider.find_with_query(
-                query=query, annotations=annotations, snapshot=snapshot, limit=limit
+                query=query, annotations=annotations, snapshot=catalog_id, limit=limit
             )
         else:
-            return self._tool_provider.find_with_name(name=name, annotations=annotations, snapshot=snapshot)
+            return self._tool_provider.find_with_name(name=name, annotations=annotations, snapshot=catalog_id)
 
     def find_prompts(
         self,
         query: str = None,
         name: str = None,
         annotations: str = None,
-        snapshot: str = LATEST_SNAPSHOT_VERSION,
+        catalog_id: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
     ) -> list[Prompt] | Prompt | None:
         """Return a list of prompts based on the specified search criteria.
@@ -423,7 +423,7 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
         :param query: A query string (natural language) to search the catalog with.
         :param name: The specific name of the catalog entry to search for.
         :param annotations: An annotation query string in the form of ``KEY="VALUE" (AND|OR KEY="VALUE")*``.
-        :param snapshot: The snapshot version to find the tools for. By default, we use the latest snapshot.
+        :param catalog_id: The snapshot version to find the tools for. By default, we use the latest snapshot.
         :param limit: The maximum number of results to return (ignored if name is specified).
         :return:
             A list of :py:class:`Prompt` instances, with the following attributes:
@@ -440,7 +440,7 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
             )
         if query is not None:
             return self._prompt_provider.find_with_query(
-                query=query, annotations=annotations, snapshot=snapshot, limit=limit
+                query=query, annotations=annotations, snapshot=catalog_id, limit=limit
             )
         else:
-            return self._prompt_provider.find_with_name(name=name, annotations=annotations, snapshot=snapshot)
+            return self._prompt_provider.find_with_name(name=name, annotations=annotations, snapshot=catalog_id)

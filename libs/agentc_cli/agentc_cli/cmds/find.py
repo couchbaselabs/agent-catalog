@@ -96,7 +96,7 @@ def cmd_find(
             query=query,
             name=name,
             limit=limit,
-            snapshot=catalog_id,
+            catalog_id=catalog_id,
             annotations=annotations_predicate,
         )
     ]

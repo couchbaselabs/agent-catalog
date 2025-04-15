@@ -6,6 +6,7 @@ import langchain_core.messages
 import langchain_core.runnables
 import langchain_core.tools
 import langgraph.prebuilt
+import langgraph.types
 import typing
 
 from agentc import Catalog
@@ -208,10 +209,12 @@ class ReActAgent[S: State]:
         )
 
     @abc.abstractmethod
-    def _invoke(self, span: Span, state: S, config: langchain_core.runnables.RunnableConfig) -> S:
+    def _invoke(
+        self, span: Span, state: S, config: langchain_core.runnables.RunnableConfig
+    ) -> S | langgraph.types.Command:
         pass
 
-    def __call__(self, state: S, config: langchain_core.runnables.RunnableConfig) -> S:
+    def __call__(self, state: S, config: langchain_core.runnables.RunnableConfig) -> S | langgraph.types.Command:
         node_name = self.__class__.__name__
 
         # Below, we build a Span instance which will bind all logs to our class name.
@@ -224,5 +227,14 @@ class ReActAgent[S: State]:
                     )
                 )
             result = self._invoke(span, state, config)
-            state["previous_node"] = span.identifier.name
-            return result
+            if isinstance(result, dict):
+                state["previous_node"] = span.identifier.name
+                return result
+
+            elif isinstance(result, langgraph.types.Command):
+                result.update["previous_node"] = span.identifier.name
+                state.update(result.update)
+                return result
+
+            else:
+                raise RuntimeError("_invoke() must return an instance of State OR a LangGraph Command.")

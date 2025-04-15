@@ -418,7 +418,7 @@ class CommandLineConfig(pydantic_settings.BaseSettings):
 class VersioningConfig(pydantic_settings.BaseSettings):
     model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_", extra="ignore")
 
-    snapshot: str = LATEST_SNAPSHOT_VERSION
+    catalog_id: str = LATEST_SNAPSHOT_VERSION
     """ The snapshot version to find the tools and prompts for.
 
     By default, we use the latest snapshot version if the repo is clean.
