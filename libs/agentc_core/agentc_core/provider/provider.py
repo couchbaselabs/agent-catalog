@@ -7,7 +7,6 @@ import typing
 from agentc_core.annotation import AnnotationPredicate
 from agentc_core.catalog.implementations.base import CatalogBase
 from agentc_core.catalog.implementations.base import SearchResult
-from agentc_core.config import LATEST_SNAPSHOT_VERSION
 from agentc_core.prompt.models import PromptDescriptor
 from agentc_core.provider.loader import EntryLoader
 from agentc_core.provider.loader import ModelType
@@ -36,7 +35,7 @@ class BaseProvider(abc.ABC):
         pass
 
 
-class ToolProvider(BaseProvider):
+class ToolProvider[T](BaseProvider):
     @dataclasses.dataclass
     class ToolResult:
         func: typing.Callable
@@ -46,6 +45,7 @@ class ToolProvider(BaseProvider):
         self,
         catalog: CatalogBase,
         output: os.PathLike = None,
+        decorator: typing.Callable[["ToolProvider.ToolResult"], T] = None,
         refiner: typing.Callable[[list[SearchResult]], list[SearchResult]] = None,
         secrets: typing.Optional[dict[str, str]] = None,
         python_version: PythonTarget = PythonTarget.PY_312,
@@ -54,6 +54,7 @@ class ToolProvider(BaseProvider):
         """
         :param catalog: A handle to the catalog. Entries can either be in memory or in Couchbase.
         :param output: Location to place the generated Python stubs (if desired).
+        :param decorator: Function to apply to each search result.
         :param refiner: Refiner (reranker / post processor) to use when retrieving tools.
         :param secrets: Map of identifiers to secret values.
         :param python_version: The target Python version for the generated (schema) code.
@@ -64,27 +65,29 @@ class ToolProvider(BaseProvider):
         self._loader = EntryLoader(output=output, python_version=python_version, model_type=model_type)
 
         # Handle our defaults.
+        self.decorator = decorator
         if secrets is not None:
             # Note: we only register our secrets at instantiation-time.
             for k, v in secrets.items():
                 put_secret(k, v)
 
-    def _generate_result(self, tool_descriptor: RecordDescriptor) -> typing.Any:
-        return ToolProvider.ToolResult(func=self._tool_cache[tool_descriptor], meta=tool_descriptor)
+    def _generate_result(self, tool_descriptor: RecordDescriptor) -> "ToolProvider.ToolResult" | T:
+        result = ToolProvider.ToolResult(func=self._tool_cache[tool_descriptor], meta=tool_descriptor)
+        return result if self.decorator is None else self.decorator(result)
 
     def find_with_query(
         self,
         query: str,
         annotations: str = None,
-        snapshot: str = LATEST_SNAPSHOT_VERSION,
+        snapshot: str = "__LATEST__",
         limit: typing.Union[int | None] = 1,
-    ) -> list[ToolResult]:
+    ) -> list[ToolResult | T]:
         """
         :param query: A string to search the catalog with.
         :param annotations: An annotation query string in the form of KEY=VALUE (AND|OR KEY=VALUE)*.
         :param snapshot: The snapshot version to search.
         :param limit: The maximum number of results to return.
-        :return: A list of tools (Python functions).
+        :return: A list of tools (Python functions OR decorated tool instances).
         """
         annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
         results = self.refiner(
@@ -99,9 +102,7 @@ class ToolProvider(BaseProvider):
         # Return the tools from the cache.
         return [self._generate_result(x.entry) for x in results]
 
-    def find_with_name(
-        self, name: str, snapshot: str = LATEST_SNAPSHOT_VERSION, annotations: str = None
-    ) -> ToolResult | None:
+    def find_with_name(self, name: str, snapshot: str = "__LATEST__", annotations: str = None) -> ToolResult | T | None:
         annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
         results = self.catalog.find(name=name, snapshot=snapshot, annotations=annotation_predicate, limit=1)
 
@@ -122,18 +123,18 @@ class ToolProvider(BaseProvider):
                 return self._generate_result(results[0].entry)
 
 
-class PromptProvider(BaseProvider):
+class PromptProvider[T](BaseProvider):
     @dataclasses.dataclass
-    class PromptResult:
+    class PromptResult[T]:
         content: str | dict
-        tools: list[ToolProvider.ToolResult]
+        tools: list[ToolProvider.ToolResult | T]
         output: typing.Optional[dict]
         meta: RecordDescriptor
 
     def __init__(
         self,
         catalog: CatalogBase,
-        tool_provider: ToolProvider = None,
+        tool_provider: ToolProvider[T] = None,
         refiner: typing.Callable[[list[SearchResult]], list[SearchResult]] = None,
     ):
         super(PromptProvider, self).__init__(catalog, refiner)
@@ -168,7 +169,7 @@ class PromptProvider(BaseProvider):
         self,
         query: str,
         annotations: str = None,
-        snapshot: str = LATEST_SNAPSHOT_VERSION,
+        snapshot: str = "__LATEST__",
         limit: typing.Union[int | None] = 1,
     ) -> list[PromptResult]:
         annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
@@ -178,7 +179,7 @@ class PromptProvider(BaseProvider):
         return [self._generate_result(r.entry) for r in results]
 
     def find_with_name(
-        self, name: str, snapshot: str = LATEST_SNAPSHOT_VERSION, annotations: str = None
+        self, name: str, snapshot: str = "__LATEST__", annotations: str = None
     ) -> typing.Optional[PromptResult]:
         annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
         results = self.catalog.find(name=name, snapshot=snapshot, annotations=annotation_predicate, limit=1)

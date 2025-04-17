@@ -14,9 +14,9 @@ class State(agentc_langgraph.agent.State):
 
 
 class FrontDeskAgent(agentc_langgraph.agent.ReActAgent):
-    def __init__(self, catalog: agentc.Catalog, span: agentc.Span, **kwargs):
+    def __init__(self, catalog: agentc.Catalog, span: agentc.Span):
         chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o", temperature=0)
-        super().__init__(chat_model=chat_model, catalog=catalog, span=span, prompt_name="front_desk_node", **kwargs)
+        super().__init__(chat_model=chat_model, catalog=catalog, span=span, prompt_name="front_desk_node")
         self.introductory_message: str = "Please provide the source and destination airports."
 
     @staticmethod
@@ -58,11 +58,9 @@ class FrontDeskAgent(agentc_langgraph.agent.ReActAgent):
 
 
 class EndpointFindingAgent(agentc_langgraph.agent.ReActAgent):
-    def __init__(self, catalog: agentc.Catalog, span: agentc.Span, **kwargs):
+    def __init__(self, catalog: agentc.Catalog, span: agentc.Span):
         chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o", temperature=0)
-        super().__init__(
-            chat_model=chat_model, catalog=catalog, span=span, prompt_name="endpoint_finding_node", **kwargs
-        )
+        super().__init__(chat_model=chat_model, catalog=catalog, span=span, prompt_name="endpoint_finding_node")
 
     def _invoke(self, span: agentc.Span, state: State, config: langchain_core.runnables.RunnableConfig) -> State:
         # Give the working state to our agent.
@@ -78,9 +76,9 @@ class EndpointFindingAgent(agentc_langgraph.agent.ReActAgent):
 
 
 class RouteFindingAgent(agentc_langgraph.agent.ReActAgent):
-    def __init__(self, catalog: agentc.Catalog, span: agentc.Span, **kwargs):
+    def __init__(self, catalog: agentc.Catalog, span: agentc.Span):
         chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o", temperature=0)
-        super().__init__(chat_model=chat_model, catalog=catalog, span=span, prompt_name="route_finding_node", **kwargs)
+        super().__init__(chat_model=chat_model, catalog=catalog, span=span, prompt_name="route_finding_node")
 
     def _invoke(self, span: agentc.Span, state: State, config: langchain_core.runnables.RunnableConfig) -> State:
         # Give the working state to our agent.

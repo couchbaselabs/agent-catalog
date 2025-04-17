@@ -199,9 +199,10 @@ class Callback(BaseCallbackHandler):
     def __init__(self, span: Span, tools: list[Tool] = None, output: dict = None):
         """
         :param span: The root span to bind to the chat model messages.
-        :param tools: The tools that being used by the chat model (i.e., those passed in :py:BaseChatModel.bind_tools).
+        :param tools: The tools that being used by the chat model (i.e., those passed in
+                      :py:meth:`BaseChatModel.bind_tools`).
         :param output: The output type that being used by the chat model (i.e., those passed in
-                       :py:BaseChatModel.with_structured_output).
+                       :py:meth`:BaseChatModel.with_structured_output:).
         """
         self.span: Span = span.new(name="agentc_langchain.chat.Callback")
         self.output: dict = output or dict()

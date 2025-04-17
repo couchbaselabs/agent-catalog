@@ -11,6 +11,7 @@ import tempfile
 import typing
 import urllib.parse
 
+from agentc_core.catalog.implementations.base import SearchResult
 from agentc_core.defaults import DEFAULT_ACTIVITY_FOLDER
 from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
 from agentc_core.defaults import DEFAULT_CLUSTER_DDL_RETRY_ATTEMPTS
@@ -21,11 +22,19 @@ from agentc_core.defaults import DEFAULT_EMBEDDING_MODEL_NAME
 from agentc_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
 from agentc_core.defaults import DEFAULT_VERBOSITY_LEVEL
 from agentc_core.learned.embedding import EmbeddingModel
+from agentc_core.provider.provider import ModelType
+from agentc_core.provider.provider import ToolProvider
 
 logger = logging.getLogger(__name__)
 
 # Constant to represent the latest snapshot version.
 LATEST_SNAPSHOT_VERSION = "__LATEST__"
+
+# To support custom refiners, we must export this model.
+SearchResult = SearchResult
+
+# To support the generation of different (schema) models, we export this model.
+SchemaModel = ModelType
 
 
 class RemoteCatalogConfig(pydantic_settings.BaseSettings):
@@ -207,6 +216,83 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
         return cluster
 
 
+class ToolRuntimeConfig[T](pydantic_settings.BaseSettings):
+    model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_", extra="ignore")
+
+    codegen_output: typing.Optional[pathlib.Path | tempfile.TemporaryDirectory | os.PathLike] = None
+    """ Location to save generated Python stubs to, if desired.
+
+    On :py:meth:`find_tools`, tools are dynamically generated and served as annotated Python callables.
+    By default, this code is never written to disk.
+    If this field is specified, we will write all generated files to the given output directory and serve the generated
+    Python callables from these files with a "standard import".
+    """
+
+    tool_decorator: typing.Optional[typing.Callable[[ToolProvider.ToolResult], T]] = None
+    """ A Python decorator (function) to apply to each result yielded by :py:meth:`agentc.catalog.Catalog.find_tools`.
+
+    By default, yielded results are callable and possess type annotations + documentation strings, but some agent
+    frameworks may ask for tools whose type is tailored to their own framework.
+    As an example, in LangChain, vanilla Python functions must be converted to ``langchain_core.tools.BaseTool``
+    instances.
+    To avoid having to "box" these tools yourself, we accept a callback to perform this boxing on your behalf.
+    """
+
+    refiner: typing.Optional[typing.Callable] = lambda results: results
+    """ A Python function to post-process results (reranking, pruning, etc...) yielded by the catalog.
+
+    By default, we perform a strict top-K nearest neighbor search for relevant results.
+    This function serves to perform any additional reranking and **pruning** before the code generation occurs.
+    This function should accept a list of :py:class:`agentc_core.catalog.SearchResult` instances (a model with the
+    fields ``entry`` and ``delta``) and return a list of :py:class:`agentc_core.catalog.SearchResult` instances.
+
+    We offer an experimental post-processor to cluster closely related results (using delta as the loss function)
+    and subsequently yield the closest cluster (see :py:class:`agentc_core.provider.refiner.ClosestClusterRefiner`).
+    """
+
+    secrets: typing.Optional[dict[str, pydantic.SecretStr]] = pydantic.Field(default_factory=dict, frozen=True)
+    """
+    A map of identifiers to secret values (e.g., Couchbase usernames, passwords, etc...).
+
+    .. card:: Field Description
+
+        Some tools require access to values that cannot be hard-coded into the tool themselves (for security reasons).
+        As an example, SQL++ tools require a connection string, username, and password.
+        Instead of capturing these raw values in the tool metadata, tool descriptors mandate the specification of a
+        map whose values are secret keys.
+        These identifiers are read either from the environment or from this ``secrets`` field.
+
+        .. code-block:: yaml
+
+            secrets:
+                - couchbase:
+                    conn_string: MY_CB_CONN_STRING
+                    username: MY_CB_USERNAME
+                    password: MY_CB_PASSWORD
+
+        To map the secret keys to values explicitly, users will specify their secrets using this field (secrets).
+
+        .. code-block:: python
+
+            provider = agentc.Catalog(secrets={
+                "CB_CONN_STRING": "couchbase//23.52.12.254",
+                "CB_USERNAME": "admin_7823",
+                "CB_PASSWORD": os.getenv("THE_CB_PASSWORD"),
+                "CB_CERTIFICATE": "path/to/cert.pem",
+            })
+    """
+
+    tool_model: SchemaModel = SchemaModel.TypingTypedDict
+    """ The target model type for the generated (schema) code for tools.
+
+    .. card:: Field Description
+
+        By default, we generate ``TypedDict`` models and attach these as type hints to the generated Python functions.
+        Other options include Pydantic (V2 and V1) models and dataclasses, though these may not be supported by all
+        agent frameworks.
+    """
+
+
 class LocalCatalogConfig(pydantic_settings.BaseSettings):
     model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_", extra="ignore")
 
@@ -236,15 +322,6 @@ class LocalCatalogConfig(pydantic_settings.BaseSettings):
     """ Location of the activity folder.
 
     By default, this value is ``$AGENT_CATALOG_ACTIVITY_PATH/.agent-activity``.
-    """
-
-    codegen_output: typing.Optional[pathlib.Path | tempfile.TemporaryDirectory | os.PathLike] = None
-    """ Location to save generated Python stubs to, if desired.
-
-    On :py:meth:`find_tools`, tools are dynamically generated and served as annotated Python callables.
-    By default, this code is never written to disk.
-    If this field is specified, we will write all generated files to the given output directory and serve the generated
-    Python callables from these files with a "standard import".
     """
 
     @pydantic.model_validator(mode="after")
@@ -430,7 +507,14 @@ class VersioningConfig(pydantic_settings.BaseSettings):
 
 
 # We'll take a mix-in approach here.
-class Config(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig, CommandLineConfig, VersioningConfig):
+class Config(
+    EmbeddingModelConfig,
+    LocalCatalogConfig,
+    RemoteCatalogConfig,
+    ToolRuntimeConfig,
+    CommandLineConfig,
+    VersioningConfig,
+):
     model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_", extra="ignore")
 
     debug: bool = False

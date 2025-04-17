@@ -17,5 +17,6 @@ Agent Catalog can be configured 1) on a per-instance-basis (for :python:`Catalog
 .. autopydantic_model:: agentc_core.config.config.RemoteCatalogConfig
 .. autopydantic_model:: agentc_core.config.config.LocalCatalogConfig
 .. autopydantic_model:: agentc_core.config.config.EmbeddingModelConfig
+.. autopydantic_model:: agentc_core.config.config.ToolRuntimeConfig
 .. autopydantic_model:: agentc_core.config.config.CommandLineConfig
 .. autopydantic_model:: agentc_core.config.config.VersioningConfig

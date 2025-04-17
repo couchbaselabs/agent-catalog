@@ -42,6 +42,26 @@ def test_local_tool_provider(
 
 
 @pytest.mark.smoke
+def test_local_tool_provider_with_decorator(
+    temporary_directory: typing.Generator[pathlib.Path, None, None],
+    environment_factory: typing.Callable[..., Environment],
+):
+    runner = click_extra.testing.ExtraCliRunner()
+    with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
+        environment_factory(
+            directory=pathlib.Path(td),
+            env_kind=EnvironmentKind.INDEXED_CLEAN_TOOLS_TRAVEL,
+            click_runner=click_extra.testing.ExtraCliRunner(),
+            click_command=agentc,
+        )
+        catalog = Catalog(tool_decorator=lambda x: {"tool": x.func})
+        tools = catalog.find("tool", query="searching travel blogs")
+        assert len(tools) == 1
+        assert isinstance(tools[0], dict)
+        assert tools[0]["tool"].__name__ == "get_travel_blog_snippets_from_user_interests"
+
+
+@pytest.mark.smoke
 def test_local_inputs_provider(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],

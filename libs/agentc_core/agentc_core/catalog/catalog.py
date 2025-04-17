@@ -8,7 +8,6 @@ import pydantic
 import typing
 
 from agentc_core.catalog.implementations.base import CatalogBase
-from agentc_core.catalog.implementations.base import SearchResult
 from agentc_core.catalog.implementations.chain import CatalogChain
 from agentc_core.catalog.implementations.db import CatalogDB
 from agentc_core.catalog.implementations.mem import CatalogMem
@@ -16,9 +15,9 @@ from agentc_core.config import LATEST_SNAPSHOT_VERSION
 from agentc_core.config import EmbeddingModelConfig
 from agentc_core.config import LocalCatalogConfig
 from agentc_core.config import RemoteCatalogConfig
+from agentc_core.config import ToolRuntimeConfig
 from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
-from agentc_core.provider import ModelType
 from agentc_core.provider import PromptProvider
 from agentc_core.provider import PythonTarget
 from agentc_core.provider import ToolProvider
@@ -26,18 +25,13 @@ from agentc_core.version import VersionDescriptor
 
 logger = logging.getLogger(__name__)
 
-# To support custom refiners, we must export this model.
-SearchResult = SearchResult
-
-# To support the generation of different (schema) models, we export this model.
-SchemaModel = ModelType
 
 # To support returning prompts with defined tools + the ability to utilize the tool schema, we export this model.
 Prompt = PromptProvider.PromptResult
 Tool = ToolProvider.ToolResult
 
 
-class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
+class Catalog[T](EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig, ToolRuntimeConfig):
     """A provider of indexed "agent building blocks" (e.g., tools, prompts, spans...).
 
     .. card:: Class Description
@@ -74,66 +68,10 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
 
     model_config = pydantic.ConfigDict(extra="ignore")
 
-    refiner: typing.Optional[typing.Callable] = lambda results: results
-    """ A Python function to post-process results (reranking, pruning, etc...) yielded by the catalog.
-
-    .. card:: Field Description
-
-        By default, we perform a strict top-K nearest neighbor search for relevant results.
-        This function serves to perform any additional reranking and **pruning** before the code generation occurs.
-        This function should accept a list of :py:class:`agentc_core.catalog.SearchResult` instances (a model with the
-        fields ``entry`` and ``delta``) and return a list of :py:class:`agentc_core.catalog.SearchResult` instances.
-
-        We offer an experimental post-processor to cluster closely related results (using delta as the loss function)
-        and subsequently yield the closest cluster (see :py:class:`agentc_core.provider.refiner.ClosestClusterRefiner`).
-    """
-
-    secrets: typing.Optional[dict[str, pydantic.SecretStr]] = pydantic.Field(default_factory=dict, frozen=True)
-    """
-    A map of identifiers to secret values (e.g., Couchbase usernames, passwords, etc...).
-
-    .. card:: Field Description
-
-        Some tools require access to values that cannot be hard-coded into the tool themselves (for security reasons).
-        As an example, SQL++ tools require a connection string, username, and password.
-        Instead of capturing these raw values in the tool metadata, tool descriptors mandate the specification of a
-        map whose values are secret keys.
-        These identifiers are read either from the environment or from this ``secrets`` field.
-
-        .. code-block:: yaml
-
-            secrets:
-                - couchbase:
-                    conn_string: MY_CB_CONN_STRING
-                    username: MY_CB_USERNAME
-                    password: MY_CB_PASSWORD
-
-        To map the secret keys to values explicitly, users will specify their secrets using this field (secrets).
-
-        .. code-block:: python
-
-            provider = agentc.Catalog(secrets={
-                "CB_CONN_STRING": "couchbase//23.52.12.254",
-                "CB_USERNAME": "admin_7823",
-                "CB_PASSWORD": os.getenv("THE_CB_PASSWORD"),
-                "CB_CERTIFICATE": "path/to/cert.pem",
-            })
-    """
-
-    tool_model: SchemaModel = SchemaModel.TypingTypedDict
-    """ The target model type for the generated (schema) code for tools.
-
-    .. card:: Field Description
-
-        By default, we generate ``TypedDict`` models and attach these as type hints to the generated Python functions.
-        Other options include Pydantic (V2 and V1) models and dataclasses, though these may not be supported by all
-        agent frameworks.
-    """
-
     _local_tool_catalog: CatalogMem = None
     _remote_tool_catalog: CatalogDB = None
     _tool_catalog: CatalogBase = None
-    _tool_provider: ToolProvider = None
+    _tool_provider: ToolProvider[T] = None
 
     _local_prompt_catalog: CatalogMem = None
     _remote_prompt_catalog: CatalogDB = None
@@ -251,6 +189,7 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
         # Finally, initialize our provider(s).
         self._tool_provider = ToolProvider(
             catalog=self._tool_catalog,
+            decorator=self.tool_decorator,
             output=self.codegen_output,
             refiner=self.refiner,
             secrets=self.secrets,
@@ -315,16 +254,21 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
             version_tuples += [self._remote_prompt_catalog.version]
         return sorted(version_tuples, key=lambda x: x.timestamp, reverse=True)[0]
 
-    def Span(self, name: str, state: typing.Any = None, **kwargs) -> "Span":
+    def Span(self, name: str, session: str = None, state: typing.Any = None, **kwargs) -> "Span":
         """A factory method to initialize a :py:class:`Span` (more specifically, a :py:class:`GlobalSpan`) instance.
 
         :param name: Name to bind to each message logged within this span.
+        :param session: The run that this tree of spans is associated with. By default, this is a UUID.
         :param state: A JSON-serializable object that will be logged on entering and exiting this span.
         :param kwargs: Additional keyword arguments to pass to the Span constructor.
         """
         from agentc_core.activity import GlobalSpan
 
-        return GlobalSpan(config=self, version=self.version, name=name, state=state, kwargs=kwargs)
+        parameters = {"config": self, "version": self.version, "name": name, "state": state, "kwargs": kwargs}
+        if session is not None:
+            parameters["session"] = session
+
+        return GlobalSpan(**parameters)
 
     def find(
         self,
@@ -334,7 +278,7 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
         annotations: str = None,
         catalog_id: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
-    ) -> typing.Union[list[Tool] | list[Prompt] | None]:
+    ) -> typing.Union[list[Tool | T] | list[Prompt[T]] | None]:
         """Return a list of tools or prompts based on the specified search criteria.
 
         .. card:: Method Description
@@ -384,7 +328,7 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
         annotations: str = None,
         catalog_id: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
-    ) -> list[Tool] | Tool | None:
+    ) -> list[Tool | T] | Tool | T | None:
         """Return a list of tools based on the specified search criteria.
 
         :param query: A query string (natural language) to search the catalog with.
@@ -393,10 +337,12 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
         :param catalog_id: The snapshot version to find the tools for. By default, we use the latest snapshot.
         :param limit: The maximum number of results to return (ignored if name is specified).
         :return:
-            A list of :py:class:`Tool` instances, with the following attributes:
+            By default, a list of :py:class:`Tool` instances with the following attributes:
 
             1. **func** (``typing.Callable``): A Python callable representing the function.
             2. **meta** (:py:type:`RecordDescriptor`): The metadata associated with the tool.
+
+            If a ``tool_decorator`` is present, this method will return a list of objects decorated accordingly.
         """
         if self._tool_provider is None:
             raise RuntimeError(
@@ -417,7 +363,7 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig):
         annotations: str = None,
         catalog_id: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
-    ) -> list[Prompt] | Prompt | None:
+    ) -> list[Prompt[T]] | Prompt[T] | None:
         """Return a list of prompts based on the specified search criteria.
 
         :param query: A query string (natural language) to search the catalog with.

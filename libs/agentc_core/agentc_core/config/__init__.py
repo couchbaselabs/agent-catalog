@@ -4,6 +4,7 @@ from .config import Config
 from .config import EmbeddingModelConfig
 from .config import LocalCatalogConfig
 from .config import RemoteCatalogConfig
+from .config import ToolRuntimeConfig
 from .config import VersioningConfig
 
 __all__ = [
@@ -11,6 +12,7 @@ __all__ = [
     "EmbeddingModelConfig",
     "RemoteCatalogConfig",
     "LocalCatalogConfig",
+    "ToolRuntimeConfig",
     "CommandLineConfig",
     "VersioningConfig",
     "LATEST_SNAPSHOT_VERSION",

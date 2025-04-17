@@ -16,6 +16,9 @@ python = "^3.12"
 langgraph = "^0.3.7"
 couchbase = "^4.3.5"
 
+# For our Python REPL.
+langchain-experimental = "^0.3.3"
+
 # For Google Search.
 serpapi = "^0.1.5"
 google_search_results = "^2.4.2"
@@ -23,7 +26,6 @@ google_search_results = "^2.4.2"
 # For our graphs (+ Jupyter notebook).
 ipython = "^8.27.0"
 langchain-community = "^0.3.10"
-langchain-experimental = "^0.3.3"
 matplotlib = "^3.9.3"
 jupyter = "^1.1.1"
 ipykernel = "^6.29.5"
