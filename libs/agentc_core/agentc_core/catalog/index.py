@@ -9,13 +9,16 @@ from ..defaults import DEFAULT_ITEM_DESCRIPTION_MAX_LEN
 from ..indexer import AllIndexers
 from ..indexer import vectorize_descriptor
 from ..learned.embedding import EmbeddingModel
+from ..learned.model import EmbeddingModel as CatalogDescriptorEmbeddingModel
 from ..record.descriptor import RecordDescriptor
-from .catalog.mem import CatalogMem
 from .descriptor import CatalogDescriptor
 from .directory import ScanDirectoryOpts
 from .directory import scan_directory
+from .implementations.mem import CatalogMem
 from .version import catalog_schema_version_compare
 from .version import lib_version_compare
+from agentc_core.record.descriptor import RecordKind
+from agentc_core.version import VersionDescriptor
 
 logger = logging.getLogger(__name__)
 
@@ -29,10 +32,10 @@ class MetaVersion:
 def index_catalog(
     embedding_model: EmbeddingModel,
     meta_version: MetaVersion,
-    catalog_version: str,
-    get_path_version: typing.Callable[[str], str],
+    catalog_version: VersionDescriptor,
+    get_path_version: typing.Callable[[str], VersionDescriptor],
     kind: typing.Literal["tool", "prompt"],
-    catalog_path,
+    catalog_file,
     source_dirs,
     scan_directory_opts: ScanDirectoryOpts = None,
     printer: typing.Callable = lambda x, *args, **kwargs: print(x),
@@ -45,7 +48,7 @@ def index_catalog(
         catalog_version=catalog_version,
         get_path_version=get_path_version,
         kind=kind,
-        catalog_path=catalog_path,
+        catalog_file=catalog_file,
         source_dirs=source_dirs,
         scan_directory_opts=scan_directory_opts,
         printer=printer,
@@ -81,7 +84,7 @@ def index_catalog(
         all_errs += errs or []
 
     if all_errs:
-        logger.error("Encountered error(s) during embedding generation: " + "\n".join([str(e) for e in all_errs]))
+        logger.warning("Encountered error(s) during embedding generation: " + "\n".join([str(e) for e in all_errs]))
         raise all_errs[0]
 
     return next_catalog
@@ -90,10 +93,10 @@ def index_catalog(
 def index_catalog_start(
     embedding_model: EmbeddingModel,
     meta_version: MetaVersion,
-    catalog_version: str,
-    get_path_version: typing.Callable[[str], str],
+    catalog_version: VersionDescriptor,
+    get_path_version: typing.Callable[[str], VersionDescriptor],
     kind: typing.Literal["tool", "prompt"],
-    catalog_path,
+    catalog_file,
     source_dirs,
     scan_directory_opts: ScanDirectoryOpts = None,
     printer: typing.Callable = lambda x, *args, **kwargs: print(x),
@@ -102,7 +105,7 @@ def index_catalog_start(
 ):
     # Load the old / previous local catalog if our catalog path exists.
     curr_catalog = (
-        CatalogMem(catalog_path=catalog_path, embedding_model=embedding_model) if catalog_path.exists() else None
+        CatalogMem(catalog_file=catalog_file, embedding_model=embedding_model) if catalog_file.exists() else None
     )
 
     logger.debug(f"Now crawling source directories. [{','.join(d for d in source_dirs)}]")
@@ -110,9 +113,9 @@ def index_catalog_start(
 
     source_files = list()
     if kind == "tool":
-        source_globs = [i.glob_pattern for i in AllIndexers if all(k.is_tool() for k in i.kind)]
+        source_globs = [i.glob_pattern for i in AllIndexers if any(k != RecordKind.Prompt for k in i.kind)]
     elif kind == "prompt":
-        source_globs = [i.glob_pattern for i in AllIndexers if all(k.is_prompt() for k in i.kind)]
+        source_globs = [i.glob_pattern for i in AllIndexers if any(k == RecordKind.Prompt for k in i.kind)]
     else:
         raise ValueError(f"Unknown kind: {kind}")
     for source_dir in source_dirs:
@@ -135,12 +138,19 @@ def index_catalog_start(
                 is_description_length_valid = True
 
                 errs, descriptors = indexer.start_descriptors(source_file, get_path_version)
+                descriptors = [
+                    d
+                    for d in descriptors
+                    if (kind == "prompt" and d.record_kind == RecordKind.Prompt)
+                    or (kind == "tool" and d.record_kind != RecordKind.Prompt)
+                ]
                 for descriptor in descriptors:
                     # Validate description lengths
                     if len(descriptor.description) == 0:
                         printer(f"WARNING: Catalog item {descriptor.name} has an empty description.", fg="yellow")
                         is_description_empty = True
                         break
+
                     if len(descriptor.description.split()) > DEFAULT_ITEM_DESCRIPTION_MAX_LEN:
                         printer(
                             f"WARNING: Catalog item {descriptor.name} has a description with token size more"
@@ -154,6 +164,7 @@ def index_catalog_start(
                     raise ValueError(
                         "Catalog contains item(s) with empty description! Please provide a description and index again."
                     )
+                # TODO (GLENN): We can offer options here to (potentially) summarize the description in the future.
                 if not is_description_length_valid:
                     raise ValueError(
                         f"Catalog contains item(s) with description length more than the allowed limit of "
@@ -164,16 +175,23 @@ def index_catalog_start(
                 break
 
     if all_errs:
-        logger.error("Encountered error(s) while crawling source directories: " + "\n".join([str(e) for e in all_errs]))
+        logger.warning(
+            "Encountered error(s) while crawling source directories: " + "\n".join([str(e) for e in all_errs])
+        )
         raise all_errs[0]
 
+    catalog_descriptor_embedding_model = (
+        CatalogDescriptorEmbeddingModel(name=embedding_model.name, base_url=None)
+        if embedding_model.embedding_model_url is None
+        else CatalogDescriptorEmbeddingModel(name=embedding_model.name, base_url=embedding_model.embedding_model_url)
+    )
     next_catalog = CatalogMem(
         embedding_model=embedding_model,
         catalog_descriptor=CatalogDescriptor(
             schema_version=meta_version.schema_version,
             library_version=meta_version.library_version,
             version=catalog_version,
-            embedding_model=embedding_model.name,
+            embedding_model=catalog_descriptor_embedding_model,
             kind=kind,
             source_dirs=source_dirs,
             items=all_descriptors,

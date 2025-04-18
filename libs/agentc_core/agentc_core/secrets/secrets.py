@@ -1,4 +1,5 @@
 import logging
+import os
 import pydantic
 
 logger = logging.getLogger(__name__)
@@ -17,6 +18,10 @@ def put_secret(secret_key: str, secret_value: pydantic.SecretStr | str):
 
 
 def get_secret(secret_key: str) -> pydantic.SecretStr:
-    if secret_key not in _SECRETS_SINGLETON_MAP or _SECRETS_SINGLETON_MAP[secret_key] is None:
+    if secret_key in _SECRETS_SINGLETON_MAP and _SECRETS_SINGLETON_MAP[secret_key] is not None:
+        return _SECRETS_SINGLETON_MAP[secret_key]
+    elif os.getenv(secret_key) is not None:
+        return pydantic.SecretStr(secret_value=os.getenv(secret_key))
+    else:
         logger.warning(f"Secret {secret_key} has been requested but does not exist!")
-    return _SECRETS_SINGLETON_MAP[secret_key]
+        return None

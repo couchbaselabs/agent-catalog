@@ -1,19 +1,27 @@
+[project]
+name = "agentc-core"
+description = "The core for the Couchbase Agent Catalog project."
+authors = [
+    { name = "Glenn Galvizo", email = "glenn.galvizo@couchbase.com" },
+    { name = "Steve Yen", email = "steve.yen@couchbase.com" },
+    { name = "Tanvi Johari", email = "tanvi.johari@couchbase.com" },
+    { name = "Thejas N U", email = "thejas.nu@couchbase.com" }
+]
+license = "Apache-2.0"
+dynamic = ["version"]
+requires-python = ">=3.12"
+
+[project.urls]
+repository = "https://github.com/couchbaselabs/agent-catalog"
+documentation = "https://couchbaselabs.github.io/agent-catalog/api.html"
+
+# Version is dynamically pulled from Git.
 [tool.poetry]
 name = "agentc-core"
-version = "0.0.1"
-description = "The core for the Couchbase Agent Catalog project."
-repository = "https://github.com/couchbaselabs/agent-catalog"
-authors = [
-    "Glenn Galvizo <glenn.galvizo@couchbase.com>",
-    "Steve Yen <steve.yen@couchbase.com>",
-    "Tanvi Johari <tanvi.johari@couchbase.com>",
-    "Thejas N U <thejas.nu@couchbase.com>"
-]
-readme = "README.md"
+version = "0.0.0"
 packages = [
-    { include = "agentc_core" },
+    { include = "agentc_core" }
 ]
-
 include = [
     "agentc_core/tool/generate/templates/*",
     "agentc_core/analytics/ddls/*",
@@ -21,27 +29,22 @@ include = [
     "agentc_core/prompt/templates/*"
 ]
 
-[tool.poetry.urls]
-Homepage = "https://couchbase.com"
-Documentation = "https://docs.couchbase.com"
-Repository = "https://github.com/couchbaselabs/agent-catalog"
-
 [tool.poetry.dependencies]
 python = "^3.12"
-python-dotenv = "^1.0.1"
 requests = "^2.32.3"
 PyYAML = "^6.0.1"
 semantic_version = "^2.10.0"
 gitignore-parser = "^0.1.11"
 GitPython = "^3.1.43"
-pydantic = "^2.8.2"
+pydantic = "^2.10.6"
 datamodel-code-generator = "^0.26.0"
 couchbase = "^4.3.0"
 jinja2 = "^3.1.4"
-openapi3-parser = "^1.1.17"
+openapi-pydantic = "^0.5.1"
+jsonschema = "^4.23.0"
 py-openapi-schema-to-json-schema = "^0.0.3"
 jsbeautifier = "^1.15.1"
-sentence-transformers = "^3.1.1"
+sentence-transformers = "^3.4.1"
 
 [tool.poetry.group.refiner]
 optional = true
@@ -54,17 +57,39 @@ scipy = ">0.14.0"
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
 pytest = "^8.3.2"
+pytest-retry = "^1.7.0"
 
 [tool.poetry.group.dev.dependencies.agentc-testing]
 path = "../agentc_testing"
 develop = true
 
+# Note: we only depend on the CLI for tests.
+[tool.poetry.group.dev.dependencies.agentc-cli]
+path = "../agentc_cli"
+develop = true
+
 [tool.pytest.ini_options]
 markers = [
     "smoke: marks tests for running on each git-push",
-    "regression: marks regression tests for running on each git-push",
+    "slow: marks slow tests for running on each git-push",
 ]
 
+[tool.poetry-monoranger-plugin]
+enabled = true
+monorepo-root = "../../"
+version-pinning-rule = '=='
+
+[tool.poetry-dynamic-versioning]
+enable = true
+format-jinja = "{% if distance == 0 %}{{ base }}{% else %}{{ base }}.post{{ distance }}{% endif %}+g{{ commit }}"
+
+[tool.poetry.requires-plugins]
+poetry-monoranger-plugin = ">=0.4.1"
+poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
+
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = [
+    "poetry-core>=2.1.0",
+    "poetry-dynamic-versioning>=1.8.2"
+]
+build-backend = "poetry_dynamic_versioning.backend"

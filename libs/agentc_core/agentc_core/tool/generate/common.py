@@ -30,7 +30,7 @@ def _post_process_model_code(generated_code: str, class_name: str) -> str:
 
 
 def generate_model_from_json_schema(
-    json_schema: str,
+    json_schema: dict,
     class_name: str,
     python_version: datamodel_code_generator.PythonVersion,
     model_type: datamodel_code_generator.DataModelType,
@@ -43,13 +43,12 @@ def generate_model_from_json_schema(
     )
 
     # If we have a list-valued field, first extract the fields involved.
-    parsed_json_schema = json.loads(json_schema)
-    if parsed_json_schema["type"] == "array":
-        codegen_schema = parsed_json_schema["items"]
+    if json_schema["type"] == "array":
+        codegen_schema = json_schema["items"]
         is_list_valued = True
         type_name = class_name
     else:
-        codegen_schema = parsed_json_schema
+        codegen_schema = json_schema
         is_list_valued = False
         type_name = class_name
 

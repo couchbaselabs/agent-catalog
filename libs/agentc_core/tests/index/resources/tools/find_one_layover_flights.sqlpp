@@ -1,0 +1,53 @@
+/*
+name: find_routes_with_one_layover
+
+description: >
+    Find a list of routes between two airports with one layover.
+    The routes always start at source_airport and end at destination_airport.
+
+input: >
+    {
+      "type": "object",
+      "properties": {
+        "source_airport": { "type": "string" },
+        "destination_airport": { "type": "string" }
+      }
+    }
+
+output: >
+    {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "airlines": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "layovers": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "from_airport": { "type": "string" },
+          "to_airport": { "type": "string" }
+        }
+      }
+    }
+
+secrets:
+    - couchbase:
+        conn_string: CB_CONN_STRING
+        username: CB_USERNAME
+        password: CB_PASSWORD
+*/
+
+FROM  `travel-sample`.inventory.route r1,
+      `travel-sample`.inventory.route r2
+WHERE  r1.sourceairport = $source_airport AND
+       r1.destinationairport = r2.sourceairport AND
+       r2.destinationairport = $destination_airport
+SELECT VALUE { "airlines"     : [r1.airline, r2.airline],
+               "layovers"     : [r1.destinationairport],
+               "from_airport" : r1.sourceairport,
+               "to_airport"   : r2.destinationairport }
+LIMIT  10;

@@ -2,7 +2,6 @@ import pydantic
 import typing
 
 
-# TODO (GLENN): Add more types of secrets below.
 class CouchbaseSecrets(pydantic.BaseModel):
     class Couchbase(pydantic.BaseModel):
         conn_string: str
@@ -11,3 +10,12 @@ class CouchbaseSecrets(pydantic.BaseModel):
         certificate: typing.Optional[str] = None
 
     couchbase: Couchbase
+
+
+class EmbeddingModelSecrets(pydantic.BaseModel):
+    class EmbeddingModel(pydantic.BaseModel):
+        auth: str
+        username: typing.Optional[str] = None
+        password: typing.Optional[str] = None
+
+    embedding: EmbeddingModel

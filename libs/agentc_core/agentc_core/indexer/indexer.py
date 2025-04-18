@@ -6,8 +6,7 @@ import typing
 import yaml
 
 from ..learned.embedding import EmbeddingModel
-from ..prompt.models import JinjaPromptDescriptor
-from ..prompt.models import RawPromptDescriptor
+from ..prompt.models import PromptDescriptor
 from ..record.descriptor import RecordDescriptor
 from ..record.descriptor import RecordKind
 from ..tool.descriptor import HTTPRequestToolDescriptor
@@ -101,7 +100,7 @@ class DotYamlFileIndexer(BaseFileIndexer):
 
     @property
     def kind(self) -> list[RecordKind]:
-        return [RecordKind.SemanticSearch, RecordKind.HTTPRequest]
+        return [RecordKind.SemanticSearch, RecordKind.HTTPRequest, RecordKind.Prompt]
 
     def start_descriptors(
         self, filename: pathlib.Path, get_version
@@ -129,6 +128,9 @@ class DotYamlFileIndexer(BaseFileIndexer):
             case RecordKind.HTTPRequest:
                 return None, list(HTTPRequestToolDescriptor.Factory(**factory_args))
 
+            case RecordKind.Prompt:
+                return None, list(PromptDescriptor.Factory(**factory_args))
+
             case _:
                 logger.warning(
                     f"Encountered .yaml file with unknown record_kind field. "
@@ -138,33 +140,19 @@ class DotYamlFileIndexer(BaseFileIndexer):
 
 
 class DotPromptFileIndexer(BaseFileIndexer):
-    def start_descriptors(
-        self, filename: pathlib.Path, get_version
-    ) -> typing.Tuple[list[ValueError], list[RecordDescriptor]]:
-        return None, list(RawPromptDescriptor.Factory(filename=filename, version=get_version(filename)))
-
     @property
     def glob_pattern(self) -> str:
         return "*.prompt"
 
     @property
     def kind(self) -> list[RecordKind]:
-        return [RecordKind.RawPrompt]
+        return [RecordKind.Prompt]
 
-
-class DotJinjaFileIndexer(BaseFileIndexer):
     def start_descriptors(
-        self, filename: pathlib.Path, get_path_version
+        self, filename: pathlib.Path, get_version
     ) -> typing.Tuple[list[ValueError], list[RecordDescriptor]]:
-        return None, list(JinjaPromptDescriptor.Factory(filename=filename, version=get_path_version(filename)))
-
-    @property
-    def glob_pattern(self) -> str:
-        return "*.jinja"
-
-    @property
-    def kind(self) -> list[RecordKind]:
-        return [RecordKind.JinjaPrompt]
+        factory_args = {"filename": filename, "version": get_version(filename)}
+        return None, list(PromptDescriptor.Factory(**factory_args))
 
 
 def augment_descriptor(descriptor: RecordDescriptor) -> list[ValueError]:
@@ -193,10 +181,4 @@ def vectorize_descriptor(descriptor: RecordDescriptor, embedding_model: Embeddin
     return None
 
 
-AllIndexers = [
-    DotPyFileIndexer(),
-    DotSqlppFileIndexer(),
-    DotYamlFileIndexer(),
-    DotPromptFileIndexer(),
-    DotJinjaFileIndexer(),
-]
+AllIndexers = [DotPyFileIndexer(), DotSqlppFileIndexer(), DotYamlFileIndexer(), DotPromptFileIndexer()]

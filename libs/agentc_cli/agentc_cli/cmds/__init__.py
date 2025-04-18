@@ -4,11 +4,11 @@ from .env import cmd_env
 from .execute import cmd_execute
 from .find import cmd_find
 from .index import cmd_index
+from .init import cmd_init
 from .ls import cmd_ls
 from .publish import cmd_publish
 from .status import cmd_status
 from .version import cmd_version
-from .web import cmd_web
 
 __all__ = [
     "cmd_add",
@@ -20,6 +20,6 @@ __all__ = [
     "cmd_execute",
     "cmd_status",
     "cmd_version",
-    "cmd_web",
     "cmd_ls",
+    "cmd_init",
 ]

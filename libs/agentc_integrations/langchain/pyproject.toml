@@ -1,0 +1,67 @@
+[project]
+name = "agentc-langchain"
+description = "Collection of LangChain-specific classes and functions used with the Couchbase Agent Catalog project."
+authors = [
+    { name = "Kush Khanna", email = "kush.khanna@couchbase.com" },
+    { name = "Glenn Galvizo", email = "glenn.galvizo@couchbase.com" },
+]
+license = "Apache-2.0"
+dynamic = ["version"]
+requires-python = ">=3.12"
+
+[project.urls]
+repository = "https://github.com/couchbaselabs/agent-catalog"
+documentation = "https://couchbaselabs.github.io/agent-catalog/api.html#langchain-langgraph"
+
+# Version is dynamically pulled from Git.
+[tool.poetry]
+name = "agentc-langchain"
+version = "0.0.0"
+packages = [
+  { include = "agentc_langchain" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+couchbase = "^4.3.0"
+joblib = "^1.4.2"
+langchain = ">=0.2.12"
+langchain-core = ">=0.2.28"
+langchain-openai = ">=0.1.20"
+langchain_couchbase = "^0.2.4"
+pydantic = "^2.10.6"
+requests = "^2.32.3"
+pydantic-settings = "^2.7.1"
+
+# The version of this package will be updated dynamically.
+agentc-core = { path = "../../agentc_core", develop = true }
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.2.2"
+pytest = "^8.3.2"
+pytest-retry = "^1.7.0"
+
+# Note: we only depend on the CLI for tests.
+[tool.poetry.group.dev.dependencies.agentc-cli]
+path = "../../agentc_cli"
+develop = true
+
+[tool.poetry-monoranger-plugin]
+enabled = true
+monorepo-root = "../../../"
+version-pinning-rule = '=='
+
+[tool.poetry-dynamic-versioning]
+enable = true
+format-jinja = "{% if distance == 0 %}{{ base }}{% else %}{{ base }}.post{{ distance }}{% endif %}+g{{ commit }}"
+
+[tool.poetry.requires-plugins]
+poetry-monoranger-plugin = ">=0.4.1"
+poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
+
+[build-system]
+requires = [
+    "poetry-core>=2.1.0",
+    "poetry-dynamic-versioning>=1.8.2"
+]
+build-backend = "poetry_dynamic_versioning.backend"

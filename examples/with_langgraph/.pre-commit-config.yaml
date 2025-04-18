@@ -1,0 +1,44 @@
+repos:
+  # Check various file formats.
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: "v4.6.0"
+    hooks:
+      - id: check-added-large-files
+      - id: check-toml
+      - id: check-yaml
+      - id: check-json
+      - id: check-xml
+      - id: end-of-file-fixer
+        exclude: \.json$
+        files: \.py$
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+
+  # For linting & style checks.
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.1
+    hooks:
+      - id: ruff
+        args: [ "--fix" ]
+      - id: ruff-format
+        name: format code with ruff
+
+  # For indexing --> publishing our tools and prompts.
+  - repo: local
+    hooks:
+      # Note: agentc doesn't strictly follow the pre-commit conventions (i.e., it returns 0 on modification).
+      - id: agentc-index
+        name: index tools and prompts
+        language: system
+        entry: agentc index tools prompts
+        stages: [ post-commit, post-rewrite ]
+        pass_filenames: false
+        always_run: true
+
+      - id: agentc-publish
+        name: publish tools and prompts
+        language: system
+        entry: agentc publish tools prompts
+        stages: [ post-commit, post-rewrite ]
+        pass_filenames: false
+        always_run: true

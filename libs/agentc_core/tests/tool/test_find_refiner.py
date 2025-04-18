@@ -21,6 +21,7 @@ def _generate_test_tools(deltas: list[int]) -> list[SearchResult]:
                     name="dummy tool #" + str(i),
                     description="a dummy tool #" + str(i),
                     source=pathlib.Path("."),
+                    raw="A dummy tool",
                     version=VersionDescriptor(
                         identifier=uuid.uuid4().hex,
                         version_system=VersionSystem.Raw,

@@ -1,9 +1,12 @@
 name: publish
-run-name: 👁️ ${{ github.actor }} has pushed a new commit!
-on: [ push ]
+run-name: 👁️ ${{ github.actor }} has created a new release!
+
+on:
+  release:
+    types: [published]
 
 jobs:
-  Pages:
+  Publish:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,37 +23,11 @@ jobs:
           poetry-version: "latest"
           shell: "bash"
 
-      - name: Add Poetry to path
-        run: echo "${HOME}/.poetry/bin" >> $GITHUB_PATH
+      - name: Run pre-commit
+        uses: pre-commit/action@v3.0.1
 
-      - name: Config our publishing repo
-        run: |
-          poetry config repositories.testpypi https://test.pypi.org/legacy/
-          poetry config pypi-token.testpypi ${{ secrets.TEST_PYPI_API_KEY }}
+      - name: Install repository with Poetry
+        run: scripts/setup.sh dev
 
-# TODO (GLENN): See https://www.ianwootten.co.uk/2020/10/23/publishing-to-pypi-using-github-actions/
-# TODO (GLENN): We need to add a step to make the agentc packages in pyproject.toml not relative.
-# TODO (GLENN): We also need to figure out the versioning here (also to do with pyproject.toml files).
-#      - name: Build and publish the agentc_core package
-#        run: |
-#          cd libs/agentc_core
-#          poetry build
-#          poetry publish -r testpypi
-#
-#      - name: Build and publish the agentc_cli package
-#        run: |
-#          cd libs/agentc_cli
-#          poetry build
-#          poetry publish -r testpypi
-#
-#      - name: Build and publish the agentc_langchain package
-#        run: |
-#          cd libs/agentc_langchain
-#          poetry build
-#          poetry publish -r testpypi
-#
-#      - name: Build and publish the agentc package
-#        run: |
-#          cd libs/agentc
-#          poetry build
-#          poetry publish -r testpypi
+      - name: Build and publish our packages
+        run: scripts/publish.sh

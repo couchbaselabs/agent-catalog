@@ -11,6 +11,7 @@ import uuid
 
 from agentc_core.record.descriptor import RecordDescriptor
 from agentc_core.record.descriptor import RecordKind
+from agentc_core.security import import_module
 from agentc_core.tool.decorator import is_tool
 from agentc_core.tool.generate import HTTPRequestCodeGenerator
 from agentc_core.tool.generate import SemanticSearchCodeGenerator
@@ -83,12 +84,9 @@ class EntryLoader:
         sys.meta_path.append(_ModuleFinder(self._loader))
 
     def _load_module_from_filename(self, filename: pathlib.Path):
-        # TODO (GLENN): We should avoid blindly putting things in our path.
-        if str(filename.parent.absolute()) not in sys.path:
-            sys.path.append(str(filename.parent.absolute()))
         if filename.stem not in self._modules:
             logger.debug(f"Loading module {filename.stem}.")
-            self._modules[filename.stem] = importlib.import_module(filename.stem)
+            self._modules[filename.stem] = import_module(filename)
 
     def _load_module_from_string(self, module_name: str, module_content: str) -> typing.Callable:
         if module_name not in self._modules:
@@ -137,9 +135,10 @@ class EntryLoader:
                     source_file = entries[0].source
                     try:
                         self._load_module_from_filename(source_file)
-                    except ModuleNotFoundError:
+                    except ModuleNotFoundError as e:
+                        logger.debug(f"Swallowing exception {str(e)} (raised while trying to import {source_file}).")
                         logger.warning(f"Module {source_file} not found. Attempting to use the indexed contents.")
-                        self._load_module_from_string(source_file.stem, entries[0].contents)
+                        self._load_module_from_string(source_file.stem, entries[0].raw)
                     for entry in entries:
                         loaded_entry = self._get_tool_from_module(source_file.stem, entry)
                         yield (
@@ -158,7 +157,7 @@ class EntryLoader:
                 case _:
                     raise ValueError("Unexpected tool-kind encountered!")
 
-            for entry, code in zip(entries, generator()):
+            for entry, code in zip(entries, generator(), strict=False):
                 module_id = uuid.uuid4().hex.replace("-", "")
                 self._load_module_from_string(module_id, code)
                 loaded_entry = self._get_tool_from_module(module_id, entry)

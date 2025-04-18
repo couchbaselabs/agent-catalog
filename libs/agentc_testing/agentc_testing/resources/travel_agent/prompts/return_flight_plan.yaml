@@ -1,0 +1,13 @@
+record_kind: prompt
+
+name: return_flight_plan
+
+description: Instructions on how to return the flight plan back to the user.
+
+annotations:
+  framework: "controlflow"
+
+content:
+  Return the formatted travel plan back to the user.
+  In the same message, ask if the travel plan looks okay to continue with.
+  DO NOT return a message without the travel plan.

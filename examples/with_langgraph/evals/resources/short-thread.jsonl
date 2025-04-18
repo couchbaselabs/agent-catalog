@@ -1,0 +1,3 @@
+{"input": ["I want to go to San Francisco.", "I am in LA.", "I'm done, goodbye."], "reference": "List of airlines that serve flights from Los Angeles International Airport (LAX) to San Francisco International Airport (SFO)."}
+{"input": ["Source: SFO, Dest: NRT", "Bye, that's all"], "reference":  "List of airlines that serve flights from San Francisco Internal Airport (SFO) to Tokyo Narita Airport (NRT)."}
+{"input": ["i want to go to LAX from Canyonlands Field Airport"], "reference": "List of airlines that serve flights from Canyonlands Field Airport (CNY) to Los Angeles International Airport (LAX) using one layover."}

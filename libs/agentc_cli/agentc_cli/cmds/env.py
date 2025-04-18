@@ -1,38 +1,24 @@
-import click
+import click_extra
 import importlib.util
 import json
-import os
+import logging
 import re
 
-from ..models.context import Context
-from agentc_core.catalog import LATEST_SNAPSHOT_VERSION
-from agentc_core.defaults import DEFAULT_EMBEDDING_MODEL
+from .util import logging_command
+from agentc_core.config import Config
+
+logger = logging.getLogger(__name__)
 
 
-def cmd_env(ctx: Context = None):
-    if ctx is None:
-        ctx = Context()
-    environment_dict = {
-        "AGENT_CATALOG_ACTIVITY": ctx.activity,
-        "AGENT_CATALOG_CATALOG": ctx.catalog,
-        "AGENT_CATALOG_VERBOSE": ctx.verbose,
-        "AGENT_CATALOG_INTERACTIVE": ctx.interactive,
-        "AGENT_CATALOG_DEBUG": os.getenv("AGENT_CATALOG_DEBUG", False),
-        "AGENT_CATALOG_CONN_STRING": os.getenv("AGENT_CATALOG_CONN_STRING"),
-        "AGENT_CATALOG_USERNAME": os.getenv("AGENT_CATALOG_USERNAME"),
-        "AGENT_CATALOG_PASSWORD": os.getenv("AGENT_CATALOG_PASSWORD"),
-        "AGENT_CATALOG_CONN_ROOT_CERTIFICATE": os.getenv("AGENT_CATALOG_CONN_ROOT_CERTIFICATE"),
-        "AGENT_CATALOG_BUCKET": os.getenv("AGENT_CATALOG_BUCKET"),
-        "AGENT_CATALOG_SNAPSHOT": os.getenv("AGENT_CATALOG_SNAPSHOT", LATEST_SNAPSHOT_VERSION),
-        "AGENT_CATALOG_PROVIDER_OUTPUT": os.getenv("AGENT_CATALOG_PROVIDER_OUTPUT", None),
-        "AGENT_CATALOG_AUDITOR_OUTPUT": os.getenv("AGENT_CATALOG_AUDITOR_OUTPUT", None),
-        "AGENT_CATALOG_EMBEDDING_MODEL": os.getenv("AGENT_CATALOG_EMBEDDING_MODEL", DEFAULT_EMBEDDING_MODEL),
-    }
-    for line in json.dumps(environment_dict, indent=4).split("\n"):
+@logging_command(logger)
+def cmd_env(cfg: Config = None):
+    if cfg is None:
+        cfg = Config()
+    for line in json.dumps(cfg.model_dump(), indent=4).split("\n"):
         if re.match(r'\s*"AGENT_CATALOG_.*": (?!null)', line):
-            click.secho(line, fg="green")
+            click_extra.secho(line, fg="green")
         else:
-            click.echo(line)
+            click_extra.echo(line)
 
 
 # Note: flask is an optional dependency.

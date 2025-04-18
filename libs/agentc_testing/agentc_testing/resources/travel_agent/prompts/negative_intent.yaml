@@ -1,0 +1,11 @@
+record_kind: prompt
+
+name: negative_intent
+
+description: Instructions on what to do when you cannot identify the user intent.
+
+annotations:
+  framework: "controlflow"
+
+content:
+  Tell the user that you cannot help them with their request and explain why.

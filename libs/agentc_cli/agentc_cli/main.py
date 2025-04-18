@@ -1,11 +1,14 @@
-import click
-import dotenv
+import click_extra
+import cloup
+import couchbase.cluster
+import couchbase.exceptions
 import logging
 import os
 import pathlib
 import pydantic
 import sys
 import textwrap
+import typing
 
 from .cmds import cmd_add
 from .cmds import cmd_clean
@@ -13,47 +16,27 @@ from .cmds import cmd_env
 from .cmds import cmd_execute
 from .cmds import cmd_find
 from .cmds import cmd_index
+from .cmds import cmd_init
 from .cmds import cmd_ls
 from .cmds import cmd_publish
 from .cmds import cmd_status
 from .cmds import cmd_version
-from .models import Context
-from agentc_core.catalog import LATEST_SNAPSHOT_VERSION
-from agentc_core.defaults import DEFAULT_ACTIVITY_FOLDER
-from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
-from agentc_core.defaults import DEFAULT_CATALOG_SCOPE
-from agentc_core.defaults import DEFAULT_EMBEDDING_MODEL
+from .util import validate_or_prompt_for_bucket
+from agentc_core.config import LATEST_SNAPSHOT_VERSION
+from agentc_core.config.config import Config
 from agentc_core.defaults import DEFAULT_VERBOSITY_LEVEL
 from agentc_core.record.descriptor import RecordKind
-from agentc_core.util.connection import get_host_name
-from agentc_core.util.models import CouchbaseConnect
-from agentc_core.util.models import Keyspace
-from agentc_core.util.publish import get_buckets
-from agentc_core.util.publish import get_connection
-from pydantic import ValidationError
-
-# Configure all logging here before we continue with our imports.
-# By default, we won't print any log messages below WARNING.
-logging.basicConfig(
-    level=logging.WARNING,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler()],
-)
 
 # Keeping this here, the logging these libraries do can be pretty verbose.
 logging.getLogger("sentence_transformers").setLevel(logging.ERROR)
 logging.getLogger("openapi_parser").setLevel(logging.ERROR)
 
-# TODO: Should we load from ".env.rosetta"?
-# TODO: Or, perhaps even stage specific, like from ".env.rosetta.prod"?
-dotenv.load_dotenv(dotenv.find_dotenv(usecwd=True))
-
 
 # Support abbreviated command aliases, ex: "agentc st" ==> "agentc status".
-# From: https://click.palletsprojects.com/en/8.1.x/advanced/#command-aliases
-class AliasedGroup(click.Group):
+# From: https://click_extra.palletsprojects.com/en/8.1.x/advanced/#command-aliases
+class AliasedGroup(click_extra.ExtraGroup):
     def get_command(self, ctx, cmd_name):
-        rv = click.Group.get_command(self, ctx, cmd_name)
+        rv = click_extra.Group.get_command(self, ctx, cmd_name)
         if rv is not None:
             return rv
 
@@ -62,7 +45,7 @@ class AliasedGroup(click.Group):
             return None
 
         if len(matches) == 1:
-            return click.Group.get_command(self, ctx, matches[0])
+            return click_extra.Group.get_command(self, ctx, matches[0])
 
         ctx.fail(f"Too many matches: {', '.join(sorted(matches))}")
 
@@ -72,100 +55,175 @@ class AliasedGroup(click.Group):
         return cmd.name, cmd, args
 
 
-@click.group(
+@click_extra.group(
     cls=AliasedGroup,
-    epilog="See: https://docs.couchbase.com or https://couchbaselabs.github.io/agent-catalog/index.html# for more information.",
-    context_settings=dict(max_content_width=800),
+    epilog="See https://couchbaselabs.github.io/agent-catalog/index.html for more information.",
+    context_settings={
+        "formatter_settings": click_extra.HelpExtraFormatter.settings(
+            theme=click_extra.HelpExtraTheme.dark().with_(
+                # "click_extra" at the moment only supports dark themes -- but unfortunately this does not play well
+                # with light backgrounds (e.g., our docs).
+                # TODO (GLENN): When click_extra gets around to making an actual light theme, use that instead.
+                invoked_command=cloup.Style(fg=cloup.Color.cyan, italic=True)
+            )
+        )
+    },
 )
-@click.option(
-    "-c",
-    "--catalog",
-    default=DEFAULT_CATALOG_FOLDER,
-    type=click.Path(exists=False, file_okay=False, dir_okay=True),
-    help="""Directory of the local catalog files.""",
-    envvar="AGENT_CATALOG_CATALOG",
-    show_default=True,
-)
-@click.option(
-    "-a",
-    "--activity",
-    default=DEFAULT_ACTIVITY_FOLDER,
-    type=click.Path(exists=False, file_okay=False, dir_okay=True),
-    help="""Directory of the local activity files (runtime data).""",
-    envvar="AGENT_CATALOG_ACTIVITY",
-    show_default=True,
-)
-@click.option(
+@click_extra.option(
     "-v",
     "--verbose",
     default=DEFAULT_VERBOSITY_LEVEL,
-    type=click.IntRange(min=0, max=2, clamp=True),
+    type=click_extra.IntRange(min=0, max=2, clamp=True),
     count=True,
     help="Flag to enable verbose output.",
-    envvar="AGENT_CATALOG_VERBOSE",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "-i/-ni",
     "--interactive/--no-interactive",
     is_flag=True,
     default=True,
     help="Flag to enable interactive mode.",
-    envvar="AGENT_CATALOG_INTERACTIVE",
     show_default=True,
 )
-@click.pass_context
-def click_main(ctx, catalog, activity, verbose, interactive):
-    """The Couchbase Agent Catalog command line tool."""
-    ctx.obj = Context(activity=activity, catalog=catalog, verbose=verbose, interactive=interactive)
+@click_extra.pass_context
+def agentc(ctx: click_extra.Context, verbose: int, interactive: bool):
+    """
+    The Couchbase Agent Catalog command line tool.
+    """
+    ctx.obj = Config(
+        # TODO (GLENN): We really need to use this "verbosity_level" parameter more.
+        verbosity_level=verbose,
+        with_interaction=interactive,
+    )
 
 
-@click_main.command()
-@click.option(
+@agentc.command()
+@click_extra.argument("targets", type=click_extra.Choice(["catalog", "activity"], case_sensitive=False), nargs=-1)
+@click_extra.option(
+    "--db/--no-db",
+    default=True,
+    is_flag=True,
+    help="Flag to enable / disable DB initialization.",
+    show_default=True,
+)
+@click_extra.option(
+    "--local/--no-local",
+    default=True,
+    is_flag=True,
+    help="Flag to enable / disable local FS initialization.",
+    show_default=True,
+)
+@click_extra.option(
+    "--bucket",
+    default=None,
+    type=str,
+    help="Name of the Couchbase bucket to initialize in.",
+    show_default=False,
+)
+@click_extra.pass_context
+def init(
+    ctx: click_extra.Context,
+    targets: list[typing.Literal["catalog", "activity"]],
+    db: bool,
+    local: bool,
+    bucket: str = None,
+):
+    """
+    Initialize the necessary files/collections for your working Agent Catalog environment.
+    """
+    cfg: Config = ctx.obj
+
+    # By default, we will initialize everything.
+    if not targets:
+        targets = ["catalog", "activity"]
+
+    # Set our bucket (if it is not already set).
+    if db:
+        validate_or_prompt_for_bucket(cfg, bucket)
+
+    cmd_init(
+        cfg=cfg,
+        targets=targets,
+        db=db,
+        local=local,
+    )
+
+
+@agentc.command()
+@click_extra.option(
     "-o",
     "--output",
     default=os.getcwd(),
-    type=click.Path(exists=False, file_okay=False, dir_okay=True, path_type=pathlib.Path),
+    show_default=False,
+    type=click_extra.Path(exists=False, file_okay=False, dir_okay=True, path_type=pathlib.Path),
     help="Location to save the generated tool / prompt to. Defaults to your current working directory.",
 )
-@click.option(
-    "--record-kind", type=click.Choice([c for c in RecordKind], case_sensitive=False), default=None, show_default=True
+@click_extra.option(
+    "--kind", type=click_extra.Choice([c for c in RecordKind], case_sensitive=False), default=None, show_default=True
 )
-@click.pass_context
-def add(ctx, output: pathlib.Path, record_kind: RecordKind):
-    """Interactively create a new tool or prompt and save it to the filesystem (output). You MUST edit the generated file as per your requirements!"""
-    ctx_obj: Context = ctx.obj
-    if not ctx_obj.interactive:
-        click.secho(
+@click_extra.pass_context
+def add(ctx, output: pathlib.Path, kind: RecordKind):
+    """
+    Interactively create a new tool or prompt and save it to the filesystem (output).
+    You MUST edit the generated file as per your requirements!
+    """
+    cfg: Config = ctx.obj
+    if not cfg.with_interaction:
+        click_extra.secho(
             "ERROR: Cannot run agentc add in non-interactive mode! "
             "Specify your command without the non-interactive flag. ",
             fg="red",
         )
         return
 
-    if record_kind is None:
-        record_kind = click.prompt("Record Kind", type=click.Choice([c for c in RecordKind], case_sensitive=False))
-    cmd_add(ctx=ctx_obj, output=output, record_kind=record_kind)
+    if kind is None:
+        kind = click_extra.prompt("Record Kind", type=click_extra.Choice([c for c in RecordKind], case_sensitive=False))
+    cmd_add(cfg=cfg, output=output, kind=kind)
 
 
-@click_main.command()
-@click.argument(
-    "catalog",
-    type=click.Choice(["local", "db"], case_sensitive=False),
+@agentc.command()
+@click_extra.argument(
+    "targets",
+    type=click_extra.Choice(["catalog", "activity"], case_sensitive=False),
     nargs=-1,
 )
-@click.argument(
-    "type_metadata",
-    type=click.Choice(["catalog", "activity", "all"], case_sensitive=False),
+@click_extra.option(
+    "--db/--no-db",
+    default=True,
+    is_flag=True,
+    help="Flag to perform / not-perform a DB clean.",
+    show_default=True,
 )
-@click.option(
+@click_extra.option(
+    "--local/--no-local",
+    default=True,
+    is_flag=True,
+    help="Flag to perform / not-perform a local FS clean.",
+    show_default=True,
+)
+@click_extra.option(
+    "--tools/--no-tools",
+    default=True,
+    is_flag=True,
+    help="Flag to clean / avoid-cleaning the tool-catalog.",
+    show_default=True,
+)
+@click_extra.option(
+    "--prompts/--no-prompts",
+    default=True,
+    is_flag=True,
+    help="Flag to clean / avoid-cleaning the prompt-catalog.",
+    show_default=True,
+)
+@click_extra.option(
     "--bucket",
     default=None,
     type=str,
-    help="Name of the Couchbase bucket to remove agent-catalog from.",
+    help="Name of the Couchbase bucket to remove Agent Catalog from.",
     show_default=False,
 )
-@click.option(
+@click_extra.option(
     "-cid",
     "--catalog-id",
     multiple=True,
@@ -174,31 +232,68 @@ def add(ctx, output: pathlib.Path, record_kind: RecordKind):
     help="Catalog ID used to remove a specific catalog version from the DB catalog.",
     show_default=False,
 )
-@click.option(
+@click_extra.option(
     "-y",
-    "--skip_confirm",
+    "--yes",
     default=False,
     is_flag=True,
-    help="Flag to delete catalogs without confirm prompting.",
+    help="Flag to delete local-FS and DB catalog data without confirmation.",
     show_default=False,
 )
-@click.option(
-    "--kind",
-    default="all",
-    type=click.Choice(["tool", "prompt", "all"], case_sensitive=True),
-    help="Kind of catalog to remove versions from.",
-    show_default=True,
+@click_extra.option(
+    "-d",
+    "--date",
+    default=None,
+    type=str,
+    help="Datetime of the oldest log entry to keep (older log entries will be deleted).",
+    show_default=False,
 )
-@click.pass_context
-def clean(ctx, catalog, type_metadata, bucket, catalog_id, skip_confirm, kind):
-    """Delete all or specific (catalog and/or activity) agent related files / collections."""
-    ctx_obj: Context = ctx.obj
-    clean_db = "db" in catalog
-    clean_local = "local" in catalog
+@click_extra.pass_context
+def clean(
+    ctx: click_extra.Context,
+    targets: list[typing.Literal["catalog", "activity"]],
+    db: bool,
+    local: bool,
+    tools: bool,
+    prompts: bool,
+    catalog_id: list[str] = None,
+    bucket: str = None,
+    yes: bool = False,
+    date: str = None,
+):
+    """Delete all or specific (catalog and/or activity) Agent Catalog related files / collections."""
+    cfg: Config = ctx.obj
 
-    # If a user specifies non-interactive AND does not specify skip_prompt, we will exit here.
-    if not ctx_obj.interactive and not skip_confirm:
-        click.secho(
+    # By default, we will clean everything.
+    if not targets:
+        targets = ["catalog", "activity"]
+
+    kind: list[typing.Literal["tool", "prompt"]] = list()
+    if tools:
+        kind.append("tool")
+    if prompts:
+        kind.append("prompt")
+
+    # If a user specifies both --no-tools and --no-prompts AND only "catalog", we have nothing to delete.
+    if len(kind) == 0 and len(targets) == 1 and targets[0] == "catalog":
+        click_extra.secho(
+            'WARNING: No action taken. "catalog" with the flags --no-tools and --no-prompts have ' "been specified.",
+            fg="yellow",
+        )
+        return
+
+    # If a user specifies date and does not specify a sole target of "activity", then we will error out.
+    if date is not None and len(targets) != 1 and targets[0] != "activity":
+        click_extra.secho(
+            "ERROR: When using the date option, only activity logs can be deleted (not catalog entries). "
+            "For example: `agentc clean activity --date/-d '2021-09-01T00:00:00'.",
+            fg="red",
+        )
+        return
+
+    # If a user specifies non-interactive AND does not specify yes, we will exit here.
+    if not cfg.with_interaction and not yes:
+        click_extra.secho(
             "WARNING: No action taken. Specify -y to delete catalogs without confirmation, "
             "or specify your command with interactive mode.",
             fg="yellow",
@@ -206,131 +301,94 @@ def clean(ctx, catalog, type_metadata, bucket, catalog_id, skip_confirm, kind):
         return
 
     # Similar to the rm command, we will prompt the user for each catalog to delete.
-    if clean_local:
-        if not skip_confirm:
-            click.confirm(
+    if local:
+        if not yes:
+            click_extra.confirm(
                 "Are you sure you want to delete catalogs and/or audit logs from your filesystem?", abort=True
             )
         cmd_clean(
-            ctx=ctx_obj,
-            is_local=clean_local,
-            is_db=clean_db,
-            bucket=None,
-            cluster=None,
+            cfg=cfg,
+            targets=targets,
+            kind=kind,
+            is_local=True,
+            is_db=False,
             catalog_ids=None,
-            kind=None,
-            type_metadata=type_metadata,
         )
 
-    if clean_db:
-        if not skip_confirm:
-            click.confirm("Are you sure you want to delete catalogs and/or audit logs from the database?", abort=True)
-
-        # Load all Couchbase connection related data from env
-        connection_details_env = CouchbaseConnect(
-            connection_url=os.getenv("AGENT_CATALOG_CONN_STRING"),
-            username=os.getenv("AGENT_CATALOG_USERNAME"),
-            password=os.getenv("AGENT_CATALOG_PASSWORD"),
-            host=get_host_name(os.getenv("AGENT_CATALOG_CONN_STRING")),
-            certificate=os.getenv("AGENT_CATALOG_CONN_ROOT_CERTIFICATE"),
-        )
-
-        # Establish a connection
-        err, cluster = get_connection(conn=connection_details_env)
-        if err:
-            raise ValueError(f"Unable to connect to Couchbase!\n{err}")
-
-        # Determine the bucket.
-        buckets = get_buckets(cluster=cluster)
-        if bucket is None and ctx_obj.interactive:
-            bucket = click.prompt("Bucket", type=click.Choice(buckets), show_choices=True)
-
-        elif bucket is not None and bucket not in buckets:
-            raise ValueError(
-                "Bucket does not exist!\n"
-                f"Available buckets from cluster are: {','.join(buckets)}\nRun agentc --help for more information."
+    if db:
+        if not yes:
+            click_extra.confirm(
+                "Are you sure you want to delete catalogs and/or audit logs from the database?", abort=True
             )
 
-        elif bucket is None and not ctx_obj.interactive:
-            raise ValueError(
-                "Bucket must be specified to delete catalog from the database."
-                "Add --bucket BUCKET_NAME to your command or run 'agent clean' in interactive mode."
-            )
+        # Set our bucket (if it is not already set).
+        validate_or_prompt_for_bucket(cfg, bucket)
 
         # Perform our clean operation.
-        kind_list = ["tool", "prompt"] if kind == "all" else [kind]
         cmd_clean(
-            ctx=ctx.obj,
-            is_db=clean_db,
-            is_local=clean_local,
-            bucket=bucket,
-            cluster=cluster,
+            cfg=cfg,
+            is_local=False,
+            is_db=True,
             catalog_ids=catalog_id,
-            kind=kind_list,
-        )
-        cluster.close()
-
-    if not clean_db and not clean_local:
-        raise ValueError(
-            "No catalogs specified to clean. "
-            "Please specify either 'local' or 'db' or both to clean your catalog(s). "
+            kind=kind,
+            targets=targets,
         )
 
 
-@click_main.command()
-@click.pass_context
+@agentc.command()
+@click_extra.pass_context
 def env(ctx):
-    """Return all agentc related environment and configuration parameters as a JSON object."""
-    cmd_env(ctx=ctx.obj)
+    """Return all Agent Catalog related environment and configuration parameters as a JSON object."""
+    cmd_env(cfg=ctx.obj)
 
 
-@click_main.command()
-@click.argument(
+@agentc.command()
+@click_extra.argument(
     "kind",
-    type=click.Choice(["tool", "prompt"], case_sensitive=False),
-    default="tool",
+    type=click_extra.Choice(["tools", "prompts"], case_sensitive=False),
 )
-@click.option(
+@click_extra.option(
     "--query",
     default=None,
     help="User query describing the task for which tools / prompts are needed. "
     "This field or --name must be specified.",
     show_default=False,
 )
-@click.option(
+@click_extra.option(
     "--name",
     default=None,
-    help="Name of catalog item to retrieve from the catalog directly. " "This field or --query must be specified.",
+    help="Name of catalog item to retrieve from the catalog directly. This field or --query must be specified.",
     show_default=False,
 )
-@click.option(
+@click_extra.option(
     "--bucket",
     default=None,
     type=str,
     help="Name of the Couchbase bucket to search.",
     show_default=False,
 )
-@click.option(
+@click_extra.option(
     "--limit",
     default=1,
+    type=int,
     help="Maximum number of results to show.",
     show_default=True,
 )
-@click.option(
-    "--include-dirty",
+@click_extra.option(
+    "--dirty/--no-dirty",
     default=True,
     is_flag=True,
     help="Flag to process and search amongst dirty source files.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--refiner",
-    type=click.Choice(["ClosestCluster", "None"], case_sensitive=False),
+    type=click_extra.Choice(["ClosestCluster", "None"], case_sensitive=False),
     default=None,
     help="Class to post-process (rerank, prune, etc...) find results.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "-an",
     "--annotations",
     type=str,
@@ -338,7 +396,7 @@ def env(ctx):
     help='Tool-specific annotations to filter by, specified using KEY="VALUE" (AND|OR KEY="VALUE")*.',
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "-cid",
     "--catalog-id",
     type=str,
@@ -346,361 +404,271 @@ def env(ctx):
     help="Catalog ID that uniquely specifies a catalog version / snapshot (git commit id).",
     show_default=True,
 )
-@click.option(
-    "-db",
-    "--search-db",
-    default=False,
+@click_extra.option(
+    "--db/--no-db",
+    default=None,
     is_flag=True,
-    help="Flag to force a DB-only search.",
+    help="Flag to include / exclude items from the DB-catalog while searching.",
     show_default=True,
 )
-@click.option(
-    "-local",
-    "--search-local",
-    default=False,
+@click_extra.option(
+    "--local/--no-local",
+    default=True,
     is_flag=True,
-    help="Flag to force a local-only search.",
+    help="Flag to include / exclude items from the local-FS-catalog while searching.",
     show_default=True,
 )
-@click.pass_context
+@click_extra.pass_context
 def find(
-    ctx, query, name, kind, bucket, limit, include_dirty, refiner, annotations, catalog_id, search_db, search_local
+    ctx: click_extra.Context,
+    kind: typing.Literal["tools", "prompts"],
+    query: str = None,
+    name: str = None,
+    bucket: str = None,
+    limit: int = 1,
+    dirty: bool = True,
+    refiner: typing.Literal["ClosestCluster", "None"] = "None",
+    annotations: str = None,
+    catalog_id: str = LATEST_SNAPSHOT_VERSION,
+    db: bool | None = None,
+    local: bool | None = True,
 ):
-    """Find items from the catalog based on a natural language QUERY string or by name."""
-    ctx_obj: Context = ctx.obj
+    """Find items from the catalog based on a natural language string (query) or by name."""
+    cfg: Config = ctx.obj
 
+    # TODO (GLENN): We should perform the same best-effort work for search_local.
     # Perform a best-effort attempt to connect to the database if search_db is not raised.
-    if not search_local:
+    if db is None or db is True:
         try:
-            # Load all Couchbase connection related data from env
-            connection_details_env = CouchbaseConnect(
-                connection_url=os.getenv("AGENT_CATALOG_CONN_STRING"),
-                username=os.getenv("AGENT_CATALOG_USERNAME"),
-                password=os.getenv("AGENT_CATALOG_PASSWORD"),
-                host=get_host_name(os.getenv("AGENT_CATALOG_CONN_STRING")),
-                certificate=os.getenv("AGENT_CATALOG_CONN_ROOT_CERTIFICATE"),
-            )
+            validate_or_prompt_for_bucket(cfg, bucket)
 
-            # Establish a connection
-            err, cluster = get_connection(conn=connection_details_env)
-            if err and search_db:
-                raise ValueError(f"Unable to connect to Couchbase!\n{err}")
-
-        except pydantic.ValidationError as e:
-            cluster = None
-            if search_db:
+        except (couchbase.exceptions.CouchbaseException, ValueError) as e:
+            if db is True:
                 raise e
-    else:
-        cluster = None
-
-    if cluster is not None:
-        # Determine the bucket.
-        buckets = get_buckets(cluster=cluster)
-        if bucket is None and ctx_obj.interactive:
-            bucket = click.prompt("Bucket", type=click.Choice(buckets), show_choices=True)
-
-        elif bucket is not None and bucket not in buckets:
-            raise ValueError(
-                "Bucket does not exist!\n"
-                f"Available buckets from cluster are: {','.join(buckets)}\nRun agentc --help for more information."
-            )
-
-        elif bucket is None and not ctx_obj.interactive:
-            raise ValueError(
-                "Bucket must be specified to search the database catalog."
-                "Add --bucket BUCKET_NAME to your command or run agentc clean in interactive mode."
-            )
-
-    else:
-        bucket = None
+            db = False
 
     cmd_find(
-        ctx=ctx.obj,
+        cfg=cfg,
+        kind=kind,
+        with_db=db,
+        with_local=local,
         query=query,
         name=name,
-        kind=kind,
         limit=limit,
-        include_dirty=include_dirty,
+        include_dirty=dirty,
         refiner=refiner,
         annotations=annotations,
         catalog_id=catalog_id,
-        bucket=bucket,
-        cluster=cluster,
-        force_db=search_db,
     )
-    if cluster is not None:
-        cluster.close()
 
 
-@click_main.command()
-@click.argument("source_dirs", nargs=-1)
-@click.option(
+@agentc.command()
+@click_extra.argument("sources", nargs=-1)
+@click_extra.option(
     "--prompts/--no-prompts",
     is_flag=True,
     default=True,
-    help="Flag to (avoid) ignoring prompts when indexing source files into the local catalog.",
+    help="Flag to look for / ignore prompts when indexing source files into the local catalog.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--tools/--no-tools",
     is_flag=True,
     default=True,
-    help="Flag to (avoid) ignoring tools when indexing source files into the local catalog.",
+    help="Flag to look for / ignore tools when indexing source files into the local catalog.",
     show_default=True,
 )
-@click.option(
-    "-em",
-    "--embedding-model",
-    default=DEFAULT_EMBEDDING_MODEL,
-    help="Embedding model used when indexing source files into the local catalog.",
-    show_default=True,
-)
-@click.option(
+@click_extra.option(
     "--dry-run",
     default=False,
     is_flag=True,
     help="Flag to prevent catalog changes.",
     show_default=True,
 )
-@click.pass_context
-def index(ctx, source_dirs, tools, prompts, embedding_model, dry_run):
-    """Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
+@click_extra.pass_context
+def index(ctx: click_extra.Context, sources: list[str], tools: bool, prompts: bool, dry_run: bool = False):
+    """Walk the source directory trees (sources) to index source files into the local catalog.
     Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc."""
-
-    if not source_dirs:
-        raise ValueError(
-            "Source directories to index not provided!!\n"
-            "Please use the command 'agentc index --help' for more information."
-        )
-
-    kinds = list()
+    kind = list()
     if tools:
-        kinds.append("tool")
+        kind.append("tool")
     if prompts:
-        kinds.append("prompt")
-    if len(kinds) == 0:
-        raise ValueError(
-            "No kinds specified!\n"
-            "Please specify at least one of 'tool' (via --tools) or 'prompt' (via --prompts) to index the "
-            "source directories."
+        kind.append("prompt")
+
+    if not sources:
+        click_extra.secho(
+            "WARNING: No action taken. No source directories have been specified. "
+            "Please use the command 'agentc index --help' for more information.",
+            fg="yellow",
         )
+        return
+
+    # Both "--no-tools" and "--no-prompts" have been specified.
+    if len(kind) == 0:
+        click_extra.secho(
+            "WARNING: No action taken. Both flags --no-tools and --no-prompts have been specified.",
+            fg="yellow",
+        )
+        return
+
     cmd_index(
-        ctx=ctx.obj,
-        source_dirs=source_dirs,
-        kinds=kinds,
-        embedding_model_name=embedding_model,
+        cfg=ctx.obj,
+        source_dirs=sources,
+        kinds=kind,
         dry_run=dry_run,
     )
 
 
-@click_main.command()
-@click.argument(
+@agentc.command()
+@click_extra.argument(
     "kind",
     nargs=-1,
-    type=click.Choice(["tool", "prompt", "log"], case_sensitive=False),
+    type=click_extra.Choice(["tools", "prompts", "logs"], case_sensitive=False),
 )
-@click.option(
+@click_extra.option(
     "--bucket",
     default=None,
     type=str,
     help="Name of the Couchbase bucket to publish to.",
     show_default=False,
 )
-@click.option(
+@click_extra.option(
     "-an",
     "--annotations",
     multiple=True,
-    type=click.Tuple([str, str]),
+    type=click_extra.Tuple([str, str]),
     default=[],
     help="Snapshot level annotations to be added while publishing catalogs.",
     show_default=True,
 )
-@click.pass_context
-def publish(ctx, kind, bucket, annotations):
+@click_extra.pass_context
+def publish(
+    ctx: click_extra.Context, kind: list[typing.Literal["tools", "prompts", "logs"]], bucket: str, annotations: str
+):
     """Upload the local catalog and/or logs to a Couchbase instance.
-    By default, only tools and prompts are published unless log is specified."""
-    ctx_obj: Context = ctx.obj
+    By default, only tools and prompts are published unless log is explicitly specified."""
+    kind = ["tools", "prompts"] if len(kind) == 0 else kind
 
-    # By default, we'll publish everything.
-    kind = ["tool", "prompt"] if len(kind) == 0 else list(kind)
-
-    # Load all Couchbase connection related data from env
-    connection_details_env = CouchbaseConnect(
-        connection_url=os.getenv("AGENT_CATALOG_CONN_STRING"),
-        username=os.getenv("AGENT_CATALOG_USERNAME"),
-        password=os.getenv("AGENT_CATALOG_PASSWORD"),
-        host=get_host_name(os.getenv("AGENT_CATALOG_CONN_STRING")),
-        certificate=os.getenv("AGENT_CATALOG_CONN_ROOT_CERTIFICATE"),
-    )
-
-    # Establish a connection
-    err, cluster = get_connection(conn=connection_details_env)
-    if err:
-        raise ValueError(f"Unable to connect to Couchbase!\n{err}")
-
-    # Determine the bucket.
-    buckets = get_buckets(cluster=cluster)
-    cluster.close()
-    if bucket is None and ctx_obj.interactive:
-        bucket = click.prompt("Bucket", type=click.Choice(buckets), show_choices=True)
-
-    elif bucket is not None and bucket not in buckets:
-        raise ValueError(
-            "Bucket does not exist!\n"
-            f"Available buckets from cluster are: {','.join(buckets)}\n"
-            f"Run agentc publish --help for more information."
-        )
-
-    elif bucket is None and not ctx_obj.interactive:
-        raise ValueError(
-            "Bucket must be specified to publish to the database catalog."
-            "Add --bucket BUCKET_NAME to your command or run agentc clean in interactive mode."
-        )
-
-    # Get keyspace and connection details
-    keyspace_details = Keyspace(bucket=bucket, scope=DEFAULT_CATALOG_SCOPE)
-
+    cfg: Config = ctx.obj
+    validate_or_prompt_for_bucket(cfg, bucket)
     cmd_publish(
-        ctx=ctx.obj,
+        cfg=cfg,
         kind=kind,
         annotations=annotations,
-        keyspace=keyspace_details,
-        connection_details_env=connection_details_env,
     )
 
 
-# TODO (GLENN): We should make kind an argument here (similar to publish and clean).
-@click_main.command()
-@click.argument(
+@agentc.command()
+@click_extra.argument(
     "kind",
-    type=click.Choice(["tool", "prompt"], case_sensitive=False),
+    type=click_extra.Choice(["tools", "prompts"], case_sensitive=False),
     nargs=-1,
 )
-@click.option(
-    "--include-dirty",
+@click_extra.option(
+    "--dirty/--no-dirty",
     default=True,
     is_flag=True,
     help="Flag to process and compare against dirty source files.",
     show_default=True,
 )
-@click.option(
-    "-db",
-    "--status-db",
-    default=False,
+@click_extra.option(
+    "--db/--no-db",
+    default=None,
     is_flag=True,
-    help="Flag to check status of catalogs in the Cluster.",
+    help="Flag to include / exclude items from the DB-catalog while displaying status.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
+    "--local/--no-local",
+    default=True,
+    is_flag=True,
+    help="Flag to include / exclude items from the local-FS-catalog while displaying status.",
+    show_default=True,
+)
+@click_extra.option(
     "--bucket",
     default=None,
     type=str,
-    help="Name of Couchbase bucket that is being used for agentc functionalities.",
-    show_default=True,
+    help="Name of the Couchbase bucket hosting the Agent Catalog.",
+    show_default=False,
 )
-@click.option(
-    "--compare",
-    default=None,
-    is_flag=True,
-    help="Flag to compare the local catalog with the last published catalog.",
-    show_default=True,
-)
-@click.pass_context
-def status(ctx, kind, include_dirty, status_db, bucket, compare):
-    """Show the status of the local catalog."""
-    ctx_obj: Context = ctx.obj
-
+@click_extra.pass_context
+def status(
+    ctx: click_extra.Context,
+    kind: list[typing.Literal["tools", "prompts"]],
+    dirty: bool,
+    db: bool = None,
+    local: bool = True,
+    bucket: str = None,
+):
+    """Show the (aggregate) status of your Agent Catalog environment."""
+    cfg: Config = ctx.obj
     if len(kind) == 0:
-        kind = ["tool", "prompt"]
+        kind = ["tools", "prompts"]
 
-    if status_db or compare:
-        # Get keyspace and connection details
-        keyspace_details = Keyspace(bucket="", scope=DEFAULT_CATALOG_SCOPE)
+    # TODO (GLENN): We should perform the same best-effort work for status_local.
+    # Perform a best-effort attempt to connect to the database if status_db is not raised.
+    if db is None or db is True:
+        try:
+            validate_or_prompt_for_bucket(cfg, bucket)
 
-        # Load all Couchbase connection related data from env
-        connection_details_env = CouchbaseConnect(
-            connection_url=os.getenv("AGENT_CATALOG_CONN_STRING"),
-            username=os.getenv("AGENT_CATALOG_USERNAME"),
-            password=os.getenv("AGENT_CATALOG_PASSWORD"),
-            host=get_host_name(os.getenv("AGENT_CATALOG_CONN_STRING")),
-            certificate=os.getenv("AGENT_CATALOG_CONN_ROOT_CERTIFICATE"),
-        )
+        except (couchbase.exceptions.CouchbaseException, ValueError) as e:
+            if db is True:
+                raise e
+            db = False
 
-        # Establish a connection
-        err, cluster = get_connection(conn=connection_details_env)
-        if err:
-            click.echo(str(err))
-            return
-
-        # Get buckets from CB Cluster
-        buckets = get_buckets(cluster=cluster)
-        if bucket is None:
-            # Prompt user to select a bucket
-            bucket = click.prompt("Please select a bucket: ", type=click.Choice(buckets), show_choices=True)
-        elif bucket not in buckets:
-            raise ValueError(
-                "Bucket does not exist!\n"
-                f"Available buckets from cluster are: {','.join(buckets)}\n"
-                f"Run agentc status --help for more information."
-            )
-        keyspace_details.bucket = bucket
-
-        cmd_status(
-            ctx_obj,
-            kind=kind,
-            include_dirty=include_dirty,
-            status_db=status_db,
-            bucket=keyspace_details.bucket,
-            cluster=cluster,
-            compare=compare,
-        )
-    else:
-        cmd_status(ctx.obj, kind=kind, include_dirty=include_dirty, status_db=status_db)
+    cmd_status(
+        cfg=cfg,
+        kind=kind,
+        include_dirty=dirty,
+        with_db=db,
+        with_local=local,
+    )
 
 
-@click_main.command()
-@click.pass_context
+@agentc.command()
+@click_extra.pass_context
 def version(ctx):
-    """Show the current version of agentc."""
+    """Show the current version of Agent Catalog."""
     cmd_version(ctx.obj)
 
 
-@click_main.command()
-@click.option(
+@agentc.command()
+@click_extra.option(
     "--query",
     default=None,
     help="User query describing the task for which tools / prompts are needed. "
     "This field or --name must be specified.",
     show_default=False,
 )
-@click.option(
+@click_extra.option(
     "--name",
     default=None,
-    help="Name of catalog item to retrieve from the catalog directly. " "This field or --query must be specified.",
+    help="Name of catalog item to retrieve from the catalog directly. This field or --query must be specified.",
     show_default=False,
 )
-@click.option(
+@click_extra.option(
     "--bucket",
     default=None,
     type=str,
     help="Name of the Couchbase bucket to search.",
     show_default=False,
 )
-@click.option(
-    "--include-dirty",
+@click_extra.option(
+    "--dirty/--no-dirty",
     default=True,
     is_flag=True,
     help="Flag to process and search amongst dirty source files.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "--refiner",
-    type=click.Choice(["ClosestCluster", "None"], case_sensitive=False),
+    type=click_extra.Choice(["ClosestCluster", "None"], case_sensitive=False),
     default=None,
     help="Class to post-process (rerank, prune, etc...) find results.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "-an",
     "--annotations",
     type=str,
@@ -708,7 +676,7 @@ def version(ctx):
     help='Tool-specific annotations to filter by, specified using KEY="VALUE" (AND|OR KEY="VALUE")*.',
     show_default=True,
 )
-@click.option(
+@click_extra.option(
     "-cid",
     "--catalog-id",
     type=str,
@@ -716,193 +684,133 @@ def version(ctx):
     help="Catalog ID that uniquely specifies a catalog version / snapshot (git commit id).",
     show_default=True,
 )
-@click.option(
-    "-db",
-    "--search-db",
-    default=False,
+@click_extra.option(
+    "--db/--no-db",
+    default=None,
     is_flag=True,
-    help="Flag to force a DB-only search.",
+    help="Flag to include / exclude items from the DB-catalog while searching.",
     show_default=True,
 )
-@click.option(
-    "-local",
-    "--search-local",
-    default=False,
+@click_extra.option(
+    "--local/--no-local",
+    default=True,
     is_flag=True,
-    help="Flag to force a local-only search.",
+    help="Flag to include / exclude items from the local-FS-catalog while searching.",
     show_default=True,
 )
-@click.pass_context
-def execute(ctx, query, name, bucket, include_dirty, refiner, annotations, catalog_id, search_db, search_local):
-    """Search and execute a specific tool."""
-    ctx_obj: Context = ctx.obj
+@click_extra.pass_context
+def execute(
+    ctx: click_extra.Context,
+    query: str,
+    name: str,
+    dirty: bool = True,
+    bucket: str = None,
+    refiner: typing.Literal["ClosestCluster", "None"] = "None",
+    annotations: str = None,
+    catalog_id: list[str] = None,
+    db: bool = None,
+    local: bool = True,
+):
+    """Search for and subsequently execute a specific tool."""
+    cfg: Config = ctx.obj
 
-    # Perform a best-effort attempt to connect to the database if search_db is not raised.
-    if not search_local:
+    # TODO (GLENN): We should perform the same best-effort work for status_local.
+    # Perform a best-effort attempt to connect to the database if status_db is not raised.
+    if db is None or db is True:
         try:
-            # Load all Couchbase connection related data from env
-            connection_details_env = CouchbaseConnect(
-                connection_url=os.getenv("AGENT_CATALOG_CONN_STRING"),
-                username=os.getenv("AGENT_CATALOG_USERNAME"),
-                password=os.getenv("AGENT_CATALOG_PASSWORD"),
-                host=get_host_name(os.getenv("AGENT_CATALOG_CONN_STRING")),
-                certificate=os.getenv("AGENT_CATALOG_CONN_ROOT_CERTIFICATE"),
-            )
+            validate_or_prompt_for_bucket(cfg, bucket)
 
-            # Establish a connection
-            err, cluster = get_connection(conn=connection_details_env)
-            if err and search_db:
-                raise ValueError(f"Unable to connect to Couchbase!\n{err}")
-
-        except pydantic.ValidationError as e:
-            cluster = None
-            if search_db:
+        except (couchbase.exceptions.CouchbaseException, ValueError) as e:
+            if db is True:
                 raise e
-    else:
-        cluster = None
-
-    if cluster is not None:
-        # Determine the bucket.
-        buckets = get_buckets(cluster=cluster)
-        if bucket is None and ctx_obj.interactive:
-            bucket = click.prompt("Bucket", type=click.Choice(buckets), show_choices=True)
-
-        elif bucket is not None and bucket not in buckets:
-            raise ValueError(
-                "Bucket does not exist!\n"
-                f"Available buckets from cluster are: {','.join(buckets)}\nRun agentc --help for more information."
-            )
-
-        elif bucket is None and not ctx_obj.interactive:
-            raise ValueError(
-                "Bucket must be specified to search the database catalog."
-                "Add --bucket BUCKET_NAME to your command or run agentc clean in interactive mode."
-            )
-
-    else:
-        bucket = None
+            db = False
 
     cmd_execute(
-        ctx=ctx.obj,
+        cfg=cfg,
+        with_db=db,
+        with_local=local,
         query=query,
         name=name,
-        include_dirty=include_dirty,
+        include_dirty=dirty,
         refiner=refiner,
         annotations=annotations,
         catalog_id=catalog_id,
-        bucket=bucket,
-        cluster=cluster,
-        force_db=search_db,
     )
 
 
-@click_main.command()
-@click.argument(
+@agentc.command()
+@click_extra.argument(
     "kind",
     nargs=-1,
-    type=click.Choice(["tool", "prompt"], case_sensitive=False),
+    type=click_extra.Choice(["tools", "prompts"], case_sensitive=False),
 )
-@click.option(
-    "-db",
-    "--search-db",
+@click_extra.option(
+    "--db/--no-db",
     default=False,
     is_flag=True,
     help="Flag to force a DB-only search.",
     show_default=True,
 )
-@click.option(
-    "-local",
-    "--search-local",
-    default=False,
+@click_extra.option(
+    "--local/--no-local",
+    default=True,
     is_flag=True,
     help="Flag to force a local-only search.",
     show_default=True,
 )
-@click.option(
+@click_extra.option(
+    "--dirty/--no-dirty",
+    default=True,
+    is_flag=True,
+    help="Flag to process and search amongst dirty source files.",
+    show_default=True,
+)
+@click_extra.option(
     "--bucket",
     default=None,
     type=str,
-    help="Name of Couchbase bucket that is being used for agentc functionalities.",
+    help="Name of Couchbase bucket that is being used for Agent Catalog.",
     show_default=True,
 )
-@click.pass_context
-def ls(ctx, kind, search_db, search_local, bucket):
+@click_extra.pass_context
+def ls(
+    ctx: click_extra.Context,
+    kind: list[typing.Literal["tools", "prompts"]],
+    db: bool = None,
+    local: bool = True,
+    dirty: bool = True,
+    bucket: str = None,
+):
     """List all indexed tools and/or prompts in the catalog."""
-    ctx_obj: Context = ctx.obj
-
-    if search_db and search_local:
-        raise ValueError(
-            "Both local and database force search tags should not be used simultaneously. Please specify one or don't specify any tag to search both."
-        )
+    cfg: Config = ctx.obj
 
     # By default, we'll list everything.
     if len(kind) == 0:
-        kind = ["tool", "prompt"]
+        kind = ["tools", "prompts"]
 
-    # Perform a best-effort attempt to connect to the database if search_db is not raised.
-    if not search_local:
-        try:
-            # Load all Couchbase connection related data from env
-            connection_details_env = CouchbaseConnect(
-                connection_url=os.getenv("AGENT_CATALOG_CONN_STRING"),
-                username=os.getenv("AGENT_CATALOG_USERNAME"),
-                password=os.getenv("AGENT_CATALOG_PASSWORD"),
-                host=get_host_name(os.getenv("AGENT_CATALOG_CONN_STRING")),
-                certificate=os.getenv("AGENT_CATALOG_CONN_ROOT_CERTIFICATE"),
-            )
+    if db:
+        # In contrast to the other commands, we do not perform a best effort attempt to connect to Couchbase here.
+        validate_or_prompt_for_bucket(cfg, bucket)
 
-            # Establish a connection
-            err, cluster = get_connection(conn=connection_details_env)
-            if err and search_db:
-                raise ValueError(f"Unable to connect to Couchbase!\n{err}")
-
-        except pydantic.ValidationError as e:
-            cluster = None
-            if search_db:
-                raise e
-    else:
-        cluster = None
-
-    if cluster is not None:
-        # Determine the bucket.
-        buckets = get_buckets(cluster=cluster)
-        if bucket is None and ctx_obj.interactive:
-            bucket = click.prompt("Bucket", type=click.Choice(buckets), show_choices=True)
-
-        elif bucket is not None and bucket not in buckets:
-            raise ValueError(
-                "Bucket does not exist!\n"
-                f"Available buckets from cluster are: {','.join(buckets)}\nRun agentc --help for more information."
-            )
-
-        elif bucket is None and not ctx_obj.interactive:
-            raise ValueError(
-                "Bucket must be specified to search the database catalog."
-                "Add --bucket BUCKET_NAME to your command or run the command in interactive mode."
-            )
-
-    else:
-        bucket = None
-
-    cmd_ls(ctx=ctx_obj, kind_list=kind, bucket=bucket, cluster=cluster, force_db=search_db)
+    cmd_ls(cfg=cfg, kind=kind, include_dirty=dirty, with_local=local, with_db=db)
 
 
 # @click_main.command()
-# @click.option(
+# @click_extra.option(
 #     "--host-port",
 #     default=DEFAULT_WEB_HOST_PORT,
 #     envvar="AGENT_CATALOG_WEB_HOST_PORT",
 #     help="The host:port to listen on.",
 #     show_default=True,
 # )
-# @click.option(
+# @click_extra.option(
 #     "--debug/--no-debug",
 #     envvar="AGENT_CATALOG_WEB_DEBUG",
 #     default=True,
 #     help="Debug mode.",
 #     show_default=True,
 # )
-# @click.pass_context
+# @click_extra.pass_context
 # def web(ctx, host_port, debug):
 #     """Start a local web server to view our tools."""
 #     cmd_web(ctx.obj, host_port, debug)
@@ -910,25 +818,25 @@ def ls(ctx, kind, search_db, search_local, bucket):
 
 def main():
     try:
-        click_main()
+        agentc()
     except Exception as e:
-        if isinstance(e, ValidationError):
+        if isinstance(e, pydantic.ValidationError):
             for err in e.errors():
                 err_it = iter(err["msg"].splitlines())
-                click.secho(f"ERROR: {next(err_it)}", fg="red", err=True)
+                click_extra.secho(f"ERROR: {next(err_it)}", fg="red", err=True)
                 try:
                     while True:
-                        click.secho(textwrap.indent(next(err_it), "       "), fg="red", err=True)
+                        click_extra.secho(textwrap.indent(next(err_it), "       "), fg="red", err=True)
 
                 except StopIteration:
                     pass
 
         else:
             err_it = iter(str(e).splitlines())
-            click.secho(f"ERROR: {next(err_it)}", fg="red", err=True)
+            click_extra.secho(f"ERROR: {next(err_it)}", fg="red", err=True)
             try:
                 while True:
-                    click.secho(textwrap.indent(next(err_it), "       "), fg="red", err=True)
+                    click_extra.secho(textwrap.indent(next(err_it), "       "), fg="red", err=True)
 
             except StopIteration:
                 pass

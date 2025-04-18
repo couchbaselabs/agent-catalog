@@ -1,10 +1,6 @@
-import abc
-import jinja2
-import jinja2.exceptions
 import logging
 import pathlib
 import pydantic
-import re
 import typing
 import yaml
 
@@ -12,6 +8,7 @@ from ..annotation.annotation import AnnotationPredicate
 from ..record.descriptor import RecordDescriptor
 from ..record.descriptor import RecordKind
 from ..version import VersionDescriptor
+from agentc_core.record.helper import JSONSchemaValidatingMixin
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +22,7 @@ class ToolSearchMetadata(pydantic.BaseModel):
 
     @pydantic.field_validator("annotations")
     @classmethod
-    def annotations_must_be_valid_string(cls, v: str | None):
+    def _annotations_must_be_valid_string(cls, v: str | None):
         # We raise an error on instantiation here if v is not valid.
         if v is not None:
             AnnotationPredicate(v)
@@ -33,7 +30,7 @@ class ToolSearchMetadata(pydantic.BaseModel):
 
     # TODO (GLENN): There is similar validation being done in agentc_cli/find... converge these?
     @pydantic.model_validator(mode="after")
-    def name_or_query_must_be_specified(self):
+    def _name_or_query_must_be_specified(self):
         if self.name is None and self.query is None:
             raise ValueError("Either name or query must be specified!")
         elif self.name is not None and self.query is not None:
@@ -41,97 +38,97 @@ class ToolSearchMetadata(pydantic.BaseModel):
         return self
 
 
-class _BaseFactory(abc.ABC):
-    class PromptMetadata(pydantic.BaseModel):
-        model_config = pydantic.ConfigDict(extra="allow")
-        name: str
-        description: str
-        record_kind: typing.Literal[RecordKind.RawPrompt, RecordKind.JinjaPrompt]
-        annotations: typing.Optional[dict[str, str] | None] = None
-        tools: typing.Optional[list[ToolSearchMetadata] | None] = None
+class PromptDescriptor(RecordDescriptor):
+    content: str | dict[str, typing.Any]
 
-    def __init__(self, filename: pathlib.Path, version: VersionDescriptor):
-        """
-        :param filename: Name of the file to load the record descriptor from.
-        :param version: The version descriptor associated with file describing a set of tools.
-        """
-        self.filename = filename
-        self.version = version
+    output: typing.Optional[dict] = None
+    tools: typing.Optional[list[ToolSearchMetadata]] = pydantic.Field(default_factory=list)
+    record_kind: typing.Literal[RecordKind.Prompt]
 
-    @abc.abstractmethod
-    def __iter__(self):
-        pass
+    class Factory:
+        class Metadata(pydantic.BaseModel, JSONSchemaValidatingMixin):
+            model_config = pydantic.ConfigDict(frozen=True, use_enum_values=True, extra="allow")
 
-    def _get_prompt_metadata(self) -> tuple[dict, str]:
-        with self.filename.open("r") as fp:
-            matches = re.findall(r"---(.*)---(.*)", fp.read(), re.DOTALL)
-            # TODO (GLENN): Make the specification of this front matter optional in the future.
-            if len(matches) == 0:
-                raise ValueError(f"Malformed input! No front-matter found for {self.filename.name}.")
-            front_matter = yaml.safe_load(matches[0][0])
-            prompt_text = matches[0][1]
-        return front_matter, prompt_text
+            record_kind: typing.Literal[RecordKind.Prompt]
+            name: str
+            description: str
+            content: str | dict[str, typing.Any]
+            output: typing.Optional[str | dict] = None
+            tools: typing.Optional[list[ToolSearchMetadata] | None] = None
+            annotations: typing.Optional[dict[str, str] | None] = None
 
+            @pydantic.field_validator("output")
+            @classmethod
+            def _value_should_be_valid_json_schema(cls, v: str | dict):
+                if v is not None and isinstance(v, str):
+                    v = cls.check_if_valid_json_schema_str(v)
+                elif v is not None and isinstance(v, dict):
+                    v = cls.check_if_valid_json_schema_dict(v)
+                else:
+                    raise ValueError("Type must be either a string or a YAML dictionary.")
+                return v
 
-class RawPromptDescriptor(RecordDescriptor):
-    record_kind: typing.Literal[RecordKind.RawPrompt]
-    prompt: str
-    tools: typing.Optional[list[ToolSearchMetadata] | None] = None
+            @pydantic.field_validator("name")
+            @classmethod
+            def _name_should_be_valid_identifier(cls, v: str):
+                if not v.isidentifier():
+                    raise ValueError(f"name {v} is not a valid identifier!")
+                return v
 
-    class Factory(_BaseFactory):
-        def __iter__(self) -> typing.Iterable["RawPromptDescriptor"]:
-            front_matter, prompt_text = self._get_prompt_metadata()
-            metadata = RawPromptDescriptor.Factory.PromptMetadata.model_validate(front_matter)
-            if metadata.__pydantic_extra__:
-                logger.warning(
-                    f"Extra fields found in {self.filename.name}: {metadata.__pydantic_extra__}. "
-                    f"We will ignore these."
-                )
-            descriptor_args = {
-                "name": metadata.name,
-                "description": metadata.description,
-                "record_kind": metadata.record_kind,
-                "tools": metadata.tools,
-                "prompt": prompt_text,
-                "source": self.filename,
-                "version": self.version,
-            }
-            if metadata.annotations is not None:
-                descriptor_args["annotations"] = metadata.annotations
-            yield RawPromptDescriptor(**descriptor_args)
+            @pydantic.field_validator("content")
+            @classmethod
+            def _content_must_only_contain_strings(cls, v: str | dict):
+                if isinstance(v, dict):
 
+                    def traverse_dict(working_dict: dict):
+                        for _k, _v in working_dict.items():
+                            if isinstance(_v, dict):
+                                return traverse_dict(_v)
+                            elif isinstance(_v, str):
+                                return
+                            elif isinstance(_v, list):
+                                for _item in _v:
+                                    if isinstance(_item, dict):
+                                        return traverse_dict(_item)
+                                    elif isinstance(_item, str):
+                                        return
+                                    else:
+                                        raise ValueError("Content must only contain objects, lists, and string values.")
+                            else:
+                                raise ValueError("Content must only contain objects, lists, and string values.")
 
-class JinjaPromptDescriptor(RawPromptDescriptor):
-    record_kind: typing.Literal[RecordKind.JinjaPrompt]
+                    traverse_dict(v)
+                return v
 
-    @pydantic.field_validator("prompt")
-    @classmethod
-    def prompt_must_be_valid_jinja_template(cls, v: str):
-        # We'll rely on Jinja to raise an error here.
-        try:
-            jinja2.Template(source=v, autoescape=True)
-            return v
-        except jinja2.exceptions.TemplateError as e:
-            raise ValueError("Malformed input! Invalid Jinja template.") from e
+        def __init__(self, filename: pathlib.Path, version: VersionDescriptor):
+            """
+            :param filename: Name of the file to load the record descriptor from.
+            :param version: The version descriptor associated with file describing a set of tools.
+            """
+            self.filename = filename
+            self.version = version
 
-    class Factory(_BaseFactory):
-        def __iter__(self) -> typing.Iterable["JinjaPromptDescriptor"]:
-            front_matter, prompt_text = self._get_prompt_metadata()
-            metadata = JinjaPromptDescriptor.Factory.PromptMetadata.model_validate(front_matter)
-            if metadata.__pydantic_extra__:
-                logger.warning(
-                    f"Extra fields found in {self.filename.name}: {metadata.__pydantic_extra__}. "
-                    f"We will ignore these."
-                )
-            descriptor_args = {
-                "name": metadata.name,
-                "description": metadata.description,
-                "record_kind": metadata.record_kind,
-                "tools": metadata.tools,
-                "prompt": prompt_text,
-                "source": self.filename,
-                "version": self.version,
-            }
-            if metadata.annotations is not None:
-                descriptor_args["annotations"] = metadata.annotations
-            yield JinjaPromptDescriptor(**descriptor_args)
+        def __iter__(self) -> typing.Iterable["PromptDescriptor"]:
+            with self.filename.open("r") as fp:
+                metadata = PromptDescriptor.Factory.Metadata.model_validate(yaml.safe_load(fp))
+                if metadata.__pydantic_extra__:
+                    logger.warning(
+                        f"Extra fields found in {self.filename.name}: {metadata.__pydantic_extra__}. "
+                        f"We will ignore these."
+                    )
+
+                # Re-read the entire file into a string (for the raw field).
+                fp.seek(0)
+                descriptor_args = {
+                    "name": metadata.name,
+                    "description": metadata.description,
+                    "record_kind": metadata.record_kind,
+                    "content": metadata.content,
+                    "output": metadata.output,
+                    "tools": metadata.tools,
+                    "source": self.filename,
+                    "raw": fp.read(),
+                    "version": self.version,
+                    "annotations": metadata.annotations,
+                }
+                yield PromptDescriptor(**descriptor_args)

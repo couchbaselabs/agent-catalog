@@ -29,13 +29,12 @@ class VersionDescriptor(pydantic.BaseModel):
         description='The kind of versioning system used with this "snapshot".', default=VersionSystem.Git
     )
     metadata: typing.Optional[dict[str, str]] = pydantic.Field(
-        description="A set of system-defined annotations that are used to identify records. "
-        "This field should NOT be saved on publish, and should only exist in the local catalog. ",
+        description="A set of system-defined annotations that are used to identify records.",
         default=None,
     )
 
     @pydantic.model_validator(mode="after")
-    def non_dirty_must_have_identifier(self) -> typing.Self:
+    def _non_dirty_must_have_identifier(self) -> typing.Self:
         if self.identifier is None and not self.is_dirty:
             raise ValueError("A non-dirty version descriptor cannot have an empty identifier!")
         return self

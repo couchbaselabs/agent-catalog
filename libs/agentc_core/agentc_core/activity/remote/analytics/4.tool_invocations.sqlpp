@@ -1,0 +1,132 @@
+CREATE OR REPLACE ANALYTICS VIEW `[BUCKET_NAME]`.`[SCOPE_NAME]`.ToolInvocations AS
+    FROM
+        (
+            WITH
+                RowOrderedToolLogs AS (
+                    FROM
+                        `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]` AS l
+                    WHERE
+                        l.content.kind = "tool-call" OR
+                        l.content.kind = "tool-result"
+                    SELECT
+                        l.content.kind AS kind,
+                        l.span.session AS sid,
+                        l.*,
+                        ROW_NUMBER()
+                            OVER (
+                                PARTITION BY
+                                    sid
+                                ORDER BY
+                                    STR_TO_MILLIS(l.timestamp) ASC
+                            ) AS rn
+                ),
+                CallToResultRows AS (
+                    FROM
+                        RowOrderedToolLogs rol
+                    GROUP BY
+                        rol.sid
+                        GROUP AS g
+                    LETTING
+                        input_rows = (
+                            FROM
+                                g AS gi
+                            WHERE
+                                gi.rol.kind = "tool-call"
+                            SELECT VALUE
+                                gi.rol.rn
+                            ORDER BY
+                                gi.rol.rn ASC
+                        ),
+                        output_rows = (
+                            FROM
+                                g AS gi
+                            WHERE
+                                gi.rol.kind = "tool-result"
+                            SELECT VALUE
+                                gi.rol.rn
+                            ORDER BY
+                                gi.rol.rn ASC
+                        ),
+                        input_output_pairs = (
+                            FROM
+                               input_rows AS iro,
+                               output_rows AS oro
+                            WHERE
+                                iro < oro
+                            GROUP BY
+                                iro
+                                GROUP AS gi
+                            LETTING
+                                ordered_output = (
+                                    FROM
+                                        gi AS gii
+                                    SELECT VALUE
+                                        gii.oro
+                                    ORDER BY
+                                        gii.oro ASC
+                                )
+                            SELECT
+                                iro               AS input_row,
+                                ordered_output[0] AS output_row
+                        )
+                    SELECT
+                        rol.sid            AS sid,
+                        input_output_pairs AS pairs
+                ),
+                CallToResultRowsUnnested AS (
+                    FROM
+                        CallToResultRows AS c2r,
+                        c2r.pairs AS p
+                    SELECT
+                        c2r.sid      AS sid,
+                        p.input_row  AS inp_rn,
+                        p.output_row AS out_rn
+                ),
+                ToolCalls AS (
+                    FROM
+                        `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]` AS l
+                    WHERE
+                        l.content.kind = "tool-call"
+                    SELECT VALUE
+                        l
+                ),
+                ToolResults AS (
+                    FROM
+                        `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]` AS l
+                    WHERE
+                        l.content.kind = "tool-result"
+                    SELECT VALUE
+                        l
+                )
+            FROM
+                CallToResultRowsUnnested AS c2ru,
+                RowOrderedToolLogs AS rol1,
+                RowOrderedToolLogs AS rol2
+            LETTING
+                tool_call = OBJECT_REMOVE(rol1, "rn"),
+                tool_result = OBJECT_REMOVE(rol2, "rn")
+            WHERE
+                rol1.rn = c2ru.inp_rn AND
+                rol2.rn = c2ru.out_rn
+            SELECT
+                c2ru.sid       AS sid,
+                c2ru.span.name AS root,
+                tool_call      AS tool_call,
+                tool_result    AS tool_result
+            UNION ALL
+            FROM
+                ToolCalls AS tc,
+                ToolResults AS tr
+            WHERE
+                tc.content.tool_call_id = tr.content.tool_call_id
+            SELECT
+                tc.span.session AS sid,
+                tc.span.name    AS root,
+                tc              AS tool_call,
+                tr              AS tool_result
+        ) AS ti
+    GROUP BY
+        tc.identifier
+        GROUP AS g
+    SELECT VALUE
+        g[0].ti;

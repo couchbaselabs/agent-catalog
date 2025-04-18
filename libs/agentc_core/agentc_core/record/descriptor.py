@@ -30,16 +30,7 @@ class RecordKind(enum.StrEnum):
     SQLPPQuery = "sqlpp_query"
     SemanticSearch = "semantic_search"
     HTTPRequest = "http_request"
-
-    # TODO (GLENN): Include other classes for prompts.
-    RawPrompt = "raw_prompt"
-    JinjaPrompt = "jinja_prompt"
-
-    def is_prompt(self) -> bool:
-        return self in [RecordKind.RawPrompt, RecordKind.JinjaPrompt]
-
-    def is_tool(self) -> bool:
-        return self not in [RecordKind.RawPrompt, RecordKind.JinjaPrompt]
+    Prompt = "prompt"
 
 
 class RecordDescriptor(pydantic.BaseModel):
@@ -52,8 +43,7 @@ class RecordDescriptor(pydantic.BaseModel):
         RecordKind.SQLPPQuery,
         RecordKind.SemanticSearch,
         RecordKind.HTTPRequest,
-        RecordKind.RawPrompt,
-        RecordKind.JinjaPrompt,
+        RecordKind.Prompt,
     ] = pydantic.Field(description="The type of catalog entry (python tool, prompt, etc...).")
 
     name: str = pydantic.Field(
@@ -67,11 +57,12 @@ class RecordDescriptor(pydantic.BaseModel):
         "For a *.py tool, this is the python function's docstring. "
     )
 
-    # TODO: One day also track source line numbers?
     source: pathlib.Path = pydantic.Field(
         description="Source location of the file, relative to where index was called.",
         examples=[pathlib.Path("src/tools/finance.py")],
     )
+
+    raw: str = pydantic.Field(description="The raw contents of the file this tool was sourced from.")
 
     version: VersionDescriptor = pydantic.Field(
         description="A low water-mark that defines the earliest version this record is valid under.",

@@ -1,7 +1,7 @@
 #
 # The following file is a template for a Python tool.
 #
-from agentc import tool
+from agentc.catalog import tool
 from pydantic import BaseModel
 
 
@@ -18,8 +18,6 @@ class SalesModel(BaseModel):
 def compute_sales_for_this_week(sales_model: SalesModel) -> float:
     """A description for the function bound to the tool. This is mandatory for tools."""
 
-    # The implementation of the tool (given below) is *not* indexed.
-    # The indexer only cares about the name, function signature, and description.
     return 1.0 * 0.99 + 2.00 % 6.0
 
 

@@ -1,0 +1,71 @@
+# To signal to Agent Catalog that this file is a prompt, the 'record_kind' field must be set to 'prompt'.
+record_kind: prompt
+
+# The name of the prompt must be a valid Python identifier (e.g., no spaces).
+# This field is mandatory, and will be used when searching for prompts by name.
+name: route_finding_node
+
+# A description of where this prompt is used.
+# This field is mandatory, and will be used (indirectly) when performing semantic search for prompts.
+description: >
+  All inputs required to assemble the route-finding node.
+
+# As a supplement to the description similarity search, users can optionally specify search annotations.
+# The values of these annotations MUST be strings (e.g., not 'true', but '"true"').
+# This field is optional, and does not have to be present.
+annotations:
+  framework: "langgraph"
+
+# The tools associated with this prompt.
+tools:
+  # Agent Catalog allows you to specify tools directly by name...
+  - name: "find_direct_routes_between_airports"
+
+    # ...or semantically via query.
+    # You can verify this search on the command line using `agentc find`.
+    # (i.e., `agentc find --query 'finding indirect flights (those with layovers)' --limit 2`)
+  - query: "finding indirect flights (those with layovers)"
+    limit: 2
+
+# The output type (expressed in JSON-schema) associated with this prompt.
+# See https://json-schema.org/understanding-json-schema for more information.
+# This field is commonly supplied to an LLM to generate structured responses.
+# This field is optional, and does not have to be present.
+output:
+  title: Routes
+  description: A list of a sequence of flights (source and destinations) that connect two airports.
+  type: object
+  properties:
+    routes:
+      type: array
+      items:
+        type: object
+        properties:
+          source:
+            type: string
+            description: "The IATA code for the source airport."
+          dest:
+            type: string
+            description: "The IATA code for the destination airport."
+        required: [ source, dest ]
+    is_last_step:
+      type: boolean
+      description: "Whether the agent should continue to find routes between new source and destination cities."
+  required: [ routes, is_last_step ]
+
+# The main content of the prompt.
+# This field is mandatory and must be specified as a string OR a YAML object.
+content:
+  agent_instructions:
+    - >
+      Your task is to use the provided tools to find a route that connects the source and destination airports.
+      You will be given the source and destination cities.
+      You MUST use the provided tools.
+      Use routes with fewer layovers (e.g., if a direct flight and a one-layover flight exists, choose the direct flight).
+    - >
+      If no routes exist, return an empty list.
+      You will then be given new source and destination cities to find routes between.
+      If you cannot find a route after the second attempt, set the `is_last_step` flag to True.
+
+  output_format_instructions: >
+    Ensure that each IATA code is a string and is capitalized for all routes returned.

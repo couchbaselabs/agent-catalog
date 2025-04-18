@@ -1,5 +1,4 @@
 import datetime
-import json
 import pathlib
 import pydantic
 import pytest
@@ -39,6 +38,8 @@ def test_python_function():
         "Calculate the travel costs based on distance, fuel efficiency, and fuel price."
         in positive_1_tools[0].description
     )
+    assert positive_1_tools[0].content.line_no_start == 13
+    assert positive_1_tools[0].content.line_no_end == 16
 
     positive_2_factory = _get_tool_descriptor_factory(
         cls=PythonToolDescriptor.Factory, filename=pathlib.Path("python_function/positive_2.py")
@@ -77,11 +78,11 @@ def test_sqlpp_query():
     assert positive_1_tools[0].secrets[0].couchbase.conn_string == "CB_CONN_STRING"
     assert positive_1_tools[0].secrets[0].couchbase.username == "CB_USERNAME"
     assert positive_1_tools[0].secrets[0].couchbase.password == "CB_PASSWORD"
-    positive_1_input_json = json.loads(positive_1_tools[0].input)
+    positive_1_input_json = positive_1_tools[0].input
     assert positive_1_input_json["type"] == "object"
     assert positive_1_input_json["properties"]["source_airport"]["type"] == "string"
     assert positive_1_input_json["properties"]["destination_airport"]["type"] == "string"
-    positive_1_output_json = json.loads(positive_1_tools[0].output)
+    positive_1_output_json = positive_1_tools[0].output
     assert positive_1_output_json["type"] == "array"
     assert positive_1_output_json["items"]["type"] == "object"
     assert positive_1_output_json["items"]["properties"]["airlines"]["type"] == "array"
@@ -100,11 +101,11 @@ def test_sqlpp_query():
     assert positive_2_tools[0].secrets[0].couchbase.conn_string == "CB_CONN_STRING"
     assert positive_2_tools[0].secrets[0].couchbase.username == "CB_USERNAME"
     assert positive_2_tools[0].secrets[0].couchbase.password == "CB_PASSWORD"
-    positive_2_input_json = json.loads(positive_2_tools[0].input)
+    positive_2_input_json = positive_2_tools[0].input
     assert positive_2_input_json["type"] == "object"
     assert positive_2_input_json["properties"]["source_airport"]["type"] == "string"
     assert positive_2_input_json["properties"]["destination_airport"]["type"] == "string"
-    positive_2_output_json = json.loads(positive_2_tools[0].output)
+    positive_2_output_json = positive_2_tools[0].output
     assert positive_2_output_json["type"] == "array"
     assert positive_2_output_json["items"]["type"] == "object"
     assert positive_2_output_json["items"]["properties"]["airlines"]["type"] == "array"
@@ -123,7 +124,7 @@ def test_sqlpp_query():
     assert positive_3_tools[0].secrets[0].couchbase.conn_string == "CB_CONN_STRING"
     assert positive_3_tools[0].secrets[0].couchbase.username == "CB_USERNAME"
     assert positive_3_tools[0].secrets[0].couchbase.password == "CB_PASSWORD"
-    positive_3_input_json = json.loads(positive_3_tools[0].input)
+    positive_3_input_json = positive_3_tools[0].input
     assert positive_3_input_json["type"] == "object"
     assert positive_3_input_json["properties"]["source_airport"]["type"] == "string"
     assert positive_3_input_json["properties"]["destination_airport"]["type"] == "string"
@@ -164,7 +165,7 @@ def test_semantic_search():
     assert positive_1_tools[0].secrets[0].couchbase.username == "CB_USERNAME"
     assert positive_1_tools[0].secrets[0].couchbase.password == "CB_PASSWORD"
     assert positive_1_tools[0].record_kind == RecordKind.SemanticSearch
-    positive_1_input_json = json.loads(positive_1_tools[0].input)
+    positive_1_input_json = positive_1_tools[0].input
     assert positive_1_input_json["type"] == "object"
     assert positive_1_input_json["properties"]["user_interests"]["type"] == "array"
     assert positive_1_input_json["properties"]["user_interests"]["items"]["type"] == "string"

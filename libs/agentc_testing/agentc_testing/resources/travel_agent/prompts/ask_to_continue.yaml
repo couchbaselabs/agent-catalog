@@ -1,0 +1,14 @@
+record_kind: prompt
+
+name: ask_to_continue
+
+description: Instructions on what to do after addressing a user's request.
+
+annotations:
+  framework: "controlflow"
+
+content:
+  Ask the user if they want to continue.
+  If they say yes, then return true.
+  If they say no, return false.
+  When in doubt, ask the user again for clarification.

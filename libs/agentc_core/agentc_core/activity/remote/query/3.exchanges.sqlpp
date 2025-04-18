@@ -1,0 +1,128 @@
+CREATE OR REPLACE FUNCTION `[BUCKET_NAME]`.`[SCOPE_NAME]`.Exchanges() {
+    (
+        WITH
+            RowOrderedLogs AS (
+                FROM
+                    `[BUCKET_NAME]`.`[SCOPE_NAME]`.`[LOG_COLLECTION_NAME]` AS l
+                SELECT
+                    l.content.kind AS kind,
+                    l.span.session AS sid,
+                    l.*,
+                    ROW_NUMBER()
+                        OVER (
+                            PARTITION BY
+                                sid
+                            ORDER BY
+                                STR_TO_MILLIS(l.timestamp) ASC
+                        ) AS rn
+            ),
+            UserToAssistantRows AS (
+                FROM
+                    RowOrderedLogs rol
+                GROUP BY
+                    rol.sid
+                    GROUP AS g
+                LETTING
+                    -- We are looking for the row numbers corresponding to user -- assistant pairs here.
+                    input_output_pairs = (
+                        FROM
+                            (
+                                FROM
+                                    g AS gi
+                                WHERE
+                                    gi.rol.kind = "user"
+                                SELECT VALUE
+                                    gi.rol.rn
+                                ORDER BY
+                                    gi.rol.rn ASC
+                            ) AS iro,
+                            (
+                                FROM
+                                    g AS gi
+                                WHERE
+                                    gi.rol.kind = "assistant"
+                                SELECT VALUE
+                                    gi.rol.rn
+                                ORDER BY
+                                    gi.rol.rn ASC
+                            ) AS oro
+                        WHERE
+                            iro < oro
+                        GROUP BY
+                            iro
+                            GROUP AS gi
+                        SELECT
+                            iro AS input_row,
+                            -- We are interested in the closest assistant message to the user message.
+                            (
+                                FROM
+                                    gi AS gii
+                                SELECT VALUE
+                                    gii.oro
+                                ORDER BY
+                                    gii.oro ASC
+                                LIMIT
+                                    1
+                            )[0] AS output_row
+                    )
+                SELECT
+                    rol.sid            AS sid,
+                    input_output_pairs AS pairs
+            ),
+            UserToAssistantUnnested AS (
+                FROM
+                    UserToAssistantRows AS u2a,
+                    u2a.pairs AS p
+                SELECT
+                    u2a.sid      AS sid,
+                    p.input_row  AS inp_rn,
+                    p.output_row AS out_rn
+            )
+        FROM
+            UserToAssistantUnnested AS u2au,
+            RowOrderedLogs AS rol
+        WHERE
+            rol.sid = u2au.sid AND
+            rol.rn >= u2au.inp_rn AND
+            rol.rn <= u2au.out_rn
+        GROUP BY
+            rol.sid,
+            rol.span.name[0],
+            u2au.inp_rn,
+            u2au.out_rn
+            GROUP AS g
+        LETTING
+            content = (
+                FROM
+                    g AS gi
+                SELECT VALUE
+                    OBJECT_REMOVE(gi.rol, "rn")
+                ORDER BY
+                    gi.rol.timestamp ASC
+            ),
+            input_content = (
+                FROM
+                    g AS gi
+                WHERE
+                    gi.rol.rn = gi.u2au.inp_rn
+                SELECT VALUE
+                    OBJECT_REMOVE(gi.rol, "rn")
+                LIMIT 1
+            )[0],
+            output_content = (
+                FROM
+                    g AS gi
+                WHERE
+                    gi.rol.rn = gi.u2au.out_rn
+                SELECT VALUE
+                    OBJECT_REMOVE(gi.rol, "rn")
+                LIMIT 1
+            )[0]
+        SELECT
+            rol.sid          AS sid,
+            rol.span.name[0] AS root,
+            input_content    AS `input`,
+            output_content   AS `output`,
+            content          AS content
+    )
+};

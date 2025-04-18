@@ -1,0 +1,47 @@
+record_kind: prompt
+
+name: {{ input_name }}
+
+description: >
+    {{ input_description }}
+
+# As a supplement to the description similarity search, users can optionally specify search annotations.
+# The values of these annotations MUST be strings (e.g., not 'true', but '"true"').
+# This field is optional, and does not have to be present.
+# annotations:
+#  organization: "sequoia"
+
+# The input to an LLM will _generally_ (more often than not) be accompanied by a small collection of tools.
+# This field is used at provider time to search the catalog for tools.
+# This field is optional, and does not have to be present.
+# tools:
+#   # Tools can be specified using the same parameters found in Catalog.find("tool", ...).
+#   # For instance, we can condition on the tool name...
+#   - name: "find_indirect_routes"
+#
+#   # ...the tool name and some annotations...
+#   - name: "find_direct_routes"
+#     annotations: gdpr_2016_compliant = "true"
+#
+#   # ...or even a semantic search via the tool description.
+#   - query: "finding flights by name"
+#     limit: 2
+
+# The output type (expressed in JSON-schema) associated with this prompt.
+# See https://json-schema.org/understanding-json-schema for more information.
+# This field is commonly supplied to an LLM to generate structured responses.
+# This field is optional, and does not have to be present.
+# output:
+#   type: object
+#   properties:
+#     source:
+#       type: string
+#       description: "The IATA code for the source airport."
+#     dest:
+#       type: string
+#       description: "The IATA code for the destination airport."
+
+# The textual input to the model.
+# This can either be a single string or an arbitrarily nested
+content: >
+  <<< Replace me with your prompt! >>>
