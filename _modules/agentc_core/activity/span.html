@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>agentc_core.activity.span &#8212; Agent Catalog v0.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=50651e91" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic_mod.css?v=9b2032db" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=86a354c8" />
+    <script src="../../../_static/documentation_options.js?v=683873e3"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../_static/js/theme.js"></script>
+    <script src="../../../_static/js/petite-vue.js"></script>
+    <link rel="icon" href="../../../_static/favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body data-dark_mode_code_blocks="true">
+
+<div id="top_nav">
+    
+
+    <nav>
+        
+            
+        
+
+        <p id="toggle_sidebar">
+            <a href="#" title="Toggle sidebar">|||</a>
+        </p>
+        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog v0.2.0 documentation</a></h1>
+
+        <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
+    <template v-if="mode == 'light'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_light"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M67.48,18.073c1.913,-1.912 1.913,-5.018 0,-6.931c-1.912,-1.912 -5.018,-1.912 -6.931,0l-6.798,6.799c-1.912,1.912 -1.912,5.018 0,6.931c1.913,1.912 5.018,1.912 6.931,-0l6.798,-6.799Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.728,61.108c1.912,-1.913 1.912,-5.018 -0,-6.931c-1.913,-1.913 -5.019,-1.913 -6.931,-0l-6.799,6.798c-1.912,1.913 -1.912,5.019 0,6.931c1.913,1.913 5.019,1.913 6.931,0l6.799,-6.798Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.682,54.177c-1.913,-1.913 -5.018,-1.913 -6.931,-0c-1.912,1.913 -1.912,5.018 0,6.931l6.798,6.798c1.913,1.913 5.019,1.913 6.931,0c1.913,-1.912 1.913,-5.018 0,-6.931l-6.798,-6.798Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M4.901,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,-0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M18.929,11.142c-1.912,-1.912 -5.018,-1.912 -6.931,0c-1.912,1.913 -1.912,5.019 0,6.931l6.799,6.799c1.912,1.912 5.018,1.912 6.931,-0c1.912,-1.913 1.912,-5.019 -0,-6.931l-6.799,-6.799Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.108,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c-0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c-0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'dark'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_dark"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.901,2.196 -4.901,4.901c0,2.705 2.197,4.901 4.901,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.662,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.989,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.732,61.103c1.91,-1.91 1.91,-5.011 0,-6.921l-0.009,-0.01c-1.91,-1.91 -5.012,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.909,1.91 5.011,1.91 6.92,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.672,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.52,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l-0,-0.01c-0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.901,2.196 -4.901,4.901c0,2.704 2.197,4.9 4.901,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.73,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 -0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.098,34.623c-2.699,0 -4.891,2.192 -4.891,4.892l-0,0.019c-0,2.699 2.192,4.891 4.891,4.891c2.7,0 4.892,-2.192 4.892,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.892,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'darkest'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_darkest"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><path d="M39.315,23.791c8.684,-0 15.734,7.05 15.734,15.733c0,8.684 -7.05,15.734 -15.734,15.734c-8.683,0 -15.733,-7.05 -15.733,-15.734c-0,-8.683 7.05,-15.733 15.733,-15.733Zm0,4.737c6.069,0 10.997,4.927 10.997,10.996c-0,6.069 -4.928,10.996 -10.997,10.996c-6.068,0 -10.996,-4.927 -10.996,-10.996c0,-6.069 4.928,-10.996 10.996,-10.996Z" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.216,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.9,2.196 -4.9,4.901c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.666,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.99,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.737,61.103c1.909,-1.91 1.909,-5.011 -0,-6.921l-0.01,-0.01c-1.91,-1.91 -5.011,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.91,1.91 5.011,1.91 6.921,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.676,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.524,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l0,-0.01c0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.216,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901c-0,2.704 2.196,4.9 4.9,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.734,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.103,34.623c-2.7,0 -4.892,2.192 -4.892,4.892l-0,0.019c-0,2.699 2.192,4.891 4.892,4.891c2.699,0 4.891,-2.192 4.891,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.891,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+</a>
+
+<script>
+(function() {
+    const LOCAL_STORAGE_KEY = 'piccoloThemeMode'
+
+    var initialMode = localStorage.getItem(LOCAL_STORAGE_KEY)
+
+    if (initialMode) {
+        // Make sure the value in local storage is valid
+        if (['light', 'dark', 'darkest'].indexOf(initialMode) == -1) {
+            initialMode = 'light'
+            localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+        }
+    } else {
+        // Check if the client prefers dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            initialMode = 'dark'
+        } else {
+            initialMode = 'light'
+        }
+        localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+    }
+
+    document.documentElement.dataset.mode = initialMode
+
+    PetiteVue.createApp({
+        'mode': initialMode,
+        handleClick() {
+            let currentMode = this.mode
+
+            if (currentMode == 'light') {
+                this.mode = 'dark'
+            } else if (currentMode == 'dark') {
+                this.mode = 'darkest'
+            } else if (currentMode == 'darkest') {
+                this.mode = 'light'
+            }
+
+            document.documentElement.dataset.mode = this.mode
+            localStorage.setItem(LOCAL_STORAGE_KEY, this.mode)
+
+            console.log(this.mode)
+        }
+    }).mount('#mode_toggle')
+})()
+</script>
+            <p class="mobile_search_link">
+                <a href="../../../search.html" title="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65 64" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2">
+                        <path d="M14.873 40.009c-2.315-3.943-3.642-8.532-3.642-13.429C11.231 11.91 23.141 0 37.811 0s26.58 11.91 26.58 26.58-11.91 26.58-26.58 26.58a26.44 26.44 0 0 1-14.277-4.161L9.739 62.794a3.12 3.12 0 0 1-4.413 0L.913 58.382c-1.217-1.218-1.217-3.196 0-4.413l13.96-13.96zM37.811 8.054c10.225 0 18.526 8.301 18.526 18.526s-8.301 18.526-18.526 18.526-18.526-8.301-18.526-18.526S27.586 8.054 37.811 8.054z" fill="#fff" />
+                    </svg>
+                </a>
+            </p>
+        
+
+        <div class="searchbox_wrapper">
+            
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+    </nav>
+</div>
+
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../concept.html">Concepts</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">agentc CLI Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">Package Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../catalog.html">Tool / Prompt Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../log.html">Spans and Log Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../analysis.html">Log Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Help / Questions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../faqs.html">FAQs</a></li>
+</ul>
+
+        </div>
+      </div>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for agentc_core.activity.span</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">couchbase.exceptions</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">textwrap</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChainLogger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">DBLogger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalLogger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.activity.models.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeginContent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.activity.models.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">Content</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.activity.models.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">EndContent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.activity.models.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">KeyValueContent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.activity.models.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">Log</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalCatalogConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">RemoteCatalogConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">VersionDescriptor</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Span">
+<a class="viewcode-back" href="../../../api.html#agentc.span.Span">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Span</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A structured logging context for agent activity.</span>
+
+<span class="sd">    .. card:: Class Description</span>
+
+<span class="sd">        A :py:class:`Span` instance belongs to a tree of other :py:class:`Span` instances, whose root is a</span>
+<span class="sd">        :py:class:`GlobalSpan` instance that is constructed using the :py:meth:`Catalog.Span` method.</span>
+
+<span class="sd">        .. attention::</span>
+
+<span class="sd">            Spans should never be created directly (via constructor), as logs generated by the span must always be</span>
+<span class="sd">            associated with a catalog version and some application structure.</span>
+
+<span class="sd">        Below we illustrate how a tree of :py:class:`Span` instances is created:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            import agentc</span>
+<span class="sd">            catalog = agentc.Catalog()</span>
+<span class="sd">            root_span = catalog.Span(name=&quot;root&quot;)</span>
+<span class="sd">            child_1_span = root_span.new(name=&quot;child_1&quot;)</span>
+<span class="sd">            child_2_span = root_span.new(name=&quot;child_2&quot;)</span>
+
+<span class="sd">        In practice, you&#39;ll likely use different spans for different agents and/or different tasks.</span>
+<span class="sd">        Below we give a small LangGraph example using spans for different agents:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            import agentc</span>
+<span class="sd">            import langgraph.graph</span>
+
+<span class="sd">            catalog = agentc.Catalog()</span>
+<span class="sd">            root_span = catalog.Span(name=&quot;flight_planner&quot;)</span>
+
+<span class="sd">            def front_desk_agent(...):</span>
+<span class="sd">                with root_span.new(name=&quot;front_desk_agent&quot;) as front_desk_span:</span>
+<span class="sd">                    ...</span>
+
+<span class="sd">            def route_finding_agent(...):</span>
+<span class="sd">                with root_span.new(name=&quot;route_finding_agent&quot;) as route_finding_span:</span>
+<span class="sd">                    ...</span>
+
+<span class="sd">            workflow = langgraph.graph.StateGraph()</span>
+<span class="sd">            workflow.add_node(&quot;front_desk_agent&quot;, front_desk_agent)</span>
+<span class="sd">            workflow.add_node(&quot;route_finding_agent&quot;, route_finding_agent)</span>
+<span class="sd">            workflow.set_entry_point(&quot;front_desk_agent&quot;)</span>
+<span class="sd">            workflow.add_edge(&quot;front_desk_agent&quot;, &quot;route_finding_agent&quot;)</span>
+<span class="sd">            ...</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Span.Identifier">
+<a class="viewcode-back" href="../../../api.html#agentc.span.Span.Identifier">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Identifier</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The unique identifier for a :py:class:`Span`.</span>
+
+<span class="sd">        .. card:: Class Description</span>
+
+<span class="sd">            A :py:class:`Span` is uniquely identified by two parts:</span>
+
+<span class="sd">            1. an application-defined multipart name and...</span>
+<span class="sd">            2. a session identifier unique to each run of the application.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">name</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The name of the :py:class:`Span`.</span>
+
+<span class="sd">        Names are built up from the root of the span tree to the leaf, thus the first element of :py:attr:`name` is the</span>
+<span class="sd">        name of the root and the last element is the name of the current span (i.e., the leaf).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">session</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The session identifier of the :py:class:`Span`.</span>
+
+<span class="sd">        Sessions must be unique to each run of the application.</span>
+<span class="sd">        By default, we generate these as UUIDs (see :py:attr:`GlobalSpan.session`).</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+    <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Log</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Method which handles the logging implementation. &quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Name to bind to each message logged within this span. &quot;&quot;&quot;</span>
+
+    <span class="n">parent</span><span class="p">:</span> <span class="s2">&quot;Span&quot;</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Parent span of this span (i.e., the span that had :py:meth:`new` called on it). &quot;&quot;&quot;</span>
+
+    <span class="n">state</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A JSON-serializable object that will be logged on entering and exiting this span. &quot;&quot;&quot;</span>
+
+    <span class="n">iterable</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Flag to indicate whether or not this span should be iterable. &quot;&quot;&quot;</span>
+
+    <span class="n">kwargs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Annotations to apply to all messages logged within this span. &quot;&quot;&quot;</span>
+
+    <span class="n">_logs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Log</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_iterable_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterable</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Iterable span requested for </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+            <span class="c1"># The logs captured here (and this instance&#39;s children) belong to this specific span.</span>
+            <span class="c1"># The &quot;iterable&quot; field itself is not propagated to children.</span>
+            <span class="n">original_logger</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
+
+            <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">original_logger</span><span class="p">)</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">iterable_logger</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Log</span><span class="p">]:</span>
+                <span class="n">log</span> <span class="o">=</span> <span class="n">original_logger</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">log</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">log</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">iterable_logger</span>
+
+        <span class="k">return</span> <span class="bp">self</span>
+
+<div class="viewcode-block" id="Span.new">
+<a class="viewcode-back" href="../../../api.html#agentc.span.Span.new">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">new</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">iterable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Span&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new span under the current :py:class:`Span`.</span>
+
+<span class="sd">        .. card:: Method Description</span>
+
+<span class="sd">            Spans require a name and a session (see :py:attr:`identifier`).</span>
+<span class="sd">            Aside from :py:attr:`name`, :py:attr:`state`, and :py:attr:`iterable`, you can also pass additional keywords</span>
+<span class="sd">            that will be applied as annotations to each :py:meth:`log` call within a span.</span>
+<span class="sd">            As an example, the following code illustrates the use of :py:attr:`kwargs` to add a span-wide &quot;alpha&quot;</span>
+<span class="sd">            annotation:</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                import agentc</span>
+<span class="sd">                catalog = agentc.Catalog()</span>
+<span class="sd">                root_span = catalog.Span(name=&quot;flight_planner&quot;)</span>
+<span class="sd">                with root_span.new(name=&quot;find_airports_task&quot;, alpha=&quot;SDGD&quot;) as child_span:</span>
+<span class="sd">                    child_span.log(content=agentc.span.UserContent(value=&quot;Hello, world!&quot;, &quot;beta&quot;: &quot;412d&quot;))</span>
+
+<span class="sd">            The example code above will generate the three logs below (for brevity, we only show the ``content`` and</span>
+<span class="sd">             ``annotations`` fields):</span>
+
+<span class="sd">            .. code-block:: json</span>
+
+<span class="sd">                { &quot;content&quot;: { &quot;kind&quot;: &quot;begin&quot; }, &quot;annotations&quot;: { &quot;alpha&quot;: &quot;SDGD&quot;} }</span>
+<span class="sd">                { &quot;content&quot;: { &quot;kind&quot;: &quot;user&quot;, &quot;value&quot;: &quot;Hello, world!&quot; },</span>
+<span class="sd">                  &quot;annotations&quot;: { &quot;alpha&quot;: &quot;SDGD&quot;, &quot;beta&quot;: &quot;412d&quot; } }</span>
+<span class="sd">                { &quot;content&quot; : { &quot;kind&quot;: &quot;end&quot; }, &quot;annotations&quot;: { &quot;alpha&quot;: &quot;SDGD&quot; } }</span>
+
+<span class="sd">        :param name: The name of the span.</span>
+<span class="sd">        :param state: The starting state of the span. This will be recorded upon entering and exiting the span.</span>
+<span class="sd">        :param iterable: Whether this new span should be iterable. By default, this is :python:`False`.</span>
+<span class="sd">        :param kwargs: Additional annotations to apply to the span.</span>
+<span class="sd">        :return: A new :py:class:`Span` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># **kwargs take precedence over self.kwargs.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">new_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">new_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_kwargs</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">Span</span><span class="p">(</span>
+            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">iterable</span><span class="o">=</span><span class="n">iterable</span><span class="p">,</span>
+            <span class="n">state</span><span class="o">=</span><span class="n">state</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+            <span class="n">kwargs</span><span class="o">=</span><span class="n">new_kwargs</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Span.log">
+<a class="viewcode-back" href="../../../api.html#agentc.span.Span.log">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="n">Content</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Accept some content (with optional annotations specified by :python:`kwargs`) and generate a</span>
+<span class="sd">        corresponding log entry.</span>
+
+<span class="sd">        .. card:: Method Description</span>
+
+<span class="sd">            The heart of the :py:class:`Span` class is the :py:meth:`log` method.</span>
+<span class="sd">            This method is used to log events that occur within the span.</span>
+<span class="sd">            Users can capture events that occur in popular frameworks like LangChain and LlamaIndex using our helper</span>
+<span class="sd">            packages (see :py:mod:`agentc_langchain`, :py:mod:`agentc_langgraph`, and :py:mod:`agentc_llamaindex`) but</span>
+<span class="sd">            must use those packages in conjunction with this :py:meth:`log` method to capture the full breadth of their</span>
+<span class="sd">            application&#39;s activity.</span>
+<span class="sd">            See `here &lt;log.html&gt;`__ for a list of all available log content types.</span>
+
+<span class="sd">            Users can also use Python&#39;s ``[]`` syntax to write arbitrary JSON-serializable content as a key-value</span>
+<span class="sd">            (:py:class:`KeyValueContent`) pair.</span>
+<span class="sd">            This is useful for logging arbitrary data like metrics during evaluations.</span>
+<span class="sd">            In the example below, we illustrate an example of a system-wide evaluation suite that uses this ``[]``</span>
+<span class="sd">            syntax:</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                import my_agent_app</span>
+<span class="sd">                import my_output_evaluator</span>
+<span class="sd">                import agentc</span>
+
+<span class="sd">                catalog = agentc.Catalog()</span>
+<span class="sd">                evaluation_span = catalog.Span(name=&quot;evaluation_suite&quot;)</span>
+<span class="sd">                with open(&quot;my-evaluation-suite.json&quot;) as fp:</span>
+<span class="sd">                    for i, line in enumerate(fp):</span>
+<span class="sd">                        with evaluation_span.new(name=f&quot;evaluation{i}&quot;) as span:</span>
+<span class="sd">                            output = my_agent_app(span)</span>
+<span class="sd">                            span[&quot;positive_sentiment&quot;] = my_output_evaluator.positive(output)</span>
+<span class="sd">                            span.log(</span>
+<span class="sd">                                content={</span>
+<span class="sd">                                    &quot;kind&quot;: &quot;key-value&quot;,</span>
+<span class="sd">                                    &quot;key&quot;: &quot;negative_sentiment&quot;,</span>
+<span class="sd">                                    &quot;value&quot;: my_output_evaluator.negative(output)</span>
+<span class="sd">                                    },</span>
+<span class="sd">                                alpha=&quot;SDGD&quot;</span>
+<span class="sd">                            )</span>
+
+<span class="sd">            All keywords passed to the :py:meth:`log` method will be applied as annotations to the log entry.</span>
+<span class="sd">            In the example above, the ``alpha`` annotation is applied only to the second log entry.</span>
+<span class="sd">            For span-wide annotations, use the :py:attr:`kwargs` attribute on :py:meth:`new`.</span>
+
+<span class="sd">        :param content: The content to log.</span>
+<span class="sd">        :param kwargs: Additional annotations to apply to the log.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">}</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">kwargs</span>
+        <span class="n">identifier</span><span class="p">:</span> <span class="n">Span</span><span class="o">.</span><span class="n">Identifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span>
+        <span class="n">_log</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">,</span> <span class="n">session_id</span><span class="o">=</span><span class="n">identifier</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">span_name</span><span class="o">=</span><span class="n">identifier</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">new_kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterable</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_log</span><span class="p">)</span></div>
+
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">computed_field</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Span.Identifier&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A unique identifier for this span.&quot;&quot;&quot;</span>
+        <span class="n">name_stack</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">working</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">while</span> <span class="n">working</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name_stack</span> <span class="o">+=</span> <span class="p">[</span><span class="n">working</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+            <span class="n">working</span> <span class="o">=</span> <span class="n">working</span><span class="o">.</span><span class="n">parent</span>
+        <span class="k">return</span> <span class="n">Span</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">name_stack</span><span class="p">)),</span> <span class="n">session</span><span class="o">=</span><span class="n">working</span><span class="o">.</span><span class="n">session</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Span.enter">
+<a class="viewcode-back" href="../../../api.html#agentc.span.Span.enter">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">enter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record a :py:class:`BeginContent` log entry for this span.</span>
+
+<span class="sd">        .. card:: Method Description</span>
+
+<span class="sd">            The :py:meth:`enter` method is to denote the start of the span (optionally logging the incoming state if</span>
+<span class="sd">            specified).</span>
+<span class="sd">            This method is also called when entering the span using the :python:`with` statement.</span>
+<span class="sd">            In the example below, :py:meth:`enter` is called (implicitly).</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                import agentc</span>
+
+<span class="sd">                catalog = agentc.Catalog()</span>
+<span class="sd">                incoming_state = {&quot;flights&quot;: []}</span>
+<span class="sd">                with catalog.Span(name=&quot;flight_planner&quot;, state=incoming_state) as span:</span>
+<span class="sd">                    flight_planner_implementation()</span>
+
+<span class="sd">            On entering the context, one log is generated possessing the content below:</span>
+
+<span class="sd">            .. code-block:: json</span>
+
+<span class="sd">                { &quot;kind&quot;: &quot;begin&quot;, &quot;state&quot;: {&quot;flights&quot;: []} }</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">BeginContent</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">BeginContent</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="Span.exit">
+<a class="viewcode-back" href="../../../api.html#agentc.span.Span.exit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record a :py:class:`EndContent` log entry for this span.</span>
+
+<span class="sd">        .. card:: Method Description</span>
+
+<span class="sd">            The :py:meth:`exit` method is to denote the end of the span (optionally logging the outgoing state if</span>
+<span class="sd">            specified).</span>
+<span class="sd">            This method is also called when exiting the span using the :python:`with` statement *successfully*.</span>
+<span class="sd">            In the example below, :py:meth:`exit` is called (implicitly).</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                import agentc</span>
+
+<span class="sd">                catalog = agentc.Catalog()</span>
+<span class="sd">                incoming_state = {&quot;flights&quot;: []}</span>
+<span class="sd">                with catalog.Span(name=&quot;flight_planner&quot;, state=incoming_state) as span:</span>
+<span class="sd">                    ... = flight_planner_implementation(...)</span>
+<span class="sd">                    incoming_state[&quot;flights&quot;] = [{&quot;flight_number&quot;: &quot;AA123&quot;, &quot;status&quot;: &quot;on_time&quot;}]</span>
+
+<span class="sd">            On exiting the context, one log is generated possessing the content below:</span>
+
+<span class="sd">            .. code-block:: json</span>
+
+<span class="sd">                { &quot;kind&quot;: &quot;end&quot;, &quot;state&quot;: {&quot;flights&quot;: [{&quot;flight_number&quot;: &quot;AA123&quot;, &quot;status&quot;: &quot;on_time&quot;}]} }</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            The :python:`state` of the span must be JSON-serializable **and** must be mutated in-place.</span>
+<span class="sd">            If you are working with immutable state objects, you must set the :py:attr:`state` attribute before exiting</span>
+<span class="sd">            the span (i.e., before the :python:`with` statement exits or with :py:meth:`exit` explicitly).</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                import agentc</span>
+
+<span class="sd">                catalog = agentc.Catalog()</span>
+<span class="sd">                immutable_incoming_state = {&quot;flights&quot;: []}</span>
+<span class="sd">                with catalog.Span(name=&quot;flight_planner&quot;, state=incoming_state) as span:</span>
+<span class="sd">                    ... = flight_planner_implementation(...)</span>
+<span class="sd">                    span.state = {&quot;flights&quot;: [{&quot;flight_number&quot;: &quot;AA123&quot;, &quot;status&quot;: &quot;on_time&quot;}]}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">EndContent</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">EndContent</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Span.logs">
+<a class="viewcode-back" href="../../../api.html#agentc.span.Span.logs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">logs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Log</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the logs generated by the tree of :py:class:`Span` nodes rooted from this :py:class:`Span` instance.</span>
+
+<span class="sd">        .. card:: Method Description</span>
+
+<span class="sd">            The :py:meth:`logs` method returns an iterable of all logs generated within the span.</span>
+<span class="sd">            This method is also called (implicitly) when iterating over the span (e.g., using a :python:`for` loop).</span>
+<span class="sd">            To use this method, you must set the :py:attr:`iterable` attribute to True when instantiating the span:</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                import agentc</span>
+
+<span class="sd">                catalog = agentc.Catalog()</span>
+<span class="sd">                span = catalog.Span(name=&quot;flight_planner&quot;, iterable=True)</span>
+<span class="sd">                for log in span:</span>
+<span class="sd">                    match log.content.kind:</span>
+<span class="sd">                        case &quot;begin&quot;:</span>
+<span class="sd">                            ...</span>
+
+<span class="sd">        .. tip::</span>
+
+<span class="sd">            Generally, this method should only be used for debugging purposes.</span>
+<span class="sd">            This method will keep **all** logs generated by the span in memory.</span>
+<span class="sd">            To perform efficient aggregate analysis of your logs, consider querying the ``agent_activity.logs``</span>
+<span class="sd">            collection in your Couchbase cluster using SQL++ instead.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterable</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This span is not iterable. To iterate over logs, set &#39;iterable&#39;=True on instantiation.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logs</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">enter</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">KeyValueContent</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="c1"># We will only record this transition if we are exiting cleanly.</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterable</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This span is not iterable. To iterate over logs, set &#39;iterable&#39;=True on instantiation.&quot;</span><span class="p">)</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logs</span></div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">GlobalSpan</span><span class="p">(</span><span class="n">Span</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An auditor of various events (e.g., LLM completions) given a catalog.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Note: this is more of a composite type rather than a union type.</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">LocalCatalogConfig</span><span class="p">,</span> <span class="n">RemoteCatalogConfig</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Config (configuration) instance associated with this activity. &quot;&quot;&quot;</span>
+
+    <span class="n">session</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The run (alternative: session) that this span is associated with. &quot;&quot;&quot;</span>
+
+    <span class="n">version</span><span class="p">:</span> <span class="n">VersionDescriptor</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Catalog version to bind all messages logged within this auditor. &quot;&quot;&quot;</span>
+
+    <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_local_logger</span><span class="p">:</span> <span class="n">LocalLogger</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_db_logger</span><span class="p">:</span> <span class="n">DBLogger</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_chain_logger</span><span class="p">:</span> <span class="n">ChainLogger</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_find_local_activity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">activity_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Note: this method sets the self.config.activity_path attribute if found.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ActivityPath</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Local activity (folder) not found while trying to initialize a Span instance. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Swallowing exception </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_auditor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">activity_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">conn_string</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                Could not initialize a local or remote auditor!</span>
+<span class="s2">                If this is a new project, please run the command `agentc init` before instantiating an auditor.</span>
+<span class="s2">                If you are intending to use a remote-only auditor, please ensure that all of the relevant variables</span>
+<span class="s2">                (i.e., conn_string, username, password, and bucket) are set.</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
+
+        <span class="c1"># Finally, instantiate our auditors.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">activity_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_local_logger</span> <span class="o">=</span> <span class="n">LocalLogger</span><span class="p">(</span><span class="n">cfg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">catalog_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">conn_string</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_db_logger</span> <span class="o">=</span> <span class="n">DBLogger</span><span class="p">(</span><span class="n">cfg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">catalog_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="n">couchbase</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">CouchbaseException</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Could not connect to the Couchbase cluster. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Skipping remote auditor and swallowing exception </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_db_logger</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># If we have both a local and remote auditor, we&#39;ll use both.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_db_logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using both a local auditor and a remote auditor.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_chain_logger</span> <span class="o">=</span> <span class="n">ChainLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_local_logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_db_logger</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chain_logger</span><span class="o">.</span><span class="n">log</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using a local auditor (a connection to a remote auditor could not be established).&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_logger</span><span class="o">.</span><span class="n">log</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_db_logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using a remote auditor (a local auditor could not be instantiated).&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_db_logger</span><span class="o">.</span><span class="n">log</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># We should never reach this point (this error is handled above).</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not instantiate an auditor.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">new</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">iterable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Span</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new span under the current :py:class:`GlobalSpan`.</span>
+
+<span class="sd">        :param name: The name of the span.</span>
+<span class="sd">        :param state: The starting state of the span. This will be recorded upon entering and exiting the span.</span>
+<span class="sd">        :param iterable: Whether this new span should be iterable.</span>
+<span class="sd">        :param kwargs: Additional annotations to apply to the span.</span>
+<span class="sd">        :return: A new :py:class:`Span` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Span</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">,</span> <span class="n">iterable</span><span class="o">=</span><span class="n">iterable</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+    
+
+      <div class="clearer"></div>
+    </div>
+    <div class="button_nav_wrapper">
+        <div class="button_nav">
+            <div class="left">
+                
+            </div>
+
+            <div class="right">
+                
+            </div>
+        </div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Couchbase.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+
+<p id="theme_credit">Styled using the <a href="https://github.com/piccolo-orm/piccolo_theme">Piccolo Theme</a></p>
+  </body>
+</html>

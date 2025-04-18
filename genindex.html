@@ -1,759 +1,240 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="./">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; Agent Catalog v0.0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
-      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=86a354c8" />
 
-  
-    <link rel="shortcut icon" href="_static/favicon.png"/>
-      <script src="_static/jquery.js?v=5d32c60e"></script>
-      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=2fea6348"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
-      <script src="_static/copybutton.js?v=f281be69"></script>
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; Agent Catalog v0.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=50651e91" />
+    <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
+    <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=86a354c8" />
+    <script src="_static/documentation_options.js?v=683873e3"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
     <script src="_static/js/theme.js"></script>
+    <script src="_static/js/petite-vue.js"></script>
+    <link rel="icon" href="_static/favicon.png"/>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
-</head>
+  </head><body data-dark_mode_code_blocks="true">
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+<div id="top_nav">
+    
 
-          
-          
-          <a href="index.html" class="icon icon-home">
-            Agent Catalog
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+    <nav>
+        
+            
+        
+
+        <p id="toggle_sidebar">
+            <a href="#" title="Toggle sidebar">|||</a>
+        </p>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog v0.2.0 documentation</a></h1>
+
+        <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
+    <template v-if="mode == 'light'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_light"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M67.48,18.073c1.913,-1.912 1.913,-5.018 0,-6.931c-1.912,-1.912 -5.018,-1.912 -6.931,0l-6.798,6.799c-1.912,1.912 -1.912,5.018 0,6.931c1.913,1.912 5.018,1.912 6.931,-0l6.798,-6.799Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.728,61.108c1.912,-1.913 1.912,-5.018 -0,-6.931c-1.913,-1.913 -5.019,-1.913 -6.931,-0l-6.799,6.798c-1.912,1.913 -1.912,5.019 0,6.931c1.913,1.913 5.019,1.913 6.931,0l6.799,-6.798Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.682,54.177c-1.913,-1.913 -5.018,-1.913 -6.931,-0c-1.912,1.913 -1.912,5.018 0,6.931l6.798,6.798c1.913,1.913 5.019,1.913 6.931,0c1.913,-1.912 1.913,-5.018 0,-6.931l-6.798,-6.798Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M4.901,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,-0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M18.929,11.142c-1.912,-1.912 -5.018,-1.912 -6.931,0c-1.912,1.913 -1.912,5.019 0,6.931l6.799,6.799c1.912,1.912 5.018,1.912 6.931,-0c1.912,-1.913 1.912,-5.019 -0,-6.931l-6.799,-6.799Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.108,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c-0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c-0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'dark'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_dark"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.901,2.196 -4.901,4.901c0,2.705 2.197,4.901 4.901,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.662,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.989,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.732,61.103c1.91,-1.91 1.91,-5.011 0,-6.921l-0.009,-0.01c-1.91,-1.91 -5.012,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.909,1.91 5.011,1.91 6.92,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.672,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.52,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l-0,-0.01c-0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.901,2.196 -4.901,4.901c0,2.704 2.197,4.9 4.901,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.73,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 -0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.098,34.623c-2.699,0 -4.891,2.192 -4.891,4.892l-0,0.019c-0,2.699 2.192,4.891 4.891,4.891c2.7,0 4.892,-2.192 4.892,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.892,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'darkest'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_darkest"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><path d="M39.315,23.791c8.684,-0 15.734,7.05 15.734,15.733c0,8.684 -7.05,15.734 -15.734,15.734c-8.683,0 -15.733,-7.05 -15.733,-15.734c-0,-8.683 7.05,-15.733 15.733,-15.733Zm0,4.737c6.069,0 10.997,4.927 10.997,10.996c-0,6.069 -4.928,10.996 -10.997,10.996c-6.068,0 -10.996,-4.927 -10.996,-10.996c0,-6.069 4.928,-10.996 10.996,-10.996Z" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.216,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.9,2.196 -4.9,4.901c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.666,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.99,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.737,61.103c1.909,-1.91 1.909,-5.011 -0,-6.921l-0.01,-0.01c-1.91,-1.91 -5.011,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.91,1.91 5.011,1.91 6.921,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.676,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.524,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l0,-0.01c0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.216,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901c-0,2.704 2.196,4.9 4.9,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.734,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.103,34.623c-2.7,0 -4.892,2.192 -4.892,4.892l-0,0.019c-0,2.699 2.192,4.891 4.892,4.891c2.699,0 4.891,-2.192 4.891,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.891,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+</a>
+
+<script>
+(function() {
+    const LOCAL_STORAGE_KEY = 'piccoloThemeMode'
+
+    var initialMode = localStorage.getItem(LOCAL_STORAGE_KEY)
+
+    if (initialMode) {
+        // Make sure the value in local storage is valid
+        if (['light', 'dark', 'darkest'].indexOf(initialMode) == -1) {
+            initialMode = 'light'
+            localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+        }
+    } else {
+        // Check if the client prefers dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            initialMode = 'dark'
+        } else {
+            initialMode = 'light'
+        }
+        localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+    }
+
+    document.documentElement.dataset.mode = initialMode
+
+    PetiteVue.createApp({
+        'mode': initialMode,
+        handleClick() {
+            let currentMode = this.mode
+
+            if (currentMode == 'light') {
+                this.mode = 'dark'
+            } else if (currentMode == 'dark') {
+                this.mode = 'darkest'
+            } else if (currentMode == 'darkest') {
+                this.mode = 'light'
+            }
+
+            document.documentElement.dataset.mode = this.mode
+            localStorage.setItem(LOCAL_STORAGE_KEY, this.mode)
+
+            console.log(this.mode)
+        }
+    }).mount('#mode_toggle')
+})()
+</script>
+            <p class="mobile_search_link">
+                <a href="search.html" title="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65 64" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2">
+                        <path d="M14.873 40.009c-2.315-3.943-3.642-8.532-3.642-13.429C11.231 11.91 23.141 0 37.811 0s26.58 11.91 26.58 26.58-11.91 26.58-26.58 26.58a26.44 26.44 0 0 1-14.277-4.161L9.739 62.794a3.12 3.12 0 0 1-4.413 0L.913 58.382c-1.217-1.218-1.217-3.196 0-4.413l13.96-13.96zM37.811 8.054c10.225 0 18.526 8.301 18.526 18.526s-8.301 18.526-18.526 18.526-18.526-8.301-18.526-18.526S27.586 8.054 37.811 8.054z" fill="#fff" />
+                    </svg>
+                </a>
+            </p>
+        
+
+        <div class="searchbox_wrapper">
+            
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+    </nav>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="install.html">Getting Agent Catalog</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#building-from-package">Building From Package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#building-from-source-with-pip">Building From Source (with pip)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#building-from-source-with-poetry">Building From Source (with Poetry)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#verifying-your-installation">Verifying Your Installation</a></li>
+
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concept.html">Concepts</a></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="guide.html">Agent Catalog User Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="guide.html#metrics-driven-development">Metrics Driven Development</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide.html#couchbase-backed-agent-catalogs">Couchbase-Backed Agent Catalogs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide.html#assessing-agent-quality">Assessing Agent Quality</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide.html#ignoring-files-while-indexing">Ignoring Files While Indexing</a></li>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">agentc CLI Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Package Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="catalog.html">Tool / Prompt Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="log.html">Spans and Log Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Log Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Tool</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#agentc">agentc</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-add">add</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-clean">clean</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-env">env</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-execute">execute</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-find">find</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-index">index</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-ls">ls</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-publish">publish</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-status">status</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-version">version</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">Agent Catalog API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api.html#agentc.Auditor"><code class="docutils literal notranslate"><span class="pre">Auditor</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.agent_name"><code class="docutils literal notranslate"><span class="pre">Auditor.agent_name</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.auditor_output"><code class="docutils literal notranslate"><span class="pre">Auditor.auditor_output</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.bucket"><code class="docutils literal notranslate"><span class="pre">Auditor.bucket</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.catalog"><code class="docutils literal notranslate"><span class="pre">Auditor.catalog</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.conn_root_certificate"><code class="docutils literal notranslate"><span class="pre">Auditor.conn_root_certificate</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.conn_string"><code class="docutils literal notranslate"><span class="pre">Auditor.conn_string</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.llm_model_name"><code class="docutils literal notranslate"><span class="pre">Auditor.llm_model_name</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.password"><code class="docutils literal notranslate"><span class="pre">Auditor.password</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.username"><code class="docutils literal notranslate"><span class="pre">Auditor.username</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.accept"><code class="docutils literal notranslate"><span class="pre">Auditor.accept()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.move"><code class="docutils literal notranslate"><span class="pre">Auditor.move()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#agentc.Provider"><code class="docutils literal notranslate"><span class="pre">Provider</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.bucket"><code class="docutils literal notranslate"><span class="pre">Provider.bucket</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.catalog"><code class="docutils literal notranslate"><span class="pre">Provider.catalog</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.conn_root_certificate"><code class="docutils literal notranslate"><span class="pre">Provider.conn_root_certificate</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.conn_string"><code class="docutils literal notranslate"><span class="pre">Provider.conn_string</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.decorator"><code class="docutils literal notranslate"><span class="pre">Provider.decorator</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.password"><code class="docutils literal notranslate"><span class="pre">Provider.password</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.provider_output"><code class="docutils literal notranslate"><span class="pre">Provider.provider_output</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.refiner"><code class="docutils literal notranslate"><span class="pre">Provider.refiner</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.secrets"><code class="docutils literal notranslate"><span class="pre">Provider.secrets</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.snapshot"><code class="docutils literal notranslate"><span class="pre">Provider.snapshot</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.tool_model"><code class="docutils literal notranslate"><span class="pre">Provider.tool_model</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.username"><code class="docutils literal notranslate"><span class="pre">Provider.username</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.get_item"><code class="docutils literal notranslate"><span class="pre">Provider.get_item()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.version"><code class="docutils literal notranslate"><span class="pre">Provider.version</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#agentc.langchain.audit"><code class="docutils literal notranslate"><span class="pre">audit()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="provider.html">Provider Configuration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="provider.html#langchain-langgraph-crewai">Langchain/LangGraph/CrewAI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="provider.html#llamaindex">LlamaIndex</a></li>
-<li class="toctree-l2"><a class="reference internal" href="provider.html#controlflow">Controlflow</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="env.html">Environment Variables</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="env.html#mandatory-environment-variables">Mandatory Environment Variables</a></li>
-<li class="toctree-l2"><a class="reference internal" href="env.html#optional-environment-variables">Optional Environment Variables</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="entry.html">On Catalog Entries</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="entry.html#tool-catalog-records">Tool Catalog Records</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#python-function-tools">Python Function Tools</a></li>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#sql-query-tools">SQL++ Query Tools</a></li>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#semantic-search-tools">Semantic Search Tools</a></li>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#http-request-tools">HTTP Request Tools</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="entry.html#prompt-catalog-records">Prompt Catalog Records</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#raw-prompts">Raw Prompts</a></li>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#jinja-templated-prompts">Jinja Templated Prompts</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="faqs.html">Frequently Asked Questions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#which-couchbase-capella-or-server-version-should-i-use">Which Couchbase Capella or Server version should I use?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#do-i-need-to-use-a-specific-agent-framework-e-g-langchain-with-agent-catalog">Do I need to use a specific agent framework (e.g., LangChain) with Agent Catalog?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-services-do-i-need-to-enable-on-my-couchbase-cluster">What services do I need to enable on my Couchbase cluster?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-can-i-do-to-increase-log-ingestion-rate-into-my-cluster">What can I do to increase log ingestion rate into my Cluster?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-does-agent-catalog-add-to-my-couchbase-bucket">What does Agent Catalog add to my Couchbase bucket?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#do-i-need-couchbase-instance-to-run-agent-catalog">Do I need Couchbase instance to run Agent Catalog?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-is-agent-catalog-doing-when-i-run-agentc-index">What is Agent Catalog doing when I run <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">index</span></code>?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#how-do-i-roll-back-to-a-previous-catalog-version">How do I roll back to a previous catalog version?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-environment-variables-are-required-to-use-agent-catalog">What environment variables are required to use Agent Catalog?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-are-the-different-types-of-tools-and-prompts-i-can-create">What are the different types of tools and prompts I can create?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#can-i-write-multiple-tools-prompts-in-one-file">Can I write multiple tools/prompts in one file?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#do-cli-commands-need-to-be-executed-in-a-certain-order">Do CLI commands need to be executed in a certain order?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#can-i-index-and-publish-catalogs-programmatically">Can I index and publish catalogs programmatically?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#does-agent-catalog-require-an-openai-api-key">Does Agent Catalog require an OpenAI API key?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#does-agent-catalog-work-with-any-llm">Does Agent Catalog work with any LLM?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#why-am-i-not-able-to-install-agent-catalog-agentc-because-of-pytorch-error">Why am I not able to install Agent Catalog(agentc) because of PyTorch error?</a></li>
-</ul>
-</li>
+<p class="caption" role="heading"><span class="caption-text">Help / Questions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="faqs.html">FAQs</a></li>
 </ul>
 
         </div>
       </div>
-    </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Agent Catalog</a>
-      </nav>
 
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Index</li>
-      <li class="wy-breadcrumbs-aside">
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
 
 <h1 id="index">Index</h1>
 
 <div class="genindex-jumpbox">
- <a href="#Symbols"><strong>Symbols</strong></a>
- | <a href="#A"><strong>A</strong></a>
+ <a href="#A"><strong>A</strong></a>
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#I"><strong>I</strong></a>
  | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
  | <a href="#V"><strong>V</strong></a>
+ | <a href="#W"><strong>W</strong></a>
  
 </div>
-<h2 id="Symbols">Symbols</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    --activity
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-a">agentc command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --annotations
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-execute-an">agentc-execute command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-an">agentc-find command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-publish-an">agentc-publish command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --bucket
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-clean-bucket">agentc-clean command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-execute-bucket">agentc-execute command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-bucket">agentc-find command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-ls-bucket">agentc-ls command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-publish-bucket">agentc-publish command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-status-bucket">agentc-status command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --catalog
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-c">agentc command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --catalog-id
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-clean-cid">agentc-clean command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-execute-cid">agentc-execute command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-cid">agentc-find command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --compare
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-status-compare">agentc-status command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --dry-run
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-index-dry-run">agentc-index command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --embedding-model
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-index-em">agentc-index command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --include-dirty
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-execute-include-dirty">agentc-execute command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-include-dirty">agentc-find command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-status-include-dirty">agentc-status command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --interactive
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-i">agentc command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --kind
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-clean-kind">agentc-clean command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --limit
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-find-limit">agentc-find command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --name
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-execute-name">agentc-execute command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-name">agentc-find command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-interactive
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-i">agentc command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-prompts
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-index-prompts">agentc-index command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --no-tools
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-index-tools">agentc-index command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --output
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-add-o">agentc-add command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --prompts
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-index-prompts">agentc-index command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --query
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-execute-query">agentc-execute command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-query">agentc-find command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --record-kind
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-add-record-kind">agentc-add command line option</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    --refiner
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-execute-refiner">agentc-execute command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-refiner">agentc-find command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --search-db
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-execute-db">agentc-execute command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-db">agentc-find command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-ls-db">agentc-ls command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --search-local
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-execute-local">agentc-execute command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-local">agentc-find command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-ls-local">agentc-ls command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --skip_confirm
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-clean-y">agentc-clean command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --status-db
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-status-db">agentc-status command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --tools
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-index-tools">agentc-index command line option</a>
-</li>
-      </ul></li>
-      <li>
-    --verbose
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-v">agentc command line option</a>
-</li>
-      </ul></li>
-      <li>
-    -a
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-a">agentc command line option</a>
-</li>
-      </ul></li>
-      <li>
-    -an
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-execute-an">agentc-execute command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-an">agentc-find command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-publish-an">agentc-publish command line option</a>
-</li>
-      </ul></li>
-      <li>
-    -c
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-c">agentc command line option</a>
-</li>
-      </ul></li>
-      <li>
-    -cid
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-clean-cid">agentc-clean command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-execute-cid">agentc-execute command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-cid">agentc-find command line option</a>
-</li>
-      </ul></li>
-      <li>
-    -db
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-execute-db">agentc-execute command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-db">agentc-find command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-ls-db">agentc-ls command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-status-db">agentc-status command line option</a>
-</li>
-      </ul></li>
-      <li>
-    -em
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-index-em">agentc-index command line option</a>
-</li>
-      </ul></li>
-      <li>
-    -i
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-i">agentc command line option</a>
-</li>
-      </ul></li>
-      <li>
-    -local
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-execute-local">agentc-execute command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-local">agentc-find command line option</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-ls-local">agentc-ls command line option</a>
-</li>
-      </ul></li>
-      <li>
-    -ni
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-i">agentc command line option</a>
-</li>
-      </ul></li>
-      <li>
-    -o
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-add-o">agentc-add command line option</a>
-</li>
-      </ul></li>
-      <li>
-    -v
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-v">agentc command line option</a>
-</li>
-      </ul></li>
-      <li>
-    -y
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-clean-y">agentc-clean command line option</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#agentc.Auditor.accept">accept() (agentc.Auditor method)</a>
+      <li><a href="config.html#agentc_core.config.config.LocalCatalogConfig.activity_path">activity_path (agentc_core.config.config.LocalCatalogConfig attribute)</a>
 </li>
-      <li><a href="api.html#agentc.Auditor.agent_name">agent_name (agentc.Auditor attribute)</a>
+      <li><a href="config.html#agentc_core.config.config.LocalCatalogConfig.ActivityPath">ActivityPath() (agentc_core.config.config.LocalCatalogConfig method)</a>
 </li>
       <li>
-    agentc
+    agentc_langchain.cache
 
       <ul>
-        <li><a href="api.html#module-agentc">module</a>
+        <li><a href="api.html#module-agentc_langchain.cache">module</a>
 </li>
       </ul></li>
       <li>
-    agentc command line option
+    agentc_langgraph.agent
 
       <ul>
-        <li><a href="cli.html#cmdoption-agentc-a">--activity</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-c">--catalog</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-i">--interactive</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-i">--no-interactive</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-v">--verbose</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-a">-a</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-c">-c</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-i">-i</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-i">-ni</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-v">-v</a>
+        <li><a href="api.html#module-agentc_langgraph.agent">module</a>
 </li>
       </ul></li>
       <li>
-    agentc-add command line option
+    agentc_langgraph.graph
 
       <ul>
-        <li><a href="cli.html#cmdoption-agentc-add-o">--output</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-add-record-kind">--record-kind</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-add-o">-o</a>
-</li>
-      </ul></li>
-      <li>
-    agentc-clean command line option
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-clean-bucket">--bucket</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-clean-cid">--catalog-id</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-clean-kind">--kind</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-clean-y">--skip_confirm</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-clean-cid">-cid</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-clean-y">-y</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-clean-arg-CATALOG">CATALOG</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-clean-arg-TYPE_METADATA">TYPE_METADATA</a>
-</li>
-      </ul></li>
-      <li>
-    agentc-execute command line option
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-execute-an">--annotations</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-execute-bucket">--bucket</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-execute-cid">--catalog-id</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-execute-include-dirty">--include-dirty</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-execute-name">--name</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-execute-query">--query</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-execute-refiner">--refiner</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-execute-db">--search-db</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-execute-local">--search-local</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-execute-an">-an</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-execute-cid">-cid</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-execute-db">-db</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-execute-local">-local</a>
-</li>
-      </ul></li>
-      <li>
-    agentc-find command line option
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-find-an">--annotations</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-bucket">--bucket</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-cid">--catalog-id</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-include-dirty">--include-dirty</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-limit">--limit</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-name">--name</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-query">--query</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-refiner">--refiner</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-db">--search-db</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-local">--search-local</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-an">-an</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-cid">-cid</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-db">-db</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-local">-local</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-find-arg-KIND">KIND</a>
+        <li><a href="api.html#module-agentc_langgraph.graph">module</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
-    agentc-index command line option
+    agentc_langgraph.tools
 
       <ul>
-        <li><a href="cli.html#cmdoption-agentc-index-dry-run">--dry-run</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-index-em">--embedding-model</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-index-prompts">--no-prompts</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-index-tools">--no-tools</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-index-prompts">--prompts</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-index-tools">--tools</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-index-em">-em</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-index-arg-SOURCE_DIRS">SOURCE_DIRS</a>
+        <li><a href="api.html#module-agentc_langgraph.tools">module</a>
 </li>
       </ul></li>
       <li>
-    agentc-ls command line option
+    agentc_llamaindex.chat
 
       <ul>
-        <li><a href="cli.html#cmdoption-agentc-ls-bucket">--bucket</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-ls-db">--search-db</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-ls-local">--search-local</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-ls-db">-db</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-ls-local">-local</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-ls-arg-KIND">KIND</a>
+        <li><a href="api.html#module-agentc_llamaindex.chat">module</a>
 </li>
       </ul></li>
-      <li>
-    agentc-publish command line option
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-publish-an">--annotations</a>
+      <li><a href="log.html#agentc_core.activity.models.log.Log.annotations">annotations (agentc_core.activity.models.log.Log attribute)</a>
 </li>
-        <li><a href="cli.html#cmdoption-agentc-publish-bucket">--bucket</a>
+      <li><a href="log.html#agentc_core.activity.models.content.RequestHeaderContent.Tool.args_schema">args_schema (agentc_core.activity.models.content.RequestHeaderContent.Tool attribute)</a>
 </li>
-        <li><a href="cli.html#cmdoption-agentc-publish-an">-an</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-publish-arg-KIND">KIND</a>
-</li>
-      </ul></li>
-      <li>
-    agentc-status command line option
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-status-bucket">--bucket</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-status-compare">--compare</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-status-include-dirty">--include-dirty</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-status-db">--status-db</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-status-db">-db</a>
-</li>
-        <li><a href="cli.html#cmdoption-agentc-status-arg-KIND">KIND</a>
-</li>
-      </ul></li>
-      <li>
-    agentc.langchain
-
-      <ul>
-        <li><a href="api.html#module-agentc.langchain">module</a>
-</li>
-      </ul></li>
-      <li><a href="api.html#agentc.langchain.audit">audit() (in module agentc.langchain)</a>
-</li>
-      <li><a href="api.html#agentc.Auditor.auditor_output">auditor_output (agentc.Auditor attribute)</a>
+      <li><a href="log.html#agentc_core.activity.models.content.Kind.Assistant">Assistant (agentc_core.activity.models.content.Kind attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -761,10 +242,14 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#agentc.Auditor.bucket">bucket (agentc.Auditor attribute)</a>
+      <li><a href="log.html#agentc_core.activity.models.content.Kind.Begin">Begin (agentc_core.activity.models.content.Kind attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="config.html#agentc_core.config.config.RemoteCatalogConfig.bucket">bucket (agentc_core.config.config.RemoteCatalogConfig attribute)</a>
 
       <ul>
-        <li><a href="api.html#agentc.Provider.bucket">(agentc.Provider attribute)</a>
+        <li><a href="api.html#agentc_langchain.cache.CacheOptions.bucket">(agentc_langchain.cache.CacheOptions attribute)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -773,40 +258,135 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    CATALOG
+      <li><a href="api.html#agentc_langchain.cache.cache">cache() (in module agentc_langchain.cache)</a>
+</li>
+      <li><a href="api.html#agentc_langchain.chat.Callback">Callback (class in agentc_langchain.chat)</a>
 
       <ul>
-        <li><a href="cli.html#cmdoption-agentc-clean-arg-CATALOG">agentc-clean command line option</a>
+        <li><a href="api.html#agentc_llamaindex.chat.Callback">(class in agentc_llamaindex.chat)</a>
 </li>
       </ul></li>
-      <li><a href="api.html#agentc.Auditor.catalog">catalog (agentc.Auditor attribute)</a>
-
-      <ul>
-        <li><a href="api.html#agentc.Provider.catalog">(agentc.Provider attribute)</a>
+      <li><a href="config.html#agentc_core.config.config.VersioningConfig.catalog_id">catalog_id (agentc_core.config.config.VersioningConfig attribute)</a>
 </li>
-      </ul></li>
+      <li><a href="config.html#agentc_core.config.config.LocalCatalogConfig.catalog_path">catalog_path (agentc_core.config.config.LocalCatalogConfig attribute)</a>
+</li>
+      <li><a href="log.html#agentc_core.activity.models.log.Log.catalog_version">catalog_version (agentc_core.activity.models.log.Log attribute)</a>
+</li>
+      <li><a href="config.html#agentc_core.config.config.LocalCatalogConfig.CatalogPath">CatalogPath() (agentc_core.config.config.LocalCatalogConfig method)</a>
+</li>
+      <li><a href="log.html#agentc_core.activity.models.content.Kind.ChatCompletion">ChatCompletion (agentc_core.activity.models.content.Kind attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#agentc.Auditor.conn_root_certificate">conn_root_certificate (agentc.Auditor attribute)</a>
+      <li><a href="config.html#agentc_core.config.config.RemoteCatalogConfig.Cluster">Cluster() (agentc_core.config.config.RemoteCatalogConfig method)</a>
+</li>
+      <li><a href="config.html#agentc_core.config.config.ToolRuntimeConfig.codegen_output">codegen_output (agentc_core.config.config.ToolRuntimeConfig attribute)</a>
+</li>
+      <li><a href="api.html#agentc_langchain.cache.CacheOptions.collection">collection (agentc_langchain.cache.CacheOptions attribute)</a>
+</li>
+      <li><a href="config.html#agentc_core.config.config.RemoteCatalogConfig.conn_root_certificate">conn_root_certificate (agentc_core.config.config.RemoteCatalogConfig attribute)</a>
 
       <ul>
-        <li><a href="api.html#agentc.Provider.conn_root_certificate">(agentc.Provider attribute)</a>
+        <li><a href="api.html#agentc_langchain.cache.CacheOptions.conn_root_certificate">(agentc_langchain.cache.CacheOptions attribute)</a>
 </li>
       </ul></li>
-      <li><a href="api.html#agentc.Auditor.conn_string">conn_string (agentc.Auditor attribute)</a>
+      <li><a href="config.html#agentc_core.config.config.RemoteCatalogConfig.conn_string">conn_string (agentc_core.config.config.RemoteCatalogConfig attribute)</a>
 
       <ul>
-        <li><a href="api.html#agentc.Provider.conn_string">(agentc.Provider attribute)</a>
+        <li><a href="api.html#agentc_langchain.cache.CacheOptions.conn_string">(agentc_langchain.cache.CacheOptions attribute)</a>
 </li>
       </ul></li>
+      <li><a href="log.html#agentc_core.activity.models.log.Log.content">content (agentc_core.activity.models.log.Log attribute)</a>
+</li>
+      <li><a href="api.html#agentc_langgraph.agent.ReActAgent.create_react_agent">create_react_agent() (agentc_langgraph.agent.ReActAgent method)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#agentc.Provider.decorator">decorator (agentc.Provider attribute)</a>
+      <li><a href="config.html#agentc_core.config.config.RemoteCatalogConfig.ddl_create_index_interval_seconds">ddl_create_index_interval_seconds (agentc_core.config.config.RemoteCatalogConfig attribute)</a>
+</li>
+      <li><a href="config.html#agentc_core.config.config.RemoteCatalogConfig.ddl_retry_attempts">ddl_retry_attempts (agentc_core.config.config.RemoteCatalogConfig attribute)</a>
+
+      <ul>
+        <li><a href="api.html#agentc_langchain.cache.CacheOptions.ddl_retry_attempts">(agentc_langchain.cache.CacheOptions attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="config.html#agentc_core.config.config.RemoteCatalogConfig.ddl_retry_wait_seconds">ddl_retry_wait_seconds (agentc_core.config.config.RemoteCatalogConfig attribute)</a>
+
+      <ul>
+        <li><a href="api.html#agentc_langchain.cache.CacheOptions.ddl_retry_wait_seconds">(agentc_langchain.cache.CacheOptions attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="config.html#agentc_core.config.config.Config.debug">debug (agentc_core.config.config.Config attribute)</a>
+</li>
+      <li><a href="log.html#agentc_core.activity.models.content.RequestHeaderContent.Tool.description">description (agentc_core.activity.models.content.RequestHeaderContent.Tool attribute)</a>
+</li>
+      <li><a href="log.html#agentc_core.activity.models.content.EdgeContent.dest">dest (agentc_core.activity.models.content.EdgeContent attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="log.html#agentc_core.activity.models.content.Kind.Edge">Edge (agentc_core.activity.models.content.Kind attribute)</a>
+</li>
+      <li><a href="config.html#agentc_core.config.config.EmbeddingModelConfig.embedding_model_auth">embedding_model_auth (agentc_core.config.config.EmbeddingModelConfig attribute)</a>
+</li>
+      <li><a href="config.html#agentc_core.config.config.EmbeddingModelConfig.embedding_model_name">embedding_model_name (agentc_core.config.config.EmbeddingModelConfig attribute)</a>
+</li>
+      <li><a href="config.html#agentc_core.config.config.EmbeddingModelConfig.embedding_model_url">embedding_model_url (agentc_core.config.config.EmbeddingModelConfig attribute)</a>
+</li>
+      <li><a href="config.html#agentc_core.config.config.EmbeddingModelConfig.EmbeddingModel">EmbeddingModel() (agentc_core.config.config.EmbeddingModelConfig method)</a>
+</li>
+      <li><a href="log.html#agentc_core.activity.models.content.Kind.End">End (agentc_core.activity.models.content.Kind attribute)</a>
+</li>
+      <li><a href="api.html#agentc.span.Span.enter">enter() (agentc.span.Span method)</a>
+</li>
+      <li><a href="api.html#agentc.span.Span.exit">exit() (agentc.span.Span method)</a>
+</li>
+      <li><a href="log.html#agentc_core.activity.models.content.AssistantContent.extra">extra (agentc_core.activity.models.content.AssistantContent attribute)</a>
+
+      <ul>
+        <li><a href="log.html#agentc_core.activity.models.content.BeginContent.extra">(agentc_core.activity.models.content.BeginContent attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.ChatCompletionContent.extra">(agentc_core.activity.models.content.ChatCompletionContent attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.EdgeContent.extra">(agentc_core.activity.models.content.EdgeContent attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.EndContent.extra">(agentc_core.activity.models.content.EndContent attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.KeyValueContent.extra">(agentc_core.activity.models.content.KeyValueContent attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.RequestHeaderContent.extra">(agentc_core.activity.models.content.RequestHeaderContent attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.SystemContent.extra">(agentc_core.activity.models.content.SystemContent attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.ToolCallContent.extra">(agentc_core.activity.models.content.ToolCallContent attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.ToolResultContent.extra">(agentc_core.activity.models.content.ToolResultContent attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.UserContent.extra">(agentc_core.activity.models.content.UserContent attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#agentc.catalog.Catalog.find">find() (agentc.catalog.Catalog method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#agentc.catalog.Catalog.find_prompts">find_prompts() (agentc.catalog.Catalog method)</a>
+</li>
+      <li><a href="api.html#agentc.catalog.Catalog.find_tools">find_tools() (agentc.catalog.Catalog method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -814,7 +394,31 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#agentc.Provider.get_item">get_item() (agentc.Provider method)</a>
+      <li><a href="api.html#agentc_langgraph.graph.GraphRunnable.get_graph">get_graph() (agentc_langgraph.graph.GraphRunnable method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#agentc_langgraph.graph.GraphRunnable">GraphRunnable (class in agentc_langgraph.graph)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#agentc.span.Span.identifier">identifier (agentc.span.Span property)</a>
+
+      <ul>
+        <li><a href="log.html#agentc_core.activity.models.log.Log.identifier">(agentc_core.activity.models.log.Log attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#agentc_langchain.cache.CacheOptions.index_name">index_name (agentc_langchain.cache.CacheOptions attribute)</a>
+</li>
+      <li><a href="config.html#agentc_core.config.config.RemoteCatalogConfig.index_partition">index_partition (agentc_core.config.config.RemoteCatalogConfig attribute)</a>
+</li>
+      <li><a href="api.html#agentc.span.Span.iterable">iterable (agentc.span.Span attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -822,26 +426,49 @@
 <h2 id="K">K</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    KIND
+      <li><a href="log.html#agentc_core.activity.models.content.KeyValueContent.key">key (agentc_core.activity.models.content.KeyValueContent attribute)</a>
+</li>
+      <li><a href="log.html#agentc_core.activity.models.content.Kind.KeyValue">KeyValue (agentc_core.activity.models.content.Kind attribute)</a>
+</li>
+      <li><a href="log.html#agentc_core.activity.models.content.AssistantContent.kind">kind (agentc_core.activity.models.content.AssistantContent attribute)</a>
 
       <ul>
-        <li><a href="cli.html#cmdoption-agentc-find-arg-KIND">agentc-find command line option</a>
+        <li><a href="log.html#agentc_core.activity.models.content.BeginContent.kind">(agentc_core.activity.models.content.BeginContent attribute)</a>
 </li>
-        <li><a href="cli.html#cmdoption-agentc-ls-arg-KIND">agentc-ls command line option</a>
+        <li><a href="log.html#agentc_core.activity.models.content.ChatCompletionContent.kind">(agentc_core.activity.models.content.ChatCompletionContent attribute)</a>
 </li>
-        <li><a href="cli.html#cmdoption-agentc-publish-arg-KIND">agentc-publish command line option</a>
+        <li><a href="log.html#agentc_core.activity.models.content.EdgeContent.kind">(agentc_core.activity.models.content.EdgeContent attribute)</a>
 </li>
-        <li><a href="cli.html#cmdoption-agentc-status-arg-KIND">agentc-status command line option</a>
+        <li><a href="log.html#agentc_core.activity.models.content.EndContent.kind">(agentc_core.activity.models.content.EndContent attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.KeyValueContent.kind">(agentc_core.activity.models.content.KeyValueContent attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.RequestHeaderContent.kind">(agentc_core.activity.models.content.RequestHeaderContent attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.SystemContent.kind">(agentc_core.activity.models.content.SystemContent attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.ToolCallContent.kind">(agentc_core.activity.models.content.ToolCallContent attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.ToolResultContent.kind">(agentc_core.activity.models.content.ToolResultContent attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.UserContent.kind">(agentc_core.activity.models.content.UserContent attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#agentc.span.Span.kwargs">kwargs (agentc.span.Span attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#agentc.Auditor.llm_model_name">llm_model_name (agentc.Auditor attribute)</a>
+      <li><a href="api.html#agentc.span.Span.log">log() (agentc.span.Span method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#agentc.span.Span.logs">logs() (agentc.span.Span method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -849,34 +476,82 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="config.html#agentc_core.config.config.RemoteCatalogConfig.max_index_partition">max_index_partition (agentc_core.config.config.RemoteCatalogConfig attribute)</a>
+</li>
+      <li><a href="log.html#agentc_core.activity.models.content.ChatCompletionContent.meta">meta (agentc_core.activity.models.content.ChatCompletionContent attribute)</a>
+
+      <ul>
+        <li><a href="log.html#agentc_core.activity.models.content.RequestHeaderContent.meta">(agentc_core.activity.models.content.RequestHeaderContent attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.ToolCallContent.meta">(agentc_core.activity.models.content.ToolCallContent attribute)</a>
+</li>
+      </ul></li>
       <li>
     module
 
       <ul>
-        <li><a href="api.html#module-agentc">agentc</a>
+        <li><a href="api.html#module-agentc_langchain.cache">agentc_langchain.cache</a>
 </li>
-        <li><a href="api.html#module-agentc.langchain">agentc.langchain</a>
+        <li><a href="api.html#module-agentc_langgraph.agent">agentc_langgraph.agent</a>
+</li>
+        <li><a href="api.html#module-agentc_langgraph.graph">agentc_langgraph.graph</a>
+</li>
+        <li><a href="api.html#module-agentc_langgraph.tools">agentc_langgraph.tools</a>
+</li>
+        <li><a href="api.html#module-agentc_llamaindex.chat">agentc_llamaindex.chat</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#agentc.span.Span.name">name (agentc.span.Span attribute)</a>
+
+      <ul>
+        <li><a href="api.html#agentc.span.Span.Identifier.name">(agentc.span.Span.Identifier attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.RequestHeaderContent.Tool.name">(agentc_core.activity.models.content.RequestHeaderContent.Tool attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.log.Log.Span.name">(agentc_core.activity.models.log.Log.Span attribute)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#agentc.Auditor.move">move() (agentc.Auditor method)</a>
+      <li><a href="api.html#agentc.span.Span.new">new() (agentc.span.Span method)</a>
 </li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="log.html#agentc_core.activity.models.content.ChatCompletionContent.output">output (agentc_core.activity.models.content.ChatCompletionContent attribute)</a>
+
+      <ul>
+        <li><a href="log.html#agentc_core.activity.models.content.RequestHeaderContent.output">(agentc_core.activity.models.content.RequestHeaderContent attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#agentc.Auditor.password">password (agentc.Auditor attribute)</a>
+      <li><a href="api.html#agentc.span.Span.parent">parent (agentc.span.Span attribute)</a>
+</li>
+      <li><a href="config.html#agentc_core.config.config.RemoteCatalogConfig.password">password (agentc_core.config.config.RemoteCatalogConfig attribute)</a>
 
       <ul>
-        <li><a href="api.html#agentc.Provider.password">(agentc.Provider attribute)</a>
+        <li><a href="api.html#agentc_langchain.cache.CacheOptions.password">(agentc_langchain.cache.CacheOptions attribute)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#agentc.Provider.provider_output">provider_output (agentc.Provider attribute)</a>
+      <li><a href="log.html#agentc_core.activity.models.content.EdgeContent.payload">payload (agentc_core.activity.models.content.EdgeContent attribute)</a>
+</li>
+      <li><a href="config.html#agentc_core.config.config.LocalCatalogConfig.project_path">project_path (agentc_core.config.config.LocalCatalogConfig attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -884,7 +559,13 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#agentc.Provider.refiner">refiner (agentc.Provider attribute)</a>
+      <li><a href="api.html#agentc_langgraph.agent.ReActAgent">ReActAgent (class in agentc_langgraph.agent)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="config.html#agentc_core.config.config.ToolRuntimeConfig.refiner">refiner (agentc_core.config.config.ToolRuntimeConfig attribute)</a>
+</li>
+      <li><a href="log.html#agentc_core.activity.models.content.Kind.RequestHeader">RequestHeader (agentc_core.activity.models.content.Kind attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -892,46 +573,100 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#agentc.Provider.secrets">secrets (agentc.Provider attribute)</a>
+      <li><a href="api.html#agentc_langchain.cache.CacheOptions.scope">scope (agentc_langchain.cache.CacheOptions attribute)</a>
 </li>
-      <li><a href="api.html#agentc.Provider.snapshot">snapshot (agentc.Provider attribute)</a>
+      <li><a href="api.html#agentc_langchain.cache.CacheOptions.score_threshold">score_threshold (agentc_langchain.cache.CacheOptions attribute)</a>
+</li>
+      <li><a href="config.html#agentc_core.config.config.ToolRuntimeConfig.secrets">secrets (agentc_core.config.config.ToolRuntimeConfig attribute)</a>
+</li>
+      <li><a href="config.html#agentc_core.config.config.EmbeddingModelConfig.sentence_transformers_model_cache">sentence_transformers_model_cache (agentc_core.config.config.EmbeddingModelConfig attribute)</a>
+</li>
+      <li><a href="config.html#agentc_core.config.config.EmbeddingModelConfig.sentence_transformers_retry_attempts">sentence_transformers_retry_attempts (agentc_core.config.config.EmbeddingModelConfig attribute)</a>
+</li>
+      <li><a href="api.html#agentc.span.Span.Identifier.session">session (agentc.span.Span.Identifier attribute)</a>
+
+      <ul>
+        <li><a href="log.html#agentc_core.activity.models.log.Log.Span.session">(agentc_core.activity.models.log.Log.Span attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="log.html#agentc_core.activity.models.content.EdgeContent.source">source (agentc_core.activity.models.content.EdgeContent attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    SOURCE_DIRS
+      <li><a href="log.html#agentc_core.activity.models.log.Log.span">span (agentc_core.activity.models.log.Log attribute)</a>
+</li>
+      <li><a href="api.html#agentc.catalog.Catalog.Span">Span() (agentc.catalog.Catalog method)</a>
+</li>
+      <li><a href="api.html#agentc.span.Span.state">state (agentc.span.Span attribute)</a>
 
       <ul>
-        <li><a href="cli.html#cmdoption-agentc-index-arg-SOURCE_DIRS">agentc-index command line option</a>
+        <li><a href="log.html#agentc_core.activity.models.content.BeginContent.state">(agentc_core.activity.models.content.BeginContent attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.EndContent.state">(agentc_core.activity.models.content.EndContent attribute)</a>
 </li>
       </ul></li>
+      <li><a href="api.html#agentc_langgraph.agent.State">State (class in agentc_langgraph.agent)</a>
+</li>
+      <li><a href="log.html#agentc_core.activity.models.content.ToolCallContent.status">status (agentc_core.activity.models.content.ToolCallContent attribute)</a>
+
+      <ul>
+        <li><a href="log.html#agentc_core.activity.models.content.ToolResultContent.status">(agentc_core.activity.models.content.ToolResultContent attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="log.html#agentc_core.activity.models.content.Kind.System">System (agentc_core.activity.models.content.Kind attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#agentc.Provider.tool_model">tool_model (agentc.Provider attribute)</a>
+      <li><a href="log.html#agentc_core.activity.models.log.Log.timestamp">timestamp (agentc_core.activity.models.log.Log attribute)</a>
+</li>
+      <li><a href="log.html#agentc_core.activity.models.content.ToolCallContent.tool_args">tool_args (agentc_core.activity.models.content.ToolCallContent attribute)</a>
+</li>
+      <li><a href="log.html#agentc_core.activity.models.content.ToolCallContent.tool_call_id">tool_call_id (agentc_core.activity.models.content.ToolCallContent attribute)</a>
+
+      <ul>
+        <li><a href="log.html#agentc_core.activity.models.content.ToolResultContent.tool_call_id">(agentc_core.activity.models.content.ToolResultContent attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="config.html#agentc_core.config.config.ToolRuntimeConfig.tool_decorator">tool_decorator (agentc_core.config.config.ToolRuntimeConfig attribute)</a>
+</li>
+      <li><a href="config.html#agentc_core.config.config.ToolRuntimeConfig.tool_model">tool_model (agentc_core.config.config.ToolRuntimeConfig attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    TYPE_METADATA
-
-      <ul>
-        <li><a href="cli.html#cmdoption-agentc-clean-arg-TYPE_METADATA">agentc-clean command line option</a>
+      <li><a href="log.html#agentc_core.activity.models.content.ToolCallContent.tool_name">tool_name (agentc_core.activity.models.content.ToolCallContent attribute)</a>
 </li>
-      </ul></li>
+      <li><a href="log.html#agentc_core.activity.models.content.ToolResultContent.tool_result">tool_result (agentc_core.activity.models.content.ToolResultContent attribute)</a>
+</li>
+      <li><a href="log.html#agentc_core.activity.models.content.Kind.ToolCall">ToolCall (agentc_core.activity.models.content.Kind attribute)</a>
+</li>
+      <li><a href="api.html#agentc_langgraph.tools.ToolNode">ToolNode (class in agentc_langgraph.tools)</a>
+</li>
+      <li><a href="log.html#agentc_core.activity.models.content.Kind.ToolResult">ToolResult (agentc_core.activity.models.content.Kind attribute)</a>
+</li>
+      <li><a href="log.html#agentc_core.activity.models.content.RequestHeaderContent.tools">tools (agentc_core.activity.models.content.RequestHeaderContent attribute)</a>
+</li>
+      <li><a href="api.html#agentc_langchain.cache.CacheOptions.ttl">ttl (agentc_langchain.cache.CacheOptions attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#agentc.Auditor.username">username (agentc.Auditor attribute)</a>
+      <li><a href="log.html#agentc_core.activity.models.content.Kind.User">User (agentc_core.activity.models.content.Kind attribute)</a>
+</li>
+      <li><a href="log.html#agentc_core.activity.models.content.UserContent.user_id">user_id (agentc_core.activity.models.content.UserContent attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="config.html#agentc_core.config.config.RemoteCatalogConfig.username">username (agentc_core.config.config.RemoteCatalogConfig attribute)</a>
 
       <ul>
-        <li><a href="api.html#agentc.Provider.username">(agentc.Provider attribute)</a>
+        <li><a href="api.html#agentc_langchain.cache.CacheOptions.username">(agentc_langchain.cache.CacheOptions attribute)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -940,38 +675,65 @@
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#agentc.Provider.version">version (agentc.Provider property)</a>
+      <li><a href="log.html#agentc_core.activity.models.content.AssistantContent.value">value (agentc_core.activity.models.content.AssistantContent attribute)</a>
+
+      <ul>
+        <li><a href="log.html#agentc_core.activity.models.content.KeyValueContent.value">(agentc_core.activity.models.content.KeyValueContent attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.SystemContent.value">(agentc_core.activity.models.content.SystemContent attribute)</a>
+</li>
+        <li><a href="log.html#agentc_core.activity.models.content.UserContent.value">(agentc_core.activity.models.content.UserContent attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="config.html#agentc_core.config.config.CommandLineConfig.verbosity_level">verbosity_level (agentc_core.config.config.CommandLineConfig attribute)</a>
+</li>
+      <li><a href="api.html#agentc.catalog.Catalog.version">version (agentc.catalog.Catalog property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="config.html#agentc_core.config.config.RemoteCatalogConfig.wait_until_ready_seconds">wait_until_ready_seconds (agentc_core.config.config.RemoteCatalogConfig attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="config.html#agentc_core.config.config.CommandLineConfig.with_interaction">with_interaction (agentc_core.config.config.CommandLineConfig attribute)</a>
 </li>
   </ul></td>
 </tr></table>
 
 
 
-           </div>
+            <div class="clearer"></div>
           </div>
-          <footer>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2024, Couchbase.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
         </div>
       </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
+    
 
-</body>
+      <div class="clearer"></div>
+    </div>
+    <div class="button_nav_wrapper">
+        <div class="button_nav">
+            <div class="left">
+                
+            </div>
+
+            <div class="right">
+                
+            </div>
+        </div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Couchbase.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+
+<p id="theme_credit">Styled using the <a href="https://github.com/piccolo-orm/piccolo_theme">Piccolo Theme</a></p>
+  </body>
 </html>

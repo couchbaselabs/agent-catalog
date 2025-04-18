@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>agentc_core.config.config &#8212; Agent Catalog v0.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=50651e91" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic_mod.css?v=9b2032db" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=86a354c8" />
+    <script src="../../../_static/documentation_options.js?v=683873e3"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../_static/js/theme.js"></script>
+    <script src="../../../_static/js/petite-vue.js"></script>
+    <link rel="icon" href="../../../_static/favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body data-dark_mode_code_blocks="true">
+
+<div id="top_nav">
+    
+
+    <nav>
+        
+            
+        
+
+        <p id="toggle_sidebar">
+            <a href="#" title="Toggle sidebar">|||</a>
+        </p>
+        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog v0.2.0 documentation</a></h1>
+
+        <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
+    <template v-if="mode == 'light'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_light"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M67.48,18.073c1.913,-1.912 1.913,-5.018 0,-6.931c-1.912,-1.912 -5.018,-1.912 -6.931,0l-6.798,6.799c-1.912,1.912 -1.912,5.018 0,6.931c1.913,1.912 5.018,1.912 6.931,-0l6.798,-6.799Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.728,61.108c1.912,-1.913 1.912,-5.018 -0,-6.931c-1.913,-1.913 -5.019,-1.913 -6.931,-0l-6.799,6.798c-1.912,1.913 -1.912,5.019 0,6.931c1.913,1.913 5.019,1.913 6.931,0l6.799,-6.798Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.682,54.177c-1.913,-1.913 -5.018,-1.913 -6.931,-0c-1.912,1.913 -1.912,5.018 0,6.931l6.798,6.798c1.913,1.913 5.019,1.913 6.931,0c1.913,-1.912 1.913,-5.018 0,-6.931l-6.798,-6.798Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M4.901,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,-0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M18.929,11.142c-1.912,-1.912 -5.018,-1.912 -6.931,0c-1.912,1.913 -1.912,5.019 0,6.931l6.799,6.799c1.912,1.912 5.018,1.912 6.931,-0c1.912,-1.913 1.912,-5.019 -0,-6.931l-6.799,-6.799Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.108,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c-0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c-0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'dark'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_dark"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.901,2.196 -4.901,4.901c0,2.705 2.197,4.901 4.901,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.662,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.989,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.732,61.103c1.91,-1.91 1.91,-5.011 0,-6.921l-0.009,-0.01c-1.91,-1.91 -5.012,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.909,1.91 5.011,1.91 6.92,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.672,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.52,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l-0,-0.01c-0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.901,2.196 -4.901,4.901c0,2.704 2.197,4.9 4.901,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.73,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 -0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.098,34.623c-2.699,0 -4.891,2.192 -4.891,4.892l-0,0.019c-0,2.699 2.192,4.891 4.891,4.891c2.7,0 4.892,-2.192 4.892,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.892,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'darkest'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_darkest"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><path d="M39.315,23.791c8.684,-0 15.734,7.05 15.734,15.733c0,8.684 -7.05,15.734 -15.734,15.734c-8.683,0 -15.733,-7.05 -15.733,-15.734c-0,-8.683 7.05,-15.733 15.733,-15.733Zm0,4.737c6.069,0 10.997,4.927 10.997,10.996c-0,6.069 -4.928,10.996 -10.997,10.996c-6.068,0 -10.996,-4.927 -10.996,-10.996c0,-6.069 4.928,-10.996 10.996,-10.996Z" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.216,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.9,2.196 -4.9,4.901c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.666,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.99,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.737,61.103c1.909,-1.91 1.909,-5.011 -0,-6.921l-0.01,-0.01c-1.91,-1.91 -5.011,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.91,1.91 5.011,1.91 6.921,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.676,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.524,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l0,-0.01c0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.216,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901c-0,2.704 2.196,4.9 4.9,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.734,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.103,34.623c-2.7,0 -4.892,2.192 -4.892,4.892l-0,0.019c-0,2.699 2.192,4.891 4.892,4.891c2.699,0 4.891,-2.192 4.891,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.891,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+</a>
+
+<script>
+(function() {
+    const LOCAL_STORAGE_KEY = 'piccoloThemeMode'
+
+    var initialMode = localStorage.getItem(LOCAL_STORAGE_KEY)
+
+    if (initialMode) {
+        // Make sure the value in local storage is valid
+        if (['light', 'dark', 'darkest'].indexOf(initialMode) == -1) {
+            initialMode = 'light'
+            localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+        }
+    } else {
+        // Check if the client prefers dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            initialMode = 'dark'
+        } else {
+            initialMode = 'light'
+        }
+        localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+    }
+
+    document.documentElement.dataset.mode = initialMode
+
+    PetiteVue.createApp({
+        'mode': initialMode,
+        handleClick() {
+            let currentMode = this.mode
+
+            if (currentMode == 'light') {
+                this.mode = 'dark'
+            } else if (currentMode == 'dark') {
+                this.mode = 'darkest'
+            } else if (currentMode == 'darkest') {
+                this.mode = 'light'
+            }
+
+            document.documentElement.dataset.mode = this.mode
+            localStorage.setItem(LOCAL_STORAGE_KEY, this.mode)
+
+            console.log(this.mode)
+        }
+    }).mount('#mode_toggle')
+})()
+</script>
+            <p class="mobile_search_link">
+                <a href="../../../search.html" title="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65 64" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2">
+                        <path d="M14.873 40.009c-2.315-3.943-3.642-8.532-3.642-13.429C11.231 11.91 23.141 0 37.811 0s26.58 11.91 26.58 26.58-11.91 26.58-26.58 26.58a26.44 26.44 0 0 1-14.277-4.161L9.739 62.794a3.12 3.12 0 0 1-4.413 0L.913 58.382c-1.217-1.218-1.217-3.196 0-4.413l13.96-13.96zM37.811 8.054c10.225 0 18.526 8.301 18.526 18.526s-8.301 18.526-18.526 18.526-18.526-8.301-18.526-18.526S27.586 8.054 37.811 8.054z" fill="#fff" />
+                    </svg>
+                </a>
+            </p>
+        
+
+        <div class="searchbox_wrapper">
+            
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+    </nav>
+</div>
+
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../concept.html">Concepts</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">agentc CLI Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">Package Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../catalog.html">Tool / Prompt Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../log.html">Spans and Log Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../analysis.html">Log Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Help / Questions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../faqs.html">FAQs</a></li>
+</ul>
+
+        </div>
+      </div>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for agentc_core.config.config</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">couchbase.auth</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">couchbase.cluster</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">couchbase.options</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pydantic_settings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.parse</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.catalog.implementations.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">SearchResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_ACTIVITY_FOLDER</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_CATALOG_FOLDER</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_CLUSTER_DDL_RETRY_ATTEMPTS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_CLUSTER_DDL_RETRY_WAIT_SECONDS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_CLUSTER_WAIT_UNTIL_READY_SECONDS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_DDL_CREATE_INDEX_INTERVAL_SECONDS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_EMBEDDING_MODEL_NAME</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_MODEL_CACHE_FOLDER</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_VERBOSITY_LEVEL</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.learned.embedding</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmbeddingModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.provider.provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.provider.provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">ToolProvider</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1"># Constant to represent the latest snapshot version.</span>
+<span class="n">LATEST_SNAPSHOT_VERSION</span> <span class="o">=</span> <span class="s2">&quot;__LATEST__&quot;</span>
+
+<span class="c1"># To support custom refiners, we must export this model.</span>
+<span class="n">SearchResult</span> <span class="o">=</span> <span class="n">SearchResult</span>
+
+<span class="c1"># To support the generation of different (schema) models, we export this model.</span>
+<span class="n">SchemaModel</span> <span class="o">=</span> <span class="n">ModelType</span>
+
+
+<div class="viewcode-block" id="RemoteCatalogConfig">
+<a class="viewcode-back" href="../../../config.html#agentc_core.config.config.RemoteCatalogConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RemoteCatalogConfig</span><span class="p">(</span><span class="n">pydantic_settings</span><span class="o">.</span><span class="n">BaseSettings</span><span class="p">):</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic_settings</span><span class="o">.</span><span class="n">SettingsConfigDict</span><span class="p">(</span><span class="n">env_file</span><span class="o">=</span><span class="s2">&quot;.env&quot;</span><span class="p">,</span> <span class="n">env_prefix</span><span class="o">=</span><span class="s2">&quot;AGENT_CATALOG_&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+    <span class="n">conn_string</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Couchbase connection string that points to the catalog.</span>
+
+<span class="sd">    This Couchbase instance refers to the CB instance used with the :code:`publish` command.</span>
+<span class="sd">    If there exists no local catalog (e.g., this is deployed in a standalone environment), we will perform all</span>
+<span class="sd">    :code:`find` commands directly on the remote catalog.</span>
+<span class="sd">    If this field AND ``$AGENT_CATALOG_PROJECT_PATH`` are specified, we will issue :code:`find` on both the remote</span>
+<span class="sd">    and local catalog (with local catalog entries taking precedence).</span>
+
+<span class="sd">    This field **must** be specified with :py:attr:`username`, :py:attr:`password`, and  :py:attr:`bucket`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">username</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Username associated with the Couchbase instance possessing the catalog.</span>
+
+<span class="sd">    This field **must** be specified with :py:attr:`conn_string`, :py:attr:`password`, and :py:attr:`bucket`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">password</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">pydantic</span><span class="o">.</span><span class="n">SecretStr</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Password associated with the Couchbase instance possessing the catalog.</span>
+
+<span class="sd">    This field **must** be specified with :py:attr:`conn_string`, :py:attr:`username`, and :py:attr:`bucket`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">conn_root_certificate</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Path to the root certificate file for the Couchbase cluster.</span>
+
+<span class="sd">    This field is optional and only required if the Couchbase cluster is using a self-signed certificate.</span>
+<span class="sd">    If specified, this field **must** be specified with :py:attr:`conn_string`, :py:attr:`username`,</span>
+<span class="sd">    and :py:attr:`password`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">bucket</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The name of the Couchbase bucket possessing the catalog.</span>
+
+<span class="sd">    This field **must** be specified with :py:attr:`conn_string`, :py:attr:`username`, and :py:attr:`password`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">max_index_partition</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The maximum number of index partitions across all nodes for your cluster.</span>
+
+<span class="sd">    This parameter is used by the Search service to build vector indexes on :code:`init`.</span>
+<span class="sd">    By default, this value is 1024.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">index_partition</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot; The maximum number of index partitions across all nodes for your cluster.</span>
+
+<span class="sd">    This parameter is used by the Search service to build vector indexes on :code:`init`.</span>
+<span class="sd">    By default, this value is :math:`2 \times \text{number of FTS nodes in your cluster}`.</span>
+<span class="sd">    More information on index partitioning can be found</span>
+<span class="sd">    `here &lt;https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index-partitioning.html&gt;`_.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">wait_until_ready_seconds</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_CLUSTER_WAIT_UNTIL_READY_SECONDS</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Maximum wait time before timing out when connecting to a Couchbase cluster.</span>
+
+<span class="sd">    If you have a slow network connection, you may want to increase this value.</span>
+<span class="sd">    By default, this value is 5 seconds.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ddl_create_index_interval_seconds</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_DDL_CREATE_INDEX_INTERVAL_SECONDS</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Wait time (in seconds) between individual :code:`CREATE INDEX` operations.</span>
+
+<span class="sd">    This field is only used by the :code:`init` command during index creation.</span>
+<span class="sd">    Multiple index creation operations may raise a transient error from the Index Service.</span>
+<span class="sd">    If you keep running into this issue, raise this value.</span>
+<span class="sd">    By default, this value is 1 second.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ddl_retry_attempts</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_CLUSTER_DDL_RETRY_ATTEMPTS</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Maximum number of attempts to retry DDL operations.</span>
+
+<span class="sd">    This field is only used by the :code:`init` command during scope, collection, and index creation.</span>
+<span class="sd">    If the number of attempts is exceeded, the command will fail.</span>
+<span class="sd">    By default, this value is 3 attempts.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ddl_retry_wait_seconds</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_CLUSTER_DDL_RETRY_WAIT_SECONDS</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Wait time (in seconds) between DDL operation retries.</span>
+
+<span class="sd">    This field is only used by the :code:`init` command during scope, collection, and index creation.</span>
+<span class="sd">    By default, this value is 5 seconds.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">field_validator</span><span class="p">(</span><span class="s2">&quot;conn_string&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_conn_string_must_follow_supported_url_pattern</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># No connection string provided, so we&#39;re good.</span>
+            <span class="k">return</span> <span class="n">v</span>
+
+        <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">parsed_url</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlparse</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;couchbase&quot;</span><span class="p">,</span> <span class="s2">&quot;couchbases&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">netloc</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Malformed $AGENT_CATALOG_CONN_STRING received.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;Please edit your $AGENT_CATALOG_CONN_STRING and try again.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;Examples of accepted formats are:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">couchbase://localhost</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">couchbases://my_capella.cloud.couchbase.com&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">field_validator</span><span class="p">(</span><span class="s2">&quot;conn_root_certificate&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_certificate_path_must_be_valid_if_not_none</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">ValidationInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">conn_url</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;conn_string&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">conn_url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s2">&quot;couchbases&quot;</span> <span class="ow">in</span> <span class="n">conn_url</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Could not find the environment variable $AGENT_CATALOG_CONN_ROOT_CERTIFICATE!</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;Please run &#39;export AGENT_CATALOG_CONN_ROOT_CERTIFICATE=...&#39; or add &quot;</span>
+                    <span class="s2">&quot;$AGENT_CATALOG_CONN_ROOT_CERTIFICATE to your .env file and try again.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Value provided for variable $AGENT_CATALOG_CONN_ROOT_CERTIFICATE does not exist in your file &quot;</span>
+                    <span class="s2">&quot;system!</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Value provided for variable $AGENT_CATALOG_CONN_ROOT_CERTIFICATE is not a valid path to the &quot;</span>
+                    <span class="s2">&quot;cluster&#39;s root certificate file!</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">field_serializer</span><span class="p">(</span><span class="s2">&quot;password&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_serialize_password_as_stars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">SecretStr</span><span class="p">,</span> <span class="n">_info</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;***&quot;</span>
+
+<div class="viewcode-block" id="RemoteCatalogConfig.Cluster">
+<a class="viewcode-back" href="../../../config.html#agentc_core.config.config.RemoteCatalogConfig.Cluster">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Cluster</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">couchbase</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">Cluster</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn_string</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Could not find the environment variable $AGENT_CATALOG_CONN_STRING!</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;Please run &#39;export AGENT_CATALOG_CONN_STRING=...&#39; or add &quot;</span>
+                <span class="s2">&quot;$AGENT_CATALOG_CONN_STRING to your .env file and try again.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Could not find the environment variable $AGENT_CATALOG_USERNAME!</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;Please run &#39;export AGENT_CATALOG_USERNAME=...&#39; or add &quot;</span>
+                <span class="s2">&quot;$AGENT_CATALOG_USERNAME to your .env file and try again.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Could not find the environment variable $AGENT_CATALOG_PASSWORD!</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;Please run &#39;export $AGENT_CATALOG_PASSWORD=...&#39; or add &quot;</span>
+                <span class="s2">&quot;$AGENT_CATALOG_PASSWORD to your .env file and try again.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bucket</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Could not find the environment variable $AGENT_CATALOG_BUCKET!</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;Please run &#39;export AGENT_CATALOG_BUCKET=...&#39; or add &quot;</span>
+                <span class="s2">&quot;$AGENT_CATALOG_BUCKET to your .env file and try again.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">auth</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">couchbase</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">PasswordAuthenticator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">())</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn_root_certificate</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="n">couchbase</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">PasswordAuthenticator</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">(),</span> <span class="n">cert_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conn_root_certificate</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="n">couchbase</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">ClusterOptions</span><span class="p">(</span><span class="n">auth</span><span class="p">)</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">apply_profile</span><span class="p">(</span><span class="s2">&quot;wan_development&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Connect to our cluster.</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connecting to Couchbase cluster at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">conn_string</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+        <span class="n">cluster</span> <span class="o">=</span> <span class="n">couchbase</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">Cluster</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conn_string</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+        <span class="n">cluster</span><span class="o">.</span><span class="n">wait_until_ready</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wait_until_ready_seconds</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Connection successfully established.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cluster</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ToolRuntimeConfig">
+<a class="viewcode-back" href="../../../config.html#agentc_core.config.config.ToolRuntimeConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ToolRuntimeConfig</span><span class="p">[</span><span class="n">T</span><span class="p">](</span><span class="n">pydantic_settings</span><span class="o">.</span><span class="n">BaseSettings</span><span class="p">):</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic_settings</span><span class="o">.</span><span class="n">SettingsConfigDict</span><span class="p">(</span><span class="n">env_file</span><span class="o">=</span><span class="s2">&quot;.env&quot;</span><span class="p">,</span> <span class="n">env_prefix</span><span class="o">=</span><span class="s2">&quot;AGENT_CATALOG_&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+    <span class="n">codegen_output</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Location to save generated Python stubs to, if desired.</span>
+
+<span class="sd">    On :py:meth:`find_tools`, tools are dynamically generated and served as annotated Python callables.</span>
+<span class="sd">    By default, this code is never written to disk.</span>
+<span class="sd">    If this field is specified, we will write all generated files to the given output directory and serve the generated</span>
+<span class="sd">    Python callables from these files with a &quot;standard import&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">tool_decorator</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">[[</span><span class="n">ToolProvider</span><span class="o">.</span><span class="n">ToolResult</span><span class="p">],</span> <span class="n">T</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A Python decorator (function) to apply to each result yielded by :py:meth:`agentc.catalog.Catalog.find_tools`.</span>
+
+<span class="sd">    By default, yielded results are callable and possess type annotations + documentation strings, but some agent</span>
+<span class="sd">    frameworks may ask for tools whose type is tailored to their own framework.</span>
+<span class="sd">    As an example, in LangChain, vanilla Python functions must be converted to ``langchain_core.tools.BaseTool``</span>
+<span class="sd">    instances.</span>
+<span class="sd">    To avoid having to &quot;box&quot; these tools yourself, we accept a callback to perform this boxing on your behalf.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">refiner</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">results</span><span class="p">:</span> <span class="n">results</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A Python function to post-process results (reranking, pruning, etc...) yielded by the catalog.</span>
+
+<span class="sd">    By default, we perform a strict top-K nearest neighbor search for relevant results.</span>
+<span class="sd">    This function serves to perform any additional reranking and **pruning** before the code generation occurs.</span>
+<span class="sd">    This function should accept a list of :py:class:`agentc_core.catalog.SearchResult` instances (a model with the</span>
+<span class="sd">    fields ``entry`` and ``delta``) and return a list of :py:class:`agentc_core.catalog.SearchResult` instances.</span>
+
+<span class="sd">    We offer an experimental post-processor to cluster closely related results (using delta as the loss function)</span>
+<span class="sd">    and subsequently yield the closest cluster (see :py:class:`agentc_core.provider.refiner.ClosestClusterRefiner`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">secrets</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">SecretStr</span><span class="p">]]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A map of identifiers to secret values (e.g., Couchbase usernames, passwords, etc...).</span>
+
+<span class="sd">    .. card:: Field Description</span>
+
+<span class="sd">        Some tools require access to values that cannot be hard-coded into the tool themselves (for security reasons).</span>
+<span class="sd">        As an example, SQL++ tools require a connection string, username, and password.</span>
+<span class="sd">        Instead of capturing these raw values in the tool metadata, tool descriptors mandate the specification of a</span>
+<span class="sd">        map whose values are secret keys.</span>
+<span class="sd">        These identifiers are read either from the environment or from this ``secrets`` field.</span>
+
+<span class="sd">        .. code-block:: yaml</span>
+
+<span class="sd">            secrets:</span>
+<span class="sd">                - couchbase:</span>
+<span class="sd">                    conn_string: MY_CB_CONN_STRING</span>
+<span class="sd">                    username: MY_CB_USERNAME</span>
+<span class="sd">                    password: MY_CB_PASSWORD</span>
+
+<span class="sd">        To map the secret keys to values explicitly, users will specify their secrets using this field (secrets).</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            provider = agentc.Catalog(secrets={</span>
+<span class="sd">                &quot;CB_CONN_STRING&quot;: &quot;couchbase//23.52.12.254&quot;,</span>
+<span class="sd">                &quot;CB_USERNAME&quot;: &quot;admin_7823&quot;,</span>
+<span class="sd">                &quot;CB_PASSWORD&quot;: os.getenv(&quot;THE_CB_PASSWORD&quot;),</span>
+<span class="sd">                &quot;CB_CERTIFICATE&quot;: &quot;path/to/cert.pem&quot;,</span>
+<span class="sd">            })</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">tool_model</span><span class="p">:</span> <span class="n">SchemaModel</span> <span class="o">=</span> <span class="n">SchemaModel</span><span class="o">.</span><span class="n">TypingTypedDict</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The target model type for the generated (schema) code for tools.</span>
+
+<span class="sd">    .. card:: Field Description</span>
+
+<span class="sd">        By default, we generate ``TypedDict`` models and attach these as type hints to the generated Python functions.</span>
+<span class="sd">        Other options include Pydantic (V2 and V1) models and dataclasses, though these may not be supported by all</span>
+<span class="sd">        agent frameworks.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="LocalCatalogConfig">
+<a class="viewcode-back" href="../../../config.html#agentc_core.config.config.LocalCatalogConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LocalCatalogConfig</span><span class="p">(</span><span class="n">pydantic_settings</span><span class="o">.</span><span class="n">BaseSettings</span><span class="p">):</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic_settings</span><span class="o">.</span><span class="n">SettingsConfigDict</span><span class="p">(</span><span class="n">env_file</span><span class="o">=</span><span class="s2">&quot;.env&quot;</span><span class="p">,</span> <span class="n">env_prefix</span><span class="o">=</span><span class="s2">&quot;AGENT_CATALOG_&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+    <span class="n">project_path</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Location of the project root.</span>
+
+<span class="sd">    If specified, we expect the ``.agent-catalog`` and ``.agent-activity`` folders to exist under this directory.</span>
+<span class="sd">    If not specified, the project path is the parent folder of the working Git repository root.</span>
+<span class="sd">    A typical project structure is as follows::</span>
+
+<span class="sd">        MY_PROJECT</span>
+<span class="sd">        |- .agent-catalog</span>
+<span class="sd">        |- .agent-activity</span>
+<span class="sd">        |- .git</span>
+
+<span class="sd">    To directly specify the catalog or activity paths, specify values for the ``$AGENT_CATALOG_CATALOG_PATH`` and/or</span>
+<span class="sd">    ``$AGENT_CATALOG_ACTIVITY_PATH`` fields.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">catalog_path</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Location of the catalog folder.</span>
+
+<span class="sd">    By default, this value is ``$AGENT_CATALOG_PROJECT_PATH/.agent-catalog``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">activity_path</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Location of the activity folder.</span>
+
+<span class="sd">    By default, this value is ``$AGENT_CATALOG_ACTIVITY_PATH/.agent-activity``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_catalog_and_activity_must_align_with_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
+        <span class="c1"># Note: this validator does not care about existence, rather malformed configurations.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">catalog_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">activity_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># and self.project_path is not None</span>
+            <span class="n">catalog_path_under_project</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="o">/</span> <span class="n">DEFAULT_CATALOG_FOLDER</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog_path</span><span class="o">.</span><span class="n">samefile</span><span class="p">(</span><span class="n">catalog_path_under_project</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;AGENT_CATALOG_PROJECT_PATH specified with misaligned AGENT_CATALOG_CATALOG_PATH!</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&#39;</span><span class="si">{</span><span class="n">catalog_path_under_project</span><span class="si">}</span><span class="s2">&#39; vs. &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">catalog_path</span><span class="si">}</span><span class="s2">&#39;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Try unsetting either variable (e.g. `unset AGENT_CATALOG_PROJECT_PATH` or &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;`unset AGENT_CATALOG_CATALOG_PATH`.&quot;</span>
+                <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">activity_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">activity_path_under_project</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="o">/</span> <span class="n">DEFAULT_ACTIVITY_FOLDER</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog_path</span><span class="o">.</span><span class="n">samefile</span><span class="p">(</span><span class="n">activity_path_under_project</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;AGENT_CATALOG_PROJECT_PATH specified with misaligned AGENT_CATALOG_ACTIVITY_PATH!</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&#39;</span><span class="si">{</span><span class="n">activity_path_under_project</span><span class="si">}</span><span class="s2">&#39; vs. &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">catalog_path</span><span class="si">}</span><span class="s2">&#39;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Try unsetting either variable (e.g. `unset AGENT_CATALOG_PROJECT_PATH` or &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;`unset AGENT_CATALOG_ACTIVITY_PATH`.&quot;</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+<div class="viewcode-block" id="LocalCatalogConfig.CatalogPath">
+<a class="viewcode-back" href="../../../config.html#agentc_core.config.config.LocalCatalogConfig.CatalogPath">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">CatalogPath</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">:</span>
+        <span class="c1"># If a user has explicitly specified a path, or we have inferred the path previously, serve the path here.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Catalog does not exist at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">catalog_path</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="si">}</span><span class="s2">!</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;If this is a new Agent Catalog instance, please run the &#39;agentc init&#39; command.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog_path</span>
+
+        <span class="c1"># If a catalog path is not set, perform a best-effort search.</span>
+        <span class="n">starting_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s1">&#39;Starting upwards search for the catalog folder in &quot;</span><span class="si">%s</span><span class="s1">&quot;. Searching for &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span><span class="p">,</span>
+            <span class="n">starting_path</span><span class="p">,</span>
+            <span class="n">DEFAULT_CATALOG_FOLDER</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">&lt;=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+            <span class="n">items_in_directory</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">starting_path</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
+                <span class="n">items_in_directory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Items in directory: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">items_in_directory</span><span class="p">)</span>
+
+        <span class="c1"># Iteratively ascend our starting path until we find the catalog folder.</span>
+        <span class="n">working_path</span> <span class="o">=</span> <span class="n">starting_path</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="p">(</span><span class="n">working_path</span> <span class="o">/</span> <span class="n">DEFAULT_CATALOG_FOLDER</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Searching in </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">working_path</span><span class="o">.</span><span class="n">absolute</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">working_path</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">working_path</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Local catalog not found using an upwards search from </span><span class="si">{</span><span class="n">starting_path</span><span class="si">}</span><span class="s2">!</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;If this is a new Agent Catalog instance, please run the &#39;agentc init&#39; command.&quot;</span>
+                <span class="p">)</span>
+            <span class="n">working_path</span> <span class="o">=</span> <span class="n">working_path</span><span class="o">.</span><span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">catalog_path</span> <span class="o">=</span> <span class="n">working_path</span> <span class="o">/</span> <span class="n">DEFAULT_CATALOG_FOLDER</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog_path</span></div>
+
+
+<div class="viewcode-block" id="LocalCatalogConfig.ActivityPath">
+<a class="viewcode-back" href="../../../config.html#agentc_core.config.config.LocalCatalogConfig.ActivityPath">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ActivityPath</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">:</span>
+        <span class="c1"># If a user has explicitly specified a path, or we have inferred the path previously, serve the path here.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">activity_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">activity_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Activity (folder) does not exist at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">catalog_path</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="si">}</span><span class="s2">!&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">activity_path</span>
+
+        <span class="c1"># If a catalog path is not set, perform a best-effort search.</span>
+        <span class="n">starting_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s1">&#39;Starting upwards search for the activity folder. Searching for &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span><span class="p">,</span>
+            <span class="n">DEFAULT_ACTIVITY_FOLDER</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Iteratively ascend our starting path until we find the activity folder.</span>
+        <span class="n">working_path</span> <span class="o">=</span> <span class="n">starting_path</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="p">(</span><span class="n">working_path</span> <span class="o">/</span> <span class="n">DEFAULT_ACTIVITY_FOLDER</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">working_path</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">working_path</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Activity (folder) not found with search from </span><span class="si">{</span><span class="n">starting_path</span><span class="si">}</span><span class="s2">!&quot;</span><span class="p">)</span>
+            <span class="n">working_path</span> <span class="o">=</span> <span class="n">working_path</span><span class="o">.</span><span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activity_path</span> <span class="o">=</span> <span class="n">working_path</span> <span class="o">/</span> <span class="n">DEFAULT_ACTIVITY_FOLDER</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">activity_path</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="EmbeddingModelConfig">
+<a class="viewcode-back" href="../../../config.html#agentc_core.config.config.EmbeddingModelConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EmbeddingModelConfig</span><span class="p">(</span><span class="n">LocalCatalogConfig</span><span class="p">,</span> <span class="n">RemoteCatalogConfig</span><span class="p">):</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic_settings</span><span class="o">.</span><span class="n">SettingsConfigDict</span><span class="p">(</span><span class="n">env_file</span><span class="o">=</span><span class="s2">&quot;.env&quot;</span><span class="p">,</span> <span class="n">env_prefix</span><span class="o">=</span><span class="s2">&quot;AGENT_CATALOG_&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+    <span class="n">embedding_model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_EMBEDDING_MODEL_NAME</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The name of the embedding model that Agent Catalog will use when indexing and querying tools and prompts.</span>
+
+<span class="sd">    By default, the ``sentence-transformers/all-MiniLM-L12-v2`` model is used.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">embedding_model_url</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The base URL of an OpenAI-client-compatible endpoint.</span>
+
+<span class="sd">    This field is optional, but if specified we will assume that the model specified by ``embedding_model_name`` is</span>
+<span class="sd">    accessible by this endpoint.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">embedding_model_auth</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The authentication token for the endpoint specified by ``embedding_model_url``.</span>
+
+<span class="sd">    For endpoints hosted by OpenAI, this is the API key.</span>
+<span class="sd">    For endpoints hosted on Capella, this is your JWT.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">sentence_transformers_model_cache</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_MODEL_CACHE_FOLDER</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The path to the folder where sentence-transformer embedding models will be cached.</span>
+
+<span class="sd">    By default, this is ``$AGENT_CATALOG_PROJECT_PATH/.model-cache``.</span>
+<span class="sd">    For OpenAI embedding models, this field is ignored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">sentence_transformers_retry_attempts</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The number of times to retry fetching a sentence-transformers model.</span>
+
+<span class="sd">    On the first attempt, we will always try to fetch the model from the cache.</span>
+<span class="sd">    For all subsequent attempts, we will try to fetch the model from HuggingFace.</span>
+<span class="sd">    If this field is set to 1, we will error out if the model is not found in the cache.</span>
+<span class="sd">    By default, this value is 3.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="EmbeddingModelConfig.EmbeddingModel">
+<a class="viewcode-back" href="../../../config.html#agentc_core.config.config.EmbeddingModelConfig.EmbeddingModel">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">EmbeddingModel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">load_from</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;NAME&quot;</span><span class="p">,</span> <span class="s2">&quot;LOCAL&quot;</span><span class="p">,</span> <span class="s2">&quot;DB&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">EmbeddingModel</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">load_from</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">load_from</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;NAME&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;LOCAL&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;sentence_transformers_model_cache&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sentence_transformers_model_cache</span><span class="p">,</span>
+            <span class="s2">&quot;sentence_transformers_retry_attempts&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sentence_transformers_retry_attempts</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">load_from</span><span class="p">):</span>
+            <span class="k">match</span> <span class="n">source</span><span class="o">.</span><span class="n">upper</span><span class="p">():</span>
+                <span class="k">case</span> <span class="s2">&quot;NAME&quot;</span><span class="p">:</span>
+                    <span class="n">params</span><span class="p">[</span><span class="s2">&quot;embedding_model_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding_model_name</span>
+                    <span class="n">params</span><span class="p">[</span><span class="s2">&quot;embedding_model_url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding_model_url</span>
+                    <span class="n">params</span><span class="p">[</span><span class="s2">&quot;embedding_model_auth&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding_model_auth</span>
+                <span class="k">case</span> <span class="s2">&quot;LOCAL&quot;</span><span class="p">:</span>
+                    <span class="n">params</span><span class="p">[</span><span class="s2">&quot;catalog_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">CatalogPath</span><span class="p">()</span>
+                <span class="k">case</span> <span class="s2">&quot;DB&quot;</span><span class="p">:</span>
+                    <span class="n">params</span><span class="p">[</span><span class="s2">&quot;cb_bucket&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bucket</span>
+                    <span class="n">params</span><span class="p">[</span><span class="s2">&quot;cb_cluster&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Cluster</span><span class="p">()</span>
+                    <span class="n">params</span><span class="p">[</span><span class="s2">&quot;catalog_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">CatalogPath</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">EmbeddingModel</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CommandLineConfig">
+<a class="viewcode-back" href="../../../config.html#agentc_core.config.config.CommandLineConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CommandLineConfig</span><span class="p">(</span><span class="n">pydantic_settings</span><span class="o">.</span><span class="n">BaseSettings</span><span class="p">):</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic_settings</span><span class="o">.</span><span class="n">SettingsConfigDict</span><span class="p">(</span><span class="n">env_file</span><span class="o">=</span><span class="s2">&quot;.env&quot;</span><span class="p">,</span> <span class="n">env_prefix</span><span class="o">=</span><span class="s2">&quot;AGENT_CATALOG_&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+    <span class="n">verbosity_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_VERBOSITY_LEVEL</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Verbosity level of the :command:`agentc` command line tool.</span>
+
+<span class="sd">    By default, this value is 0.</span>
+<span class="sd">    If ``AGENT_CATALOG_DEBUG`` exists, this value is set to 2.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">with_interaction</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Whether to enable the interaction mode for the :command:`agentc` command line tool.</span>
+
+<span class="sd">    By default, this value is True.</span>
+<span class="sd">    Set this value to False to raise errors when the command line tool requires user input (e.g., when developing</span>
+<span class="sd">    scripts).</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="VersioningConfig">
+<a class="viewcode-back" href="../../../config.html#agentc_core.config.config.VersioningConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">VersioningConfig</span><span class="p">(</span><span class="n">pydantic_settings</span><span class="o">.</span><span class="n">BaseSettings</span><span class="p">):</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic_settings</span><span class="o">.</span><span class="n">SettingsConfigDict</span><span class="p">(</span><span class="n">env_file</span><span class="o">=</span><span class="s2">&quot;.env&quot;</span><span class="p">,</span> <span class="n">env_prefix</span><span class="o">=</span><span class="s2">&quot;AGENT_CATALOG_&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+    <span class="n">catalog_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">LATEST_SNAPSHOT_VERSION</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The snapshot version to find the tools and prompts for.</span>
+
+<span class="sd">    By default, we use the latest snapshot version if the repo is clean.</span>
+<span class="sd">    This snapshot version is retrieved directly from Git (if the repo is clean).</span>
+<span class="sd">    If the repo is dirty, we will fetch all tools and prompts from the local catalog (by default).</span>
+<span class="sd">    If snapshot is specified at search time (i.e., with :py:meth:`find_tools` or :py:meth:`find_prompts`), we</span>
+<span class="sd">    will use that snapshot version instead.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
+<span class="c1"># We&#39;ll take a mix-in approach here.</span>
+<div class="viewcode-block" id="Config">
+<a class="viewcode-back" href="../../../config.html#agentc_core.config.config.Config">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">(</span>
+    <span class="n">EmbeddingModelConfig</span><span class="p">,</span>
+    <span class="n">LocalCatalogConfig</span><span class="p">,</span>
+    <span class="n">RemoteCatalogConfig</span><span class="p">,</span>
+    <span class="n">ToolRuntimeConfig</span><span class="p">,</span>
+    <span class="n">CommandLineConfig</span><span class="p">,</span>
+    <span class="n">VersioningConfig</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic_settings</span><span class="o">.</span><span class="n">SettingsConfigDict</span><span class="p">(</span><span class="n">env_file</span><span class="o">=</span><span class="s2">&quot;.env&quot;</span><span class="p">,</span> <span class="n">env_prefix</span><span class="o">=</span><span class="s2">&quot;AGENT_CATALOG_&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+    <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Whether or not to display debug messages from all Agent Catalog components.</span>
+
+<span class="sd">    By default, this value is False.</span>
+<span class="sd">    If ``AGENT_CATALOG_VERBOSITY_LEVEL`` is set to 2, this value is set to True.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_use_verbosity_level_for_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">verbosity_level</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity_level</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_logger_name</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="s2">&quot;agentc&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;agentc_core&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;agentc_cli&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;agentc_langchain&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;agentc_llamaindex&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;agentc_testing&quot;</span><span class="p">,</span>
+            <span class="p">]:</span>
+                <span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">_logger_name</span><span class="p">)</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">())</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+    
+
+      <div class="clearer"></div>
+    </div>
+    <div class="button_nav_wrapper">
+        <div class="button_nav">
+            <div class="left">
+                
+            </div>
+
+            <div class="right">
+                
+            </div>
+        </div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Couchbase.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+
+<p id="theme_credit">Styled using the <a href="https://github.com/piccolo-orm/piccolo_theme">Piccolo Theme</a></p>
+  </body>
+</html>

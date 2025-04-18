@@ -1,776 +1,695 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="./">
-<head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>agentc Command Documentation &mdash; Agent Catalog v0.0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
-      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=86a354c8" />
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  
-    <link rel="shortcut icon" href="_static/favicon.png"/>
-      <script src="_static/jquery.js?v=5d32c60e"></script>
-      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=2fea6348"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
-      <script src="_static/copybutton.js?v=f281be69"></script>
+    <title>agentc Command Documentation &#8212; Agent Catalog v0.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=50651e91" />
+    <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
+    <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=86a354c8" />
+    <script src="_static/documentation_options.js?v=683873e3"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
     <script src="_static/js/theme.js"></script>
+    <script src="_static/js/petite-vue.js"></script>
+    <link rel="icon" href="_static/favicon.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="agentc Package Documentation" href="api.html" />
-    <link rel="prev" title="Agent Catalog User Guide" href="guide.html" /> 
-</head>
+    <link rel="next" title="Package Documentation" href="api.html" />
+    <link rel="prev" title="Agent Catalog Concepts" href="concept.html" /> 
+  </head><body data-dark_mode_code_blocks="true">
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+<div id="top_nav">
+    
 
-          
-          
-          <a href="index.html" class="icon icon-home">
-            Agent Catalog
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+    <nav>
+        
+            
+        
+
+        <p id="toggle_sidebar">
+            <a href="#" title="Toggle sidebar">|||</a>
+        </p>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog v0.2.0 documentation</a></h1>
+
+        <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
+    <template v-if="mode == 'light'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_light"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M67.48,18.073c1.913,-1.912 1.913,-5.018 0,-6.931c-1.912,-1.912 -5.018,-1.912 -6.931,0l-6.798,6.799c-1.912,1.912 -1.912,5.018 0,6.931c1.913,1.912 5.018,1.912 6.931,-0l6.798,-6.799Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.728,61.108c1.912,-1.913 1.912,-5.018 -0,-6.931c-1.913,-1.913 -5.019,-1.913 -6.931,-0l-6.799,6.798c-1.912,1.913 -1.912,5.019 0,6.931c1.913,1.913 5.019,1.913 6.931,0l6.799,-6.798Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.682,54.177c-1.913,-1.913 -5.018,-1.913 -6.931,-0c-1.912,1.913 -1.912,5.018 0,6.931l6.798,6.798c1.913,1.913 5.019,1.913 6.931,0c1.913,-1.912 1.913,-5.018 0,-6.931l-6.798,-6.798Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M4.901,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,-0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M18.929,11.142c-1.912,-1.912 -5.018,-1.912 -6.931,0c-1.912,1.913 -1.912,5.019 0,6.931l6.799,6.799c1.912,1.912 5.018,1.912 6.931,-0c1.912,-1.913 1.912,-5.019 -0,-6.931l-6.799,-6.799Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.108,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c-0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c-0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'dark'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_dark"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.901,2.196 -4.901,4.901c0,2.705 2.197,4.901 4.901,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.662,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.989,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.732,61.103c1.91,-1.91 1.91,-5.011 0,-6.921l-0.009,-0.01c-1.91,-1.91 -5.012,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.909,1.91 5.011,1.91 6.92,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.672,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.52,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l-0,-0.01c-0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.901,2.196 -4.901,4.901c0,2.704 2.197,4.9 4.901,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.73,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 -0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.098,34.623c-2.699,0 -4.891,2.192 -4.891,4.892l-0,0.019c-0,2.699 2.192,4.891 4.891,4.891c2.7,0 4.892,-2.192 4.892,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.892,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'darkest'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_darkest"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><path d="M39.315,23.791c8.684,-0 15.734,7.05 15.734,15.733c0,8.684 -7.05,15.734 -15.734,15.734c-8.683,0 -15.733,-7.05 -15.733,-15.734c-0,-8.683 7.05,-15.733 15.733,-15.733Zm0,4.737c6.069,0 10.997,4.927 10.997,10.996c-0,6.069 -4.928,10.996 -10.997,10.996c-6.068,0 -10.996,-4.927 -10.996,-10.996c0,-6.069 4.928,-10.996 10.996,-10.996Z" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.216,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.9,2.196 -4.9,4.901c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.666,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.99,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.737,61.103c1.909,-1.91 1.909,-5.011 -0,-6.921l-0.01,-0.01c-1.91,-1.91 -5.011,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.91,1.91 5.011,1.91 6.921,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.676,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.524,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l0,-0.01c0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.216,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901c-0,2.704 2.196,4.9 4.9,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.734,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.103,34.623c-2.7,0 -4.892,2.192 -4.892,4.892l-0,0.019c-0,2.699 2.192,4.891 4.892,4.891c2.699,0 4.891,-2.192 4.891,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.891,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+</a>
+
+<script>
+(function() {
+    const LOCAL_STORAGE_KEY = 'piccoloThemeMode'
+
+    var initialMode = localStorage.getItem(LOCAL_STORAGE_KEY)
+
+    if (initialMode) {
+        // Make sure the value in local storage is valid
+        if (['light', 'dark', 'darkest'].indexOf(initialMode) == -1) {
+            initialMode = 'light'
+            localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+        }
+    } else {
+        // Check if the client prefers dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            initialMode = 'dark'
+        } else {
+            initialMode = 'light'
+        }
+        localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+    }
+
+    document.documentElement.dataset.mode = initialMode
+
+    PetiteVue.createApp({
+        'mode': initialMode,
+        handleClick() {
+            let currentMode = this.mode
+
+            if (currentMode == 'light') {
+                this.mode = 'dark'
+            } else if (currentMode == 'dark') {
+                this.mode = 'darkest'
+            } else if (currentMode == 'darkest') {
+                this.mode = 'light'
+            }
+
+            document.documentElement.dataset.mode = this.mode
+            localStorage.setItem(LOCAL_STORAGE_KEY, this.mode)
+
+            console.log(this.mode)
+        }
+    }).mount('#mode_toggle')
+})()
+</script>
+            <p class="mobile_search_link">
+                <a href="search.html" title="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65 64" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2">
+                        <path d="M14.873 40.009c-2.315-3.943-3.642-8.532-3.642-13.429C11.231 11.91 23.141 0 37.811 0s26.58 11.91 26.58 26.58-11.91 26.58-26.58 26.58a26.44 26.44 0 0 1-14.277-4.161L9.739 62.794a3.12 3.12 0 0 1-4.413 0L.913 58.382c-1.217-1.218-1.217-3.196 0-4.413l13.96-13.96zM37.811 8.054c10.225 0 18.526 8.301 18.526 18.526s-8.301 18.526-18.526 18.526-18.526-8.301-18.526-18.526S27.586 8.054 37.811 8.054z" fill="#fff" />
+                    </svg>
+                </a>
+            </p>
+        
+
+        <div class="searchbox_wrapper">
+            
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+    </nav>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="install.html">Getting Agent Catalog</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#building-from-package">Building From Package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#building-from-source-with-pip">Building From Source (with pip)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#building-from-source-with-poetry">Building From Source (with Poetry)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#verifying-your-installation">Verifying Your Installation</a></li>
+
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concept.html">Concepts</a></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="guide.html">Agent Catalog User Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="guide.html#metrics-driven-development">Metrics Driven Development</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide.html#couchbase-backed-agent-catalogs">Couchbase-Backed Agent Catalogs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide.html#assessing-agent-quality">Assessing Agent Quality</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide.html#ignoring-files-while-indexing">Ignoring Files While Indexing</a></li>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">agentc CLI Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Package Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="catalog.html">Tool / Prompt Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="log.html">Spans and Log Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Log Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
 </ul>
-</li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Command Line Tool</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#agentc">agentc</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#agentc-add">add</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#agentc-clean">clean</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#agentc-env">env</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#agentc-execute">execute</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#agentc-find">find</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#agentc-index">index</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#agentc-ls">ls</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#agentc-publish">publish</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#agentc-status">status</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#agentc-version">version</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">Agent Catalog API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api.html#agentc.Auditor"><code class="docutils literal notranslate"><span class="pre">Auditor</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.agent_name"><code class="docutils literal notranslate"><span class="pre">Auditor.agent_name</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.auditor_output"><code class="docutils literal notranslate"><span class="pre">Auditor.auditor_output</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.bucket"><code class="docutils literal notranslate"><span class="pre">Auditor.bucket</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.catalog"><code class="docutils literal notranslate"><span class="pre">Auditor.catalog</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.conn_root_certificate"><code class="docutils literal notranslate"><span class="pre">Auditor.conn_root_certificate</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.conn_string"><code class="docutils literal notranslate"><span class="pre">Auditor.conn_string</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.llm_model_name"><code class="docutils literal notranslate"><span class="pre">Auditor.llm_model_name</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.password"><code class="docutils literal notranslate"><span class="pre">Auditor.password</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.username"><code class="docutils literal notranslate"><span class="pre">Auditor.username</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.accept"><code class="docutils literal notranslate"><span class="pre">Auditor.accept()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.move"><code class="docutils literal notranslate"><span class="pre">Auditor.move()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#agentc.Provider"><code class="docutils literal notranslate"><span class="pre">Provider</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.bucket"><code class="docutils literal notranslate"><span class="pre">Provider.bucket</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.catalog"><code class="docutils literal notranslate"><span class="pre">Provider.catalog</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.conn_root_certificate"><code class="docutils literal notranslate"><span class="pre">Provider.conn_root_certificate</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.conn_string"><code class="docutils literal notranslate"><span class="pre">Provider.conn_string</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.decorator"><code class="docutils literal notranslate"><span class="pre">Provider.decorator</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.password"><code class="docutils literal notranslate"><span class="pre">Provider.password</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.provider_output"><code class="docutils literal notranslate"><span class="pre">Provider.provider_output</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.refiner"><code class="docutils literal notranslate"><span class="pre">Provider.refiner</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.secrets"><code class="docutils literal notranslate"><span class="pre">Provider.secrets</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.snapshot"><code class="docutils literal notranslate"><span class="pre">Provider.snapshot</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.tool_model"><code class="docutils literal notranslate"><span class="pre">Provider.tool_model</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.username"><code class="docutils literal notranslate"><span class="pre">Provider.username</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.get_item"><code class="docutils literal notranslate"><span class="pre">Provider.get_item()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.version"><code class="docutils literal notranslate"><span class="pre">Provider.version</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#agentc.langchain.audit"><code class="docutils literal notranslate"><span class="pre">audit()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="provider.html">Provider Configuration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="provider.html#langchain-langgraph-crewai">Langchain/LangGraph/CrewAI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="provider.html#llamaindex">LlamaIndex</a></li>
-<li class="toctree-l2"><a class="reference internal" href="provider.html#controlflow">Controlflow</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="env.html">Environment Variables</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="env.html#mandatory-environment-variables">Mandatory Environment Variables</a></li>
-<li class="toctree-l2"><a class="reference internal" href="env.html#optional-environment-variables">Optional Environment Variables</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="entry.html">On Catalog Entries</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="entry.html#tool-catalog-records">Tool Catalog Records</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#python-function-tools">Python Function Tools</a></li>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#sql-query-tools">SQL++ Query Tools</a></li>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#semantic-search-tools">Semantic Search Tools</a></li>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#http-request-tools">HTTP Request Tools</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="entry.html#prompt-catalog-records">Prompt Catalog Records</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#raw-prompts">Raw Prompts</a></li>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#jinja-templated-prompts">Jinja Templated Prompts</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="faqs.html">Frequently Asked Questions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#which-couchbase-capella-or-server-version-should-i-use">Which Couchbase Capella or Server version should I use?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#do-i-need-to-use-a-specific-agent-framework-e-g-langchain-with-agent-catalog">Do I need to use a specific agent framework (e.g., LangChain) with Agent Catalog?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-services-do-i-need-to-enable-on-my-couchbase-cluster">What services do I need to enable on my Couchbase cluster?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-can-i-do-to-increase-log-ingestion-rate-into-my-cluster">What can I do to increase log ingestion rate into my Cluster?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-does-agent-catalog-add-to-my-couchbase-bucket">What does Agent Catalog add to my Couchbase bucket?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#do-i-need-couchbase-instance-to-run-agent-catalog">Do I need Couchbase instance to run Agent Catalog?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-is-agent-catalog-doing-when-i-run-agentc-index">What is Agent Catalog doing when I run <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">index</span></code>?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#how-do-i-roll-back-to-a-previous-catalog-version">How do I roll back to a previous catalog version?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-environment-variables-are-required-to-use-agent-catalog">What environment variables are required to use Agent Catalog?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-are-the-different-types-of-tools-and-prompts-i-can-create">What are the different types of tools and prompts I can create?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#can-i-write-multiple-tools-prompts-in-one-file">Can I write multiple tools/prompts in one file?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#do-cli-commands-need-to-be-executed-in-a-certain-order">Do CLI commands need to be executed in a certain order?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#can-i-index-and-publish-catalogs-programmatically">Can I index and publish catalogs programmatically?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#does-agent-catalog-require-an-openai-api-key">Does Agent Catalog require an OpenAI API key?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#does-agent-catalog-work-with-any-llm">Does Agent Catalog work with any LLM?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#why-am-i-not-able-to-install-agent-catalog-agentc-because-of-pytorch-error">Why am I not able to install Agent Catalog(agentc) because of PyTorch error?</a></li>
-</ul>
-</li>
+<p class="caption" role="heading"><span class="caption-text">Help / Questions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="faqs.html">FAQs</a></li>
 </ul>
 
         </div>
       </div>
-    </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Agent Catalog</a>
-      </nav>
 
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active"><cite>agentc</cite> Command Documentation</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="_sources/cli.rst.txt" rel="nofollow"> View page source</a>
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
   <section id="agentc-command-documentation">
-<h1><cite>agentc</cite> Command Documentation<a class="headerlink" href="#agentc-command-documentation" title="Link to this heading"></a></h1>
-<section id="agentc">
-<h2>agentc<a class="headerlink" href="#agentc" title="Link to this heading"></a></h2>
-<p>The Couchbase Agent Catalog command line tool.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>COMMAND<span class="w"> </span><span class="o">[</span>ARGS<span class="o">]</span>...
+<h1><code class="docutils literal notranslate"><span class="pre">agentc</span></code> Command Documentation<a class="headerlink" href="#agentc-command-documentation" title="Link to this heading">¶</a></h1>
+<p>The <strong class="command">agentc</strong> command line tool acts as an interface for your Agent Catalog instance.</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">COMMAND [ARGS]...</span>
+
+  The Couchbase Agent Catalog command line tool.
+
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">-v</span>, <span class=" -Color -Color-Cyan -C-Cyan">--verbose</span>  Flag to enable verbose output.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">0</span><span class=" -Color -Color-Faint -C-Faint">; 0&lt;=x&lt;=2]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">-i</span>, <span class=" -Color -Color-Cyan -C-Cyan">--interactive</span> / <span class=" -Color -Color-Cyan -C-Cyan">-ni</span>, <span class=" -Color -Color-Cyan -C-Cyan">--no-interactive</span>
+                 Flag to enable interactive mode.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">i</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>     Show this message and exit.
+
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Commands:</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">add</span>      Interactively create a new tool or prompt and save it to the...
+  <span class=" -Color -Color-Cyan -C-Cyan">clean</span>    Delete all or specific (catalog and/or activity) Agent Catalog...
+  <span class=" -Color -Color-Cyan -C-Cyan">env</span>      Return all Agent Catalog related environment and configuration...
+  <span class=" -Color -Color-Cyan -C-Cyan">execute</span>  Search for and subsequently execute a specific tool.
+  <span class=" -Color -Color-Cyan -C-Cyan">find</span>     Find items from the catalog based on a natural language string...
+  <span class=" -Color -Color-Cyan -C-Cyan">index</span>    Walk the source directory trees (sources) to index source files...
+  <span class=" -Color -Color-Cyan -C-Cyan">init</span>     Initialize the necessary files/collections for your working Agent...
+  <span class=" -Color -Color-Cyan -C-Cyan">ls</span>       List all indexed tools and/or prompts in the catalog.
+  <span class=" -Color -Color-Cyan -C-Cyan">publish</span>  Upload the local catalog and/or logs to a Couchbase instance.
+  <span class=" -Color -Color-Cyan -C-Cyan">status</span>   Show the (aggregate) status of your Agent Catalog environment.
+  <span class=" -Color -Color-Cyan -C-Cyan">version</span>  Show the current version of Agent Catalog.
+
+See https://couchbaselabs.github.io/agent-catalog/index.html for more
+information.
 </pre></div>
 </div>
-<p class="rubric">Options</p>
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-c">
-<span id="cmdoption-agentc-catalog"></span><span class="sig-name descname"><span class="pre">-c</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--catalog</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;catalog&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-c" title="Link to this definition"></a></dt>
-<dd><p>Directory of the local catalog files.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">'.agent-catalog'</span></code></p>
-</dd>
-</dl>
-</dd></dl>
+<p>All sub-commands have a verbosity option (<code class="code docutils literal notranslate"><span class="pre">-v,</span> <span class="pre">--verbose</span></code>, by default verbosity is 0) and an interactive option
+(<code class="code docutils literal notranslate"><span class="pre">-i,</span> <span class="pre">--interactive</span> <span class="pre">/</span> <span class="pre">-ni,</span> <span class="pre">--no-interactive</span></code>, by default interactivity is enabled).</p>
+<section id="add-command">
+<h2><code class="docutils literal notranslate"><span class="pre">add</span></code> Command<a class="headerlink" href="#add-command" title="Link to this heading">¶</a></h2>
+<p>The primary purpose of the <code class="code docutils literal notranslate"><span class="pre">add</span></code> command is to import templates for declarative Agent Catalog tools (and prompts).</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>add<span class="w"> </span>--help
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc add</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span>
 
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-a">
-<span id="cmdoption-agentc-activity"></span><span class="sig-name descname"><span class="pre">-a</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--activity</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;activity&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-a" title="Link to this definition"></a></dt>
-<dd><p>Directory of the local activity files (runtime data).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">'.agent-activity'</span></code></p>
-</dd>
-</dl>
-</dd></dl>
+  Interactively create a new tool or <span class=" -Color -Color-Magenta -C-Magenta">prompt</span> and save it to the filesystem
+  (output). You MUST edit the generated file as per your requirements!
 
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-v">
-<span id="cmdoption-agentc-verbose"></span><span class="sig-name descname"><span class="pre">-v</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--verbose</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-v" title="Link to this definition"></a></dt>
-<dd><p>Flag to enable verbose output.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-i">
-<span id="cmdoption-agentc-interactive"></span><span id="cmdoption-agentc-ni"></span><span id="cmdoption-agentc-no-interactive"></span><span class="sig-name descname"><span class="pre">-i</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--interactive</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">-ni</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-interactive</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-i" title="Link to this definition"></a></dt>
-<dd><p>Flag to enable interactive mode.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<p class="rubric">Environment variables</p>
-<dl class="std envvar" id="agentc-catalog-agent-catalog-catalog">
-<dt class="sig sig-object std">
-<span class="sig-name descname"><span class="pre">AGENT_CATALOG_CATALOG</span></span></dt>
-<dd><blockquote>
-<div><p>Provide a default for <a class="reference internal" href="#cmdoption-agentc-c"><code class="xref std std-option docutils literal notranslate"><span class="pre">-c</span></code></a></p>
-</div></blockquote>
-</dd></dl>
-
-<dl class="std envvar" id="agentc-activity-agent-catalog-activity">
-<dt class="sig sig-object std">
-<span class="sig-name descname"><span class="pre">AGENT_CATALOG_ACTIVITY</span></span></dt>
-<dd><blockquote>
-<div><p>Provide a default for <a class="reference internal" href="#cmdoption-agentc-a"><code class="xref std std-option docutils literal notranslate"><span class="pre">-a</span></code></a></p>
-</div></blockquote>
-</dd></dl>
-
-<dl class="std envvar" id="agentc-verbose-agent-catalog-verbose">
-<dt class="sig sig-object std">
-<span class="sig-name descname"><span class="pre">AGENT_CATALOG_VERBOSE</span></span></dt>
-<dd><blockquote>
-<div><p>Provide a default for <a class="reference internal" href="#cmdoption-agentc-v"><code class="xref std std-option docutils literal notranslate"><span class="pre">-v</span></code></a></p>
-</div></blockquote>
-</dd></dl>
-
-<dl class="std envvar" id="agentc-interactive-agent-catalog-interactive">
-<dt class="sig sig-object std">
-<span class="sig-name descname"><span class="pre">AGENT_CATALOG_INTERACTIVE</span></span></dt>
-<dd><blockquote>
-<div><p>Provide a default for <a class="reference internal" href="#cmdoption-agentc-i"><code class="xref std std-option docutils literal notranslate"><span class="pre">-i</span></code></a></p>
-</div></blockquote>
-</dd></dl>
-
-<p>See: <a class="reference external" href="https://docs.couchbase.com">https://docs.couchbase.com</a> or <a class="reference external" href="https://couchbaselabs.github.io/agent-catalog/index">https://couchbaselabs.github.io/agent-catalog/index</a>.html# for more information.</p>
-<section id="agentc-add">
-<h3>add<a class="headerlink" href="#agentc-add" title="Link to this heading"></a></h3>
-<p>Interactively create a new tool or prompt and save it to the filesystem (output). You MUST edit the generated file as per your requirements!</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span>add<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">-o</span>, <span class=" -Color -Color-Cyan -C-Cyan">--output</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">DIRECTORY</span>  Location to save the generated tool / <span class=" -Color -Color-Magenta -C-Magenta">prompt</span> to.
+                          Defaults to your current working directory.
+  <span class=" -Color -Color-Cyan -C-Cyan">--kind</span> [<span class=" -Color -Color-Magenta -C-Magenta">python_function</span>|<span class=" -Color -Color-Magenta -C-Magenta">sqlpp_query</span>|<span class=" -Color -Color-Magenta -C-Magenta">semantic_search</span>|<span class=" -Color -Color-Magenta -C-Magenta">http_request</span>|<span class=" -Color -Color-Magenta -C-Magenta">prompt</span>]
+  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>              Show this message and exit.
 </pre></div>
 </div>
-<p class="rubric">Options</p>
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-add-o">
-<span id="cmdoption-agentc-add-output"></span><span class="sig-name descname"><span class="pre">-o</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--output</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;output&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-add-o" title="Link to this definition"></a></dt>
-<dd><p>Location to save the generated tool / prompt to. Defaults to your current working directory.</p>
-</dd></dl>
+<p>See  <a class="reference external" href="catalog.html">here</a> for more information on the types of catalog entries Agent Catalog currently recognizes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">add</span></code> command <strong>does not</strong> index the generated tool / prompt for you.
+You are responsible for populating the remaining fields from the generated output and running the subsequent
+<code class="code docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">index</span></code> command.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>For tools authored in Python, we recommend adding the <code class="code highlight python docutils literal highlight-python"><span class="n">agentc</span><span class="o">.</span><span class="n">catalog</span><span class="o">.</span><span class="n">tool</span></code> decorator to your function and
+specifying the containing directory on <code class="code docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">index</span></code> instead of using the <code class="code docutils literal notranslate"><span class="pre">add</span></code> command.
+For example, if you have an existing tool named <code class="docutils literal notranslate"><span class="pre">positive_sentiment_analysis_tool</span></code> that is properly documented
+(i.e., has a docstring and descriptive names in the function signature), simply add <code class="code docutils literal notranslate"><span class="pre">&#64;agentc.catalog.tool</span></code>
+to the top of your function.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">agentc</span>
 
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-add-record-kind">
-<span class="sig-name descname"><span class="pre">--record-kind</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;record_kind&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-add-record-kind" title="Link to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Options<span class="colon">:</span></dt>
-<dd class="field-odd"><p>python_function | sqlpp_query | semantic_search | http_request | raw_prompt | jinja_prompt</p>
-</dd>
-</dl>
-</dd></dl>
-
+<span class="nd">@agentc</span><span class="o">.</span><span class="n">catalog</span><span class="o">.</span><span class="n">tool</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">positive_sentiment_analysis_tool</span><span class="p">(</span><span class="n">text_to_analyze</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Using the given text, return a number between 0 and 1.</span>
+<span class="sd">        A value of 0 means the text is not positive.</span>
+<span class="sd">        A value of 1 means the text is positive.</span>
+<span class="sd">        A vale of 0.5 means the text is slightly positive. &quot;&quot;&quot;</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+</div>
 </section>
-<section id="agentc-clean">
-<h3>clean<a class="headerlink" href="#agentc-clean" title="Link to this heading"></a></h3>
-<p>Delete all or specific (catalog and/or activity) agent related files / collections.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span>clean<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span><span class="o">[[</span>local<span class="p">|</span>db<span class="o">]]</span>...<span class="w"> </span><span class="o">{</span>catalog<span class="p">|</span>activity<span class="p">|</span>all<span class="o">}</span>
+<section id="clean-command">
+<h2><code class="docutils literal notranslate"><span class="pre">clean</span></code> Command<a class="headerlink" href="#clean-command" title="Link to this heading">¶</a></h2>
+<p>The purpose of the <code class="code docutils literal notranslate"><span class="pre">clean</span></code> command is to &quot;clean&quot; / prune data from your local and / or remote catalog.</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>clean<span class="w"> </span>--help
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc clean</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span>
+                    [[<span class=" -Color -Color-Magenta -C-Magenta">catalog</span>|<span class=" -Color -Color-Magenta -C-Magenta">activity</span>]]...
+
+  Delete all or specific (<span class=" -Color -Color-Magenta -C-Magenta">catalog</span> and/or <span class=" -Color -Color-Magenta -C-Magenta">activity</span>) Agent Catalog related files /
+  collections.
+
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--db</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-db</span>            Flag to perform / not-perform a DB clean.  <span class=" -Color -Color-Faint -C-Faint">[default:</span>
+<span class=" -Color -Color-Faint -C-Faint">                            </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">db</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--local</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-local</span>      Flag to perform / not-perform a local FS clean.
+                            <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">local</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--tools</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-tools</span>      Flag to clean / avoid-cleaning the tool-<span class=" -Color -Color-Magenta -C-Magenta">catalog</span>.
+                            <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">tools</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--prompts</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-prompts</span>  Flag to clean / avoid-cleaning the prompt-<span class=" -Color -Color-Magenta -C-Magenta">catalog</span>.
+                            <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">prompts</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--bucket</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>             Name of the Couchbase bucket to remove Agent Catalog
+                            from.
+  <span class=" -Color -Color-Cyan -C-Cyan">-cid</span>, <span class=" -Color -Color-Cyan -C-Cyan">--</span><span class=" -Color -Color-Magenta -C-Magenta">catalog</span>-id <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>   Catalog ID used to remove a specific <span class=" -Color -Color-Magenta -C-Magenta">catalog</span> version
+                            from the DB <span class=" -Color -Color-Magenta -C-Magenta">catalog</span>.
+  <span class=" -Color -Color-Cyan -C-Cyan">-y</span>, <span class=" -Color -Color-Cyan -C-Cyan">--yes</span>                 Flag to delete local-FS and DB <span class=" -Color -Color-Magenta -C-Magenta">catalog</span> data without
+                            confirmation.
+  <span class=" -Color -Color-Cyan -C-Cyan">-d</span>, <span class=" -Color -Color-Cyan -C-Cyan">--date</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>           Datetime of the oldest log entry to keep (older log
+                            entries will be deleted).
+  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>                Show this message and exit.
 </pre></div>
 </div>
-<p class="rubric">Options</p>
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-clean-bucket">
-<span class="sig-name descname"><span class="pre">--bucket</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;bucket&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-clean-bucket" title="Link to this definition"></a></dt>
-<dd><p>Name of the Couchbase bucket to remove agent-catalog from.</p>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-clean-cid">
-<span id="cmdoption-agentc-clean-catalog-id"></span><span class="sig-name descname"><span class="pre">-cid</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--catalog-id</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;catalog_id&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-clean-cid" title="Link to this definition"></a></dt>
-<dd><p>Catalog ID used to remove a specific catalog version from the DB catalog.</p>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-clean-y">
-<span id="cmdoption-agentc-clean-skip_confirm"></span><span class="sig-name descname"><span class="pre">-y</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--skip_confirm</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-clean-y" title="Link to this definition"></a></dt>
-<dd><p>Flag to delete catalogs without confirm prompting.</p>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-clean-kind">
-<span class="sig-name descname"><span class="pre">--kind</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;kind&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-clean-kind" title="Link to this definition"></a></dt>
-<dd><p>Kind of catalog to remove versions from.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">'all'</span></code></p>
-</dd>
-<dt class="field-even">Options<span class="colon">:</span></dt>
-<dd class="field-even"><p>tool | prompt | all</p>
-</dd>
-</dl>
-</dd></dl>
-
-<p class="rubric">Arguments</p>
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-clean-arg-CATALOG">
-<span class="sig-name descname"><span class="pre">CATALOG</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-clean-arg-CATALOG" title="Link to this definition"></a></dt>
-<dd><p>Optional argument(s)</p>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-clean-arg-TYPE_METADATA">
-<span class="sig-name descname"><span class="pre">TYPE_METADATA</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-clean-arg-TYPE_METADATA" title="Link to this definition"></a></dt>
-<dd><p>Required argument</p>
-</dd></dl>
-
-</section>
-<section id="agentc-env">
-<h3>env<a class="headerlink" href="#agentc-env" title="Link to this heading"></a></h3>
-<p>Return all agentc related environment and configuration parameters as a JSON object.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span>env<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+<p>For remote catalogs possessing multiple catalog versions, you can specify a set of catalog IDs (i.e., Git SHAs) via the
+<code class="code docutils literal notranslate"><span class="pre">--catalog-id</span></code> flag to delete their associated entries from the remote catalog.
+For example, running the command below will delete all tool + prompt + metadata entries associated with catalog versions
+<code class="docutils literal notranslate"><span class="pre">GS53S</span></code> and <code class="docutils literal notranslate"><span class="pre">14dFDD</span></code>:</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>clean<span class="w"> </span>-cid<span class="w"> </span>GS53S<span class="w"> </span>-cid<span class="w"> </span>14dFDD
 </pre></div>
 </div>
 </section>
-<section id="agentc-execute">
-<h3>execute<a class="headerlink" href="#agentc-execute" title="Link to this heading"></a></h3>
-<p>Search and execute a specific tool.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span>execute<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+<section id="env-command">
+<h2><code class="docutils literal notranslate"><span class="pre">env</span></code> Command<a class="headerlink" href="#env-command" title="Link to this heading">¶</a></h2>
+<p>The <code class="code docutils literal notranslate"><span class="pre">env</span></code> command displays the current configuration of Agent Catalog as a JSON object (see <a class="reference external" href="config.html">here</a>
+for all configuration fields).</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>env<span class="w"> </span>--help
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc env</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span>
+
+  Return all Agent Catalog related environment and configuration parameters as a
+  JSON object.
+
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>  Show this message and exit.
 </pre></div>
 </div>
-<p class="rubric">Options</p>
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-execute-query">
-<span class="sig-name descname"><span class="pre">--query</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;query&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-execute-query" title="Link to this definition"></a></dt>
-<dd><p>User query describing the task for which tools / prompts are needed. This field or –name must be specified.</p>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-execute-name">
-<span class="sig-name descname"><span class="pre">--name</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;name&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-execute-name" title="Link to this definition"></a></dt>
-<dd><p>Name of catalog item to retrieve from the catalog directly. This field or –query must be specified.</p>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-execute-bucket">
-<span class="sig-name descname"><span class="pre">--bucket</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;bucket&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-execute-bucket" title="Link to this definition"></a></dt>
-<dd><p>Name of the Couchbase bucket to search.</p>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-execute-include-dirty">
-<span class="sig-name descname"><span class="pre">--include-dirty</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-execute-include-dirty" title="Link to this definition"></a></dt>
-<dd><p>Flag to process and search amongst dirty source files.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-execute-refiner">
-<span class="sig-name descname"><span class="pre">--refiner</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;refiner&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-execute-refiner" title="Link to this definition"></a></dt>
-<dd><p>Class to post-process (rerank, prune, etc…) find results.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Options<span class="colon">:</span></dt>
-<dd class="field-odd"><p>ClosestCluster | None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-execute-an">
-<span id="cmdoption-agentc-execute-annotations"></span><span class="sig-name descname"><span class="pre">-an</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--annotations</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;annotations&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-execute-an" title="Link to this definition"></a></dt>
-<dd><p>Tool-specific annotations to filter by, specified using KEY=”VALUE” (AND|OR KEY=”VALUE”)*.</p>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-execute-cid">
-<span id="cmdoption-agentc-execute-catalog-id"></span><span class="sig-name descname"><span class="pre">-cid</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--catalog-id</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;catalog_id&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-execute-cid" title="Link to this definition"></a></dt>
-<dd><p>Catalog ID that uniquely specifies a catalog version / snapshot (git commit id).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">'__LATEST__'</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-execute-db">
-<span id="cmdoption-agentc-execute-search-db"></span><span class="sig-name descname"><span class="pre">-db</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--search-db</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-execute-db" title="Link to this definition"></a></dt>
-<dd><p>Flag to force a DB-only search.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-execute-local">
-<span id="cmdoption-agentc-execute-search-local"></span><span class="sig-name descname"><span class="pre">-local</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--search-local</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-execute-local" title="Link to this definition"></a></dt>
-<dd><p>Flag to force a local-only search.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
 </section>
-<section id="agentc-find">
-<h3>find<a class="headerlink" href="#agentc-find" title="Link to this heading"></a></h3>
-<p>Find items from the catalog based on a natural language QUERY string or by name.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span>find<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span><span class="o">[[</span>tool<span class="p">|</span>prompt<span class="o">]]</span>
+<section id="execute-command">
+<h2><code class="docutils literal notranslate"><span class="pre">execute</span></code> Command<a class="headerlink" href="#execute-command" title="Link to this heading">¶</a></h2>
+<p>The <code class="code docutils literal notranslate"><span class="pre">execute</span></code> command is a helper command that allows users to directly invoke tools indexed by Agent Catalog.</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>execute<span class="w"> </span>--help
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc execute</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span>
+
+  Search for and subsequently execute a specific tool.
+
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--query</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>             User query describing the task for which tools /
+                           prompts are needed. This field or <span class=" -Color -Color-Cyan -C-Cyan">--name</span> must be
+                           specified.
+  <span class=" -Color -Color-Cyan -C-Cyan">--name</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>              Name of catalog item to retrieve from the catalog
+                           directly. This field or <span class=" -Color -Color-Cyan -C-Cyan">--query</span> must be specified.
+  <span class=" -Color -Color-Cyan -C-Cyan">--bucket</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>            Name of the Couchbase bucket to search.
+  <span class=" -Color -Color-Cyan -C-Cyan">--dirty</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-dirty</span>     Flag to process and search amongst dirty source
+                           files.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">dirty</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--refiner</span> [<span class=" -Color -Color-Magenta -C-Magenta">ClosestCluster</span>|<span class=" -Color -Color-Magenta -C-Magenta">None</span>]
+                           Class to post-process (rerank, prune, etc...) find
+                           results.
+  <span class=" -Color -Color-Cyan -C-Cyan">-an</span>, <span class=" -Color -Color-Cyan -C-Cyan">--annotations</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>  Tool-specific annotations to filter by, specified
+                           using KEY=&quot;VALUE&quot; (AND|OR KEY=&quot;VALUE&quot;)*.
+  <span class=" -Color -Color-Cyan -C-Cyan">-cid</span>, <span class=" -Color -Color-Cyan -C-Cyan">--catalog-id</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>  Catalog ID that uniquely specifies a catalog version
+                           / snapshot (git commit id).  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">__LATEST__</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--db</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-db</span>           Flag to include / exclude items from the DB-catalog
+                           while searching.
+  <span class=" -Color -Color-Cyan -C-Cyan">--local</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-local</span>     Flag to include / exclude items from the local-FS-
+                           catalog while searching.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">local</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>               Show this message and exit.
 </pre></div>
 </div>
-<p class="rubric">Options</p>
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-find-query">
-<span class="sig-name descname"><span class="pre">--query</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;query&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-find-query" title="Link to this definition"></a></dt>
-<dd><p>User query describing the task for which tools / prompts are needed. This field or –name must be specified.</p>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-find-name">
-<span class="sig-name descname"><span class="pre">--name</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;name&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-find-name" title="Link to this definition"></a></dt>
-<dd><p>Name of catalog item to retrieve from the catalog directly. This field or –query must be specified.</p>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-find-bucket">
-<span class="sig-name descname"><span class="pre">--bucket</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;bucket&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-find-bucket" title="Link to this definition"></a></dt>
-<dd><p>Name of the Couchbase bucket to search.</p>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-find-limit">
-<span class="sig-name descname"><span class="pre">--limit</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;limit&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-find-limit" title="Link to this definition"></a></dt>
-<dd><p>Maximum number of results to show.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-find-include-dirty">
-<span class="sig-name descname"><span class="pre">--include-dirty</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-find-include-dirty" title="Link to this definition"></a></dt>
-<dd><p>Flag to process and search amongst dirty source files.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-find-refiner">
-<span class="sig-name descname"><span class="pre">--refiner</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;refiner&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-find-refiner" title="Link to this definition"></a></dt>
-<dd><p>Class to post-process (rerank, prune, etc…) find results.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Options<span class="colon">:</span></dt>
-<dd class="field-odd"><p>ClosestCluster | None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-find-an">
-<span id="cmdoption-agentc-find-annotations"></span><span class="sig-name descname"><span class="pre">-an</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--annotations</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;annotations&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-find-an" title="Link to this definition"></a></dt>
-<dd><p>Tool-specific annotations to filter by, specified using KEY=”VALUE” (AND|OR KEY=”VALUE”)*.</p>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-find-cid">
-<span id="cmdoption-agentc-find-catalog-id"></span><span class="sig-name descname"><span class="pre">-cid</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--catalog-id</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;catalog_id&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-find-cid" title="Link to this definition"></a></dt>
-<dd><p>Catalog ID that uniquely specifies a catalog version / snapshot (git commit id).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">'__LATEST__'</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-find-db">
-<span id="cmdoption-agentc-find-search-db"></span><span class="sig-name descname"><span class="pre">-db</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--search-db</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-find-db" title="Link to this definition"></a></dt>
-<dd><p>Flag to force a DB-only search.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-find-local">
-<span id="cmdoption-agentc-find-search-local"></span><span class="sig-name descname"><span class="pre">-local</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--search-local</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-find-local" title="Link to this definition"></a></dt>
-<dd><p>Flag to force a local-only search.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<p class="rubric">Arguments</p>
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-find-arg-KIND">
-<span class="sig-name descname"><span class="pre">KIND</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-find-arg-KIND" title="Link to this definition"></a></dt>
-<dd><p>Optional argument</p>
-</dd></dl>
-
+<p>The arguments for <code class="code docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">execute</span></code> are identical to that of <code class="code docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">find</span></code> (with the exception of the
+<code class="code docutils literal notranslate"><span class="pre">{tools|prompts}</span></code> argument).
+<code class="code docutils literal notranslate"><span class="pre">execute</span></code> is useful for verifying declarative tools before running them in your application (e.g., validating
+the results of your SQL++ query, checking the results of your semantic search, etc...).</p>
 </section>
-<section id="agentc-index">
-<h3>index<a class="headerlink" href="#agentc-index" title="Link to this heading"></a></h3>
-<p>Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.
-Source files that will be scanned include <a href="#id1"><span class="problematic" id="id2">*</span></a>.py, <a href="#id3"><span class="problematic" id="id4">*</span></a>.sqlpp, <a href="#id5"><span class="problematic" id="id6">*</span></a>.yaml, etc.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span>index<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span><span class="o">[</span>SOURCE_DIRS<span class="o">]</span>...
+<section id="find-command">
+<h2><code class="docutils literal notranslate"><span class="pre">find</span></code> Command<a class="headerlink" href="#find-command" title="Link to this heading">¶</a></h2>
+<p>The primary purpose of the <code class="code docutils literal notranslate"><span class="pre">find</span></code> command is to validate the <code class="code docutils literal notranslate"><span class="pre">query</span></code> or <code class="code docutils literal notranslate"><span class="pre">name</span></code> arguments used by
+a call to <code class="code docutils literal notranslate"><span class="pre">agentc.Catalog:find</span></code>.</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>find<span class="w"> </span>--help
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc find</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span> {<span class=" -Color -Color-Magenta -C-Magenta">tools</span>|<span class=" -Color -Color-Magenta -C-Magenta">prompts</span>}
+
+  Find items from the catalog based on a natural language string (query) or by
+  name.
+
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--query</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>             User query describing the task for which <span class=" -Color -Color-Magenta -C-Magenta">tools</span> /
+                           <span class=" -Color -Color-Magenta -C-Magenta">prompts</span> are needed. This field or <span class=" -Color -Color-Cyan -C-Cyan">--name</span> must be
+                           specified.
+  <span class=" -Color -Color-Cyan -C-Cyan">--name</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>              Name of catalog item to retrieve from the catalog
+                           directly. This field or <span class=" -Color -Color-Cyan -C-Cyan">--query</span> must be specified.
+  <span class=" -Color -Color-Cyan -C-Cyan">--bucket</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>            Name of the Couchbase bucket to search.
+  <span class=" -Color -Color-Cyan -C-Cyan">--limit</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">INTEGER</span>          Maximum number of results to show.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">1</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--dirty</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-dirty</span>     Flag to process and search amongst dirty source
+                           files.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">dirty</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--refiner</span> [<span class=" -Color -Color-Magenta -C-Magenta">ClosestCluster</span>|<span class=" -Color -Color-Magenta -C-Magenta">None</span>]
+                           Class to post-process (rerank, prune, etc...) find
+                           results.
+  <span class=" -Color -Color-Cyan -C-Cyan">-an</span>, <span class=" -Color -Color-Cyan -C-Cyan">--annotations</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>  Tool-specific annotations to filter by, specified
+                           using KEY=&quot;VALUE&quot; (AND|OR KEY=&quot;VALUE&quot;)*.
+  <span class=" -Color -Color-Cyan -C-Cyan">-cid</span>, <span class=" -Color -Color-Cyan -C-Cyan">--catalog-id</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>  Catalog ID that uniquely specifies a catalog version
+                           / snapshot (git commit id).  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">__LATEST__</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--db</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-db</span>           Flag to include / exclude items from the DB-catalog
+                           while searching.
+  <span class=" -Color -Color-Cyan -C-Cyan">--local</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-local</span>     Flag to include / exclude items from the local-FS-
+                           catalog while searching.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">local</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>               Show this message and exit.
 </pre></div>
 </div>
-<p class="rubric">Options</p>
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-index-prompts">
-<span id="cmdoption-agentc-index-no-prompts"></span><span class="sig-name descname"><span class="pre">--prompts</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-prompts</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-index-prompts" title="Link to this definition"></a></dt>
-<dd><p>Flag to (avoid) ignoring prompts when indexing source files into the local catalog.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-index-tools">
-<span id="cmdoption-agentc-index-no-tools"></span><span class="sig-name descname"><span class="pre">--tools</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-tools</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-index-tools" title="Link to this definition"></a></dt>
-<dd><p>Flag to (avoid) ignoring tools when indexing source files into the local catalog.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-index-em">
-<span id="cmdoption-agentc-index-embedding-model"></span><span class="sig-name descname"><span class="pre">-em</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--embedding-model</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;embedding_model&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-index-em" title="Link to this definition"></a></dt>
-<dd><p>Embedding model used when indexing source files into the local catalog.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">'sentence-transformers/all-MiniLM-L12-v2'</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-index-dry-run">
-<span class="sig-name descname"><span class="pre">--dry-run</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-index-dry-run" title="Link to this definition"></a></dt>
-<dd><p>Flag to prevent catalog changes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<p class="rubric">Arguments</p>
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-index-arg-SOURCE_DIRS">
-<span class="sig-name descname"><span class="pre">SOURCE_DIRS</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-index-arg-SOURCE_DIRS" title="Link to this definition"></a></dt>
-<dd><p>Optional argument(s)</p>
-</dd></dl>
-
-</section>
-<section id="agentc-ls">
-<h3>ls<a class="headerlink" href="#agentc-ls" title="Link to this heading"></a></h3>
-<p>List all indexed tools and/or prompts in the catalog.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span>ls<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span><span class="o">[[</span>tool<span class="p">|</span>prompt<span class="o">]]</span>...
+<section id="search-by-name">
+<h3>Search By Name<a class="headerlink" href="#search-by-name" title="Link to this heading">¶</a></h3>
+<p>To find a tool or prompt directly by name, use the <code class="code docutils literal notranslate"><span class="pre">--name</span></code> option.
+For example, to search for the latest version of the tool &quot;find_user_by_id&quot;, you would write / author the following:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-0">
+Command Line</label><div class="sd-tab-content docutils">
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>find<span class="w"> </span>tool<span class="w"> </span>--name<span class="w"> </span>find_user_by_id
 </pre></div>
 </div>
-<p class="rubric">Options</p>
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-ls-db">
-<span id="cmdoption-agentc-ls-search-db"></span><span class="sig-name descname"><span class="pre">-db</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--search-db</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-ls-db" title="Link to this definition"></a></dt>
-<dd><p>Flag to force a DB-only search.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
-</dd>
-</dl>
-</dd></dl>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-1">
+Python Program</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">agentc</span>
 
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-ls-local">
-<span id="cmdoption-agentc-ls-search-local"></span><span class="sig-name descname"><span class="pre">-local</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--search-local</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-ls-local" title="Link to this definition"></a></dt>
-<dd><p>Flag to force a local-only search.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-ls-bucket">
-<span class="sig-name descname"><span class="pre">--bucket</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;bucket&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-ls-bucket" title="Link to this definition"></a></dt>
-<dd><p>Name of Couchbase bucket that is being used for agentc functionalities.</p>
-</dd></dl>
-
-<p class="rubric">Arguments</p>
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-ls-arg-KIND">
-<span class="sig-name descname"><span class="pre">KIND</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-ls-arg-KIND" title="Link to this definition"></a></dt>
-<dd><p>Optional argument(s)</p>
-</dd></dl>
-
-</section>
-<section id="agentc-publish">
-<h3>publish<a class="headerlink" href="#agentc-publish" title="Link to this heading"></a></h3>
-<p>Upload the local catalog and/or logs to a Couchbase instance.
-By default, only tools and prompts are published unless log is specified.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span>publish<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span><span class="o">[[</span>tool<span class="p">|</span>prompt<span class="p">|</span>log<span class="o">]]</span>...
+<span class="n">catalog</span> <span class="o">=</span> <span class="n">agentc</span><span class="o">.</span><span class="n">Catalog</span><span class="p">()</span>
+<span class="n">my_tool</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;find_user_by_id&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="rubric">Options</p>
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-publish-bucket">
-<span class="sig-name descname"><span class="pre">--bucket</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;bucket&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-publish-bucket" title="Link to this definition"></a></dt>
-<dd><p>Name of the Couchbase bucket to publish to.</p>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-publish-an">
-<span id="cmdoption-agentc-publish-annotations"></span><span class="sig-name descname"><span class="pre">-an</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--annotations</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;annotations&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-publish-an" title="Link to this definition"></a></dt>
-<dd><p>Snapshot level annotations to be added while publishing catalogs.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</dd></dl>
-
-<p class="rubric">Arguments</p>
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-publish-arg-KIND">
-<span class="sig-name descname"><span class="pre">KIND</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-publish-arg-KIND" title="Link to this definition"></a></dt>
-<dd><p>Optional argument(s)</p>
-</dd></dl>
-
+</div>
+</div>
 </section>
-<section id="agentc-status">
-<h3>status<a class="headerlink" href="#agentc-status" title="Link to this heading"></a></h3>
-<p>Show the status of the local catalog.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span>status<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span><span class="o">[[</span>tool<span class="p">|</span>prompt<span class="o">]]</span>...
+<section id="search-by-query">
+<h3>Search By Query<a class="headerlink" href="#search-by-query" title="Link to this heading">¶</a></h3>
+<p>On <code class="code docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">index</span></code>, descriptions of tools and prompts are forwarded through an embedding model to enable semantic
+search of tools and prompts at find time.
+This is useful for authoring prompts in a tool-agnostic manner (see
+<a class="reference external" href="concept.html#couchbase-backed-agent-catalogs">here</a> for more information).
+To find 3 tools semantically related to &quot;finding users&quot;, you would write / author the following:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-2">
+Command Line</label><div class="sd-tab-content docutils">
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>find<span class="w"> </span>tool<span class="w"> </span>--query<span class="w"> </span><span class="s2">&quot;finding users&quot;</span><span class="w"> </span>--limit<span class="w"> </span><span class="m">3</span>
 </pre></div>
 </div>
-<p class="rubric">Options</p>
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-status-include-dirty">
-<span class="sig-name descname"><span class="pre">--include-dirty</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-status-include-dirty" title="Link to this definition"></a></dt>
-<dd><p>Flag to process and compare against dirty source files.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p>
-</dd>
-</dl>
-</dd></dl>
+</div>
+<input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-3">
+Python Program</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">agentc</span>
 
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-status-db">
-<span id="cmdoption-agentc-status-status-db"></span><span class="sig-name descname"><span class="pre">-db</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--status-db</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-status-db" title="Link to this definition"></a></dt>
-<dd><p>Flag to check status of catalogs in the Cluster.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-status-bucket">
-<span class="sig-name descname"><span class="pre">--bucket</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;bucket&gt;</span></span><a class="headerlink" href="#cmdoption-agentc-status-bucket" title="Link to this definition"></a></dt>
-<dd><p>Name of Couchbase bucket that is being used for agentc functionalities.</p>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-status-compare">
-<span class="sig-name descname"><span class="pre">--compare</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-status-compare" title="Link to this definition"></a></dt>
-<dd><p>Flag to compare the local catalog with the last published catalog.</p>
-</dd></dl>
-
-<p class="rubric">Arguments</p>
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-agentc-status-arg-KIND">
-<span class="sig-name descname"><span class="pre">KIND</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-agentc-status-arg-KIND" title="Link to this definition"></a></dt>
-<dd><p>Optional argument(s)</p>
-</dd></dl>
-
+<span class="n">catalog</span> <span class="o">=</span> <span class="n">agentc</span><span class="o">.</span><span class="n">Catalog</span><span class="p">()</span>
+<span class="n">my_tools</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="s2">&quot;finding users&quot;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
 </section>
-<section id="agentc-version">
-<h3>version<a class="headerlink" href="#agentc-version" title="Link to this heading"></a></h3>
-<p>Show the current version of agentc.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span>version<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+<section id="filter-by-annotations">
+<h3>Filter By Annotations<a class="headerlink" href="#filter-by-annotations" title="Link to this heading">¶</a></h3>
+<p>Annotations can be added to tools and prompts, which can serve as optional filters for <code class="code docutils literal notranslate"><span class="pre">--query</span></code> at find time.
+For example, to search for the most related prompt to &quot;frontdesk agent&quot; tailored towards healthcare
+(<code class="code docutils literal notranslate"><span class="pre">domain=&quot;healthcare&quot;</span></code>), you would write / author the following:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-4" name="sd-tab-set-2" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-4">
+Command Line</label><div class="sd-tab-content docutils">
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="c1"># Use single quotes to interpret the annotations string as a literal here!</span>
+<span class="gp">$ </span>agentc<span class="w"> </span>find<span class="w"> </span>prompt<span class="w"> </span>--query<span class="w"> </span><span class="s2">&quot;frontdesk agent&quot;</span><span class="w"> </span>--annotations<span class="w"> </span><span class="s1">&#39;domain=&quot;healthcare&quot;&#39;</span>
+</pre></div>
+</div>
+</div>
+<input id="sd-tab-item-5" name="sd-tab-set-2" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-5">
+Python Program</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">agentc</span>
+
+<span class="n">catalog</span> <span class="o">=</span> <span class="n">agentc</span><span class="o">.</span><span class="n">Catalog</span><span class="p">()</span>
+<span class="n">prompt</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;prompt&quot;</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="s2">&quot;frontdesk agent&quot;</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="s1">&#39;domain=&quot;healthcare&quot;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Annotations on the command line must (generally) follow the regex <code class="code docutils literal notranslate"><span class="pre">KEY=&quot;VALUE&quot;</span> <span class="pre">(AND|OR</span> <span class="pre">KEY=&quot;VALUE&quot;)*</span></code>.
+This string must be specified in between single quotes to properly interpret the double quote.</p>
+</div>
+</section>
+<section id="local-only-search">
+<h3>Local Only Search<a class="headerlink" href="#local-only-search" title="Link to this heading">¶</a></h3>
+<p>By default, Agent Catalog will search the local catalog and attempt (in a best-effort fashion) to search your
+Couchbase-backed catalog.
+To search for local-only entries for a single <code class="code docutils literal notranslate"><span class="pre">find</span></code> command, use the <code class="code docutils literal notranslate"><span class="pre">--no-db</span></code> flag.
+There is no equivalent flag using a <code class="code highlight python docutils literal highlight-python"><span class="n">agentc</span><span class="o">.</span><span class="n">Catalog</span><span class="p">:</span><span class="n">find</span></code> call, but you can force local-only searches for a
+<code class="code highlight python docutils literal highlight-python"><span class="n">agentc</span><span class="o">.</span><span class="n">Catalog</span></code> instance by explicitly setting the <code class="code highlight python docutils literal highlight-python"><span class="n">conn_string</span></code> attribute to <code class="code highlight python docutils literal highlight-python"><span class="kc">None</span></code>.
+For example, to find the tool named &quot;get_most_popular_categories&quot; from the local catalog, write / author the following:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-6" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-6">
+Command Line</label><div class="sd-tab-content docutils">
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>find<span class="w"> </span>tool<span class="w"> </span>--name<span class="w"> </span>get_most_popular_categories<span class="w"> </span>--no-db
+</pre></div>
+</div>
+</div>
+<input id="sd-tab-item-7" name="sd-tab-set-3" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-7">
+Python Program</label><div class="sd-tab-content docutils">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">agentc</span>
+
+<span class="n">catalog</span> <span class="o">=</span> <span class="n">agentc</span><span class="o">.</span><span class="n">Catalog</span><span class="p">(</span><span class="n">conn_string</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">tool</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;get_most_popular_categories&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="index-command">
+<h2><code class="docutils literal notranslate"><span class="pre">index</span></code> Command<a class="headerlink" href="#index-command" title="Link to this heading">¶</a></h2>
+<p>The purpose of the <code class="code docutils literal notranslate"><span class="pre">index</span></code> command is to build a <em>local</em> index of all tools and prompts.</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>index<span class="w"> </span>--help
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc index</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[SOURCES]...</span>
+
+  Walk the source directory trees (<span class=" -Color -Color-Cyan -C-Cyan">sources</span>) to index source files into the local
+  catalog. Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc.
+
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--prompts</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-prompts</span>  Flag to look for / ignore prompts when indexing
+                            source files into the local catalog.  <span class=" -Color -Color-Faint -C-Faint">[default:</span>
+<span class=" -Color -Color-Faint -C-Faint">                            </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">prompts</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--tools</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-tools</span>      Flag to look for / ignore tools when indexing source
+                            files into the local catalog.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">tools</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--dry-run</span>                 Flag to prevent catalog changes.
+  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>                Show this message and exit.
+</pre></div>
+</div>
+<p>By default, the <code class="code docutils literal notranslate"><span class="pre">index</span></code> command will look for both tools and prompts in the given <code class="docutils literal notranslate"><span class="pre">SOURCES</span></code>.
+To avoid searching for tools or prompts specifically, use the <code class="docutils literal notranslate"><span class="pre">--no-tools</span></code> and <code class="docutils literal notranslate"><span class="pre">--no-prompts</span></code> flags respectively.
+In the example below, Agent Catalog will scan the directories <code class="file docutils literal notranslate"><span class="pre">my_tools_1</span></code>, <code class="file docutils literal notranslate"><span class="pre">my_tools_2</span></code>, and
+<code class="file docutils literal notranslate"><span class="pre">my_tools_3</span></code> for only tools.</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>index<span class="w"> </span>--no-prompts<span class="w"> </span>my_tools_1<span class="w"> </span>my_tools_2<span class="w"> </span>my_tools_3
+</pre></div>
+</div>
+</section>
+<section id="init-command">
+<h2><code class="docutils literal notranslate"><span class="pre">init</span></code> Command<a class="headerlink" href="#init-command" title="Link to this heading">¶</a></h2>
+<p>The purpose of the <code class="code docutils literal notranslate"><span class="pre">init</span></code> command is to initialize your Agent Catalog environment (both locally and on Couchbase).</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>init<span class="w"> </span>--help
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc init</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span>
+                   [[<span class=" -Color -Color-Magenta -C-Magenta">catalog</span>|<span class=" -Color -Color-Magenta -C-Magenta">activity</span>]]...
+
+  Initialize the necessary files/collections for your working Agent Catalog
+  environment.
+
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--db</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-db</span>        Flag to enable / disable DB initialization.  <span class=" -Color -Color-Faint -C-Faint">[default:</span>
+<span class=" -Color -Color-Faint -C-Faint">                        </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">db</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--local</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-local</span>  Flag to enable / disable local FS initialization.
+                        <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">local</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--bucket</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>         Name of the Couchbase bucket to initialize in.
+  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>            Show this message and exit.
+</pre></div>
+</div>
+<p>The <code class="code docutils literal notranslate"><span class="pre">init</span></code> command must be run at least once for each Agent Catalog environment.
+By default, <code class="code docutils literal notranslate"><span class="pre">init</span></code> will run both locally and on Couchbase, initializing your catalog environment and your
+activity environment on each.
+For instances where <code class="code docutils literal notranslate"><span class="pre">init</span></code> has already been run on Couchbase (or vice-versa), use the <code class="docutils literal notranslate"><span class="pre">--no-db</span></code> and
+<code class="docutils literal notranslate"><span class="pre">--no-local</span></code> flags respectively.
+In the example below, the catalog environment and the activity environment is only locally initialized:</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>init<span class="w"> </span>--no-db
+</pre></div>
+</div>
+</section>
+<section id="ls-command">
+<h2><code class="docutils literal notranslate"><span class="pre">ls</span></code> Command<a class="headerlink" href="#ls-command" title="Link to this heading">¶</a></h2>
+<p>The purpose of the <code class="code docutils literal notranslate"><span class="pre">ls</span></code> command is to list out all items in the latest version of your Agent Catalog instance.</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>ls<span class="w"> </span>--help
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc ls</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span> [[<span class=" -Color -Color-Magenta -C-Magenta">tools</span>|<span class=" -Color -Color-Magenta -C-Magenta">prompts</span>]]...
+
+  List all indexed <span class=" -Color -Color-Magenta -C-Magenta">tools</span> and/or <span class=" -Color -Color-Magenta -C-Magenta">prompts</span> in the catalog.
+
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--db</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-db</span>        Flag to force a DB-only search.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">no-db</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--local</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-local</span>  Flag to force a local-only search.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">local</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--dirty</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-dirty</span>  Flag to process and search amongst dirty source files.
+                        <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">dirty</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--bucket</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>         Name of Couchbase bucket that is being used for Agent
+                        Catalog.
+  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>            Show this message and exit.
+</pre></div>
+</div>
+<p>By default, the <code class="code docutils literal notranslate"><span class="pre">ls</span></code> command will only list items in a local and potentially <em>dirty</em> catalog instance.
+To list out all items in your Couchbase instance requires the <code class="docutils literal notranslate"><span class="pre">--db</span></code> flag.
+A common use case for this command involves running this command after <code class="code docutils literal notranslate"><span class="pre">index</span></code> to see whether or not a certain
+tool exists in your local catalog.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This command is the equivalent to a <code class="code highlight sql docutils literal highlight-sql"><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">agent_catalog</span><span class="p">.[</span><span class="n">tools</span><span class="o">|</span><span class="n">prompts</span><span class="p">];</span></code> and should be used sparingly
+with the <code class="docutils literal notranslate"><span class="pre">--db</span></code> flag.
+To view aggregate information about your catalog, use the <code class="code docutils literal notranslate"><span class="pre">status</span></code> command instead.</p>
+</div>
+</section>
+<section id="publish-command">
+<h2><code class="docutils literal notranslate"><span class="pre">publish</span></code> Command<a class="headerlink" href="#publish-command" title="Link to this heading">¶</a></h2>
+<p>The primary purpose of the <code class="code docutils literal notranslate"><span class="pre">publish</span></code> command is to &quot;snapshot&quot; your local catalog instance and persist this
+snapshot to Couchbase.</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>publish<span class="w"> </span>--help
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc publish</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span>
+                      [[<span class=" -Color -Color-Magenta -C-Magenta">tools</span>|<span class=" -Color -Color-Magenta -C-Magenta">prompts</span>|<span class=" -Color -Color-Magenta -C-Magenta">logs</span>]]...
+
+  Upload the local catalog and/or <span class=" -Color -Color-Magenta -C-Magenta">logs</span> to a Couchbase instance. By default, only
+  <span class=" -Color -Color-Magenta -C-Magenta">tools</span> and <span class=" -Color -Color-Magenta -C-Magenta">prompts</span> are published unless log is explicitly specified.
+
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--bucket</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>  Name of the Couchbase bucket to publish to.
+  <span class=" -Color -Color-Cyan -C-Cyan">-an</span>, <span class=" -Color -Color-Cyan -C-Cyan">--annotations</span> &lt;<span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span> TEXT&gt;...
+                 Snapshot level annotations to be added while publishing
+                 catalogs.
+  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>     Show this message and exit.
+</pre></div>
+</div>
+<p>The <code class="code docutils literal notranslate"><span class="pre">publish</span></code> command, similar to all other Couchbase-interfacing commands (e.g., <code class="code docutils literal notranslate"><span class="pre">clean</span></code>, <code class="code docutils literal notranslate"><span class="pre">find</span></code>,
+etc...) reads Couchbase authentication details from your environment.
+To override the bucket being published to, users can specify the bucket name directly via the <code class="docutils literal notranslate"><span class="pre">--bucket</span></code> option.
+In the example below, both tools and prompts are published to a bucket named <code class="docutils literal notranslate"><span class="pre">test_bucket</span></code>:</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>publish<span class="w"> </span>--bucket<span class="w"> </span>test_bucket
+</pre></div>
+</div>
+<p>Users can also choose to selectively publish tools, prompts, or logs to Couchbase.
+By default, only tools and prompts are published -- logs are expected to be continuously pushed to Couchbase while your
+application is running (thus, the <code class="docutils literal notranslate"><span class="pre">logs</span></code> choice is primarily for recovery operations).
+In the example below, only tools are published:</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>publish<span class="w"> </span>tools
+</pre></div>
+</div>
+</section>
+<section id="status-command">
+<h2><code class="docutils literal notranslate"><span class="pre">status</span></code> Command<a class="headerlink" href="#status-command" title="Link to this heading">¶</a></h2>
+<p>The purpose of the <code class="code docutils literal notranslate"><span class="pre">status</span></code> command is to view <em>aggregate</em> information about your Agent Catalog instance.</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>status<span class="w"> </span>--help
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc status</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span>
+                     [[<span class=" -Color -Color-Magenta -C-Magenta">tools</span>|<span class=" -Color -Color-Magenta -C-Magenta">prompts</span>]]...
+
+  Show the (aggregate) status of your Agent Catalog environment.
+
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--dirty</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-dirty</span>  Flag to process and compare against dirty source files.
+                        <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">dirty</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--db</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-db</span>        Flag to include / exclude items from the DB-catalog
+                        while displaying status.
+  <span class=" -Color -Color-Cyan -C-Cyan">--local</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-local</span>  Flag to include / exclude items from the local-FS-
+                        catalog while displaying status.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">local</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">--bucket</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>         Name of the Couchbase bucket hosting the Agent Catalog.
+  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>            Show this message and exit.
+</pre></div>
+</div>
+<p>TODO</p>
+</section>
+<section id="version-command">
+<h2><code class="docutils literal notranslate"><span class="pre">version</span></code> Command<a class="headerlink" href="#version-command" title="Link to this heading">¶</a></h2>
+<p>The purpose of the <code class="code docutils literal notranslate"><span class="pre">version</span></code> command is to display the current version of the <code class="docutils literal notranslate"><span class="pre">agentc</span></code> package.</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>version<span class="w"> </span>--help
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc version</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span>
+
+  Show the current version of Agent Catalog.
+
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>  Show this message and exit.
+</pre></div>
+</div>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>version
+<span class=" -Color -Color-Bold -C-Bold">0.0.0</span>
 </pre></div>
 </div>
 </section>
 </section>
-</section>
 
 
-           </div>
+            <div class="clearer"></div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="guide.html" class="btn btn-neutral float-left" title="Agent Catalog User Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="api.html" class="btn btn-neutral float-right" title="agentc Package Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        </div>
+      </div>
+    
+        <div id="show_right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&lt;</span><span>Page contents</span></a></p>
+        </div>
+
+        <div id="right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&gt;</span><span>Page contents:</span></a></p>
+            <div class="page_toc">
+                <ul>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">agentc</span></code> Command Documentation</a><ul>
+<li><a class="reference internal" href="#add-command"><code class="docutils literal notranslate"><span class="pre">add</span></code> Command</a></li>
+<li><a class="reference internal" href="#clean-command"><code class="docutils literal notranslate"><span class="pre">clean</span></code> Command</a></li>
+<li><a class="reference internal" href="#env-command"><code class="docutils literal notranslate"><span class="pre">env</span></code> Command</a></li>
+<li><a class="reference internal" href="#execute-command"><code class="docutils literal notranslate"><span class="pre">execute</span></code> Command</a></li>
+<li><a class="reference internal" href="#find-command"><code class="docutils literal notranslate"><span class="pre">find</span></code> Command</a><ul>
+<li><a class="reference internal" href="#search-by-name">Search By Name</a></li>
+<li><a class="reference internal" href="#search-by-query">Search By Query</a></li>
+<li><a class="reference internal" href="#filter-by-annotations">Filter By Annotations</a></li>
+<li><a class="reference internal" href="#local-only-search">Local Only Search</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#index-command"><code class="docutils literal notranslate"><span class="pre">index</span></code> Command</a></li>
+<li><a class="reference internal" href="#init-command"><code class="docutils literal notranslate"><span class="pre">init</span></code> Command</a></li>
+<li><a class="reference internal" href="#ls-command"><code class="docutils literal notranslate"><span class="pre">ls</span></code> Command</a></li>
+<li><a class="reference internal" href="#publish-command"><code class="docutils literal notranslate"><span class="pre">publish</span></code> Command</a></li>
+<li><a class="reference internal" href="#status-command"><code class="docutils literal notranslate"><span class="pre">status</span></code> Command</a></li>
+<li><a class="reference internal" href="#version-command"><code class="docutils literal notranslate"><span class="pre">version</span></code> Command</a></li>
+</ul>
+</li>
+</ul>
+
+            </div>
+        </div>
+    
+
+      <div class="clearer"></div>
+    </div>
+    <div class="button_nav_wrapper">
+        <div class="button_nav">
+            <div class="left">
+                
+                <a href="concept.html">
+                    <span class="icon">&lt;</span><span>Agent Catalog Concepts</span></a>
+                
+            </div>
+
+            <div class="right">
+                
+                    <a href="api.html"><span>Package Documentation</span><span class="icon">&gt;</span></a>
+                
+            </div>
+        </div>
     </div>
 
-  <hr/>
 
-  <div role="contentinfo">
-    <p>&#169; Copyright 2024, Couchbase.</p>
-  </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Couchbase.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
-        </div>
-      </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
-
-</body>
+<p id="theme_credit">Styled using the <a href="https://github.com/piccolo-orm/piccolo_theme">Piccolo Theme</a></p>
+  </body>
 </html>

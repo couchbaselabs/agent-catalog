@@ -1,379 +1,237 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="./">
-<head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Frequently Asked Questions &mdash; Agent Catalog v0.0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
-      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=86a354c8" />
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  
-    <link rel="shortcut icon" href="_static/favicon.png"/>
-      <script src="_static/jquery.js?v=5d32c60e"></script>
-      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=2fea6348"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
-      <script src="_static/copybutton.js?v=f281be69"></script>
-      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <title>Frequently Asked Questions &#8212; Agent Catalog v0.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=50651e91" />
+    <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
+    <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=86a354c8" />
+    <script src="_static/documentation_options.js?v=683873e3"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
+    <script src="_static/js/petite-vue.js"></script>
+    <link rel="icon" href="_static/favicon.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Agent Catalog Record Entries" href="entry.html" /> 
-</head>
+    <link rel="prev" title="Agent Catalog Configuration" href="config.html" /> 
+  </head><body data-dark_mode_code_blocks="true">
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+<div id="top_nav">
+    
 
-          
-          
-          <a href="index.html" class="icon icon-home">
-            Agent Catalog
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+    <nav>
+        
+            
+        
+
+        <p id="toggle_sidebar">
+            <a href="#" title="Toggle sidebar">|||</a>
+        </p>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog v0.2.0 documentation</a></h1>
+
+        <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
+    <template v-if="mode == 'light'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_light"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M67.48,18.073c1.913,-1.912 1.913,-5.018 0,-6.931c-1.912,-1.912 -5.018,-1.912 -6.931,0l-6.798,6.799c-1.912,1.912 -1.912,5.018 0,6.931c1.913,1.912 5.018,1.912 6.931,-0l6.798,-6.799Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.728,61.108c1.912,-1.913 1.912,-5.018 -0,-6.931c-1.913,-1.913 -5.019,-1.913 -6.931,-0l-6.799,6.798c-1.912,1.913 -1.912,5.019 0,6.931c1.913,1.913 5.019,1.913 6.931,0l6.799,-6.798Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.682,54.177c-1.913,-1.913 -5.018,-1.913 -6.931,-0c-1.912,1.913 -1.912,5.018 0,6.931l6.798,6.798c1.913,1.913 5.019,1.913 6.931,0c1.913,-1.912 1.913,-5.018 0,-6.931l-6.798,-6.798Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M4.901,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,-0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M18.929,11.142c-1.912,-1.912 -5.018,-1.912 -6.931,0c-1.912,1.913 -1.912,5.019 0,6.931l6.799,6.799c1.912,1.912 5.018,1.912 6.931,-0c1.912,-1.913 1.912,-5.019 -0,-6.931l-6.799,-6.799Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.108,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c-0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c-0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'dark'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_dark"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.901,2.196 -4.901,4.901c0,2.705 2.197,4.901 4.901,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.662,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.989,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.732,61.103c1.91,-1.91 1.91,-5.011 0,-6.921l-0.009,-0.01c-1.91,-1.91 -5.012,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.909,1.91 5.011,1.91 6.92,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.672,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.52,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l-0,-0.01c-0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.901,2.196 -4.901,4.901c0,2.704 2.197,4.9 4.901,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.73,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 -0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.098,34.623c-2.699,0 -4.891,2.192 -4.891,4.892l-0,0.019c-0,2.699 2.192,4.891 4.891,4.891c2.7,0 4.892,-2.192 4.892,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.892,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'darkest'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_darkest"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><path d="M39.315,23.791c8.684,-0 15.734,7.05 15.734,15.733c0,8.684 -7.05,15.734 -15.734,15.734c-8.683,0 -15.733,-7.05 -15.733,-15.734c-0,-8.683 7.05,-15.733 15.733,-15.733Zm0,4.737c6.069,0 10.997,4.927 10.997,10.996c-0,6.069 -4.928,10.996 -10.997,10.996c-6.068,0 -10.996,-4.927 -10.996,-10.996c0,-6.069 4.928,-10.996 10.996,-10.996Z" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.216,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.9,2.196 -4.9,4.901c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.666,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.99,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.737,61.103c1.909,-1.91 1.909,-5.011 -0,-6.921l-0.01,-0.01c-1.91,-1.91 -5.011,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.91,1.91 5.011,1.91 6.921,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.676,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.524,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l0,-0.01c0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.216,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901c-0,2.704 2.196,4.9 4.9,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.734,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.103,34.623c-2.7,0 -4.892,2.192 -4.892,4.892l-0,0.019c-0,2.699 2.192,4.891 4.892,4.891c2.699,0 4.891,-2.192 4.891,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.891,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+</a>
+
+<script>
+(function() {
+    const LOCAL_STORAGE_KEY = 'piccoloThemeMode'
+
+    var initialMode = localStorage.getItem(LOCAL_STORAGE_KEY)
+
+    if (initialMode) {
+        // Make sure the value in local storage is valid
+        if (['light', 'dark', 'darkest'].indexOf(initialMode) == -1) {
+            initialMode = 'light'
+            localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+        }
+    } else {
+        // Check if the client prefers dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            initialMode = 'dark'
+        } else {
+            initialMode = 'light'
+        }
+        localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+    }
+
+    document.documentElement.dataset.mode = initialMode
+
+    PetiteVue.createApp({
+        'mode': initialMode,
+        handleClick() {
+            let currentMode = this.mode
+
+            if (currentMode == 'light') {
+                this.mode = 'dark'
+            } else if (currentMode == 'dark') {
+                this.mode = 'darkest'
+            } else if (currentMode == 'darkest') {
+                this.mode = 'light'
+            }
+
+            document.documentElement.dataset.mode = this.mode
+            localStorage.setItem(LOCAL_STORAGE_KEY, this.mode)
+
+            console.log(this.mode)
+        }
+    }).mount('#mode_toggle')
+})()
+</script>
+            <p class="mobile_search_link">
+                <a href="search.html" title="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65 64" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2">
+                        <path d="M14.873 40.009c-2.315-3.943-3.642-8.532-3.642-13.429C11.231 11.91 23.141 0 37.811 0s26.58 11.91 26.58 26.58-11.91 26.58-26.58 26.58a26.44 26.44 0 0 1-14.277-4.161L9.739 62.794a3.12 3.12 0 0 1-4.413 0L.913 58.382c-1.217-1.218-1.217-3.196 0-4.413l13.96-13.96zM37.811 8.054c10.225 0 18.526 8.301 18.526 18.526s-8.301 18.526-18.526 18.526-18.526-8.301-18.526-18.526S27.586 8.054 37.811 8.054z" fill="#fff" />
+                    </svg>
+                </a>
+            </p>
+        
+
+        <div class="searchbox_wrapper">
+            
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+    </nav>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="install.html">Getting Agent Catalog</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="install.html#building-from-package">Building From Package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#building-from-source-with-pip">Building From Source (with pip)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#building-from-source-with-poetry">Building From Source (with Poetry)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="install.html#verifying-your-installation">Verifying Your Installation</a></li>
+
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concept.html">Concepts</a></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="guide.html">Agent Catalog User Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="guide.html#metrics-driven-development">Metrics Driven Development</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide.html#couchbase-backed-agent-catalogs">Couchbase-Backed Agent Catalogs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide.html#assessing-agent-quality">Assessing Agent Quality</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide.html#ignoring-files-while-indexing">Ignoring Files While Indexing</a></li>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">agentc CLI Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Package Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="catalog.html">Tool / Prompt Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="log.html">Spans and Log Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Log Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Tool</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#agentc">agentc</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-add">add</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-clean">clean</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-env">env</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-execute">execute</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-find">find</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-index">index</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-ls">ls</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-publish">publish</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-status">status</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-version">version</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">Agent Catalog API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api.html#agentc.Auditor"><code class="docutils literal notranslate"><span class="pre">Auditor</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.agent_name"><code class="docutils literal notranslate"><span class="pre">Auditor.agent_name</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.auditor_output"><code class="docutils literal notranslate"><span class="pre">Auditor.auditor_output</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.bucket"><code class="docutils literal notranslate"><span class="pre">Auditor.bucket</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.catalog"><code class="docutils literal notranslate"><span class="pre">Auditor.catalog</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.conn_root_certificate"><code class="docutils literal notranslate"><span class="pre">Auditor.conn_root_certificate</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.conn_string"><code class="docutils literal notranslate"><span class="pre">Auditor.conn_string</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.llm_model_name"><code class="docutils literal notranslate"><span class="pre">Auditor.llm_model_name</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.password"><code class="docutils literal notranslate"><span class="pre">Auditor.password</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.username"><code class="docutils literal notranslate"><span class="pre">Auditor.username</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.accept"><code class="docutils literal notranslate"><span class="pre">Auditor.accept()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.move"><code class="docutils literal notranslate"><span class="pre">Auditor.move()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#agentc.Provider"><code class="docutils literal notranslate"><span class="pre">Provider</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.bucket"><code class="docutils literal notranslate"><span class="pre">Provider.bucket</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.catalog"><code class="docutils literal notranslate"><span class="pre">Provider.catalog</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.conn_root_certificate"><code class="docutils literal notranslate"><span class="pre">Provider.conn_root_certificate</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.conn_string"><code class="docutils literal notranslate"><span class="pre">Provider.conn_string</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.decorator"><code class="docutils literal notranslate"><span class="pre">Provider.decorator</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.password"><code class="docutils literal notranslate"><span class="pre">Provider.password</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.provider_output"><code class="docutils literal notranslate"><span class="pre">Provider.provider_output</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.refiner"><code class="docutils literal notranslate"><span class="pre">Provider.refiner</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.secrets"><code class="docutils literal notranslate"><span class="pre">Provider.secrets</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.snapshot"><code class="docutils literal notranslate"><span class="pre">Provider.snapshot</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.tool_model"><code class="docutils literal notranslate"><span class="pre">Provider.tool_model</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.username"><code class="docutils literal notranslate"><span class="pre">Provider.username</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.get_item"><code class="docutils literal notranslate"><span class="pre">Provider.get_item()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.version"><code class="docutils literal notranslate"><span class="pre">Provider.version</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#agentc.langchain.audit"><code class="docutils literal notranslate"><span class="pre">audit()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="provider.html">Provider Configuration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="provider.html#langchain-langgraph-crewai">Langchain/LangGraph/CrewAI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="provider.html#llamaindex">LlamaIndex</a></li>
-<li class="toctree-l2"><a class="reference internal" href="provider.html#controlflow">Controlflow</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="env.html">Environment Variables</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="env.html#mandatory-environment-variables">Mandatory Environment Variables</a></li>
-<li class="toctree-l2"><a class="reference internal" href="env.html#optional-environment-variables">Optional Environment Variables</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="entry.html">On Catalog Entries</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="entry.html#tool-catalog-records">Tool Catalog Records</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#python-function-tools">Python Function Tools</a></li>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#sql-query-tools">SQL++ Query Tools</a></li>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#semantic-search-tools">Semantic Search Tools</a></li>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#http-request-tools">HTTP Request Tools</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="entry.html#prompt-catalog-records">Prompt Catalog Records</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#raw-prompts">Raw Prompts</a></li>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#jinja-templated-prompts">Jinja Templated Prompts</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Frequently Asked Questions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#which-couchbase-capella-or-server-version-should-i-use">Which Couchbase Capella or Server version should I use?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#do-i-need-to-use-a-specific-agent-framework-e-g-langchain-with-agent-catalog">Do I need to use a specific agent framework (e.g., LangChain) with Agent Catalog?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#what-services-do-i-need-to-enable-on-my-couchbase-cluster">What services do I need to enable on my Couchbase cluster?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#what-can-i-do-to-increase-log-ingestion-rate-into-my-cluster">What can I do to increase log ingestion rate into my Cluster?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#what-does-agent-catalog-add-to-my-couchbase-bucket">What does Agent Catalog add to my Couchbase bucket?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#do-i-need-couchbase-instance-to-run-agent-catalog">Do I need Couchbase instance to run Agent Catalog?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#what-is-agent-catalog-doing-when-i-run-agentc-index">What is Agent Catalog doing when I run <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">index</span></code>?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#how-do-i-roll-back-to-a-previous-catalog-version">How do I roll back to a previous catalog version?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#what-environment-variables-are-required-to-use-agent-catalog">What environment variables are required to use Agent Catalog?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#what-are-the-different-types-of-tools-and-prompts-i-can-create">What are the different types of tools and prompts I can create?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#can-i-write-multiple-tools-prompts-in-one-file">Can I write multiple tools/prompts in one file?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#do-cli-commands-need-to-be-executed-in-a-certain-order">Do CLI commands need to be executed in a certain order?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#can-i-index-and-publish-catalogs-programmatically">Can I index and publish catalogs programmatically?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#does-agent-catalog-require-an-openai-api-key">Does Agent Catalog require an OpenAI API key?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#does-agent-catalog-work-with-any-llm">Does Agent Catalog work with any LLM?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#why-am-i-not-able-to-install-agent-catalog-agentc-because-of-pytorch-error">Why am I not able to install Agent Catalog(agentc) because of PyTorch error?</a></li>
-</ul>
-</li>
+<p class="caption" role="heading"><span class="caption-text">Help / Questions</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">FAQs</a></li>
 </ul>
 
         </div>
       </div>
-    </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Agent Catalog</a>
-      </nav>
 
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Frequently Asked Questions</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="_sources/faqs.rst.txt" rel="nofollow"> View page source</a>
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
   <section id="frequently-asked-questions">
-<h1>Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Link to this heading"></a></h1>
+<h1>Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Link to this heading">¶</a></h1>
 <p>Welcome to the FAQ section of the project documentation!
 This section provides answers to common questions about the Agent Catalog project (key concepts, solutions to common
-issues, guidance on using various features, etc…).
-For additional information, consult the documentation or community resources.</p>
+issues, guidance on using various features, etc...).
+For additional information, please consult the documentation or community resources.</p>
+<section id="couchbase-capella-questions">
+<h2>Couchbase &amp; Capella Questions<a class="headerlink" href="#couchbase-capella-questions" title="Link to this heading">¶</a></h2>
 <section id="which-couchbase-capella-or-server-version-should-i-use">
-<h2>Which Couchbase Capella or Server version should I use?<a class="headerlink" href="#which-couchbase-capella-or-server-version-should-i-use" title="Link to this heading"></a></h2>
+<h3>Which Couchbase Capella or Server version should I use?<a class="headerlink" href="#which-couchbase-capella-or-server-version-should-i-use" title="Link to this heading">¶</a></h3>
 <p>Agent Catalog uses Vector search at its base, so any Couchbase version above and inclusive of <code class="docutils literal notranslate"><span class="pre">7.6</span></code> should be used.
 If you are a new user, we recommend using the latest version!</p>
 </section>
-<section id="do-i-need-to-use-a-specific-agent-framework-e-g-langchain-with-agent-catalog">
-<h2>Do I need to use a specific agent framework (e.g., LangChain) with Agent Catalog?<a class="headerlink" href="#do-i-need-to-use-a-specific-agent-framework-e-g-langchain-with-agent-catalog" title="Link to this heading"></a></h2>
-<p>No, Agent Catalog was designed to work <em>alongside</em> existing agent frameworks.
-Feel free to use your favorite framework (e.g., LangChain, LangGraph, Controlflow, etc…) when building your agent
-application!
-For our examples (see <a class="reference external" href="https://github.com/couchbaselabs/agent-catalog-example">here</a>), we use Controlflow.</p>
-</section>
 <section id="what-services-do-i-need-to-enable-on-my-couchbase-cluster">
-<h2>What services do I need to enable on my Couchbase cluster?<a class="headerlink" href="#what-services-do-i-need-to-enable-on-my-couchbase-cluster" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>Enable the following services on your Couchbase cluster:</dt><dd><ul class="simple">
-<li><p>Data, Query, Index: For storing items and searching them.</p></li>
-<li><p>Search: For performing vector search on items.</p></li>
-<li><p>Analytics: For creating views on audit logs and to query the views for better insights on logs.</p></li>
+<h3>What services do I need to enable on my Couchbase cluster?<a class="headerlink" href="#what-services-do-i-need-to-enable-on-my-couchbase-cluster" title="Link to this heading">¶</a></h3>
+<p>At a minimum, Agent Catalog requires the following services:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><em>Data</em>, <em>Query</em>, <em>Index</em>: For storing records (tools, prompts, logs) and subsequently searching for them.</p></li>
+<li><p><em>Search</em>: To enable semantic search of your catalog items (tools and prompts).</p></li>
 </ul>
-</dd>
-</dl>
+</div></blockquote>
+<p>To perform analysis of your logs, we also recommend enabling the <em>Analytics Service</em> to efficiently compute aggregate
+information about your application's performance.</p>
 </section>
-<section id="what-can-i-do-to-increase-log-ingestion-rate-into-my-cluster">
-<h2>What can I do to increase log ingestion rate into my Cluster?<a class="headerlink" href="#what-can-i-do-to-increase-log-ingestion-rate-into-my-cluster" title="Link to this heading"></a></h2>
-<p>When the auditor is initialized and the application runs, logs are continuously inserted into the Couchbase cluster.
-The ingestion rate depends on your Couchbase cluster configuration and can be adjusted by scaling your nodes—either
-horizontally by adding more data nodes or vertically by increasing the RAM per node. Additionally, increasing resources
-on your application infrastructure can also help optimize the rate at which logs are pushed.</p>
+<section id="what-can-i-do-to-increase-log-ingestion-rate-into-my-couchbase-cluster">
+<h3>What can I do to increase log ingestion rate into my Couchbase cluster?<a class="headerlink" href="#what-can-i-do-to-increase-log-ingestion-rate-into-my-couchbase-cluster" title="Link to this heading">¶</a></h3>
+<p>When a <code class="xref py py-class docutils literal notranslate"><span class="pre">agentc.Span</span></code> instance is used, logs are continuously inserted into your Couchbase cluster.
+The ingestion rate ultimately depends on your Couchbase cluster configuration and can be adjusted by scaling your
+nodes -- either horizontally by adding more data nodes or vertically by increasing the RAM per node.</p>
 <p>For more information on Cluster scaling, refer to the Couchbase documentation
 <a class="reference external" href="https://docs.couchbase.com/cloud/clusters/scale-database.html#events">here</a>.</p>
 </section>
 <section id="what-does-agent-catalog-add-to-my-couchbase-bucket">
-<h2>What does Agent Catalog add to my Couchbase bucket?<a class="headerlink" href="#what-does-agent-catalog-add-to-my-couchbase-bucket" title="Link to this heading"></a></h2>
-<p>When you publish catalog files using the <a class="reference external" href="cli.html#agentc-publish">agentc publish command</a>, Agent Catalog creates
-a scope called <code class="docutils literal notranslate"><span class="pre">agent_catalog</span></code> within a user-specified bucket.
-Inside this scope, two collections are created:</p>
-<ol class="arabic">
-<li><p><code class="docutils literal notranslate"><span class="pre">&lt;kind&gt;_catalog</span></code>: This collection stores individual catalog items.
-The following is an example tool from the <code class="docutils literal notranslate"><span class="pre">travel-sample</span></code> example application:</p>
-<div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-text">tool_catalog collection - description of one tool from catalog</span><a class="headerlink" href="#id6" title="Link to this code"></a></div>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;record_kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;semantic_search&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;get_travel_blog_snippets_from_user_interests&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Fetch snippets of travel blogs using a user&#39;s interests.\n&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;src/resources/agent_c/tools/blogs_from_interests.yaml&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-10-23 07:16:18.517967+00:00&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;c33204b0bb39c954e10dbcc1e930cee814361945&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;is_dirty&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;version_system&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;git&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
-<span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;embedding&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mf">-0.027521444484591484</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">],</span>
-<span class="w">  </span><span class="nt">&quot;annotations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;ccpa_2019_compliant&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;true&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;gdpr_2016_compliant&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;true&quot;</span>
-<span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;input&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;{\n  \&quot;type\&quot;: \&quot;object\&quot;,\n  \&quot;properties\&quot;: {\n    \&quot;user_interests\&quot;: {\n      \&quot;type\&quot;: \&quot;array\&quot;,\n      \&quot;items\&quot;: { \&quot;type\&quot;: \&quot;string\&quot; }\n    }\n  }\n}\n&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;vector_search&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;bucket&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;travel-sample&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;inventory&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;collection&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;article&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;articles-index&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;vector_field&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;vec&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;text_field&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;text&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;embedding_model&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sentence-transformers/all-MiniLM-L12-v2&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;num_candidates&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span>
-<span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;secrets&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
-<span class="w">    </span><span class="nt">&quot;couchbase&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;conn_string&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CB_CONN_STRING&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CB_USERNAME&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CB_PASSWORD&quot;</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">  </span><span class="p">}],</span>
-<span class="w">  </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;src/resources/agent_c/tools/blogs_from_interests.yaml:get_travel_blog_snippets_from_user_interests:git_c33204b0bb39c954e10dbcc1e930cee814561945&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;catalog_identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;53010a92d74f96851fb36fc2c69b9c3337140890&quot;</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</div>
-</li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&lt;kind&gt;_metadata</span></code>: This collection contains metadata for each version of the catalog.
-The following is an example metadata record from the <code class="docutils literal notranslate"><span class="pre">travel-sample</span></code> example application:</p>
-<div class="literal-block-wrapper docutils container" id="id7">
-<div class="code-block-caption"><span class="caption-text">tool_metadata collection - metadata associated with a catalog version</span><a class="headerlink" href="#id7" title="Link to this code"></a></div>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;schema_version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.0.0&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;library_version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v0.0.0-0-g0&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;tool&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;embedding_model&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sentence-transformers/all-MiniLM-L12-v2&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-10-23 07:16:15.058405+00:00&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;53010a92d74f96851fb36fc2c69b9c3337140890&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;is_dirty&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;version_system&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;git&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
-<span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;source_dirs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="s2">&quot;src/resources/agent_c/tools&quot;</span>
-<span class="w">  </span><span class="p">],</span>
-<span class="w">  </span><span class="nt">&quot;project&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;main&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;snapshot_annotations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</div>
-</li>
+<h3>What does Agent Catalog add to my Couchbase bucket?<a class="headerlink" href="#what-does-agent-catalog-add-to-my-couchbase-bucket" title="Link to this heading">¶</a></h3>
+<p>On <code class="code docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">init</span></code>, Agent Catalog creates two scopes: 1) <code class="code highlight sql docutils literal highlight-sql"><span class="n">agent_activity</span></code> and 2) <code class="code highlight sql docutils literal highlight-sql"><span class="n">agent_catalog</span></code>.
+The former holds all logs captured by <code class="xref py py-class docutils literal notranslate"><span class="pre">agentc.Span</span></code> instances` in the <code class="code highlight sql docutils literal highlight-sql"><span class="n">agent_activity</span><span class="p">.</span><span class="n">logs</span></code> collection
+(see <a class="reference external" href="analysis.html">here</a> for more information).
+The latter contains three collections:</p>
+<ol class="arabic simple">
+<li><p><code class="code highlight sql docutils literal highlight-sql"><span class="n">agent_catalog</span><span class="p">.</span><span class="n">tools</span></code>, which holds all tool records across all snapshots yielded by <code class="code docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">publish</span></code>.</p></li>
+<li><p><code class="code highlight sql docutils literal highlight-sql"><span class="n">agent_catalog</span><span class="p">.</span><span class="n">prompts</span></code>, which holds all prompt records across all snapshots yielded by <code class="code docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">publish</span></code>.</p></li>
+<li><p><code class="code highlight sql docutils literal highlight-sql"><span class="n">agent_catalog</span><span class="p">.</span><span class="n">metadata</span></code>, which holds all snapshot-related info across <code class="code highlight sql docutils literal highlight-sql"><span class="n">agent_catalog</span><span class="p">.</span><span class="n">tools</span></code> and
+<code class="code highlight sql docutils literal highlight-sql"><span class="n">agent_catalog</span><span class="p">.</span><span class="n">prompts</span></code>.</p></li>
 </ol>
-<p>Agent Catalog also creates GSI indexes on these collections (to optimize tool / prompt retrieval) as well as vector
-indexes on the <code class="docutils literal notranslate"><span class="pre">&lt;kind&gt;_catalog</span></code> collection for tool / prompt semantic search.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">init</span></code> will also create several GSI and vector indexes for collections within the <code class="code highlight sql docutils literal highlight-sql"><span class="n">agent_catalog</span></code>
+scope to assist in tool and prompt searching.</p>
 </section>
 <section id="do-i-need-couchbase-instance-to-run-agent-catalog">
-<h2>Do I need Couchbase instance to run Agent Catalog?<a class="headerlink" href="#do-i-need-couchbase-instance-to-run-agent-catalog" title="Link to this heading"></a></h2>
-<p>No, you do not need a Couchbase instance to run Agent Catalog.</p>
-<p>If couchbase credentials are not provided in the environment variables file, Agent Catalog will use only the local catalog.
-For functionalities such as <strong class="command">find</strong>, <strong class="command">execute</strong> if couchbase credentials are not mentioned, only the local catalog will be used for searching tools/prompts.</p>
+<h3>Do I need Couchbase instance to run Agent Catalog?<a class="headerlink" href="#do-i-need-couchbase-instance-to-run-agent-catalog" title="Link to this heading">¶</a></h3>
+<p>No, you do not need a Couchbase instance to get started with Agent Catalog.
+A Couchbase instance, however, is required for the <code class="code docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">publish</span></code> command.</p>
 </section>
-<section id="what-is-agent-catalog-doing-when-i-run-agentc-index">
-<h2>What is Agent Catalog doing when I run <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">index</span></code>?<a class="headerlink" href="#what-is-agent-catalog-doing-when-i-run-agentc-index" title="Link to this heading"></a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">index</span></code> command is used to assemble a local tool / prompt catalog from the source files in your project.
-Depending on the specified options, the command will index tools, prompts, or (by default) both.
-The end result are <code class="docutils literal notranslate"><span class="pre">&lt;kind&gt;-catalog.json</span></code> files stored in the <code class="docutils literal notranslate"><span class="pre">.agent-catalog</span></code> directory.</p>
-<p>Below, we give an example of what fields go into the <code class="docutils literal notranslate"><span class="pre">&lt;kind&gt;-catalog.json</span></code> file (specifically, a tool catalog
-containing a semantic search tool).</p>
-<div class="highlight-md notranslate"><div class="highlight"><pre><span></span><span class="sb">`embedding_model`</span> <span class="ge">*(string)*</span>: Embedding model used to generate the embeddings of the item description.
-<span class="sb">`kind`</span> <span class="ge">*(string)*</span>: Catalog type (e.g., <span class="sb">`tool`</span>).
-<span class="sb">`library_version`</span> <span class="ge">*(string)*</span>: Version of agentc library.
-<span class="sb">`schema_version`</span> <span class="ge">*(string)*</span>: Version of catalog schema.
-<span class="sb">`source_dirs`</span> <span class="ge">*(array)*</span>: Source directories for catalog items.
-<span class="sb">`version`</span> <span class="ge">*(object)*</span>: Catalog version details.
-  <span class="sb">`identifier`</span> <span class="ge">*(string)*</span>: Git commit hash for catalog.
-  <span class="sb">`is_dirty`</span> <span class="ge">*(boolean)*</span>: Indicates uncommitted changes.
-  <span class="sb">`timestamp`</span> <span class="ge">*(string)*</span>: Timestamp of catalog creation.
-<span class="sb">`items`</span> <span class="ge">*(array)*</span>: List of catalog items.
-    <span class="sb">`annotations`</span> <span class="ge">*(object key-value)*</span>: Annotations of key-value type.
-    <span class="sb">`description`</span> <span class="ge">*(string)*</span>: Description of the item.
-    <span class="sb">`embedding`</span> <span class="ge">*(array)*</span>: Embeddings of item description.
-    <span class="sb">`identifier`</span> <span class="ge">*(string - `source_of_item:file_name_of_item:git_commit_hash`)*</span>: Unique identifier for the item.
-    <span class="sb">`input`</span> <span class="ge">*(string)*</span>: Input schema for the item.
-    <span class="sb">`name`</span> <span class="ge">*(string)*</span>: Name of the item.
-    <span class="sb">`record_kind`</span> <span class="ge">*(string)*</span>: Type of record (e.g., <span class="sb">`semantic_search`</span>).
-    <span class="sb">`secrets`</span> <span class="ge">*(array)*</span>: Secrets configuration.
-      <span class="sb">`couchbase`</span> <span class="ge">*(object)*</span>: Couchbase connection details.
-        <span class="sb">`conn_string`</span> <span class="ge">*(string)*</span>: Couchbase server connection string.
-        <span class="sb">`password`</span> <span class="ge">*(string)*</span>: Couchbase server password.
-        <span class="sb">`username`</span> <span class="ge">*(string)*</span>: Couchbase server username.
-    <span class="sb">`source`</span> <span class="ge">*(string)*</span>: Source file location.
-    <span class="sb">`vector_search`</span> <span class="ge">*(object)*</span>: Vector search configuration.
-      <span class="sb">`bucket`</span> <span class="ge">*(string)*</span>: Couchbase bucket name.
-      <span class="sb">`collection`</span> <span class="ge">*(string)*</span>: Couchbase collection name.
-      <span class="sb">`embedding_model`</span> <span class="ge">*(string)*</span>: Embedding model for vector search.
-      <span class="sb">`index`</span> <span class="ge">*(string)*</span>: Index name for Couchbase.
-      <span class="sb">`scope`</span> <span class="ge">*(string)*</span>: Scope in Couchbase bucket.
-      <span class="sb">`text_field`</span> <span class="ge">*(string)*</span>: Field containing text.
-      <span class="sb">`vector_field`</span> <span class="ge">*(string)*</span>: Field containing vectors.
-    <span class="sb">`version`</span> <span class="ge">*(object)*</span>: Version information.
-      <span class="sb">`identifier`</span> <span class="ge">*(string)*</span>: Git commit hash when this item was recorded.
-      <span class="sb">`timestamp`</span> <span class="ge">*(string)*</span>: Timestamp of creation / last update of item.
-</pre></div>
-</div>
 </section>
+<section id="git-versioning-questions">
+<h2>Git Versioning Questions<a class="headerlink" href="#git-versioning-questions" title="Link to this heading">¶</a></h2>
 <section id="how-do-i-roll-back-to-a-previous-catalog-version">
-<h2>How do I roll back to a previous catalog version?<a class="headerlink" href="#how-do-i-roll-back-to-a-previous-catalog-version" title="Link to this heading"></a></h2>
-<p>Agent Catalog was built on the principle of agent <em>snapshots</em>.
-Consequently, it is possible to roll back to a previous catalog version <span class="math notranslate nohighlight">\(v\)</span> if you have <span class="math notranslate nohighlight">\(v\)</span>’s version ID.
+<h3>How do I roll back to a previous catalog version?<a class="headerlink" href="#how-do-i-roll-back-to-a-previous-catalog-version" title="Link to this heading">¶</a></h3>
+<p>Agent Catalog was built on the principle of application <em>snapshots</em>.
+Consequently, it is possible to roll back to a previous catalog version <span class="math notranslate nohighlight">\(v\)</span> if you have <span class="math notranslate nohighlight">\(v\)</span>'s version ID.
 Some common use cases for rolling back to a previous catalog version include performing A/B testing on different
-versions of your agent or rolling back your agent due to some regression.</p>
+versions of your application or rolling back your application due to some regression.</p>
 <p>Catalog versions are Git commit hashes.
-To roll back to a previous catalog version, follow these steps:</p>
+To roll back to a previous catalog version (and ultimately, a previous version of your application), follow these steps
+below:</p>
 <ol class="arabic">
-<li><p><strong>List Catalog Versions</strong> : Start by running the <strong class="command">agentc status</strong> command with the <code class="docutils literal notranslate"><span class="pre">-db</span></code> flag to
-list all the published catalog versions of tools in your bucket (here, we are checking in <code class="docutils literal notranslate"><span class="pre">travel-sample</span></code>):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># run agentc status --help for all options</span>
-agentc<span class="w"> </span>status<span class="w"> </span>tool<span class="w"> </span>-db<span class="w"> </span>--bucket<span class="w"> </span>travel-sample
+<li><p><strong>List Catalog Versions</strong> : Start by running the <code class="code docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">status</span></code> command with the <code class="docutils literal notranslate"><span class="pre">--db</span></code> and <code class="docutils literal notranslate"><span class="pre">--no-local</span></code>
+flags to list all the published catalog versions of tools (or prompts) in your bucket.
+For this example, we will focus on tools:</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="c1"># run agentc status --help for all options</span>
+<span class="gp">$ </span>agentc<span class="w"> </span>status<span class="w"> </span>tools<span class="w"> </span>--db<span class="w"> </span>--no-local
 </pre></div>
 </div>
 <p>Running the command above will return a list of all the tool catalog snapshots you have published to Couchbase.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">-----------------------------------------------------------------</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">--------------------------------------------------------------------------------------------------</span>
 <span class="go">TOOL</span>
-<span class="go">-----------------------------------------------------------------</span>
+<span class="go">--------------------------------------------------------------------------------------------------</span>
 <span class="go">db catalog info:</span>
 <span class="hll"><span class="go">    catalog id: 53010a92d74e96851fb36fc2c69b9c3337140890</span>
 </span><span class="go">            path            : travel-sample.agent_catalog.tool</span>
@@ -382,7 +240,7 @@ agentc<span class="w"> </span>status<span class="w"> </span>tool<span class="w">
 <span class="go">            repo version    :</span>
 <span class="go">                    time of publish: 2024-10-23 07:16:15.058405+00:00</span>
 <span class="go">                    catalog identifier: 53010a92d74e96851fb36fc2c69b9c3337140890</span>
-<span class="go">            embedding model : sentence-transformers/all-MiniLM-L12-v2</span>
+<span class="go">            embedding model : {&#39;base_url&#39;: None, &#39;name&#39;: &#39;sentence-transformers/all-MiniLM-L12-v2&#39;}</span>
 <span class="go">            source dirs     : [&#39;src/resources/agent_c/tools&#39;]</span>
 <span class="go">            number of items : 24</span>
 
@@ -393,7 +251,7 @@ agentc<span class="w"> </span>status<span class="w"> </span>tool<span class="w">
 <span class="go">            repo version    :</span>
 <span class="go">                    time of publish: 2024-10-16 05:34:38.523755+00:00</span>
 <span class="go">                    catalog identifier: fe25a5755bfa9af68e1f1fae9ac45e9e37b37611</span>
-<span class="go">            embedding model : sentence-transformers/all-MiniLM-L12-v2</span>
+<span class="go">            embedding model : {&#39;base_url&#39;: None, &#39;name&#39;: &#39;sentence-transformers/all-MiniLM-L12-v2&#39;}</span>
 <span class="go">            source dirs     : [&#39;src/resources/tools&#39;]</span>
 <span class="go">            number of items : 2</span>
 
@@ -403,28 +261,28 @@ agentc<span class="w"> </span>status<span class="w"> </span>tool<span class="w">
 </li>
 <li><p><strong>Browse Git Commits</strong>: Next, check the <code class="docutils literal notranslate"><span class="pre">catalog</span> <span class="pre">id</span></code> from the above output for the Git commit hash at which the
 catalogs were published to the database.
-Open your repository commit history on Github or run the <strong class="command">git log</strong> command in your terminal to view the
+Open your repository commit history on Github or run the <code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">log</span></code> command in your terminal to view the
 commit history for your project.
 Once you have a comprehensive list of commits, you can decide which catalog version to roll back to.</p></li>
 <li><p><strong>Perform Rollback</strong>: When you decide which catalog version you want to roll back to, you can move forward
-(or rather, “backward”) in three ways:</p>
+(or rather, &quot;backward&quot;) in three ways:</p>
 <ol class="loweralpha">
-<li><p>To revert your changes to a specific commit in a non-destructive manner, run <strong class="command">git revert</strong>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>revert<span class="w"> </span>&lt;commit_hash&gt;..HEAD
+<li><p>To revert your changes to a specific commit in a non-destructive manner, run <code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">revert</span></code>.</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>revert<span class="w"> </span>&lt;commit_hash&gt;..HEAD
 </pre></div>
 </div>
 <p>This command will rollback your repository to <cite>&lt;commit_hash&gt;</cite> <em>but</em> with a new commit hash.
 This is a safe way to rollback to a previous version without losing your current work, as your existing
 Git commit history will be preserved.</p>
 </li>
-<li><p>To checkout a particular commit (i.e., all changes associated with some commit), run <strong class="command">git checkout</strong>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>checkout<span class="w"> </span>&lt;commit_hash&gt;
+<li><p>To checkout a particular commit (i.e., all changes associated with some commit), run <code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">checkout</span></code>.</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>checkout<span class="w"> </span>&lt;commit_hash&gt;
 </pre></div>
 </div>
 <p>This command will checkout the commit <cite>&lt;commit_hash&gt;</cite> without creating a new commit.</p>
 </li>
-<li><p>To revert your changes to a specific commit in a <strong>destructive</strong> manner, run <strong class="command">git reset</strong>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>reset<span class="w"> </span>--hard<span class="w"> </span>&lt;commit_hash&gt;
+<li><p>To revert your changes to a specific commit in a <strong>destructive</strong> manner, run <code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">reset</span></code>.</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>reset<span class="w"> </span>--hard<span class="w"> </span>&lt;commit_hash&gt;
 </pre></div>
 </div>
 <p>This command will reset your working Git HEAD to the provided commit if you have not published your changes so
@@ -437,163 +295,83 @@ far.
 </li>
 </ol>
 </section>
-<section id="what-environment-variables-are-required-to-use-agent-catalog">
-<h2>What environment variables are required to use Agent Catalog?<a class="headerlink" href="#what-environment-variables-are-required-to-use-agent-catalog" title="Link to this heading"></a></h2>
-<p>To get started with Agent Catalog, you’ll need to initialize certain environment variables.
-These can be in a <code class="docutils literal notranslate"><span class="pre">.env</span></code> file located at the root of your project (where all of your <strong class="command">agentc</strong> commands are
-run) <em>or</em> manually using <strong class="command">export</strong>.</p>
-<p>Make sure to review the required variables and populate them with appropriate values before starting your project.</p>
-<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">------------------------------------------ REQUIRED -----------------------------------------</span>
-<span class="c1"># Agent Catalog specific environment variables that identify where the catalog is stored.</span>
-<span class="na">AGENT_CATALOG_CONN_STRING</span><span class="o">=</span><span class="s">couchbase://localhost</span>
-<span class="na">AGENT_CATALOG_USERNAME</span><span class="o">=</span><span class="s">Administrator</span>
-<span class="na">AGENT_CATALOG_PASSWORD</span><span class="o">=</span><span class="s">password</span>
-<span class="na">AGENT_CATALOG_BUCKET</span><span class="o">=</span><span class="s">travel-sample</span>
-
-<span class="c1"># In case of capella instance or if secure connection is required</span>
-<span class="c1"># replace couchbase with couchbases in AGENT_CATALOG_CONN_STRING and add the following</span>
-<span class="c1"># AGENT_CATALOG_CONN_ROOT_CERTIFICATE=/path/to/cluster/root/certificate/on/local/system</span>
-
-<span class="c1"># The holy OpenAI API key. :-)</span>
-<span class="na">OPENAI_API_KEY</span><span class="o">=</span><span class="s">...</span>
-</pre></div>
-</div>
-<p>For more information on Agent Catalog environment variables, refer to the documentation <a class="reference external" href="env.html">here</a>.</p>
 </section>
-<section id="what-are-the-different-types-of-tools-and-prompts-i-can-create">
-<h2>What are the different types of tools and prompts I can create?<a class="headerlink" href="#what-are-the-different-types-of-tools-and-prompts-i-can-create" title="Link to this heading"></a></h2>
-<p>Agent Catalog currently supports four types of tools (<code class="docutils literal notranslate"><span class="pre">python_function</span></code>, <code class="docutils literal notranslate"><span class="pre">sqlpp_query</span></code>, <code class="docutils literal notranslate"><span class="pre">semantic_search</span></code>,
-<code class="docutils literal notranslate"><span class="pre">http_request</span></code>) and two types of prompts (<code class="docutils literal notranslate"><span class="pre">raw_prompt</span></code>, <code class="docutils literal notranslate"><span class="pre">jinja_prompt</span></code>).
-For more information on the types of tools and prompts you can create, refer to the documentation <a class="reference external" href="entry.html">here</a>.</p>
+<section id="installation-questions">
+<h2>Installation Questions<a class="headerlink" href="#installation-questions" title="Link to this heading">¶</a></h2>
+<section id="why-am-i-getting-a-pytorch-error-on-installation">
+<h3>Why am I getting a PyTorch error on installation?<a class="headerlink" href="#why-am-i-getting-a-pytorch-error-on-installation" title="Link to this heading">¶</a></h3>
+<p>When installing Agent Catalog, you may face a dependency clash between the PyTorch version installed globally in your
+system and the PyTorch version being installed by the <code class="code highlight python docutils literal highlight-python"><span class="n">sentence_transformers</span></code> library of <code class="code highlight python docutils literal highlight-python"><span class="n">agentc_core</span></code>.</p>
+<p>This issue can be resolved by using virtual environments (e.g., Poetry, Anaconda, <code class="code highlight python docutils literal highlight-python"><span class="n">venv</span></code>, etc...).
+We detail the use of Poetry and Anaconda in our installation instructions <a class="reference external" href="install.html">here</a>.
+If this does not solve the issue and you are on an older OS, considering using a virtual machine to run your
+application.</p>
 </section>
-<section id="can-i-write-multiple-tools-prompts-in-one-file">
-<h2>Can I write multiple tools/prompts in one file?<a class="headerlink" href="#can-i-write-multiple-tools-prompts-in-one-file" title="Link to this heading"></a></h2>
-<p>All prompts must be defined in separate files, as each prompt is uniquely identified by its file name.
-However multiple tools can exist in a single file <em>if you are defining Python tools or HTTP request tools</em>.
-Examples of multiple tools existing within a single file are shown below:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">agentc</span><span class="w"> </span><span class="kn">import</span> <span class="n">tool</span>
-
-<span class="nd">@tool</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">search_best_flight_deals</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">FlightDeal</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Search for the best flight deals.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="kc">None</span>
-
-
-<span class="nd">@tool</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">create_packing_checklist</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">PackingChecklistItem</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a packing checklist.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="kc">None</span>
-</pre></div>
-</div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">record_kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http_request</span>
-
-<span class="nt">open_api</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">filename</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../rewards_spec.json</span>
-<span class="w">  </span><span class="nt">operations</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/create</span><span class="w">                       </span><span class="c1"># ===&gt; one tool</span>
-<span class="w">      </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">post</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/rewards/{member_id}</span><span class="w">          </span><span class="c1"># ===&gt; another tool</span>
-<span class="w">      </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">get</span>
-</pre></div>
-</div>
-</section>
-<section id="do-cli-commands-need-to-be-executed-in-a-certain-order">
-<h2>Do CLI commands need to be executed in a certain order?<a class="headerlink" href="#do-cli-commands-need-to-be-executed-in-a-certain-order" title="Link to this heading"></a></h2>
-<p>With the exception of the <strong class="command">agentc publish</strong> command, all other commands can be executed in any order.</p>
-<dl class="simple">
-<dt><strong>Indexing</strong>:</dt><dd><p>After creating your tools and/or prompts, you first need to generate a local catalog with the
-<strong class="command">agentc index</strong> command.
-This will build a file-based catalog that you can immediately use (without needing to connect to a Couchbase
-instance).</p>
-</dd>
-<dt><strong>Publishing</strong>:</dt><dd><p>To persist your catalog entries on Couchbase, use the <strong class="command">agentc publish</strong> command.</p>
-</dd>
-</dl>
-<p>Publishing can only be done after indexing the catalog.
-To publish new changes, you must first commit your changes to Git and then run the <strong class="command">agentc index</strong> command
-again with a clean Git repository.</p>
-<p>For the complete set of Agent Catalog CLI commands, refer to the documentation <a class="reference external" href="cli.html">here</a>.</p>
-</section>
-<section id="can-i-index-and-publish-catalogs-programmatically">
-<h2>Can I index and publish catalogs programmatically?<a class="headerlink" href="#can-i-index-and-publish-catalogs-programmatically" title="Link to this heading"></a></h2>
-<p>Yes!
-The <code class="docutils literal notranslate"><span class="pre">agentc.cmd</span></code> module allows developers to author Python scripts with the same functionality as our CLI commands.
-Below we give an example of how to index and publish catalogs programmatically:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">agentc.cmd</span><span class="w"> </span><span class="kn">import</span> <span class="n">index</span><span class="p">,</span> <span class="n">publish</span>
-
-<span class="c1"># Index the directory named tools.</span>
-<span class="n">index</span><span class="p">(</span>
-       <span class="n">directory</span><span class="o">=</span><span class="s2">&quot;tools&quot;</span><span class="p">,</span>
-       <span class="n">tools</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-       <span class="n">prompts</span><span class="o">=</span><span class="kc">False</span>
-<span class="p">)</span>
-
-<span class="c1"># Publish our local catalog.</span>
-<span class="n">publish</span><span class="p">(</span>
-       <span class="n">kind</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;tool&quot;</span><span class="p">],</span>
-       <span class="n">bucket</span><span class="o">=</span><span class="s2">&quot;travel-sample&quot;</span><span class="p">,</span>
-       <span class="n">username</span><span class="o">=</span><span class="s2">&quot;Administrator&quot;</span><span class="p">,</span>
-       <span class="n">password</span><span class="o">=</span><span class="s2">&quot;password&quot;</span><span class="p">,</span>
-       <span class="n">connection_string</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<p>The script above is equivalent to running the following CLI commands:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>agentc<span class="w"> </span>index<span class="w"> </span>tools<span class="w"> </span>--no-prompts
-
-<span class="nb">export</span><span class="w"> </span><span class="nv">AGENT_CATALOG_CONN_STRING</span><span class="o">=</span>localhost
-<span class="nb">export</span><span class="w"> </span><span class="nv">AGENT_CATALOG_USERNAME</span><span class="o">=</span>Administrator
-<span class="nb">export</span><span class="w"> </span><span class="nv">AGENT_CATALOG_PASSWORD</span><span class="o">=</span>password
-agentc<span class="w"> </span>publish<span class="w"> </span>tool<span class="w"> </span>--bucket<span class="w"> </span>travel-sample
-</pre></div>
-</div>
-</section>
-<section id="does-agent-catalog-require-an-openai-api-key">
-<h2>Does Agent Catalog require an OpenAI API key?<a class="headerlink" href="#does-agent-catalog-require-an-openai-api-key" title="Link to this heading"></a></h2>
-<p>Agent Catalog does not require an OpenAI API key.</p>
-</section>
-<section id="does-agent-catalog-work-with-any-llm">
-<h2>Does Agent Catalog work with any LLM?<a class="headerlink" href="#does-agent-catalog-work-with-any-llm" title="Link to this heading"></a></h2>
-<p>Yes!
-Agent Catalog does not restrict you to a specific language model.
-You are free to choose any LLM for your agent workflow development (provided your chosen agent framework supports
-the LLM you choose).</p>
-</section>
-<section id="why-am-i-not-able-to-install-agent-catalog-agentc-because-of-pytorch-error">
-<h2>Why am I not able to install Agent Catalog(agentc) because of PyTorch error?<a class="headerlink" href="#why-am-i-not-able-to-install-agent-catalog-agentc-because-of-pytorch-error" title="Link to this heading"></a></h2>
-<p>While installing agentc, you may face a dependency clash between the PyTorch version installed globally in your system and the PyTorch version being installed by the Sentence transformers library in agentc. This likely happens when the globally installed PyTorch is of a different version as compared to the one agentc requires.</p>
-<p>You can resolve this by using Anaconda or any other virtual environment manager instead of the in-built python venv manager. We have found Anaconda to be better in terms of isolating project dependencies. In case this does not solve the issue and you are on an older OS, considering using a Virtual Machine to run your application.</p>
 </section>
 </section>
 
 
-           </div>
+            <div class="clearer"></div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="entry.html" class="btn btn-neutral float-left" title="Agent Catalog Record Entries" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-    </div>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2024, Couchbase.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
         </div>
       </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
+    
+        <div id="show_right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&lt;</span><span>Page contents</span></a></p>
+        </div>
 
-</body>
+        <div id="right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&gt;</span><span>Page contents:</span></a></p>
+            <div class="page_toc">
+                <ul>
+<li><a class="reference internal" href="#">Frequently Asked Questions</a><ul>
+<li><a class="reference internal" href="#couchbase-capella-questions">Couchbase &amp; Capella Questions</a><ul>
+<li><a class="reference internal" href="#which-couchbase-capella-or-server-version-should-i-use">Which Couchbase Capella or Server version should I use?</a></li>
+<li><a class="reference internal" href="#what-services-do-i-need-to-enable-on-my-couchbase-cluster">What services do I need to enable on my Couchbase cluster?</a></li>
+<li><a class="reference internal" href="#what-can-i-do-to-increase-log-ingestion-rate-into-my-couchbase-cluster">What can I do to increase log ingestion rate into my Couchbase cluster?</a></li>
+<li><a class="reference internal" href="#what-does-agent-catalog-add-to-my-couchbase-bucket">What does Agent Catalog add to my Couchbase bucket?</a></li>
+<li><a class="reference internal" href="#do-i-need-couchbase-instance-to-run-agent-catalog">Do I need Couchbase instance to run Agent Catalog?</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#git-versioning-questions">Git Versioning Questions</a><ul>
+<li><a class="reference internal" href="#how-do-i-roll-back-to-a-previous-catalog-version">How do I roll back to a previous catalog version?</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#installation-questions">Installation Questions</a><ul>
+<li><a class="reference internal" href="#why-am-i-getting-a-pytorch-error-on-installation">Why am I getting a PyTorch error on installation?</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+        </div>
+    
+
+      <div class="clearer"></div>
+    </div>
+    <div class="button_nav_wrapper">
+        <div class="button_nav">
+            <div class="left">
+                
+                <a href="config.html">
+                    <span class="icon">&lt;</span><span>Agent Catalog Configuration</span></a>
+                
+            </div>
+
+            <div class="right">
+                
+            </div>
+        </div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Couchbase.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+
+<p id="theme_credit">Styled using the <a href="https://github.com/piccolo-orm/piccolo_theme">Piccolo Theme</a></p>
+  </body>
 </html>

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Agent Catalog: A Primer &#8212; Agent Catalog v0.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=50651e91" />
+    <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
+    <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=86a354c8" />
+    <script src="_static/documentation_options.js?v=683873e3"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="_static/js/theme.js"></script>
+    <script src="_static/js/petite-vue.js"></script>
+    <link rel="icon" href="_static/favicon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Agent Catalog Concepts" href="concept.html" />
+    <link rel="prev" title="Installation" href="install.html" /> 
+  </head><body data-dark_mode_code_blocks="true">
+
+<div id="top_nav">
+    
+
+    <nav>
+        
+            
+        
+
+        <p id="toggle_sidebar">
+            <a href="#" title="Toggle sidebar">|||</a>
+        </p>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog v0.2.0 documentation</a></h1>
+
+        <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
+    <template v-if="mode == 'light'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_light"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M67.48,18.073c1.913,-1.912 1.913,-5.018 0,-6.931c-1.912,-1.912 -5.018,-1.912 -6.931,0l-6.798,6.799c-1.912,1.912 -1.912,5.018 0,6.931c1.913,1.912 5.018,1.912 6.931,-0l6.798,-6.799Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.728,61.108c1.912,-1.913 1.912,-5.018 -0,-6.931c-1.913,-1.913 -5.019,-1.913 -6.931,-0l-6.799,6.798c-1.912,1.913 -1.912,5.019 0,6.931c1.913,1.913 5.019,1.913 6.931,0l6.799,-6.798Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.682,54.177c-1.913,-1.913 -5.018,-1.913 -6.931,-0c-1.912,1.913 -1.912,5.018 0,6.931l6.798,6.798c1.913,1.913 5.019,1.913 6.931,0c1.913,-1.912 1.913,-5.018 0,-6.931l-6.798,-6.798Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M4.901,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,-0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M18.929,11.142c-1.912,-1.912 -5.018,-1.912 -6.931,0c-1.912,1.913 -1.912,5.019 0,6.931l6.799,6.799c1.912,1.912 5.018,1.912 6.931,-0c1.912,-1.913 1.912,-5.019 -0,-6.931l-6.799,-6.799Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.108,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c-0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c-0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'dark'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_dark"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.901,2.196 -4.901,4.901c0,2.705 2.197,4.901 4.901,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.662,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.989,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.732,61.103c1.91,-1.91 1.91,-5.011 0,-6.921l-0.009,-0.01c-1.91,-1.91 -5.012,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.909,1.91 5.011,1.91 6.92,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.672,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.52,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l-0,-0.01c-0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.901,2.196 -4.901,4.901c0,2.704 2.197,4.9 4.901,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.73,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 -0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.098,34.623c-2.699,0 -4.891,2.192 -4.891,4.892l-0,0.019c-0,2.699 2.192,4.891 4.891,4.891c2.7,0 4.892,-2.192 4.892,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.892,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'darkest'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_darkest"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><path d="M39.315,23.791c8.684,-0 15.734,7.05 15.734,15.733c0,8.684 -7.05,15.734 -15.734,15.734c-8.683,0 -15.733,-7.05 -15.733,-15.734c-0,-8.683 7.05,-15.733 15.733,-15.733Zm0,4.737c6.069,0 10.997,4.927 10.997,10.996c-0,6.069 -4.928,10.996 -10.997,10.996c-6.068,0 -10.996,-4.927 -10.996,-10.996c0,-6.069 4.928,-10.996 10.996,-10.996Z" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.216,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.9,2.196 -4.9,4.901c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.666,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.99,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.737,61.103c1.909,-1.91 1.909,-5.011 -0,-6.921l-0.01,-0.01c-1.91,-1.91 -5.011,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.91,1.91 5.011,1.91 6.921,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.676,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.524,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l0,-0.01c0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.216,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901c-0,2.704 2.196,4.9 4.9,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.734,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.103,34.623c-2.7,0 -4.892,2.192 -4.892,4.892l-0,0.019c-0,2.699 2.192,4.891 4.892,4.891c2.699,0 4.891,-2.192 4.891,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.891,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+</a>
+
+<script>
+(function() {
+    const LOCAL_STORAGE_KEY = 'piccoloThemeMode'
+
+    var initialMode = localStorage.getItem(LOCAL_STORAGE_KEY)
+
+    if (initialMode) {
+        // Make sure the value in local storage is valid
+        if (['light', 'dark', 'darkest'].indexOf(initialMode) == -1) {
+            initialMode = 'light'
+            localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+        }
+    } else {
+        // Check if the client prefers dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            initialMode = 'dark'
+        } else {
+            initialMode = 'light'
+        }
+        localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+    }
+
+    document.documentElement.dataset.mode = initialMode
+
+    PetiteVue.createApp({
+        'mode': initialMode,
+        handleClick() {
+            let currentMode = this.mode
+
+            if (currentMode == 'light') {
+                this.mode = 'dark'
+            } else if (currentMode == 'dark') {
+                this.mode = 'darkest'
+            } else if (currentMode == 'darkest') {
+                this.mode = 'light'
+            }
+
+            document.documentElement.dataset.mode = this.mode
+            localStorage.setItem(LOCAL_STORAGE_KEY, this.mode)
+
+            console.log(this.mode)
+        }
+    }).mount('#mode_toggle')
+})()
+</script>
+            <p class="mobile_search_link">
+                <a href="search.html" title="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65 64" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2">
+                        <path d="M14.873 40.009c-2.315-3.943-3.642-8.532-3.642-13.429C11.231 11.91 23.141 0 37.811 0s26.58 11.91 26.58 26.58-11.91 26.58-26.58 26.58a26.44 26.44 0 0 1-14.277-4.161L9.739 62.794a3.12 3.12 0 0 1-4.413 0L.913 58.382c-1.217-1.218-1.217-3.196 0-4.413l13.96-13.96zM37.811 8.054c10.225 0 18.526 8.301 18.526 18.526s-8.301 18.526-18.526 18.526-18.526-8.301-18.526-18.526S27.586 8.054 37.811 8.054z" fill="#fff" />
+                    </svg>
+                </a>
+            </p>
+        
+
+        <div class="searchbox_wrapper">
+            
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+    </nav>
+</div>
+
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concept.html">Concepts</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">agentc CLI Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Package Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="catalog.html">Tool / Prompt Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="log.html">Spans and Log Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Log Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Help / Questions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="faqs.html">FAQs</a></li>
+</ul>
+
+        </div>
+      </div>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="agent-catalog-a-primer">
+<h1>Agent Catalog: A Primer<a class="headerlink" href="#agent-catalog-a-primer" title="Link to this heading">¶</a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+<p>The Agent Catalog project aims to enrich your agent development process by i) providing a consolidated view of tools
+and prompts used by your agents and ii) enabling observability with our logging library + Couchbase.
+In this short tutorial, we will:</p>
+<ol class="arabic simple">
+<li><p>Build a 3-agent application using LangGraph ;</p></li>
+<li><p>Integrate Agent Catalog into our existing application ; and</p></li>
+<li><p>Perform some prompt engineering to improve our application using a Git-backed workflow.</p></li>
+</ol>
+<p>We assume no prior LangGraph or Agent Catalog experience in this tutorial.
+This application is available in full <a class="reference external" href="TODOREPLACEMEWITHLINK">here</a>.</p>
+</section>
+<section id="step-1-building-a-langgraph-application">
+<h2>Step #1: Building a LangGraph Application<a class="headerlink" href="#step-1-building-a-langgraph-application" title="Link to this heading">¶</a></h2>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Feel free to skip this section if you already have your agent application.</p>
+</div>
+<p>To start, let's explain the application we want to build.
+We are interested in developing a chatbot that is able to use a structured knowledge base (Couchbase) to answer
+routing-related questions.
+<em>Agents</em> are actors with agency that interact with an environment and possibly other actors.
+We use agents to realize the broad set of tasks representing these &quot;routing-related&quot; questions.
+Specifically, in Figure 1 (below) we define an architecture of three agents to handle these questions:</p>
+<ol class="arabic simple">
+<li><p>&quot;Front Desk&quot; -- Purposed to interact with the user and the &quot;Endpoint Finding&quot; agent.</p></li>
+<li><p>&quot;Endpoint Finding&quot; -- Purposed to translate the user's input into IATA airport codes and interact with the
+&quot;Route Finding&quot; agent.</p></li>
+<li><p>&quot;Route Finding&quot; -- Purposed to find routes using Couchbase tools between the endpoints provided by the
+&quot;Endpoint Finding&quot; and to i) interact with the &quot;Endpoint Finding&quot; agent to provide new endpoints if no routes are
+found or ii) send the routes (or lack of routes) to the &quot;Front Desk&quot; agent to give back to the user.</p></li>
+</ol>
+<figure class="align-center" id="id1">
+<pre  class="mermaid">
+        ---
+title: 3-Agent Route Finding System
+---
+%%{init: {'flowchart': {'curve': 'linear', 'defaultRenderer': 'elk'}}}%%
+graph BT
+;
+    __start__([&lt;p&gt;__start__&lt;/p&gt;]):::first
+    front_desk_agent(front_desk_agent)
+    endpoint_finding_agent(endpoint_finding_agent)
+    route_finding_agent(route_finding_agent)
+    __end__([&lt;p&gt;__end__&lt;/p&gt;]):::last
+    __start__ --&gt; front_desk_agent;
+    endpoint_finding_agent --&gt; route_finding_agent;
+    front_desk_agent -. ENDPOINT_FINDING .-&gt; endpoint_finding_agent;
+front_desk_agent -. END .-&gt; __end__;
+route_finding_agent -. FRONT_DESK .-&gt; front_desk_agent;
+route_finding_agent -. ENDPOINT_FINDING .-&gt; endpoint_finding_agent;
+front_desk_agent -. FRONT_DESK .-&gt; front_desk_agent;
+classDef default fill:#f2f0ff, line-height: 1.2
+classDef first fill-opacity:0
+classDef last fill: #bfb6fc
+    </pre><figcaption>
+<p><span class="caption-text"><strong>Figure 1</strong>: The 3-agent system (a Front Desk agent, a Route Finding agent, and an Endpoint Finding
+agent) we will be working with.</span><a class="headerlink" href="#id1" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<section id="building-our-agent-graph">
+<h3>Building our Agent Graph<a class="headerlink" href="#building-our-agent-graph" title="Link to this heading">¶</a></h3>
+<p>Let's now realize the graph above in Figure 1 (above).
+We will build up the agents, state, and edges in the next step.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># We define these in the following steps!</span>
+<span class="n">FrontDeskAgent</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">EndpointFindingAgent</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">RouteFindingAgent</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">State</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">out_front_desk_edge</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">out_route_finding_edge</span> <span class="o">=</span> <span class="o">...</span>
+
+<span class="c1"># Create a workflow graph.</span>
+<span class="n">workflow</span> <span class="o">=</span> <span class="n">langgraph</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">StateGraph</span><span class="p">(</span><span class="n">State</span><span class="p">)</span>
+<span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;front_desk_agent&quot;</span><span class="p">,</span> <span class="n">FrontDeskAgent</span><span class="p">())</span>
+<span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;endpoint_finding_agent&quot;</span><span class="p">,</span> <span class="n">EndpointFindingAgent</span><span class="p">())</span>
+<span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;route_finding_agent&quot;</span><span class="p">,</span> <span class="n">RouteFindingAgent</span><span class="p">())</span>
+<span class="n">workflow</span><span class="o">.</span><span class="n">set_entry_point</span><span class="p">(</span><span class="s2">&quot;front_desk_agent&quot;</span><span class="p">)</span>
+<span class="n">workflow</span><span class="o">.</span><span class="n">add_conditional_edges</span><span class="p">(</span>
+    <span class="s2">&quot;front_desk_agent&quot;</span><span class="p">,</span>
+    <span class="n">out_front_desk_edge</span><span class="p">,</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;ENDPOINT_FINDING&quot;</span><span class="p">:</span> <span class="s2">&quot;endpoint_finding_agent&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FRONT_DESK&quot;</span><span class="p">:</span> <span class="s2">&quot;front_desk_agent&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;END&quot;</span><span class="p">:</span> <span class="n">langgraph</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">END</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="n">workflow</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;endpoint_finding_agent&quot;</span><span class="p">,</span> <span class="s2">&quot;route_finding_agent&quot;</span><span class="p">)</span>
+<span class="n">workflow</span><span class="o">.</span><span class="n">add_conditional_edges</span><span class="p">(</span>
+    <span class="s2">&quot;route_finding_agent&quot;</span><span class="p">,</span>
+    <span class="n">out_route_finding_edge</span><span class="p">,</span>
+    <span class="p">{</span><span class="s2">&quot;FRONT_DESK&quot;</span><span class="p">:</span> <span class="s2">&quot;front_desk_agent&quot;</span><span class="p">,</span> <span class="s2">&quot;ENDPOINT_FINDING&quot;</span><span class="p">:</span> <span class="s2">&quot;endpoint_finding_agent&quot;</span><span class="p">},</span>
+<span class="p">)</span>
+<span class="n">graph</span> <span class="o">=</span> <span class="n">workflow</span><span class="o">.</span><span class="n">compile</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="defining-a-contract-the-state">
+<h3>Defining a Contract: The State<a class="headerlink" href="#defining-a-contract-the-state" title="Link to this heading">¶</a></h3>
+<p>Similar to how humans communicate, agents require some sort of contract before communicating.
+As an example, you <em>typically</em> don't start a conversation with your barista by summarizing the intricacies of bread
+tabs (at least where we are from :-)).
+In LangGraph, this contract exists in the form of a <code class="docutils literal notranslate"><span class="pre">State</span></code> class.
+Let's define our state class as such:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">langchain_core.messages</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">State</span><span class="p">(</span><span class="n">typing</span><span class="o">.</span><span class="n">TypedDict</span><span class="p">):</span>
+    <span class="n">messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">langchain_core</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">BaseMessage</span><span class="p">]</span>
+    <span class="n">is_last_step</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">needs_clarification</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">endpoints</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>
+    <span class="n">routes</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>Our state class, defined as a typed dictionary, has the following attributes:</p>
+<ol class="arabic simple">
+<li><p>A <code class="docutils literal notranslate"><span class="pre">messages</span></code> field, used to hold the history for the current conversation / session.
+This field is standard across most LangGraph applications.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">is_last_step</span></code> field, a control field used to signal to the terminating agent (in our case, the &quot;Front Desk&quot;)
+that the current session should end.
+Similar to <code class="docutils literal notranslate"><span class="pre">messages</span></code>, this field is standard across most LangGraph applications.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">needs_clarification</span></code> field, primarily a control field used by the &quot;Front Desk&quot; agent to repeat the &quot;Front Desk&quot;
+agent code block.</p></li>
+<li><p>An <code class="docutils literal notranslate"><span class="pre">endpoints</span></code> field, used to hold endpoints found by our &quot;Endpoint Finding&quot; agent.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">routes</span></code> field, used to hold routes found by our &quot;Route Finding&quot; agent.</p></li>
+</ol>
+</section>
+<section id="defining-our-graph-nodes">
+<h3>Defining Our Graph Nodes<a class="headerlink" href="#defining-our-graph-nodes" title="Link to this heading">¶</a></h3>
+<p>The &quot;nodes&quot; in LangGraph, similar to other vertex-centric paradigms, are our pièce de résistance.</p>
+</section>
+<section id="defining-our-graph-edges">
+<h3>Defining Our Graph Edges<a class="headerlink" href="#defining-our-graph-edges" title="Link to this heading">¶</a></h3>
+<p>In LangGraph, edges are defined using functions that accept a <code class="docutils literal notranslate"><span class="pre">State</span></code> instance (defined previously) and return the
+name of the next node that will handle the current state.
+As illustrated in Figure 1 (above, repeated directly below for reference), there are seven edges we need to define:</p>
+<figure class="align-center" id="id2">
+<pre  class="mermaid">
+        ---
+title: 3-Agent Route Finding System
+---
+%%{init: {'flowchart': {'curve': 'linear', 'defaultRenderer': 'elk'}}}%%
+graph BT
+;
+    __start__([&lt;p&gt;__start__&lt;/p&gt;]):::first
+    front_desk_agent(front_desk_agent)
+    endpoint_finding_agent(endpoint_finding_agent)
+    route_finding_agent(route_finding_agent)
+    __end__([&lt;p&gt;__end__&lt;/p&gt;]):::last
+    __start__ --&gt; front_desk_agent;
+    endpoint_finding_agent --&gt; route_finding_agent;
+    front_desk_agent -. ENDPOINT_FINDING .-&gt; endpoint_finding_agent;
+front_desk_agent -. END .-&gt; __end__;
+route_finding_agent -. FRONT_DESK .-&gt; front_desk_agent;
+route_finding_agent -. ENDPOINT_FINDING .-&gt; endpoint_finding_agent;
+front_desk_agent -. FRONT_DESK .-&gt; front_desk_agent;
+classDef default fill:#f2f0ff, line-height: 1.2
+classDef first fill-opacity:0
+classDef last fill: #bfb6fc
+    </pre><figcaption>
+<p><span class="caption-text"><strong>Figure 1</strong> (duplicate): The 3-agent system (a Front Desk agent, a Route Finding agent, and an Endpoint
+Finding agent) we will be working with.</span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<ol class="arabic">
+<li><p>The edge from <code class="docutils literal notranslate"><span class="pre">__start__</span></code> to <code class="docutils literal notranslate"><span class="pre">front_desk_agent</span></code> denotes that our graph starts with our &quot;Front Desk&quot; agent.
+This edge is constructed using the line:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">workflow</span><span class="o">.</span><span class="n">set_entry_point</span><span class="p">(</span><span class="s2">&quot;front_desk_agent&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>The solid edge from <code class="docutils literal notranslate"><span class="pre">endpoint_finding_agent</span></code> to <code class="docutils literal notranslate"><span class="pre">route_finding_agent</span></code> denotes that the &quot;Endpoint Finding&quot; agent
+will unconditionally forward its output to the &quot;Route Finding&quot; agent.
+This edge is constructed using the line:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">workflow</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;endpoint_finding_agent&quot;</span><span class="p">,</span> <span class="s2">&quot;route_finding_agent&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>The dashed edges</p></li>
+</ol>
+</section>
+</section>
+<section id="step-2-adding-agent-catalog">
+<h2>Step #2: Adding Agent Catalog<a class="headerlink" href="#step-2-adding-agent-catalog" title="Link to this heading">¶</a></h2>
+</section>
+<section id="step-3-versioning-and-improving-our-application">
+<h2>Step #3: Versioning and Improving Our Application<a class="headerlink" href="#step-3-versioning-and-improving-our-application" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+    
+        <div id="show_right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&lt;</span><span>Page contents</span></a></p>
+        </div>
+
+        <div id="right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&gt;</span><span>Page contents:</span></a></p>
+            <div class="page_toc">
+                <ul>
+<li><a class="reference internal" href="#">Agent Catalog: A Primer</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#step-1-building-a-langgraph-application">Step #1: Building a LangGraph Application</a><ul>
+<li><a class="reference internal" href="#building-our-agent-graph">Building our Agent Graph</a></li>
+<li><a class="reference internal" href="#defining-a-contract-the-state">Defining a Contract: The State</a></li>
+<li><a class="reference internal" href="#defining-our-graph-nodes">Defining Our Graph Nodes</a></li>
+<li><a class="reference internal" href="#defining-our-graph-edges">Defining Our Graph Edges</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#step-2-adding-agent-catalog">Step #2: Adding Agent Catalog</a></li>
+<li><a class="reference internal" href="#step-3-versioning-and-improving-our-application">Step #3: Versioning and Improving Our Application</a></li>
+</ul>
+</li>
+</ul>
+
+            </div>
+        </div>
+    
+
+      <div class="clearer"></div>
+    </div>
+    <div class="button_nav_wrapper">
+        <div class="button_nav">
+            <div class="left">
+                
+                <a href="install.html">
+                    <span class="icon">&lt;</span><span>Installation</span></a>
+                
+            </div>
+
+            <div class="right">
+                
+                    <a href="concept.html"><span>Agent Catalog Concepts</span><span class="icon">&gt;</span></a>
+                
+            </div>
+        </div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Couchbase.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+
+<p id="theme_credit">Styled using the <a href="https://github.com/piccolo-orm/piccolo_theme">Piccolo Theme</a></p>
+  </body>
+</html>

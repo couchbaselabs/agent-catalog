@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>agentc_core.activity.models.content &#8212; Agent Catalog v0.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=50651e91" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/basic_mod.css?v=9b2032db" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=86a354c8" />
+    <script src="../../../../_static/documentation_options.js?v=683873e3"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <script src="../../../../_static/js/petite-vue.js"></script>
+    <link rel="icon" href="../../../../_static/favicon.png"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body data-dark_mode_code_blocks="true">
+
+<div id="top_nav">
+    
+
+    <nav>
+        
+            
+        
+
+        <p id="toggle_sidebar">
+            <a href="#" title="Toggle sidebar">|||</a>
+        </p>
+        <h1><a href="../../../../index.html" title="Go to homepage">Agent Catalog v0.2.0 documentation</a></h1>
+
+        <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
+    <template v-if="mode == 'light'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_light"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M67.48,18.073c1.913,-1.912 1.913,-5.018 0,-6.931c-1.912,-1.912 -5.018,-1.912 -6.931,0l-6.798,6.799c-1.912,1.912 -1.912,5.018 0,6.931c1.913,1.912 5.018,1.912 6.931,-0l6.798,-6.799Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.728,61.108c1.912,-1.913 1.912,-5.018 -0,-6.931c-1.913,-1.913 -5.019,-1.913 -6.931,-0l-6.799,6.798c-1.912,1.913 -1.912,5.019 0,6.931c1.913,1.913 5.019,1.913 6.931,0l6.799,-6.798Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.682,54.177c-1.913,-1.913 -5.018,-1.913 -6.931,-0c-1.912,1.913 -1.912,5.018 0,6.931l6.798,6.798c1.913,1.913 5.019,1.913 6.931,0c1.913,-1.912 1.913,-5.018 0,-6.931l-6.798,-6.798Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M4.901,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,-0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M18.929,11.142c-1.912,-1.912 -5.018,-1.912 -6.931,0c-1.912,1.913 -1.912,5.019 0,6.931l6.799,6.799c1.912,1.912 5.018,1.912 6.931,-0c1.912,-1.913 1.912,-5.019 -0,-6.931l-6.799,-6.799Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.108,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c-0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c-0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'dark'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_dark"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.901,2.196 -4.901,4.901c0,2.705 2.197,4.901 4.901,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.662,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.989,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.732,61.103c1.91,-1.91 1.91,-5.011 0,-6.921l-0.009,-0.01c-1.91,-1.91 -5.012,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.909,1.91 5.011,1.91 6.92,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.672,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.52,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l-0,-0.01c-0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.901,2.196 -4.901,4.901c0,2.704 2.197,4.9 4.901,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.73,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 -0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.098,34.623c-2.699,0 -4.891,2.192 -4.891,4.892l-0,0.019c-0,2.699 2.192,4.891 4.891,4.891c2.7,0 4.892,-2.192 4.892,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.892,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'darkest'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_darkest"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><path d="M39.315,23.791c8.684,-0 15.734,7.05 15.734,15.733c0,8.684 -7.05,15.734 -15.734,15.734c-8.683,0 -15.733,-7.05 -15.733,-15.734c-0,-8.683 7.05,-15.733 15.733,-15.733Zm0,4.737c6.069,0 10.997,4.927 10.997,10.996c-0,6.069 -4.928,10.996 -10.997,10.996c-6.068,0 -10.996,-4.927 -10.996,-10.996c0,-6.069 4.928,-10.996 10.996,-10.996Z" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.216,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.9,2.196 -4.9,4.901c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.666,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.99,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.737,61.103c1.909,-1.91 1.909,-5.011 -0,-6.921l-0.01,-0.01c-1.91,-1.91 -5.011,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.91,1.91 5.011,1.91 6.921,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.676,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.524,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l0,-0.01c0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.216,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901c-0,2.704 2.196,4.9 4.9,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.734,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.103,34.623c-2.7,0 -4.892,2.192 -4.892,4.892l-0,0.019c-0,2.699 2.192,4.891 4.892,4.891c2.699,0 4.891,-2.192 4.891,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.891,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+</a>
+
+<script>
+(function() {
+    const LOCAL_STORAGE_KEY = 'piccoloThemeMode'
+
+    var initialMode = localStorage.getItem(LOCAL_STORAGE_KEY)
+
+    if (initialMode) {
+        // Make sure the value in local storage is valid
+        if (['light', 'dark', 'darkest'].indexOf(initialMode) == -1) {
+            initialMode = 'light'
+            localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+        }
+    } else {
+        // Check if the client prefers dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            initialMode = 'dark'
+        } else {
+            initialMode = 'light'
+        }
+        localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+    }
+
+    document.documentElement.dataset.mode = initialMode
+
+    PetiteVue.createApp({
+        'mode': initialMode,
+        handleClick() {
+            let currentMode = this.mode
+
+            if (currentMode == 'light') {
+                this.mode = 'dark'
+            } else if (currentMode == 'dark') {
+                this.mode = 'darkest'
+            } else if (currentMode == 'darkest') {
+                this.mode = 'light'
+            }
+
+            document.documentElement.dataset.mode = this.mode
+            localStorage.setItem(LOCAL_STORAGE_KEY, this.mode)
+
+            console.log(this.mode)
+        }
+    }).mount('#mode_toggle')
+})()
+</script>
+            <p class="mobile_search_link">
+                <a href="../../../../search.html" title="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65 64" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2">
+                        <path d="M14.873 40.009c-2.315-3.943-3.642-8.532-3.642-13.429C11.231 11.91 23.141 0 37.811 0s26.58 11.91 26.58 26.58-11.91 26.58-26.58 26.58a26.44 26.44 0 0 1-14.277-4.161L9.739 62.794a3.12 3.12 0 0 1-4.413 0L.913 58.382c-1.217-1.218-1.217-3.196 0-4.413l13.96-13.96zM37.811 8.054c10.225 0 18.526 8.301 18.526 18.526s-8.301 18.526-18.526 18.526-18.526-8.301-18.526-18.526S27.586 8.054 37.811 8.054z" fill="#fff" />
+                    </svg>
+                </a>
+            </p>
+        
+
+        <div class="searchbox_wrapper">
+            
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+    </nav>
+</div>
+
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../concept.html">Concepts</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">agentc CLI Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">Package Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../catalog.html">Tool / Prompt Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../log.html">Spans and Log Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../analysis.html">Log Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Help / Questions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../faqs.html">FAQs</a></li>
+</ul>
+
+        </div>
+      </div>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for agentc_core.activity.models.content</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">enum</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">textwrap</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Kind">
+<a class="viewcode-back" href="../../../../log.html#agentc_core.activity.models.content.Kind">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Kind</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">StrEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The different types of log content that are recognized.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value_</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="n">System</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;system&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        System refers to messages that are generated by (none other than) the system or application.</span>
+<span class="sd">        In agent frameworks, these messages are typically templated and instantiated with application-defined</span>
+<span class="sd">        objectives / instructions.</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">ToolCall</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;tool-call&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ToolCall refers to messages that contain (typically LLM generated) arguments for invoking a tool.</span>
+<span class="sd">        These logs are not to be confused with *ToolResult* messages which contain the results of invoking a tool.</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">ToolResult</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;tool-result&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ToolResult refers to messages containing the results of invoking a tool.</span>
+<span class="sd">        These logs are not to be confused with *ToolCall* messages which are (typically) generated by an LLM.</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">ChatCompletion</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;chat-completion&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ChatCompletion refers to messages that are generated using a language model.</span>
+<span class="sd">        Ideally, these messages should be captured immediately after generation (without any post-processing).</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">RequestHeader</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;request-header&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        RequestHeader refers to messages that *specifically* capture tools and output types used in a request to</span>
+<span class="sd">        a language model.</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">User</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        User refers to messages that are directly sent by (none other than) the user.</span>
+<span class="sd">        If the application uses prompt templates, these messages refer to the raw user input (not the templated text).</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">Assistant</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;assistant&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assistant refers to messages that are directly served back to the user.</span>
+<span class="sd">        These messages exclude any *ModelOutput* or *System* messages that are used internally by the application.</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">Begin</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;begin&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Begin refers to marker messages that are used to indicate the start of a span (e.g., a task, agent, state,</span>
+<span class="sd">        etc...).</span>
+<span class="sd">        These messages are typically used to trace how one unit of work mutates some state, and are application</span>
+<span class="sd">        specific.</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">End</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;end&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        End refers to marker messages that are used to indicate the end of a span (e.g., a task, agent, state, etc...).</span>
+<span class="sd">        These messages are typically used to trace how one unit of work mutates some state, and are application</span>
+<span class="sd">        specific.</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">Edge</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;edge&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Edge refers to marker messages that are used to indicate one unit of work (essentially) invoking another unit</span>
+<span class="sd">        of work.</span>
+<span class="sd">        These messages can be used to trace &#39;handoffs&#39; and &#39;agent-to-agent&#39; communication.</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">KeyValue</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;key-value&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        KeyValue refers to messages that contain user-specified data that are to be logged under some span.</span>
+<span class="sd">        &quot;&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseContent</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_enum_values</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">extra</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Additional data that is associated with the content. This field is optional.&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_safe_serialize</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Source available at: https://stackoverflow.com/a/74923639&quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_safe_serialize_impl</span><span class="p">(</span><span class="n">inner_obj</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_obj</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">inner_obj</span><span class="p">:</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_safe_serialize_impl</span><span class="p">(</span><span class="n">element</span><span class="p">))</span>
+                <span class="k">return</span> <span class="n">result</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner_obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">inner_obj</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_safe_serialize_impl</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">result</span>
+            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">inner_obj</span><span class="p">,</span> <span class="s2">&quot;__dict__&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">inner_obj</span><span class="p">,</span> <span class="s2">&quot;__repr__&quot;</span><span class="p">):</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">inner_obj</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># noinspection PyBroadException</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">result</span> <span class="o">=</span> <span class="n">inner_obj</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;object&quot;</span>
+                <span class="k">return</span> <span class="n">result</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">inner_obj</span>
+
+        <span class="k">return</span> <span class="n">_safe_serialize_impl</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">field_serializer</span><span class="p">(</span><span class="s2">&quot;extra&quot;</span><span class="p">,</span> <span class="n">when_used</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_serialize_extra</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extra</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">_info</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_safe_serialize</span><span class="p">(</span><span class="n">extra</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SystemContent">
+<a class="viewcode-back" href="../../../../log.html#agentc_core.activity.models.content.SystemContent">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SystemContent</span><span class="p">(</span><span class="n">BaseContent</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;System refers to messages that are generated by (none other than) the system or application.</span>
+
+<span class="sd">    .. card:: Class Description</span>
+
+<span class="sd">        In agent frameworks, these messages are typically templated and instantiated with application-defined</span>
+<span class="sd">        objectives / instructions.</span>
+<span class="sd">        In our integration packages (e.g., :py:class:`agentc_langchain.chat.Callback`), system messages are commonly</span>
+<span class="sd">        used to record the contents used to generate a chat-completion or tool-call message.</span>
+
+<span class="sd">        A system message has a single required field, ``value``, which contains the content of the system message.</span>
+<span class="sd">        If extra data is associated with the system message (e.g., LangGraph&#39;s ``run_id`` fields), it can be stored in</span>
+<span class="sd">        the optional ``extra`` field.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="n">Kind</span><span class="o">.</span><span class="n">System</span><span class="p">]</span> <span class="o">=</span> <span class="n">Kind</span><span class="o">.</span><span class="n">System</span>
+
+    <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The content of the system message.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ToolCallContent">
+<a class="viewcode-back" href="../../../../log.html#agentc_core.activity.models.content.ToolCallContent">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ToolCallContent</span><span class="p">(</span><span class="n">BaseContent</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;ToolCall refers to messages that contain (typically LLM generated) arguments for invoking a tool.</span>
+
+<span class="sd">    .. card:: Class Description</span>
+
+<span class="sd">        LLMs enable the invocation of standard Python functions (i.e., &quot;tools&quot;) by a) &quot;selecting&quot; tools from some larger</span>
+<span class="sd">        tool-set and b) generating arguments to these tools.</span>
+<span class="sd">        This type of content is not to be confused with :py:class:`ToolResult` messages which contain the results of</span>
+<span class="sd">        invoking a tool (i.e., the output).</span>
+
+<span class="sd">        A tool call message has two required fields: ``tool_name`` and ``tool_args``.</span>
+<span class="sd">        The ``tool_name`` field refers to the name of the tool that is being called.</span>
+<span class="sd">        The ``tool_args`` field contains the arguments that are going to be passed to the tool (represented as a</span>
+<span class="sd">        dictionary keyed by parameter names whose entries are the parameter values).</span>
+
+<span class="sd">        Optional fields for a tool call message include ``tool_call_id``, ``status``, ``meta``, and ``extra``.</span>
+<span class="sd">        The ``tool_call_id`` field is an optional unique identifier associated with a tool call instance and is used</span>
+<span class="sd">        to correlate the call to the result of its execution (i.e., the :py:class:`ToolResult` message) by the</span>
+<span class="sd">        application.</span>
+<span class="sd">        The ``status`` field is an optional field that indicates the status of *generating* the tool call message</span>
+<span class="sd">        (e.g., the generated output does not adhere to the function signature).</span>
+<span class="sd">        To capture the breadth of LLM-provider metadata, tool call messages may also contain a ``meta`` field</span>
+<span class="sd">        (used to capture the raw response associated with the tool call message).</span>
+<span class="sd">        If extra data is associated with the tool call (e.g., the log-probabilities), it can be stored in the optional</span>
+<span class="sd">        ``extra`` field.</span>
+
+<span class="sd">    .. tip::</span>
+
+<span class="sd">        If ``tool_call_id`` is not specified *but* your application calls and executes tools sequentially, you can still</span>
+<span class="sd">        link the tool call to the corresponding tool result by using the order of the messages in the log.</span>
+<span class="sd">        This is the approach taken by the :sql:`ToolInvocations` view (more information can be found</span>
+<span class="sd">        `here &lt;analysis.html#toolinvocations-view&gt;`__).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="n">Kind</span><span class="o">.</span><span class="n">ToolCall</span><span class="p">]</span> <span class="o">=</span> <span class="n">Kind</span><span class="o">.</span><span class="n">ToolCall</span>
+
+    <span class="n">tool_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the tool that is being called. If this tool is indexed with Agent Catalog, this field &quot;</span>
+        <span class="s2">&quot;should refer to the tool&#39;s &#39;name&#39; field.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">tool_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The arguments that are going to be passed to the tool. This field should be JSON-serializable.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">tool_call_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The unique identifier associated with a tool call instance. &quot;</span>
+        <span class="s2">&quot;This field is (typically) parsed from a LLM response and is used to correlate / JOIN this &quot;</span>
+        <span class="s2">&quot;message with the corresponding ToolResult message.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">status</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;success&quot;</span>
+
+    <span class="n">meta</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The raw response associated with the tool call. This must be JSON-serializable.&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">field_serializer</span><span class="p">(</span><span class="s2">&quot;tool_args&quot;</span><span class="p">,</span> <span class="n">when_used</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_serialize_tool_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tool_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span> <span class="n">_info</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_safe_serialize</span><span class="p">(</span><span class="n">tool_args</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ToolResultContent">
+<a class="viewcode-back" href="../../../../log.html#agentc_core.activity.models.content.ToolResultContent">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ToolResultContent</span><span class="p">(</span><span class="n">BaseContent</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;ToolResult refers to messages containing the results of invoking a tool.</span>
+
+<span class="sd">    .. card:: Class Description</span>
+
+<span class="sd">        Tool result messages are used to capture the output of invoking a tool (i.e., the result of the tool call).</span>
+<span class="sd">        This type of content is not to be confused with :py:class:`ToolCall` messages which contain the arguments for</span>
+<span class="sd">        invoking a tool.</span>
+
+<span class="sd">        A tool result message has a single required field, ``tool_result``, which contains a JSON-serializable object</span>
+<span class="sd">        representing the result of executing the tool.</span>
+
+<span class="sd">        Optional fields for a tool result message include ``tool_call_id``, ``status``, and ``extra``.</span>
+<span class="sd">        The ``tool_call_id`` field is an optional unique identifier associated with a tool call instance and is used</span>
+<span class="sd">        here to correlate the execution of a tool to its call generation.</span>
+<span class="sd">        ``status`` is an optional field that indicates the status of the tool invocation (i.e., &quot;success&quot;, or &quot;error&quot;</span>
+<span class="sd">        if the tool itself raised an exception).</span>
+<span class="sd">        Finally, if extra data is associated with the tool result (e.g., the error message on unsuccessful tool</span>
+<span class="sd">        invocations), it can be stored in the optional ``extra`` field.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="n">Kind</span><span class="o">.</span><span class="n">ToolResult</span><span class="p">]</span> <span class="o">=</span> <span class="n">Kind</span><span class="o">.</span><span class="n">ToolResult</span>
+
+    <span class="n">tool_call_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The unique identifier of the tool call. This field will be used to correlate / JOIN this message &quot;</span>
+        <span class="s2">&quot;with the corresponding ToolCall message.&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">tool_result</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The result of invoking the tool. This field should be JSON-serializable.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">status</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The status of the tool invocation. This field should be one of &#39;success&#39; or &#39;error&#39;.&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;success&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">field_serializer</span><span class="p">(</span><span class="s2">&quot;tool_result&quot;</span><span class="p">,</span> <span class="n">when_used</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_serialize_tool_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tool_result</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="n">_info</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_safe_serialize</span><span class="p">(</span><span class="n">tool_result</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ChatCompletionContent">
+<a class="viewcode-back" href="../../../../log.html#agentc_core.activity.models.content.ChatCompletionContent">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChatCompletionContent</span><span class="p">(</span><span class="n">BaseContent</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;ChatCompletion refers to messages that are generated using a language model.</span>
+
+<span class="sd">    .. card:: Class Description</span>
+
+<span class="sd">        Chat completion messages refer to the output &quot;predicted&quot; text of a language model.</span>
+<span class="sd">        In the context of &quot;agentic&quot; applications, these messages are distinct from :py:class:`ToolCallContent` messages</span>
+<span class="sd">        (even though both are generated using LLMs).</span>
+
+<span class="sd">        A chat completion message has one required field: ``output``.</span>
+<span class="sd">        The ``output`` field refers to the unstructured generated text returned by the language model.</span>
+
+<span class="sd">        To capture the breadth of LLM-provider metadata, chat completion messages may also contain a ``meta`` field</span>
+<span class="sd">        (used to capture the raw response associated with the chat completion).</span>
+<span class="sd">        Finally, any extra data that exists outside the raw response can be stored in the optional ``extra`` field.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="n">Kind</span><span class="o">.</span><span class="n">ChatCompletion</span><span class="p">]</span> <span class="o">=</span> <span class="n">Kind</span><span class="o">.</span><span class="n">ChatCompletion</span>
+
+    <span class="n">output</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The output of the model.&quot;</span><span class="p">)</span>
+
+    <span class="n">meta</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The raw response associated with the chat completion. This must be JSON-serializable.&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">field_serializer</span><span class="p">(</span><span class="s2">&quot;meta&quot;</span><span class="p">,</span> <span class="n">when_used</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_serialize_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">_info</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_safe_serialize</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="RequestHeaderContent">
+<a class="viewcode-back" href="../../../../log.html#agentc_core.activity.models.content.RequestHeaderContent">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RequestHeaderContent</span><span class="p">(</span><span class="n">BaseContent</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;RequestHeader refers to messages that *specifically* capture tools and output types used in a request to a</span>
+<span class="sd">    language model.</span>
+
+<span class="sd">    .. card:: Class Description</span>
+
+<span class="sd">        Request header messages are used to record &quot;setup&quot; information for subsequent chat-completion and/or tool-call</span>
+<span class="sd">        events.</span>
+<span class="sd">        These primarily include tools (dictionaries of names, descriptions, and function schemas) and output types.</span>
+
+<span class="sd">        All fields of a request header message are optional: ``tools``, ``output``, ``meta``, and ``extra``.</span>
+<span class="sd">        The ``tools`` field is a list of :py:class:`RequestHeaderContent.Tool` instances made available to subsequent</span>
+<span class="sd">        LLM calls.</span>
+<span class="sd">        The ``output`` field refers to the output type that subsequent LLM calls must adhere to (most commonly expressed</span>
+<span class="sd">        in JSON schema).</span>
+<span class="sd">        The ``meta`` field refers to a JSON-serializable object containing the request information.</span>
+<span class="sd">        Finally, ``extra`` is used to capture any other data that does not belong in ``meta``.</span>
+
+<span class="sd">    .. tip::</span>
+
+<span class="sd">        Pydantic enables the specification of their objects using dictionaries.</span>
+<span class="sd">        The code snippet below demonstrates two equivalent approaches to specifying the :py:attr:`tools` attribute:</span>
+<span class="sd">        First, users can create :py:class:`RequestHeaderContent.Tool` instances by referencing the subclass directly:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            from agentc.span import RequestHeaderContent</span>
+
+<span class="sd">            request_header_content = RequestHeaderContent(</span>
+<span class="sd">                tools=[</span>
+<span class="sd">                    RequestHeaderContent.Tool(</span>
+<span class="sd">                        name=&quot;get_user_by_id&quot;,</span>
+<span class="sd">                        description=&quot;Lookup a user by their ID field.&quot;,</span>
+<span class="sd">                        args_schema={&quot;type&quot;: &quot;object&quot;, &quot;properties&quot;: {&quot;id&quot;: {&quot;type&quot;: &quot;integer&quot;}}}</span>
+<span class="sd">                    )</span>
+<span class="sd">                ]</span>
+<span class="sd">            )</span>
+
+<span class="sd">        Second, users can specify a dictionary:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            from agentc.span import RequestHeaderContent</span>
+
+<span class="sd">            request_header_content = RequestHeaderContent(</span>
+<span class="sd">                tools=[</span>
+<span class="sd">                    {</span>
+<span class="sd">                        &quot;name&quot;: &quot;get_user_by_id&quot;,</span>
+<span class="sd">                        &quot;description&quot;: &quot;Lookup a user by their ID field.&quot;,</span>
+<span class="sd">                        &quot;args_schema&quot;: {&quot;type&quot;: &quot;object&quot;, &quot;properties&quot;: {&quot;id&quot;: {&quot;type&quot;: &quot;integer&quot;}}}</span>
+<span class="sd">                    }</span>
+<span class="sd">                ]</span>
+<span class="sd">            )</span>
+
+<span class="sd">        For most cases though, we recommend the former (as this enables most IDEs to catch name errors before runtime).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RequestHeaderContent.Tool">
+<a class="viewcode-back" href="../../../../log.html#agentc_core.activity.models.content.RequestHeaderContent.Tool">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Tool</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the tool.&quot;</span><span class="p">)</span>
+        <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;A description of the tool.&quot;</span><span class="p">)</span>
+        <span class="n">args_schema</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The (JSON) schema of the tool.&quot;</span><span class="p">)</span></div>
+
+
+    <span class="n">kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="n">Kind</span><span class="o">.</span><span class="n">RequestHeader</span><span class="p">]</span> <span class="o">=</span> <span class="n">Kind</span><span class="o">.</span><span class="n">RequestHeader</span>
+
+    <span class="n">tools</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Tool</span><span class="p">]]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The tools (name, description, schema) included in the request to a model. &quot;</span>
+        <span class="s2">&quot;For tools indexed by Agent Catalog, this field should refer to the tool&#39;s &#39;name&#39; field. &quot;</span>
+        <span class="s2">&quot;This field is optional.&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">output</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The output type of the model (in JSON schema) response. This field is optional.&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">meta</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;All request parameters associated with the model input. This must be JSON-serializable.&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">field_serializer</span><span class="p">(</span><span class="s2">&quot;meta&quot;</span><span class="p">,</span> <span class="n">when_used</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_serialize_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">_info</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_safe_serialize</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="UserContent">
+<a class="viewcode-back" href="../../../../log.html#agentc_core.activity.models.content.UserContent">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UserContent</span><span class="p">(</span><span class="n">BaseContent</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;User refers to messages that are directly sent by (none other than) the user.</span>
+
+<span class="sd">    .. card:: Class Description</span>
+
+<span class="sd">        User messages are used to capture a user&#39;s input into your application.</span>
+<span class="sd">        User messages exclude those generated by a prior LLM call for the purpose of &quot;mocking&quot; an intelligent actor</span>
+<span class="sd">        (e.g., multi-agent applications).</span>
+
+<span class="sd">        A user message has a single required field, ``value``, which contains the direct input given by the user.</span>
+<span class="sd">        If extra data is associated with the user message, it can be stored in the optional ``extra`` field.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="n">Kind</span><span class="o">.</span><span class="n">User</span><span class="p">]</span> <span class="o">=</span> <span class="n">Kind</span><span class="o">.</span><span class="n">User</span>
+
+    <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The captured user input.&quot;</span><span class="p">)</span>
+
+    <span class="n">user_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The unique identifier of the user. This field is optional.&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="AssistantContent">
+<a class="viewcode-back" href="../../../../log.html#agentc_core.activity.models.content.AssistantContent">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AssistantContent</span><span class="p">(</span><span class="n">BaseContent</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Assistant refers to messages that are directly served back to the user.</span>
+
+<span class="sd">    .. card:: Class Description</span>
+
+<span class="sd">        Assistant messages are used to capture the direct output of your application (i.e., the messages served back to</span>
+<span class="sd">        the user).</span>
+<span class="sd">        These messages are *not* strictly :py:class:`ChatCompletionContent` messages, as your application may utilize</span>
+<span class="sd">        multiple LLM calls before returning some message back to the user.</span>
+
+<span class="sd">        An assistant message has a single required field, ``value``, which contains the direct output back to the user.</span>
+<span class="sd">        If extra data is associated with the assistant message, it can be stored in the optional ``extra`` field.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="n">Kind</span><span class="o">.</span><span class="n">Assistant</span><span class="p">]</span> <span class="o">=</span> <span class="n">Kind</span><span class="o">.</span><span class="n">Assistant</span>
+
+    <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The response served back to the user.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="EdgeContent">
+<a class="viewcode-back" href="../../../../log.html#agentc_core.activity.models.content.EdgeContent">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EdgeContent</span><span class="p">(</span><span class="n">BaseContent</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Edge refers to messages used to capture a caller&#39;s intent to &#39;handoff&#39; some state to another span.</span>
+
+<span class="sd">    .. card:: Card Description</span>
+
+<span class="sd">        Edge messages denote the explicit intent to invoke another unit of work.</span>
+<span class="sd">        In the case of multi-agent applications, this type of message can be used to capture how one agent might call</span>
+<span class="sd">        another agent.</span>
+
+<span class="sd">        Edge messages have two required fields: i) ``source``, the fully qualified name of the source :py:class:`Span`,</span>
+<span class="sd">        and ii) ``dest``, the fully qualified name of the destination :py:class:`Span`.</span>
+<span class="sd">        A ``payload`` field can optionally be recorded in an edge message to model spans as a functional unit of work</span>
+<span class="sd">        (which they are in most cases).</span>
+<span class="sd">        If extra data is associated with the edge message, it can be stored in the optional ``extra`` field.</span>
+
+<span class="sd">        There are two paradigms around span to span &quot;communication&quot;: a) *horizontal* and b) *vertical*.</span>
+<span class="sd">        Horizontal communication refers to (span) graphs that are managed by some orchestrator (e.g., LangGraph, CrewAI,</span>
+<span class="sd">        etc...), while vertical communication refers to (span) graphs that are built by directly invoking other spans</span>
+<span class="sd">        (ultimately building a call stack).</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            In the case of our :py:class:`agentc_langgraph.agent.ReActAgent` helper class, a ``previous_node`` field is</span>
+<span class="sd">            used to help build these edges for horizontal communication.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="n">Kind</span><span class="o">.</span><span class="n">Edge</span><span class="p">]</span> <span class="o">=</span> <span class="n">Kind</span><span class="o">.</span><span class="n">Edge</span>
+
+    <span class="n">source</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Name of the source span associated with this edge.&quot;</span><span class="p">)</span>
+
+    <span class="n">dest</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Name of the destination span associated with this edge.&quot;</span><span class="p">)</span>
+
+    <span class="n">payload</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A (JSON-serializable) item being sent from the source span to the destination span.&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="BeginContent">
+<a class="viewcode-back" href="../../../../log.html#agentc_core.activity.models.content.BeginContent">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BeginContent</span><span class="p">(</span><span class="n">BaseContent</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Begin refers to marker messages that are used to indicate the start of a span (e.g., a task, agent, state,</span>
+<span class="sd">    etc...).</span>
+
+<span class="sd">    .. card:: Card Description</span>
+
+<span class="sd">        Begin messages denote the start of a span *and* (perhaps just as important) record the entrance state of a span.</span>
+<span class="sd">        In certain applications, log analysts are able to use this information to model how the state of an application</span>
+<span class="sd">        mutates over time.</span>
+
+<span class="sd">        Begin messages have two optional fields: i) the ``state`` field (used to record the starting state of a span)</span>
+<span class="sd">        and ii) ``extra`` (used to record any extra information pertaining to the start of a span).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="n">Kind</span><span class="o">.</span><span class="n">Begin</span><span class="p">]</span> <span class="o">=</span> <span class="n">Kind</span><span class="o">.</span><span class="n">Begin</span>
+
+    <span class="n">state</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The state logged on entering a span.&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="EndContent">
+<a class="viewcode-back" href="../../../../log.html#agentc_core.activity.models.content.EndContent">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EndContent</span><span class="p">(</span><span class="n">BaseContent</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;End refers to marker messages that are used to indicate the end of a span (e.g., a task, agent, state, etc...).</span>
+
+<span class="sd">    .. card:: Class Description</span>
+
+<span class="sd">        End messages denote the end of a span *and* (perhaps just as important) record the exit state of a span.</span>
+<span class="sd">        In certain applications, log analysts are able to use this information to model how the state of an application</span>
+<span class="sd">        mutates over time.</span>
+
+<span class="sd">        End messages have two optional fields: i) the ``state`` field (used to record the ending state of a span)</span>
+<span class="sd">        and ii) ``extra`` (used to record any extra information pertaining to the end of a span).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="n">Kind</span><span class="o">.</span><span class="n">End</span><span class="p">]</span> <span class="o">=</span> <span class="n">Kind</span><span class="o">.</span><span class="n">End</span>
+
+    <span class="n">state</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The state logged on exiting a span.&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="KeyValueContent">
+<a class="viewcode-back" href="../../../../log.html#agentc_core.activity.models.content.KeyValueContent">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">KeyValueContent</span><span class="p">(</span><span class="n">BaseContent</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;KeyValue refers to messages that contain user-specified data that are to be logged under some span.</span>
+
+<span class="sd">    .. card:: Class Description</span>
+
+<span class="sd">        Key-value messages serve as the catch-all container for user-defined data that belong to some span.</span>
+<span class="sd">        We distinguish key-value messages from log-level *annotations*, which are used to attach information to a log</span>
+<span class="sd">        entry with existing content.</span>
+
+<span class="sd">        Key-value messages have two required fields: i) the ``key`` field (used to record the name of the entry)</span>
+<span class="sd">        and ii) ``value`` (used to record the value of the entry).</span>
+<span class="sd">        Extra data can also be passed in through the optional ``extra`` field (as with other messages).</span>
+
+<span class="sd">        Using the :python:`[]` syntax with a :py:class:`agentc.span.Span` instance generates one key-value entry per</span>
+<span class="sd">        call.</span>
+<span class="sd">        For example, the following code snippet generates two logs with the same key but different values:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            my_span = catalog.Span(name=&quot;my_span&quot;)</span>
+<span class="sd">            my_span[&quot;alpha&quot;] = alpha_value_1</span>
+<span class="sd">            my_span[&quot;alpha&quot;] = alpha_value_2</span>
+
+<span class="sd">        These messages are commonly purposed for recording evaluation data, as seen in our example application</span>
+<span class="sd">        `here &lt;TODO REPLACE ME WITH THE GITHUB LINK&gt;`__.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="n">Kind</span><span class="o">.</span><span class="n">KeyValue</span><span class="p">]</span> <span class="o">=</span> <span class="n">Kind</span><span class="o">.</span><span class="n">KeyValue</span>
+
+    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the key-value pair.&quot;</span><span class="p">)</span>
+
+    <span class="n">value</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The value of the key-value pair. This value should be JSON-serializable.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">field_serializer</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">when_used</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_serialize_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="n">_info</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_safe_serialize</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+
+<span class="n">Content</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span>
+    <span class="n">SystemContent</span><span class="p">,</span>
+    <span class="n">ToolCallContent</span><span class="p">,</span>
+    <span class="n">ToolResultContent</span><span class="p">,</span>
+    <span class="n">ChatCompletionContent</span><span class="p">,</span>
+    <span class="n">RequestHeaderContent</span><span class="p">,</span>
+    <span class="n">UserContent</span><span class="p">,</span>
+    <span class="n">AssistantContent</span><span class="p">,</span>
+    <span class="n">BeginContent</span><span class="p">,</span>
+    <span class="n">EndContent</span><span class="p">,</span>
+    <span class="n">EdgeContent</span><span class="p">,</span>
+    <span class="n">KeyValueContent</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+    
+
+      <div class="clearer"></div>
+    </div>
+    <div class="button_nav_wrapper">
+        <div class="button_nav">
+            <div class="left">
+                
+            </div>
+
+            <div class="right">
+                
+            </div>
+        </div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Couchbase.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+
+<p id="theme_credit">Styled using the <a href="https://github.com/piccolo-orm/piccolo_theme">Piccolo Theme</a></p>
+  </body>
+</html>

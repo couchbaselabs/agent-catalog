@@ -1,341 +1,325 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="./">
-<head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; Agent Catalog v0.0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
-      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=86a354c8" />
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  
-    <link rel="shortcut icon" href="_static/favicon.png"/>
-      <script src="_static/jquery.js?v=5d32c60e"></script>
-      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=2fea6348"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
-      <script src="_static/copybutton.js?v=f281be69"></script>
+    <title>Installation &#8212; Agent Catalog v0.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=50651e91" />
+    <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
+    <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=86a354c8" />
+    <script src="_static/documentation_options.js?v=683873e3"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
     <script src="_static/js/theme.js"></script>
+    <script src="_static/js/petite-vue.js"></script>
+    <link rel="icon" href="_static/favicon.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Agent Catalog User Guide" href="guide.html" />
+    <link rel="next" title="Agent Catalog: A Primer" href="tutorial.html" />
     <link rel="prev" title="Couchbase Agent Catalog Project" href="index.html" /> 
-</head>
+  </head><body data-dark_mode_code_blocks="true">
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+<div id="top_nav">
+    
 
-          
-          
-          <a href="index.html" class="icon icon-home">
-            Agent Catalog
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+    <nav>
+        
+            
+        
+
+        <p id="toggle_sidebar">
+            <a href="#" title="Toggle sidebar">|||</a>
+        </p>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog v0.2.0 documentation</a></h1>
+
+        <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
+    <template v-if="mode == 'light'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_light"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M67.48,18.073c1.913,-1.912 1.913,-5.018 0,-6.931c-1.912,-1.912 -5.018,-1.912 -6.931,0l-6.798,6.799c-1.912,1.912 -1.912,5.018 0,6.931c1.913,1.912 5.018,1.912 6.931,-0l6.798,-6.799Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.728,61.108c1.912,-1.913 1.912,-5.018 -0,-6.931c-1.913,-1.913 -5.019,-1.913 -6.931,-0l-6.799,6.798c-1.912,1.913 -1.912,5.019 0,6.931c1.913,1.913 5.019,1.913 6.931,0l6.799,-6.798Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.682,54.177c-1.913,-1.913 -5.018,-1.913 -6.931,-0c-1.912,1.913 -1.912,5.018 0,6.931l6.798,6.798c1.913,1.913 5.019,1.913 6.931,0c1.913,-1.912 1.913,-5.018 0,-6.931l-6.798,-6.798Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M4.901,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,-0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M18.929,11.142c-1.912,-1.912 -5.018,-1.912 -6.931,0c-1.912,1.913 -1.912,5.019 0,6.931l6.799,6.799c1.912,1.912 5.018,1.912 6.931,-0c1.912,-1.913 1.912,-5.019 -0,-6.931l-6.799,-6.799Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.108,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c-0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c-0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'dark'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_dark"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.901,2.196 -4.901,4.901c0,2.705 2.197,4.901 4.901,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.662,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.989,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.732,61.103c1.91,-1.91 1.91,-5.011 0,-6.921l-0.009,-0.01c-1.91,-1.91 -5.012,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.909,1.91 5.011,1.91 6.92,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.672,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.52,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l-0,-0.01c-0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.901,2.196 -4.901,4.901c0,2.704 2.197,4.9 4.901,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.73,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 -0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.098,34.623c-2.699,0 -4.891,2.192 -4.891,4.892l-0,0.019c-0,2.699 2.192,4.891 4.891,4.891c2.7,0 4.892,-2.192 4.892,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.892,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'darkest'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_darkest"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><path d="M39.315,23.791c8.684,-0 15.734,7.05 15.734,15.733c0,8.684 -7.05,15.734 -15.734,15.734c-8.683,0 -15.733,-7.05 -15.733,-15.734c-0,-8.683 7.05,-15.733 15.733,-15.733Zm0,4.737c6.069,0 10.997,4.927 10.997,10.996c-0,6.069 -4.928,10.996 -10.997,10.996c-6.068,0 -10.996,-4.927 -10.996,-10.996c0,-6.069 4.928,-10.996 10.996,-10.996Z" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.216,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.9,2.196 -4.9,4.901c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.666,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.99,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.737,61.103c1.909,-1.91 1.909,-5.011 -0,-6.921l-0.01,-0.01c-1.91,-1.91 -5.011,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.91,1.91 5.011,1.91 6.921,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.676,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.524,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l0,-0.01c0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.216,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901c-0,2.704 2.196,4.9 4.9,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.734,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.103,34.623c-2.7,0 -4.892,2.192 -4.892,4.892l-0,0.019c-0,2.699 2.192,4.891 4.892,4.891c2.699,0 4.891,-2.192 4.891,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.891,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+</a>
+
+<script>
+(function() {
+    const LOCAL_STORAGE_KEY = 'piccoloThemeMode'
+
+    var initialMode = localStorage.getItem(LOCAL_STORAGE_KEY)
+
+    if (initialMode) {
+        // Make sure the value in local storage is valid
+        if (['light', 'dark', 'darkest'].indexOf(initialMode) == -1) {
+            initialMode = 'light'
+            localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+        }
+    } else {
+        // Check if the client prefers dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            initialMode = 'dark'
+        } else {
+            initialMode = 'light'
+        }
+        localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+    }
+
+    document.documentElement.dataset.mode = initialMode
+
+    PetiteVue.createApp({
+        'mode': initialMode,
+        handleClick() {
+            let currentMode = this.mode
+
+            if (currentMode == 'light') {
+                this.mode = 'dark'
+            } else if (currentMode == 'dark') {
+                this.mode = 'darkest'
+            } else if (currentMode == 'darkest') {
+                this.mode = 'light'
+            }
+
+            document.documentElement.dataset.mode = this.mode
+            localStorage.setItem(LOCAL_STORAGE_KEY, this.mode)
+
+            console.log(this.mode)
+        }
+    }).mount('#mode_toggle')
+})()
+</script>
+            <p class="mobile_search_link">
+                <a href="search.html" title="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65 64" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2">
+                        <path d="M14.873 40.009c-2.315-3.943-3.642-8.532-3.642-13.429C11.231 11.91 23.141 0 37.811 0s26.58 11.91 26.58 26.58-11.91 26.58-26.58 26.58a26.44 26.44 0 0 1-14.277-4.161L9.739 62.794a3.12 3.12 0 0 1-4.413 0L.913 58.382c-1.217-1.218-1.217-3.196 0-4.413l13.96-13.96zM37.811 8.054c10.225 0 18.526 8.301 18.526 18.526s-8.301 18.526-18.526 18.526-18.526-8.301-18.526-18.526S27.586 8.054 37.811 8.054z" fill="#fff" />
+                    </svg>
+                </a>
+            </p>
+        
+
+        <div class="searchbox_wrapper">
+            
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+    </nav>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Agent Catalog</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#building-from-package">Building From Package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#building-from-source-with-pip">Building From Source (with pip)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#building-from-source-with-poetry">Building From Source (with Poetry)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#verifying-your-installation">Verifying Your Installation</a></li>
+
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concept.html">Concepts</a></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="guide.html">Agent Catalog User Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="guide.html#metrics-driven-development">Metrics Driven Development</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide.html#couchbase-backed-agent-catalogs">Couchbase-Backed Agent Catalogs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide.html#assessing-agent-quality">Assessing Agent Quality</a></li>
-<li class="toctree-l2"><a class="reference internal" href="guide.html#ignoring-files-while-indexing">Ignoring Files While Indexing</a></li>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">agentc CLI Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Package Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="catalog.html">Tool / Prompt Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="log.html">Spans and Log Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Log Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Tool</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#agentc">agentc</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-add">add</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-clean">clean</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-env">env</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-execute">execute</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-find">find</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-index">index</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-ls">ls</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-publish">publish</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-status">status</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#agentc-version">version</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">Agent Catalog API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api.html#agentc.Auditor"><code class="docutils literal notranslate"><span class="pre">Auditor</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.agent_name"><code class="docutils literal notranslate"><span class="pre">Auditor.agent_name</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.auditor_output"><code class="docutils literal notranslate"><span class="pre">Auditor.auditor_output</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.bucket"><code class="docutils literal notranslate"><span class="pre">Auditor.bucket</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.catalog"><code class="docutils literal notranslate"><span class="pre">Auditor.catalog</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.conn_root_certificate"><code class="docutils literal notranslate"><span class="pre">Auditor.conn_root_certificate</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.conn_string"><code class="docutils literal notranslate"><span class="pre">Auditor.conn_string</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.llm_model_name"><code class="docutils literal notranslate"><span class="pre">Auditor.llm_model_name</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.password"><code class="docutils literal notranslate"><span class="pre">Auditor.password</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.username"><code class="docutils literal notranslate"><span class="pre">Auditor.username</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.accept"><code class="docutils literal notranslate"><span class="pre">Auditor.accept()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Auditor.move"><code class="docutils literal notranslate"><span class="pre">Auditor.move()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#agentc.Provider"><code class="docutils literal notranslate"><span class="pre">Provider</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.bucket"><code class="docutils literal notranslate"><span class="pre">Provider.bucket</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.catalog"><code class="docutils literal notranslate"><span class="pre">Provider.catalog</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.conn_root_certificate"><code class="docutils literal notranslate"><span class="pre">Provider.conn_root_certificate</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.conn_string"><code class="docutils literal notranslate"><span class="pre">Provider.conn_string</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.decorator"><code class="docutils literal notranslate"><span class="pre">Provider.decorator</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.password"><code class="docutils literal notranslate"><span class="pre">Provider.password</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.provider_output"><code class="docutils literal notranslate"><span class="pre">Provider.provider_output</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.refiner"><code class="docutils literal notranslate"><span class="pre">Provider.refiner</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.secrets"><code class="docutils literal notranslate"><span class="pre">Provider.secrets</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.snapshot"><code class="docutils literal notranslate"><span class="pre">Provider.snapshot</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.tool_model"><code class="docutils literal notranslate"><span class="pre">Provider.tool_model</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.username"><code class="docutils literal notranslate"><span class="pre">Provider.username</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.get_item"><code class="docutils literal notranslate"><span class="pre">Provider.get_item()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="api.html#agentc.Provider.version"><code class="docutils literal notranslate"><span class="pre">Provider.version</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#agentc.langchain.audit"><code class="docutils literal notranslate"><span class="pre">audit()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="provider.html">Provider Configuration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="provider.html#langchain-langgraph-crewai">Langchain/LangGraph/CrewAI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="provider.html#llamaindex">LlamaIndex</a></li>
-<li class="toctree-l2"><a class="reference internal" href="provider.html#controlflow">Controlflow</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="env.html">Environment Variables</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="env.html#mandatory-environment-variables">Mandatory Environment Variables</a></li>
-<li class="toctree-l2"><a class="reference internal" href="env.html#optional-environment-variables">Optional Environment Variables</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="entry.html">On Catalog Entries</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="entry.html#tool-catalog-records">Tool Catalog Records</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#python-function-tools">Python Function Tools</a></li>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#sql-query-tools">SQL++ Query Tools</a></li>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#semantic-search-tools">Semantic Search Tools</a></li>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#http-request-tools">HTTP Request Tools</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="entry.html#prompt-catalog-records">Prompt Catalog Records</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#raw-prompts">Raw Prompts</a></li>
-<li class="toctree-l3"><a class="reference internal" href="entry.html#jinja-templated-prompts">Jinja Templated Prompts</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="faqs.html">Frequently Asked Questions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#which-couchbase-capella-or-server-version-should-i-use">Which Couchbase Capella or Server version should I use?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#do-i-need-to-use-a-specific-agent-framework-e-g-langchain-with-agent-catalog">Do I need to use a specific agent framework (e.g., LangChain) with Agent Catalog?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-services-do-i-need-to-enable-on-my-couchbase-cluster">What services do I need to enable on my Couchbase cluster?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-can-i-do-to-increase-log-ingestion-rate-into-my-cluster">What can I do to increase log ingestion rate into my Cluster?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-does-agent-catalog-add-to-my-couchbase-bucket">What does Agent Catalog add to my Couchbase bucket?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#do-i-need-couchbase-instance-to-run-agent-catalog">Do I need Couchbase instance to run Agent Catalog?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-is-agent-catalog-doing-when-i-run-agentc-index">What is Agent Catalog doing when I run <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">index</span></code>?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#how-do-i-roll-back-to-a-previous-catalog-version">How do I roll back to a previous catalog version?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-environment-variables-are-required-to-use-agent-catalog">What environment variables are required to use Agent Catalog?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#what-are-the-different-types-of-tools-and-prompts-i-can-create">What are the different types of tools and prompts I can create?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#can-i-write-multiple-tools-prompts-in-one-file">Can I write multiple tools/prompts in one file?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#do-cli-commands-need-to-be-executed-in-a-certain-order">Do CLI commands need to be executed in a certain order?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#can-i-index-and-publish-catalogs-programmatically">Can I index and publish catalogs programmatically?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#does-agent-catalog-require-an-openai-api-key">Does Agent Catalog require an OpenAI API key?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#does-agent-catalog-work-with-any-llm">Does Agent Catalog work with any LLM?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="faqs.html#why-am-i-not-able-to-install-agent-catalog-agentc-because-of-pytorch-error">Why am I not able to install Agent Catalog(agentc) because of PyTorch error?</a></li>
-</ul>
-</li>
+<p class="caption" role="heading"><span class="caption-text">Help / Questions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="faqs.html">FAQs</a></li>
 </ul>
 
         </div>
       </div>
-    </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Agent Catalog</a>
-      </nav>
 
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Installation</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="_sources/install.rst.txt" rel="nofollow"> View page source</a>
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
   <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h1>
 <section id="building-from-package">
-<h2>Building From Package<a class="headerlink" href="#building-from-package" title="Link to this heading"></a></h2>
+<h2>Building From Package<a class="headerlink" href="#building-from-package" title="Link to this heading">¶</a></h2>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>This part is in-the-works!
-For now, please refer to the <a class="reference internal" href="#building-from-source-with-pip">Building From Source (with pip)</a> section below.</p>
+For now, please refer to the <a class="reference internal" href="#installing-from-source-with-makefile">Installing from Source (with Makefile)</a> section below.</p>
 </div>
 </section>
-<section id="building-from-source-with-pip">
-<h2>Building From Source (with pip)<a class="headerlink" href="#building-from-source-with-pip" title="Link to this heading"></a></h2>
+<section id="installing-from-source-with-makefile">
+<h2>Installing from Source (with Makefile)<a class="headerlink" href="#installing-from-source-with-makefile" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
-<li><p>Make sure you have Python 3.12 and <a class="reference external" href="https://python-poetry.org/docs/#installation">Poetry</a> installed!</p></li>
+<li><p>Make sure you have <strong class="command">python3.12</strong> and <a class="reference external" href="https://python-poetry.org/docs/#installation">poetry</a> installed!</p></li>
+<li><p>Make sure you have <strong class="command">make</strong> installed!
+For Mac-based installations, see <a class="reference external" href="https://formulae.brew.sh/formula/make">here</a>.
+For Windows-based installations, see <a class="reference external" href="https://gnuwin32.sourceforge.net/packages/make.htm">here</a>.
+For Ubuntu-based installations, see <a class="reference external" href="https://www.geeksforgeeks.org/how-to-install-make-on-ubuntu/">here</a>.</p></li>
 <li><p>Clone this repository.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/couchbaselabs/agent-catalog
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/couchbaselabs/agent-catalog
 </pre></div>
 </div>
 </li>
-<li><p>Installation using Makefile</p>
-<p>To run the following <code class="docutils literal notranslate"><span class="pre">make</span></code> commands, you must have Anaconda and Make installed (<code class="docutils literal notranslate"><span class="pre">make</span></code> for <a class="reference external" href="https://formulae.brew.sh/formula/make">MacOS</a>, <a class="reference external" href="https://gnuwin32.sourceforge.net/packages/make.htm">Windows</a>, <a class="reference external" href="https://www.geeksforgeeks.org/how-to-install-make-on-ubuntu/">Ubuntu</a>).</p>
-<p>We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.</p>
-<p><a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html">Click here</a> for Anaconda installation steps.</p>
-<p>Once anaconda or any of its distribution is installed, run the following commands to create and activate a virtual environment using Anaconda and install Agentc.
-Replace <code class="docutils literal notranslate"><span class="pre">agentcenv</span></code> with any other suitable environment name.</p>
-<p>You are now ready to explore Agentc!</p>
+<li><p>Navigate to the <code class="docutils literal notranslate"><span class="pre">agent-catalog</span></code> directory and run <strong class="command">make</strong>.
+This will a) create a new virtual environment using Poetry and b) install all required packages and CLI tools.</p></li>
+<li><p>Activate your newly created virtual environment using the outputs of <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">activate</span></code> or
+<code class="code docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">env</span> <span class="pre">activate</span></code>.
+If you do not want to copy-and-paste the output, you can run the command with <strong class="command">eval</strong>:</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">eval</span><span class="w"> </span><span class="k">$(</span>poetry<span class="w"> </span>env<span class="w"> </span>activate<span class="k">)</span>
+</pre></div>
+</div>
+<p>If your environment has been successfully activated, you should see <code class="docutils literal notranslate"><span class="pre">(Activated)</span></code> after running
+<code class="code docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">env</span> <span class="pre">list</span></code>.</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>poetry<span class="w"> </span>env<span class="w"> </span>list
+agent-catalog-UEfqTvAT-py3.13 (Activated)
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note that you must activate your environment before running any <strong class="command">agentc</strong> commands!</p>
+</div>
+<p>If your environment has been activated properly, you should see the following output:</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">COMMAND [ARGS]...</span>
+
+  The Couchbase Agent Catalog command line tool.
+
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">-v</span>, <span class=" -Color -Color-Cyan -C-Cyan">--verbose</span>  Flag to enable verbose output.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">0</span><span class=" -Color -Color-Faint -C-Faint">; 0&lt;=x&lt;=2]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">-i</span>, <span class=" -Color -Color-Cyan -C-Cyan">--interactive</span> / <span class=" -Color -Color-Cyan -C-Cyan">-ni</span>, <span class=" -Color -Color-Cyan -C-Cyan">--no-interactive</span>
+                 Flag to enable interactive mode.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">i</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>     Show this message and exit.
+
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Commands:</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">add</span>      Interactively create a new tool or prompt and save it to the...
+  <span class=" -Color -Color-Cyan -C-Cyan">clean</span>    Delete all or specific (catalog and/or activity) Agent Catalog...
+  <span class=" -Color -Color-Cyan -C-Cyan">env</span>      Return all Agent Catalog related environment and configuration...
+  <span class=" -Color -Color-Cyan -C-Cyan">execute</span>  Search for and subsequently execute a specific tool.
+  <span class=" -Color -Color-Cyan -C-Cyan">find</span>     Find items from the catalog based on a natural language string...
+  <span class=" -Color -Color-Cyan -C-Cyan">index</span>    Walk the source directory trees (sources) to index source files...
+  <span class=" -Color -Color-Cyan -C-Cyan">init</span>     Initialize the necessary files/collections for your working Agent...
+  <span class=" -Color -Color-Cyan -C-Cyan">ls</span>       List all indexed tools and/or prompts in the catalog.
+  <span class=" -Color -Color-Cyan -C-Cyan">publish</span>  Upload the local catalog and/or logs to a Couchbase instance.
+  <span class=" -Color -Color-Cyan -C-Cyan">status</span>   Show the (aggregate) status of your Agent Catalog environment.
+  <span class=" -Color -Color-Cyan -C-Cyan">version</span>  Show the current version of Agent Catalog.
+
+See https://couchbaselabs.github.io/agent-catalog/index.html for more
+information.
+</pre></div>
+</div>
 </li>
-<li><p>Manual Installation</p>
-<p>Alternatively, you can choose to manually install Agentc by first creating a virtual environment either using Anaconda or any other Python virtual environment manager.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>agentcenv<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.12
-conda<span class="w"> </span>activate<span class="w"> </span>agentcenv
-</pre></div>
-</div>
-<p>Once environment is set up, execute the following command to install a local package with <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>agent-catalog
-<span class="c1"># Install the agentc package.</span>
-pip<span class="w"> </span>install<span class="w"> </span>libs/agentc
-</pre></div>
-</div>
-<p>If you are interested in building a <code class="docutils literal notranslate"><span class="pre">.whl</span></code> file (for later use in <code class="docutils literal notranslate"><span class="pre">.whl</span></code>-based installs), use <strong class="command">poetry</strong>
-directly:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>libs/agentc
-poetry<span class="w"> </span>build
+<li><p>If you are interested in building a <code class="docutils literal notranslate"><span class="pre">.whl</span></code> file (for later use in <code class="docutils literal notranslate"><span class="pre">.whl</span></code>-based installation in other projects),
+run the following command:</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>libs/agentc
+<span class="gp">$ </span>poetry<span class="w"> </span>build
 </pre></div>
 </div>
 </li>
 </ol>
 </section>
-<section id="building-from-source-with-poetry">
-<h2>Building From Source (with Poetry)<a class="headerlink" href="#building-from-source-with-poetry" title="Link to this heading"></a></h2>
+<section id="installing-from-source-with-anaconda">
+<h2>Installing from Source (with Anaconda)<a class="headerlink" href="#installing-from-source-with-anaconda" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
-<li><p>Make sure you have Python 3.12 and <a class="reference external" href="https://python-poetry.org/docs/#installation">Poetry</a> installed!</p></li>
-<li><p>Clone this repository.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/couchbaselabs/agent-catalog
+<li><p>Make sure you have <strong class="command">python3.12</strong> and
+<a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html">conda</a> installed!</p></li>
+<li><p>Create a new virtual environment with Anaconda and subsequently activate your environment.
+Again, you must activate your environment before running any <strong class="command">agentc</strong> commands!</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>my_agentc_env<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.12
+<span class="gp">$ </span>conda<span class="w"> </span>activate<span class="w"> </span>my_agentc_env
 </pre></div>
 </div>
 </li>
-<li><p>Within <em>your own</em> <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> file, add the following dependency to your project:
-The <code class="docutils literal notranslate"><span class="pre">path</span></code> should point to the location of the <code class="docutils literal notranslate"><span class="pre">agentc</span></code> package (and is relative to the <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>
-file itself).</p>
-<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[tool.poetry.dependencies]</span>
-<span class="n">agentc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;agent-catalog/libs/agentc&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">develop</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">}</span>
+<li><p>Navigate to this directory and install Agent Catalog with <strong class="command">pip</strong>:</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>agent-catalog
+
+<span class="gp">$ </span><span class="c1"># Install the agentc package.</span>
+<span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>libs/agentc
 </pre></div>
 </div>
-</li>
-<li><p>Run the command <strong class="command">poetry update</strong> to install the Agent Catalog package.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>agent-catalog
-poetry<span class="w"> </span>update
+<p>If you are interested in developing with LangChain or LangGraph, install the helper <code class="docutils literal notranslate"><span class="pre">agentc_langchain</span></code> package
+and/or <code class="docutils literal notranslate"><span class="pre">agentc_langgraph</span></code> package with the command(s) below:</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>libs/agentc_integrations/langchain
+<span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>libs/agentc_integrations/langgraph
 </pre></div>
 </div>
-</li>
-<li><p>Install using Makefile</p>
-<p>You can install Agentc without adding to your pyproject if you wish to explore first. Simply run the following make commands to create and activate a virtual environment and install the requirements.</p>
-<p>To run the following <code class="docutils literal notranslate"><span class="pre">make</span></code> commands, you must have Anaconda and Make installed (<code class="docutils literal notranslate"><span class="pre">make</span></code> for <a class="reference external" href="https://formulae.brew.sh/formula/make">MacOS</a>, <a class="reference external" href="https://gnuwin32.sourceforge.net/packages/make.htm">Windows</a>, <a class="reference external" href="https://www.geeksforgeeks.org/how-to-install-make-on-ubuntu/">Ubuntu</a>).</p>
-<p>We recommend using Anaconda to create a virtual environment for your project to ensure no global dependencies interfere with the project.</p>
-<p><a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html">Click here</a> for Anaconda installation steps.</p>
-<p>Once anaconda or any of its distribution is installed, run the following commands to create and activate a virtual environment using Anaconda and install Agentc.</p>
-<p>Replace <code class="docutils literal notranslate"><span class="pre">agentcenv</span></code> with any other suitable environment name.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>dev-local-poetry<span class="w"> </span><span class="nv">env_name</span><span class="o">=</span>agentcenv
-conda<span class="w"> </span>activate<span class="w"> </span>agentcenv
+<p>Similarly, for LlamaIndex Developers:</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>libs/agentc_integrations/llamaindex
 </pre></div>
 </div>
 </li>
 </ol>
 </section>
-<section id="verifying-your-installation">
-<h2>Verifying Your Installation<a class="headerlink" href="#verifying-your-installation" title="Link to this heading"></a></h2>
-<p>If you’ve followed the steps above, you should now have the <strong class="command">agentc</strong> command line tool.
-Run <strong class="command">agentc --help</strong> to verify your installation (note that your first run will take a couple of seconds as
-some libraries like numpy need to be built, subsequent runs will be faster).</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Usage: agentc [OPTIONS] COMMAND [ARGS]...</span>
-
-<span class="go">  The Couchbase Agent Catalog command line tool.</span>
-
-<span class="go">Options:</span>
-<span class="go">  -c, --catalog DIRECTORY         Directory of the local catalog files.  [default: .agent-catalog]</span>
-<span class="go">  -a, --activity DIRECTORY        Directory of the local activity files (runtime data).  [default: .agent-activity]</span>
-<span class="go">  -v, --verbose                   Flag to enable verbose output.  [default: 0; 0&lt;=x&lt;=2]</span>
-<span class="go">  -i, --interactive / -ni, --no-interactive</span>
-<span class="go">                                  Flag to enable interactive mode.  [default: i]</span>
-<span class="go">  --help                          Show this message and exit.</span>
-
-<span class="go">Commands:</span>
-<span class="go">  add      Interactively create a new tool or prompt and save it to the filesystem (output).</span>
-<span class="go">  clean    Delete all or specific (catalog and/or activity) agent related files / collections.</span>
-<span class="go">  env      Return all agentc related environment and configuration parameters as a JSON object.</span>
-<span class="go">  execute  Search and execute a specific tool.</span>
-<span class="go">  find     Find items from the catalog based on a natural language QUERY string or by name.</span>
-<span class="go">  index    Walk the source directory trees (SOURCE_DIRS) to index source files into the local catalog.</span>
-<span class="go">  ls       List all indexed tools and/or prompts in the catalog.</span>
-<span class="go">  publish  Upload the local catalog and/or logs to a Couchbase instance.</span>
-<span class="go">  status   Show the status of the local catalog.</span>
-<span class="go">  version  Show the current version of agentc.</span>
-
-<span class="go">  See: https://docs.couchbase.com or https://couchbaselabs.github.io/agent-catalog/index.html# for more information.</span>
-</pre></div>
-</div>
-<p>If you see the output above, you are all set!
-To build your first agent, head on over to the <a class="reference external" href="guide.html">user guide</a> page.</p>
-</section>
 </section>
 
 
-           </div>
+            <div class="clearer"></div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="Couchbase Agent Catalog Project" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="guide.html" class="btn btn-neutral float-right" title="Agent Catalog User Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2024, Couchbase.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
         </div>
       </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
+    
+        <div id="show_right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&lt;</span><span>Page contents</span></a></p>
+        </div>
 
-</body>
+        <div id="right_sidebar">
+            <p><a class="toggle_right_sidebar" href="#"><span class="icon">&gt;</span><span>Page contents:</span></a></p>
+            <div class="page_toc">
+                <ul>
+<li><a class="reference internal" href="#">Installation</a><ul>
+<li><a class="reference internal" href="#building-from-package">Building From Package</a></li>
+<li><a class="reference internal" href="#installing-from-source-with-makefile">Installing from Source (with Makefile)</a></li>
+<li><a class="reference internal" href="#installing-from-source-with-anaconda">Installing from Source (with Anaconda)</a></li>
+</ul>
+</li>
+</ul>
+
+            </div>
+        </div>
+    
+
+      <div class="clearer"></div>
+    </div>
+    <div class="button_nav_wrapper">
+        <div class="button_nav">
+            <div class="left">
+                
+                <a href="index.html">
+                    <span class="icon">&lt;</span><span>Couchbase Agent Catalog Project</span></a>
+                
+            </div>
+
+            <div class="right">
+                
+                    <a href="tutorial.html"><span>Agent Catalog: A Primer</span><span class="icon">&gt;</span></a>
+                
+            </div>
+        </div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Couchbase.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+
+<p id="theme_credit">Styled using the <a href="https://github.com/piccolo-orm/piccolo_theme">Piccolo Theme</a></p>
+  </body>
 </html>

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>agentc_llamaindex.chat.chat &#8212; Agent Catalog v0.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=50651e91" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic_mod.css?v=9b2032db" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=86a354c8" />
+    <script src="../../../_static/documentation_options.js?v=683873e3"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../_static/js/theme.js"></script>
+    <script src="../../../_static/js/petite-vue.js"></script>
+    <link rel="icon" href="../../../_static/favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body data-dark_mode_code_blocks="true">
+
+<div id="top_nav">
+    
+
+    <nav>
+        
+            
+        
+
+        <p id="toggle_sidebar">
+            <a href="#" title="Toggle sidebar">|||</a>
+        </p>
+        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog v0.2.0 documentation</a></h1>
+
+        <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
+    <template v-if="mode == 'light'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_light"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M67.48,18.073c1.913,-1.912 1.913,-5.018 0,-6.931c-1.912,-1.912 -5.018,-1.912 -6.931,0l-6.798,6.799c-1.912,1.912 -1.912,5.018 0,6.931c1.913,1.912 5.018,1.912 6.931,-0l6.798,-6.799Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.728,61.108c1.912,-1.913 1.912,-5.018 -0,-6.931c-1.913,-1.913 -5.019,-1.913 -6.931,-0l-6.799,6.798c-1.912,1.913 -1.912,5.019 0,6.931c1.913,1.913 5.019,1.913 6.931,0l6.799,-6.798Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.682,54.177c-1.913,-1.913 -5.018,-1.913 -6.931,-0c-1.912,1.913 -1.912,5.018 0,6.931l6.798,6.798c1.913,1.913 5.019,1.913 6.931,0c1.913,-1.912 1.913,-5.018 0,-6.931l-6.798,-6.798Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M4.901,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901l-0,9.614c-0,2.705 2.196,4.901 4.9,4.901c2.705,-0 4.901,-2.196 4.901,-4.901l0,-9.614Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M18.929,11.142c-1.912,-1.912 -5.018,-1.912 -6.931,0c-1.912,1.913 -1.912,5.019 0,6.931l6.799,6.799c1.912,1.912 5.018,1.912 6.931,-0c1.912,-1.913 1.912,-5.019 -0,-6.931l-6.799,-6.799Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.108,34.623c-2.705,0 -4.901,2.196 -4.901,4.901c-0,2.705 2.196,4.901 4.901,4.901l9.614,0c2.705,0 4.901,-2.196 4.901,-4.901c-0,-2.705 -2.196,-4.901 -4.901,-4.901l-9.614,0Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'dark'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_dark"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><circle cx="39.311" cy="39.524" r="15.734" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.212,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.901,2.196 -4.901,4.901c0,2.705 2.197,4.901 4.901,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.662,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.989,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.732,61.103c1.91,-1.91 1.91,-5.011 0,-6.921l-0.009,-0.01c-1.91,-1.91 -5.012,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.909,1.91 5.011,1.91 6.92,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.672,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.52,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l-0,-0.01c-0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.212,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.901,2.196 -4.901,4.901c0,2.704 2.197,4.9 4.901,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.73,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 -0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.098,34.623c-2.699,0 -4.891,2.192 -4.891,4.892l-0,0.019c-0,2.699 2.192,4.891 4.891,4.891c2.7,0 4.892,-2.192 4.892,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.892,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+
+    <template v-if="mode == 'darkest'">
+        <svg width="100%" height="100%" viewBox="0 0 79 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><g id="mode_darkest"><rect id="Bounds" x="0" y="-0" width="78.623" height="79.049" style="fill:none;"/><path d="M39.315,23.791c8.684,-0 15.734,7.05 15.734,15.733c0,8.684 -7.05,15.734 -15.734,15.734c-8.683,0 -15.733,-7.05 -15.733,-15.734c-0,-8.683 7.05,-15.733 15.733,-15.733Zm0,4.737c6.069,0 10.997,4.927 10.997,10.996c-0,6.069 -4.928,10.996 -10.997,10.996c-6.068,0 -10.996,-4.927 -10.996,-10.996c0,-6.069 4.928,-10.996 10.996,-10.996Z" style="fill:#fff;"/><g id="beams"><g id="beam"><path id="beam1" serif:id="beam" d="M44.216,14.515c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,0 -4.9,2.196 -4.9,4.901c-0,2.705 2.196,4.901 4.9,4.901c2.705,0 4.901,-2.196 4.901,-4.901Z" style="fill:#fff;"/></g><g id="beam2" serif:id="beam"><path id="beam3" serif:id="beam" d="M60.666,24.892c1.902,-1.902 1.902,-4.99 0,-6.892l-0.04,-0.039c-1.901,-1.902 -4.989,-1.902 -6.891,-0c-1.901,1.901 -1.901,4.989 0,6.891l0.04,0.04c1.902,1.901 4.99,1.901 6.891,-0Z" style="fill:#fff;"/></g><g id="beam4" serif:id="beam"><path id="beam5" serif:id="beam" d="M25.737,61.103c1.909,-1.91 1.909,-5.011 -0,-6.921l-0.01,-0.01c-1.91,-1.91 -5.011,-1.91 -6.921,-0c-1.91,1.91 -1.91,5.011 -0,6.921l0.01,0.01c1.91,1.91 5.011,1.91 6.921,-0Z" style="fill:#fff;"/></g><g id="beam6" serif:id="beam"><path id="beam7" serif:id="beam" d="M60.676,54.167c-1.907,-1.907 -5.004,-1.907 -6.911,0l-0.02,0.02c-1.907,1.907 -1.907,5.004 0,6.911c1.907,1.907 5.004,1.907 6.911,-0l0.02,-0.02c1.907,-1.907 1.907,-5.004 0,-6.911Z" style="fill:#fff;"/></g><g id="beam8" serif:id="beam"><path id="beam9" serif:id="beam" d="M14.524,34.623c-2.702,0 -4.896,2.194 -4.896,4.896l0,0.01c0,2.702 2.194,4.896 4.896,4.896c2.702,0 4.896,-2.194 4.896,-4.896l0,-0.01c0,-2.702 -2.194,-4.896 -4.896,-4.896Z" style="fill:#fff;"/></g><g id="beam10" serif:id="beam"><path id="beam11" serif:id="beam" d="M44.216,64.534c0,-2.705 -2.196,-4.901 -4.901,-4.901c-2.704,-0 -4.9,2.196 -4.9,4.901c-0,2.704 2.196,4.9 4.9,4.9c2.705,0 4.901,-2.196 4.901,-4.9Z" style="fill:#fff;"/></g><g id="beam12" serif:id="beam"><path id="beam13" serif:id="beam" d="M25.734,17.943c-1.911,-1.911 -5.015,-1.911 -6.926,0l-0.005,0.005c-1.911,1.911 -1.911,5.015 0,6.926c1.911,1.911 5.015,1.911 6.926,0l0.005,-0.005c1.911,-1.911 1.911,-5.014 0,-6.926Z" style="fill:#fff;"/></g><g id="beam14" serif:id="beam"><path id="beam15" serif:id="beam" d="M64.103,34.623c-2.7,0 -4.892,2.192 -4.892,4.892l-0,0.019c-0,2.699 2.192,4.891 4.892,4.891c2.699,0 4.891,-2.192 4.891,-4.891l0,-0.019c0,-2.7 -2.192,-4.892 -4.891,-4.892Z" style="fill:#fff;"/></g></g></g></svg>
+    </template>
+</a>
+
+<script>
+(function() {
+    const LOCAL_STORAGE_KEY = 'piccoloThemeMode'
+
+    var initialMode = localStorage.getItem(LOCAL_STORAGE_KEY)
+
+    if (initialMode) {
+        // Make sure the value in local storage is valid
+        if (['light', 'dark', 'darkest'].indexOf(initialMode) == -1) {
+            initialMode = 'light'
+            localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+        }
+    } else {
+        // Check if the client prefers dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            initialMode = 'dark'
+        } else {
+            initialMode = 'light'
+        }
+        localStorage.setItem(LOCAL_STORAGE_KEY, initialMode)
+    }
+
+    document.documentElement.dataset.mode = initialMode
+
+    PetiteVue.createApp({
+        'mode': initialMode,
+        handleClick() {
+            let currentMode = this.mode
+
+            if (currentMode == 'light') {
+                this.mode = 'dark'
+            } else if (currentMode == 'dark') {
+                this.mode = 'darkest'
+            } else if (currentMode == 'darkest') {
+                this.mode = 'light'
+            }
+
+            document.documentElement.dataset.mode = this.mode
+            localStorage.setItem(LOCAL_STORAGE_KEY, this.mode)
+
+            console.log(this.mode)
+        }
+    }).mount('#mode_toggle')
+})()
+</script>
+            <p class="mobile_search_link">
+                <a href="../../../search.html" title="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65 64" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2">
+                        <path d="M14.873 40.009c-2.315-3.943-3.642-8.532-3.642-13.429C11.231 11.91 23.141 0 37.811 0s26.58 11.91 26.58 26.58-11.91 26.58-26.58 26.58a26.44 26.44 0 0 1-14.277-4.161L9.739 62.794a3.12 3.12 0 0 1-4.413 0L.913 58.382c-1.217-1.218-1.217-3.196 0-4.413l13.96-13.96zM37.811 8.054c10.225 0 18.526 8.301 18.526 18.526s-8.301 18.526-18.526 18.526-18.526-8.301-18.526-18.526S27.586 8.054 37.811 8.054z" fill="#fff" />
+                    </svg>
+                </a>
+            </p>
+        
+
+        <div class="searchbox_wrapper">
+            
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+    </nav>
+</div>
+
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../concept.html">Concepts</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">agentc CLI Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">Package Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../catalog.html">Tool / Prompt Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../log.html">Spans and Log Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../analysis.html">Log Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Help / Questions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../faqs.html">FAQs</a></li>
+</ul>
+
+        </div>
+      </div>
+
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for agentc_llamaindex.chat.chat</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">llama_index.core.llms.callbacks</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">llama_index.core.tools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.activity</span><span class="w"> </span><span class="kn">import</span> <span class="n">Span</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.activity.models.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChatCompletionContent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.activity.models.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">SystemContent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.activity.models.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">ToolCallContent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.activity.models.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">ToolResultContent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">llama_index.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCallbackHandler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">llama_index.core.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">CBEventType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">llama_index.core.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventPayload</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Callback">
+<a class="viewcode-back" href="../../../api.html#agentc_llamaindex.chat.Callback">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Callback</span><span class="p">(</span><span class="n">BaseCallbackHandler</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;All callback that will log all LlamaIndex events using the given span as the root.</span>
+
+<span class="sd">    .. card:: Class Description</span>
+
+<span class="sd">        This class is a callback handler that will log :py:class:`ChatCompletionContent`, :py:class:`ToolCallContent`,</span>
+<span class="sd">        and :py:class:`ToolResultContent` using events yielded from LlamaIndex (with the given span as the root).</span>
+<span class="sd">        Below, we provide an example of how to use this class.</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            import agentc</span>
+<span class="sd">            import llama_index.core.llms</span>
+<span class="sd">            import llama_index.llms.openai</span>
+
+<span class="sd">            catalog = agentc.Catalog()</span>
+<span class="sd">            root_span = catalog.Span(name=&quot;root_span&quot;)</span>
+<span class="sd">            my_prompt = catalog.find(&quot;prompt&quot;, name=&quot;talk_like_a_pirate&quot;)</span>
+<span class="sd">            chat_model = llama_index.llms.openai.OpenAI(model=&quot;gpt-4o&quot;)</span>
+<span class="sd">            chat_model.callback_manager.add_handler(Callback(span=span))</span>
+<span class="sd">            result = chat_model.chat(</span>
+<span class="sd">                [</span>
+<span class="sd">                    llama_index.core.llms.ChatMessage(role=&quot;system&quot;, content=my_prompt.content),</span>
+<span class="sd">                    llama_index.core.llms.ChatMessage(role=&quot;user&quot;, content=&quot;What is your name&quot;),</span>
+<span class="sd">                ]</span>
+<span class="sd">            )</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">_TraceNode</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+        <span class="n">span</span><span class="p">:</span> <span class="n">Span</span>
+        <span class="n">children</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">llama_index</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">llms</span><span class="o">.</span><span class="n">MessageRole</span><span class="p">,</span> <span class="s2">&quot;Callback._TraceNode&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">span</span><span class="p">:</span> <span class="n">Span</span><span class="p">,</span>
+        <span class="n">event_starts_to_ignore</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">CBEventType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">event_ends_to_ignore</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">CBEventType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">event_starts_to_ignore</span> <span class="ow">or</span> <span class="nb">list</span><span class="p">(),</span> <span class="n">event_ends_to_ignore</span> <span class="ow">or</span> <span class="nb">list</span><span class="p">())</span>
+
+        <span class="c1"># We&#39;ll use a stack to store our active traces.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_traces</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Callback</span><span class="o">.</span><span class="n">_TraceNode</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root_span</span> <span class="o">=</span> <span class="n">span</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_handle_unknown_payload</span><span class="p">(</span><span class="n">span</span><span class="p">:</span> <span class="n">Span</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Encountered unknown payload </span><span class="si">%s</span><span class="s2">. Logging as System content.&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">payload</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">span</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">SystemContent</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="n">key</span><span class="p">}),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error logging payload </span><span class="si">%s</span><span class="s2">!&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_handle_payload</span><span class="p">(</span><span class="n">span</span><span class="p">:</span> <span class="n">Span</span><span class="p">,</span> <span class="n">event_type</span><span class="p">:</span> <span class="n">CBEventType</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Handling event of type </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="p">)</span>
+        <span class="n">unhandled_payloads</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">payload</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="c1"># Determine any &#39;extraneous&#39; fields in the payload (that will be logged as annotations).</span>
+        <span class="n">annotations</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">EventPayload</span><span class="o">.</span><span class="n">ADDITIONAL_KWARGS</span> <span class="ow">in</span> <span class="n">payload</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">payload</span><span class="p">[</span><span class="n">EventPayload</span><span class="o">.</span><span class="n">ADDITIONAL_KWARGS</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">annotations</span><span class="p">[</span><span class="s2">&quot;additional_kwargs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">payload</span><span class="p">[</span><span class="n">EventPayload</span><span class="o">.</span><span class="n">ADDITIONAL_KWARGS</span><span class="p">]</span>
+            <span class="n">unhandled_payloads</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">EventPayload</span><span class="o">.</span><span class="n">ADDITIONAL_KWARGS</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">EventPayload</span><span class="o">.</span><span class="n">SERIALIZED</span> <span class="ow">in</span> <span class="n">payload</span><span class="p">:</span>
+            <span class="n">annotations</span><span class="p">[</span><span class="s2">&quot;serialized&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">payload</span><span class="p">[</span><span class="n">EventPayload</span><span class="o">.</span><span class="n">SERIALIZED</span><span class="p">]</span>
+            <span class="n">unhandled_payloads</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">EventPayload</span><span class="o">.</span><span class="n">SERIALIZED</span><span class="p">)</span>
+
+        <span class="c1"># TODO (GLENN): Support more than just LLM and FUNCTION_CALL events.</span>
+        <span class="k">match</span> <span class="n">event_type</span><span class="p">:</span>
+            <span class="k">case</span> <span class="n">CBEventType</span><span class="o">.</span><span class="n">LLM</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">EventPayload</span><span class="o">.</span><span class="n">PROMPT</span> <span class="ow">in</span> <span class="n">payload</span><span class="p">:</span>
+                    <span class="n">span</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">SystemContent</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">payload</span><span class="p">[</span><span class="n">EventPayload</span><span class="o">.</span><span class="n">PROMPT</span><span class="p">]),</span> <span class="o">**</span><span class="n">annotations</span><span class="p">)</span>
+                    <span class="n">unhandled_payloads</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">EventPayload</span><span class="o">.</span><span class="n">PROMPT</span><span class="p">)</span>
+
+                <span class="c1"># Note: we shouldn&#39;t expect both MESSAGES and PROMPT to exist at the same time...</span>
+                <span class="k">if</span> <span class="n">EventPayload</span><span class="o">.</span><span class="n">MESSAGES</span> <span class="ow">in</span> <span class="n">payload</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">payload</span><span class="p">[</span><span class="n">EventPayload</span><span class="o">.</span><span class="n">MESSAGES</span><span class="p">]:</span>
+                        <span class="c1"># This is just to get some typing for our IDEs.</span>
+                        <span class="n">message</span><span class="p">:</span> <span class="n">llama_index</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">llms</span><span class="o">.</span><span class="n">ChatMessage</span> <span class="o">=</span> <span class="n">message</span>
+                        <span class="n">span</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">SystemContent</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">message</span><span class="o">.</span><span class="n">content</span><span class="p">),</span> <span class="o">**</span><span class="n">annotations</span><span class="p">)</span>
+                    <span class="n">unhandled_payloads</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">EventPayload</span><span class="o">.</span><span class="n">MESSAGES</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">EventPayload</span><span class="o">.</span><span class="n">COMPLETION</span> <span class="ow">in</span> <span class="n">payload</span><span class="p">:</span>
+                    <span class="n">completion_payload</span><span class="p">:</span> <span class="n">llama_index</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">llms</span><span class="o">.</span><span class="n">CompletionResponse</span> <span class="o">=</span> <span class="n">payload</span><span class="p">[</span><span class="n">EventPayload</span><span class="o">.</span><span class="n">COMPLETION</span><span class="p">]</span>
+                    <span class="n">span</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                        <span class="n">content</span><span class="o">=</span><span class="n">ChatCompletionContent</span><span class="p">(</span>
+                            <span class="n">output</span><span class="o">=</span><span class="n">completion_payload</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+                            <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+                                <span class="s2">&quot;logprobs&quot;</span><span class="p">:</span> <span class="n">completion_payload</span><span class="o">.</span><span class="n">logprobs</span><span class="p">,</span>
+                                <span class="s2">&quot;delta&quot;</span><span class="p">:</span> <span class="n">completion_payload</span><span class="o">.</span><span class="n">delta</span><span class="p">,</span>
+                            <span class="p">},</span>
+                        <span class="p">),</span>
+                        <span class="o">**</span><span class="n">annotations</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">unhandled_payloads</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">EventPayload</span><span class="o">.</span><span class="n">COMPLETION</span><span class="p">)</span>
+
+                <span class="c1"># Note: we shouldn&#39;t expect both COMPLETION and RESPONSE to exist at the same time...</span>
+                <span class="k">if</span> <span class="n">EventPayload</span><span class="o">.</span><span class="n">RESPONSE</span> <span class="ow">in</span> <span class="n">payload</span><span class="p">:</span>
+                    <span class="n">response_payload</span><span class="p">:</span> <span class="n">llama_index</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">llms</span><span class="o">.</span><span class="n">ChatResponse</span> <span class="o">=</span> <span class="n">payload</span><span class="p">[</span><span class="n">EventPayload</span><span class="o">.</span><span class="n">RESPONSE</span><span class="p">]</span>
+                    <span class="n">span</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                        <span class="n">content</span><span class="o">=</span><span class="n">ChatCompletionContent</span><span class="p">(</span>
+                            <span class="n">output</span><span class="o">=</span><span class="n">response_payload</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                            <span class="n">meta</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">response_payload</span><span class="o">.</span><span class="n">message</span><span class="p">),</span>
+                            <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+                                <span class="s2">&quot;logprobs&quot;</span><span class="p">:</span> <span class="n">response_payload</span><span class="o">.</span><span class="n">logprobs</span><span class="p">,</span>
+                                <span class="s2">&quot;delta&quot;</span><span class="p">:</span> <span class="n">response_payload</span><span class="o">.</span><span class="n">delta</span><span class="p">,</span>
+                            <span class="p">},</span>
+                        <span class="p">),</span>
+                        <span class="o">**</span><span class="n">annotations</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">unhandled_payloads</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">EventPayload</span><span class="o">.</span><span class="n">RESPONSE</span><span class="p">)</span>
+
+                <span class="c1"># For all other fields, we will log them as SYSTEM events.</span>
+                <span class="n">Callback</span><span class="o">.</span><span class="n">_handle_unknown_payload</span><span class="p">(</span>
+                    <span class="n">span</span><span class="p">,</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">payload</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">unhandled_payloads</span><span class="p">},</span> <span class="o">**</span><span class="n">annotations</span>
+                <span class="p">)</span>
+
+            <span class="k">case</span> <span class="n">CBEventType</span><span class="o">.</span><span class="n">FUNCTION_CALL</span><span class="p">:</span>
+                <span class="c1"># We will generate our own unique ID for each tool call.</span>
+                <span class="n">tool_call_id</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
+                <span class="k">if</span> <span class="n">EventPayload</span><span class="o">.</span><span class="n">TOOL</span> <span class="ow">in</span> <span class="n">payload</span> <span class="ow">and</span> <span class="n">EventPayload</span><span class="o">.</span><span class="n">FUNCTION_CALL</span> <span class="ow">in</span> <span class="n">payload</span><span class="p">:</span>
+                    <span class="n">tool</span><span class="p">:</span> <span class="n">llama_index</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">ToolMetadata</span> <span class="o">=</span> <span class="n">payload</span><span class="p">[</span><span class="n">EventPayload</span><span class="o">.</span><span class="n">TOOL</span><span class="p">]</span>
+                    <span class="n">func</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">payload</span><span class="p">[</span><span class="n">EventPayload</span><span class="o">.</span><span class="n">FUNCTION_CALL</span><span class="p">]</span>
+                    <span class="n">span</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                        <span class="n">content</span><span class="o">=</span><span class="n">ToolCallContent</span><span class="p">(</span>
+                            <span class="n">tool_name</span><span class="o">=</span><span class="n">tool</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                            <span class="n">tool_args</span><span class="o">=</span><span class="n">func</span><span class="p">,</span>
+                            <span class="n">tool_call_id</span><span class="o">=</span><span class="n">tool_call_id</span><span class="p">,</span>
+                            <span class="n">status</span><span class="o">=</span><span class="s2">&quot;success&quot;</span><span class="p">,</span>
+                            <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="n">tool</span><span class="p">},</span>
+                        <span class="p">),</span>
+                        <span class="o">**</span><span class="n">annotations</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">unhandled_payloads</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">EventPayload</span><span class="o">.</span><span class="n">FUNCTION_CALL</span><span class="p">)</span>
+                    <span class="n">unhandled_payloads</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">EventPayload</span><span class="o">.</span><span class="n">TOOL</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">EventPayload</span><span class="o">.</span><span class="n">FUNCTION_OUTPUT</span> <span class="ow">in</span> <span class="n">payload</span><span class="p">:</span>
+                    <span class="n">span</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                        <span class="n">content</span><span class="o">=</span><span class="n">ToolResultContent</span><span class="p">(</span>
+                            <span class="n">tool_call_id</span><span class="o">=</span><span class="n">tool_call_id</span><span class="p">,</span>
+                            <span class="n">tool_result</span><span class="o">=</span><span class="n">payload</span><span class="p">[</span><span class="n">EventPayload</span><span class="o">.</span><span class="n">FUNCTION_OUTPUT</span><span class="p">],</span>
+                            <span class="n">status</span><span class="o">=</span><span class="s2">&quot;success&quot;</span><span class="p">,</span>
+                        <span class="p">),</span>
+                        <span class="o">**</span><span class="n">annotations</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">unhandled_payloads</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">EventPayload</span><span class="o">.</span><span class="n">FUNCTION_OUTPUT</span><span class="p">)</span>
+
+                <span class="c1"># For all other fields, we will log them as SYSTEM events.</span>
+                <span class="n">Callback</span><span class="o">.</span><span class="n">_handle_unknown_payload</span><span class="p">(</span>
+                    <span class="n">span</span><span class="p">,</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">payload</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">unhandled_payloads</span><span class="p">},</span> <span class="o">**</span><span class="n">annotations</span>
+                <span class="p">)</span>
+
+            <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Unknown event type encounter &#39;</span><span class="si">%s</span><span class="s2">&#39;. Recording as System.&quot;</span><span class="p">,</span> <span class="n">event_type</span><span class="p">)</span>
+                <span class="n">span</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">SystemContent</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">payload</span><span class="p">)),</span> <span class="o">**</span><span class="n">annotations</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_event_start</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">event_type</span><span class="p">:</span> <span class="n">CBEventType</span><span class="p">,</span>
+        <span class="n">payload</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">event_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">parent_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">trace</span><span class="p">:</span> <span class="n">Callback</span><span class="o">.</span><span class="n">_TraceNode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_traces</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">annotations</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">parent_id</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">annotations</span><span class="p">[</span><span class="s2">&quot;parent_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent_id</span>
+        <span class="k">if</span> <span class="n">event_id</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">annotations</span><span class="p">[</span><span class="s2">&quot;event_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_id</span>
+
+        <span class="n">trace</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">event_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">span</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">event_type</span><span class="p">,</span> <span class="o">**</span><span class="n">annotations</span><span class="p">)</span>
+        <span class="n">trace</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">event_type</span><span class="p">]</span><span class="o">.</span><span class="n">enter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_handle_payload</span><span class="p">(</span><span class="n">trace</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">event_type</span><span class="p">],</span> <span class="n">event_type</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">event_id</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_event_end</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">event_type</span><span class="p">:</span> <span class="n">CBEventType</span><span class="p">,</span>
+        <span class="n">payload</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">event_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">span</span><span class="p">:</span> <span class="n">Span</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_traces</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">event_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_handle_payload</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="n">event_type</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="n">span</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">start_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">new_span</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_span</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;start_trace&quot;</span><span class="p">,</span> <span class="n">trace_id</span><span class="o">=</span><span class="n">trace_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_traces</span> <span class="o">+=</span> <span class="p">[</span>
+            <span class="n">Callback</span><span class="o">.</span><span class="n">_TraceNode</span><span class="p">(</span>
+                <span class="n">span</span><span class="o">=</span><span class="n">new_span</span><span class="p">,</span>
+                <span class="n">children</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">new_span</span><span class="o">.</span><span class="n">enter</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">end_trace</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">trace_id</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">trace_map</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">trace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_traces</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="n">trace</span><span class="o">.</span><span class="n">span</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+    
+
+      <div class="clearer"></div>
+    </div>
+    <div class="button_nav_wrapper">
+        <div class="button_nav">
+            <div class="left">
+                
+            </div>
+
+            <div class="right">
+                
+            </div>
+        </div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Couchbase.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+
+<p id="theme_credit">Styled using the <a href="https://github.com/piccolo-orm/piccolo_theme">Piccolo Theme</a></p>
+  </body>
+</html>
