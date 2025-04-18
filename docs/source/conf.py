@@ -45,6 +45,7 @@ autodoc_pydantic_settings_show_json_error_strategy = "coerce"
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
+# https://piccolo-theme.readthedocs.io/en/latest/
 html_theme = "piccolo_theme"
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]

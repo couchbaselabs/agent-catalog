@@ -25,11 +25,11 @@ from agentc_testing.server import DEFAULT_COUCHBASE_BUCKET
 from agentc_testing.server import DEFAULT_COUCHBASE_PASSWORD
 from agentc_testing.server import DEFAULT_COUCHBASE_USERNAME
 from agentc_testing.server import connection_factory
-from agentc_testing.server import isolated_server_factory
+from agentc_testing.server import shared_server_factory
 from unittest.mock import patch
 
 # This is to keep ruff from falsely flagging this as unused.
-_ = isolated_server_factory
+_ = shared_server_factory
 _ = connection_factory
 _ = environment_factory
 _ = temporary_directory
@@ -81,12 +81,12 @@ def test_index(
 def test_publish_positive_1(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
-    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    shared_server_factory: typing.Callable[[], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
 ):
     runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
-        isolated_server_factory(pathlib.Path(td) / ".couchbase")
+        shared_server_factory()
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
@@ -114,12 +114,12 @@ def test_publish_positive_1(
 def test_publish_negative_1(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
-    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    shared_server_factory: typing.Callable[[], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
 ):
     runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
-        isolated_server_factory(pathlib.Path(td) / ".couchbase")
+        shared_server_factory()
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_DIRTY_ALL_TRAVEL,
@@ -146,12 +146,12 @@ def test_publish_negative_1(
 def test_publish_positive_2(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
-    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    shared_server_factory: typing.Callable[[], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
 ):
     runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
-        isolated_server_factory(pathlib.Path(td) / ".couchbase")
+        shared_server_factory()
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
@@ -178,12 +178,12 @@ def test_publish_positive_2(
 def test_publish_positive_3(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
-    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    shared_server_factory: typing.Callable[[], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
 ):
     runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
-        isolated_server_factory(pathlib.Path(td) / ".couchbase")
+        shared_server_factory()
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
@@ -210,7 +210,7 @@ def test_publish_positive_3(
 def test_find(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
-    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    shared_server_factory: typing.Callable[[], ...],
 ):
     """
     This test performs the following checks:
@@ -220,7 +220,7 @@ def test_find(
     """
     runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
-        isolated_server_factory(pathlib.Path(td) / ".couchbase")
+        shared_server_factory()
         env = environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.PUBLISHED_ALL_TRAVEL,
@@ -285,7 +285,7 @@ def test_find(
 def test_status(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
-    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    shared_server_factory: typing.Callable[[], ...],
 ):
     runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
@@ -296,7 +296,7 @@ def test_status(
         assert "Local catalog not found " in str(output.exception)
         assert isinstance(output.exception, ValueError)
 
-        isolated_server_factory(pathlib.Path(td) / ".couchbase")
+        shared_server_factory()
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.PUBLISHED_TOOLS_TRAVEL,
@@ -363,11 +363,11 @@ def test_local_clean_with_date(
 def test_db_clean(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
-    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    shared_server_factory: typing.Callable[[], ...],
 ):
     runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
-        isolated_server_factory(pathlib.Path(td) / ".couchbase")
+        shared_server_factory()
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.PUBLISHED_ALL_TRAVEL,
@@ -414,7 +414,7 @@ def test_db_clean(
 def test_db_clean_with_date(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
-    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    shared_server_factory: typing.Callable[[], ...],
 ):
     # TODO (GLENN): Implement me!
     pass
@@ -468,12 +468,12 @@ def test_publish_multiple_nodes(
 def test_publish_different_versions(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
-    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    shared_server_factory: typing.Callable[[], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
 ):
     runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
-        isolated_server_factory(pathlib.Path(td) / ".couchbase")
+        shared_server_factory()
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.PUBLISHED_ALL_TRAVEL,
@@ -605,7 +605,7 @@ def test_ls_local_both_tools_prompts(
 def test_init_local(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
-    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    shared_server_factory: typing.Callable[[], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
 ):
     runner = click_extra.testing.ExtraCliRunner()
@@ -643,12 +643,12 @@ def test_init_local_all(
 def test_init_db(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
-    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    shared_server_factory: typing.Callable[[], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
 ):
     runner = click_extra.testing.ExtraCliRunner()
     with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
-        isolated_server_factory(pathlib.Path(td) / ".couchbase")
+        shared_server_factory()
         environment_factory(
             directory=pathlib.Path(td),
             env_kind=EnvironmentKind.EMPTY,

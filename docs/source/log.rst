@@ -7,7 +7,7 @@
 Log Records
 ===========
 
-As of date, Agent Catalog supports 10 different types of log records (all varied by content).
+As of date, Agent Catalog supports 11 different types of log records (all varied by content).
 Agent Catalog maintains a collection of logs as a **series** of events.
 
 Schema of Logs

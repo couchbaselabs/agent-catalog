@@ -19,10 +19,10 @@ from agentc_testing.catalog import EnvironmentKind
 from agentc_testing.catalog import environment_factory
 from agentc_testing.directory import temporary_directory
 from agentc_testing.server import connection_factory
-from agentc_testing.server import isolated_server_factory
+from agentc_testing.server import shared_server_factory
 
 # This is to keep ruff from falsely flagging this as unused.
-_ = isolated_server_factory
+_ = shared_server_factory
 _ = environment_factory
 _ = connection_factory
 _ = temporary_directory
@@ -183,7 +183,7 @@ def test_local_auditor_positive_3(
 def test_db_auditor(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
-    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    shared_server_factory: typing.Callable[[], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
 ):
     # TODO (GLENN): Finish me!
@@ -195,7 +195,7 @@ def test_db_auditor(
 def test_chain_auditor(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
-    isolated_server_factory: typing.Callable[[pathlib.Path], ...],
+    shared_server_factory: typing.Callable[[], ...],
     connection_factory: typing.Callable[[], couchbase.cluster.Cluster],
 ):
     # TODO (GLENN): Finish me!

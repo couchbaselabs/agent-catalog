@@ -83,16 +83,11 @@ We will build up the agents, state, and edges in the next step.
     out_front_desk_edge = ...
     out_route_finding_edge = ...
 
-    # Define our agents.
-    front_desk_agent = FrontDeskAgent()
-    endpoint_finding_agent = EndpointFindingAgent()
-    route_finding_agent = RouteFindingAgent()
-
     # Create a workflow graph.
     workflow = langgraph.graph.StateGraph(State)
-    workflow.add_node("front_desk_agent", front_desk_agent)
-    workflow.add_node("endpoint_finding_agent", endpoint_finding_agent)
-    workflow.add_node("route_finding_agent", route_finding_agent)
+    workflow.add_node("front_desk_agent", FrontDeskAgent())
+    workflow.add_node("endpoint_finding_agent", EndpointFindingAgent())
+    workflow.add_node("route_finding_agent", RouteFindingAgent())
     workflow.set_entry_point("front_desk_agent")
     workflow.add_conditional_edges(
         "front_desk_agent",
@@ -121,7 +116,7 @@ tabs (at least where we are from :-)).
 In LangGraph, this contract exists in the form of a ``State`` class.
 Let's define our state class as such:
 
-..code-block:: python
+.. code-block:: python
 
     import typing
     import langchain_core.messages
@@ -136,15 +131,70 @@ Let's define our state class as such:
 Our state class, defined as a typed dictionary, has the following attributes:
 
 1. A ``messages`` field, used to hold the history for the current conversation / session.
-   This field is standard across most LangGraph application.
-2. A ``is_last_step`` field, used to signal to the terminating agent (in our case, the "Front Desk") that the current
-   session should end.
+   This field is standard across most LangGraph applications.
+2. A ``is_last_step`` field, a control field used to signal to the terminating agent (in our case, the "Front Desk")
+   that the current session should end.
+   Similar to ``messages``, this field is standard across most LangGraph applications.
 3. A ``needs_clarification`` field, primarily a control field used by the "Front Desk" agent to repeat the "Front Desk"
    agent code block.
+4. An ``endpoints`` field, used to hold endpoints found by our "Endpoint Finding" agent.
+5. A ``routes`` field, used to hold routes found by our "Route Finding" agent.
+
+Defining Our Graph Nodes
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The "nodes" in LangGraph, similar to other vertex-centric paradigms, are our pièce de résistance.
 
 
-TODO
 
+Defining Our Graph Edges
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+In LangGraph, edges are defined using functions that accept a ``State`` instance (defined previously) and return the
+name of the next node that will handle the current state.
+As illustrated in Figure 1 (above, repeated directly below for reference), there are seven edges we need to define:
+
+.. mermaid::
+    :title: 3-Agent Route Finding System
+    :align: center
+    :caption: **Figure 1** (duplicate): The 3-agent system (a Front Desk agent, a Route Finding agent, and an Endpoint
+        Finding agent) we will be working with.
+
+    %%{init: {'flowchart': {'curve': 'linear', 'defaultRenderer': 'elk'}}}%%
+    graph BT
+    ;
+        __start__([<p>__start__</p>]):::first
+        front_desk_agent(front_desk_agent)
+        endpoint_finding_agent(endpoint_finding_agent)
+        route_finding_agent(route_finding_agent)
+        __end__([<p>__end__</p>]):::last
+        __start__ --> front_desk_agent;
+        endpoint_finding_agent --> route_finding_agent;
+        front_desk_agent -. ENDPOINT_FINDING .-> endpoint_finding_agent;
+    front_desk_agent -. END .-> __end__;
+    route_finding_agent -. FRONT_DESK .-> front_desk_agent;
+    route_finding_agent -. ENDPOINT_FINDING .-> endpoint_finding_agent;
+    front_desk_agent -. FRONT_DESK .-> front_desk_agent;
+    classDef default fill:#f2f0ff, line-height: 1.2
+    classDef first fill-opacity:0
+    classDef last fill: #bfb6fc
+
+1. The edge from ``__start__`` to ``front_desk_agent`` denotes that our graph starts with our "Front Desk" agent.
+   This edge is constructed using the line:
+
+   .. code-block:: python
+
+        workflow.set_entry_point("front_desk_agent")
+
+2. The solid edge from ``endpoint_finding_agent`` to ``route_finding_agent`` denotes that the "Endpoint Finding" agent
+   will unconditionally forward its output to the "Route Finding" agent.
+   This edge is constructed using the line:
+
+   .. code-block:: python
+
+        workflow.add_edge("endpoint_finding_agent", "route_finding_agent")
+
+3. The dashed edges
 
 
 Step #2: Adding Agent Catalog

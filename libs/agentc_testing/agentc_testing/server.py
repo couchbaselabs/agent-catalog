@@ -75,35 +75,12 @@ def _start_container(volume_path: pathlib.Path) -> docker.models.containers.Cont
     )
 
 
-def _start_couchbase(
+def _setup_bucket(
     container: docker.models.containers.Container,
     retry_count: int = 5,
     backoff_factor: float = 0.7,
     wait_for_ready: bool = True,
 ) -> None:
-    # Initialize the cluster.
-    def _init_cluster():
-        return requests.post(
-            "http://localhost:8091/clusterInit",
-            data={
-                "username": DEFAULT_COUCHBASE_USERNAME,
-                "password": DEFAULT_COUCHBASE_PASSWORD,
-                "services": "kv,index,n1ql,fts,cbas",
-                "clusterName": "agentc",
-                "indexerStorageMode": "plasma",
-                "port": "SAME",
-            },
-        )
-
-    logger.info("Initializing Couchbase container %s (clusterInit).", container.name)
-    _execute_with_retry(
-        func=_init_cluster,
-        condition=lambda r: r.status_code == http.HTTPStatus.OK,
-        result_str=lambda r: r.text,
-        retry_count=retry_count,
-        backoff_factor=backoff_factor,
-    )
-
     # Install the travel-sample bucket.
     def _install_bucket():
         return requests.post(
@@ -138,6 +115,39 @@ def _start_couchbase(
         retry_count=retry_count,
         backoff_factor=backoff_factor,
     )
+    return
+
+
+def _start_couchbase(
+    container: docker.models.containers.Container,
+    retry_count: int = 5,
+    backoff_factor: float = 0.7,
+    wait_for_ready: bool = True,
+) -> None:
+    # Initialize the cluster.
+    def _init_cluster():
+        return requests.post(
+            "http://localhost:8091/clusterInit",
+            data={
+                "username": DEFAULT_COUCHBASE_USERNAME,
+                "password": DEFAULT_COUCHBASE_PASSWORD,
+                "services": "kv,index,n1ql,fts,cbas",
+                "clusterName": "agentc",
+                "indexerStorageMode": "plasma",
+                "port": "SAME",
+            },
+        )
+
+    logger.info("Initializing Couchbase container %s (clusterInit).", container.name)
+    _execute_with_retry(
+        func=_init_cluster,
+        condition=lambda r: r.status_code == http.HTTPStatus.OK,
+        result_str=lambda r: r.text,
+        retry_count=retry_count,
+        backoff_factor=backoff_factor,
+    )
+
+    _setup_bucket(container, retry_count, backoff_factor, wait_for_ready)
 
     # As a sanity check, we should now be able to use our SDK to connect to our cluster.
     def _is_client_ready():
@@ -161,7 +171,31 @@ def _start_couchbase(
         backoff_factor=backoff_factor,
     )
     logger.debug("Couchbase container %s is ready.", container.name)
-    return
+
+
+def _restart_couchbase(
+    container: docker.models.containers.Container,
+    retry_count: int = 5,
+    backoff_factor: float = 0.7,
+    wait_for_ready: bool = True,
+) -> None:
+    # Drop our bucket...
+    def _drop_bucket():
+        return requests.delete(
+            "http://localhost:8091/pools/default/buckets/travel-sample",
+            auth=(DEFAULT_COUCHBASE_USERNAME, DEFAULT_COUCHBASE_PASSWORD),
+        )
+
+    logger.info("Dropping previous bucket data (travel-sample)")
+    _execute_with_retry(
+        func=_drop_bucket,
+        condition=lambda r: r.status_code in {http.HTTPStatus.OK},
+        result_str=lambda r: r.text,
+        retry_count=retry_count,
+        backoff_factor=backoff_factor,
+    )
+
+    _setup_bucket(container, retry_count, backoff_factor, wait_for_ready)
 
 
 def _stop_container(container: docker.models.containers.Container):
@@ -223,6 +257,45 @@ def isolated_server_factory() -> typing.Callable[[pathlib.Path], docker.models.c
         del os.environ["AGENT_CATALOG_DDL_RETRY_WAIT_SECONDS"]
         if len(container_instance) > 0:
             _stop_container(container_instance.pop())
+
+
+# Fixture to start a Couchbase server instance via Docker (and subsequently remove this instance).
+@pytest.fixture(scope="session")
+def shared_server_factory(tmp_path_factory) -> typing.Callable[[], docker.models.containers.Container]:
+    os.environ["AGENT_CATALOG_CONN_STRING"] = DEFAULT_COUCHBASE_CONN_STRING
+    os.environ["AGENT_CATALOG_USERNAME"] = DEFAULT_COUCHBASE_USERNAME
+    os.environ["AGENT_CATALOG_PASSWORD"] = DEFAULT_COUCHBASE_PASSWORD
+    os.environ["AGENT_CATALOG_BUCKET"] = DEFAULT_COUCHBASE_BUCKET
+    os.environ["AGENT_CATALOG_DDL_CREATE_INDEX_INTERVAL_SECONDS"] = "5"
+    os.environ["AGENT_CATALOG_DDL_RETRY_WAIT_SECONDS"] = "5"
+    container = None
+
+    try:
+        container = _start_container(tmp_path_factory.mktemp(".couchbase"))
+        _start_couchbase(container)
+        skip_token = {1}
+
+        # (we need to capture the container we spawn).
+        def get_shared_server() -> docker.models.containers.Container:
+            if len(skip_token) == 0:
+                _restart_couchbase(container)
+            else:
+                skip_token.pop()
+            return container
+
+        # Enter our test.
+        yield get_shared_server
+
+    # Execute our cleanup.
+    finally:
+        del os.environ["AGENT_CATALOG_CONN_STRING"]
+        del os.environ["AGENT_CATALOG_USERNAME"]
+        del os.environ["AGENT_CATALOG_PASSWORD"]
+        del os.environ["AGENT_CATALOG_BUCKET"]
+        del os.environ["AGENT_CATALOG_DDL_CREATE_INDEX_INTERVAL_SECONDS"]
+        del os.environ["AGENT_CATALOG_DDL_RETRY_WAIT_SECONDS"]
+        if container is not None:
+            _stop_container(container)
 
 
 if __name__ == "__main__":

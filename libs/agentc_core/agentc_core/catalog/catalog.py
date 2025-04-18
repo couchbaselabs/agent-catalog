@@ -278,7 +278,7 @@ class Catalog[T](EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig, 
         annotations: str = None,
         catalog_id: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
-    ) -> typing.Union[list[Tool | T] | list[Prompt[T]] | None]:
+    ) -> list[Tool | T] | list[Prompt[T]] | Tool | T | Prompt[T] | None:
         """Return a list of tools or prompts based on the specified search criteria.
 
         .. card:: Method Description
@@ -311,8 +311,8 @@ class Catalog[T](EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig, 
             One of the following:
 
             * :python:`None` if no results are found by name.
-            * A list of :py:class:`Tool` instances if `kind` is "tool" (see :py:meth:`find_tools` for details).
-            * A list of :py:class:`Prompt` instances if `kind` is "prompt" (see :py:meth:`find_prompts` for details).
+            * "tools" if `kind` is "tool" (see :py:meth:`find_tools` for details).
+            * "prompts" if `kind` is "prompt" (see :py:meth:`find_prompts` for details).
         """
         if kind.lower() == "tool":
             return self.find_tools(query, name, annotations, catalog_id, limit)
