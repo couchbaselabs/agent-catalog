@@ -1,7 +1,11 @@
 name: tests
 run-name: 👁️ ${{ github.actor }} has pushed a new commit!
 
-on: [ push ]
+on:
+  push:
+    # The PR process requires that these tests pass before merging, so running these again is unnecessary.
+    branches-ignore:
+      - master
 
 permissions:
   contents: read
