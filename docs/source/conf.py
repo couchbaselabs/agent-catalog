@@ -10,10 +10,12 @@ sys.path.insert(0, os.path.abspath(".."))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+from agentc import __version__ as version
+
 project = "Agent Catalog"
 copyright = "2025, Couchbase"
 author = "Couchbase"
-release = "v0.2.0"
+release = version
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
