@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Log Records &#8212; Agent Catalog v0.2.0 documentation</title>
+    <title>Log Records &#8212; Agent Catalog 0.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=50651e91" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=86a354c8" />
-    <script src="_static/documentation_options.js?v=683873e3"></script>
+    <script src="_static/documentation_options.js?v=7026087e"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -38,7 +38,7 @@
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">Agent Catalog v0.2.0 documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.0.0 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -491,7 +491,7 @@ via the <a class="reference internal" href="api.html#agentc.span.Span.log" title
 <span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span>
 <span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;KeyValueContent&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;KeyValue refers to messages that contain user-specified data that are to be logged under some span.\n\n.. card:: Class Description\n\n    Key-value messages serve as the catch-all container for user-defined data that belong to some span.\n    We distinguish key-value messages from log-level *annotations*, which are used to attach information to a log\n    entry with existing content.\n\n    Key-value messages have two required fields: i) the ``key`` field (used to record the name of the entry)\n    and ii) ``value`` (used to record the value of the entry).\n    Extra data can also be passed in through the optional ``extra`` field (as with other messages).\n\n    Using the :python:`[]` syntax with a :py:class:`agentc.span.Span` instance generates one key-value entry per\n    call.\n    For example, the following code snippet generates two logs with the same key but different values:\n\n    .. code-block:: python\n\n        my_span = catalog.Span(name=\&quot;my_span\&quot;)\n        my_span[\&quot;alpha\&quot;] = alpha_value_1\n        my_span[\&quot;alpha\&quot;] = alpha_value_2\n\n    These messages are commonly purposed for recording evaluation data, as seen in our example application\n    `here &lt;TODO REPLACE ME WITH THE GITHUB LINK&gt;`__.&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;KeyValue refers to messages that contain user-specified data that are to be logged under some span.\n\n.. card:: Class Description\n\n    Key-value messages serve as the catch-all container for user-defined data that belong to some span.\n    We distinguish key-value messages from log-level *annotations*, which are used to attach information to a log\n    entry with existing content.\n\n    Key-value messages have two required fields: i) the ``key`` field (used to record the name of the entry)\n    and ii) ``value`` (used to record the value of the entry).\n    Extra data can also be passed in through the optional ``extra`` field (as with other messages).\n\n    Using the :python:`[]` syntax with a :py:class:`agentc.span.Span` instance generates one key-value entry per\n    call.\n    For example, the following code snippet generates two logs with the same key but different values:\n\n    .. code-block:: python\n\n        my_span = catalog.Span(name=\&quot;my_span\&quot;)\n        my_span[\&quot;alpha\&quot;] = alpha_value_1\n        my_span[\&quot;alpha\&quot;] = alpha_value_2\n\n    These messages are commonly purposed for recording evaluation data, as seen in our example application\n    `here &lt;https://github.com/couchbaselabs/agent-catalog/tree/master/examples/with_langgraph&gt;`__.&quot;</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">            </span><span class="nt">&quot;extra&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">               </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
@@ -2475,13 +2475,13 @@ For example, the following code snippet generates two logs with the same key but
 </pre></div>
 </div>
 <p class="sd-card-text">These messages are commonly purposed for recording evaluation data, as seen in our example application
-<a class="reference external" href="TODOREPLACEMEWITHTHEGITHUBLINK">here</a>.</p>
+<a class="reference external" href="https://github.com/couchbaselabs/agent-catalog/tree/master/examples/with_langgraph">here</a>.</p>
 </div>
 </div>
 <p><details  class="autodoc_pydantic_collapsable_json">
 <summary>Show JSON schema</summary><div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">   </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;KeyValueContent&quot;</span><span class="p">,</span>
-<span class="w">   </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;KeyValue refers to messages that contain user-specified data that are to be logged under some span.\n\n.. card:: Class Description\n\n    Key-value messages serve as the catch-all container for user-defined data that belong to some span.\n    We distinguish key-value messages from log-level *annotations*, which are used to attach information to a log\n    entry with existing content.\n\n    Key-value messages have two required fields: i) the ``key`` field (used to record the name of the entry)\n    and ii) ``value`` (used to record the value of the entry).\n    Extra data can also be passed in through the optional ``extra`` field (as with other messages).\n\n    Using the :python:`[]` syntax with a :py:class:`agentc.span.Span` instance generates one key-value entry per\n    call.\n    For example, the following code snippet generates two logs with the same key but different values:\n\n    .. code-block:: python\n\n        my_span = catalog.Span(name=\&quot;my_span\&quot;)\n        my_span[\&quot;alpha\&quot;] = alpha_value_1\n        my_span[\&quot;alpha\&quot;] = alpha_value_2\n\n    These messages are commonly purposed for recording evaluation data, as seen in our example application\n    `here &lt;TODO REPLACE ME WITH THE GITHUB LINK&gt;`__.&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;KeyValue refers to messages that contain user-specified data that are to be logged under some span.\n\n.. card:: Class Description\n\n    Key-value messages serve as the catch-all container for user-defined data that belong to some span.\n    We distinguish key-value messages from log-level *annotations*, which are used to attach information to a log\n    entry with existing content.\n\n    Key-value messages have two required fields: i) the ``key`` field (used to record the name of the entry)\n    and ii) ``value`` (used to record the value of the entry).\n    Extra data can also be passed in through the optional ``extra`` field (as with other messages).\n\n    Using the :python:`[]` syntax with a :py:class:`agentc.span.Span` instance generates one key-value entry per\n    call.\n    For example, the following code snippet generates two logs with the same key but different values:\n\n    .. code-block:: python\n\n        my_span = catalog.Span(name=\&quot;my_span\&quot;)\n        my_span[\&quot;alpha\&quot;] = alpha_value_1\n        my_span[\&quot;alpha\&quot;] = alpha_value_2\n\n    These messages are commonly purposed for recording evaluation data, as seen in our example application\n    `here &lt;https://github.com/couchbaselabs/agent-catalog/tree/master/examples/with_langgraph&gt;`__.&quot;</span><span class="p">,</span>
 <span class="w">   </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;object&quot;</span><span class="p">,</span>
 <span class="w">   </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;extra&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
