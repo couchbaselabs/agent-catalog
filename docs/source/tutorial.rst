@@ -19,7 +19,7 @@ In this short tutorial, we will:
 3. Perform some prompt engineering to improve our application using a Git-backed workflow.
 
 We assume no prior LangGraph or Agent Catalog experience in this tutorial.
-This application is available in full `here <TODO REPLACE ME WITH LINK>`__.
+This application is available in full `here <https://github.com/couchbaselabs/agent-catalog/tree/master/examples/with_langgraph>`__.
 
 Step #1: Building a LangGraph Application
 -----------------------------------------
