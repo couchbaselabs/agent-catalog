@@ -99,10 +99,5 @@ The mono-repo for the Couchbase Agent Catalog project.
 ## Docs and Templates
 
 Refer to [`docs/`](docs) to build our technical documentation (also hosted
-[here](https://couchbaselabs.github.io/agent-catalog/index.html) and explore Couchbase Agent Catalog before authoring
+[here](https://couchbaselabs.github.io/agent-catalog/index.html)) and explore Couchbase Agent Catalog before authoring
 your agent applications.
-We also provide some starter [`agents`](templates/agents) using different frameworks to get you running off the ground
-quicker.
-
-For more info on basic tool and prompt definitions, please refer to the [`tool`](templates/tools) and
-[`prompt`](templates/prompts) templates that can be created using `agentc add` command.

@@ -536,7 +536,7 @@ class KeyValueContent(BaseContent):
             my_span["alpha"] = alpha_value_2
 
         These messages are commonly purposed for recording evaluation data, as seen in our example application
-        `here <TODO REPLACE ME WITH THE GITHUB LINK>`__.
+        `here <https://github.com/couchbaselabs/agent-catalog/tree/master/examples/with_langgraph>`__.
     """
 
     kind: typing.Literal[Kind.KeyValue] = Kind.KeyValue

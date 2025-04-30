@@ -18,9 +18,10 @@ CREATE OR REPLACE ANALYTICS VIEW `[BUCKET_NAME]`.`[SCOPE_NAME]`.Sessions AS
             FROM
                 g AS gi
             SELECT
-                gi.l.content   AS event,
-                gi.l.timestamp AS timestamp,
-                gi.l.span.name AS name,
+                gi.l.content     AS event,
+                gi.l.timestamp   AS timestamp,
+                gi.l.span.name   AS name,
+                gi.l.annotations AS annotations,
                 ROW_NUMBER()
                     OVER (
                         ORDER BY

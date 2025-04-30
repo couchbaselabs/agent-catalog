@@ -1,8 +1,3 @@
-.. Agent Catalog documentation master file, created by
-   sphinx-quickstart on Fri Oct 18 10:45:14 2024.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Couchbase Agent Catalog Project
 ===============================
 
