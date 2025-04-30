@@ -86,7 +86,7 @@ testpaths = [
     "libs/agentc_cli/tests",
     "libs/agentc_integrations/langchain/tests",
     "libs/agentc_integrations/llamaindex/tests",
-    # "/libs/agentc_integrations/langgraph/tests"
+    "libs/agentc_integrations/langgraph/tests"
 ]
 # addopts = "--retries 5 --retry-delay 300"
 norecursedirs = [

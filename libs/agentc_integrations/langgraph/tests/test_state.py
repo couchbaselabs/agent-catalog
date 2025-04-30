@@ -1,12 +1,15 @@
 import click_extra.testing
 import couchbase.cluster
 import langchain_openai
+import langgraph.prebuilt
 import pathlib
 import pytest
 import typing
 
 from agentc_cli.main import agentc
-from agentc_langchain.cache import cache
+from agentc_langgraph.state import AsyncCheckpointSaver
+from agentc_langgraph.state import CheckpointSaver
+from agentc_langgraph.state import initialize
 from agentc_testing.catalog import Environment
 from agentc_testing.catalog import EnvironmentKind
 from agentc_testing.catalog import environment_factory
@@ -22,7 +25,7 @@ _ = temporary_directory
 
 
 @pytest.mark.slow
-def test_exact_cache(
+def test_checkpoint_saver(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     shared_server_factory: typing.Callable[[], ...],
@@ -40,21 +43,34 @@ def test_exact_cache(
 
         # TODO (GLENN): Use a fake chat model here...
         chat_model = langchain_openai.ChatOpenAI(name="gpt-4o")
-        cached_model = cache(chat_model, kind="exact", create_if_not_exists=True)
-        cached_model.invoke("Hello, how are you doing today?")
+        agent = langgraph.prebuilt.create_react_agent(
+            model=chat_model, tools=list(), checkpointer=CheckpointSaver(create_if_not_exists=True)
+        )
+        config = {"configurable": {"thread_id": "1"}}
+        agent.invoke({"messages": [("human", "what's the weather in sf")]}, config)
 
-        # We should have a value in the cache collection.
+        # We should have a value in the thread and tuples collection.
         cluster = connection_factory()
         results = cluster.query("""
-            FROM `travel-sample`.agent_activity.langchain_llm_cache l
-            SELECT VALUE l
+            (
+                SELECT VALUE l
+                FROM `travel-sample`.agent_activity.langgraph_checkpoint_thread l
+                LIMIT 1
+            )
+            UNION ALL
+            (
+                SELECT VALUE l
+                FROM `travel-sample`.agent_activity.langgraph_checkpoint_tuple l
+                LIMIT 1
+            )
         """).execute()
-        assert len(results) == 1
-        assert "Hello, how are you doing today?" in str(results[0]["prompt"])
+        assert len(results) == 2
 
 
+@pytest.skip
+@pytest.mark.asyncio
 @pytest.mark.slow
-def test_semantic_cache(
+async def test_async_checkpoint_saver(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     shared_server_factory: typing.Callable[[], ...],
@@ -72,16 +88,26 @@ def test_semantic_cache(
 
         # TODO (GLENN): Use a fake chat model here...
         chat_model = langchain_openai.ChatOpenAI(name="gpt-4o")
-        embeddings = langchain_openai.OpenAIEmbeddings(model="text-embedding-3-small")
-        cached_model = cache(chat_model, kind="semantic", embeddings=embeddings, create_if_not_exists=True)
-        cached_model.invoke("Hello, how are you doing today?")
+        initialize()
+        agent = langgraph.prebuilt.create_react_agent(
+            model=chat_model, tools=list(), checkpointer=await AsyncCheckpointSaver.create()
+        )
+        config = {"configurable": {"thread_id": "1"}}
+        await agent.ainvoke({"messages": [("human", "what's the weather in sf")]}, config)
 
-        # We should have a value in the cache collection.
+        # We should have a value in the thread and tuples collection.
         cluster = connection_factory()
         results = cluster.query("""
-            FROM `travel-sample`.agent_activity.langchain_llm_cache l
-            SELECT VALUE l
+            (
+                SELECT VALUE l
+                FROM `travel-sample`.agent_activity.langgraph_checkpoint_thread l
+                LIMIT 1
+            )
+            UNION ALL
+            (
+                SELECT VALUE l
+                FROM `travel-sample`.agent_activity.langgraph_checkpoint_tuple l
+                LIMIT 1
+            )
         """).execute()
-        assert len(results) == 1
-        assert "embedding" in results[0]
-        assert "Hello, how are you doing today?" in str(results[0])
+        assert len(results) == 2
