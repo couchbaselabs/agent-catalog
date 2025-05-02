@@ -85,6 +85,14 @@ class CacheOptions(pydantic_settings.BaseSettings):
     If the cache is of type `semantic` and this field is not specified, this field defaults to 0.8.
     """
 
+    create_if_not_exists: typing.Optional[bool] = False
+    """ Create the required collections and/or indexes if they do not exist.
+
+    When raised (i.e., this value is set to :python:`True`), the collections and indexes will be created if they do not
+    exist.
+    Lower this flag (set this to :python:`False`) to instead raise an error if the collections & indexes do not exist.
+    """
+
     ddl_retry_attempts: typing.Optional[int] = DEFAULT_COUCHBASE_CACHE_DDL_RETRY_ATTEMPTS
     """ Maximum number of attempts to retry DDL operations.
 
