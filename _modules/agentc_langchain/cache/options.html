@@ -250,6 +250,14 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">    If the cache is of type `semantic` and this field is not specified, this field defaults to 0.8.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">create_if_not_exists</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Create the required collections and/or indexes if they do not exist.</span>
+
+<span class="sd">    When raised (i.e., this value is set to :python:`True`), the collections and indexes will be created if they do not</span>
+<span class="sd">    exist.</span>
+<span class="sd">    Lower this flag (set this to :python:`False`) to instead raise an error if the collections &amp; indexes do not exist.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">ddl_retry_attempts</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_COUCHBASE_CACHE_DDL_RETRY_ATTEMPTS</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Maximum number of attempts to retry DDL operations.</span>
 

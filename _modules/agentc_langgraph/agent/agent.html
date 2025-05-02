@@ -362,8 +362,6 @@ window.addEventListener("load", () => mermaid.run());
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">output</span>
 
-<div class="viewcode-block" id="ReActAgent.create_react_agent">
-<a class="viewcode-back" href="../../../api.html#agentc_langgraph.agent.ReActAgent.create_react_agent">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_react_agent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">span</span><span class="p">:</span> <span class="n">Span</span><span class="p">,</span> <span class="n">tools</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">langchain_core</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">Tool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;A wrapper around LangGraph&#39;s create_react_agent for use with Agent Catalog.</span>
 
@@ -396,8 +394,7 @@ window.addEventListener("load", () => mermaid.run());
             <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chat_model</span><span class="p">,</span>
             <span class="n">tools</span><span class="o">=</span><span class="n">tool_node</span><span class="p">,</span>
             <span class="o">**</span><span class="n">agent_kwargs</span><span class="p">,</span>
-        <span class="p">)</span></div>
-
+        <span class="p">)</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_invoke</span><span class="p">(</span>
