@@ -67,7 +67,7 @@ def test_checkpoint_saver(
         assert len(results) == 2
 
 
-@pytest.skip
+@pytest.mark.skip
 @pytest.mark.asyncio
 @pytest.mark.slow
 async def test_async_checkpoint_saver(
