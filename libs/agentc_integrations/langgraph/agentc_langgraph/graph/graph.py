@@ -1,5 +1,6 @@
 import abc
 import langchain_core.runnables
+import langchain_core.runnables.graph
 import langgraph.graph.graph
 import langgraph.store.base
 import typing
@@ -84,7 +85,7 @@ class GraphRunnable[S](langchain_core.runnables.Runnable):
 
     def get_graph(
         self, config: typing.Optional[langchain_core.runnables.RunnableConfig] = None
-    ) -> langgraph.graph.graph.DrawableGraph:
+    ) -> langchain_core.runnables.graph.Graph:
         graph = self.compile()
         return graph.get_graph(config=config)
 
