@@ -1172,9 +1172,76 @@ This field is optional and defaults to None.</p>
 </dd></dl>
 
 </section>
-<section id="module-agentc_langgraph.agent">
-<span id="langgraph"></span><h3>LangGraph<a class="headerlink" href="#module-agentc_langgraph.agent" title="Link to this heading">¶</a></h3>
+<section id="module-agentc_langgraph.tools">
+<span id="langgraph"></span><h3>LangGraph<a class="headerlink" href="#module-agentc_langgraph.tools" title="Link to this heading">¶</a></h3>
 <dl class="py class">
+<dt class="sig sig-object py" id="agentc_langgraph.tools.ToolNode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_langgraph.tools.</span></span><span class="sig-name descname"><span class="pre">ToolNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#agentc_langgraph.tools.ToolNode" title="Link to this definition">¶</a></dt>
+<dd><p>A tool node that logs tool results to a span.</p>
+<div class="sd-card sd-sphinx-override sd-mb-3 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Class Description</div>
+<p class="sd-card-text">This class will record the results of each tool invocation to the span that is passed to it (ultimately
+generating <code class="xref py py-class docutils literal notranslate"><span class="pre">ToolResultContent</span></code> log entries).
+This class does <em>not</em> log tool calls (i.e., <code class="xref py py-class docutils literal notranslate"><span class="pre">ToolCallContent</span></code> log entries) as these are typically
+logged with <code class="xref py py-class docutils literal notranslate"><span class="pre">ChatCompletionContent</span></code> log entries.</p>
+<p class="sd-card-text">Below, we illustrate a minimal working example of how to use this class with
+<a class="reference internal" href="#agentc_langchain.chat.Callback" title="agentc_langchain.chat.Callback"><code class="xref py py-class docutils literal notranslate"><span class="pre">agentc_langchain.chat.Callback</span></code></a> to record <code class="xref py py-class docutils literal notranslate"><span class="pre">ChatCompletionContent</span></code> log entries,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ToolCallContent</span></code> log entries, and <code class="xref py py-class docutils literal notranslate"><span class="pre">ToolResultContent</span></code> log entries.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">langchain_openai</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">langchain_core.tools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">langgraph.prebuilt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">agentc_langchain.chat</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">agentc_langgraph</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">agentc</span>
+
+<span class="c1"># Create a span to bind to the chat model messages.</span>
+<span class="n">catalog</span> <span class="o">=</span> <span class="n">agentc</span><span class="o">.</span><span class="n">Catalog</span><span class="p">()</span>
+<span class="n">root_span</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">Span</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;root_span&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create a chat model.</span>
+<span class="n">chat_model</span> <span class="o">=</span> <span class="n">langchain_openai</span><span class="o">.</span><span class="n">chat_models</span><span class="o">.</span><span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[])</span>
+
+<span class="c1"># Create a callback with the appropriate span, and attach it to the chat model.</span>
+<span class="n">my_agent_span</span> <span class="o">=</span> <span class="n">root_span</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;my_agent&quot;</span><span class="p">)</span>
+<span class="n">callback</span> <span class="o">=</span> <span class="n">agentc_langchain</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">Callback</span><span class="p">(</span><span class="n">span</span><span class="o">=</span><span class="n">my_agent_span</span><span class="p">)</span>
+<span class="n">chat_model</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span>
+
+<span class="c1"># Grab the correct tools and output from the catalog.</span>
+<span class="n">my_agent_prompt</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;prompt&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my_agent&quot;</span><span class="p">)</span>
+<span class="n">my_agent_tools</span> <span class="o">=</span> <span class="n">agentc_langgraph</span><span class="o">.</span><span class="n">tool</span><span class="o">.</span><span class="n">ToolNode</span><span class="p">(</span>
+    <span class="n">span</span><span class="o">=</span><span class="n">my_agent_span</span><span class="p">,</span>
+    <span class="n">tools</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">langchain_core</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">StructuredTool</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">tool</span><span class="o">.</span><span class="n">func</span><span class="p">)</span> <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="n">my_agent_prompt</span><span class="o">.</span><span class="n">tools</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="n">my_agent_output</span> <span class="o">=</span> <span class="n">my_agent_prompt</span><span class="o">.</span><span class="n">output</span>
+
+<span class="c1"># Finally, build your agent.</span>
+<span class="n">my_agent</span> <span class="o">=</span> <span class="n">langgraph</span><span class="o">.</span><span class="n">prebuilt</span><span class="o">.</span><span class="n">create_react_agent</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">chat_model</span><span class="p">,</span>
+    <span class="n">tools</span><span class="o">=</span><span class="n">my_agent_tools</span><span class="p">,</span>
+    <span class="n">prompt</span><span class="o">=</span><span class="n">my_agent_prompt</span><span class="p">,</span>
+    <span class="n">response_format</span><span class="o">=</span><span class="n">my_agent_output</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For all constructor parameters, see the documentation for <code class="xref py py-class docutils literal notranslate"><span class="pre">langgraph.prebuilt.ToolNode</span></code>
+<a class="reference external" href="https://langchain-ai.github.io/langgraph/reference/prebuilt/#langgraph.prebuilt.tool_node.ToolNode">here</a>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>span</strong> (<a class="reference internal" href="#agentc.span.Span" title="agentc_core.activity.span.Span"><em>Span</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class" id="module-agentc_langgraph.agent">
 <dt class="sig sig-object py" id="agentc_langgraph.agent.ReActAgent">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_langgraph.agent.</span></span><span class="sig-name descname"><span class="pre">ReActAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chat_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">span</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langgraph/agent/agent.html#ReActAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langgraph.agent.ReActAgent" title="Link to this definition">¶</a></dt>
 <dd><p>A helper ReAct agent base class that integrates with Agent Catalog.</p>
@@ -1299,6 +1366,397 @@ This class is essentially identical to the default state schema for LangGraph (i
 </div>
 </dd></dl>
 
+<dl class="py class" id="module-agentc_langgraph.graph">
+<dt class="sig sig-object py" id="agentc_langgraph.graph.GraphRunnable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_langgraph.graph.</span></span><span class="sig-name descname"><span class="pre">GraphRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">span</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langgraph/graph/graph.html#GraphRunnable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langgraph.graph.GraphRunnable" title="Link to this definition">¶</a></dt>
+<dd><p>A helper class that wraps the &quot;Runnable&quot; interface with <code class="xref py py-class docutils literal notranslate"><span class="pre">agentc.Span</span></code>.</p>
+<div class="sd-card sd-sphinx-override sd-mb-3 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Class Description</div>
+<p class="sd-card-text">This class is meant to handle some of the boilerplate around using <code class="xref py py-class docutils literal notranslate"><span class="pre">agentc.Span</span></code> instances and
+LangGraph compiled graphs.
+Specifically, this class builds a new span on instantiation and wraps all <code class="docutils literal notranslate"><span class="pre">Runnable</span></code> methods in a Span's
+context manager.</p>
+<p class="sd-card-text">Below, we illustrate an example implementation of this class for a two-agent system.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">langgraph.prebuilt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">langgraph.graph</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">langchain_openai</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">langchain_core.messages</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">agentc_langgraph</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">agentc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyResearcherApp</span><span class="p">(</span><span class="n">agentc_langgraph</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">GraphRunnable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">search_web</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">str</span><span class="p">:</span> <span class="n">search_string</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">summarize_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">str</span><span class="p">:</span> <span class="n">content</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">compile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">research_agent</span> <span class="o">=</span> <span class="n">langgraph</span><span class="o">.</span><span class="n">prebuilt</span><span class="o">.</span><span class="n">create_react_agent</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">langchain_openai</span><span class="o">.</span><span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">),</span>
+            <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">search_web</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">summary_agent</span> <span class="o">=</span> <span class="n">langgraph</span><span class="o">.</span><span class="n">prebuilt</span><span class="o">.</span><span class="n">create_react_agent</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">langchain_openai</span><span class="o">.</span><span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">),</span>
+            <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">summarize_results</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">workflow</span> <span class="o">=</span> <span class="n">langgraph</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">StateGraph</span><span class="p">(</span><span class="n">agentc_langgraph</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">State</span><span class="p">)</span>
+        <span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;research_agent&quot;</span><span class="p">,</span> <span class="n">research_agent</span><span class="p">)</span>
+        <span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;summary_agent&quot;</span><span class="p">,</span> <span class="n">summary_agent</span><span class="p">)</span>
+        <span class="n">workflow</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;research_agent&quot;</span><span class="p">,</span> <span class="s2">&quot;summary_agent&quot;</span><span class="p">)</span>
+        <span class="n">workflow</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;summary_agent&quot;</span><span class="p">,</span> <span class="n">langgraph</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">END</span><span class="p">)</span>
+        <span class="n">workflow</span><span class="o">.</span><span class="n">set_entry_point</span><span class="p">(</span><span class="s2">&quot;research_agent&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">workflow</span><span class="o">.</span><span class="n">compile</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">catalog</span> <span class="o">=</span> <span class="n">agentc</span><span class="o">.</span><span class="n">Catalog</span><span class="p">()</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">MyResearchState</span><span class="p">(</span><span class="n">messages</span><span class="o">=</span><span class="p">[],</span> <span class="n">is_last_step</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">MyResearcherApp</span><span class="p">(</span><span class="n">catalog</span><span class="o">=</span><span class="n">catalog</span><span class="p">)</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p class="sd-card-text">For more information around LangGraph's (LangChain's) <code class="docutils literal notranslate"><span class="pre">Runnable</span></code> interface, see LangChain's documentation
+<a class="reference external" href="https://python.langchain.com/api_reference/core/runnables/langchain_core.runnables.base.Runnable.html">here</a>.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p class="sd-card-text">The example above does not use tools and prompts managed by Agent Catalog.
+See <a class="reference internal" href="#agentc_langgraph.agent.ReActAgent" title="agentc_langgraph.agent.ReActAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">agentc_langgraph.agent.ReActAgent</span></code></a> for a helper class that handles some of the boilerplate
+around using LangGraph's prebuilt ReAct agent and Agent Catalog.</p>
+</div>
+</div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>catalog</strong> (<a class="reference internal" href="#agentc.catalog.Catalog" title="agentc_core.catalog.catalog.Catalog"><em>Catalog</em></a>)</p></li>
+<li><p><strong>span</strong> (<a class="reference internal" href="#agentc.span.Span" title="agentc_core.activity.span.Span"><em>Span</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class" id="module-agentc_langgraph.state">
+<dt class="sig sig-object py" id="agentc_langgraph.state.CheckpointSaver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_langgraph.state.</span></span><span class="sig-name descname"><span class="pre">CheckpointSaver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serde</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langgraph/state/checkpoint.html#CheckpointSaver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langgraph.state.CheckpointSaver" title="Link to this definition">¶</a></dt>
+<dd><p>Checkpoint saver class to persist LangGraph states in a Couchbase instance.</p>
+<div class="sd-card sd-sphinx-override sd-mb-3 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Class Description</div>
+<p class="sd-card-text">Instances of this class are used by LangGraph (passed in during <code class="xref py py-meth docutils literal notranslate"><span class="pre">compile()</span></code> time)
+to save checkpoints of agent state.</p>
+<p class="sd-card-text">Below, we give a minimal working example of how to use this class with LangGraph's prebuilt ReAct agent.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">langchain_openai</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">langgraph.prebuilt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">agentc_langgraph.state</span>
+
+<span class="c1"># Pass our checkpoint saver to the create_react_agent method.</span>
+<span class="n">chat_model</span> <span class="o">=</span> <span class="n">langchain_openai</span><span class="o">.</span><span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">)</span>
+<span class="n">agent</span> <span class="o">=</span> <span class="n">langgraph</span><span class="o">.</span><span class="n">prebuilt</span><span class="o">.</span><span class="n">create_react_agent</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">chat_model</span><span class="p">,</span>
+    <span class="n">tools</span><span class="o">=</span><span class="nb">list</span><span class="p">(),</span>
+    <span class="n">checkpointer</span><span class="o">=</span><span class="n">CheckpointSaver</span><span class="p">(</span><span class="n">create_if_not_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;configurable&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;thread_id&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">}}</span>
+<span class="n">agent</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span><span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[(</span><span class="s2">&quot;human&quot;</span><span class="p">,</span> <span class="s2">&quot;Hello!)]}, config)</span>
+</pre></div>
+</div>
+<p class="sd-card-text">To use this method with Agent Catalog's <a class="reference internal" href="#agentc_langgraph.graph.GraphRunnable" title="agentc_langgraph.graph.GraphRunnable"><code class="xref py py-class docutils literal notranslate"><span class="pre">agentc_langgraph.graph.GraphRunnable</span></code></a> class, pass the
+checkpoint saver to your workflow's <code class="docutils literal notranslate"><span class="pre">compile()</span></code> method (see the documentation for LangGraph's
+<code class="docutils literal notranslate"><span class="pre">Graph.compile()</span></code> method <a class="reference external" href="https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.graph.Graph.compile">here</a>
+for more information.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">langgraph.prebuilt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">langgraph.graph</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">langchain_openai</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">langchain_core.messages</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">agentc_langgraph</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">agentc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyResearcherApp</span><span class="p">(</span><span class="n">agentc_langgraph</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">GraphRunnable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">search_web</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">str</span><span class="p">:</span> <span class="n">search_string</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">summarize_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">str</span><span class="p">:</span> <span class="n">content</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">compile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">research_agent</span> <span class="o">=</span> <span class="n">langgraph</span><span class="o">.</span><span class="n">prebuilt</span><span class="o">.</span><span class="n">create_react_agent</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">langchain_openai</span><span class="o">.</span><span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">),</span>
+            <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">search_web</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">summary_agent</span> <span class="o">=</span> <span class="n">langgraph</span><span class="o">.</span><span class="n">prebuilt</span><span class="o">.</span><span class="n">create_react_agent</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">langchain_openai</span><span class="o">.</span><span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">),</span>
+            <span class="n">tools</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">summarize_results</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">workflow</span> <span class="o">=</span> <span class="n">langgraph</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">StateGraph</span><span class="p">(</span><span class="n">agentc_langgraph</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">State</span><span class="p">)</span>
+        <span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;research_agent&quot;</span><span class="p">,</span> <span class="n">research_agent</span><span class="p">)</span>
+        <span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&quot;summary_agent&quot;</span><span class="p">,</span> <span class="n">summary_agent</span><span class="p">)</span>
+        <span class="n">workflow</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;research_agent&quot;</span><span class="p">,</span> <span class="s2">&quot;summary_agent&quot;</span><span class="p">)</span>
+        <span class="n">workflow</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;summary_agent&quot;</span><span class="p">,</span> <span class="n">langgraph</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">END</span><span class="p">)</span>
+        <span class="n">workflow</span><span class="o">.</span><span class="n">set_entry_point</span><span class="p">(</span><span class="s2">&quot;research_agent&quot;</span><span class="p">)</span>
+        <span class="n">checkpointer</span> <span class="o">=</span> <span class="n">agentc_langgraph</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">CheckpointSaver</span><span class="p">(</span><span class="n">create_if_not_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">workflow</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">checkpointer</span><span class="o">=</span><span class="n">checkpointer</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p class="sd-card-text">See <a class="reference external" href="https://langchain-ai.github.io/langgraph/concepts/persistence/#checkpoints">here</a> for more
+information about checkpoints in LangGraph.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p class="sd-card-text">This class is a wrapper around the <code class="docutils literal notranslate"><span class="pre">langgraph_checkpointer_couchbase.CouchbaseSaver</span></code> class.
+See <a class="reference external" href="https://pypi.org/project/langgraph-checkpointer-couchbase/">here</a> for more information.</p>
+</div>
+</div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>options</strong> (<a class="reference internal" href="#agentc_langgraph.state.CheckpointOptions" title="agentc_langgraph.state.options.CheckpointOptions"><em>CheckpointOptions</em></a>)</p></li>
+<li><p><strong>serde</strong> (<em>SerializerProtocol</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="agentc_langgraph.state.initialize">
+<span class="sig-prename descclassname"><span class="pre">agentc_langgraph.state.</span></span><span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langgraph/state/checkpoint.html#initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langgraph.state.initialize" title="Link to this definition">¶</a></dt>
+<dd><p>A function to create the collections required to use the checkpoint savers in this module.</p>
+<div class="sd-card sd-sphinx-override sd-mb-3 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Function Description</div>
+<p class="sd-card-text">This function is a helper function for creating the default collections (the thread and tuple collections)
+required for the <a class="reference internal" href="#agentc_langgraph.state.CheckpointSaver" title="agentc_langgraph.state.CheckpointSaver"><code class="xref py py-class docutils literal notranslate"><span class="pre">CheckpointSaver</span></code></a> and :py:class`AsyncCheckpointSaver` classes.
+Below, we give a minimal working example of how to use this function to create these collections.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">langchain_openai</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">langgraph.prebuilt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">agentc_langgraph.state</span>
+
+<span class="c1"># Initialize our collections.</span>
+<span class="n">agentc_langgraph</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+
+<span class="c1"># Pass our checkpoint saver to the create_react_agent method.</span>
+<span class="n">chat_model</span> <span class="o">=</span> <span class="n">langchain_openai</span><span class="o">.</span><span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">)</span>
+<span class="n">agent</span> <span class="o">=</span> <span class="n">langgraph</span><span class="o">.</span><span class="n">prebuilt</span><span class="o">.</span><span class="n">create_react_agent</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">chat_model</span><span class="p">,</span>
+    <span class="n">tools</span><span class="o">=</span><span class="nb">list</span><span class="p">(),</span>
+    <span class="n">checkpointer</span><span class="o">=</span><span class="n">CheckpointSaver</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;configurable&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;thread_id&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">}}</span>
+<span class="n">agent</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span><span class="s2">&quot;messages&quot;</span><span class="p">:</span> <span class="p">[(</span><span class="s2">&quot;human&quot;</span><span class="p">,</span> <span class="s2">&quot;Hello there!&quot;</span><span class="p">)]},</span> <span class="n">config</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>options</strong> (<a class="reference internal" href="#agentc_langgraph.state.CheckpointOptions" title="agentc_langgraph.state.options.CheckpointOptions"><em>CheckpointOptions</em></a>) -- The options to use when saving checkpoints to Couchbase.</p></li>
+<li><p><strong>kwargs</strong> -- Keyword arguments to be forwarded to a <a class="reference internal" href="#agentc_langgraph.state.CheckpointOptions" title="agentc_langgraph.state.CheckpointOptions"><code class="xref py py-class docutils literal notranslate"><span class="pre">CheckpointOptions</span></code></a> constructor (ignored if
+options is present).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class pydantic_settings">
+<dt class="sig sig-object py" id="agentc_langgraph.state.CheckpointOptions">
+<em class="property"><span class="pre">pydantic</span> <span class="pre">settings</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_langgraph.state.</span></span><span class="sig-name descname"><span class="pre">CheckpointOptions</span></span><a class="reference internal" href="_modules/agentc_langgraph/state/options.html#CheckpointOptions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langgraph.state.CheckpointOptions" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Config<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>env_prefix</strong>: <em>str = AGENT_CATALOG_LANGGRAPH_CHECKPOINT_</em></p></li>
+<li><p><strong>env_file</strong>: <em>str = .env</em></p></li>
+</ul>
+</dd>
+<dt class="field-even">Fields<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bucket</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">checkpoint_collection</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">conn_root_certificate</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">pathlib.Path</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">conn_string</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_if_not_exists</span> <span class="pre">(bool</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ddl_retry_attempts</span> <span class="pre">(int</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ddl_retry_wait_seconds</span> <span class="pre">(float</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">password</span> <span class="pre">(pydantic.types.SecretStr</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">scope</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple_collection</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">username</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="agentc_langgraph.state.CheckpointOptions.bucket">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bucket</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc_langgraph.state.CheckpointOptions.bucket" title="Link to this definition">¶</a></dt>
+<dd><p>The name of the Couchbase bucket hosting the checkpoints.</p>
+<p>This field <strong>must</strong> be specified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pull_cluster_from_agent_catalog</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="agentc_langgraph.state.CheckpointOptions.checkpoint_collection">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">checkpoint_collection</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'langgraph_checkpoint_thread'</span></em><a class="headerlink" href="#agentc_langgraph.state.CheckpointOptions.checkpoint_collection" title="Link to this definition">¶</a></dt>
+<dd><p>The name of the Couchbase collection hosting the checkpoints threads.</p>
+<p>This field is optional and defaults to <code class="docutils literal notranslate"><span class="pre">langgraph_checkpoint_thread</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pull_cluster_from_agent_catalog</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="agentc_langgraph.state.CheckpointOptions.conn_root_certificate">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">conn_root_certificate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc_langgraph.state.CheckpointOptions.conn_root_certificate" title="Link to this definition">¶</a></dt>
+<dd><p>Path to the root certificate file for the Couchbase cluster.</p>
+<p>This field is optional and only required if the Couchbase cluster is using a self-signed certificate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pull_cluster_from_agent_catalog</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="agentc_langgraph.state.CheckpointOptions.conn_string">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">conn_string</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc_langgraph.state.CheckpointOptions.conn_string" title="Link to this definition">¶</a></dt>
+<dd><p>The connection string to the Couchbase cluster hosting the cache.</p>
+<p>This field <strong>must</strong> be specified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pull_cluster_from_agent_catalog</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="agentc_langgraph.state.CheckpointOptions.create_if_not_exists">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_if_not_exists</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#agentc_langgraph.state.CheckpointOptions.create_if_not_exists" title="Link to this definition">¶</a></dt>
+<dd><p>Create the required collections if they do not exist.</p>
+<p>When raised (i.e., this value is set to <code class="code highlight python docutils literal highlight-python"><span class="kc">True</span></code>), the collections will be created if they do not exist.
+Lower this flag (set this to <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code>) to instead raise an error if the collections do not exist.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pull_cluster_from_agent_catalog</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="agentc_langgraph.state.CheckpointOptions.ddl_retry_attempts">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ddl_retry_attempts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#agentc_langgraph.state.CheckpointOptions.ddl_retry_attempts" title="Link to this definition">¶</a></dt>
+<dd><p>Maximum number of attempts to retry DDL operations.</p>
+<p>This value is only used on setup (i.e., the first time the checkpointer is requested).
+If the number of attempts is exceeded, the command will fail.
+By default, this value is 3 attempts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pull_cluster_from_agent_catalog</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="agentc_langgraph.state.CheckpointOptions.ddl_retry_wait_seconds">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ddl_retry_wait_seconds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#agentc_langgraph.state.CheckpointOptions.ddl_retry_wait_seconds" title="Link to this definition">¶</a></dt>
+<dd><p>Wait time (in seconds) between DDL operation retries.</p>
+<p>This value is only used on setup (i.e., the first time the checkpointer is requested).
+By default, this value is 5 seconds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pull_cluster_from_agent_catalog</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="agentc_langgraph.state.CheckpointOptions.password">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">password</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SecretStr</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc_langgraph.state.CheckpointOptions.password" title="Link to this definition">¶</a></dt>
+<dd><p>Password associated with the Couchbase instance hosting the cache.</p>
+<p>This field <strong>must</strong> be specified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pull_cluster_from_agent_catalog</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="agentc_langgraph.state.CheckpointOptions.scope">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scope</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'agent_activity'</span></em><a class="headerlink" href="#agentc_langgraph.state.CheckpointOptions.scope" title="Link to this definition">¶</a></dt>
+<dd><p>The name of the Couchbase scope hosting the checkpoints.</p>
+<p>This field is optional and defaults to <code class="docutils literal notranslate"><span class="pre">agent_activity</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pull_cluster_from_agent_catalog</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="agentc_langgraph.state.CheckpointOptions.tuple_collection">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tuple_collection</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'langgraph_checkpoint_tuple'</span></em><a class="headerlink" href="#agentc_langgraph.state.CheckpointOptions.tuple_collection" title="Link to this definition">¶</a></dt>
+<dd><p>The name of the Couchbase collection hosting the checkpoints tuples.</p>
+<p>This field is optional and defaults to <code class="docutils literal notranslate"><span class="pre">langgraph_checkpoint_tuple</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pull_cluster_from_agent_catalog</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="agentc_langgraph.state.CheckpointOptions.username">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">username</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc_langgraph.state.CheckpointOptions.username" title="Link to this definition">¶</a></dt>
+<dd><p>Username associated with the Couchbase instance hosting the cache.</p>
+<p>This field <strong>must</strong> be specified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pull_cluster_from_agent_catalog</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-agentc_llamaindex.chat">
 <span id="llamaindex"></span><h3>LlamaIndex<a class="headerlink" href="#module-agentc_llamaindex.chat" title="Link to this heading">¶</a></h3>
@@ -1415,9 +1873,27 @@ Below, we provide an example of how to use this class.</p>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-agentc_langgraph.agent">LangGraph</a><ul>
+<li><a class="reference internal" href="#module-agentc_langgraph.tools">LangGraph</a><ul>
+<li><a class="reference internal" href="#agentc_langgraph.tools.ToolNode"><code class="docutils literal notranslate"><span class="pre">ToolNode</span></code></a></li>
 <li><a class="reference internal" href="#agentc_langgraph.agent.ReActAgent"><code class="docutils literal notranslate"><span class="pre">ReActAgent</span></code></a></li>
 <li><a class="reference internal" href="#agentc_langgraph.agent.State"><code class="docutils literal notranslate"><span class="pre">State</span></code></a></li>
+<li><a class="reference internal" href="#agentc_langgraph.graph.GraphRunnable"><code class="docutils literal notranslate"><span class="pre">GraphRunnable</span></code></a></li>
+<li><a class="reference internal" href="#agentc_langgraph.state.CheckpointSaver"><code class="docutils literal notranslate"><span class="pre">CheckpointSaver</span></code></a></li>
+<li><a class="reference internal" href="#agentc_langgraph.state.initialize"><code class="docutils literal notranslate"><span class="pre">initialize()</span></code></a></li>
+<li><a class="reference internal" href="#agentc_langgraph.state.CheckpointOptions"><code class="docutils literal notranslate"><span class="pre">CheckpointOptions</span></code></a><ul>
+<li><a class="reference internal" href="#agentc_langgraph.state.CheckpointOptions.bucket"><code class="docutils literal notranslate"><span class="pre">CheckpointOptions.bucket</span></code></a></li>
+<li><a class="reference internal" href="#agentc_langgraph.state.CheckpointOptions.checkpoint_collection"><code class="docutils literal notranslate"><span class="pre">CheckpointOptions.checkpoint_collection</span></code></a></li>
+<li><a class="reference internal" href="#agentc_langgraph.state.CheckpointOptions.conn_root_certificate"><code class="docutils literal notranslate"><span class="pre">CheckpointOptions.conn_root_certificate</span></code></a></li>
+<li><a class="reference internal" href="#agentc_langgraph.state.CheckpointOptions.conn_string"><code class="docutils literal notranslate"><span class="pre">CheckpointOptions.conn_string</span></code></a></li>
+<li><a class="reference internal" href="#agentc_langgraph.state.CheckpointOptions.create_if_not_exists"><code class="docutils literal notranslate"><span class="pre">CheckpointOptions.create_if_not_exists</span></code></a></li>
+<li><a class="reference internal" href="#agentc_langgraph.state.CheckpointOptions.ddl_retry_attempts"><code class="docutils literal notranslate"><span class="pre">CheckpointOptions.ddl_retry_attempts</span></code></a></li>
+<li><a class="reference internal" href="#agentc_langgraph.state.CheckpointOptions.ddl_retry_wait_seconds"><code class="docutils literal notranslate"><span class="pre">CheckpointOptions.ddl_retry_wait_seconds</span></code></a></li>
+<li><a class="reference internal" href="#agentc_langgraph.state.CheckpointOptions.password"><code class="docutils literal notranslate"><span class="pre">CheckpointOptions.password</span></code></a></li>
+<li><a class="reference internal" href="#agentc_langgraph.state.CheckpointOptions.scope"><code class="docutils literal notranslate"><span class="pre">CheckpointOptions.scope</span></code></a></li>
+<li><a class="reference internal" href="#agentc_langgraph.state.CheckpointOptions.tuple_collection"><code class="docutils literal notranslate"><span class="pre">CheckpointOptions.tuple_collection</span></code></a></li>
+<li><a class="reference internal" href="#agentc_langgraph.state.CheckpointOptions.username"><code class="docutils literal notranslate"><span class="pre">CheckpointOptions.username</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-agentc_llamaindex.chat">LlamaIndex</a><ul>

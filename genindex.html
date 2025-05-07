@@ -170,6 +170,7 @@ window.addEventListener("load", () => mermaid.run());
  | <a href="#D"><strong>D</strong></a>
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
@@ -206,8 +207,29 @@ window.addEventListener("load", () => mermaid.run());
         <li><a href="api.html#module-agentc_langgraph.agent">module</a>
 </li>
       </ul></li>
+      <li>
+    agentc_langgraph.graph
+
+      <ul>
+        <li><a href="api.html#module-agentc_langgraph.graph">module</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    agentc_langgraph.state
+
+      <ul>
+        <li><a href="api.html#module-agentc_langgraph.state">module</a>
+</li>
+      </ul></li>
+      <li>
+    agentc_langgraph.tools
+
+      <ul>
+        <li><a href="api.html#module-agentc_langgraph.tools">module</a>
+</li>
+      </ul></li>
       <li>
     agentc_llamaindex.chat
 
@@ -229,12 +251,12 @@ window.addEventListener("load", () => mermaid.run());
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="log.html#agentc_core.activity.models.content.Kind.Begin">Begin (agentc_core.activity.models.content.Kind attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="config.html#agentc_core.config.config.RemoteCatalogConfig.bucket">bucket (agentc_core.config.config.RemoteCatalogConfig attribute)</a>
 
       <ul>
         <li><a href="api.html#agentc_langchain.cache.CacheOptions.bucket">(agentc_langchain.cache.CacheOptions attribute)</a>
+</li>
+        <li><a href="api.html#agentc_langgraph.state.CheckpointOptions.bucket">(agentc_langgraph.state.CheckpointOptions attribute)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -261,10 +283,14 @@ window.addEventListener("load", () => mermaid.run());
 </li>
       <li><a href="log.html#agentc_core.activity.models.content.Kind.ChatCompletion">ChatCompletion (agentc_core.activity.models.content.Kind attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#agentc_langgraph.state.CheckpointOptions.checkpoint_collection">checkpoint_collection (agentc_langgraph.state.CheckpointOptions attribute)</a>
+</li>
+      <li><a href="api.html#agentc_langgraph.state.CheckpointSaver">CheckpointSaver (class in agentc_langgraph.state)</a>
+</li>
       <li><a href="config.html#agentc_core.config.config.RemoteCatalogConfig.Cluster">Cluster() (agentc_core.config.config.RemoteCatalogConfig method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="config.html#agentc_core.config.config.ToolRuntimeConfig.codegen_output">codegen_output (agentc_core.config.config.ToolRuntimeConfig attribute)</a>
 </li>
       <li><a href="api.html#agentc_langchain.cache.CacheOptions.collection">collection (agentc_langchain.cache.CacheOptions attribute)</a>
@@ -274,17 +300,25 @@ window.addEventListener("load", () => mermaid.run());
       <ul>
         <li><a href="api.html#agentc_langchain.cache.CacheOptions.conn_root_certificate">(agentc_langchain.cache.CacheOptions attribute)</a>
 </li>
+        <li><a href="api.html#agentc_langgraph.state.CheckpointOptions.conn_root_certificate">(agentc_langgraph.state.CheckpointOptions attribute)</a>
+</li>
       </ul></li>
       <li><a href="config.html#agentc_core.config.config.RemoteCatalogConfig.conn_string">conn_string (agentc_core.config.config.RemoteCatalogConfig attribute)</a>
 
       <ul>
         <li><a href="api.html#agentc_langchain.cache.CacheOptions.conn_string">(agentc_langchain.cache.CacheOptions attribute)</a>
 </li>
+        <li><a href="api.html#agentc_langgraph.state.CheckpointOptions.conn_string">(agentc_langgraph.state.CheckpointOptions attribute)</a>
+</li>
       </ul></li>
       <li><a href="log.html#agentc_core.activity.models.log.Log.content">content (agentc_core.activity.models.log.Log attribute)</a>
 </li>
       <li><a href="api.html#agentc_langchain.cache.CacheOptions.create_if_not_exists">create_if_not_exists (agentc_langchain.cache.CacheOptions attribute)</a>
+
+      <ul>
+        <li><a href="api.html#agentc_langgraph.state.CheckpointOptions.create_if_not_exists">(agentc_langgraph.state.CheckpointOptions attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -298,11 +332,15 @@ window.addEventListener("load", () => mermaid.run());
       <ul>
         <li><a href="api.html#agentc_langchain.cache.CacheOptions.ddl_retry_attempts">(agentc_langchain.cache.CacheOptions attribute)</a>
 </li>
+        <li><a href="api.html#agentc_langgraph.state.CheckpointOptions.ddl_retry_attempts">(agentc_langgraph.state.CheckpointOptions attribute)</a>
+</li>
       </ul></li>
       <li><a href="config.html#agentc_core.config.config.RemoteCatalogConfig.ddl_retry_wait_seconds">ddl_retry_wait_seconds (agentc_core.config.config.RemoteCatalogConfig attribute)</a>
 
       <ul>
         <li><a href="api.html#agentc_langchain.cache.CacheOptions.ddl_retry_wait_seconds">(agentc_langchain.cache.CacheOptions attribute)</a>
+</li>
+        <li><a href="api.html#agentc_langgraph.state.CheckpointOptions.ddl_retry_wait_seconds">(agentc_langgraph.state.CheckpointOptions attribute)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -376,6 +414,14 @@ window.addEventListener("load", () => mermaid.run());
   </ul></td>
 </tr></table>
 
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#agentc_langgraph.graph.GraphRunnable">GraphRunnable (class in agentc_langgraph.graph)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -392,7 +438,11 @@ window.addEventListener("load", () => mermaid.run());
       <li><a href="config.html#agentc_core.config.config.RemoteCatalogConfig.index_partition">index_partition (agentc_core.config.config.RemoteCatalogConfig attribute)</a>
 </li>
       <li><a href="api.html#agentc_langchain.cache.initialize">initialize() (in module agentc_langchain.cache)</a>
+
+      <ul>
+        <li><a href="api.html#agentc_langgraph.state.initialize">(in module agentc_langgraph.state)</a>
 </li>
+      </ul></li>
       <li><a href="api.html#agentc.span.Span.iterable">iterable (agentc.span.Span attribute)</a>
 </li>
   </ul></td>
@@ -461,8 +511,6 @@ window.addEventListener("load", () => mermaid.run());
         <li><a href="log.html#agentc_core.activity.models.content.ToolCallContent.meta">(agentc_core.activity.models.content.ToolCallContent attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     module
 
@@ -470,6 +518,12 @@ window.addEventListener("load", () => mermaid.run());
         <li><a href="api.html#module-agentc_langchain.cache">agentc_langchain.cache</a>
 </li>
         <li><a href="api.html#module-agentc_langgraph.agent">agentc_langgraph.agent</a>
+</li>
+        <li><a href="api.html#module-agentc_langgraph.graph">agentc_langgraph.graph</a>
+</li>
+        <li><a href="api.html#module-agentc_langgraph.state">agentc_langgraph.state</a>
+</li>
+        <li><a href="api.html#module-agentc_langgraph.tools">agentc_langgraph.tools</a>
 </li>
         <li><a href="api.html#module-agentc_llamaindex.chat">agentc_llamaindex.chat</a>
 </li>
@@ -519,6 +573,8 @@ window.addEventListener("load", () => mermaid.run());
       <ul>
         <li><a href="api.html#agentc_langchain.cache.CacheOptions.password">(agentc_langchain.cache.CacheOptions attribute)</a>
 </li>
+        <li><a href="api.html#agentc_langgraph.state.CheckpointOptions.password">(agentc_langgraph.state.CheckpointOptions attribute)</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -547,7 +603,11 @@ window.addEventListener("load", () => mermaid.run());
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#agentc_langchain.cache.CacheOptions.scope">scope (agentc_langchain.cache.CacheOptions attribute)</a>
+
+      <ul>
+        <li><a href="api.html#agentc_langgraph.state.CheckpointOptions.scope">(agentc_langgraph.state.CheckpointOptions attribute)</a>
 </li>
+      </ul></li>
       <li><a href="api.html#agentc_langchain.cache.CacheOptions.score_threshold">score_threshold (agentc_langchain.cache.CacheOptions attribute)</a>
 </li>
       <li><a href="config.html#agentc_core.config.config.ToolRuntimeConfig.secrets">secrets (agentc_core.config.config.ToolRuntimeConfig attribute)</a>
@@ -608,19 +668,23 @@ window.addEventListener("load", () => mermaid.run());
 </li>
       <li><a href="config.html#agentc_core.config.config.ToolRuntimeConfig.tool_model">tool_model (agentc_core.config.config.ToolRuntimeConfig attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="log.html#agentc_core.activity.models.content.ToolCallContent.tool_name">tool_name (agentc_core.activity.models.content.ToolCallContent attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="log.html#agentc_core.activity.models.content.ToolResultContent.tool_result">tool_result (agentc_core.activity.models.content.ToolResultContent attribute)</a>
 </li>
       <li><a href="log.html#agentc_core.activity.models.content.Kind.ToolCall">ToolCall (agentc_core.activity.models.content.Kind attribute)</a>
+</li>
+      <li><a href="api.html#agentc_langgraph.tools.ToolNode">ToolNode (class in agentc_langgraph.tools)</a>
 </li>
       <li><a href="log.html#agentc_core.activity.models.content.Kind.ToolResult">ToolResult (agentc_core.activity.models.content.Kind attribute)</a>
 </li>
       <li><a href="log.html#agentc_core.activity.models.content.RequestHeaderContent.tools">tools (agentc_core.activity.models.content.RequestHeaderContent attribute)</a>
 </li>
       <li><a href="api.html#agentc_langchain.cache.CacheOptions.ttl">ttl (agentc_langchain.cache.CacheOptions attribute)</a>
+</li>
+      <li><a href="api.html#agentc_langgraph.state.CheckpointOptions.tuple_collection">tuple_collection (agentc_langgraph.state.CheckpointOptions attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -638,6 +702,8 @@ window.addEventListener("load", () => mermaid.run());
 
       <ul>
         <li><a href="api.html#agentc_langchain.cache.CacheOptions.username">(agentc_langchain.cache.CacheOptions attribute)</a>
+</li>
+        <li><a href="api.html#agentc_langgraph.state.CheckpointOptions.username">(agentc_langgraph.state.CheckpointOptions attribute)</a>
 </li>
       </ul></li>
   </ul></td>
