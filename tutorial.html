@@ -37,6 +37,123 @@ window.addEventListener("load", () => mermaid.run());
 
 <div id="top_nav">
     
+        <div id="notification_banner" data-banner-hiding="temporary" v-show="!permanentlyHidden">
+    <p v-if="visible" id="content">You are viewing documentation for a pre-GA (alpha) version of Couchbase Agent Catalog!</p>
+    <a class="close" href="#" @click.prevent="toggleVisible()">[[ visible ? '&#x25B2; HIDE' : '&#x25BC; SHOW BANNER' ]]</a>
+</div>
+
+<script>
+(function() {
+    const topNav = document.querySelector('#top_nav')
+    const notificationContent = document.querySelector('#notification_banner p#content').innerText
+    const localStorageKey = 'readNotification'
+    const bannerHiding = document.querySelector('#notification_banner').dataset['bannerHiding']
+    const cssVariableName = '--navbarHeight'
+    const rootElement = document.documentElement
+
+    /*************************************************************************/
+    // Local storage for remembering if the user has read the notification.
+
+    function checkAlreadyRead() {
+        return localStorage.getItem(localStorageKey) == notificationContent
+    }
+
+    function setRead() {
+        localStorage.setItem(localStorageKey, notificationContent)
+    }
+
+    function clearRead() {
+        localStorage.removeItem(localStorageKey)
+    }
+
+    const alreadyRead = checkAlreadyRead()
+    const permanentlyHidden = alreadyRead && bannerHiding == 'permanent'
+
+    /*************************************************************************/
+    // Updating a CSS variable so other elements adjust to the nav bar height.
+
+    function updateNavbarHeight() {
+        // Only update it if the delta is significant. Otherwise it causes
+        // unnecessary browser repaints.
+        const documentStyles = getComputedStyle(rootElement)
+        // We store the value in REM, so need to convert to pixels
+        const currentValue = parseFloat(
+            documentStyles.getPropertyValue(cssVariableName)
+        ) * parseFloat(documentStyles.fontSize)
+
+        const newValue = topNav.clientHeight
+
+        if (newValue - 5 > currentValue) {
+            console.log(`Updating ${cssVariableName} - overlapping`)
+            rootElement.style.setProperty(
+                cssVariableName, newValue + "px"
+            );
+        } else if (currentValue - newValue >= 30) {
+            console.log(`Updating ${cssVariableName} - gap too large`)
+            rootElement.style.setProperty(
+                cssVariableName, newValue + "px"
+            );
+        }
+    }
+
+    /*************************************************************************/
+    // After loading the page, and resizing the window, recalculate the nav bar
+    // height.
+
+    if (!permanentlyHidden) {
+        // This height is approximately correct when there's a banner, so
+        // shouldn't require any page reflow:
+        rootElement.style.setProperty(
+            '--navbarHeight', "5.5rem"
+        );
+
+        document.addEventListener("DOMContentLoaded", function() {
+            updateNavbarHeight()
+        });
+
+        var interval = undefined
+
+        window.addEventListener('resize', () => {
+            if (interval) {
+                clearTimeout(interval)
+            }
+            interval = setTimeout(() => {
+                console.log("Finished resizing")
+                updateNavbarHeight()
+            }, 100)
+        })
+    }
+
+    /*************************************************************************/
+
+    PetiteVue.createApp({
+        visible: !alreadyRead,
+        permanentlyHidden: permanentlyHidden,
+        bannerHiding: bannerHiding,
+        $delimiters: ['[[', ']]'],
+        toggleVisible() {
+            this.visible = !this.visible
+
+            if (this.visible) {
+                clearRead()
+            } else {
+                setRead()
+            }
+
+            if (!this.visible && bannerHiding == 'permanent') {
+                this.permanentlyHidden = true
+            }
+
+            // Run this after Vue has had time to update the DOM:
+            setTimeout(
+                updateNavbarHeight,
+                0
+            )
+        }
+    }).mount('#notification_banner')
+})()
+</script>
+    
 
     <nav>
         
@@ -198,7 +315,7 @@ Specifically, in Figure 1 (below) we define an architecture of three agents to h
 &quot;Endpoint Finding&quot; and to i) interact with the &quot;Endpoint Finding&quot; agent to provide new endpoints if no routes are
 found or ii) send the routes (or lack of routes) to the &quot;Front Desk&quot; agent to give back to the user.</p></li>
 </ol>
-<figure class="align-center" id="id1">
+<figure class="align-center" id="id3">
 <pre  class="mermaid">
         ---
 title: 3-Agent Route Finding System
@@ -223,7 +340,7 @@ classDef first fill-opacity:0
 classDef last fill: #bfb6fc
     </pre><figcaption>
 <p><span class="caption-text"><strong>Figure 1</strong>: The 3-agent system (a Front Desk agent, a Route Finding agent, and an Endpoint Finding
-agent) we will be working with.</span><a class="headerlink" href="#id1" title="Link to this image">¶</a></p>
+agent) we will be working with.</span><a class="headerlink" href="#id3" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <section id="building-our-agent-graph">
@@ -268,7 +385,7 @@ We will build up the agents, state, and edges in the next step.</p>
 <p>Similar to how humans communicate, agents require some sort of contract before communicating.
 As an example, you <em>typically</em> don't start a conversation with your barista by summarizing the intricacies of bread
 tabs (at least where we are from :-)).
-In LangGraph, this contract exists in the form of a <code class="docutils literal notranslate"><span class="pre">State</span></code> class.
+In LangGraph, this contract exists in the form of a <code class="code highlight python docutils literal highlight-python"><span class="n">State</span></code> class.
 Let's define our state class as such:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">langchain_core.messages</span>
@@ -296,14 +413,32 @@ agent code block.</p></li>
 </section>
 <section id="defining-our-graph-nodes">
 <h3>Defining Our Graph Nodes<a class="headerlink" href="#defining-our-graph-nodes" title="Link to this heading">¶</a></h3>
-<p>The &quot;nodes&quot; in LangGraph, similar to other vertex-centric paradigms, are our pièce de résistance.</p>
+<p>The &quot;nodes&quot; in LangGraph, similar to other vertex-centric paradigms, are our pièce de résistance.
+Nodes in LangGraph are defined as functions (or more generally, objects that implement the <code class="code highlight python docutils literal highlight-python"><span class="fm">__call__</span></code> method)
+that accept an instance of <code class="code highlight python docutils literal highlight-python"><span class="n">State</span></code> and return a (potentially modified) instance of the same input
+<code class="code highlight python docutils literal highlight-python"><span class="n">State</span></code> <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.
+Broadly speaking, nodes are where our calls to LLMs and tools occur.
+In this tutorial, these LLM calls are managed using the ReAct paradigm (implemented in
+<code class="code highlight python docutils literal highlight-python"><span class="n">langgraph</span><span class="o">.</span><span class="n">prebuilt</span><span class="o">.</span><span class="n">create_react_agent</span></code>).</p>
+<p>To start, let's define the function class associated with our route finding agent:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">langchain_openai</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">langgraph.prebuilt</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">RouteFindingAgent</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chat_model</span> <span class="o">=</span> <span class="n">langchain_openai</span><span class="o">.</span><span class="n">chat_models</span><span class="o">.</span><span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">agent</span> <span class="o">=</span>
+</pre></div>
+</div>
 </section>
 <section id="defining-our-graph-edges">
 <h3>Defining Our Graph Edges<a class="headerlink" href="#defining-our-graph-edges" title="Link to this heading">¶</a></h3>
-<p>In LangGraph, edges are defined using functions that accept a <code class="docutils literal notranslate"><span class="pre">State</span></code> instance (defined previously) and return the
-name of the next node that will handle the current state.
+<p>In LangGraph, edges are defined using functions that accept a <code class="code highlight python docutils literal highlight-python"><span class="n">State</span></code> instance (defined previously) and return
+the name of the next node that will handle the current state.
 As illustrated in Figure 1 (above, repeated directly below for reference), there are seven edges we need to define:</p>
-<figure class="align-center" id="id2">
+<figure class="align-center" id="id4">
 <pre  class="mermaid">
         ---
 title: 3-Agent Route Finding System
@@ -328,7 +463,7 @@ classDef first fill-opacity:0
 classDef last fill: #bfb6fc
     </pre><figcaption>
 <p><span class="caption-text"><strong>Figure 1</strong> (duplicate): The 3-agent system (a Front Desk agent, a Route Finding agent, and an Endpoint
-Finding agent) we will be working with.</span><a class="headerlink" href="#id2" title="Link to this image">¶</a></p>
+Finding agent) we will be working with.</span><a class="headerlink" href="#id4" title="Link to this image">¶</a></p>
 </figcaption>
 </figure>
 <ol class="arabic">
@@ -354,6 +489,13 @@ This edge is constructed using the line:</p>
 </section>
 <section id="step-3-versioning-and-improving-our-application">
 <h2>Step #3: Versioning and Improving Our Application<a class="headerlink" href="#step-3-versioning-and-improving-our-application" title="Link to this heading">¶</a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>LangGraph nodes may also return <code class="code highlight python docutils literal highlight-python"><span class="n">Command</span></code> instances which contain information about where the outgoing
+<code class="code highlight python docutils literal highlight-python"><span class="n">State</span></code> instance should be forward to, but for this tutorial we will not use this paradigm.</p>
+</aside>
+</aside>
 </section>
 </section>
 
