@@ -52,3 +52,6 @@ html_theme = "piccolo_theme"
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
 html_favicon = "_static/favicon.png"
+html_theme_options = {
+    "banner_text": "You are viewing documentation for a pre-GA (alpha) version of Couchbase Agent Catalog!"
+}

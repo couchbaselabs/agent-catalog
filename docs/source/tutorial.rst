@@ -113,7 +113,7 @@ Defining a Contract: The State
 Similar to how humans communicate, agents require some sort of contract before communicating.
 As an example, you *typically* don't start a conversation with your barista by summarizing the intricacies of bread
 tabs (at least where we are from :-)).
-In LangGraph, this contract exists in the form of a ``State`` class.
+In LangGraph, this contract exists in the form of a :python:`State` class.
 Let's define our state class as such:
 
 .. code-block:: python
@@ -144,14 +144,34 @@ Defining Our Graph Nodes
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 The "nodes" in LangGraph, similar to other vertex-centric paradigms, are our pièce de résistance.
+Nodes in LangGraph are defined as functions (or more generally, objects that implement the :python:`__call__` method)
+that accept an instance of :python:`State` and return a (potentially modified) instance of the same input
+:python:`State` [#]_.
+Broadly speaking, nodes are where our calls to LLMs and tools occur.
+In this tutorial, these LLM calls are managed using the ReAct paradigm (implemented in
+:python:`langgraph.prebuilt.create_react_agent`).
+
+To start, let's define the function class associated with our route finding agent:
+
+.. code-block:: python
+
+    import langchain_openai
+    import langgraph.prebuilt
+
+    class RouteFindingAgent:
+        def __init__(self):
+            self.chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o", temperature=0)
+
+        def __call__ (self, state, *args, **kwargs):
+            agent =
 
 
 
 Defining Our Graph Edges
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-In LangGraph, edges are defined using functions that accept a ``State`` instance (defined previously) and return the
-name of the next node that will handle the current state.
+In LangGraph, edges are defined using functions that accept a :python:`State` instance (defined previously) and return
+the name of the next node that will handle the current state.
 As illustrated in Figure 1 (above, repeated directly below for reference), there are seven edges we need to define:
 
 .. mermaid::
@@ -204,5 +224,7 @@ Step #3: Versioning and Improving Our Application
 -------------------------------------------------
 
 
+.. [#] LangGraph nodes may also return :python:`Command` instances which contain information about where the outgoing
+       :python:`State` instance should be forward to, but for this tutorial we will not use this paradigm.
 
 
