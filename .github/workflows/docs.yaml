@@ -28,6 +28,9 @@ jobs:
         run: |
           poetry install --with docs
 
+      - name: Update the package version
+        run: scripts/pre-build.sh
+
       - name: Build the documentation
         working-directory: docs
         run: |

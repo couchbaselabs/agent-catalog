@@ -14,9 +14,63 @@ The mono-repo for the Couchbase Agent Catalog project.
 
 ## Getting Started
 
+### Installing from PyPI
+
+*Note: this section is in the works! We recommend installing from our pre-built packages in the meantime.*
+
+1. Make sure you have `python3.12` installed!
+
+2. Use `pip` to install the `agentc` package.
+
+   ```bash
+      pip install agentc
+   ```
+
+   If you are interested in developing with LangChain or LangGraph, install the helper ``agentc_langchain`` package
+   and/or ``agentc_langgraph`` packages as extras:
+
+   ```bash
+   pip install agentc[langchain,langgraph]
+   ```
+
+   Similarly, for LlamaIndex Developers:
+
+   ```bash
+   pip install agentc[llamaindex]
+   ```
+
 ### Installing from Package
 
-(in the works!)
+1. Make sure you have `python3.12` installed!
+
+2. Navigate to the releases page for Agent Catalog [here](https://github.com/couchbaselabs/agent-catalog/releases)
+   and choose the latest version.
+   Expand the "Assets" tab and download all `*.whl` files (e.g., `agentc-0.2.0+g59944db-py3-none-any.whl`) into your
+   project location.
+
+3. Install the `agentc` package using the `.whl` file and `pip`:
+
+   ```sh
+   pip install agentc_core-*.whl
+   pip install agentc_cli-*.whl
+   pip install agentc-*.whl
+   ```
+
+   Note that order matters here!
+
+4. If you are interested in developing with LangChain or LangGraph, install the helper `agentc_langchain` and/or
+   `agentc_langgraph` packages with the commands below:
+
+   ```sh
+   pip install agentc_langchain-*.whl
+   pip install agentc_langgraph-*.whl
+   ```
+
+   Similarly, for LlamaIndex Developers:
+
+   ```sh
+   pip install agentc_llamaindex-*.whl
+   ```
 
 ### Installing from Source (with Makefile)
 
@@ -91,7 +145,7 @@ The mono-repo for the Couchbase Agent Catalog project.
    pip install libs/agentc_integrations/langgraph
    ```
 
-   ...and for those working with LlamaIndex:
+   Similarly, for LlamaIndex Developers:
    ```bash
    pip install libs/agentc_integrations/llamaindex
    ```
@@ -101,3 +155,15 @@ The mono-repo for the Couchbase Agent Catalog project.
 Refer to [`docs/`](docs) to build our technical documentation (also hosted
 [here](https://couchbaselabs.github.io/agent-catalog/index.html)) and explore Couchbase Agent Catalog before authoring
 your agent applications.
+
+## Disclaimer
+The agent_catalog library is still in development and is not ready for production use.
+Use it at your own risk.
+This library is a non-GA offering.
+Non-GA Offerings are provided without support or any servicing obligations, and may contain bugs and other functional
+issues.
+NON-GA OFFERINGS ARE PROVIDED AS-IS AND WITHOUT ANY WARRANTY OR INDEMNITY.
+Couchbase, its affiliates, and its licensors are not liable for any harm or damages related to Non-GA Offerings.
+Couchbase may discontinue Non-GA Offerings at any time in its sole discretion and is under no obligation to make
+Non-GA Offerings generally available.
+By utilizing the agent_catalog library, you acknowledge and accept these parameters.

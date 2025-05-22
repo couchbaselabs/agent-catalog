@@ -365,22 +365,3 @@ input is not working)._
 
       For my runs I get an average score of 1.44 with one of the "problematic" inputs being the
       "Canyonlands Field Airport CNY" input.
-      If we make the same change as we did in the previous section (the change to `prompts/front_desk.yaml`), we see
-      and run the query below, we should see an improvement in our goal accuracy:
-
-      ```sql
-         FROM
-            `travel-sample`.agent_activity.logs AS l
-         WHERE
-            l.content.kind = "key-value" AND
-            l.content.`key` = "goal_accuracy"
-         GROUP BY
-             l.catalog_version
-         SELECT
-            AVG(l.content.`value`.score),
-            l.catalog_version
-         ORDER BY
-            l.catalog_version.timestamp DESC;
-      ```
-
-      TODO (tweak the scorer)
