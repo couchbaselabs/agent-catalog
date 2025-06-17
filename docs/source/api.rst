@@ -44,7 +44,7 @@ LangChain
 LangGraph
 ^^^^^^^^^
 
-.. automodule:: agentc_langgraph.tools
+.. automodule:: agentc_langgraph.tool
     :members:
 
 .. automodule:: agentc_langgraph.agent

@@ -51,17 +51,11 @@ enabled = true
 monorepo-root = "../../../"
 version-pinning-rule = '=='
 
-[tool.poetry-dynamic-versioning]
-enable = true
-format-jinja = "{% if distance == 0 %}{{ base }}{% else %}{{ base }}.post{{ distance }}{% endif %}+g{{ commit }}"
-
 [tool.poetry.requires-plugins]
 poetry-monoranger-plugin = ">=0.4.1"
-poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
 
 [build-system]
 requires = [
-    "poetry-core>=2.1.0",
-    "poetry-dynamic-versioning>=1.8.2"
+    "poetry-core>=2.1.0"
 ]
-build-backend = "poetry_dynamic_versioning.backend"
+build-backend = "poetry.core.masonry.api"

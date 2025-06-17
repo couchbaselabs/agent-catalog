@@ -12,7 +12,6 @@ Table of Contents
    :caption: Getting Started
 
    Installation <install>
-   Tutorial <tutorial>
    Concepts <concept>
 
 .. toctree::

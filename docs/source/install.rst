@@ -4,13 +4,75 @@
 Installation
 ============
 
-Building From Package
----------------------
+Installing from PyPI
+--------------------
 
-.. important::
+.. note::
 
-    This part is in-the-works!
-    For now, please refer to the `Installing from Source (with Makefile)`_ section below.
+    This section is in the works!
+    We recommend installing from our pre-built packages in the meantime.
+
+1. Make sure you have :command:`python3.12` installed!
+
+2. Install ``agentc`` with ``pip``.
+
+   .. code-block:: ansi-shell-session
+
+       $ pip install agentc
+
+   If you are interested in developing with LangChain or LangGraph, install the helper ``agentc_langchain`` package
+   and/or ``agentc_langgraph`` packages as extras:
+
+   .. code-block:: ansi-shell-session
+
+      $ pip install agentc[langchain,langgraph]
+
+   Similarly, for LlamaIndex Developers:
+
+   .. code-block:: ansi-shell-session
+
+      $ pip install agentc[llamaindex]
+
+3. Validate your installation by running ``agentc``.
+   If your installation was successful, you should see the following output:
+
+   .. click:run::
+      from agentc_cli.main import agentc
+      invoke(agentc)
+
+Installing from Pre-Built Package
+---------------------------------
+
+1. Make sure you have :command:`python3.12` installed!
+
+2. Navigate to the releases page for Agent Catalog `here <https://github.com/couchbaselabs/agent-catalog/releases>`__
+   and choose the latest version.
+   Expand the "Assets" tab and download all ``*.whl`` files (e.g., ``agentc-0.2.0+g59944db-py3-none-any.whl``) into
+   your project location.
+
+3. Install the ``agentc`` packages using the ``.whl`` file and ``pip``.
+   Note that order matters here!
+
+    .. code-block:: ansi-shell-session
+
+        $ pip install agentc_core-*.whl
+        $ pip install agentc_cli-*.whl
+        $ pip install agentc-*.whl
+
+4. If you are interested in developing with LangChain or LangGraph, install the helper ``agentc_langchain`` package
+   and/or ``agentc_langgraph`` package with the command(s) below:
+
+   .. code-block:: ansi-shell-session
+
+      $ pip install agentc_langchain-*.whl
+      $ pip install agentc_langgraph-*.whl
+
+   Similarly, for LlamaIndex Developers:
+
+   .. code-block:: ansi-shell-session
+
+      $ pip install agentc_llamaindex-*.whl
+
 
 Installing from Source (with Makefile)
 --------------------------------------
@@ -50,12 +112,6 @@ Installing from Source (with Makefile)
    .. note::
 
       Note that you must activate your environment before running any :command:`agentc` commands!
-
-   If your environment has been activated properly, you should see the following output:
-
-   .. click:run::
-      from agentc_cli.main import agentc
-      invoke(agentc)
 
 6. If you are interested in building a ``.whl`` file (for later use in ``.whl``-based installation in other projects),
    run the following command:
