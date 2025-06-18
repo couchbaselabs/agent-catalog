@@ -15,6 +15,9 @@ jobs:
 
       - name: Check out repository code
         uses: actions/checkout@v4
+        with:
+          fetch-tags: 'true'
+          fetch-depth: '5'
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
 
       - name: Set up Python Poetry
@@ -29,6 +32,8 @@ jobs:
           poetry install --with docs
 
       - name: Update the package version
+        env:
+          TERM: xterm
         run: scripts/pre-build.sh
 
       - name: Build the documentation
