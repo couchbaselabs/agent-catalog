@@ -26,6 +26,8 @@ FILES=(
   libs/agentc_integrations/langgraph/agentc_langgraph/__init__.py
   libs/agentc_integrations/llamaindex/pyproject.toml
   libs/agentc_integrations/llamaindex/agentc_llamaindex/__init__.py
+  libs/agentc_testing/pyproject.toml
+  libs/agentc_testing/agentc_testing/__init__.py
 )
 for file in "${FILES[@]}"; do
   cp "$file" "$file".bak
@@ -33,8 +35,8 @@ done
 
 echo "Modifying file versions."
 PDV_OUTPUT=$(poetry dynamic-versioning 2>&1 1>/dev/null)
-VERSION=$(echo "$PDV_OUTPUT" | head -n 1 | awk '{print $2}')
-echo "Using version ${VERSION}."
+VERSION=$(echo "$PDV_OUTPUT" | grep -m 1 '^Version' | awk '{print $2}')
+echo "Using version ${VERSION} from PDV output ${PDV_OUTPUT}."
 find libs -type f -name 'pyproject.toml' \
   -exec sed -i '' \
    "s/version = \"0.0.0\"/version = \"$VERSION\"/g" {} +
