@@ -30,7 +30,7 @@ FILES=(
   libs/agentc_testing/agentc_testing/__init__.py
 )
 for file in "${FILES[@]}"; do
-  cp "$file" "$file".bak
+  cp "$file" dist/temp/"$file".bak
 done
 
 echo "Modifying file versions."

@@ -17,6 +17,11 @@ documentation = "https://couchbaselabs.github.io/agent-catalog/index.html"
 [project.scripts]
 agentc = "agentc.__main__:main"
 
+[project.optional-dependencies]
+langchain = ["agentc_langchain"]
+langgraph = ["agentc_langgraph"]
+llamaindex = ["agentc_llamaindex"]
+
 # Version is dynamically pulled from Git.
 [tool.poetry]
 name = "agentc"
@@ -32,6 +37,9 @@ pydantic-settings = "^2.7.1"
 # The version of these packages will be updated dynamically.
 agentc-core = { path = "../agentc_core", develop = true }
 agentc-cli = { path = "../agentc_cli", develop = true }
+agentc-langchain = { path = "../agentc_integrations/langchain", develop = true, optional = true }
+agentc-langgraph = { path = "../agentc_integrations/langgraph", develop = true, optional = true }
+agentc-llamaindex = { path = "../agentc_integrations/llamaindex", develop = true, optional = true }
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"

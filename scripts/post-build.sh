@@ -30,7 +30,7 @@ FILES=(
   libs/agentc_testing/agentc_testing/__init__.py
 )
 for file in "${FILES[@]}"; do
-  mv "$file".bak "$file"
+  mv dist/temp/"$file".bak "$file"
 done
 
 print_separator '-'
