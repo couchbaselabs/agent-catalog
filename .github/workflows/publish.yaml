@@ -1,9 +1,9 @@
 name: publish
 run-name: 👁️ ${{ github.actor }} has created a new release!
 
-on:
-  release:
-    types: [published]
+on: workflow_dispatch
+  # release:
+  #  types: [created]
 
 jobs:
   PackagePublish:
@@ -33,4 +33,6 @@ jobs:
         run: scripts/pre-build.sh
 
       - name: Build and publish our packages
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.COUCHBASE_PYPI_KEY }}
         run: scripts/publish.sh
