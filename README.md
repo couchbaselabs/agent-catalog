@@ -155,3 +155,8 @@ The mono-repo for the Couchbase Agent Catalog project.
 Refer to [`docs/`](docs) to build our technical documentation (also hosted
 [here](https://couchbaselabs.github.io/agent-catalog/index.html)) and explore Couchbase Agent Catalog before authoring
 your agent applications.
+
+## Disclaimer
+The agent_catalog library is still in development and is not ready for production use. Use it at your own risk.
+
+This library is a non-GA offering.  Non-GA Offerings are provided without support or any servicing obligations, and may contain bugs and other functional issues. NON-GA OFFERINGS ARE PROVIDED AS-IS AND WITHOUT ANY WARRANTY OR INDEMNITY. Couchbase, its affiliates, and its licensors are not liable for any harm or damages related to Non-GA Offerings. Couchbase may discontinue Non-GA Offerings at any time in its sole discretion and is under no obligation to make Non-GA Offerings generally available. By utilizing the agent_catalog library, you acknowledge and accept these parameters.
