@@ -8,9 +8,6 @@ on:
 jobs:
   PackagePublish:
     runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/agent_catalog
 
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
