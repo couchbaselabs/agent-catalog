@@ -95,10 +95,15 @@ norecursedirs = [
 
 [tool.poetry-dynamic-versioning]
 enable = true
-format-jinja = "{{ base }}{{ stage }}{{ revision }}{% if distance > 0 %}.post{{ distance }}{% endif %}"
-
-# To include a local version that uses the Git SHA of this repository, use the format string below.
-# format-jinja = "{{ base }}{{ stage }}{{ revision }}{% if distance > 0 %}.post{{ distance }}{% endif %}+g{{ commit }}"
+format-jinja = """
+    {{- base -}}
+    {%- if stage is not none and revision is not none -%}
+        {{ stage }}{{ revision }}
+    {%- endif -%}
+    {%- if distance > 0 -%}
+        .post{{ distance }}
+    {%- endif -%}
+"""  # +g{{ commit }}"
 
 [tool.poetry.requires-plugins]
 poetry-plugin-export = ">=1.8"

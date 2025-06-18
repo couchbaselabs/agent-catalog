@@ -33,8 +33,6 @@ jobs:
         run: scripts/setup.sh dev
 
       - name: Setup our package versions
-        env:
-          TERM: xterm
         run: scripts/pre-build.sh
 
       - name: Build and publish our packages
