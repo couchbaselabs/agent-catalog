@@ -34,6 +34,3 @@ jobs:
 
       - name: Build and publish our packages
         run: scripts/publish.sh
-
-      - name: Publish package distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
