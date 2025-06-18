@@ -37,8 +37,13 @@ echo "Modifying file versions."
 PDV_OUTPUT=$(poetry dynamic-versioning 2>&1 1>/dev/null)
 VERSION=$(echo "$PDV_OUTPUT" | grep -m 1 '^Version' | awk '{print $2}')
 echo "Using version ${VERSION} from PDV output ${PDV_OUTPUT}."
+if [[ "$(uname)" == "Darwin" ]]; then
+  SED_INPLACE=(-i '')
+else
+  SED_INPLACE=(-i)
+fi
 find libs -type f -name 'pyproject.toml' \
-  -exec sed -i '' \
+  -exec sed "${SED_INPLACE[@]}" \
    "s/version = \"0.0.0\"/version = \"$VERSION\"/g" {} +
 
 print_separator '-'
