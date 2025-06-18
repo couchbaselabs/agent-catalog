@@ -29,5 +29,8 @@ jobs:
       - name: Install repository with Poetry
         run: scripts/setup.sh dev
 
+      - name: Setup our package versions
+        run: scripts/pre-build.sh
+
       - name: Build and publish our packages
         run: scripts/publish.sh
