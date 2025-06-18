@@ -33,6 +33,9 @@ jobs:
         run: |
           poetry install --with docs
 
+      - name: Setup our package versions
+        run: scripts/pre-build.sh
+
       - name: Build the documentation
         working-directory: docs
         run: |
