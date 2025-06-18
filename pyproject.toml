@@ -95,17 +95,15 @@ norecursedirs = [
 
 [tool.poetry-dynamic-versioning]
 enable = true
-format-jinja = "{% if distance == 0 %}{{ base }}{% else %}{{ base }}.post{{ distance }}{% endif %}+g{{ commit }}"
-
-[tool.poetry-dynamic-versioning.substitution]
-files = [
-    "libs/agentc/agentc/__init__.py",
-    "libs/agentc_cli/agentc_cli/__init__.py",
-    "libs/agentc_core/agentc_core/__init__.py",
-    "libs/agentc_integrations/langchain/agentc_langchain/__init__.py",
-    "libs/agentc_integrations/langgraph/agentc_langgraph/__init__.py",
-    "libs/agentc_integrations/llamaindex/agentc_llamaindex/__init__.py",
-]
+format-jinja = """
+    {{- base -}}
+    {%- if stage is not none and revision is not none -%}
+        {{ stage }}{{ revision }}
+    {%- endif -%}
+    {%- if distance > 0 -%}
+        .post{{ distance }}
+    {%- endif -%}
+"""  # +g{{ commit }}"
 
 [tool.poetry.requires-plugins]
 poetry-plugin-export = ">=1.8"

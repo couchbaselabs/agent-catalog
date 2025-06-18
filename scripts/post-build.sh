@@ -26,9 +26,11 @@ FILES=(
   libs/agentc_integrations/langgraph/agentc_langgraph/__init__.py
   libs/agentc_integrations/llamaindex/pyproject.toml
   libs/agentc_integrations/llamaindex/agentc_llamaindex/__init__.py
+  libs/agentc_testing/pyproject.toml
+  libs/agentc_testing/agentc_testing/__init__.py
 )
 for file in "${FILES[@]}"; do
-  mv "$file".bak "$file"
+  mv dist/temp/"$file".bak "$file"
 done
 
 print_separator '-'

@@ -10,8 +10,6 @@ print_separator '='
 echo "Running scripts/build.sh"
 print_separator '-'
 
-
-
 # Our core packages (core, CLI, and agentc) need to be built.
 mkdir -p dist
 for package in agentc_core agentc_cli agentc; do
