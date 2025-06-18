@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="../../../../">
+<html lang="en" data-content_root="../../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>agentc_core.activity.models.log &#8212; Agent Catalog 0.0.0.post1+g30e2dff documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=50651e91" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/basic_mod.css?v=9b2032db" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=86a354c8" />
-    <script src="../../../../_static/documentation_options.js?v=8b889931"></script>
-    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
-    <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+    <title>agentc_langgraph.tool.node &#8212; Agent Catalog 0.0.0.post1+g30e2dff documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=50651e91" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic_mod.css?v=9b2032db" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=86a354c8" />
+    <script src="../../../_static/documentation_options.js?v=8b889931"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
     <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
@@ -25,11 +25,11 @@
 import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
 window.addEventListener("load", () => mermaid.run());
 </script>
-    <script src="../../../../_static/js/theme.js"></script>
-    <script src="../../../../_static/js/petite-vue.js"></script>
-    <link rel="icon" href="../../../../_static/favicon.png"/>
-    <link rel="index" title="Index" href="../../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../../search.html" /> 
+    <script src="../../../_static/js/theme.js"></script>
+    <script src="../../../_static/js/petite-vue.js"></script>
+    <link rel="icon" href="../../../_static/favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
   </head><body data-dark_mode_code_blocks="true">
 
 <div id="top_nav">
@@ -160,7 +160,7 @@ window.addEventListener("load", () => mermaid.run());
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="../../../../index.html" title="Go to homepage">Agent Catalog 0.0.0.post1+g30e2dff documentation</a></h1>
+        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.0.0.post1+g30e2dff documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -222,7 +222,7 @@ window.addEventListener("load", () => mermaid.run());
 })()
 </script>
             <p class="mobile_search_link">
-                <a href="../../../../search.html" title="Search">
+                <a href="../../../search.html" title="Search">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65 64" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2">
                         <path d="M14.873 40.009c-2.315-3.943-3.642-8.532-3.642-13.429C11.231 11.91 23.141 0 37.811 0s26.58 11.91 26.58 26.58-11.91 26.58-26.58 26.58a26.44 26.44 0 0 1-14.277-4.161L9.739 62.794a3.12 3.12 0 0 1-4.413 0L.913 58.382c-1.217-1.218-1.217-3.196 0-4.413l13.96-13.96zM37.811 8.054c10.225 0 18.526 8.301 18.526 18.526s-8.301 18.526-18.526 18.526-18.526-8.301-18.526-18.526S27.586 8.054 37.811 8.054z" fill="#fff" />
                     </svg>
@@ -235,7 +235,7 @@ window.addEventListener("load", () => mermaid.run());
 <search id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
-    <form class="search" action="../../../../search.html" method="get">
+    <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
@@ -250,21 +250,21 @@ window.addEventListener("load", () => mermaid.run());
       <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../concept.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../concept.html">Concepts</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">agentc CLI Tool</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">Package Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../catalog.html">Tool / Prompt Records</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../log.html">Spans and Log Records</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../analysis.html">Log Analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">agentc CLI Tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">Package Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../catalog.html">Tool / Prompt Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../log.html">Spans and Log Records</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../analysis.html">Log Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Help / Questions</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../faqs.html">FAQs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../faqs.html">FAQs</a></li>
 </ul>
 
         </div>
@@ -276,73 +276,110 @@ window.addEventListener("load", () => mermaid.run());
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for agentc_core.activity.models.log</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
+  <h1>Source code for agentc_langgraph.tool.node</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">langchain_core.messages</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">langchain_core.runnables</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">langchain_core.tools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">langgraph.prebuilt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">..models.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">Content</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">VersionDescriptor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.activity</span><span class="w"> </span><span class="kn">import</span> <span class="n">Span</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.activity.models.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">ToolResultContent</span>
 
 
-<div class="viewcode-block" id="Log">
-<a class="viewcode-back" href="../../../../log.html#agentc_core.activity.models.log.Log">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Log</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A :py:class:`Log` instance represents a single log record that is bound to a part of the application</span>
-<span class="sd">    **versioned** according to :py:attr:`catalog_version`.</span>
+<div class="viewcode-block" id="ToolNode">
+<a class="viewcode-back" href="../../../api.html#agentc_langgraph.tool.ToolNode">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ToolNode</span><span class="p">(</span><span class="n">langgraph</span><span class="o">.</span><span class="n">prebuilt</span><span class="o">.</span><span class="n">ToolNode</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A tool node that logs tool results to a span.</span>
 
-<span class="sd">    .. attention::</span>
+<span class="sd">    .. card:: Class Description</span>
 
-<span class="sd">        :py:class:`Log` instances are **immutable** and should not be instantiated directly.</span>
-<span class="sd">        Only :py:class:`Content` instances should be created directly, and then passed to a :py:class:`Span` instance</span>
-<span class="sd">        via the :py:meth:`agentc.span.Span.log` method.</span>
+<span class="sd">        This class will record the results of each tool invocation to the span that is passed to it (ultimately</span>
+<span class="sd">        generating :py:class:`ToolResultContent` log entries).</span>
+<span class="sd">        This class does *not* log tool calls (i.e., :py:class:`ToolCallContent` log entries) as these are typically</span>
+<span class="sd">        logged with :py:class:`ChatCompletionContent` log entries.</span>
+
+<span class="sd">        Below, we illustrate a minimal working example of how to use this class with</span>
+<span class="sd">        :py:class:`agentc_langchain.chat.Callback` to record :py:class:`ChatCompletionContent` log entries,</span>
+<span class="sd">        :py:class:`ToolCallContent` log entries, and :py:class:`ToolResultContent` log entries.</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            import langchain_openai</span>
+<span class="sd">            import langchain_core.tools</span>
+<span class="sd">            import langgraph.prebuilt</span>
+<span class="sd">            import agentc_langchain.chat</span>
+<span class="sd">            import agentc_langgraph</span>
+<span class="sd">            import agentc</span>
+
+<span class="sd">            # Create a span to bind to the chat model messages.</span>
+<span class="sd">            catalog = agentc.Catalog()</span>
+<span class="sd">            root_span = catalog.Span(name=&quot;root_span&quot;)</span>
+
+<span class="sd">            # Create a chat model.</span>
+<span class="sd">            chat_model = langchain_openai.chat_models.ChatOpenAI(model=&quot;gpt-4o&quot;, callbacks=[])</span>
+
+<span class="sd">            # Create a callback with the appropriate span, and attach it to the chat model.</span>
+<span class="sd">            my_agent_span = root_span.new(name=&quot;my_agent&quot;)</span>
+<span class="sd">            callback = agentc_langchain.chat.Callback(span=my_agent_span)</span>
+<span class="sd">            chat_model.callbacks.append(callback)</span>
+
+<span class="sd">            # Grab the correct tools and output from the catalog.</span>
+<span class="sd">            my_agent_prompt = catalog.find(&quot;prompt&quot;, name=&quot;my_agent&quot;)</span>
+<span class="sd">            my_agent_tools = agentc_langgraph.tool.ToolNode(</span>
+<span class="sd">                span=my_agent_span,</span>
+<span class="sd">                tools=[</span>
+<span class="sd">                    langchain_core.tools.StructuredTool.from_function(tool.func) for tool in my_agent_prompt.tools</span>
+<span class="sd">                ]</span>
+<span class="sd">            )</span>
+<span class="sd">            my_agent_output = my_agent_prompt.output</span>
+
+<span class="sd">            # Finally, build your agent.</span>
+<span class="sd">            my_agent = langgraph.prebuilt.create_react_agent(</span>
+<span class="sd">                model=chat_model,</span>
+<span class="sd">                tools=my_agent_tools,</span>
+<span class="sd">                prompt=my_agent_prompt,</span>
+<span class="sd">                response_format=my_agent_output</span>
+<span class="sd">            )</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        For all constructor parameters, see the documentation for :py:class:`langgraph.prebuilt.ToolNode`</span>
+<span class="sd">        `here &lt;https://langchain-ai.github.io/langgraph/reference/prebuilt/#langgraph.prebuilt.tool_node.ToolNode&gt;`__.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Log.Span">
-<a class="viewcode-back" href="../../../../log.html#agentc_core.activity.models.log.Log.Span">[docs]</a>
-    <span class="k">class</span><span class="w"> </span><span class="nc">Span</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
-        <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">ConfigDict</span><span class="p">(</span><span class="n">use_enum_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">span</span><span class="p">:</span> <span class="n">Span</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">span</span> <span class="o">=</span> <span class="n">span</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="n">session</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The &#39;session&#39; (a runtime identifier) that this span is associated with.&quot;</span><span class="p">,</span>
-            <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_one</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">call</span><span class="p">:</span> <span class="n">langchain_core</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">ToolCall</span><span class="p">,</span>
+        <span class="n">input_type</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span> <span class="s2">&quot;tool_calls&quot;</span><span class="p">],</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">langchain_core</span><span class="o">.</span><span class="n">runnables</span><span class="o">.</span><span class="n">RunnableConfig</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">langchain_core</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">ToolMessage</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ToolNode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_run_one</span><span class="p">(</span><span class="n">call</span><span class="p">,</span> <span class="n">input_type</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">span</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+            <span class="n">content</span><span class="o">=</span><span class="n">ToolResultContent</span><span class="p">(</span>
+                <span class="n">tool_call_id</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">tool_call_id</span><span class="p">,</span> <span class="n">tool_result</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">status</span>
+            <span class="p">)</span>
         <span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
 
-        <span class="n">name</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the span. This is a list of names that represent the span hierarchy.&quot;</span><span class="p">,</span>
-            <span class="n">examples</span><span class="o">=</span><span class="p">[[</span><span class="s2">&quot;my_application&quot;</span><span class="p">,</span> <span class="s2">&quot;my_agent&quot;</span><span class="p">,</span> <span class="s2">&quot;my_task&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;my_application&quot;</span><span class="p">,</span> <span class="s2">&quot;my_agent&quot;</span><span class="p">]],</span>
-        <span class="p">)</span></div>
-
-
-    <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">ConfigDict</span><span class="p">(</span><span class="n">use_enum_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-    <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A unique identifier for this record. This field is typically a UUID.&quot;</span><span class="p">,</span>
-        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="n">span</span><span class="p">:</span> <span class="s2">&quot;Log.Span&quot;</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The span (i.e., a list of names and a session ID) that this record is associated with.&quot;</span>
-    <span class="p">)</span>
-
-    <span class="n">timestamp</span><span class="p">:</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">AwareDatetime</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Timestamp of the generated record. This field must have a timezone attached as well.&quot;</span><span class="p">,</span>
-        <span class="n">examples</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2024-08-26T12:02:59.500Z&quot;</span><span class="p">,</span> <span class="s2">&quot;2024-08-26T12:02:59.500+00:00&quot;</span><span class="p">],</span>
-    <span class="p">)</span>
-
-    <span class="n">content</span><span class="p">:</span> <span class="n">Content</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The content of the record. This should be as close to the producer as possible.&quot;</span><span class="p">,</span>
-        <span class="n">discriminator</span><span class="o">=</span><span class="s2">&quot;kind&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="n">annotations</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Additional annotations that can be added to the message.&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
-    <span class="p">)</span>
-
-    <span class="n">catalog_version</span><span class="p">:</span> <span class="n">VersionDescriptor</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A unique identifier that defines a catalog version / snapshot / commit.&quot;</span>
-    <span class="p">)</span></div>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_arun_one</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">call</span><span class="p">:</span> <span class="n">langchain_core</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">ToolCall</span><span class="p">,</span>
+        <span class="n">input_type</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span> <span class="s2">&quot;tool_calls&quot;</span><span class="p">],</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">langchain_core</span><span class="o">.</span><span class="n">runnables</span><span class="o">.</span><span class="n">RunnableConfig</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">langchain_core</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">ToolMessage</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="nb">super</span><span class="p">(</span><span class="n">ToolNode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_arun_one</span><span class="p">(</span><span class="n">call</span><span class="p">,</span> <span class="n">input_type</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">span</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+            <span class="n">content</span><span class="o">=</span><span class="n">ToolResultContent</span><span class="p">(</span>
+                <span class="n">tool_call_id</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">tool_call_id</span><span class="p">,</span> <span class="n">tool_result</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">status</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
 
 </pre></div>
 

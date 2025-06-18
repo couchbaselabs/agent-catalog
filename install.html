@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Installation &#8212; Agent Catalog 0.0.0 documentation</title>
+    <title>Installation &#8212; Agent Catalog 0.0.0.post1+g30e2dff documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=50651e91" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=86a354c8" />
-    <script src="_static/documentation_options.js?v=7026087e"></script>
+    <script src="_static/documentation_options.js?v=8b889931"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -23,7 +23,7 @@
     <link rel="icon" href="_static/favicon.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Agent Catalog: A Primer" href="tutorial.html" />
+    <link rel="next" title="Agent Catalog Concepts" href="concept.html" />
     <link rel="prev" title="Couchbase Agent Catalog Project" href="index.html" /> 
   </head><body data-dark_mode_code_blocks="true">
 
@@ -155,7 +155,7 @@
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.0.0 documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.0.0.post1+g30e2dff documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -246,7 +246,6 @@
         <div class="sphinxsidebarwrapper"><p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="concept.html">Concepts</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
@@ -274,13 +273,92 @@
             
   <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h1>
-<section id="building-from-package">
-<h2>Building From Package<a class="headerlink" href="#building-from-package" title="Link to this heading">¶</a></h2>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>This part is in-the-works!
-For now, please refer to the <a class="reference internal" href="#installing-from-source-with-makefile">Installing from Source (with Makefile)</a> section below.</p>
+<section id="installing-from-pypi">
+<h2>Installing from PyPI<a class="headerlink" href="#installing-from-pypi" title="Link to this heading">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This section is in the works!
+We recommend installing from our pre-built packages in the meantime.</p>
 </div>
+<ol class="arabic">
+<li><p>Make sure you have <strong class="command">python3.12</strong> installed!</p></li>
+<li><p>Install <code class="docutils literal notranslate"><span class="pre">agentc</span></code> with <code class="docutils literal notranslate"><span class="pre">pip</span></code>.</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>agentc
+</pre></div>
+</div>
+<p>If you are interested in developing with LangChain or LangGraph, install the helper <code class="docutils literal notranslate"><span class="pre">agentc_langchain</span></code> package
+and/or <code class="docutils literal notranslate"><span class="pre">agentc_langgraph</span></code> packages as extras:</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>agentc<span class="o">[</span>langchain,langgraph<span class="o">]</span>
+</pre></div>
+</div>
+<p>Similarly, for LlamaIndex Developers:</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>agentc<span class="o">[</span>llamaindex<span class="o">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>Validate your installation by running <code class="docutils literal notranslate"><span class="pre">agentc</span></code>.
+If your installation was successful, you should see the following output:</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">COMMAND [ARGS]...</span>
+
+  The Couchbase Agent Catalog command line tool.
+
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">-v</span>, <span class=" -Color -Color-Cyan -C-Cyan">--verbose</span>  Flag to enable verbose output.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">0</span><span class=" -Color -Color-Faint -C-Faint">; 0&lt;=x&lt;=2]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">-i</span>, <span class=" -Color -Color-Cyan -C-Cyan">--interactive</span> / <span class=" -Color -Color-Cyan -C-Cyan">-ni</span>, <span class=" -Color -Color-Cyan -C-Cyan">--no-interactive</span>
+                 Flag to enable interactive mode.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">i</span><span class=" -Color -Color-Faint -C-Faint">]</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>     Show this message and exit.
+
+<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Commands:</span>
+  <span class=" -Color -Color-Cyan -C-Cyan">add</span>      Interactively create a new tool or prompt and save it to the...
+  <span class=" -Color -Color-Cyan -C-Cyan">clean</span>    Delete all or specific (catalog and/or activity) Agent Catalog...
+  <span class=" -Color -Color-Cyan -C-Cyan">env</span>      Return all Agent Catalog related environment and configuration...
+  <span class=" -Color -Color-Cyan -C-Cyan">execute</span>  Search for and subsequently execute a specific tool.
+  <span class=" -Color -Color-Cyan -C-Cyan">find</span>     Find items from the catalog based on a natural language string...
+  <span class=" -Color -Color-Cyan -C-Cyan">index</span>    Walk the source directory trees (sources) to index source files...
+  <span class=" -Color -Color-Cyan -C-Cyan">init</span>     Initialize the necessary files/collections for your working Agent...
+  <span class=" -Color -Color-Cyan -C-Cyan">ls</span>       List all indexed tools and/or prompts in the catalog.
+  <span class=" -Color -Color-Cyan -C-Cyan">publish</span>  Upload the local catalog and/or logs to a Couchbase instance.
+  <span class=" -Color -Color-Cyan -C-Cyan">status</span>   Show the (aggregate) status of your Agent Catalog environment.
+  <span class=" -Color -Color-Cyan -C-Cyan">version</span>  Show the current version of Agent Catalog.
+
+See https://couchbaselabs.github.io/agent-catalog/index.html for more
+information.
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="installing-from-pre-built-package">
+<h2>Installing from Pre-Built Package<a class="headerlink" href="#installing-from-pre-built-package" title="Link to this heading">¶</a></h2>
+<ol class="arabic">
+<li><p>Make sure you have <strong class="command">python3.12</strong> installed!</p></li>
+<li><p>Navigate to the releases page for Agent Catalog <a class="reference external" href="https://github.com/couchbaselabs/agent-catalog/releases">here</a>
+and choose the latest version.
+Expand the &quot;Assets&quot; tab and download all <code class="docutils literal notranslate"><span class="pre">*.whl</span></code> files (e.g., <code class="docutils literal notranslate"><span class="pre">agentc-0.2.0+g59944db-py3-none-any.whl</span></code>) into
+your project location.</p></li>
+<li><p>Install the <code class="docutils literal notranslate"><span class="pre">agentc</span></code> packages using the <code class="docutils literal notranslate"><span class="pre">.whl</span></code> file and <code class="docutils literal notranslate"><span class="pre">pip</span></code>.
+Note that order matters here!</p>
+<blockquote>
+<div><div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>agentc_core-*.whl
+<span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>agentc_cli-*.whl
+<span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>agentc-*.whl
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>If you are interested in developing with LangChain or LangGraph, install the helper <code class="docutils literal notranslate"><span class="pre">agentc_langchain</span></code> package
+and/or <code class="docutils literal notranslate"><span class="pre">agentc_langgraph</span></code> package with the command(s) below:</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>agentc_langchain-*.whl
+<span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>agentc_langgraph-*.whl
+</pre></div>
+</div>
+<p>Similarly, for LlamaIndex Developers:</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>agentc_llamaindex-*.whl
+</pre></div>
+</div>
+</li>
+</ol>
 </section>
 <section id="installing-from-source-with-makefile">
 <h2>Installing from Source (with Makefile)<a class="headerlink" href="#installing-from-source-with-makefile" title="Link to this heading">¶</a></h2>
@@ -312,35 +390,6 @@ agent-catalog-UEfqTvAT-py3.13 (Activated)
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Note that you must activate your environment before running any <strong class="command">agentc</strong> commands!</p>
-</div>
-<p>If your environment has been activated properly, you should see the following output:</p>
-<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">COMMAND [ARGS]...</span>
-
-  The Couchbase Agent Catalog command line tool.
-
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">-v</span>, <span class=" -Color -Color-Cyan -C-Cyan">--verbose</span>  Flag to enable verbose output.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">0</span><span class=" -Color -Color-Faint -C-Faint">; 0&lt;=x&lt;=2]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">-i</span>, <span class=" -Color -Color-Cyan -C-Cyan">--interactive</span> / <span class=" -Color -Color-Cyan -C-Cyan">-ni</span>, <span class=" -Color -Color-Cyan -C-Cyan">--no-interactive</span>
-                 Flag to enable interactive mode.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">i</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>     Show this message and exit.
-
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Commands:</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">add</span>      Interactively create a new tool or prompt and save it to the...
-  <span class=" -Color -Color-Cyan -C-Cyan">clean</span>    Delete all or specific (catalog and/or activity) Agent Catalog...
-  <span class=" -Color -Color-Cyan -C-Cyan">env</span>      Return all Agent Catalog related environment and configuration...
-  <span class=" -Color -Color-Cyan -C-Cyan">execute</span>  Search for and subsequently execute a specific tool.
-  <span class=" -Color -Color-Cyan -C-Cyan">find</span>     Find items from the catalog based on a natural language string...
-  <span class=" -Color -Color-Cyan -C-Cyan">index</span>    Walk the source directory trees (sources) to index source files...
-  <span class=" -Color -Color-Cyan -C-Cyan">init</span>     Initialize the necessary files/collections for your working Agent...
-  <span class=" -Color -Color-Cyan -C-Cyan">ls</span>       List all indexed tools and/or prompts in the catalog.
-  <span class=" -Color -Color-Cyan -C-Cyan">publish</span>  Upload the local catalog and/or logs to a Couchbase instance.
-  <span class=" -Color -Color-Cyan -C-Cyan">status</span>   Show the (aggregate) status of your Agent Catalog environment.
-  <span class=" -Color -Color-Cyan -C-Cyan">version</span>  Show the current version of Agent Catalog.
-
-See https://couchbaselabs.github.io/agent-catalog/index.html for more
-information.
-</pre></div>
 </div>
 </li>
 <li><p>If you are interested in building a <code class="docutils literal notranslate"><span class="pre">.whl</span></code> file (for later use in <code class="docutils literal notranslate"><span class="pre">.whl</span></code>-based installation in other projects),
@@ -401,7 +450,8 @@ and/or <code class="docutils literal notranslate"><span class="pre">agentc_langg
             <div class="page_toc">
                 <ul>
 <li><a class="reference internal" href="#">Installation</a><ul>
-<li><a class="reference internal" href="#building-from-package">Building From Package</a></li>
+<li><a class="reference internal" href="#installing-from-pypi">Installing from PyPI</a></li>
+<li><a class="reference internal" href="#installing-from-pre-built-package">Installing from Pre-Built Package</a></li>
 <li><a class="reference internal" href="#installing-from-source-with-makefile">Installing from Source (with Makefile)</a></li>
 <li><a class="reference internal" href="#installing-from-source-with-anaconda">Installing from Source (with Anaconda)</a></li>
 </ul>
@@ -425,7 +475,7 @@ and/or <code class="docutils literal notranslate"><span class="pre">agentc_langg
 
             <div class="right">
                 
-                    <a href="tutorial.html"><span>Agent Catalog: A Primer</span><span class="icon">&gt;</span></a>
+                    <a href="concept.html"><span>Agent Catalog Concepts</span><span class="icon">&gt;</span></a>
                 
             </div>
         </div>
