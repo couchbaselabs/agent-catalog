@@ -10,9 +10,8 @@ print_separator '='
 echo "Running scripts/pre-build.sh"
 print_separator '-'
 
-# Note: dynamic-versioning and monoranger does not play well with each other :-(.
 echo "Creating backups of .toml and __init__ files."
-FILES=(
+FILES_WITH_VERSIONS=(
   pyproject.toml
   libs/agentc/pyproject.toml
   libs/agentc/agentc/__init__.py
@@ -29,7 +28,7 @@ FILES=(
   libs/agentc_testing/pyproject.toml
   libs/agentc_testing/agentc_testing/__init__.py
 )
-for file in "${FILES[@]}"; do
+for file in "${FILES_WITH_VERSIONS[@]}"; do
   mkdir -p dist/temp/$(dirname "$file")
   cp "$file" dist/temp/"$file".bak
 done
@@ -47,4 +46,8 @@ find libs -type f -name 'pyproject.toml' \
   -exec sed "${SED_INPLACE[@]}" \
    "s/version = \"0.0.0\"/version = \"$VERSION\"/g" {} +
 
+echo "Replacing relative package references."
+find libs -type f -name 'pyproject.toml' \
+  -exec sed "${SED_INPLACE[@]}" -E \
+  "s/(agentc-core|agentc-cli|agentc-langchain|agentc-langgraph|agentc-llamaindex) = \{[^}]+\}/\1 = \""^$VERSION"\"/g" {} +
 print_separator '-'

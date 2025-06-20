@@ -39,14 +39,6 @@ pytest-retry = "^1.7.0"
 path = "../../agentc_cli"
 develop = true
 
-[tool.poetry-monoranger-plugin]
-enabled = true
-monorepo-root = "../../../"
-version-pinning-rule = '=='
-
-[tool.poetry.requires-plugins]
-poetry-monoranger-plugin = ">=0.4.1"
-
 [build-system]
 requires = [
     "poetry-core>=2.1.0"

@@ -33,8 +33,7 @@ tqdm = "^4.66.5"
 dateparser = "^1.2.0"
 
 # The version of this package will be updated dynamically.
-# agentc-core = { path = "../agentc_core", develop = true }
-agentc-core = "^0.0.0"
+agentc-core = { path = "../agentc_core", develop = true }
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
@@ -50,14 +49,6 @@ markers = [
     "smoke: marks tests for running on each git-push",
     "slow: marks slow tests for running on each git-push",
 ]
-
-[tool.poetry-monoranger-plugin]
-enabled = true
-monorepo-root = "../../"
-version-pinning-rule = '=='
-
-[tool.poetry.requires-plugins]
-poetry-monoranger-plugin = ">=0.4.1"
 
 [build-system]
 requires = [

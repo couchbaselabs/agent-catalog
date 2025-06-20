@@ -55,14 +55,6 @@ markers = [
     "slow: marks slow tests for running on each git-push",
 ]
 
-[tool.poetry-monoranger-plugin]
-enabled = true
-monorepo-root = "../../"
-version-pinning-rule = '=='
-
-[tool.poetry.requires-plugins]
-poetry-monoranger-plugin = ">=0.4.1"
-
 [build-system]
 requires = [
     "poetry-core>=2.1.0"
