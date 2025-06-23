@@ -17,11 +17,6 @@ documentation = "https://couchbaselabs.github.io/agent-catalog/index.html"
 [project.scripts]
 agentc = "agentc.__main__:main"
 
-[project.optional-dependencies]
-langchain = ["agentc_langchain"]
-langgraph = ["agentc_langgraph"]
-llamaindex = ["agentc_llamaindex"]
-
 # Version is dynamically pulled from Git.
 [tool.poetry]
 name = "agentc"
@@ -41,6 +36,12 @@ agentc-langchain = { path = "../agentc_integrations/langchain", develop = true, 
 agentc-langgraph = { path = "../agentc_integrations/langgraph", develop = true, optional = true }
 agentc-llamaindex = { path = "../agentc_integrations/llamaindex", develop = true, optional = true }
 
+# TODO (GLENN): At some point we need to migrate to PEP508.
+[tool.poetry.extras]
+langchain = ["agentc_langchain"]
+langgraph = ["agentc_langgraph"]
+llamaindex = ["agentc_llamaindex"]
+
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
 pytest = "^8.3.2"
@@ -54,14 +55,6 @@ markers = [
     "smoke: marks tests for running on each git-push",
     "slow: marks slow tests for running on each git-push",
 ]
-
-[tool.poetry-monoranger-plugin]
-enabled = true
-monorepo-root = "../../"
-version-pinning-rule = '=='
-
-[tool.poetry.requires-plugins]
-poetry-monoranger-plugin = ">=0.4.1"
 
 [build-system]
 requires = [

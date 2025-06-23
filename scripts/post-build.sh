@@ -10,7 +10,6 @@ print_separator '='
 echo "Running scripts/post-build.sh"
 print_separator '-'
 
-# Note: dynamic-versioning and monoranger does not play well with each other :-(.
 echo "Restoring .toml and __init__ files."
 FILES=(
   pyproject.toml

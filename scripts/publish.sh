@@ -19,8 +19,8 @@ print_separator '-'
 for package in agentc_core agentc_cli agentc; do
   echo "Publishing '$package' package..."
   cd "libs/$package" || exit
-  poetry build
-  poetry publish # -r cb
+  poetry build --format wheel
+  poetry publish -u __token__ -p "$POETRY_PYPI_TOKEN_PYPI" # -r cb
   cd ../../
   echo "Package '$package' published!"
 done
@@ -29,8 +29,8 @@ done
 for package in langchain langgraph llamaindex; do
   echo "Publishing '$package' integration package..."
   cd "libs/agentc_integrations/$package" || exit
-  poetry build
-  poetry publish # -r cb
+  poetry build --format wheel
+  poetry publish -u __token__ -p "$POETRY_PYPI_TOKEN_PYPI" # -r cb
   cd ../../../
   echo "Integration package '$package' published!"
 done
