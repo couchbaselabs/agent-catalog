@@ -218,7 +218,7 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
             input_context = self._create_json_schema_from_specification(operation)
             if input_context is not None:
                 input_context.model = generate_model_from_json_schema(
-                    json_schema=json.dumps(input_context.json_schema),
+                    json_schema=input_context.json_schema,
                     class_name=INPUT_MODEL_CLASS_NAME_IN_TEMPLATES,
                     python_version=self.target_python_version,
                     model_type=self.target_model_type,
