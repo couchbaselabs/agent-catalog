@@ -21,9 +21,9 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.12"
-langchain-core = ">=0.2.28"
-langgraph = "^0.4.1"
-langgraph-checkpointer-couchbase = "^1.0.5"
+langchain-core = ">=0.3.68"
+langgraph = "^0.5.1"
+langgraph-checkpointer-couchbase = "^1.0.6"
 
 # The version of this package will be updated dynamically.
 agentc-core = { path = "../../agentc_core", develop = true }

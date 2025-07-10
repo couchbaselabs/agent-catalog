@@ -1,5 +1,6 @@
 import langchain_core.embeddings
 import os
+import time
 
 from .options import CacheOptions
 from agentc_core.config import Config
@@ -57,13 +58,24 @@ def setup_semantic_cache(options: CacheOptions, embeddings: langchain_core.embed
         index_partition=index_partition,
     )
 
-    _, err = create_vector_index(
-        config,
-        scope=options.scope,
-        collection=options.collection,
-        index_name=options.index_name,
-        # To determine the dimension, we'll use the sample text "text".
-        dim=len(embeddings.embed_query("text")),
-    )
+    backoff_factor = 2
+    max_attempts = 3
+    attempt = 0
+    while attempt < max_attempts:
+        _, err = create_vector_index(
+            config,
+            scope=options.scope,
+            collection=options.collection,
+            index_name=options.index_name,
+            # To determine the dimension, we'll use the sample text "text".
+            dim=len(embeddings.embed_query("text")),
+        )
+        if not err:
+            break
+        attempt += 1
+        if attempt < max_attempts:
+            time.sleep(backoff_factor**attempt)
+    # noinspection PyUnboundLocalVariable
     if err:
+        # noinspection PyUnboundLocalVariable
         raise ValueError(err)

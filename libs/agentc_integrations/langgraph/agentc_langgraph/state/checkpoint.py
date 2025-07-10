@@ -167,8 +167,6 @@ class CheckpointSaver(langgraph.checkpoint.base.BaseCheckpointSaver):
             checkpoints_collection_name=self.options.checkpoint_collection,
             checkpoint_writes_collection_name=self.options.tuple_collection,
         )
-        self.sync_saver.bucket_name = f"`{self.options.bucket}`"
-        self.sync_saver.scope_name = f"`{self.options.scope}`"
         super().__init__(serde=serde)
 
     def get(
