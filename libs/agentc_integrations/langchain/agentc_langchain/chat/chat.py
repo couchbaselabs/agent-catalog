@@ -196,7 +196,7 @@ class Callback(BaseCallbackHandler):
 
     """
 
-    def __init__(self, span: Span, tools: list[Tool] = None, output: dict = None):
+    def __init__(self, span: Span, tools: list[Tool] = None, output: tuple | dict = None):
         """
         :param span: The root span to bind to the chat model messages.
         :param tools: The tools that being used by the chat model (i.e., those passed in
@@ -205,7 +205,7 @@ class Callback(BaseCallbackHandler):
                        :py:meth`:BaseChatModel.with_structured_output:).
         """
         self.span: Span = span.new(name="agentc_langchain.chat.Callback")
-        self.output: dict = output or dict()
+        self.output: dict | tuple = output or dict()
         self.tools: list[RequestHeaderContent.Tool] = list()
         if tools is not None:
             for tool in tools:
@@ -233,7 +233,7 @@ class Callback(BaseCallbackHandler):
         self.span.log(
             RequestHeaderContent(
                 tools=self.tools,
-                output=self.output,
+                output=self.output[1] if isinstance(self.output, tuple) else self.output,
                 meta=serialized,
                 extra={
                     "run_id": str(run_id),

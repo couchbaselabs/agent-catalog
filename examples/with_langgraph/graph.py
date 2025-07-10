@@ -1,4 +1,4 @@
-import agentc_langgraph
+import agentc_langgraph.graph
 import dotenv
 import langgraph.graph
 
@@ -20,7 +20,7 @@ class FlightPlanner(agentc_langgraph.graph.GraphRunnable):
             messages=[], endpoints=None, routes=None, needs_clarification=False, is_last_step=False, previous_node=None
         )
 
-    def compile(self) -> langgraph.graph.graph.CompiledGraph:
+    def compile(self) -> langgraph.graph.StateGraph:
         # Build our nodes and agents.
         front_desk_agent = FrontDeskAgent(
             catalog=self.catalog,
