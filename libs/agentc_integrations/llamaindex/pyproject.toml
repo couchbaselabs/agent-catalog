@@ -26,9 +26,9 @@ Repository = "https://github.com/couchbaselabs/agent-catalog"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-couchbase = "^4.3.0"
+couchbase = "^4.3.6"
 joblib = "^1.4.2"
-llama-index = "^0.12.20"
+llama-index = "^0.12.47"
 pydantic = "^2.10.6"
 requests = "^2.32.3"
 pydantic-settings = "^2.7.1"

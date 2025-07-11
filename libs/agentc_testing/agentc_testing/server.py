@@ -53,6 +53,7 @@ def _start_container(volume_path: pathlib.Path) -> docker.models.containers.Cont
     volume_path.mkdir(exist_ok=True)
 
     # Start the Couchbase container.
+    time.sleep(3)
     client = docker.from_env()
     ports = {f"{port}/tcp": port for port in range(8091, 8098)}
     ports |= {f"{port}/tcp": port for port in range(18091, 18098)}
@@ -288,14 +289,14 @@ def shared_server_factory(tmp_path_factory) -> typing.Callable[[], docker.models
 
     # Execute our cleanup.
     finally:
+        if container is not None:
+            _stop_container(container)
         del os.environ["AGENT_CATALOG_CONN_STRING"]
         del os.environ["AGENT_CATALOG_USERNAME"]
         del os.environ["AGENT_CATALOG_PASSWORD"]
         del os.environ["AGENT_CATALOG_BUCKET"]
         del os.environ["AGENT_CATALOG_DDL_CREATE_INDEX_INTERVAL_SECONDS"]
         del os.environ["AGENT_CATALOG_DDL_RETRY_WAIT_SECONDS"]
-        if container is not None:
-            _stop_container(container)
 
 
 if __name__ == "__main__":

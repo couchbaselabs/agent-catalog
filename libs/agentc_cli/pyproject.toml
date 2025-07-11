@@ -29,8 +29,8 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.12"
 click-extra = "^4.15.0"
-tqdm = "^4.66.5"
-dateparser = "^1.2.0"
+tqdm = "^4.67.1"
+dateparser = "^1.2.2"
 
 # The version of this package will be updated dynamically.
 agentc-core = { path = "../agentc_core", develop = true }
