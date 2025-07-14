@@ -57,7 +57,7 @@ def find_one_layover_flights(source_airport: str, destination_airport: str) -> l
     )
     results: list[dict] = list()
     for result in query.rows():
-        results.append(result.dict)
+        results.append(result)
     return results
 
 
