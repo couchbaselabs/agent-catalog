@@ -13,6 +13,7 @@ Table of Contents
 
    Installation <install>
    Concepts <concept>
+   Tutorial <tutorial>
 
 .. toctree::
    :maxdepth: 2
