@@ -4,14 +4,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>agentc_core.config.config &#8212; Agent Catalog 0.2.2a2.post2 documentation</title>
+    <title>agentc_core.config.config &#8212; Agent Catalog 0.2.3a1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=50651e91" />
     <link rel="stylesheet" type="text/css" href="../../../_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=7230e44a" />
-    <script src="../../../_static/documentation_options.js?v=b925ca04"></script>
+    <script src="../../../_static/documentation_options.js?v=072b7ed8"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -160,7 +160,7 @@ window.addEventListener("load", () => mermaid.run());
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.2.2a2.post2 documentation</a></h1>
+        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.2.3a1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -282,6 +282,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">import</span><span class="w"> </span><span class="nn">couchbase.cluster</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">couchbase.options</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">isodate</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
@@ -293,6 +294,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.catalog.implementations.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">SearchResult</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_ACTIVITY_FOLDER</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_ACTIVITY_ROLLOVER_BYTES</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_CATALOG_FOLDER</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_CLUSTER_DDL_RETRY_ATTEMPTS</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_CLUSTER_DDL_RETRY_WAIT_SECONDS</span>
@@ -358,6 +360,13 @@ window.addEventListener("load", () => mermaid.run());
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; The name of the Couchbase bucket possessing the catalog.</span>
 
 <span class="sd">    This field **must** be specified with :py:attr:`conn_string`, :py:attr:`username`, and :py:attr:`password`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">log_ttl</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The time to live to attach to all logs forwarded to your Couchbase instance possessing the catalog.</span>
+
+<span class="sd">    This field is optional, and a :python:`None` value (the default) indicates that all logs will never expire.</span>
+<span class="sd">    If specified as a string, durations must be specified as an integer (of seconds) or an ISO 8601 duration.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">max_index_partition</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span>
@@ -449,6 +458,20 @@ window.addEventListener("load", () => mermaid.run());
                 <span class="p">)</span>
             <span class="k">return</span> <span class="n">v</span>
         <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">field_validator</span><span class="p">(</span><span class="s2">&quot;log_ttl&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log_ttl_seconds_to_timedelta</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">isodate</span><span class="o">.</span><span class="n">parse_duration</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">isodate</span><span class="o">.</span><span class="n">ISO8601Error</span> <span class="k">as</span> <span class="n">e1</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">seconds_from_v</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">seconds_from_v</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Value is not a valid seconds string nor an ISO 8601 string.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e1</span>
+        <span class="k">return</span> <span class="n">v</span>
 
     <span class="nd">@pydantic</span><span class="o">.</span><span class="n">field_serializer</span><span class="p">(</span><span class="s2">&quot;password&quot;</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_serialize_password_as_stars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">SecretStr</span><span class="p">,</span> <span class="n">_info</span><span class="p">):</span>
@@ -613,7 +636,23 @@ window.addEventListener("load", () => mermaid.run());
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Location of the activity folder.</span>
 
 <span class="sd">    By default, this value is ``$AGENT_CATALOG_ACTIVITY_PATH/.agent-activity``.</span>
+<span class="sd">    Set this value explicitly to :python:`None` to avoid logging to disk entirely.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">activity_rollover_bytes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_ACTIVITY_ROLLOVER_BYTES</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Size of the log file in bytes before rollover + compression occurs.</span>
+
+<span class="sd">    By default, this value is 128 :math:`MB` (128_000_000).</span>
+<span class="sd">    If this value is set to 0, no rollover will occur and logs will not be compressed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">field_validator</span><span class="p">(</span><span class="s2">&quot;activity_path&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_empty_string_is_none_path</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">v</span>
 
     <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_catalog_and_activity_must_align_with_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>

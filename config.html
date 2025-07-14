@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Agent Catalog Configuration &#8212; Agent Catalog 0.2.2a2.post2 documentation</title>
+    <title>Agent Catalog Configuration &#8212; Agent Catalog 0.2.3a1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=50651e91" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=7230e44a" />
-    <script src="_static/documentation_options.js?v=b925ca04"></script>
+    <script src="_static/documentation_options.js?v=072b7ed8"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -156,7 +156,7 @@
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.2a2.post2 documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.3a1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -410,6 +410,19 @@
 <span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Bucket&quot;</span>
 <span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;log_ttl&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;duration&quot;</span><span class="p">,</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">         </span><span class="p">],</span>
+<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Log Ttl&quot;</span>
+<span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;max_index_partition&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1024</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Max Index Partition&quot;</span><span class="p">,</span>
@@ -513,6 +526,11 @@
 <span class="w">         </span><span class="p">],</span>
 <span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Activity Path&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;activity_rollover_bytes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">128000000</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Activity Rollover Bytes&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;integer&quot;</span>
 <span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;embedding_model_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sentence-transformers/all-MiniLM-L12-v2&quot;</span><span class="p">,</span>
@@ -696,6 +714,19 @@ If <code class="docutils literal notranslate"><span class="pre">AGENT_CATALOG_VE
 <span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Bucket&quot;</span>
 <span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;log_ttl&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;duration&quot;</span><span class="p">,</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">         </span><span class="p">],</span>
+<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Log Ttl&quot;</span>
+<span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;max_index_partition&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1024</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Max Index Partition&quot;</span><span class="p">,</span>
@@ -782,6 +813,7 @@ If <code class="docutils literal notranslate"><span class="pre">AGENT_CATALOG_VE
 <li><p><a class="reference internal" href="#agentc_core.config.config.RemoteCatalogConfig.ddl_retry_attempts" title="agentc_core.config.config.RemoteCatalogConfig.ddl_retry_attempts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ddl_retry_attempts</span> <span class="pre">(int</span> <span class="pre">|</span> <span class="pre">None)</span></code></a></p></li>
 <li><p><a class="reference internal" href="#agentc_core.config.config.RemoteCatalogConfig.ddl_retry_wait_seconds" title="agentc_core.config.config.RemoteCatalogConfig.ddl_retry_wait_seconds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ddl_retry_wait_seconds</span> <span class="pre">(float</span> <span class="pre">|</span> <span class="pre">None)</span></code></a></p></li>
 <li><p><a class="reference internal" href="#agentc_core.config.config.RemoteCatalogConfig.index_partition" title="agentc_core.config.config.RemoteCatalogConfig.index_partition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">index_partition</span> <span class="pre">(int</span> <span class="pre">|</span> <span class="pre">None)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#agentc_core.config.config.RemoteCatalogConfig.log_ttl" title="agentc_core.config.config.RemoteCatalogConfig.log_ttl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_ttl</span> <span class="pre">(datetime.timedelta</span> <span class="pre">|</span> <span class="pre">None)</span></code></a></p></li>
 <li><p><a class="reference internal" href="#agentc_core.config.config.RemoteCatalogConfig.max_index_partition" title="agentc_core.config.config.RemoteCatalogConfig.max_index_partition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_index_partition</span> <span class="pre">(int)</span></code></a></p></li>
 <li><p><a class="reference internal" href="#agentc_core.config.config.RemoteCatalogConfig.password" title="agentc_core.config.config.RemoteCatalogConfig.password"><code class="xref py py-obj docutils literal notranslate"><span class="pre">password</span> <span class="pre">(pydantic.types.SecretStr</span> <span class="pre">|</span> <span class="pre">None)</span></code></a></p></li>
 <li><p><a class="reference internal" href="#agentc_core.config.config.RemoteCatalogConfig.username" title="agentc_core.config.config.RemoteCatalogConfig.username"><code class="xref py py-obj docutils literal notranslate"><span class="pre">username</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></a></p></li>
@@ -792,6 +824,7 @@ If <code class="docutils literal notranslate"><span class="pre">AGENT_CATALOG_VE
 <dd class="field-odd"><ul class="simple">
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_certificate_path_must_be_valid_if_not_none</span></code> » <a class="reference internal" href="#agentc_core.config.config.RemoteCatalogConfig.conn_root_certificate" title="agentc_core.config.config.RemoteCatalogConfig.conn_root_certificate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">conn_root_certificate</span></code></a></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_conn_string_must_follow_supported_url_pattern</span></code> » <a class="reference internal" href="#agentc_core.config.config.RemoteCatalogConfig.conn_string" title="agentc_core.config.config.RemoteCatalogConfig.conn_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">conn_string</span></code></a></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_log_ttl_seconds_to_timedelta</span></code> » <a class="reference internal" href="#agentc_core.config.config.RemoteCatalogConfig.log_ttl" title="agentc_core.config.config.RemoteCatalogConfig.log_ttl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_ttl</span></code></a></p></li>
 </ul>
 </dd>
 </dl>
@@ -872,6 +905,21 @@ By default, this value is 5 seconds.</p>
 By default, this value is <span class="math notranslate nohighlight">\(2 \times \text{number of FTS nodes in your cluster}\)</span>.
 More information on index partitioning can be found
 <a class="reference external" href="https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index-partitioning.html">here</a>.</p>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="agentc_core.config.config.RemoteCatalogConfig.log_ttl">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log_ttl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">timedelta</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc_core.config.config.RemoteCatalogConfig.log_ttl" title="Link to this definition">¶</a></dt>
+<dd><p>The time to live to attach to all logs forwarded to your Couchbase instance possessing the catalog.</p>
+<p>This field is optional, and a <code class="code highlight python docutils literal highlight-python"><span class="kc">None</span></code> value (the default) indicates that all logs will never expire.
+If specified as a string, durations must be specified as an integer (of seconds) or an ISO 8601 duration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_log_ttl_seconds_to_timedelta</span></code></p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
@@ -962,6 +1010,11 @@ By default, this value is 5 seconds.</p>
 <span class="w">         </span><span class="p">],</span>
 <span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Activity Path&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;activity_rollover_bytes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">128000000</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Activity Rollover Bytes&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;integer&quot;</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
@@ -978,6 +1031,7 @@ By default, this value is 5 seconds.</p>
 <dt class="field-even">Fields<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="#agentc_core.config.config.LocalCatalogConfig.activity_path" title="agentc_core.config.config.LocalCatalogConfig.activity_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">activity_path</span> <span class="pre">(pathlib.Path</span> <span class="pre">|</span> <span class="pre">None)</span></code></a></p></li>
+<li><p><a class="reference internal" href="#agentc_core.config.config.LocalCatalogConfig.activity_rollover_bytes" title="agentc_core.config.config.LocalCatalogConfig.activity_rollover_bytes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">activity_rollover_bytes</span> <span class="pre">(int)</span></code></a></p></li>
 <li><p><a class="reference internal" href="#agentc_core.config.config.LocalCatalogConfig.catalog_path" title="agentc_core.config.config.LocalCatalogConfig.catalog_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">catalog_path</span> <span class="pre">(pathlib.Path</span> <span class="pre">|</span> <span class="pre">None)</span></code></a></p></li>
 <li><p><a class="reference internal" href="#agentc_core.config.config.LocalCatalogConfig.project_path" title="agentc_core.config.config.LocalCatalogConfig.project_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">project_path</span> <span class="pre">(pathlib.Path</span> <span class="pre">|</span> <span class="pre">None)</span></code></a></p></li>
 </ul>
@@ -985,6 +1039,7 @@ By default, this value is 5 seconds.</p>
 <dt class="field-odd">Validators<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_catalog_and_activity_must_align_with_path</span></code> » <code class="xref py py-obj docutils literal notranslate"><span class="pre">all</span> <span class="pre">fields</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_empty_string_is_none_path</span></code> » <a class="reference internal" href="#agentc_core.config.config.LocalCatalogConfig.activity_path" title="agentc_core.config.config.LocalCatalogConfig.activity_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">activity_path</span></code></a></p></li>
 </ul>
 </dd>
 </dl>
@@ -992,7 +1047,24 @@ By default, this value is 5 seconds.</p>
 <dt class="sig sig-object py" id="agentc_core.config.config.LocalCatalogConfig.activity_path">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">activity_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc_core.config.config.LocalCatalogConfig.activity_path" title="Link to this definition">¶</a></dt>
 <dd><p>Location of the activity folder.</p>
-<p>By default, this value is <code class="docutils literal notranslate"><span class="pre">$AGENT_CATALOG_ACTIVITY_PATH/.agent-activity</span></code>.</p>
+<p>By default, this value is <code class="docutils literal notranslate"><span class="pre">$AGENT_CATALOG_ACTIVITY_PATH/.agent-activity</span></code>.
+Set this value explicitly to <code class="code highlight python docutils literal highlight-python"><span class="kc">None</span></code> to avoid logging to disk entirely.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_catalog_and_activity_must_align_with_path</span></code></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_empty_string_is_none_path</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="agentc_core.config.config.LocalCatalogConfig.activity_rollover_bytes">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">activity_rollover_bytes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">128000000</span></em><a class="headerlink" href="#agentc_core.config.config.LocalCatalogConfig.activity_rollover_bytes" title="Link to this definition">¶</a></dt>
+<dd><p>Size of the log file in bytes before rollover + compression occurs.</p>
+<p>By default, this value is 128 <span class="math notranslate nohighlight">\(MB\)</span> (128_000_000).
+If this value is set to 0, no rollover will occur and logs will not be compressed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Validated by<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1132,6 +1204,19 @@ A typical project structure is as follows:</p>
 <span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Bucket&quot;</span>
 <span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;log_ttl&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;duration&quot;</span><span class="p">,</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">               </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;null&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">         </span><span class="p">],</span>
+<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Log Ttl&quot;</span>
+<span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;max_index_partition&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1024</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Max Index Partition&quot;</span><span class="p">,</span>
@@ -1235,6 +1320,11 @@ A typical project structure is as follows:</p>
 <span class="w">         </span><span class="p">],</span>
 <span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Activity Path&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;activity_rollover_bytes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">128000000</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Activity Rollover Bytes&quot;</span><span class="p">,</span>
+<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;integer&quot;</span>
 <span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;embedding_model_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sentence-transformers/all-MiniLM-L12-v2&quot;</span><span class="p">,</span>
@@ -1710,6 +1800,7 @@ will use that snapshot version instead.</p>
 <li><a class="reference internal" href="#agentc_core.config.config.RemoteCatalogConfig.ddl_retry_attempts"><code class="docutils literal notranslate"><span class="pre">RemoteCatalogConfig.ddl_retry_attempts</span></code></a></li>
 <li><a class="reference internal" href="#agentc_core.config.config.RemoteCatalogConfig.ddl_retry_wait_seconds"><code class="docutils literal notranslate"><span class="pre">RemoteCatalogConfig.ddl_retry_wait_seconds</span></code></a></li>
 <li><a class="reference internal" href="#agentc_core.config.config.RemoteCatalogConfig.index_partition"><code class="docutils literal notranslate"><span class="pre">RemoteCatalogConfig.index_partition</span></code></a></li>
+<li><a class="reference internal" href="#agentc_core.config.config.RemoteCatalogConfig.log_ttl"><code class="docutils literal notranslate"><span class="pre">RemoteCatalogConfig.log_ttl</span></code></a></li>
 <li><a class="reference internal" href="#agentc_core.config.config.RemoteCatalogConfig.max_index_partition"><code class="docutils literal notranslate"><span class="pre">RemoteCatalogConfig.max_index_partition</span></code></a></li>
 <li><a class="reference internal" href="#agentc_core.config.config.RemoteCatalogConfig.password"><code class="docutils literal notranslate"><span class="pre">RemoteCatalogConfig.password</span></code></a></li>
 <li><a class="reference internal" href="#agentc_core.config.config.RemoteCatalogConfig.username"><code class="docutils literal notranslate"><span class="pre">RemoteCatalogConfig.username</span></code></a></li>
@@ -1719,6 +1810,7 @@ will use that snapshot version instead.</p>
 </li>
 <li><a class="reference internal" href="#agentc_core.config.config.LocalCatalogConfig"><code class="docutils literal notranslate"><span class="pre">LocalCatalogConfig</span></code></a><ul>
 <li><a class="reference internal" href="#agentc_core.config.config.LocalCatalogConfig.activity_path"><code class="docutils literal notranslate"><span class="pre">LocalCatalogConfig.activity_path</span></code></a></li>
+<li><a class="reference internal" href="#agentc_core.config.config.LocalCatalogConfig.activity_rollover_bytes"><code class="docutils literal notranslate"><span class="pre">LocalCatalogConfig.activity_rollover_bytes</span></code></a></li>
 <li><a class="reference internal" href="#agentc_core.config.config.LocalCatalogConfig.catalog_path"><code class="docutils literal notranslate"><span class="pre">LocalCatalogConfig.catalog_path</span></code></a></li>
 <li><a class="reference internal" href="#agentc_core.config.config.LocalCatalogConfig.project_path"><code class="docutils literal notranslate"><span class="pre">LocalCatalogConfig.project_path</span></code></a></li>
 <li><a class="reference internal" href="#agentc_core.config.config.LocalCatalogConfig.ActivityPath"><code class="docutils literal notranslate"><span class="pre">LocalCatalogConfig.ActivityPath()</span></code></a></li>
