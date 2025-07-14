@@ -1,7 +1,7 @@
 import abc
 import langchain_core.runnables
 import langchain_core.runnables.graph
-import langgraph.graph.graph
+import langgraph.graph
 import langgraph.store.base
 import typing
 
@@ -80,7 +80,7 @@ class GraphRunnable[S](langchain_core.runnables.Runnable):
             self.span = catalog.Span(name=self.__class__.__name__)
 
     @abc.abstractmethod
-    def compile(self) -> langgraph.graph.graph.CompiledGraph:
+    def compile(self) -> langgraph.graph.StateGraph:
         pass
 
     def get_graph(

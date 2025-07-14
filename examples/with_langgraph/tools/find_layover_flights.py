@@ -5,12 +5,11 @@ import couchbase.exceptions
 import couchbase.options
 import dotenv
 import os
-import pydantic
 
 dotenv.load_dotenv()
 
 # Agent Catalog imports this file once (even if both tools are requested).
-# To share (and reuse) Couchbase connections, we can use a global variable.
+# To share (and reuse) Couchbase connections, we can use a top-level variable.
 try:
     cluster = couchbase.cluster.Cluster(
         os.getenv("CB_CONN_STRING"),
@@ -31,16 +30,8 @@ except couchbase.exceptions.CouchbaseException as e:
     """)
 
 
-# Define a Pydantic model to provide more information to the LLM when analyzing a tool's output.
-class Route(pydantic.BaseModel):
-    airlines: list[str]
-    layovers: list[str]
-    from_airport: str
-    to_airport: str
-
-
 @agentc.catalog.tool
-def find_one_layover_flights(source_airport: str, destination_airport: str) -> list[Route]:
+def find_one_layover_flights(source_airport: str, destination_airport: str) -> list[dict]:
     """Find all one-layover (indirect) flights between two airports."""
     query = cluster.query(
         """
@@ -64,14 +55,14 @@ def find_one_layover_flights(source_airport: str, destination_airport: str) -> l
             named_parameters={"source_airport": source_airport, "destination_airport": destination_airport}
         ),
     )
-    results: list[Route] = list()
+    results: list[dict] = list()
     for result in query.rows():
-        results.append(Route(**result))
+        results.append(result.dict)
     return results
 
 
 @agentc.catalog.tool
-def find_two_layover_flights(source_airport: str, destination_airport: str) -> list[Route]:
+def find_two_layover_flights(source_airport: str, destination_airport: str) -> list[dict]:
     """Find all two-layover (indirect) flights between two airports."""
     query = cluster.query(
         """
@@ -97,7 +88,7 @@ def find_two_layover_flights(source_airport: str, destination_airport: str) -> l
             named_parameters={"source_airport": source_airport, "destination_airport": destination_airport}
         ),
     )
-    results: list[Route] = list()
+    results: list[dict] = list()
     for result in query.rows():
-        results.append(Route(**result))
+        results.append(result)
     return results
