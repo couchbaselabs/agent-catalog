@@ -402,7 +402,7 @@ class GlobalSpan(Span):
 
     @pydantic.model_validator(mode="after")
     def _find_local_activity(self) -> typing.Self:
-        if self.config.activity_path is None:
+        if self.config.activity_path is None and "activity_path" not in self.config.model_fields_set:
             try:
                 # Note: this method sets the self.config.activity_path attribute if found.
                 self.config.ActivityPath()
@@ -427,7 +427,12 @@ class GlobalSpan(Span):
 
         # Finally, instantiate our auditors.
         if self.config.activity_path is not None:
-            self._local_logger = LocalLogger(cfg=self.config, catalog_version=self.version, **self.kwargs)
+            self._local_logger = LocalLogger(
+                cfg=self.config,
+                catalog_version=self.version,
+                rollover=self.config.activity_rollover_bytes,
+                **self.kwargs,
+            )
         if self.config.conn_string is not None:
             try:
                 self._db_logger = DBLogger(cfg=self.config, catalog_version=self.version, **self.kwargs)

@@ -1,3 +1,4 @@
+import couchbase.options
 import logging
 import textwrap
 
@@ -39,5 +40,8 @@ class DBLogger(BaseLogger):
         cb_coll = cb.scope(DEFAULT_ACTIVITY_SCOPE).collection(DEFAULT_ACTIVITY_LOG_COLLECTION)
         self.cb_coll = cb_coll
 
+        # Grab our TTL for our logs.
+        self.ttl = cfg.log_ttl
+
     def _accept(self, log_obj: Log, log_json: dict):
-        self.cb_coll.insert(log_obj.identifier, log_json)
+        self.cb_coll.insert(log_obj.identifier, log_json, couchbase.options.InsertOptions(expiry=self.ttl))
