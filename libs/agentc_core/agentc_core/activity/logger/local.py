@@ -1,4 +1,3 @@
-import agentc_core.defaults
 import gzip
 import json
 import logging
@@ -9,6 +8,8 @@ import shutil
 from ...config import LocalCatalogConfig
 from .base import BaseLogger
 from agentc_core.activity.models.log import Log
+from agentc_core.defaults import DEFAULT_ACTIVITY_FILE
+from agentc_core.defaults import DEFAULT_ACTIVITY_ROLLOVER_BYTES
 from agentc_core.version import VersionDescriptor
 
 logger = logging.getLogger(__name__)
@@ -17,7 +18,11 @@ logger = logging.getLogger(__name__)
 class LocalLogger(BaseLogger):
     # TODO (GLENN): Add rollover to our Config class.
     def __init__(
-        self, cfg: LocalCatalogConfig, catalog_version: VersionDescriptor, rollover: int = 128_000_000, **kwargs
+        self,
+        cfg: LocalCatalogConfig,
+        catalog_version: VersionDescriptor,
+        rollover: int = DEFAULT_ACTIVITY_ROLLOVER_BYTES,
+        **kwargs,
     ):
         """
         :param output: Output file to write the audit logs to.
@@ -36,7 +41,7 @@ class LocalLogger(BaseLogger):
             os.remove(source_log_file)
 
         # We'll rotate log files and subsequently compress them when they get too large.
-        filename = cfg.ActivityPath() / agentc_core.defaults.DEFAULT_ACTIVITY_FILE
+        filename = cfg.ActivityPath() / DEFAULT_ACTIVITY_FILE
         self.rotating_handler = logging.handlers.RotatingFileHandler(filename, maxBytes=rollover)
         self.rotating_handler.rotator = compress_and_remove
         self.rotating_handler.namer = lambda name: name + ".gz"

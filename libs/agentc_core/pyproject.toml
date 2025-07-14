@@ -45,6 +45,7 @@ jsonschema = "^4.23.0"
 py-openapi-schema-to-json-schema = "^0.0.3"
 jsbeautifier = "^1.15.1"
 sentence-transformers = "^3.4.1"
+isodate = "^0.7.2"
 
 [tool.poetry.group.refiner]
 optional = true

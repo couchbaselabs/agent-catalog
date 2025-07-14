@@ -2,6 +2,7 @@ import couchbase.auth
 import couchbase.cluster
 import couchbase.options
 import datetime
+import isodate
 import logging
 import os
 import pathlib
@@ -13,6 +14,7 @@ import urllib.parse
 
 from agentc_core.catalog.implementations.base import SearchResult
 from agentc_core.defaults import DEFAULT_ACTIVITY_FOLDER
+from agentc_core.defaults import DEFAULT_ACTIVITY_ROLLOVER_BYTES
 from agentc_core.defaults import DEFAULT_CATALOG_FOLDER
 from agentc_core.defaults import DEFAULT_CLUSTER_DDL_RETRY_ATTEMPTS
 from agentc_core.defaults import DEFAULT_CLUSTER_DDL_RETRY_WAIT_SECONDS
@@ -76,6 +78,13 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
     """ The name of the Couchbase bucket possessing the catalog.
 
     This field **must** be specified with :py:attr:`conn_string`, :py:attr:`username`, and :py:attr:`password`.
+    """
+
+    log_ttl: typing.Optional[datetime.timedelta] = None
+    """ The time to live to attach to all logs forwarded to your Couchbase instance possessing the catalog.
+
+    This field is optional, and a :python:`None` value (the default) indicates that all logs will never expire.
+    If specified as a string, durations must be specified as an integer (of seconds) or an ISO 8601 duration.
     """
 
     max_index_partition: int = 1024
@@ -167,6 +176,20 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
                 )
             return v
         return None
+
+    @pydantic.field_validator("log_ttl", mode="before")
+    @classmethod
+    def _log_ttl_seconds_to_timedelta(cls, v: typing.Any) -> typing.Any:
+        if isinstance(v, str):
+            try:
+                isodate.parse_duration(v)
+            except isodate.ISO8601Error as e1:
+                try:
+                    seconds_from_v = int(v)
+                    return datetime.timedelta(seconds=seconds_from_v)
+                except ValueError:
+                    raise ValueError("Value is not a valid seconds string nor an ISO 8601 string.") from e1
+        return v
 
     @pydantic.field_serializer("password")
     def _serialize_password_as_stars(self, _: pydantic.SecretStr, _info):
@@ -322,7 +345,23 @@ class LocalCatalogConfig(pydantic_settings.BaseSettings):
     """ Location of the activity folder.
 
     By default, this value is ``$AGENT_CATALOG_ACTIVITY_PATH/.agent-activity``.
+    Set this value explicitly to :python:`None` to avoid logging to disk entirely.
     """
+
+    activity_rollover_bytes: int = DEFAULT_ACTIVITY_ROLLOVER_BYTES
+    """ Size of the log file in bytes before rollover + compression occurs.
+
+    By default, this value is 128 :math:`MB` (128_000_000).
+    If this value is set to 0, no rollover will occur and logs will not be compressed.
+    """
+
+    @pydantic.field_validator("activity_path", mode="before")
+    @classmethod
+    def _empty_string_is_none_path(cls, v: typing.Any) -> typing.Any:
+        if isinstance(v, str) and v == "":
+            return None
+        else:
+            return v
 
     @pydantic.model_validator(mode="after")
     def _catalog_and_activity_must_align_with_path(self) -> typing.Self:
