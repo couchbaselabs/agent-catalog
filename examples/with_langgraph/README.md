@@ -57,8 +57,6 @@ classDef last fill: #bfb6fc
 
    ```bash
    git init
-   git add * ; git add .gitignore .env.example .pre-commit-config.yaml
-   git commit -m "Initial commit"
    ```
 
 4. Install this example using Poetry.
@@ -147,36 +145,23 @@ classDef last fill: #bfb6fc
    this sample bucket.
 
 3. Initialize your local and Couchbase-hosted Agent Catalog instance by running the `agentc init` command.
+   In this example, we will also add a post-commit hook to integrate `agentc` with your existing `git` workflow.
 
    ```bash
-   agentc init
+   agentc init --add-hook-for tools --add-hook-for prompts
    ```
 
-4. Make sure your Git repo is clean, and run `agentc index` to index your tools and prompts.
+4. Now let us make our first commit, which will use `agentc` behind the scenes.
 
    ```bash
-   # agentc index
-   agentc index .
+   git add * ; git add .gitignore .env.example .pre-commit-config.yaml
+   git commit -m "Initial commit"
    ```
-
-   This command will subsequently crawl the current working directory for both tool and prompt files.
 
    _Hint: if you've made changes but want to keep the "same" commit within your local branch, use
    `git add $MY_FILES` followed by `git commit --amend`!_
 
-5. Publish your local agent catalog to your Couchbase instance with `agentc publish`.
-   Your Couchbase instance details in the `.env` file will be used for authentication.
-   Again, this specific starter agent system uses the `travel-sample` bucket.
-
-   ```bash
-   agentc publish
-   ```
-
-   _Hint: feel free to install `agentc` as a post-commit hook!
-   Run `pre-commit install --hook-type post-commit --hook-type pre-commit` to install this project's (pre|post)-commit
-   hooks and run `agentc index` + `agentc publish` after `git commit [--amend]`!_
-
-6. Finally, run your agent system and talk with the "Front Desk" agent!
+5. Finally, run your agent system and talk with the "Front Desk" agent!
 
    ```bash
    python main.py
@@ -189,33 +174,35 @@ In this section, we will illustrate how you can "tune" your agent system in an a
 1. To start, let's find a route from SFO to LAX.
 
     ```text
-    > Assistant: Please provide the source and destination airports.
-    > User: I want to go to LA. I am in the north bay area.
-    > Assistant: Here are the direct flight options from the North Bay Area to Los Angeles:
-      **From Charles M. Schulz–Sonoma County Airport (STS) to Los Angeles International Airport (LAX):**
-      - Alaska Airlines (AS)
-      - American Airlines (AA)
+   > Assistant: Please provide the source and destination airports.
+   > User: I want to go to LA. I am from the bay area
+   > Assistant: I found several direct flight options from the Bay Area to Los Angeles (LAX). Here are the details:
 
-      **From San Francisco International Airport (SFO) to Los Angeles International Airport (LAX):**
-      - Alaska Airlines (AS)
-      - Delta Airlines (DL)
-      - United Airlines (UA)
-      - US Airways (US)
-      - Virgin America (VX)
-      - Southwest Airlines (WN)
-      - American Airlines (AA)
+   ### From San Francisco International Airport (SFO):
+   - Airlines: Alaska Airlines (AS), Delta Airlines (DL), United Airlines (UA), US Airways (US), Virgin America (VX),
+     Southwest Airlines (WN), American Airlines (AA)
 
-      **From Oakland International Airport (OAK) to Los Angeles International Airport (LAX):**
-      - Delta Airlines (DL)
-      - AirTran Airways (FL)
-      - Southwest Airlines (WN)
+   ### From Oakland International Airport (OAK):
+   - Airlines: Delta Airlines (DL), Frontier Airlines (FL), Southwest Airlines (WN)
 
-      You have several options to choose from, depending on your preferred airport and airline. Let me know if you
-      need further assistance with booking or additional information!
-    > User: That's all, thanks
-    > Assistant: You're welcome! If you have any more questions in the future, feel free to ask. Have a great trip
-      to LA!
+   ### From San Jose International Airport (SJC):
+   - Airlines: Alaska Airlines (AS), Delta Airlines (DL), Frontier Airlines (FL), Singapore Airlines (SQ),
+     United Airlines (UA), US Airways (US), Virgin America (VX), Southwest Airlines (WN), American Airlines (AA)
+
+   You can choose any of these airports based on your convenience. Would you like more information on any specific
+   flight or airline?
     ```
+
+   We can view the path on our graph we traversed by querying our logs collection (below is an Analytics query):
+
+   ```sql
+   SELECT
+    *
+   FROM
+    `travel-sample`.agent_activity.Sessions t
+   WHERE
+    t.sid = `travel-sample`.agent_activity.LastSession()
+   ```
 
 2. Next, let's try a set of endpoints that has requires one layover.
    Specifically, we want a route from Canyonlands Field Airport (IATA 'CNY') to LAX.
@@ -223,25 +210,32 @@ In this section, we will illustrate how you can "tune" your agent system in an a
    ```text
    > Assistant: Please provide the source and destination airports.
    > User: i want to go to LAX from Canyonlands Field Airport
-   > Assistant: To travel from Canyonlands Field Airport (CNY) to Los Angeles International Airport (LAX), you will
-     likely need to book a connecting flight, as there may not be direct flights available. You can check with airlines
-     that operate from CNY for available routes and connections. Additionally, consider checking travel websites or
-     consulting with a travel agent to find the best options for your trip.
+   > Assistant: To travel from Canyonlands Field Airport (CNY) to Los Angeles International Airport (LAX), you have a
+   few options:
+
+   1. **Direct Flight**: Check for any direct flights from Canyonlands Field Airport to LAX. However, direct flights
+      may not be available, and you might need to connect through another airport.
+
+   2. **Connecting Flights**: If there are no direct flights, you can look for connecting flights. Common connecting
+   airports include Salt Lake City International Airport (SLC) or Denver International Airport (DEN). You would fly
+   from CNY to one of these airports and then catch a flight to LAX.
+
+   3. **Driving**: If you prefer to drive, the distance from Canyonlands Field Airport to LAX is approximately 700
+   miles. The drive would take around 10-12 hours, depending on traffic and road conditions. You would take US-191 S
+   to I-70 W, then connect to I-15 S towards Los Angeles.
+
+   4. **Bus or Shuttle Services**: Check if there are any bus or shuttle services that operate between these two
+   locations, although this option may take significantly longer.
+
+   Make sure to check flight availability and book in advance if you choose to fly. Safe travels!
    ```
 
-   This is **not** a correct response -- and the culprit lies with our "Front Desk" agent incorrectly assuming the
-   user input is not relevant to route planning.
+   This is **not** a correct response.
+   If we take a look at our logs (again, issuing the SQL query on ``Sessions`` above), we see that the culprit lies
+   with our "Front Desk" agent incorrectly assuming the user input is not relevant to route planning.
 
    1. To fix this, let us modify our prompt.
-      Open the file `prompts/front_desk.yaml` and uncomment the item at the very bottom of the
-      `content --> agent_instructions` list:
-
-      ```yaml
-         - >
-           If the user asks for flights / routes from obscure or small airports, DO NOT assume that no routes exist.
-           Let another agent decide this, not you.
-           In this case, set the is_last_step to False.
-      ```
+      Open the file `prompts/front_desk.yaml` and uncomment all items in the  `content --> agent_instructions` list.
 
    2. Next, we will create a new commit that captures this change.
 
@@ -249,16 +243,7 @@ In this section, we will illustrate how you can "tune" your agent system in an a
       git add prompts/front_desk.yaml ; git commit -m "Fixing front desk agent."
       ```
 
-   3. If you ran `pre-commit install --hook-type post-commit` earlier, `agentc index` + `agentc publish` will have
-      automatically run.
-      Otherwise, run these commands here.
-
-      ```bash
-      agentc index prompts
-      agentc publish
-      ```
-
-   4. Now, let us try the same input again with our agent system.
+   3. Now, let us try the same input again with our agent system.
 
        ```text
        > Assistant: Please provide the source and destination airports.

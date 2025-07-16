@@ -115,6 +115,14 @@ def agentc(ctx: click_extra.Context, verbose: int, interactive: bool):
     show_default=True,
 )
 @click_extra.option(
+    "--add-hook-for",
+    multiple=True,
+    default=None,
+    type=str,
+    help="Source directory to add a post-commit hook for.",
+    show_default=False,
+)
+@click_extra.option(
     "--bucket",
     default=None,
     type=str,
@@ -127,6 +135,7 @@ def init(
     targets: list[typing.Literal["catalog", "activity"]],
     db: bool,
     local: bool,
+    add_hook_for: list[str] = None,
     bucket: str = None,
 ):
     """
@@ -147,6 +156,7 @@ def init(
         targets=targets,
         db=db,
         local=local,
+        add_hook_for=add_hook_for,
     )
 
 

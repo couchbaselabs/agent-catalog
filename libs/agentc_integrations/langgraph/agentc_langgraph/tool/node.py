@@ -48,7 +48,10 @@ class ToolNode(langgraph.prebuilt.ToolNode):
             my_agent_tools = agentc_langgraph.tool.ToolNode(
                 span=my_agent_span,
                 tools=[
-                    langchain_core.tools.StructuredTool.from_function(tool.func) for tool in my_agent_prompt.tools
+                    langchain_core.tools.tool(
+                        tool.func,
+                        args_schema=tool.input,
+                    ) for tool in my_agent_prompt.tools
                 ]
             )
             my_agent_output = my_agent_prompt.output

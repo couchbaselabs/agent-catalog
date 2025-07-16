@@ -69,7 +69,7 @@ def _content_from_message(message: BaseMessage) -> typing.Iterable[Content]:
         case "function" | "FunctionMessageChunk":
             function_message: FunctionMessage = message
             yield SystemContent(
-                value=function_message.content,
+                value=str(function_message.content),
                 extra={
                     "kind": message.type,
                 },
@@ -78,7 +78,7 @@ def _content_from_message(message: BaseMessage) -> typing.Iterable[Content]:
         case "tool" | "ToolMessageChunk":
             tool_message: ToolMessage = message
             yield SystemContent(
-                value=tool_message.content,
+                value=str(tool_message.content),
                 extra={
                     "kind": message.type,
                     "tool_call_id": tool_message.tool_call_id,
@@ -209,8 +209,16 @@ class Callback(BaseCallbackHandler):
         self.tools: list[RequestHeaderContent.Tool] = list()
         if tools is not None:
             for tool in tools:
+                if hasattr(tool.args_schema, "model_json_schema"):
+                    args_schema = tool.args_schema.model_json_schema()
+                else:
+                    args_schema = tool.args_schema
                 self.tools.append(
-                    RequestHeaderContent.Tool(name=tool.name, description=tool.description, args_schema=tool.args)
+                    RequestHeaderContent.Tool(
+                        name=tool.name,
+                        description=tool.description,
+                        args_schema=args_schema,
+                    )
                 )
 
         # The following is set on chat completion.

@@ -1,7 +1,6 @@
 import abc
 import agentc_core.defaults
 import dataclasses
-import datamodel_code_generator
 import datetime
 import jinja2
 import json
@@ -19,15 +18,13 @@ from ..descriptor import SemanticSearchToolDescriptor
 from ..descriptor import SQLPPQueryToolDescriptor
 from ..descriptor.secrets import CouchbaseSecrets
 from ..descriptor.secrets import EmbeddingModelSecrets
-from .common import INPUT_MODEL_CLASS_NAME_IN_TEMPLATES
-from .common import OUTPUT_MODEL_CLASS_NAME_IN_TEMPLATES
-from .common import GeneratedCode
-from .common import generate_model_from_json_schema
 
 logger = logging.getLogger(__name__)
 
-ModelType = datamodel_code_generator.DataModelType
-PythonTarget = datamodel_code_generator.PythonVersion
+
+class GeneratedCode(typing.TypedDict):
+    code: str
+    args_schema: dict
 
 
 class _BaseCodeGenerator(pydantic.BaseModel):
@@ -36,19 +33,8 @@ class _BaseCodeGenerator(pydantic.BaseModel):
         description="Location of the the template files.",
     )
 
-    target_python_version: PythonTarget = pydantic.Field(
-        default=PythonTarget.PY_311,
-        description="The target Python version for the generated (schema) code.",
-    )
-
-    target_model_type: ModelType = pydantic.Field(
-        default=ModelType.PydanticV2BaseModel,
-        examples=[ModelType.TypingTypedDict, ModelType.PydanticV2BaseModel],
-        description="The target model type for the generated (schema) code.",
-    )
-
     @abc.abstractmethod
-    def generate(self) -> typing.Iterable[tuple[str, str]]:
+    def generate(self) -> typing.Iterable[GeneratedCode]:
         pass
 
 
@@ -59,27 +45,7 @@ class SQLPPCodeGenerator(_BaseCodeGenerator):
     def record_descriptor(self) -> SQLPPQueryToolDescriptor:
         return self.record_descriptors[0]
 
-    def generate(self) -> typing.Iterable[str]:
-        # Generate a Pydantic model for the input schema...
-        input_model = generate_model_from_json_schema(
-            json_schema=self.record_descriptor.input,
-            class_name=INPUT_MODEL_CLASS_NAME_IN_TEMPLATES,
-            python_version=self.target_python_version,
-            model_type=self.target_model_type,
-        )
-
-        # ...and the output schema.
-        output_model = (
-            generate_model_from_json_schema(
-                json_schema=self.record_descriptor.output,
-                class_name=OUTPUT_MODEL_CLASS_NAME_IN_TEMPLATES,
-                python_version=self.target_python_version,
-                model_type=self.target_model_type,
-            )
-            if self.record_descriptor.output is not None
-            else GeneratedCode(generated_code="", is_list_valued=False, type_name="dict")
-        )
-
+    def generate(self) -> typing.Iterable[GeneratedCode]:
         # Instantiate our template.
         with (self.template_directory / "sqlpp_q.jinja").open("r") as tmpl_fp:
             template = jinja2.Template(source=tmpl_fp.read())
@@ -89,13 +55,11 @@ class SQLPPCodeGenerator(_BaseCodeGenerator):
                     "time": generation_time,
                     "query": self.record_descriptor.query,
                     "tool": self.record_descriptor,
-                    "input": input_model,
-                    "output": output_model,
                     "secrets": self.record_descriptor.secrets[0].couchbase,
                 }
             )
             logger.debug("The following code has been generated:\n" + rendered_code)
-            yield rendered_code
+            yield GeneratedCode(code=rendered_code, args_schema=self.record_descriptor.input)
 
 
 class SemanticSearchCodeGenerator(_BaseCodeGenerator):
@@ -105,15 +69,7 @@ class SemanticSearchCodeGenerator(_BaseCodeGenerator):
     def record_descriptor(self) -> SemanticSearchToolDescriptor:
         return self.record_descriptors[0]
 
-    def generate(self) -> typing.Iterable[str]:
-        # Generate a Pydantic model for the input schema.
-        input_model = generate_model_from_json_schema(
-            json_schema=self.record_descriptor.input,
-            class_name=INPUT_MODEL_CLASS_NAME_IN_TEMPLATES,
-            python_version=self.target_python_version,
-            model_type=self.target_model_type,
-        )
-
+    def generate(self) -> typing.Iterable[GeneratedCode]:
         # Instantiate our template.
         with (self.template_directory / "semantic_q.jinja").open("r") as tmpl_fp:
             template = jinja2.Template(source=tmpl_fp.read(), autoescape=True)
@@ -134,7 +90,6 @@ class SemanticSearchCodeGenerator(_BaseCodeGenerator):
                 {
                     "time": generation_time,
                     "tool": self.record_descriptor,
-                    "input": input_model,
                     "vector_search": self.record_descriptor.vector_search,
                     "cluster_secrets": cluster_secrets.couchbase if cluster_secrets is not None else None,
                     "embedding_model": {
@@ -147,7 +102,7 @@ class SemanticSearchCodeGenerator(_BaseCodeGenerator):
                 }
             )
             logger.debug("The following code has been generated:\n" + rendered_code)
-            yield rendered_code
+            yield GeneratedCode(code=rendered_code, args_schema=self.record_descriptor.input)
 
 
 class HTTPRequestCodeGenerator(_BaseCodeGenerator):
@@ -156,7 +111,6 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
 
     @dataclasses.dataclass
     class InputContext:
-        model: typing.Any
         json_schema: dict
         locations_dict: dict
         content_type: str = openapi_pydantic.DataType.OBJECT
@@ -206,25 +160,15 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
         if len(base_object["properties"]) == 0:
             return None
         else:
-            return HTTPRequestCodeGenerator.InputContext(json_schema=base_object, locations_dict=locations, model=None)
+            return HTTPRequestCodeGenerator.InputContext(json_schema=base_object, locations_dict=locations)
 
-    def generate(self) -> typing.Iterable[str]:
+    def generate(self) -> typing.Iterable[GeneratedCode]:
         # Iterate over our operations.
         for record_descriptor in self.record_descriptors:
             operation = record_descriptor.handle
 
-            # TODO (GLENN): We should try to build a model for the response (output) in the future.
-            # Generate a Pydantic model for the input schema.
-            input_context = self._create_json_schema_from_specification(operation)
-            if input_context is not None:
-                input_context.model = generate_model_from_json_schema(
-                    json_schema=input_context.json_schema,
-                    class_name=INPUT_MODEL_CLASS_NAME_IN_TEMPLATES,
-                    python_version=self.target_python_version,
-                    model_type=self.target_model_type,
-                )
-
             # Instantiate our template.
+            input_context = self._create_json_schema_from_specification(operation)
             with (self.template_directory / "httpreq_q.jinja").open("r") as tmpl_fp:
                 template = jinja2.Template(source=tmpl_fp.read())
                 generation_time = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
@@ -239,4 +183,4 @@ class HTTPRequestCodeGenerator(_BaseCodeGenerator):
                     }
                 )
                 logger.debug("The following code has been generated:\n" + rendered_code)
-                yield rendered_code
+                yield GeneratedCode(code=rendered_code, args_schema=input_context.json_schema)

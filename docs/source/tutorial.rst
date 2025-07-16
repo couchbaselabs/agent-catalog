@@ -90,7 +90,10 @@ You can also save these to a ``.env`` file and ``agentc`` will read these values
     $ export AGENT_CATALOG_PASSWORD=...
     $ export AGENT_CATALOG_BUCKET=...
     $ export AGENT_CATALOG_CONN_ROOT_CERTIFICATE=...
-    $ agentc init
+    $ agentc init --add-hook-for tools --add-hook-for prompts
+
+The ``--add-hook-for`` option allows us to integrate with :command:`git` as a post-commit hook.
+Here, we will focus on ``tools`` and ``prompts`` as directories.
 
 
 Step #1: Building Agent Tools and Prompts
@@ -133,37 +136,7 @@ We describe the prompt for each agent below.
 
         content:
           agent_instructions:
-            - >
-              Your task is to respond to the user AND decide if the conversation
-              should end based on the user's response.
-              If you have any routes that have been given to by another agent,
-              respond to the user in Markdown illustrating the routes.
-
-            - >
-              If the user asks for help with flight planning but there are no
-              source and destination cities provided, set the
-              'needs_clarification' field to True and provide a polite response.
-
-            - >
-              If the user asks / replies with anything not related to flight
-              planning, set the 'is_last_step' field to True and
-              'needs_clarification' to True.
-              DO NOT continue the conversation if the user's input / response is
-              not related to flight planning.
-              For example, the following responses should end the conversation
-              (set 'is_last_step' to True):
-              - I need help with my hotel reservation. ==> is_last_step: True
-              - Can you help me with my car rental? ==> is_last_step: True
-              - I need recommendations for restaurants in the area.
-                ==> is_last_step: True
-
-            - >
-              If the user wants to end the conversation, set the 'is_last_step'
-              field to True and provide a polite response.
-              For example:
-              - Thanks! That's all I need. ==> is_last_step: True
-              - I'm done for now. ==> is_last_step: True
-              - That's all for today. ==> is_last_step: True
+            - Be polite!
 
           output_format_instructions: >
             Be polite and professional in your responses.
@@ -499,20 +472,14 @@ LLMs, and by extension agents, are very sensitive to their initial conditions (e
 etc...).
 For agent developers like us, using a tried-and-true versioning system like Git is essential to adequately capturing
 these initial conditions for reproducibility down-the-line.
-This example comes with a post-commit hook (see ``.pre-commit-config.yaml``) that we will install using the command
-below:
-
-.. code-block:: ansi-shell-session
-
-    $ pre-commit install --hook-type post-commit
-
 If you have set the correct environment variables (or populated ``.env`` appropriately), all we need to do now is
 ``git add`` the prompts and tools we just authored and commit them with ``git commit``.
 Behind the scenes, ``agentc index`` and ``agentc publish`` will run to index these tools and prompts to a
 local catalog file and to your Couchbase instance.
 
-Assuming that you have placed your tools in a ``tools`` folder and your prompts in a ``prompts`` folder, run the
-commands below to commit your files to Git and to index + publish your artifacts.
+Assuming that you have placed your tools in a ``tools`` folder and your prompts in a ``prompts`` folder
+(corresponding to the ``add-hook-for`` option from ``agentc init``), run the commands below to commit your files to
+Git and to index + publish your artifacts.
 
 .. code-block:: ansi-shell-session
 
@@ -525,25 +492,28 @@ and call the ``find`` method.
 .. code-block:: python
 
     import agentc
+    import dotenv
 
-    # AGENT_CATALOG_CONN_STRING, AGENT_CATALOG_USERNAME, and AGENT_PASSWORD
+    dotenv.load_dotenv()
+
+    # AGENT_CATALOG_CONN_STRING, AGENT_CATALOG_USERNAME, and AGENT_CATALOG_PASSWORD
     # must be set as environment variables or passed as parameters here.
     catalog = agentc.Catalog()
 
     # Grab a tool by name.
-    tool = catalog.find("tool", name="find_direct_routes_between_airports")[0]
-    print(tool.func({"source_airport": "SFO", "destination_airport": "LAX"}))
+    tool = catalog.find("tool", name="find_direct_routes_between_airports")
+    print(tool.func(source_airport="SFO", destination_airport="LAX"))
 
     # Grab a prompt by name.
-    prompt = catalog.find("prompt", name="endpoint_finding_node")[0]
+    prompt = catalog.find("prompt", name="route_finding_node")
     print(prompt.content)
 
     # Use the tool specified in the prompt.
     tool_from_prompt = prompt.tools[0].func
-    print(tool_from_prompt({
-        "source_airport": "SFO",
-        "destination_airport": "LAX",
-    }))
+    print(tool_from_prompt(
+        source_airport="SFO",
+        destination_airport="LAX",
+    ))
 
 In addition to tracking the initial conditions of our agents, we are also interested in intuiting the exact
 circumstances that led to an agent's output.
@@ -618,7 +588,7 @@ with LangGraph's built-in ReAct agent.
                 span: agentc.Span,
             ):
                 chat_model = langchain_openai.chat_models.ChatOpenAI(
-                    model="gpt-4o",
+                    model="gpt-4o-mini",
                     temperature=0,
                 )
                 super().__init__(
@@ -627,6 +597,8 @@ with LangGraph's built-in ReAct agent.
                     span=span,
                     prompt_name="front_desk_node",
                 )
+                self.introductory_message: str = \
+                    "Please provide the source and destination airports."
 
             def _invoke(
                 self,
@@ -636,41 +608,27 @@ with LangGraph's built-in ReAct agent.
             ) -> State:
                 if len(state["messages"]) == 0:
                     # This is the first message in the conversation.
-                    response = talk_to_user(
-                        span,
-                        "Please provide the source and destination airports.",
-                    )
+                    response = talk_to_user(span, self.introductory_message)
                     state["messages"].append(langchain_core.messages.HumanMessage(content=response))
                 else:
                     # Display the last message in our conversation to our user.
                     response = talk_to_user(span, state["messages"][-1].content)
                     state["messages"].append(langchain_core.messages.HumanMessage(content=response))
 
-                # Give the working state to our "agent" (in this case, just an LLM call).
-                callback = agentc_langchain.chat.Callback(
-                    span=span,
-                    output=self.prompt.output,
-                )
-                self.chat_model.callbacks.append(callback)
-                chat_model = self.chat_model.with_structured_output(self.prompt.output)
-                structured_response = chat_model.invoke(
-                    state["messages"],
-                    config=config,
-                )
+                # Give the working state to our agent.
+                agent = self.create_react_agent(span)
+                response = agent.invoke(input=state, config=config)
 
                 # 'is_last_step' and 'response' comes from the prompt's output format.
                 # Note this is a direct mutation on the "state" given to the Span!
-                state["messages"].append(langchain_core.messages.AIMessage(
-                    structured_response["response"])
+                structured_response = response["structured_response"]
+                state["messages"].append(
+                    langchain_core.messages.AIMessage(structured_response["response"])
                 )
                 state["is_last_step"] = structured_response["is_last_step"]
                 state["needs_clarification"] = structured_response["needs_clarification"]
                 if state["is_last_step"]:
-                    self._talk_to_user(
-                        span,
-                        structured_response["response"],
-                        requires_response=False,
-                    )
+                    talk_to_user(span, structured_response["response"], requires_response=False)
                 return state
 
     Outside of our agent we define a :python:`talk_to_user` tool, which interfaces with the user through the console
@@ -678,22 +636,19 @@ with LangGraph's built-in ReAct agent.
 
     Starting with our constructor, the prompt we specified earlier is retrieved by name with
     :python:`prompt_name="front_desk_node"`.
-    For this example, we are using ``gpt-4o`` but any LangChain-compatible chat model can be used here.
+    For this example, we are using ``gpt-4o-mini`` but any LangChain-compatible chat model can be used here.
 
     .. note::
 
-        Note that we pass an OpenAI chat model instance (specifically, ``gpt-4o`` with :python:`temperature=0`) to the
-        parent class.
+        Note that we pass an OpenAI chat model instance (specifically, ``gpt-4o-mini`` with :python:`temperature=0`)
+        to the parent class.
         This is one of many initial conditions that would not be captured if we versioned only our prompts!
 
     Child classes of :python:`agentc_langgraph.agent.ReActAgent` must also implement the :python:`_invoke` method, which
     handles the invocation of our LLM and how to mutate the input :python:`State` instance for use by other agents.
     Our front desk agent always starts with a pre-canned message when first interacting with a user, but will invoke
-    our LLM containing our message history for all subsequent responses.
-    To actually log our responses, the :python:`agentc_langgraph.chat.Callback` is used with the working :python:`span`
-    and :python:`self.chat_model` instances.
-
-    After the LLM invocation, we mutate the :python:`state` object to:
+    a ReAct agent containing our message history for all subsequent responses.
+    After the agent invocation, we mutate the :python:`state` object to:
 
     1. Add the LLM's output to our conversational history list, :python:`"messages"`;
     2. Set the :python:`is_last_step` and :python:`needs_clarification` flags from the LLM's structured response
@@ -787,6 +742,8 @@ with LangGraph's built-in ReAct agent.
     The route finding agent is also relatively simple (compared to our front desk agent).
     Using the output type defined in our prompt, we set the routes and the :python:`"is_last_step"` flag of our state
     using the LLM's structured response.
+
+Having defined all of our nodes, let us now define our graph.
 
 .. dropdown:: Travel Application Graph
 
@@ -932,19 +889,56 @@ Specifically, we want a route from Canyonlands Field Airport (IATA ``'CNY'``) to
     airlines that operate from CNY for available routes and connections. Additionally, consider checking travel
     websites or consulting with a travel agent to find the best options for your trip.
 
-This is **not** a correct response -- and the culprit lies with our "Front Desk" agent incorrectly assuming the
-user input is not relevant to route planning.
+This is **not** a correct response.
+To intuit why our application has failed, we will use the logs generated by our application.
+Specifically, we will look at our logs using Agent Catalog's built-in Query Service UDFs:
+
+.. code-block:: sql
+
+    SELECT
+        *
+    FROM
+        `travel-sample`.agent_activity.Sessions() s
+    WHERE
+        s.sid = `travel-sample`.agent_activity.LastSession();
+
+The results from the query above show that the "Front Desk" agent has incorrectly assumed that the user input is not
+relevant to route planning.
 
 1. To fix this, let us modify our prompt.
-   Open the file ``prompts/front_desk.yaml`` and uncomment the item at the very bottom of the
-   ``content --> agent_instructions`` list:
+   Open the file ``prompts/front_desk.yaml`` and uncomment all parts of the ``content --> agent_instructions`` list.
 
    .. code-block:: yaml
 
      - >
-       If the user asks for flights / routes from obscure or small airports, DO NOT assume that no routes exist.
-       Let another agent decide this, not you.
-       In this case, set the is_last_step to False.
+       Your task is to respond to the user AND decide if the conversation should
+       end based on the user's response.
+       If you have any routes that have been given to by another agent, respond
+       to the user in Markdown illustrating the routes.
+
+     - >
+       If the user asks for help with flight planning but there are no source and
+       destination cities provided, set the 'needs_clarification' field to True
+       and provide a polite response.
+
+     - >
+       If the user asks / replies with anything not related to flight planning, set
+       the 'is_last_step' field to True and 'needs_clarification' to True.
+       DO NOT continue the conversation if the user's input / response is not related
+       to flight planning.
+       For example, the following responses should end the conversation (set
+       'is_last_step' to True):
+       - I need help with my hotel reservation. ==> is_last_step: True
+       - Can you help me with my car rental? ==> is_last_step: True
+       - I need recommendations for restaurants in the area. ==> is_last_step: True
+
+     - >
+       If the user wants to end the conversation, set the 'is_last_step' field to True
+       and provide a polite response.
+       For example:
+       - Thanks! That's all I need. ==> is_last_step: True
+       - I'm done for now. ==> is_last_step: True
+       - That's all for today. ==> is_last_step: True
 
 2. Next, we will create a new commit that captures this change.
 

@@ -9,8 +9,6 @@ from agentc_core.catalog.implementations.base import CatalogBase
 from agentc_core.catalog.implementations.base import SearchResult
 from agentc_core.prompt.models import PromptDescriptor
 from agentc_core.provider.loader import EntryLoader
-from agentc_core.provider.loader import ModelType
-from agentc_core.provider.loader import PythonTarget
 from agentc_core.record.descriptor import RecordDescriptor
 from agentc_core.secrets import put_secret
 
@@ -40,6 +38,7 @@ class ToolProvider[T](BaseProvider):
     class ToolResult:
         func: typing.Callable
         meta: RecordDescriptor
+        input: typing.Optional[dict]
 
     def __init__(
         self,
@@ -48,8 +47,6 @@ class ToolProvider[T](BaseProvider):
         decorator: typing.Callable[["ToolProvider.ToolResult"], T] = None,
         refiner: typing.Callable[[list[SearchResult]], list[SearchResult]] = None,
         secrets: typing.Optional[dict[str, str]] = None,
-        python_version: PythonTarget = PythonTarget.PY_312,
-        model_type: ModelType = ModelType.TypingTypedDict,
     ):
         """
         :param catalog: A handle to the catalog. Entries can either be in memory or in Couchbase.
@@ -57,12 +54,10 @@ class ToolProvider[T](BaseProvider):
         :param decorator: Function to apply to each search result.
         :param refiner: Refiner (reranker / post processor) to use when retrieving tools.
         :param secrets: Map of identifiers to secret values.
-        :param python_version: The target Python version for the generated (schema) code.
-        :param model_type: The target model type for the generated (schema) code.
         """
         super(ToolProvider, self).__init__(catalog=catalog, refiner=refiner)
         self._tool_cache = dict()
-        self._loader = EntryLoader(output=output, python_version=python_version, model_type=model_type)
+        self._loader = EntryLoader(output=output)
 
         # Handle our defaults.
         self.decorator = decorator
@@ -72,7 +67,7 @@ class ToolProvider[T](BaseProvider):
                 put_secret(k, v)
 
     def _generate_result(self, tool_descriptor: RecordDescriptor) -> "ToolProvider.ToolResult" | T:
-        result = ToolProvider.ToolResult(func=self._tool_cache[tool_descriptor], meta=tool_descriptor)
+        result = self._tool_cache[tool_descriptor]
         return result if self.decorator is None else self.decorator(result)
 
     def find_with_query(
@@ -96,8 +91,12 @@ class ToolProvider[T](BaseProvider):
 
         # Load all tools that we have not already cached.
         non_cached_results = [f.entry for f in results if f.entry not in self._tool_cache]
-        for record_descriptor, tool in self._loader.load(non_cached_results):
-            self._tool_cache[record_descriptor] = tool
+        for load_result in self._loader.load(non_cached_results):
+            self._tool_cache[load_result["record_descriptor"]] = ToolProvider.ToolResult(
+                func=load_result["func"],
+                meta=load_result["record_descriptor"],
+                input=load_result["args_schema"],
+            )
 
         # Return the tools from the cache.
         return [self._generate_result(x.entry) for x in results]
@@ -108,8 +107,12 @@ class ToolProvider[T](BaseProvider):
 
         # Load all tools that we have not already cached.
         non_cached_results = [f.entry for f in results if f.entry not in self._tool_cache]
-        for record_descriptor, tool in self._loader.load(non_cached_results):
-            self._tool_cache[record_descriptor] = tool
+        for load_result in self._loader.load(non_cached_results):
+            self._tool_cache[load_result["record_descriptor"]] = ToolProvider.ToolResult(
+                func=load_result["func"],
+                meta=load_result["record_descriptor"],
+                input=load_result["args_schema"],
+            )
 
         # Return the tools from the cache.
         match len(results):

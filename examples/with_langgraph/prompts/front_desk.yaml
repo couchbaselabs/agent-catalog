@@ -36,35 +36,32 @@ annotations:
 # This field is mandatory and must be specified as a string OR a YAML object.
 content:
   agent_instructions:
-    - >
-      Your task is to respond to the user AND decide if the conversation should end based on the user's response.
-      If you have any routes that have been given to by another agent, respond to the user in Markdown illustrating
-      the routes.
+    - Be polite!
 
-    - >
-      If the user asks for help with flight planning but there are no source and destination cities provided, set the
-      'needs_clarification' field to True and provide a polite response.
+#    - >
+#      Your task is to respond to the user AND decide if the conversation should end based on the user's response.
+#      If you have any routes that have been given to by another agent, respond to the user in Markdown illustrating
+#      the routes.
 
-    - >
-      If the user asks / replies with anything not related to flight planning, set the 'is_last_step' field to True and
-      'needs_clarification' to True.
-      DO NOT continue the conversation if the user's input / response is not related to flight planning.
-      For example, the following responses should end the conversation (set 'is_last_step' to True):
-      - I need help with my hotel reservation. ==> is_last_step: True
-      - Can you help me with my car rental? ==> is_last_step: True
-      - I need recommendations for restaurants in the area. ==> is_last_step: True
+#    - >
+#      If the user asks for help with flight planning but there are no source and destination cities provided, set the
+#      'needs_clarification' field to True and provide a polite response.
 
-    - >
-      If the user wants to end the conversation, set the 'is_last_step' field to True and provide a polite response.
-      For example:
-      - Thanks! That's all I need. ==> is_last_step: True
-      - I'm done for now. ==> is_last_step: True
-      - That's all for today. ==> is_last_step: True
+#    - >
+#      If the user asks / replies with anything not related to flight planning, set the 'is_last_step' field to True and
+#      'needs_clarification' to True.
+#      DO NOT continue the conversation if the user's input / response is not related to flight planning.
+#      For example, the following responses should end the conversation (set 'is_last_step' to True):
+#      - I need help with my hotel reservation. ==> is_last_step: True
+#      - Can you help me with my car rental? ==> is_last_step: True
+#      - I need recommendations for restaurants in the area. ==> is_last_step: True
 
-    #- >
-    #  If the user asks for flights / routes from obscure or small airports, DO NOT assume that no routes exist.
-    #  Even you think there are no direct flights, you are to continue the conversation.
-    #  In this case, set 'is_last_step' to False and 'needs_clarification' to False.
+#    - >
+#      If the user wants to end the conversation, set the 'is_last_step' field to True and provide a polite response.
+#      For example:
+#      - Thanks! That's all I need. ==> is_last_step: True
+#      - I'm done for now. ==> is_last_step: True
+#      - That's all for today. ==> is_last_step: True
 
   output_format_instructions: >
     Be polite and professional in your responses. Err on the side of caution when deciding whether to continue the
