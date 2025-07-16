@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import couchbase.auth
 import couchbase.options
 import couchbase.cluster
@@ -16,8 +14,6 @@ from agentc_core.secrets import get_secret
 
 logger = logging.getLogger(__name__)
 
-{{ input.generated_code | safe }}
-
 
 def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
     authenticator = couchbase.auth.PasswordAuthenticator(
@@ -30,7 +26,7 @@ def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
 
 
 @tool
-def {{ tool.name }}(question: {{ input.type_name }}) -> list[str]:
+def {{ tool.name }}(**kwargs) -> list[str]:
     """ {{ tool.description }} """
     cluster = _get_couchbase_cluster()
     bucket = cluster.bucket('{{ vector_search.bucket }}')
@@ -38,20 +34,8 @@ def {{ tool.name }}(question: {{ input.type_name }}) -> list[str]:
     collection = scope.collection('{{ vector_search.collection }}')
     logger.debug("{{ tool.name }} has been called.")
 
-    # We need to safeguard against weird LLM function calls.
-    logger.debug("{{ tool.name }} has been given the input: " + str(question) + ".")
-    if isinstance(question, dict):
-        formatted_question = json.dumps(question)
-    elif isinstance(question, str):
-        formatted_question = question
-    elif dataclasses.is_dataclass(question):
-        formatted_question = json.dumps(question.asdict())
-    elif isinstance(question, {{ input.type_name }}):
-        formatted_question = json.dumps(question.dict())
-    else:
-        raise ValueError("Bad input given to tool!")
-
-    logger.debug("{{ tool.name }} is generating an embedding for: " + formatted_question + ".")
+    logger.debug("{{ tool.name }} has been given the input: " + str(kwargs) + ".")
+    logger.debug("{{ tool.name }} is generating an embedding for: " + str(kwargs) + ".")
     {% if vector_search.embedding_model.base_url is none %}
     import sentence_transformers
     embedding_model = sentence_transformers.SentenceTransformer(
@@ -60,7 +44,7 @@ def {{ tool.name }}(question: {{ input.type_name }}) -> list[str]:
         cache_folder="{{ embedding_model.cache }}",
         local_files_only=True
     )
-    _embedding = embedding_model.encode(formatted_question)
+    _embedding = embedding_model.encode(str(kwargs))
     for_q = list(_embedding.astype('float64'))
     {% else %}
     import openai

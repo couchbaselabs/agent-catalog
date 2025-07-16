@@ -74,20 +74,18 @@ Jupyter notebook.
    You'll need to navigate to your instance's UI (for local instances, this is on http://localhost:8091) to install
    this sample bucket.
 
-3. Initialize your local and Couchbase-hosted Agent Catalog instance by running the `agentc init` command.
+3. Agent Catalog uses Git for its versioning, and acts seamlessly as a Git post-commit hook.
 
-   ```bash
-   agentc init
-   ```
-
-4. Agent Catalog uses Git for its versioning, and acts seamlessly as a Git post-commit hook.
-
-   Run the command below to initialize a new Git repository within the `examples/with_notebook` directory and install
-   the Agent Catalog hooks.
+   Run the command below to initialize a new Git repository within the `examples/with_notebook` directory.
 
    ```bash
    git init
-   pre-commit install --hook-type post-commit --hook-type pre-commit
+   ```
+
+4. Initialize your local and Couchbase-hosted Agent Catalog instance by running the `agentc init` command.
+
+   ```bash
+   agentc init --add-hook-for .
    ```
 
 5. We will now make our first commit.
@@ -96,41 +94,6 @@ Jupyter notebook.
    ```bash
       git add * ; git add .gitignore .env.example .pre-commit-config.yaml
       git commit -m "Initial commit"
-   ```
-
-   If you have installed the post-commit hooks correctly (and the commit succeeds), you should see the following:
-
-   ```text
-   check for added large files..............................................Passed
-   check toml...............................................................Passed
-   check yaml...............................................................Passed
-   check json...............................................................Passed
-   check xml............................................(no files to check)Skipped
-   fix end of files.........................................................Passed
-   trim trailing whitespace.................................................Passed
-   mixed line ending........................................................Passed
-   ruff.....................................................................Passed
-   format code with ruff....................................................Passed
-   check toml...........................................(no files to check)Skipped
-   check yaml...........................................(no files to check)Skipped
-   check json...........................................(no files to check)Skipped
-   check xml............................................(no files to check)Skipped
-   mixed line ending....................................(no files to check)Skipped
-   ruff.................................................(no files to check)Skipped
-   format code with ruff................................(no files to check)Skipped
-   index tools and prompts..................................................Passed
-   publish tools and prompts................................................Passed
-   [main (root-commit) e97fd87] Initial commit
-    9 files changed, 633 insertions(+)
-    create mode 100644 .env.example
-    create mode 100644 .gitignore
-    create mode 100644 .pre-commit-config.yaml
-    create mode 100644 README.md
-    create mode 100644 charter.yaml
-    create mode 100644 pyproject.toml
-    create mode 100644 researcher.ipynb
-    create mode 100644 researcher.yaml
-    create mode 100644 tools.py
    ```
 
 ### Running Your Agent System

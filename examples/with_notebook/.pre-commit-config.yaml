@@ -22,23 +22,3 @@ repos:
         args: [ "--fix" ]
       - id: ruff-format
         name: format code with ruff
-
-  # For indexing --> publishing our tools and prompts.
-  - repo: local
-    hooks:
-      # Note: agentc doesn't strictly follow the pre-commit conventions (i.e., it returns 0 on modification).
-      - id: agentc-index
-        name: index tools and prompts
-        language: system
-        entry: agentc index .
-        stages: [ post-commit, post-rewrite ]
-        pass_filenames: false
-        always_run: true
-
-      - id: agentc-publish
-        name: publish tools and prompts
-        language: system
-        entry: agentc publish
-        stages: [ post-commit, post-rewrite ]
-        pass_filenames: false
-        always_run: true

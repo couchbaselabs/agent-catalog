@@ -3,7 +3,6 @@ import couchbase.cluster
 import couchbase.exceptions
 import couchbase.options
 import logging
-import platform
 import pydantic
 import typing
 
@@ -19,7 +18,6 @@ from agentc_core.config import ToolRuntimeConfig
 from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
 from agentc_core.provider import PromptProvider
-from agentc_core.provider import PythonTarget
 from agentc_core.provider import ToolProvider
 from agentc_core.version import VersionDescriptor
 
@@ -163,29 +161,6 @@ class Catalog[T](EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig, 
             logger.info("Only a remote catalog has been found. Using the remote tool tool catalog.")
             self._tool_catalog = self._remote_tool_catalog
 
-        # Check the version of Python (this is needed for the code-generator).
-        match version_tuple := platform.python_version_tuple():
-            case ("3", "6", _):
-                target_python_version = PythonTarget.PY_36
-            case ("3", "7", _):
-                target_python_version = PythonTarget.PY_37
-            case ("3", "8", _):
-                target_python_version = PythonTarget.PY_38
-            case ("3", "9", _):
-                target_python_version = PythonTarget.PY_39
-            case ("3", "10", _):
-                target_python_version = PythonTarget.PY_310
-            case ("3", "11", _):
-                target_python_version = PythonTarget.PY_311
-            case ("3", "12", _):
-                target_python_version = PythonTarget.PY_312
-            case _:
-                if hasattr(version_tuple, "__getitem__") and int(version_tuple[1]) > 12:
-                    logger.debug("Python version not recognized. Defaulting to Python 3.11.")
-                    target_python_version = PythonTarget.PY_311
-                else:
-                    raise ValueError(f"Python version {platform.python_version()} not supported.")
-
         # Finally, initialize our provider(s).
         self._tool_provider = ToolProvider(
             catalog=self._tool_catalog,
@@ -193,8 +168,6 @@ class Catalog[T](EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig, 
             output=self.codegen_output,
             refiner=self.refiner,
             secrets=self.secrets,
-            python_version=target_python_version,
-            model_type=self.tool_model,
         )
         return self
 
@@ -341,6 +314,7 @@ class Catalog[T](EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig, 
 
             1. **func** (``typing.Callable``): A Python callable representing the function.
             2. **meta** (:py:type:`RecordDescriptor`): The metadata associated with the tool.
+            3. **input** (:py:type:`dict`): The argument schema (in JSON schema) associated with the tool.
 
             If a ``tool_decorator`` is present, this method will return a list of objects decorated accordingly.
         """

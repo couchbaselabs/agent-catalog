@@ -24,7 +24,6 @@ from agentc_core.defaults import DEFAULT_EMBEDDING_MODEL_NAME
 from agentc_core.defaults import DEFAULT_MODEL_CACHE_FOLDER
 from agentc_core.defaults import DEFAULT_VERBOSITY_LEVEL
 from agentc_core.learned.embedding import EmbeddingModel
-from agentc_core.provider.provider import ModelType
 from agentc_core.provider.provider import ToolProvider
 
 logger = logging.getLogger(__name__)
@@ -34,9 +33,6 @@ LATEST_SNAPSHOT_VERSION = "__LATEST__"
 
 # To support custom refiners, we must export this model.
 SearchResult = SearchResult
-
-# To support the generation of different (schema) models, we export this model.
-SchemaModel = ModelType
 
 
 class RemoteCatalogConfig(pydantic_settings.BaseSettings):
@@ -303,16 +299,6 @@ class ToolRuntimeConfig[T](pydantic_settings.BaseSettings):
                 "CB_PASSWORD": os.getenv("THE_CB_PASSWORD"),
                 "CB_CERTIFICATE": "path/to/cert.pem",
             })
-    """
-
-    tool_model: SchemaModel = SchemaModel.TypingTypedDict
-    """ The target model type for the generated (schema) code for tools.
-
-    .. card:: Field Description
-
-        By default, we generate ``TypedDict`` models and attach these as type hints to the generated Python functions.
-        Other options include Pydantic (V2 and V1) models and dataclasses, though these may not be supported by all
-        agent frameworks.
     """
 
 

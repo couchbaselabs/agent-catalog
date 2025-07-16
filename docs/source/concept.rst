@@ -29,7 +29,7 @@ The Agent Catalog package is not just a tool/prompt catalog, it's a foundation f
 development.
 Agent builders will follow this workflow:
 
-1. **Sample Downloading**: Download the starter agent from the :file:`templates/with_langgraph` directory.
+1. **Sample Downloading**: Download the starter agent from the :file:`examples/with_langgraph` directory.
 
 2. **Project Initializing**: Initialize your project as a Git repository and invoke the Agent Catalog initialization
    command.

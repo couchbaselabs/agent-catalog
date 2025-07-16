@@ -157,7 +157,8 @@ class ReActAgent[S: State]:
             # LangChain agents expect LangChain tools, so we will convert the *pure Python functions* we get from Agent
             # Catalog into LangChain tools here.
             for tool in self.prompt.tools:
-                self.tools.append(langchain_core.tools.StructuredTool.from_function(tool.func))
+                as_langchain_tool = langchain_core.tools.tool(tool.func, args_schema=tool.input)
+                self.tools.append(as_langchain_tool)
 
             # Grab our prompt content.
             if isinstance(self.prompt.content, str):

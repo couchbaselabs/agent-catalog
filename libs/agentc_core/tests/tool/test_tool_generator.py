@@ -42,7 +42,7 @@ def test_sqlpp_generator():
         for code in positive_1_generator.generate():
             new_file = tmp_dir_path / (uuid.uuid4().hex + ".py")
             with new_file.open("w") as fp:
-                fp.write(code)
+                fp.write(code["code"])
                 fp.flush()
             generated_files.append(new_file)
         assert len(generated_files) == 1
@@ -50,8 +50,6 @@ def test_sqlpp_generator():
         sys.path.append(tmp_dir)
         mod = importlib.import_module(generated_files[0].stem)
         members = inspect.getmembers(mod)
-        assert any(x[0] == "ArgumentInput" for x in members)
-        assert any(x[0] == "ToolOutput" for x in members)
         assert any(x[0] == "tool_1" for x in members)
         tool = [x[1] for x in members if x[0] == "tool_1"][0]
         assert is_tool(tool)
@@ -70,7 +68,7 @@ def test_semantic_search_generator():
         for code in positive_1_generator.generate():
             new_file = tmp_dir_path / (uuid.uuid4().hex + ".py")
             with new_file.open("w") as fp:
-                fp.write(code)
+                fp.write(code["code"])
                 fp.flush()
             generated_files.append(new_file)
         assert len(generated_files) == 1
@@ -78,7 +76,6 @@ def test_semantic_search_generator():
         sys.path.append(tmp_dir)
         mod = importlib.import_module(generated_files[0].stem)
         members = inspect.getmembers(mod)
-        assert any(x[0] == "ArgumentInput" for x in members)
         assert any(x[0] == "get_travel_blog_snippets_from_user_interests" for x in members)
         tool = [x[1] for x in members if x[0] == "get_travel_blog_snippets_from_user_interests"][0]
         assert is_tool(tool)
@@ -97,7 +94,7 @@ def test_http_request_generator():
         for code in positive_1_generator.generate():
             new_file = tmp_dir_path / (uuid.uuid4().hex + ".py")
             with new_file.open("w") as fp:
-                fp.write(code)
+                fp.write(code["code"])
                 fp.flush()
             generated_files.append(new_file)
         assert len(generated_files) == 2
@@ -106,7 +103,6 @@ def test_http_request_generator():
         for file in generated_files:
             mod = importlib.import_module(file.stem)
             members = inspect.getmembers(mod)
-            assert any(x[0] == "ArgumentInput" for x in members)
             names = {"create_new_member_create_post", "get_member_rewards_rewards__member_id__get"}
             assert any(x[0] in names for x in members)
             tool = [x[1] for x in members if x[0] in names][0]

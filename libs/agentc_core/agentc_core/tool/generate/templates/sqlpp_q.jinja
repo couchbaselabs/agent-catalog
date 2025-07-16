@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import couchbase.auth
 import couchbase.options
 import couchbase.cluster
@@ -12,8 +10,6 @@ from agentc_core.secrets import get_secret
 
 logger = logging.getLogger(__name__)
 
-{{ input.generated_code | safe }}
-{{ output.generated_code | safe }}
 
 def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
     authenticator = couchbase.auth.PasswordAuthenticator(
@@ -24,40 +20,21 @@ def _get_couchbase_cluster() -> couchbase.cluster.Cluster:
     conn_string = get_secret("{{ secrets.conn_string }}").get_secret_value()
     return couchbase.cluster.Cluster(conn_string, couchbase.options.ClusterOptions(authenticator))
 
-# TODO (GLENN): The output type is currently not being recognized with Pydantic + ControlFlow.
+
 @tool
-def {{ tool.name }}(argument_input: {{ input.type_name }}):
+def {{ tool.name }}(**kwargs):
     """
     {{ tool.description }}
     """
     logger.debug("{{ tool.name }} has been called.")
     cluster = _get_couchbase_cluster()
-
-    # We need to safeguard against weird LLM function calls.
-    logger.debug("{{ tool.name }} has been given the input: " + str(argument_input) + ".")
-    if isinstance(argument_input, dict):
-        named_parameters = argument_input
-    elif dataclasses.is_dataclass(argument_input):
-        named_parameters = argument_input.asdict()
-    elif isinstance(argument_input, {{ input.type_name }}):
-        named_parameters = argument_input.dict()
-    else:
-        raise ValueError("Bad input given to SQL++ tool!")
-
     query_results = cluster.query(
         """ {{ query | safe }} """,
-        couchbase.options.QueryOptions(named_parameters=named_parameters)
+        couchbase.options.QueryOptions(named_parameters=kwargs)
     )
 
-    {% if output.is_list_valued %}
     tool_results = []
     for result in query_results:
-        tool_results.append({{ output.type_name }}(**result))
+        tool_results.append(result)
     logger.debug("{{ tool.name }} has returned the following: " + str(tool_results))
     return tool_results
-    {% else %}
-    for result in query_results:
-        final_result = {{ output.type_name }}(**result)
-        logger.debug("{{ tool.name }} has returned the following: " + str(final_result))
-        return final_result
-    {% endif %}

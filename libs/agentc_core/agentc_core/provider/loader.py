@@ -16,10 +16,14 @@ from agentc_core.tool.decorator import is_tool
 from agentc_core.tool.generate import HTTPRequestCodeGenerator
 from agentc_core.tool.generate import SemanticSearchCodeGenerator
 from agentc_core.tool.generate import SQLPPCodeGenerator
-from agentc_core.tool.generate.generator import ModelType
-from agentc_core.tool.generate.generator import PythonTarget
 
 logger = logging.getLogger(__name__)
+
+
+class LoadResult(typing.TypedDict):
+    record_descriptor: RecordDescriptor
+    args_schema: dict | None
+    func: typing.Callable
 
 
 class _ModuleLoader(importlib.abc.Loader):
@@ -61,12 +65,7 @@ class EntryLoader:
     def __init__(
         self,
         output: typing.Optional[pathlib.Path | tempfile.TemporaryDirectory],
-        python_version: PythonTarget = PythonTarget.PY_312,
-        model_type: ModelType = ModelType.TypingTypedDict,
     ):
-        self.python_version = python_version
-        self.model_type = model_type
-
         # TODO (GLENN): We should close this somewhere (need to add a close method).
         if isinstance(output, pathlib.Path):
             self.output = output
@@ -108,9 +107,7 @@ class EntryLoader:
             if entry.name == name:
                 return tool
 
-    def load(
-        self, record_descriptors: list[RecordDescriptor]
-    ) -> typing.Iterable[tuple[RecordDescriptor, typing.Callable]]:
+    def load(self, record_descriptors: list[RecordDescriptor]) -> typing.Iterable[LoadResult]:
         # Group all entries by their 'source'.
         source_groups = dict()
         for result in record_descriptors:
@@ -125,8 +122,6 @@ class EntryLoader:
             entries = group["entries"]
             generator_args = {
                 "record_descriptors": entries,
-                "target_python_version": self.python_version,
-                "target_model_type": self.model_type,
                 "global_suffix": uuid.uuid4().hex,
             }
             match group["kind"]:
@@ -141,10 +136,7 @@ class EntryLoader:
                         self._load_module_from_string(source_file.stem, entries[0].raw)
                     for entry in entries:
                         loaded_entry = self._get_tool_from_module(source_file.stem, entry)
-                        yield (
-                            entry,
-                            loaded_entry,
-                        )
+                        yield LoadResult(record_descriptor=entry, func=loaded_entry, args_schema=None)
                     continue
 
                 # For all other records, we generate the source and load this with a custom importlib loader.
@@ -159,9 +151,6 @@ class EntryLoader:
 
             for entry, code in zip(entries, generator(), strict=False):
                 module_id = uuid.uuid4().hex.replace("-", "")
-                self._load_module_from_string(module_id, code)
+                self._load_module_from_string(module_id, code["code"])
                 loaded_entry = self._get_tool_from_module(module_id, entry)
-                yield (
-                    entry,
-                    loaded_entry,
-                )
+                yield LoadResult(record_descriptor=entry, func=loaded_entry, args_schema=code["args_schema"])

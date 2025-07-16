@@ -1,5 +1,4 @@
 import agentc
-import agentc_langchain
 import agentc_langgraph.agent
 import langchain_core.messages
 import langchain_core.runnables
@@ -15,7 +14,7 @@ class State(agentc_langgraph.agent.State):
 
 class FrontDeskAgent(agentc_langgraph.agent.ReActAgent):
     def __init__(self, catalog: agentc.Catalog, span: agentc.Span):
-        chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o", temperature=0)
+        chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o-mini", temperature=0)
         super().__init__(chat_model=chat_model, catalog=catalog, span=span, prompt_name="front_desk_node")
         self.introductory_message: str = "Please provide the source and destination airports."
 
@@ -41,14 +40,13 @@ class FrontDeskAgent(agentc_langgraph.agent.ReActAgent):
             response = self._talk_to_user(span, state["messages"][-1].content)
             state["messages"].append(langchain_core.messages.HumanMessage(content=response))
 
-        # Give the working state to our "agent" (in this case, just an LLM call).
-        callback = agentc_langchain.chat.Callback(span=span, output=self.prompt.output)
-        self.chat_model.callbacks.append(callback)
-        chat_model = self.chat_model.with_structured_output(self.prompt.output)
-        structured_response = chat_model.invoke(state["messages"], config=config)
+        # Give the working state to our agent.
+        agent = self.create_react_agent(span)
+        response = agent.invoke(input=state, config=config)
 
         # 'is_last_step' and 'response' comes from the prompt's output format.
         # Note this is a direct mutation on the "state" given to the Span!
+        structured_response = response["structured_response"]
         state["messages"].append(langchain_core.messages.AIMessage(structured_response["response"]))
         state["is_last_step"] = structured_response["is_last_step"]
         state["needs_clarification"] = structured_response["needs_clarification"]
@@ -59,7 +57,7 @@ class FrontDeskAgent(agentc_langgraph.agent.ReActAgent):
 
 class EndpointFindingAgent(agentc_langgraph.agent.ReActAgent):
     def __init__(self, catalog: agentc.Catalog, span: agentc.Span):
-        chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o", temperature=0)
+        chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o-mini", temperature=0)
         super().__init__(chat_model=chat_model, catalog=catalog, span=span, prompt_name="endpoint_finding_node")
 
     def _invoke(self, span: agentc.Span, state: State, config: langchain_core.runnables.RunnableConfig) -> State:
@@ -77,7 +75,7 @@ class EndpointFindingAgent(agentc_langgraph.agent.ReActAgent):
 
 class RouteFindingAgent(agentc_langgraph.agent.ReActAgent):
     def __init__(self, catalog: agentc.Catalog, span: agentc.Span):
-        chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o", temperature=0)
+        chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o-mini", temperature=0)
         super().__init__(chat_model=chat_model, catalog=catalog, span=span, prompt_name="route_finding_node")
 
     def _invoke(self, span: agentc.Span, state: State, config: langchain_core.runnables.RunnableConfig) -> State:
