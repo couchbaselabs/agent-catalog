@@ -4,14 +4,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>agentc_core.catalog.catalog &#8212; Agent Catalog 0.2.3a1 documentation</title>
+    <title>agentc_core.catalog.catalog &#8212; Agent Catalog 0.2.3a1.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=50651e91" />
     <link rel="stylesheet" type="text/css" href="../../../_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=7230e44a" />
-    <script src="../../../_static/documentation_options.js?v=072b7ed8"></script>
+    <script src="../../../_static/documentation_options.js?v=c3695b27"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -160,7 +160,7 @@ window.addEventListener("load", () => mermaid.run());
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.2.3a1 documentation</a></h1>
+        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.2.3a1.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -283,7 +283,6 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">import</span><span class="w"> </span><span class="nn">couchbase.exceptions</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">couchbase.options</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pydantic</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
 
@@ -299,7 +298,6 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_PROMPT_CATALOG_FILE</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_TOOL_CATALOG_FILE</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">PromptProvider</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">PythonTarget</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">ToolProvider</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">VersionDescriptor</span>
 
@@ -445,29 +443,6 @@ window.addEventListener("load", () => mermaid.run());
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Only a remote catalog has been found. Using the remote tool tool catalog.&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_tool_catalog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_tool_catalog</span>
 
-        <span class="c1"># Check the version of Python (this is needed for the code-generator).</span>
-        <span class="k">match</span> <span class="n">version_tuple</span> <span class="o">:=</span> <span class="n">platform</span><span class="o">.</span><span class="n">python_version_tuple</span><span class="p">():</span>
-            <span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;6&quot;</span><span class="p">,</span> <span class="k">_</span><span class="p">):</span>
-                <span class="n">target_python_version</span> <span class="o">=</span> <span class="n">PythonTarget</span><span class="o">.</span><span class="n">PY_36</span>
-            <span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;7&quot;</span><span class="p">,</span> <span class="k">_</span><span class="p">):</span>
-                <span class="n">target_python_version</span> <span class="o">=</span> <span class="n">PythonTarget</span><span class="o">.</span><span class="n">PY_37</span>
-            <span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;8&quot;</span><span class="p">,</span> <span class="k">_</span><span class="p">):</span>
-                <span class="n">target_python_version</span> <span class="o">=</span> <span class="n">PythonTarget</span><span class="o">.</span><span class="n">PY_38</span>
-            <span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;9&quot;</span><span class="p">,</span> <span class="k">_</span><span class="p">):</span>
-                <span class="n">target_python_version</span> <span class="o">=</span> <span class="n">PythonTarget</span><span class="o">.</span><span class="n">PY_39</span>
-            <span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;10&quot;</span><span class="p">,</span> <span class="k">_</span><span class="p">):</span>
-                <span class="n">target_python_version</span> <span class="o">=</span> <span class="n">PythonTarget</span><span class="o">.</span><span class="n">PY_310</span>
-            <span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;11&quot;</span><span class="p">,</span> <span class="k">_</span><span class="p">):</span>
-                <span class="n">target_python_version</span> <span class="o">=</span> <span class="n">PythonTarget</span><span class="o">.</span><span class="n">PY_311</span>
-            <span class="k">case</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;12&quot;</span><span class="p">,</span> <span class="k">_</span><span class="p">):</span>
-                <span class="n">target_python_version</span> <span class="o">=</span> <span class="n">PythonTarget</span><span class="o">.</span><span class="n">PY_312</span>
-            <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">version_tuple</span><span class="p">,</span> <span class="s2">&quot;__getitem__&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">version_tuple</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">12</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Python version not recognized. Defaulting to Python 3.11.&quot;</span><span class="p">)</span>
-                    <span class="n">target_python_version</span> <span class="o">=</span> <span class="n">PythonTarget</span><span class="o">.</span><span class="n">PY_311</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Python version </span><span class="si">{</span><span class="n">platform</span><span class="o">.</span><span class="n">python_version</span><span class="p">()</span><span class="si">}</span><span class="s2"> not supported.&quot;</span><span class="p">)</span>
-
         <span class="c1"># Finally, initialize our provider(s).</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tool_provider</span> <span class="o">=</span> <span class="n">ToolProvider</span><span class="p">(</span>
             <span class="n">catalog</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tool_catalog</span><span class="p">,</span>
@@ -475,8 +450,6 @@ window.addEventListener("load", () => mermaid.run());
             <span class="n">output</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">codegen_output</span><span class="p">,</span>
             <span class="n">refiner</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">refiner</span><span class="p">,</span>
             <span class="n">secrets</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">secrets</span><span class="p">,</span>
-            <span class="n">python_version</span><span class="o">=</span><span class="n">target_python_version</span><span class="p">,</span>
-            <span class="n">model_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tool_model</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
@@ -631,6 +604,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <span class="sd">            1. **func** (``typing.Callable``): A Python callable representing the function.</span>
 <span class="sd">            2. **meta** (:py:type:`RecordDescriptor`): The metadata associated with the tool.</span>
+<span class="sd">            3. **input** (:py:type:`dict`): The argument schema (in JSON schema) associated with the tool.</span>
 
 <span class="sd">            If a ``tool_decorator`` is present, this method will return a list of objects decorated accordingly.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Agent Catalog: A Primer &#8212; Agent Catalog 0.2.3a1 documentation</title>
+    <title>Agent Catalog: A Primer &#8212; Agent Catalog 0.2.3a1.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=50651e91" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=7230e44a" />
-    <script src="_static/documentation_options.js?v=072b7ed8"></script>
+    <script src="_static/documentation_options.js?v=c3695b27"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -163,7 +163,7 @@ window.addEventListener("load", () => mermaid.run());
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.3a1 documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.3a1.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -361,9 +361,11 @@ You can also save these to a <code class="docutils literal notranslate"><span cl
 <span class="gp">$ </span><span class="nb">export</span><span class="w"> </span><span class="nv">AGENT_CATALOG_PASSWORD</span><span class="o">=</span>...
 <span class="gp">$ </span><span class="nb">export</span><span class="w"> </span><span class="nv">AGENT_CATALOG_BUCKET</span><span class="o">=</span>...
 <span class="gp">$ </span><span class="nb">export</span><span class="w"> </span><span class="nv">AGENT_CATALOG_CONN_ROOT_CERTIFICATE</span><span class="o">=</span>...
-<span class="gp">$ </span>agentc<span class="w"> </span>init
+<span class="gp">$ </span>agentc<span class="w"> </span>init<span class="w"> </span>--add-hook-for<span class="w"> </span>tools<span class="w"> </span>--add-hook-for<span class="w"> </span>prompts
 </pre></div>
 </div>
+<p>The <code class="docutils literal notranslate"><span class="pre">--add-hook-for</span></code> option allows us to integrate with <strong class="command">git</strong> as a post-commit hook.
+Here, we will focus on <code class="docutils literal notranslate"><span class="pre">tools</span></code> and <code class="docutils literal notranslate"><span class="pre">prompts</span></code> as directories.</p>
 </section>
 <section id="step-1-building-agent-tools-and-prompts">
 <h2>Step #1: Building Agent Tools and Prompts<a class="headerlink" href="#step-1-building-agent-tools-and-prompts" title="Link to this heading">¶</a></h2>
@@ -401,37 +403,7 @@ We describe the prompt for each agent below.</p>
 
 <span class="nt">content</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">agent_instructions</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
-<span class="w">      </span><span class="no">Your task is to respond to the user AND decide if the conversation</span>
-<span class="w">      </span><span class="no">should end based on the user&#39;s response.</span>
-<span class="w">      </span><span class="no">If you have any routes that have been given to by another agent,</span>
-<span class="w">      </span><span class="no">respond to the user in Markdown illustrating the routes.</span>
-
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
-<span class="w">      </span><span class="no">If the user asks for help with flight planning but there are no</span>
-<span class="w">      </span><span class="no">source and destination cities provided, set the</span>
-<span class="w">      </span><span class="no">&#39;needs_clarification&#39; field to True and provide a polite response.</span>
-
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
-<span class="w">      </span><span class="no">If the user asks / replies with anything not related to flight</span>
-<span class="w">      </span><span class="no">planning, set the &#39;is_last_step&#39; field to True and</span>
-<span class="w">      </span><span class="no">&#39;needs_clarification&#39; to True.</span>
-<span class="w">      </span><span class="no">DO NOT continue the conversation if the user&#39;s input / response is</span>
-<span class="w">      </span><span class="no">not related to flight planning.</span>
-<span class="w">      </span><span class="no">For example, the following responses should end the conversation</span>
-<span class="w">      </span><span class="no">(set &#39;is_last_step&#39; to True):</span>
-<span class="w">      </span><span class="no">- I need help with my hotel reservation. ==&gt; is_last_step: True</span>
-<span class="w">      </span><span class="no">- Can you help me with my car rental? ==&gt; is_last_step: True</span>
-<span class="w">      </span><span class="no">- I need recommendations for restaurants in the area.</span>
-<span class="w">        </span><span class="no">==&gt; is_last_step: True</span>
-
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
-<span class="w">      </span><span class="no">If the user wants to end the conversation, set the &#39;is_last_step&#39;</span>
-<span class="w">      </span><span class="no">field to True and provide a polite response.</span>
-<span class="w">      </span><span class="no">For example:</span>
-<span class="w">      </span><span class="no">- Thanks! That&#39;s all I need. ==&gt; is_last_step: True</span>
-<span class="w">      </span><span class="no">- I&#39;m done for now. ==&gt; is_last_step: True</span>
-<span class="w">      </span><span class="no">- That&#39;s all for today. ==&gt; is_last_step: True</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Be polite!</span>
 
 <span class="w">  </span><span class="nt">output_format_instructions</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
 <span class="w">    </span><span class="no">Be polite and professional in your responses.</span>
@@ -763,17 +735,13 @@ Similar to the <code class="docutils literal notranslate"><span class="pre">find
 etc...).
 For agent developers like us, using a tried-and-true versioning system like Git is essential to adequately capturing
 these initial conditions for reproducibility down-the-line.
-This example comes with a post-commit hook (see <code class="docutils literal notranslate"><span class="pre">.pre-commit-config.yaml</span></code>) that we will install using the command
-below:</p>
-<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pre-commit<span class="w"> </span>install<span class="w"> </span>--hook-type<span class="w"> </span>post-commit
-</pre></div>
-</div>
-<p>If you have set the correct environment variables (or populated <code class="docutils literal notranslate"><span class="pre">.env</span></code> appropriately), all we need to do now is
+If you have set the correct environment variables (or populated <code class="docutils literal notranslate"><span class="pre">.env</span></code> appropriately), all we need to do now is
 <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">add</span></code> the prompts and tools we just authored and commit them with <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span></code>.
 Behind the scenes, <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">index</span></code> and <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">publish</span></code> will run to index these tools and prompts to a
 local catalog file and to your Couchbase instance.</p>
-<p>Assuming that you have placed your tools in a <code class="docutils literal notranslate"><span class="pre">tools</span></code> folder and your prompts in a <code class="docutils literal notranslate"><span class="pre">prompts</span></code> folder, run the
-commands below to commit your files to Git and to index + publish your artifacts.</p>
+<p>Assuming that you have placed your tools in a <code class="docutils literal notranslate"><span class="pre">tools</span></code> folder and your prompts in a <code class="docutils literal notranslate"><span class="pre">prompts</span></code> folder
+(corresponding to the <code class="docutils literal notranslate"><span class="pre">add-hook-for</span></code> option from <code class="docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">init</span></code>), run the commands below to commit your files to
+Git and to index + publish your artifacts.</p>
 <div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>add<span class="w"> </span>*<span class="w"> </span><span class="p">;</span><span class="w"> </span>git<span class="w"> </span>add<span class="w"> </span>.gitignore<span class="w"> </span>.env.example<span class="w"> </span>.pre-commit-config.yaml
 <span class="gp">$ </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Initial commit&quot;</span>
 </pre></div>
@@ -781,25 +749,28 @@ commands below to commit your files to Git and to index + publish your artifacts
 <p>Finally, to use our tools and prompts in an application, we'll just need to create an <code class="code highlight python docutils literal highlight-python"><span class="n">agentc</span><span class="o">.</span><span class="n">Catalog</span></code> instance
 and call the <code class="docutils literal notranslate"><span class="pre">find</span></code> method.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">agentc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dotenv</span>
 
-<span class="c1"># AGENT_CATALOG_CONN_STRING, AGENT_CATALOG_USERNAME, and AGENT_PASSWORD</span>
+<span class="n">dotenv</span><span class="o">.</span><span class="n">load_dotenv</span><span class="p">()</span>
+
+<span class="c1"># AGENT_CATALOG_CONN_STRING, AGENT_CATALOG_USERNAME, and AGENT_CATALOG_PASSWORD</span>
 <span class="c1"># must be set as environment variables or passed as parameters here.</span>
 <span class="n">catalog</span> <span class="o">=</span> <span class="n">agentc</span><span class="o">.</span><span class="n">Catalog</span><span class="p">()</span>
 
 <span class="c1"># Grab a tool by name.</span>
-<span class="n">tool</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;find_direct_routes_between_airports&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">tool</span><span class="o">.</span><span class="n">func</span><span class="p">({</span><span class="s2">&quot;source_airport&quot;</span><span class="p">:</span> <span class="s2">&quot;SFO&quot;</span><span class="p">,</span> <span class="s2">&quot;destination_airport&quot;</span><span class="p">:</span> <span class="s2">&quot;LAX&quot;</span><span class="p">}))</span>
+<span class="n">tool</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;find_direct_routes_between_airports&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tool</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">source_airport</span><span class="o">=</span><span class="s2">&quot;SFO&quot;</span><span class="p">,</span> <span class="n">destination_airport</span><span class="o">=</span><span class="s2">&quot;LAX&quot;</span><span class="p">))</span>
 
 <span class="c1"># Grab a prompt by name.</span>
-<span class="n">prompt</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;prompt&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;endpoint_finding_node&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">prompt</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;prompt&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;route_finding_node&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
 
 <span class="c1"># Use the tool specified in the prompt.</span>
 <span class="n">tool_from_prompt</span> <span class="o">=</span> <span class="n">prompt</span><span class="o">.</span><span class="n">tools</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">func</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">tool_from_prompt</span><span class="p">({</span>
-    <span class="s2">&quot;source_airport&quot;</span><span class="p">:</span> <span class="s2">&quot;SFO&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;destination_airport&quot;</span><span class="p">:</span> <span class="s2">&quot;LAX&quot;</span><span class="p">,</span>
-<span class="p">}))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tool_from_prompt</span><span class="p">(</span>
+    <span class="n">source_airport</span><span class="o">=</span><span class="s2">&quot;SFO&quot;</span><span class="p">,</span>
+    <span class="n">destination_airport</span><span class="o">=</span><span class="s2">&quot;LAX&quot;</span><span class="p">,</span>
+<span class="p">))</span>
 </pre></div>
 </div>
 <p>In addition to tracking the initial conditions of our agents, we are also interested in intuiting the exact
@@ -869,7 +840,7 @@ with LangGraph's built-in ReAct agent.</p>
         <span class="n">span</span><span class="p">:</span> <span class="n">agentc</span><span class="o">.</span><span class="n">Span</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="n">chat_model</span> <span class="o">=</span> <span class="n">langchain_openai</span><span class="o">.</span><span class="n">chat_models</span><span class="o">.</span><span class="n">ChatOpenAI</span><span class="p">(</span>
-            <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
+            <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">,</span>
             <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -878,6 +849,8 @@ with LangGraph's built-in ReAct agent.</p>
             <span class="n">span</span><span class="o">=</span><span class="n">span</span><span class="p">,</span>
             <span class="n">prompt_name</span><span class="o">=</span><span class="s2">&quot;front_desk_node&quot;</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">introductory_message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> \
+            <span class="s2">&quot;Please provide the source and destination airports.&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_invoke</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -887,41 +860,27 @@ with LangGraph's built-in ReAct agent.</p>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">State</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c1"># This is the first message in the conversation.</span>
-            <span class="n">response</span> <span class="o">=</span> <span class="n">talk_to_user</span><span class="p">(</span>
-                <span class="n">span</span><span class="p">,</span>
-                <span class="s2">&quot;Please provide the source and destination airports.&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">talk_to_user</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">introductory_message</span><span class="p">)</span>
             <span class="n">state</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">langchain_core</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">HumanMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">response</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Display the last message in our conversation to our user.</span>
             <span class="n">response</span> <span class="o">=</span> <span class="n">talk_to_user</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
             <span class="n">state</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">langchain_core</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">HumanMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">response</span><span class="p">))</span>
 
-        <span class="c1"># Give the working state to our &quot;agent&quot; (in this case, just an LLM call).</span>
-        <span class="n">callback</span> <span class="o">=</span> <span class="n">agentc_langchain</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">Callback</span><span class="p">(</span>
-            <span class="n">span</span><span class="o">=</span><span class="n">span</span><span class="p">,</span>
-            <span class="n">output</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">chat_model</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span>
-        <span class="n">chat_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chat_model</span><span class="o">.</span><span class="n">with_structured_output</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
-        <span class="n">structured_response</span> <span class="o">=</span> <span class="n">chat_model</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span>
-            <span class="n">state</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">],</span>
-            <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="c1"># Give the working state to our agent.</span>
+        <span class="n">agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_react_agent</span><span class="p">(</span><span class="n">span</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">state</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
 
         <span class="c1"># &#39;is_last_step&#39; and &#39;response&#39; comes from the prompt&#39;s output format.</span>
         <span class="c1"># Note this is a direct mutation on the &quot;state&quot; given to the Span!</span>
-        <span class="n">state</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">langchain_core</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">AIMessage</span><span class="p">(</span>
-            <span class="n">structured_response</span><span class="p">[</span><span class="s2">&quot;response&quot;</span><span class="p">])</span>
+        <span class="n">structured_response</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;structured_response&quot;</span><span class="p">]</span>
+        <span class="n">state</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">langchain_core</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">AIMessage</span><span class="p">(</span><span class="n">structured_response</span><span class="p">[</span><span class="s2">&quot;response&quot;</span><span class="p">])</span>
         <span class="p">)</span>
         <span class="n">state</span><span class="p">[</span><span class="s2">&quot;is_last_step&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">structured_response</span><span class="p">[</span><span class="s2">&quot;is_last_step&quot;</span><span class="p">]</span>
         <span class="n">state</span><span class="p">[</span><span class="s2">&quot;needs_clarification&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">structured_response</span><span class="p">[</span><span class="s2">&quot;needs_clarification&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">state</span><span class="p">[</span><span class="s2">&quot;is_last_step&quot;</span><span class="p">]:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_talk_to_user</span><span class="p">(</span>
-                <span class="n">span</span><span class="p">,</span>
-                <span class="n">structured_response</span><span class="p">[</span><span class="s2">&quot;response&quot;</span><span class="p">],</span>
-                <span class="n">requires_response</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="n">talk_to_user</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="n">structured_response</span><span class="p">[</span><span class="s2">&quot;response&quot;</span><span class="p">],</span> <span class="n">requires_response</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">state</span>
 </pre></div>
 </div>
@@ -929,20 +888,18 @@ with LangGraph's built-in ReAct agent.</p>
 and records user + assistant activity to an Agent Catalog <code class="code highlight python docutils literal highlight-python"><span class="n">Span</span></code> instance.</p>
 <p class="sd-card-text">Starting with our constructor, the prompt we specified earlier is retrieved by name with
 <code class="code highlight python docutils literal highlight-python"><span class="n">prompt_name</span><span class="o">=</span><span class="s2">&quot;front_desk_node&quot;</span></code>.
-For this example, we are using <code class="docutils literal notranslate"><span class="pre">gpt-4o</span></code> but any LangChain-compatible chat model can be used here.</p>
+For this example, we are using <code class="docutils literal notranslate"><span class="pre">gpt-4o-mini</span></code> but any LangChain-compatible chat model can be used here.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p class="sd-card-text">Note that we pass an OpenAI chat model instance (specifically, <code class="docutils literal notranslate"><span class="pre">gpt-4o</span></code> with <code class="code highlight python docutils literal highlight-python"><span class="n">temperature</span><span class="o">=</span><span class="mi">0</span></code>) to the
-parent class.
+<p class="sd-card-text">Note that we pass an OpenAI chat model instance (specifically, <code class="docutils literal notranslate"><span class="pre">gpt-4o-mini</span></code> with <code class="code highlight python docutils literal highlight-python"><span class="n">temperature</span><span class="o">=</span><span class="mi">0</span></code>)
+to the parent class.
 This is one of many initial conditions that would not be captured if we versioned only our prompts!</p>
 </div>
 <p class="sd-card-text">Child classes of <code class="code highlight python docutils literal highlight-python"><span class="n">agentc_langgraph</span><span class="o">.</span><span class="n">agent</span><span class="o">.</span><span class="n">ReActAgent</span></code> must also implement the <code class="code highlight python docutils literal highlight-python"><span class="n">_invoke</span></code> method, which
 handles the invocation of our LLM and how to mutate the input <code class="code highlight python docutils literal highlight-python"><span class="n">State</span></code> instance for use by other agents.
 Our front desk agent always starts with a pre-canned message when first interacting with a user, but will invoke
-our LLM containing our message history for all subsequent responses.
-To actually log our responses, the <code class="code highlight python docutils literal highlight-python"><span class="n">agentc_langgraph</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">Callback</span></code> is used with the working <code class="code highlight python docutils literal highlight-python"><span class="n">span</span></code>
-and <code class="code highlight python docutils literal highlight-python"><span class="bp">self</span><span class="o">.</span><span class="n">chat_model</span></code> instances.</p>
-<p class="sd-card-text">After the LLM invocation, we mutate the <code class="code highlight python docutils literal highlight-python"><span class="n">state</span></code> object to:</p>
+a ReAct agent containing our message history for all subsequent responses.
+After the agent invocation, we mutate the <code class="code highlight python docutils literal highlight-python"><span class="n">state</span></code> object to:</p>
 <ol class="arabic simple">
 <li><p class="sd-card-text">Add the LLM's output to our conversational history list, <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;messages&quot;</span></code>;</p></li>
 <li><p class="sd-card-text">Set the <code class="code highlight python docutils literal highlight-python"><span class="n">is_last_step</span></code> and <code class="code highlight python docutils literal highlight-python"><span class="n">needs_clarification</span></code> flags from the LLM's structured response
@@ -1036,7 +993,8 @@ Again, using the output type defined in our prompt, we set the source and destin
 Using the output type defined in our prompt, we set the routes and the <code class="code highlight python docutils literal highlight-python"><span class="s2">&quot;is_last_step&quot;</span></code> flag of our state
 using the LLM's structured response.</p>
 </div>
-</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+</details><p>Having defined all of our nodes, let us now define our graph.</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
 <summary class="sd-summary-title sd-card-header">
 <span class="sd-summary-text">Travel Application Graph</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">catalog</span> <span class="o">=</span> <span class="n">agentc</span><span class="o">.</span><span class="n">Catalog</span><span class="p">()</span>
@@ -1170,16 +1128,51 @@ Specifically, we want a route from Canyonlands Field Airport (IATA <code class="
   websites or consulting with a travel agent to find the best options for your trip.
 </pre></div>
 </div>
-<p>This is <strong>not</strong> a correct response -- and the culprit lies with our &quot;Front Desk&quot; agent incorrectly assuming the
-user input is not relevant to route planning.</p>
+<p>This is <strong>not</strong> a correct response.
+To intuit why our application has failed, we will use the logs generated by our application.
+Specifically, we will look at our logs using Agent Catalog's built-in Query Service UDFs:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">SELECT</span>
+<span class="w">    </span><span class="o">*</span>
+<span class="k">FROM</span>
+<span class="w">    </span><span class="o">`</span><span class="n">travel</span><span class="o">-</span><span class="n">sample</span><span class="o">`</span><span class="p">.</span><span class="n">agent_activity</span><span class="p">.</span><span class="n">Sessions</span><span class="p">()</span><span class="w"> </span><span class="n">s</span>
+<span class="k">WHERE</span>
+<span class="w">    </span><span class="n">s</span><span class="p">.</span><span class="n">sid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">`</span><span class="n">travel</span><span class="o">-</span><span class="n">sample</span><span class="o">`</span><span class="p">.</span><span class="n">agent_activity</span><span class="p">.</span><span class="n">LastSession</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The results from the query above show that the &quot;Front Desk&quot; agent has incorrectly assumed that the user input is not
+relevant to route planning.</p>
 <ol class="arabic">
 <li><p>To fix this, let us modify our prompt.
-Open the file <code class="docutils literal notranslate"><span class="pre">prompts/front_desk.yaml</span></code> and uncomment the item at the very bottom of the
-<code class="docutils literal notranslate"><span class="pre">content</span> <span class="pre">--&gt;</span> <span class="pre">agent_instructions</span></code> list:</p>
+Open the file <code class="docutils literal notranslate"><span class="pre">prompts/front_desk.yaml</span></code> and uncomment all parts of the <code class="docutils literal notranslate"><span class="pre">content</span> <span class="pre">--&gt;</span> <span class="pre">agent_instructions</span></code> list.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
-<span class="w">  </span><span class="no">If the user asks for flights / routes from obscure or small airports, DO NOT assume that no routes exist.</span>
-<span class="w">  </span><span class="no">Let another agent decide this, not you.</span>
-<span class="w">  </span><span class="no">In this case, set the is_last_step to False.</span>
+<span class="w">  </span><span class="no">Your task is to respond to the user AND decide if the conversation should</span>
+<span class="w">  </span><span class="no">end based on the user&#39;s response.</span>
+<span class="w">  </span><span class="no">If you have any routes that have been given to by another agent, respond</span>
+<span class="w">  </span><span class="no">to the user in Markdown illustrating the routes.</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
+<span class="w">  </span><span class="no">If the user asks for help with flight planning but there are no source and</span>
+<span class="w">  </span><span class="no">destination cities provided, set the &#39;needs_clarification&#39; field to True</span>
+<span class="w">  </span><span class="no">and provide a polite response.</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
+<span class="w">  </span><span class="no">If the user asks / replies with anything not related to flight planning, set</span>
+<span class="w">  </span><span class="no">the &#39;is_last_step&#39; field to True and &#39;needs_clarification&#39; to True.</span>
+<span class="w">  </span><span class="no">DO NOT continue the conversation if the user&#39;s input / response is not related</span>
+<span class="w">  </span><span class="no">to flight planning.</span>
+<span class="w">  </span><span class="no">For example, the following responses should end the conversation (set</span>
+<span class="w">  </span><span class="no">&#39;is_last_step&#39; to True):</span>
+<span class="w">  </span><span class="no">- I need help with my hotel reservation. ==&gt; is_last_step: True</span>
+<span class="w">  </span><span class="no">- Can you help me with my car rental? ==&gt; is_last_step: True</span>
+<span class="w">  </span><span class="no">- I need recommendations for restaurants in the area. ==&gt; is_last_step: True</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
+<span class="w">  </span><span class="no">If the user wants to end the conversation, set the &#39;is_last_step&#39; field to True</span>
+<span class="w">  </span><span class="no">and provide a polite response.</span>
+<span class="w">  </span><span class="no">For example:</span>
+<span class="w">  </span><span class="no">- Thanks! That&#39;s all I need. ==&gt; is_last_step: True</span>
+<span class="w">  </span><span class="no">- I&#39;m done for now. ==&gt; is_last_step: True</span>
+<span class="w">  </span><span class="no">- That&#39;s all for today. ==&gt; is_last_step: True</span>
 </pre></div>
 </div>
 </li>

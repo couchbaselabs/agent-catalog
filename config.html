@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Agent Catalog Configuration &#8212; Agent Catalog 0.2.3a1 documentation</title>
+    <title>Agent Catalog Configuration &#8212; Agent Catalog 0.2.3a1.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=50651e91" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=7230e44a" />
-    <script src="_static/documentation_options.js?v=072b7ed8"></script>
+    <script src="_static/documentation_options.js?v=c3695b27"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -156,7 +156,7 @@
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.3a1 documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.3a1.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -343,10 +343,6 @@
 <span class="w">            </span><span class="p">}</span>
 <span class="w">         </span><span class="p">],</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Secrets&quot;</span>
-<span class="w">      </span><span class="p">},</span>
-<span class="w">      </span><span class="nt">&quot;tool_model&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;#/$defs/DataModelType&quot;</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;typing.TypedDict&quot;</span>
 <span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;conn_string&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">         </span><span class="nt">&quot;anyOf&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
@@ -589,19 +585,6 @@
 <span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Debug&quot;</span><span class="p">,</span>
 <span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;boolean&quot;</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">   </span><span class="p">},</span>
-<span class="w">   </span><span class="nt">&quot;$defs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;DataModelType&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="nt">&quot;enum&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">            </span><span class="s2">&quot;pydantic.BaseModel&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;pydantic_v2.BaseModel&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;dataclasses.dataclass&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;typing.TypedDict&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;msgspec.Struct&quot;</span>
-<span class="w">         </span><span class="p">],</span>
-<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DataModelType&quot;</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
@@ -1538,23 +1521,6 @@ By default, this value is 3.</p>
 <span class="w">            </span><span class="p">}</span>
 <span class="w">         </span><span class="p">],</span>
 <span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Secrets&quot;</span>
-<span class="w">      </span><span class="p">},</span>
-<span class="w">      </span><span class="nt">&quot;tool_model&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="nt">&quot;$ref&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;#/$defs/DataModelType&quot;</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;typing.TypedDict&quot;</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">   </span><span class="p">},</span>
-<span class="w">   </span><span class="nt">&quot;$defs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;DataModelType&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">         </span><span class="nt">&quot;enum&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">            </span><span class="s2">&quot;pydantic.BaseModel&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;pydantic_v2.BaseModel&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;dataclasses.dataclass&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;typing.TypedDict&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;msgspec.Struct&quot;</span>
-<span class="w">         </span><span class="p">],</span>
-<span class="w">         </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DataModelType&quot;</span><span class="p">,</span>
-<span class="w">         </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">   </span><span class="p">}</span>
 <span class="p">}</span>
@@ -1574,7 +1540,6 @@ By default, this value is 3.</p>
 <li><p><a class="reference internal" href="#agentc_core.config.config.ToolRuntimeConfig.refiner" title="agentc_core.config.config.ToolRuntimeConfig.refiner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">refiner</span> <span class="pre">(Callable</span> <span class="pre">|</span> <span class="pre">None)</span></code></a></p></li>
 <li><p><a class="reference internal" href="#agentc_core.config.config.ToolRuntimeConfig.secrets" title="agentc_core.config.config.ToolRuntimeConfig.secrets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">secrets</span> <span class="pre">(dict[str,</span> <span class="pre">pydantic.types.SecretStr]</span> <span class="pre">|</span> <span class="pre">None)</span></code></a></p></li>
 <li><p><a class="reference internal" href="#agentc_core.config.config.ToolRuntimeConfig.tool_decorator" title="agentc_core.config.config.ToolRuntimeConfig.tool_decorator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tool_decorator</span> <span class="pre">(Callable[[agentc_core.provider.provider.ToolProvider.ToolResult],</span> <span class="pre">T]</span> <span class="pre">|</span> <span class="pre">None)</span></code></a></p></li>
-<li><p><a class="reference internal" href="#agentc_core.config.config.ToolRuntimeConfig.tool_model" title="agentc_core.config.config.ToolRuntimeConfig.tool_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tool_model</span> <span class="pre">(datamodel_code_generator.DataModelType)</span></code></a></p></li>
 </ul>
 </dd>
 </dl>
@@ -1642,21 +1607,6 @@ frameworks may ask for tools whose type is tailored to their own framework.
 As an example, in LangChain, vanilla Python functions must be converted to <code class="docutils literal notranslate"><span class="pre">langchain_core.tools.BaseTool</span></code>
 instances.
 To avoid having to &quot;box&quot; these tools yourself, we accept a callback to perform this boxing on your behalf.</p>
-</dd></dl>
-
-<dl class="py attribute pydantic_field">
-<dt class="sig sig-object py" id="agentc_core.config.config.ToolRuntimeConfig.tool_model">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tool_model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DataModelType</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataModelType.TypingTypedDict</span></em><a class="headerlink" href="#agentc_core.config.config.ToolRuntimeConfig.tool_model" title="Link to this definition">¶</a></dt>
-<dd><p>The target model type for the generated (schema) code for tools.</p>
-<div class="sd-card sd-sphinx-override sd-mb-3 sd-shadow-sm docutils">
-<div class="sd-card-body docutils">
-<div class="sd-card-title sd-font-weight-bold docutils">
-Field Description</div>
-<p class="sd-card-text">By default, we generate <code class="docutils literal notranslate"><span class="pre">TypedDict</span></code> models and attach these as type hints to the generated Python functions.
-Other options include Pydantic (V2 and V1) models and dataclasses, though these may not be supported by all
-agent frameworks.</p>
-</div>
-</div>
 </dd></dl>
 
 </dd></dl>
@@ -1831,7 +1781,6 @@ will use that snapshot version instead.</p>
 <li><a class="reference internal" href="#agentc_core.config.config.ToolRuntimeConfig.refiner"><code class="docutils literal notranslate"><span class="pre">ToolRuntimeConfig.refiner</span></code></a></li>
 <li><a class="reference internal" href="#agentc_core.config.config.ToolRuntimeConfig.secrets"><code class="docutils literal notranslate"><span class="pre">ToolRuntimeConfig.secrets</span></code></a></li>
 <li><a class="reference internal" href="#agentc_core.config.config.ToolRuntimeConfig.tool_decorator"><code class="docutils literal notranslate"><span class="pre">ToolRuntimeConfig.tool_decorator</span></code></a></li>
-<li><a class="reference internal" href="#agentc_core.config.config.ToolRuntimeConfig.tool_model"><code class="docutils literal notranslate"><span class="pre">ToolRuntimeConfig.tool_model</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#agentc_core.config.config.CommandLineConfig"><code class="docutils literal notranslate"><span class="pre">CommandLineConfig</span></code></a><ul>

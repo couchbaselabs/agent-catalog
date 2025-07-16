@@ -4,14 +4,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>agentc_core.config.config &#8212; Agent Catalog 0.2.3a1 documentation</title>
+    <title>agentc_core.config.config &#8212; Agent Catalog 0.2.3a1.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=50651e91" />
     <link rel="stylesheet" type="text/css" href="../../../_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=7230e44a" />
-    <script src="../../../_static/documentation_options.js?v=072b7ed8"></script>
+    <script src="../../../_static/documentation_options.js?v=c3695b27"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -160,7 +160,7 @@ window.addEventListener("load", () => mermaid.run());
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.2.3a1 documentation</a></h1>
+        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.2.3a1.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -304,7 +304,6 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_MODEL_CACHE_FOLDER</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.defaults</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_VERBOSITY_LEVEL</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.learned.embedding</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmbeddingModel</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.provider.provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelType</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.provider.provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">ToolProvider</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -314,9 +313,6 @@ window.addEventListener("load", () => mermaid.run());
 
 <span class="c1"># To support custom refiners, we must export this model.</span>
 <span class="n">SearchResult</span> <span class="o">=</span> <span class="n">SearchResult</span>
-
-<span class="c1"># To support the generation of different (schema) models, we export this model.</span>
-<span class="n">SchemaModel</span> <span class="o">=</span> <span class="n">ModelType</span>
 
 
 <div class="viewcode-block" id="RemoteCatalogConfig">
@@ -591,16 +587,6 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">                &quot;CB_PASSWORD&quot;: os.getenv(&quot;THE_CB_PASSWORD&quot;),</span>
 <span class="sd">                &quot;CB_CERTIFICATE&quot;: &quot;path/to/cert.pem&quot;,</span>
 <span class="sd">            })</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">tool_model</span><span class="p">:</span> <span class="n">SchemaModel</span> <span class="o">=</span> <span class="n">SchemaModel</span><span class="o">.</span><span class="n">TypingTypedDict</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; The target model type for the generated (schema) code for tools.</span>
-
-<span class="sd">    .. card:: Field Description</span>
-
-<span class="sd">        By default, we generate ``TypedDict`` models and attach these as type hints to the generated Python functions.</span>
-<span class="sd">        Other options include Pydantic (V2 and V1) models and dataclasses, though these may not be supported by all</span>
-<span class="sd">        agent frameworks.</span>
 <span class="sd">    &quot;&quot;&quot;</span></div>
 
 

@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Package Documentation &#8212; Agent Catalog 0.2.3a1 documentation</title>
+    <title>Package Documentation &#8212; Agent Catalog 0.2.3a1.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=50651e91" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=7230e44a" />
-    <script src="_static/documentation_options.js?v=072b7ed8"></script>
+    <script src="_static/documentation_options.js?v=c3695b27"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -155,7 +155,7 @@
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.3a1 documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.3a1.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -431,6 +431,7 @@ configuration of this <code class="xref py py-class docutils literal notranslate
 <ol class="arabic simple">
 <li><p><strong>func</strong> (<code class="docutils literal notranslate"><span class="pre">typing.Callable</span></code>): A Python callable representing the function.</p></li>
 <li><p><strong>meta</strong> (<code class="xref py py-type docutils literal notranslate"><span class="pre">RecordDescriptor</span></code>): The metadata associated with the tool.</p></li>
+<li><p><strong>input</strong> (<code class="xref py py-type docutils literal notranslate"><span class="pre">dict</span></code>): The argument schema (in JSON schema) associated with the tool.</p></li>
 </ol>
 <p>If a <code class="docutils literal notranslate"><span class="pre">tool_decorator</span></code> is present, this method will return a list of objects decorated accordingly.</p>
 </p>
@@ -1330,7 +1331,10 @@ logged with <code class="xref py py-class docutils literal notranslate"><span cl
 <span class="n">my_agent_tools</span> <span class="o">=</span> <span class="n">agentc_langgraph</span><span class="o">.</span><span class="n">tool</span><span class="o">.</span><span class="n">ToolNode</span><span class="p">(</span>
     <span class="n">span</span><span class="o">=</span><span class="n">my_agent_span</span><span class="p">,</span>
     <span class="n">tools</span><span class="o">=</span><span class="p">[</span>
-        <span class="n">langchain_core</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">StructuredTool</span><span class="o">.</span><span class="n">from_function</span><span class="p">(</span><span class="n">tool</span><span class="o">.</span><span class="n">func</span><span class="p">)</span> <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="n">my_agent_prompt</span><span class="o">.</span><span class="n">tools</span>
+        <span class="n">langchain_core</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">tool</span><span class="p">(</span>
+            <span class="n">tool</span><span class="o">.</span><span class="n">func</span><span class="p">,</span>
+            <span class="n">args_schema</span><span class="o">=</span><span class="n">tool</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
+        <span class="p">)</span> <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="n">my_agent_prompt</span><span class="o">.</span><span class="n">tools</span>
     <span class="p">]</span>
 <span class="p">)</span>
 <span class="n">my_agent_output</span> <span class="o">=</span> <span class="n">my_agent_prompt</span><span class="o">.</span><span class="n">output</span>
