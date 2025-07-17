@@ -14,7 +14,14 @@ logger = logging.getLogger(__name__)
 def cmd_env(cfg: Config = None):
     if cfg is None:
         cfg = Config()
-    for line in json.dumps(cfg.model_dump(), indent=4).split("\n"):
+
+    def _print_encoder(obj):
+        try:
+            return str(obj)
+        except TypeError:
+            return repr(obj)
+
+    for line in json.dumps(cfg.model_dump(), indent=4, default=_print_encoder).split("\n"):
         if re.match(r'\s*"AGENT_CATALOG_.*": (?!null)', line):
             click_extra.secho(line, fg="green")
         else:
