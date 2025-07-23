@@ -137,6 +137,9 @@ def init_db_catalog(cfg: Config, cluster: couchbase.cluster.Cluster):
     try:
         init_analytics_collection(cluster, cfg.bucket)
         click_extra.secho("All analytics collections for the catalog have been successfully created!\n", fg="green")
+    except couchbase.exceptions.ServiceUnavailableException as e:
+        click_extra.secho("Analytics collections could not be created (service is not available).", fg="yellow")
+        logger.debug("Analytics collections could not be created: %s", e)
     except couchbase.exceptions.CouchbaseException as e:
         click_extra.secho("Analytics collections could not be created.", fg="red")
         logger.warning("Analytics collections could not be created: %s", e)
@@ -186,6 +189,9 @@ def init_db_auditor(cfg: Config, cluster: couchbase.cluster.Cluster):
     try:
         create_analytics_views(cluster, cfg.bucket)
         click_extra.secho("All analytics views for the auditor have been successfully created!\n", fg="green")
+    except couchbase.exceptions.ServiceUnavailableException as e:
+        click_extra.secho("Analytics views could not be created (service is not available).", fg="yellow")
+        logger.debug("Analytics views could not be created: %s", e)
     except couchbase.exceptions.CouchbaseException as e:
         click_extra.secho("Analytics views could not be created.", fg="red")
         logger.warning("Analytics views could not be created: %s", e)
