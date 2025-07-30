@@ -1,5 +1,4 @@
-main.py
+server.py
 graph.py
 edge.py
 node.py
-evals/*
