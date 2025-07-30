@@ -42,7 +42,7 @@ def test_checkpoint_saver(
         )
 
         # TODO (GLENN): Use a fake chat model here...
-        chat_model = langchain_openai.ChatOpenAI(name="gpt-4o")
+        chat_model = langchain_openai.ChatOpenAI(name="gpt-4o-mini")
         agent = langgraph.prebuilt.create_react_agent(
             model=chat_model, tools=list(), checkpointer=CheckpointSaver(create_if_not_exists=True)
         )
@@ -67,7 +67,6 @@ def test_checkpoint_saver(
         assert len(results) == 2
 
 
-@pytest.mark.skip
 @pytest.mark.asyncio
 @pytest.mark.slow
 async def test_async_checkpoint_saver(
@@ -87,7 +86,7 @@ async def test_async_checkpoint_saver(
         )
 
         # TODO (GLENN): Use a fake chat model here...
-        chat_model = langchain_openai.ChatOpenAI(name="gpt-4o")
+        chat_model = langchain_openai.ChatOpenAI(name="gpt-4o-mini")
         initialize()
         agent = langgraph.prebuilt.create_react_agent(
             model=chat_model, tools=list(), checkpointer=await AsyncCheckpointSaver.create()

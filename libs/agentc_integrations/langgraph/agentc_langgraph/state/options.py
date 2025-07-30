@@ -17,7 +17,7 @@ from agentc_langgraph.defaults import DEFAULT_COUCHBASE_CHECKPOINT_TUPLE_COLLECT
 
 class CheckpointOptions(pydantic_settings.BaseSettings):
     model_config = pydantic_settings.SettingsConfigDict(
-        env_file=".env", env_prefix="AGENT_CATALOG_LANGGRAPH_CHECKPOINT_"
+        env_file=".env", env_prefix="AGENT_CATALOG_LANGGRAPH_CHECKPOINT_", extra="allow"
     )
 
     # Connection-specific details.

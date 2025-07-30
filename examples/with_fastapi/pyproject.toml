@@ -1,0 +1,49 @@
+[tool.poetry]
+name = "with-fastapi-example"
+version = "0.2.0"
+description = "A starter agent built with Couchbase Agent Catalog, LangGraph, and FastAPI."
+repository = "https://github.com/couchbaselabs/agent-catalog"
+authors = [
+    "Glenn Galvizo <glenn.galvizo@couchbase.com>"
+]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+langgraph = "^0.5.2"
+fastapi = {version = "^0.116.1", extras = ["standard"]}
+
+# TODO (GLENN): Replace this with the PyPI package once it's available.
+# The agentc project (the front-facing parts)!
+[tool.poetry.dependencies.agentc]
+path = "../../libs/agentc"
+develop = true
+
+[tool.poetry.dependencies.agentc_langchain]
+path = "../../libs/agentc_integrations/langchain"
+develop = true
+
+[tool.poetry.dependencies.agentc_langgraph]
+path = "../../libs/agentc_integrations/langgraph"
+develop = true
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.0.0"
+pytest = "^8.3.4"
+
+[tool.ruff]
+line-length = 120
+lint.select = ["F", "B", "I", "SIM"]
+show-fixes = true
+
+[tool.ruff.lint.isort]
+no-sections = true
+force-single-line = true
+lines-between-types = 1
+force-wrap-aliases = true
+split-on-trailing-comma = false
+
+[build-system]
+requires = ["poetry-core>=2.1.0"]
+build-backend = "poetry.core.masonry.api"

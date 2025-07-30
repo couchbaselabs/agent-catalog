@@ -45,7 +45,7 @@ def test_complete(
         span = catalog.Span(name="default")
 
         # TODO (GLENN): Use a fake chat model here...
-        chat_model = llama_index.llms.openai.OpenAI(model="gpt-4o")
+        chat_model = llama_index.llms.openai.OpenAI(model="gpt-4o-mini")
         chat_model.callback_manager.add_handler(Callback(span=span))
         chat_model.complete("Hello, how are you doing today?")
 
@@ -81,7 +81,7 @@ def test_chat(
         span = catalog.Span(name="default")
 
         # TODO (GLENN): Use a fake chat model here...
-        chat_model = llama_index.llms.openai.OpenAI(model="gpt-4o")
+        chat_model = llama_index.llms.openai.OpenAI(model="gpt-4o-mini")
         chat_model.callback_manager.add_handler(Callback(span=span))
         chat_model.chat(
             [

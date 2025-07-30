@@ -39,7 +39,7 @@ def test_exact_cache(
         )
 
         # TODO (GLENN): Use a fake chat model here...
-        chat_model = langchain_openai.ChatOpenAI(name="gpt-4o")
+        chat_model = langchain_openai.ChatOpenAI(name="gpt-4o-mini")
         cached_model = cache(chat_model, kind="exact", create_if_not_exists=True)
         cached_model.invoke("Hello, how are you doing today?")
 
@@ -71,7 +71,7 @@ def test_semantic_cache(
         )
 
         # TODO (GLENN): Use a fake chat model here...
-        chat_model = langchain_openai.ChatOpenAI(name="gpt-4o")
+        chat_model = langchain_openai.ChatOpenAI(name="gpt-4o-mini")
         embeddings = langchain_openai.OpenAIEmbeddings(model="text-embedding-3-small")
         cached_model = cache(chat_model, kind="semantic", embeddings=embeddings, create_if_not_exists=True)
         cached_model.invoke("Hello, how are you doing today?")

@@ -1,0 +1,11 @@
+.agent-catalog
+.agent-activity
+.data
+.idea/*
+/.idea/
+.git_save/*
+.model-cache
+__pycache__
+.env
+poetry.lock
+*.pem
