@@ -206,6 +206,7 @@ In this section, we will illustrate how you can "tune" your agent system in an a
 
 2. Next, let's try a set of endpoints that has requires one layover.
    Specifically, we want a route from Canyonlands Field Airport (IATA 'CNY') to LAX.
+   We will restart our agent and converse with our agent accordingly:
 
    ```text
    > Assistant: Please provide the source and destination airports.

@@ -18,7 +18,7 @@ The mono-repo for the Couchbase Agent Catalog project.
 
 *Note: this section is in the works! We recommend installing from our pre-built packages in the meantime.*
 
-1. Make sure you have `python3.12` installed!
+1. Make sure you have `python3.11` installed!
 
 2. Use `pip` to install the `agentc` package.
 
@@ -41,7 +41,7 @@ The mono-repo for the Couchbase Agent Catalog project.
 
 ### Installing from Package
 
-1. Make sure you have `python3.12` installed!
+1. Make sure you have `python3.11` installed!
 
 2. Navigate to the releases page for Agent Catalog [here](https://github.com/couchbaselabs/agent-catalog/releases)
    and choose the latest version.
@@ -74,7 +74,7 @@ The mono-repo for the Couchbase Agent Catalog project.
 
 ### Installing from Source (with Makefile)
 
-1. Make sure you have `python3.12` and [`poetry`](https://python-poetry.org/docs/#installation) installed!
+1. Make sure you have `python3.11` and [`poetry`](https://python-poetry.org/docs/#installation) installed!
 
 2. Make sure you have `make` installed!
    For Mac-based installations, see [here](https://formulae.brew.sh/formula/make).
@@ -114,19 +114,22 @@ The mono-repo for the Couchbase Agent Catalog project.
    run the following command:
 
    ```bash
-   cd libs/agentc
-   poetry build
+   scripts/pre-build.sh
+   scripts/build.sh
+   scripts/post-build.sh
    ```
+
+   Your `.whl` files will end up in the `dist` folder.
 
 ### Installing from Source (with Anaconda)
 
-1. Make sure you have `python3.12` and
+1. Make sure you have `python3.11` and
    [`conda`](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) installed!
 
 2. Create a new virtual environment with Anaconda and subsequently activate your environment.
    Again, you must activate your environment before running any `agentc` commands!
    ```bash
-   conda create -n my_agentc_env python=3.12
+   conda create -n my_agentc_env python=3.11
    conda activate my_agentc_env
    ```
 

@@ -7,7 +7,7 @@ import pathlib
 import pydantic
 import tqdm
 import typing
-import uuid
+import zlib
 
 from agentc_core.activity.models.log import Log
 from agentc_core.catalog.descriptor import CatalogDescriptor
@@ -137,7 +137,12 @@ def publish_catalog(
             raise ValueError(f"Invalid record kind for {k} catalog item!\n{item.record_kind}")
 
         try:
-            key = uuid.uuid4().hex
+            raw_key = item.identifier + "_" + metadata["version"]["identifier"]
+            key = zlib.compress(raw_key.encode("utf-8")).hex()
+            if len(key) > 245:  # This is the limit on the key-length for our server. We will raise a warning here.
+                printer(f"Key value has exceeded 245 characters! Truncating key for {item.identifier}.", fg="yellow")
+                key = key[:245]
+
             progress_bar.set_description(item.name)
 
             # serialise object to str

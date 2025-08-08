@@ -7,8 +7,11 @@ import typing
 from agentc_core.activity import Span
 from agentc_core.catalog import Catalog
 
+# The type of our state.
+S = typing.TypeVar("S")
 
-class GraphRunnable[S](langchain_core.runnables.Runnable):
+
+class GraphRunnable(langchain_core.runnables.Runnable):
     """A helper class that wraps the "Runnable" interface with :py:class:`agentc.Span`.
 
     .. card:: Class Description
