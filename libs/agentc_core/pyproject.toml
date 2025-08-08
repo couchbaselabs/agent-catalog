@@ -9,7 +9,7 @@ authors = [
 ]
 license = "Apache-2.0"
 dynamic = ["version"]
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 
 [project.urls]
 repository = "https://github.com/couchbaselabs/agent-catalog"
@@ -30,7 +30,7 @@ include = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"
 requests = "^2.32.3"
 PyYAML = "^6.0.2"
 semantic_version = "^2.10.0"

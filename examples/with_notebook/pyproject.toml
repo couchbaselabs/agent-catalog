@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "with-notebook-example"
-version = "0.2.0"
+version = "0.2.1"
 description = "A starter agent built with Couchbase Agent Catalog and LangGraph in Jupyter Notebook."
 repository = "https://github.com/couchbaselabs/agent-catalog"
 authors = [
@@ -12,7 +12,7 @@ readme = "README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"
 langgraph = "^0.5.2"
 couchbase = "^4.4.0"
 

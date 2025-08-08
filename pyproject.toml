@@ -10,7 +10,7 @@ authors = [
 license = "Apache-2.0"
 readme = "README.md"
 dynamic = ["version"]
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 
 [project.urls]
 repository = "https://github.com/couchbaselabs/agent-catalog"
@@ -23,7 +23,7 @@ version = "0.0.0"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"
 
 # All of our Agent Catalog packages.
 agentc = { path = "libs/agentc", develop = true }
@@ -38,6 +38,7 @@ pre-commit = "^3.2.2"
 pytest = "^8.3.2"
 pytest-retry = "^1.7.0"
 pytest-asyncio = "^1.1.0"
+virtualenv = "<20.33.0"
 
 # An internal testing package for the Agent Catalog.
 [tool.poetry.group.dev.dependencies.agentc-testing]
@@ -117,7 +118,7 @@ files = [
 ]
 
 [tool.poetry.requires-plugins]
-poetry-plugin-export = ">=1.8"
+poetry-plugin-export = ">=1.9"
 poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
 
 [build-system]

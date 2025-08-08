@@ -33,7 +33,7 @@ class BaseProvider(abc.ABC):
         pass
 
 
-class ToolProvider[T](BaseProvider):
+class ToolProvider(BaseProvider):
     @dataclasses.dataclass
     class ToolResult:
         func: typing.Callable
@@ -44,7 +44,7 @@ class ToolProvider[T](BaseProvider):
         self,
         catalog: CatalogBase,
         output: os.PathLike = None,
-        decorator: typing.Callable[["ToolProvider.ToolResult"], T] = None,
+        decorator: typing.Callable[["ToolProvider.ToolResult"], ...] = None,
         refiner: typing.Callable[[list[SearchResult]], list[SearchResult]] = None,
         secrets: typing.Optional[dict[str, str]] = None,
     ):
@@ -66,7 +66,7 @@ class ToolProvider[T](BaseProvider):
             for k, v in secrets.items():
                 put_secret(k, v)
 
-    def _generate_result(self, tool_descriptor: RecordDescriptor) -> "ToolProvider.ToolResult" | T:
+    def _generate_result(self, tool_descriptor: RecordDescriptor) -> "ToolProvider.ToolResult":
         result = self._tool_cache[tool_descriptor]
         return result if self.decorator is None else self.decorator(result)
 
@@ -76,7 +76,7 @@ class ToolProvider[T](BaseProvider):
         annotations: str = None,
         snapshot: str = "__LATEST__",
         limit: typing.Union[int | None] = 1,
-    ) -> list[ToolResult | T]:
+    ) -> list[ToolResult]:
         """
         :param query: A string to search the catalog with.
         :param annotations: An annotation query string in the form of KEY=VALUE (AND|OR KEY=VALUE)*.
@@ -101,7 +101,7 @@ class ToolProvider[T](BaseProvider):
         # Return the tools from the cache.
         return [self._generate_result(x.entry) for x in results]
 
-    def find_with_name(self, name: str, snapshot: str = "__LATEST__", annotations: str = None) -> ToolResult | T | None:
+    def find_with_name(self, name: str, snapshot: str = "__LATEST__", annotations: str = None) -> ToolResult | None:
         annotation_predicate = AnnotationPredicate(query=annotations) if annotations is not None else None
         results = self.catalog.find(name=name, snapshot=snapshot, annotations=annotation_predicate, limit=1)
 
@@ -126,18 +126,18 @@ class ToolProvider[T](BaseProvider):
                 return self._generate_result(results[0].entry)
 
 
-class PromptProvider[T](BaseProvider):
+class PromptProvider(BaseProvider):
     @dataclasses.dataclass
-    class PromptResult[T]:
+    class PromptResult:
         content: str | dict
-        tools: list[ToolProvider.ToolResult | T]
+        tools: list[ToolProvider.ToolResult]
         output: typing.Optional[dict]
         meta: RecordDescriptor
 
     def __init__(
         self,
         catalog: CatalogBase,
-        tool_provider: ToolProvider[T] = None,
+        tool_provider: ToolProvider = None,
         refiner: typing.Callable[[list[SearchResult]], list[SearchResult]] = None,
     ):
         super(PromptProvider, self).__init__(catalog, refiner)

@@ -235,7 +235,7 @@ class RemoteCatalogConfig(pydantic_settings.BaseSettings):
         return cluster
 
 
-class ToolRuntimeConfig[T](pydantic_settings.BaseSettings):
+class ToolRuntimeConfig(pydantic_settings.BaseSettings):
     model_config = pydantic_settings.SettingsConfigDict(env_file=".env", env_prefix="AGENT_CATALOG_", extra="ignore")
 
     codegen_output: typing.Optional[pathlib.Path | tempfile.TemporaryDirectory | os.PathLike] = None
@@ -247,7 +247,7 @@ class ToolRuntimeConfig[T](pydantic_settings.BaseSettings):
     Python callables from these files with a "standard import".
     """
 
-    tool_decorator: typing.Optional[typing.Callable[[ToolProvider.ToolResult], T]] = None
+    tool_decorator: typing.Optional[typing.Callable[[ToolProvider.ToolResult], ...]] = None
     """ A Python decorator (function) to apply to each result yielded by :py:meth:`agentc.catalog.Catalog.find_tools`.
 
     By default, yielded results are callable and possess type annotations + documentation strings, but some agent

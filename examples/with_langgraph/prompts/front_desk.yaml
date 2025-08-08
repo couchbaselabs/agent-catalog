@@ -24,7 +24,7 @@ output:
     needs_clarification:
       type: boolean
       description: "Whether (or not) the response needs clarification."
-  required: [ should_continue, response, needs_clarification ]
+  required: [ is_last_step, response, needs_clarification ]
 
 # As a supplement to the description similarity search, users can optionally specify search annotations.
 # The values of these annotations MUST be strings (e.g., not 'true', but '"true"').

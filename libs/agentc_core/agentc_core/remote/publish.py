@@ -1,3 +1,4 @@
+import base64
 import couchbase.cluster
 import couchbase.exceptions
 import datetime
@@ -7,7 +8,6 @@ import pathlib
 import pydantic
 import tqdm
 import typing
-import uuid
 
 from agentc_core.activity.models.log import Log
 from agentc_core.catalog.descriptor import CatalogDescriptor
@@ -137,7 +137,12 @@ def publish_catalog(
             raise ValueError(f"Invalid record kind for {k} catalog item!\n{item.record_kind}")
 
         try:
-            key = uuid.uuid4().hex
+            raw_key = item.identifier + "_" + metadata["version"]["identifier"]
+            key = base64.urlsafe_b64encode(raw_key.encode()).decode()
+            if len(key) > 250:  # This is the limit on the key-length for our server. We will raise a warning here.
+                printer(f"Key value has exceeded 250 characters! Truncating key for {item.identifier}.", fg="yellow")
+                key = key[:250]
+
             progress_bar.set_description(item.name)
 
             # serialise object to str

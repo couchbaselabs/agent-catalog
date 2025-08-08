@@ -7,7 +7,7 @@ authors = [
 ]
 license = "Apache-2.0"
 dynamic = ["version"]
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 
 [tool.poetry]
 name = "agentc-testing"
@@ -17,7 +17,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"
 pre-commit = "^3.2.2"
 pytest = "^8.3.2"
 docker = "^7.1.0"

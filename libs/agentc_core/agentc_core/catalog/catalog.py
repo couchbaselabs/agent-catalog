@@ -29,7 +29,7 @@ Prompt = PromptProvider.PromptResult
 Tool = ToolProvider.ToolResult
 
 
-class Catalog[T](EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig, ToolRuntimeConfig):
+class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig, ToolRuntimeConfig):
     """A provider of indexed "agent building blocks" (e.g., tools, prompts, spans...).
 
     .. card:: Class Description
@@ -69,7 +69,7 @@ class Catalog[T](EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig, 
     _local_tool_catalog: CatalogMem = None
     _remote_tool_catalog: CatalogDB = None
     _tool_catalog: CatalogBase = None
-    _tool_provider: ToolProvider[T] = None
+    _tool_provider: ToolProvider = None
 
     _local_prompt_catalog: CatalogMem = None
     _remote_prompt_catalog: CatalogDB = None
@@ -251,7 +251,7 @@ class Catalog[T](EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig, 
         annotations: str = None,
         catalog_id: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
-    ) -> list[Tool | T] | list[Prompt[T]] | Tool | T | Prompt[T] | None:
+    ) -> list[Tool] | list[Prompt] | Tool | Prompt | None:
         """Return a list of tools or prompts based on the specified search criteria.
 
         .. card:: Method Description
@@ -301,7 +301,7 @@ class Catalog[T](EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig, 
         annotations: str = None,
         catalog_id: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
-    ) -> list[Tool | T] | Tool | T | None:
+    ) -> list[Tool] | Tool | None:
         """Return a list of tools based on the specified search criteria.
 
         :param query: A query string (natural language) to search the catalog with.
@@ -337,7 +337,7 @@ class Catalog[T](EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig, 
         annotations: str = None,
         catalog_id: str = LATEST_SNAPSHOT_VERSION,
         limit: typing.Union[int | None] = 1,
-    ) -> list[Prompt[T]] | Prompt[T] | None:
+    ) -> list[Prompt] | Prompt | None:
         """Return a list of prompts based on the specified search criteria.
 
         :param query: A query string (natural language) to search the catalog with.

@@ -32,7 +32,7 @@ class State(typing.TypedDict):
     previous_node: typing.Optional[list[str]]
 
 
-class ReActAgent[S: State](langchain_core.runnables.Runnable[S, S | langgraph.types.Command]):
+class ReActAgent(langchain_core.runnables.Runnable[State, State | langgraph.types.Command]):
     """A helper ReAct agent base class that integrates with Agent Catalog.
 
     .. card:: Class Description
@@ -229,21 +229,21 @@ class ReActAgent[S: State](langchain_core.runnables.Runnable[S, S | langgraph.ty
         )
 
     def _invoke(
-        self, span: Span, state: S, config: langchain_core.runnables.RunnableConfig
-    ) -> S | langgraph.types.Command:
+        self, span: Span, state: State, config: langchain_core.runnables.RunnableConfig
+    ) -> State | langgraph.types.Command:
         pass
 
     async def _ainvoke(
-        self, span: Span, state: S, config: langchain_core.runnables.RunnableConfig
-    ) -> S | langgraph.types.Command:
+        self, span: Span, state: State, config: langchain_core.runnables.RunnableConfig
+    ) -> State | langgraph.types.Command:
         pass
 
     def invoke(
         self,
-        input: S,
+        input: State,
         config: langchain_core.runnables.RunnableConfig | None = None,
         **kwargs,
-    ) -> S | langgraph.types.Command:
+    ) -> State | langgraph.types.Command:
         node_name = self.__class__.__name__
 
         # Below, we build a Span instance which will bind all logs to our class name.
@@ -270,10 +270,10 @@ class ReActAgent[S: State](langchain_core.runnables.Runnable[S, S | langgraph.ty
 
     async def ainvoke(
         self,
-        input: S,
+        input: State,
         config: langchain_core.runnables.RunnableConfig | None = None,
         **kwargs,
-    ) -> S | langgraph.types.Command:
+    ) -> State | langgraph.types.Command:
         node_name = self.__class__.__name__
 
         # Below, we build a Span instance which will bind all logs to our class name.
