@@ -4,14 +4,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>agentc_langgraph.state.checkpoint &#8212; Agent Catalog 0.2.4a1.post2 documentation</title>
+    <title>agentc_langgraph.state.checkpoint &#8212; Agent Catalog 0.2.4a1.post3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=50651e91" />
     <link rel="stylesheet" type="text/css" href="../../../_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=7230e44a" />
-    <script src="../../../_static/documentation_options.js?v=5d80694d"></script>
+    <script src="../../../_static/documentation_options.js?v=f9f8ed54"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -160,7 +160,7 @@ window.addEventListener("load", () => mermaid.run());
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.2.4a1.post2 documentation</a></h1>
+        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.2.4a1.post3 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -494,8 +494,6 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
-<span class="c1"># TODO (GLENN): This class currently doesn&#39;t work due to a bug upstream (in langgraph-checkpointer-couchbase).</span>
-<span class="c1">#               We&#39;ll revisit this class later.</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">AsyncCheckpointSaver</span><span class="p">(</span><span class="n">langgraph</span><span class="o">.</span><span class="n">checkpoint</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">BaseCheckpointSaver</span><span class="p">):</span>
     <span class="nd">@classmethod</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span>
@@ -579,7 +577,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">task_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">aput_writes</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">writes</span><span class="o">=</span><span class="n">writes</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">async_saver</span><span class="o">.</span><span class="n">aput_writes</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">writes</span><span class="o">=</span><span class="n">writes</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">)</span>
 </pre></div>
 
             <div class="clearer"></div>

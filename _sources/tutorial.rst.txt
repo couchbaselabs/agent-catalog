@@ -835,6 +835,14 @@ Having defined all of our nodes, let us now define our graph.
         with span:
             graph.invoke(input=span.state)
 
+.. tip::
+
+    This basic application does not differentiate between users.
+    For an example on how to handle multiple users, see a modified version of this example
+    `here <https://github.com/couchbaselabs/agent-catalog/tree/master/examples/with_fastapi>`__
+    that uses FastAPI and LangGraph's `async` capabilities to isolate sessions between users.
+
+
 Step #3: Iteratively Improving our Agent
 ----------------------------------------
 
