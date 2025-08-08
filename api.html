@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Package Documentation &#8212; Agent Catalog 0.2.4a1.post3 documentation</title>
+    <title>Package Documentation &#8212; Agent Catalog 0.2.4a1.post4 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=50651e91" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=7230e44a" />
-    <script src="_static/documentation_options.js?v=f9f8ed54"></script>
+    <script src="_static/documentation_options.js?v=32717d99"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -155,7 +155,7 @@
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.4a1.post3 documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.4a1.post4 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -377,7 +377,7 @@ configuration of this <code class="xref py py-class docutils literal notranslate
 </p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list[<em>ToolResult</em> | T] | list[<em>PromptResult</em>] | <em>ToolResult</em> | T | <em>PromptResult</em> | None</p>
+<dd class="field-odd"><p>list[<em>ToolResult</em>] | list[<em>PromptResult</em>] | <em>ToolResult</em> | <em>PromptResult</em> | None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -437,7 +437,7 @@ configuration of this <code class="xref py py-class docutils literal notranslate
 </p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list[<em>ToolResult</em> | T] | <em>ToolResult</em> | T | None</p>
+<dd class="field-odd"><p>list[<em>ToolResult</em>] | <em>ToolResult</em> | None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1479,12 +1479,12 @@ the Runnable did not implement a native async version of invoke.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>input</strong> (<em>S</em>)</p></li>
+<li><p><strong>input</strong> (<a class="reference internal" href="#agentc_langgraph.agent.State" title="agentc_langgraph.agent.agent.State"><em>State</em></a>)</p></li>
 <li><p><strong>config</strong> (<em>RunnableConfig</em><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>S | <em>Command</em></p>
+<dd class="field-even"><p><a class="reference internal" href="#agentc_langgraph.agent.State" title="agentc_langgraph.agent.agent.State"><em>State</em></a> | <em>Command</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1509,12 +1509,12 @@ for more details. Defaults to None.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>input</strong> (<em>S</em>)</p></li>
+<li><p><strong>input</strong> (<a class="reference internal" href="#agentc_langgraph.agent.State" title="agentc_langgraph.agent.agent.State"><em>State</em></a>)</p></li>
 <li><p><strong>config</strong> (<em>RunnableConfig</em><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>S | <em>Command</em></p>
+<dd class="field-even"><p><a class="reference internal" href="#agentc_langgraph.agent.State" title="agentc_langgraph.agent.agent.State"><em>State</em></a> | <em>Command</em></p>
 </dd>
 </dl>
 </dd></dl>

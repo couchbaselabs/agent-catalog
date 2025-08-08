@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Installation &#8212; Agent Catalog 0.2.4a1.post3 documentation</title>
+    <title>Installation &#8212; Agent Catalog 0.2.4a1.post4 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=50651e91" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=7230e44a" />
-    <script src="_static/documentation_options.js?v=f9f8ed54"></script>
+    <script src="_static/documentation_options.js?v=32717d99"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -155,7 +155,7 @@
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.4a1.post3 documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.4a1.post4 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -282,7 +282,7 @@
 We recommend installing from our pre-built packages in the meantime.</p>
 </div>
 <ol class="arabic">
-<li><p>Make sure you have <strong class="command">python3.12</strong> installed!</p></li>
+<li><p>Make sure you have <strong class="command">python3.11</strong> installed!</p></li>
 <li><p>Install <code class="docutils literal notranslate"><span class="pre">agentc</span></code> with <code class="docutils literal notranslate"><span class="pre">pip</span></code>.</p>
 <div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>agentc
 </pre></div>
@@ -333,7 +333,7 @@ information.
 <section id="installing-from-pre-built-package">
 <h2>Installing from Pre-Built Package<a class="headerlink" href="#installing-from-pre-built-package" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
-<li><p>Make sure you have <strong class="command">python3.12</strong> installed!</p></li>
+<li><p>Make sure you have <strong class="command">python3.11</strong> installed!</p></li>
 <li><p>Navigate to the releases page for Agent Catalog <a class="reference external" href="https://github.com/couchbaselabs/agent-catalog/releases">here</a>
 and choose the latest version.
 Expand the &quot;Assets&quot; tab and download all <code class="docutils literal notranslate"><span class="pre">*.whl</span></code> files (e.g., <code class="docutils literal notranslate"><span class="pre">agentc-0.2.0+g59944db-py3-none-any.whl</span></code>) into
@@ -364,7 +364,7 @@ and/or <code class="docutils literal notranslate"><span class="pre">agentc_langg
 <section id="installing-from-source-with-makefile">
 <h2>Installing from Source (with Makefile)<a class="headerlink" href="#installing-from-source-with-makefile" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
-<li><p>Make sure you have <strong class="command">python3.12</strong> and <a class="reference external" href="https://python-poetry.org/docs/#installation">poetry</a> installed!</p></li>
+<li><p>Make sure you have <strong class="command">python3.11</strong> and <a class="reference external" href="https://python-poetry.org/docs/#installation">poetry</a> installed!</p></li>
 <li><p>Make sure you have <strong class="command">make</strong> installed!
 For Mac-based installations, see <a class="reference external" href="https://formulae.brew.sh/formula/make">here</a>.
 For Windows-based installations, see <a class="reference external" href="https://gnuwin32.sourceforge.net/packages/make.htm">here</a>.
@@ -395,21 +395,23 @@ agent-catalog-UEfqTvAT-py3.13 (Activated)
 </li>
 <li><p>If you are interested in building a <code class="docutils literal notranslate"><span class="pre">.whl</span></code> file (for later use in <code class="docutils literal notranslate"><span class="pre">.whl</span></code>-based installation in other projects),
 run the following command:</p>
-<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>libs/agentc
-<span class="gp">$ </span>poetry<span class="w"> </span>build
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>./scripts/pre-build.sh
+<span class="gp">$ </span>./scripts/build.sh
+<span class="gp">$ </span>./scripts/post-build.sh
 </pre></div>
 </div>
+<p>Your <code class="docutils literal notranslate"><span class="pre">.whl</span></code> files will end up in the <cite>dist</cite> folder.</p>
 </li>
 </ol>
 </section>
 <section id="installing-from-source-with-anaconda">
 <h2>Installing from Source (with Anaconda)<a class="headerlink" href="#installing-from-source-with-anaconda" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
-<li><p>Make sure you have <strong class="command">python3.12</strong> and
+<li><p>Make sure you have <strong class="command">python3.11</strong> and
 <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html">conda</a> installed!</p></li>
 <li><p>Create a new virtual environment with Anaconda and subsequently activate your environment.
 Again, you must activate your environment before running any <strong class="command">agentc</strong> commands!</p>
-<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>my_agentc_env<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.12
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>my_agentc_env<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.11
 <span class="gp">$ </span>conda<span class="w"> </span>activate<span class="w"> </span>my_agentc_env
 </pre></div>
 </div>

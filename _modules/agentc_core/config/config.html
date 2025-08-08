@@ -4,14 +4,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>agentc_core.config.config &#8212; Agent Catalog 0.2.4a1.post3 documentation</title>
+    <title>agentc_core.config.config &#8212; Agent Catalog 0.2.4a1.post4 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=50651e91" />
     <link rel="stylesheet" type="text/css" href="../../../_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=7230e44a" />
-    <script src="../../../_static/documentation_options.js?v=f9f8ed54"></script>
+    <script src="../../../_static/documentation_options.js?v=32717d99"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -160,7 +160,7 @@ window.addEventListener("load", () => mermaid.run());
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.2.4a1.post3 documentation</a></h1>
+        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.2.4a1.post4 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -523,7 +523,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="ToolRuntimeConfig">
 <a class="viewcode-back" href="../../../config.html#agentc_core.config.config.ToolRuntimeConfig">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ToolRuntimeConfig</span><span class="p">[</span><span class="n">T</span><span class="p">](</span><span class="n">pydantic_settings</span><span class="o">.</span><span class="n">BaseSettings</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ToolRuntimeConfig</span><span class="p">(</span><span class="n">pydantic_settings</span><span class="o">.</span><span class="n">BaseSettings</span><span class="p">):</span>
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic_settings</span><span class="o">.</span><span class="n">SettingsConfigDict</span><span class="p">(</span><span class="n">env_file</span><span class="o">=</span><span class="s2">&quot;.env&quot;</span><span class="p">,</span> <span class="n">env_prefix</span><span class="o">=</span><span class="s2">&quot;AGENT_CATALOG_&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 
     <span class="n">codegen_output</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">|</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -535,7 +535,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">    Python callables from these files with a &quot;standard import&quot;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">tool_decorator</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">[[</span><span class="n">ToolProvider</span><span class="o">.</span><span class="n">ToolResult</span><span class="p">],</span> <span class="n">T</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">tool_decorator</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">[[</span><span class="n">ToolProvider</span><span class="o">.</span><span class="n">ToolResult</span><span class="p">],</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; A Python decorator (function) to apply to each result yielded by :py:meth:`agentc.catalog.Catalog.find_tools`.</span>
 
 <span class="sd">    By default, yielded results are callable and possess type annotations + documentation strings, but some agent</span>

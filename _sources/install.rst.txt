@@ -12,7 +12,7 @@ Installing from PyPI
     This section is in the works!
     We recommend installing from our pre-built packages in the meantime.
 
-1. Make sure you have :command:`python3.12` installed!
+1. Make sure you have :command:`python3.11` installed!
 
 2. Install ``agentc`` with ``pip``.
 
@@ -43,7 +43,7 @@ Installing from PyPI
 Installing from Pre-Built Package
 ---------------------------------
 
-1. Make sure you have :command:`python3.12` installed!
+1. Make sure you have :command:`python3.11` installed!
 
 2. Navigate to the releases page for Agent Catalog `here <https://github.com/couchbaselabs/agent-catalog/releases>`__
    and choose the latest version.
@@ -74,10 +74,11 @@ Installing from Pre-Built Package
       $ pip install agentc_llamaindex-*.whl
 
 
+
 Installing from Source (with Makefile)
 --------------------------------------
 
-1. Make sure you have :command:`python3.12` and `poetry <https://python-poetry.org/docs/#installation>`__ installed!
+1. Make sure you have :command:`python3.11` and `poetry <https://python-poetry.org/docs/#installation>`__ installed!
 
 2. Make sure you have :command:`make` installed!
    For Mac-based installations, see `here <https://formulae.brew.sh/formula/make>`__.
@@ -118,13 +119,16 @@ Installing from Source (with Makefile)
 
    .. code-block:: ansi-shell-session
 
-      $ cd libs/agentc
-      $ poetry build
+      $ ./scripts/pre-build.sh
+      $ ./scripts/build.sh
+      $ ./scripts/post-build.sh
+
+   Your ``.whl`` files will end up in the `dist` folder.
 
 Installing from Source (with Anaconda)
 --------------------------------------
 
-1. Make sure you have :command:`python3.12` and
+1. Make sure you have :command:`python3.11` and
    `conda <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`__ installed!
 
 2. Create a new virtual environment with Anaconda and subsequently activate your environment.
@@ -132,7 +136,7 @@ Installing from Source (with Anaconda)
 
    .. code-block:: ansi-shell-session
 
-      $ conda create -n my_agentc_env python=3.12
+      $ conda create -n my_agentc_env python=3.11
       $ conda activate my_agentc_env
 
 3. Navigate to this directory and install Agent Catalog with :command:`pip`:
