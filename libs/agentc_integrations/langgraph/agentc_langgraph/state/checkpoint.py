@@ -208,8 +208,6 @@ class CheckpointSaver(langgraph.checkpoint.base.BaseCheckpointSaver):
         return self.sync_saver.put_writes(config=config, writes=writes, task_id=task_id)
 
 
-# TODO (GLENN): This class currently doesn't work due to a bug upstream (in langgraph-checkpointer-couchbase).
-#               We'll revisit this class later.
 class AsyncCheckpointSaver(langgraph.checkpoint.base.BaseCheckpointSaver):
     @classmethod
     async def create(
@@ -293,4 +291,4 @@ class AsyncCheckpointSaver(langgraph.checkpoint.base.BaseCheckpointSaver):
         task_id: str,
         task_path: str = "",
     ) -> None:
-        return await self.aput_writes(config=config, writes=writes, task_id=task_id)
+        return await self.async_saver.aput_writes(config=config, writes=writes, task_id=task_id)

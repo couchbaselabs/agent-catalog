@@ -1,4 +1,3 @@
-import abc
 import langchain_core.runnables
 import langchain_core.runnables.graph
 import langgraph.graph
@@ -79,8 +78,10 @@ class GraphRunnable[S](langchain_core.runnables.Runnable):
         else:
             self.span = catalog.Span(name=self.__class__.__name__)
 
-    @abc.abstractmethod
     def compile(self) -> langgraph.graph.StateGraph:
+        pass
+
+    async def acompile(self) -> langgraph.graph.StateGraph:
         pass
 
     def get_graph(
@@ -98,10 +99,10 @@ class GraphRunnable[S](langchain_core.runnables.Runnable):
     async def ainvoke(
         self, input: S, config: typing.Optional[langchain_core.runnables.RunnableConfig] = None, **kwargs
     ) -> S:
-        graph = self.compile()
+        graph = await self.acompile()
         self.span.state = input
         with self.span:
-            return graph.ainvoke(input=input, config=config, **kwargs)
+            return await graph.ainvoke(input=input, config=config, **kwargs)
 
     def stream(
         self, input: S, config: typing.Optional[langchain_core.runnables.RunnableConfig] = None, **kwargs
@@ -114,7 +115,7 @@ class GraphRunnable[S](langchain_core.runnables.Runnable):
     async def astream(
         self, input: S, config: typing.Optional[langchain_core.runnables.RunnableConfig] = None, **kwargs
     ) -> typing.AsyncIterator[S]:
-        graph = self.compile()
+        graph = await self.acompile()
         self.span.state = input
         with self.span:
             async for event in graph.astream(input=input, config=config, **kwargs):

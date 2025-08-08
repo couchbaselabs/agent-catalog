@@ -1,4 +1,3 @@
-import abc
 import agentc_core.activity.models.content
 import langchain_core
 import langchain_core.language_models.chat_models
@@ -33,7 +32,7 @@ class State(typing.TypedDict):
     previous_node: typing.Optional[list[str]]
 
 
-class ReActAgent[S: State]:
+class ReActAgent[S: State](langchain_core.runnables.Runnable[S, S | langgraph.types.Command]):
     """A helper ReAct agent base class that integrates with Agent Catalog.
 
     .. card:: Class Description
@@ -229,33 +228,72 @@ class ReActAgent[S: State]:
             **agent_kwargs,
         )
 
-    @abc.abstractmethod
     def _invoke(
         self, span: Span, state: S, config: langchain_core.runnables.RunnableConfig
     ) -> S | langgraph.types.Command:
         pass
 
-    def __call__(self, state: S, config: langchain_core.runnables.RunnableConfig) -> S | langgraph.types.Command:
+    async def _ainvoke(
+        self, span: Span, state: S, config: langchain_core.runnables.RunnableConfig
+    ) -> S | langgraph.types.Command:
+        pass
+
+    def invoke(
+        self,
+        input: S,
+        config: langchain_core.runnables.RunnableConfig | None = None,
+        **kwargs,
+    ) -> S | langgraph.types.Command:
         node_name = self.__class__.__name__
 
         # Below, we build a Span instance which will bind all logs to our class name.
-        # The "state" parameter is expected to be modified by the code in the WITH block.
-        with self.span.new(name=node_name, state=state, agent_name=node_name) as span:
-            if state["previous_node"] is not None:
+        # The "input" parameter is expected to be modified by the code in the WITH block.
+        with self.span.new(name=node_name, state=input, agent_name=node_name) as span:
+            if input["previous_node"] is not None:
                 self.span.log(
                     content=agentc_core.activity.models.content.EdgeContent(
-                        source=state["previous_node"], dest=span.identifier.name, payload=state
+                        source=input["previous_node"], dest=span.identifier.name, payload=input
                     )
                 )
-            result = self._invoke(span, state, config)
+            result = self._invoke(span, input, config)
             if isinstance(result, dict):
-                state["previous_node"] = span.identifier.name
+                input["previous_node"] = span.identifier.name
                 return result
 
             elif isinstance(result, langgraph.types.Command):
                 result.update["previous_node"] = span.identifier.name
-                state.update(result.update)
+                input.update(result.update)
                 return result
 
             else:
                 raise RuntimeError("_invoke() must return an instance of State OR a LangGraph Command.")
+
+    async def ainvoke(
+        self,
+        input: S,
+        config: langchain_core.runnables.RunnableConfig | None = None,
+        **kwargs,
+    ) -> S | langgraph.types.Command:
+        node_name = self.__class__.__name__
+
+        # Below, we build a Span instance which will bind all logs to our class name.
+        # The "input" parameter is expected to be modified by the code in the WITH block.
+        with self.span.new(name=node_name, state=input, agent_name=node_name) as span:
+            if input["previous_node"] is not None:
+                self.span.log(
+                    content=agentc_core.activity.models.content.EdgeContent(
+                        source=input["previous_node"], dest=span.identifier.name, payload=input
+                    )
+                )
+            result = await self._ainvoke(span, input, config)
+            if isinstance(result, dict):
+                input["previous_node"] = span.identifier.name
+                return result
+
+            elif isinstance(result, langgraph.types.Command):
+                result.update["previous_node"] = span.identifier.name
+                input.update(result.update)
+                return result
+
+            else:
+                raise RuntimeError("_ainvoke() must return an instance of State OR a LangGraph Command.")

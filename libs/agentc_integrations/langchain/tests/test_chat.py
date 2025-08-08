@@ -37,7 +37,7 @@ def test_audit(temporary_directory, environment_factory, shared_server_factory, 
         span = catalog.Span(name="default")
 
         # TODO (GLENN): Use a fake chat model here...
-        chat_model = audit(langchain_openai.ChatOpenAI(name="gpt-4o"), span=span)
+        chat_model = audit(langchain_openai.ChatOpenAI(name="gpt-4o-mini"), span=span)
         chat_model.invoke("Hello, how are you doing today?")
 
         # We should have four logs in our local FS...
@@ -69,7 +69,7 @@ def test_callback(temporary_directory, environment_factory, shared_server_factor
         span = catalog.Span(name="default")
 
         # TODO (GLENN): Use a fake chat model here...
-        chat_model = langchain_openai.ChatOpenAI(name="gpt-4o", callbacks=[Callback(span=span)])
+        chat_model = langchain_openai.ChatOpenAI(name="gpt-4o-mini", callbacks=[Callback(span=span)])
         chat_model.invoke("Hello, how are you doing today?")
 
         # We should have five logs in our local FS...
