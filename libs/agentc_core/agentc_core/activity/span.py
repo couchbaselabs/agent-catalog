@@ -13,6 +13,7 @@ from agentc_core.activity.models.content import BeginContent
 from agentc_core.activity.models.content import Content
 from agentc_core.activity.models.content import EndContent
 from agentc_core.activity.models.content import KeyValueContent
+from agentc_core.activity.models.content import Kind
 from agentc_core.activity.models.log import Log
 from agentc_core.config import LocalCatalogConfig
 from agentc_core.config import RemoteCatalogConfig
@@ -114,6 +115,9 @@ class Span(pydantic.BaseModel):
     iterable: typing.Optional[bool] = False
     """ Flag to indicate whether or not this span should be iterable. """
 
+    blacklist: set[Kind] = pydantic.Field(default_factory=set, examples=[["system"], ["system", "user"]])
+    """ List of content types to filter. """
+
     kwargs: typing.Optional[dict[str, typing.Any]] = None
     """ Annotations to apply to all messages logged within this span. """
 
@@ -139,7 +143,9 @@ class Span(pydantic.BaseModel):
 
         return self
 
-    def new(self, name: str, state: typing.Any = None, iterable: bool = False, **kwargs) -> "Span":
+    def new(
+        self, name: str, state: typing.Any = None, iterable: bool = False, blacklist: set[Kind] = None, **kwargs
+    ) -> "Span":
         """Create a new span under the current :py:class:`Span`.
 
         .. card:: Method Description
@@ -171,6 +177,7 @@ class Span(pydantic.BaseModel):
         :param name: The name of the span.
         :param state: The starting state of the span. This will be recorded upon entering and exiting the span.
         :param iterable: Whether this new span should be iterable. By default, this is :python:`False`.
+        :param blacklist: A set of content types to skip logging. By default, there is no blacklist.
         :param kwargs: Additional annotations to apply to the span.
         :return: A new :py:class:`Span` instance.
         """
@@ -191,6 +198,7 @@ class Span(pydantic.BaseModel):
             parent=self,
             iterable=iterable,
             state=state or self.state,
+            blacklist=blacklist or set() | self.blacklist,
             kwargs=new_kwargs,
         )
 
@@ -245,6 +253,9 @@ class Span(pydantic.BaseModel):
         """
         new_kwargs = {**self.kwargs, **kwargs} if self.kwargs is not None else kwargs
         identifier: Span.Identifier = self.identifier
+        if content.kind in self.blacklist:
+            logger.debug("Log %s has been blacklisted.", content)
+            return
         _log = self.logger(content=content, session_id=identifier.session, span_name=identifier.name, **new_kwargs)
         if self.iterable:
             self._logs.append(_log)
@@ -459,13 +470,29 @@ class GlobalSpan(Span):
             raise ValueError("Could not instantiate an auditor.")
         return self
 
-    def new(self, name: str, state: typing.Any = None, iterable: bool = False, **kwargs) -> Span:
+    def new(
+        self,
+        name: str,
+        state: typing.Any = None,
+        iterable: bool = False,
+        blacklist: set[Kind] = None,
+        **kwargs,
+    ) -> Span:
         """Create a new span under the current :py:class:`GlobalSpan`.
 
         :param name: The name of the span.
         :param state: The starting state of the span. This will be recorded upon entering and exiting the span.
         :param iterable: Whether this new span should be iterable.
         :param kwargs: Additional annotations to apply to the span.
+        :param blacklist: A set of content types to skip logging. By default, there is no blacklist.
         :return: A new :py:class:`Span` instance.
         """
-        return Span(logger=self.logger, name=name, parent=self, state=state, iterable=iterable, kwargs=kwargs)
+        return Span(
+            logger=self.logger,
+            name=name,
+            parent=self,
+            state=state,
+            iterable=iterable,
+            blacklist=blacklist or set() | self.blacklist,
+            kwargs=kwargs,
+        )
