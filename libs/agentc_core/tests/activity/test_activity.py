@@ -178,6 +178,40 @@ def test_local_auditor_positive_3(
             assert log_entry.content.value == 2
 
 
+@pytest.mark.smoke
+def test_local_auditor_positive_4(
+    temporary_directory: typing.Generator[pathlib.Path, None, None],
+    environment_factory: typing.Callable[..., Environment],
+):
+    runner = click_extra.testing.ExtraCliRunner()
+    with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
+        environment_factory(
+            directory=pathlib.Path(td),
+            env_kind=EnvironmentKind.INDEXED_CLEAN_ALL_TRAVEL,
+            click_runner=click_extra.testing.ExtraCliRunner(),
+            click_command=agentc,
+        )
+
+        # Note: flush is necessary for our tests, but this is not representative of a typical workflow.
+        catalog = Catalog()
+        global_span: GlobalSpan = catalog.Span(name="my project", blacklist={"key-value"})
+        child_span: Span = global_span.new(name="my sub project")
+        logging_handler = global_span._local_logger.rotating_handler
+
+        # Test our use of the span tag blacklist.
+        global_span["metric"] = 2
+        global_span.log(SystemContent(value="Hello world!"))
+        child_span["metric"] = 2
+        logging_handler.flush()
+        with (catalog.ActivityPath() / DEFAULT_ACTIVITY_FILE).open("r") as fp:
+            lines = fp.readlines()
+            assert len(lines) == 1
+            log_entry = Log.model_validate_json(lines[0])
+            assert log_entry.span.name == ["my project"]
+            assert log_entry.content.kind == "system"
+            assert log_entry.content.value == "Hello world!"
+
+
 @pytest.mark.skip
 @pytest.mark.slow
 def test_db_auditor(

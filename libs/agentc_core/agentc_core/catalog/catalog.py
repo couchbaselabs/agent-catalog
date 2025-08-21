@@ -6,6 +6,7 @@ import logging
 import pydantic
 import typing
 
+from agentc_core.activity.models.content import Kind as ContentKind
 from agentc_core.catalog.implementations.base import CatalogBase
 from agentc_core.catalog.implementations.chain import CatalogChain
 from agentc_core.catalog.implementations.db import CatalogDB
@@ -227,17 +228,35 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig, Too
             version_tuples += [self._remote_prompt_catalog.version]
         return sorted(version_tuples, key=lambda x: x.timestamp, reverse=True)[0]
 
-    def Span(self, name: str, session: str = None, state: typing.Any = None, **kwargs) -> "Span":
+    def Span(
+        self,
+        name: str,
+        session: str = None,
+        state: typing.Any = None,
+        iterable: bool = False,
+        blacklist: set[ContentKind] = None,
+        **kwargs,
+    ) -> "Span":
         """A factory method to initialize a :py:class:`Span` (more specifically, a :py:class:`GlobalSpan`) instance.
 
         :param name: Name to bind to each message logged within this span.
         :param session: The run that this tree of spans is associated with. By default, this is a UUID.
         :param state: A JSON-serializable object that will be logged on entering and exiting this span.
+        :param iterable: Whether this new span should be iterable. By default, this is :python:`False`.
+        :param blacklist: A set of content types to skip logging. By default, there is no blacklist.
         :param kwargs: Additional keyword arguments to pass to the Span constructor.
         """
         from agentc_core.activity import GlobalSpan
 
-        parameters = {"config": self, "version": self.version, "name": name, "state": state, "kwargs": kwargs}
+        parameters = {
+            "config": self,
+            "version": self.version,
+            "name": name,
+            "state": state,
+            "iterable": iterable,
+            "blacklist": blacklist,
+            "kwargs": kwargs,
+        }
         if session is not None:
             parameters["session"] = session
 
