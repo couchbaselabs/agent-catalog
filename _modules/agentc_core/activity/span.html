@@ -4,14 +4,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>agentc_core.activity.span &#8212; Agent Catalog 0.2.5a2 documentation</title>
+    <title>agentc_core.activity.span &#8212; Agent Catalog 0.2.5a2.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=50651e91" />
     <link rel="stylesheet" type="text/css" href="../../../_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=7230e44a" />
-    <script src="../../../_static/documentation_options.js?v=cf5d4f25"></script>
+    <script src="../../../_static/documentation_options.js?v=27ccf86e"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -160,7 +160,7 @@ window.addEventListener("load", () => mermaid.run());
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.2.5a2 documentation</a></h1>
+        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.2.5a2.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -293,6 +293,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.activity.models.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">Content</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.activity.models.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">EndContent</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.activity.models.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">KeyValueContent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.activity.models.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">Kind</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.activity.models.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">Log</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalCatalogConfig</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">RemoteCatalogConfig</span>
@@ -399,6 +400,9 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">iterable</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Flag to indicate whether or not this span should be iterable. &quot;&quot;&quot;</span>
 
+    <span class="n">blacklist</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Kind</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">,</span> <span class="n">examples</span><span class="o">=</span><span class="p">[[</span><span class="s2">&quot;system&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">]])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; List of content types to filter. &quot;&quot;&quot;</span>
+
     <span class="n">kwargs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Annotations to apply to all messages logged within this span. &quot;&quot;&quot;</span>
 
@@ -426,7 +430,9 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="Span.new">
 <a class="viewcode-back" href="../../../api.html#agentc.span.Span.new">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">new</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">iterable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Span&quot;</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">new</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">iterable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">blacklist</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Kind</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Span&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new span under the current :py:class:`Span`.</span>
 
 <span class="sd">        .. card:: Method Description</span>
@@ -458,6 +464,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">        :param name: The name of the span.</span>
 <span class="sd">        :param state: The starting state of the span. This will be recorded upon entering and exiting the span.</span>
 <span class="sd">        :param iterable: Whether this new span should be iterable. By default, this is :python:`False`.</span>
+<span class="sd">        :param blacklist: A set of content types to skip logging. By default, there is no blacklist.</span>
 <span class="sd">        :param kwargs: Additional annotations to apply to the span.</span>
 <span class="sd">        :return: A new :py:class:`Span` instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -478,6 +485,7 @@ window.addEventListener("load", () => mermaid.run());
             <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">iterable</span><span class="o">=</span><span class="n">iterable</span><span class="p">,</span>
             <span class="n">state</span><span class="o">=</span><span class="n">state</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+            <span class="n">blacklist</span><span class="o">=</span><span class="n">blacklist</span> <span class="ow">or</span> <span class="nb">set</span><span class="p">()</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">blacklist</span><span class="p">,</span>
             <span class="n">kwargs</span><span class="o">=</span><span class="n">new_kwargs</span><span class="p">,</span>
         <span class="p">)</span></div>
 
@@ -535,6 +543,9 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">new_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">}</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">kwargs</span>
         <span class="n">identifier</span><span class="p">:</span> <span class="n">Span</span><span class="o">.</span><span class="n">Identifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span>
+        <span class="k">if</span> <span class="n">content</span><span class="o">.</span><span class="n">kind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blacklist</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Log </span><span class="si">%s</span><span class="s2"> has been blacklisted.&quot;</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+            <span class="k">return</span>
         <span class="n">_log</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">,</span> <span class="n">session_id</span><span class="o">=</span><span class="n">identifier</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">span_name</span><span class="o">=</span><span class="n">identifier</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">new_kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterable</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_logs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_log</span><span class="p">)</span></div>
@@ -760,16 +771,32 @@ window.addEventListener("load", () => mermaid.run());
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not instantiate an auditor.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">new</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">iterable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Span</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">new</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">state</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">iterable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">blacklist</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Kind</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Span</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new span under the current :py:class:`GlobalSpan`.</span>
 
 <span class="sd">        :param name: The name of the span.</span>
 <span class="sd">        :param state: The starting state of the span. This will be recorded upon entering and exiting the span.</span>
 <span class="sd">        :param iterable: Whether this new span should be iterable.</span>
 <span class="sd">        :param kwargs: Additional annotations to apply to the span.</span>
+<span class="sd">        :param blacklist: A set of content types to skip logging. By default, there is no blacklist.</span>
 <span class="sd">        :return: A new :py:class:`Span` instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">Span</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">,</span> <span class="n">iterable</span><span class="o">=</span><span class="n">iterable</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Span</span><span class="p">(</span>
+            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">,</span>
+            <span class="n">iterable</span><span class="o">=</span><span class="n">iterable</span><span class="p">,</span>
+            <span class="n">blacklist</span><span class="o">=</span><span class="n">blacklist</span> <span class="ow">or</span> <span class="nb">set</span><span class="p">()</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">blacklist</span><span class="p">,</span>
+            <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
 </pre></div>
 
             <div class="clearer"></div>

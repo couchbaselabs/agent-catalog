@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Package Documentation &#8212; Agent Catalog 0.2.5a2 documentation</title>
+    <title>Package Documentation &#8212; Agent Catalog 0.2.5a2.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=50651e91" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=7230e44a" />
-    <script src="_static/documentation_options.js?v=cf5d4f25"></script>
+    <script src="_static/documentation_options.js?v=27ccf86e"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -155,7 +155,7 @@
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.5a2 documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.5a2.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -316,7 +316,7 @@ you can specify them as such:</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="agentc.catalog.Catalog.Span">
-<span class="sig-name descname"><span class="pre">Span</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_core/catalog/catalog.html#Catalog.Span"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc.catalog.Catalog.Span" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">Span</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blacklist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_core/catalog/catalog.html#Catalog.Span"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc.catalog.Catalog.Span" title="Link to this definition">¶</a></dt>
 <dd><p>A factory method to initialize a <a class="reference internal" href="#agentc.catalog.Catalog.Span" title="agentc.catalog.Catalog.Span"><code class="xref py py-class docutils literal notranslate"><span class="pre">Span</span></code></a> (more specifically, a <code class="xref py py-class docutils literal notranslate"><span class="pre">GlobalSpan</span></code>) instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -324,6 +324,8 @@ you can specify them as such:</p>
 <li><p><strong>name</strong> (<em>str</em>) -- Name to bind to each message logged within this span.</p></li>
 <li><p><strong>session</strong> (<em>str</em>) -- The run that this tree of spans is associated with. By default, this is a UUID.</p></li>
 <li><p><strong>state</strong> (<em>Any</em>) -- A JSON-serializable object that will be logged on entering and exiting this span.</p></li>
+<li><p><strong>iterable</strong> (<em>bool</em>) -- Whether this new span should be iterable. By default, this is <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code>.</p></li>
+<li><p><strong>blacklist</strong> (<em>set</em><em>[</em><a class="reference internal" href="log.html#agentc_core.activity.models.content.Kind" title="agentc_core.activity.models.content.Kind"><em>Kind</em></a><em>]</em>) -- A set of content types to skip logging. By default, there is no blacklist.</p></li>
 <li><p><strong>kwargs</strong> -- Additional keyword arguments to pass to the Span constructor.</p></li>
 </ul>
 </dd>
@@ -507,6 +509,7 @@ Below we give a small LangGraph example using spans for different agents:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Fields<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">blacklist</span> <span class="pre">(set[agentc_core.activity.models.content.Kind])</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">iterable</span> <span class="pre">(bool</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">kwargs</span> <span class="pre">(dict[str,</span> <span class="pre">Any]</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">logger</span> <span class="pre">(Callable[[...],</span> <span class="pre">agentc_core.activity.models.log.Log])</span></code></p></li>
@@ -516,6 +519,19 @@ Below we give a small LangGraph example using spans for different agents:</p>
 </ul>
 </dd>
 </dl>
+<dl class="py attribute pydantic_field">
+<dt class="sig sig-object py" id="agentc.span.Span.blacklist">
+<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">blacklist</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="log.html#agentc_core.activity.models.content.Kind" title="agentc_core.activity.models.content.Kind"><span class="pre">Kind</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"> <span class="pre">[Optional]</span></em><a class="headerlink" href="#agentc.span.Span.blacklist" title="Link to this definition">¶</a></dt>
+<dd><p>List of content types to filter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Validated by<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_initialize_iterable_logger</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="agentc.span.Span.iterable">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">iterable</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#agentc.span.Span.iterable" title="Link to this definition">¶</a></dt>
@@ -795,7 +811,7 @@ collection in your Couchbase cluster using SQL++ instead.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="agentc.span.Span.new">
-<span class="sig-name descname"><span class="pre">new</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_core/activity/span.html#Span.new"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc.span.Span.new" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">new</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blacklist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_core/activity/span.html#Span.new"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc.span.Span.new" title="Link to this definition">¶</a></dt>
 <dd><p>Create a new span under the current <a class="reference internal" href="#agentc.span.Span" title="agentc.span.Span"><code class="xref py py-class docutils literal notranslate"><span class="pre">Span</span></code></a>.</p>
 <div class="sd-card sd-sphinx-override sd-mb-3 sd-shadow-sm docutils">
 <div class="sd-card-body docutils">
@@ -831,6 +847,7 @@ annotation:</p>
 <li><p><strong>name</strong> (<em>str</em>) -- The name of the span.</p></li>
 <li><p><strong>state</strong> (<em>Any</em>) -- The starting state of the span. This will be recorded upon entering and exiting the span.</p></li>
 <li><p><strong>iterable</strong> (<em>bool</em>) -- Whether this new span should be iterable. By default, this is <code class="code highlight python docutils literal highlight-python"><span class="kc">False</span></code>.</p></li>
+<li><p><strong>blacklist</strong> (<em>set</em><em>[</em><a class="reference internal" href="log.html#agentc_core.activity.models.content.Kind" title="agentc_core.activity.models.content.Kind"><em>Kind</em></a><em>]</em>) -- A set of content types to skip logging. By default, there is no blacklist.</p></li>
 <li><p><strong>kwargs</strong> -- Additional annotations to apply to the span.</p></li>
 </ul>
 </dd>
@@ -2008,6 +2025,7 @@ Below, we provide an example of how to use this class.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#agentc.span.Span"><code class="docutils literal notranslate"><span class="pre">Span</span></code></a><ul>
+<li><a class="reference internal" href="#agentc.span.Span.blacklist"><code class="docutils literal notranslate"><span class="pre">Span.blacklist</span></code></a></li>
 <li><a class="reference internal" href="#agentc.span.Span.iterable"><code class="docutils literal notranslate"><span class="pre">Span.iterable</span></code></a></li>
 <li><a class="reference internal" href="#agentc.span.Span.kwargs"><code class="docutils literal notranslate"><span class="pre">Span.kwargs</span></code></a></li>
 <li><a class="reference internal" href="#agentc.span.Span.name"><code class="docutils literal notranslate"><span class="pre">Span.name</span></code></a></li>
