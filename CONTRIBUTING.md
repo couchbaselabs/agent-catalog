@@ -217,7 +217,6 @@ that start with `-e` and possess local filesystem paths):
 poetry export \
   -f requirements.txt \
   --without-hashes \
-  --with agent-catalog \
   --with dev \
   | grep -v '^-e file' \
   > requirements.txt
