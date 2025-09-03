@@ -28,10 +28,11 @@ Repository = "https://github.com/couchbaselabs/agent-catalog"
 python = "^3.11"
 couchbase = "^4.3.6"
 joblib = "^1.4.2"
-llama-index = "^0.12.47"
+llama-index = "^0.13.4"
 pydantic = "^2.10.6"
 requests = "^2.32.3"
 pydantic-settings = "^2.7.1"
+pypdf = "^6.0.0"
 
 # The version of this package will be updated dynamically.
 agentc-core = { path = "../../agentc_core", develop = true }
