@@ -441,6 +441,7 @@ class EmbeddingModelConfig(LocalCatalogConfig, RemoteCatalogConfig):
     """ The name of the embedding model that Agent Catalog will use when indexing and querying tools and prompts.
 
     By default, the ``sentence-transformers/all-MiniLM-L12-v2`` model is used.
+    **Do not use untrusted models, as they may establish malicious effects.**
     """
 
     embedding_model_url: typing.Optional[str] = None
