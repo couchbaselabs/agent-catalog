@@ -9,7 +9,7 @@ The mono-repo for the Couchbase Agent Catalog project.
 - [Getting Started](#getting-started)
     * [Installing from Package](#installing-from-package)
     * [Installing from Source (with Makefile)](#installing-from-source-with-makefile)
-    * [Installing from Source (with Poetry)](#installing-from-source-with-poetry)
+    * [Installing from Source (with Anaconda)](#installing-from-source-with-anaconda)
 - [Docs and Templates](#docs-and-templates)
 
 ## Getting Started

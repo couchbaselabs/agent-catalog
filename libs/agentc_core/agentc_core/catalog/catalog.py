@@ -254,11 +254,12 @@ class Catalog(EmbeddingModelConfig, LocalCatalogConfig, RemoteCatalogConfig, Too
             "name": name,
             "state": state,
             "iterable": iterable,
-            "blacklist": blacklist,
             "kwargs": kwargs,
         }
         if session is not None:
             parameters["session"] = session
+        if blacklist is not None:
+            parameters["blacklist"] = blacklist
 
         return GlobalSpan(**parameters)
 

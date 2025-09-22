@@ -12,14 +12,14 @@ print_separator '-'
 
 # Check #1: Python must exist.
 if ! [ -x "$(command -v python)" ]; then
-  echo "Python is not installed. Please install Python 3.12 and try again."
+  echo "Python is not installed. Please install Python 3.11 and try again."
   echo "You can download Python from https://www.python.org/downloads/"
   exit 1
 fi
 
-# Check #2: The Python version must be 3.12.
-if [ "$(python -c 'import sys; print(sys.version_info >= (3, 12))')" != "True" ]; then
-  echo "Python >=3.12 is required, but found $(python --version). Please install Python 3.12 and try again."
+# Check #2: The Python version must be 3.11.
+if [ "$(python -c 'import sys; print(sys.version_info >= (3, 11))')" != "True" ]; then
+  echo "Python >=3.11 is required, but found $(python --version). Please install Python 3.11 and try again."
   echo "You can download Python from https://www.python.org/downloads/"
   exit 1
 fi
