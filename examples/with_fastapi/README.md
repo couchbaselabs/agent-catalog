@@ -170,10 +170,10 @@ checkpoints with Couchbase to separate storage and compute (enabling scale-out).
 5. Run your agent system using FastAPI with 8 workers.
 
    ```bash
-   fastapi run server:app --workers 8
+   fastapi run server.py --workers 8
    ```
 
-6. Interact with your agent system using CURL!
+6. Interact with your agent system using CURL (you will have to run this in a separate shell).
 
    ```bash
    curl --no-buffer -X 'POST' \
