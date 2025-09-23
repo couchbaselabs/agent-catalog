@@ -5,6 +5,7 @@ import logging
 import os
 import pathlib
 import platform
+import re
 import subprocess
 import typing
 
@@ -14,10 +15,18 @@ from agentc_core.record.descriptor import RecordKind
 
 logger = logging.getLogger(__name__)
 
-if os.environ.get("EDITOR"):
-    default_editor = os.environ.get("EDITOR")
-elif os.environ.get("VISUAL"):
-    default_editor = os.environ.get("VISUAL")
+
+def _is_safe_editor_command(cmd: str) -> bool:
+    return bool(cmd) and not re.search(r'[;&|<>$`\\"\'\s]', cmd)
+
+
+_editor_from_environment = os.environ.get("EDITOR")
+_visual_from_environment = os.environ.get("VISUAL")
+
+if _editor_from_environment and _is_safe_editor_command(_editor_from_environment):
+    default_editor = _editor_from_environment
+elif _visual_from_environment and _is_safe_editor_command(_visual_from_environment):
+    default_editor = _visual_from_environment
 elif platform.system() == "Windows":
     default_editor = "notepad"
 else:
@@ -164,7 +173,9 @@ def cmd_add(
 
     prompt_template_loader = jinja2.PackageLoader("agentc_core.prompt")
     tool_template_loader = jinja2.PackageLoader("agentc_core.tool")
-    template_env = jinja2.Environment(loader=jinja2.ChoiceLoader([prompt_template_loader, tool_template_loader]))
+    template_env = jinja2.Environment(
+        loader=jinja2.ChoiceLoader([prompt_template_loader, tool_template_loader]), autoescape=True
+    )
     click_extra.secho(f"Now building a new tool / prompt file. The output will be saved to: {output}", fg="yellow")
 
     match kind:
