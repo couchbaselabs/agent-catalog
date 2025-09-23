@@ -31,6 +31,7 @@ python = "^3.11"
 click-extra = "^4.15.0"
 tqdm = "^4.67.1"
 dateparser = "^1.2.2"
+texteditor = "^1.4.1"
 
 # The version of this package will be updated dynamically.
 agentc-core = { path = "../agentc_core", develop = true }
