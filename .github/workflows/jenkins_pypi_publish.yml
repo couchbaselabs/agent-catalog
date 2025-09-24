@@ -1,4 +1,7 @@
 name: jenkins_pypi_publish
+permissions:
+  contents: read
+  pull-requests: write
 
 # Description:
 # This GitHub Action triggers a Jenkins job to publish releases to test.pypi.
