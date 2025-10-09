@@ -279,6 +279,7 @@ def shared_server_factory(tmp_path_factory) -> typing.Callable[[], docker.models
         # (we need to capture the container we spawn).
         def get_shared_server() -> docker.models.containers.Container:
             if len(skip_token) == 0:
+                logger.info("Restarting Couchbase.")
                 _restart_couchbase(container)
             else:
                 skip_token.pop()

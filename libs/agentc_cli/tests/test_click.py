@@ -36,9 +36,8 @@ _ = temporary_directory
 
 
 @pytest.mark.smoke
-def test_help_bad_config():
+def test_help_no_config():
     runner = click_extra.testing.ExtraCliRunner()
-    os.environ["AGENT_CATALOG_CONN_STRING"] = "asdas"
     args_list = [
         ["--help"],
         ["init", "--help"],
