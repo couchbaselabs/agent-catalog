@@ -10,7 +10,7 @@ readme = "README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<3.14"
 langgraph = "^0.5.2"
 fastapi = {version = "^0.116.1", extras = ["standard"]}
 

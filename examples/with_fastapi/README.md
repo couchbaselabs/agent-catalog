@@ -75,7 +75,7 @@ checkpoints with Couchbase to separate storage and compute (enabling scale-out).
    **You must be in this virtual environment for all subsequent commands to properly execute!**
 
    ```bash
-   poetry shell
+   $(poetry env activate)
    ```
 
    In your shell, you should now see something similar below if you run `which python`:
