@@ -36,6 +36,32 @@ _ = temporary_directory
 
 
 @pytest.mark.smoke
+def test_help_bad_config(
+    temporary_directory: typing.Generator[pathlib.Path, None, None],
+):
+    runner = click_extra.testing.ExtraCliRunner()
+    os.environ["AGENT_CATALOG_CONN_STRING"] = "asdas"
+    with runner.isolated_filesystem(temp_dir=temporary_directory) as td:
+        args_list = [
+            ["--help"],
+            ["init", "--help"],
+            ["add", "--help"],
+            ["clean", "--help"],
+            ["env", "--help"],
+            ["find", "--help"],
+            ["index", "--help"],
+            ["publish", "--help"],
+            ["status", "--help"],
+            ["version", "--help"],
+            ["execute", "--help"],
+            ["ls", "--help"],
+        ]
+        for args in args_list:
+            output = runner.invoke(agentc, args)
+            assert output.exit_code == 0 and output.exception is None
+
+
+@pytest.mark.smoke
 def test_index(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
