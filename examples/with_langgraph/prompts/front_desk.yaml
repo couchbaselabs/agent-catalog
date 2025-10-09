@@ -44,10 +44,6 @@ content:
 #      the routes.
 
 #    - >
-#      If the user asks for help with flight planning but there are no source and destination cities provided, set the
-#      'needs_clarification' field to True and provide a polite response.
-
-#    - >
 #      If the user asks / replies with anything not related to flight planning, set the 'is_last_step' field to True and
 #      'needs_clarification' to True.
 #      DO NOT continue the conversation if the user's input / response is not related to flight planning.
