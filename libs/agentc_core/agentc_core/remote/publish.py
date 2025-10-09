@@ -7,7 +7,7 @@ import pathlib
 import pydantic
 import tqdm
 import typing
-import zlib
+import uuid
 
 from agentc_core.activity.models.log import Log
 from agentc_core.catalog.descriptor import CatalogDescriptor
@@ -75,7 +75,7 @@ def publish_catalog(
     k: typing.Literal["tool", "prompt"],
     annotations: list[dict],
     printer: typing.Callable = print,
-):
+) -> bool:
     # Grab the local catalog.
     if k == "tool":
         catalog_path = cfg.CatalogPath() / DEFAULT_TOOL_CATALOG_FILE
@@ -110,9 +110,15 @@ def publish_catalog(
     logger.debug(f"Now processing the metadata for the {k} catalog.")
     try:
         key = f'{metadata["version"]["identifier"]}/{metadata["kind"]}'
-        cb_coll.upsert(key, metadata)
+        cb_coll.insert(key, metadata)
+    except couchbase.exceptions.DocumentExistsException:
+        printer(
+            f"{k.capitalize()} catalog of ID {metadata['version']['identifier']} has already been published, "
+            f"no items have been uploaded."
+        )
+        return True
     except couchbase.exceptions.CouchbaseException as e:
-        raise ValueError(f"Couldn't insert metadata!\n{e.message}") from e
+        raise ValueError(f"Couldn't insert / check metadata!\n{e.message}") from e
     printer("Using the catalog identifier: ", nl=False)
     printer(metadata["version"]["identifier"] + "\n", bold=True)
 
@@ -137,12 +143,12 @@ def publish_catalog(
             raise ValueError(f"Invalid record kind for {k} catalog item!\n{item.record_kind}")
 
         try:
-            raw_key = item.identifier + "_" + metadata["version"]["identifier"]
-            key = zlib.compress(raw_key.encode("utf-8")).hex()
-            if len(key) > 245:  # This is the limit on the key-length for our server. We will raise a warning here.
-                printer(f"Key value has exceeded 245 characters! Truncating key for {item.identifier}.", fg="yellow")
-                key = key[:245]
-
+            # raw_key = item.identifier + "_" + metadata["version"]["identifier"]
+            # key = zlib.compress(raw_key.encode("utf-8")).hex()
+            # if len(key) > 245:  # This is the limit on the key-length for our server. We will raise a warning here.
+            #     printer(f"Key value has exceeded 245 characters! Truncating key for {item.identifier}.", fg="yellow")
+            #     key = key[:245]
+            key = uuid.uuid4().hex
             progress_bar.set_description(item.name)
 
             # serialise object to str
@@ -157,3 +163,4 @@ def publish_catalog(
         except couchbase.exceptions.CouchbaseException as e:
             printer(f"Couldn't insert catalog items!\n{e.message}", fg="red")
             raise e
+    return True
