@@ -91,11 +91,11 @@ def agentc(ctx: click_extra.Context, verbose: int, interactive: bool):
     """
     The Couchbase Agent Catalog command line tool.
     """
-    ctx.obj = Config(
+    ctx.obj = {
         # TODO (GLENN): We really need to use this "verbosity_level" parameter more.
-        verbosity_level=verbose,
-        with_interaction=interactive,
-    )
+        "verbosity_level": verbose,
+        "with_interaction": interactive,
+    }
 
 
 @agentc.command()
@@ -141,7 +141,7 @@ def init(
     """
     Initialize the necessary files/collections for your working Agent Catalog environment.
     """
-    cfg: Config = ctx.obj
+    cfg = Config(**ctx.obj)
 
     # By default, we will initialize everything.
     if not targets:
@@ -178,7 +178,7 @@ def add(ctx, output: pathlib.Path, kind: RecordKind):
     Interactively create a new tool or prompt and save it to the filesystem (output).
     You MUST edit the generated file as per your requirements!
     """
-    cfg: Config = ctx.obj
+    cfg = Config(**ctx.obj)
     if not cfg.with_interaction:
         click_extra.secho(
             "ERROR: Cannot run agentc add in non-interactive mode! "
@@ -272,7 +272,7 @@ def clean(
     date: str = None,
 ):
     """Delete all or specific (catalog and/or activity) Agent Catalog related files / collections."""
-    cfg: Config = ctx.obj
+    cfg = Config(**ctx.obj)
 
     # By default, we will clean everything.
     if not targets:
@@ -349,7 +349,7 @@ def clean(
 @click_extra.pass_context
 def env(ctx):
     """Return all Agent Catalog related environment and configuration parameters as a JSON object."""
-    cmd_env(cfg=ctx.obj)
+    cmd_env(cfg=Config(**ctx.obj))
 
 
 @agentc.command()
@@ -444,7 +444,7 @@ def find(
     local: bool | None = True,
 ):
     """Find items from the catalog based on a natural language string (query) or by name."""
-    cfg: Config = ctx.obj
+    cfg = Config(**ctx.obj)
 
     # TODO (GLENN): We should perform the same best-effort work for search_local.
     # Perform a best-effort attempt to connect to the database if search_db is not raised.
@@ -499,6 +499,8 @@ def find(
 def index(ctx: click_extra.Context, sources: list[str], tools: bool, prompts: bool, dry_run: bool = False):
     """Walk the source directory trees (sources) to index source files into the local catalog.
     Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc."""
+    cfg = Config(**ctx.obj)
+
     kind = list()
     if tools:
         kind.append("tool")
@@ -522,7 +524,7 @@ def index(ctx: click_extra.Context, sources: list[str], tools: bool, prompts: bo
         return
 
     cmd_index(
-        cfg=ctx.obj,
+        cfg=cfg,
         source_dirs=sources,
         kinds=kind,
         dry_run=dry_run,
@@ -559,7 +561,7 @@ def publish(
     By default, only tools and prompts are published unless log is explicitly specified."""
     kind = ["tools", "prompts"] if len(kind) == 0 else kind
 
-    cfg: Config = ctx.obj
+    cfg = Config(**ctx.obj)
     validate_or_prompt_for_bucket(cfg, bucket)
     cmd_publish(
         cfg=cfg,
@@ -612,7 +614,7 @@ def status(
     bucket: str = None,
 ):
     """Show the (aggregate) status of your Agent Catalog environment."""
-    cfg: Config = ctx.obj
+    cfg = Config(**ctx.obj)
     if len(kind) == 0:
         kind = ["tools", "prompts"]
 
@@ -640,7 +642,8 @@ def status(
 @click_extra.pass_context
 def version(ctx):
     """Show the current version of Agent Catalog."""
-    cmd_version(ctx.obj)
+    cfg = Config(**ctx.obj)
+    cmd_version(cfg)
 
 
 @agentc.command()
@@ -722,7 +725,7 @@ def execute(
     local: bool = True,
 ):
     """Search for and subsequently execute a specific tool."""
-    cfg: Config = ctx.obj
+    cfg = Config(**ctx.obj)
 
     # TODO (GLENN): We should perform the same best-effort work for status_local.
     # Perform a best-effort attempt to connect to the database if status_db is not raised.
@@ -792,7 +795,7 @@ def ls(
     bucket: str = None,
 ):
     """List all indexed tools and/or prompts in the catalog."""
-    cfg: Config = ctx.obj
+    cfg = Config(**ctx.obj)
 
     # By default, we'll list everything.
     if len(kind) == 0:

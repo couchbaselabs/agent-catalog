@@ -3,6 +3,7 @@ import couchbase.cluster
 import couchbase.options
 import datetime
 import docker
+import docker.errors
 import docker.models.containers
 import http
 import logging
@@ -273,12 +274,19 @@ def shared_server_factory(tmp_path_factory) -> typing.Callable[[], docker.models
 
     try:
         container = _start_container(tmp_path_factory.mktemp(".couchbase"))
-        _start_couchbase(container)
-        skip_token = {1}
+        logger.info("Starting Couchbase.")
+        try:
+            _start_couchbase(container)
+            skip_token = {1}
+        except docker.errors.APIError:
+            logger.info("Restarting Couchbase.")
+            _restart_couchbase(container)
+            skip_token = set()
 
         # (we need to capture the container we spawn).
         def get_shared_server() -> docker.models.containers.Container:
             if len(skip_token) == 0:
+                logger.info("Restarting Couchbase.")
                 _restart_couchbase(container)
             else:
                 skip_token.pop()
