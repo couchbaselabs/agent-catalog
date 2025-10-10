@@ -51,5 +51,5 @@ def cmd_publish(
         click_extra.secho(DASHES, fg=KIND_COLORS[k])
         click_extra.secho(k.upper(), bold=True, fg=KIND_COLORS[k])
         click_extra.secho(DASHES, fg=KIND_COLORS[k])
-        publish_catalog(cb, cfg, k, annotations, click_extra.secho)
-        click_extra.secho(f"{k.capitalize()} catalog items successfully uploaded to Couchbase!\n", fg="green")
+        if publish_catalog(cb, cfg, k, annotations, click_extra.secho):
+            click_extra.secho(f"{k.capitalize()} catalog items successfully uploaded to Couchbase!\n", fg="green")

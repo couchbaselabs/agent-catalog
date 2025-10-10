@@ -103,6 +103,14 @@ def test_publish_positive_1(
         assert "Uploading the tool catalog items to Couchbase" in result.output
         assert "Uploading the prompt catalog items to Couchbase" in result.output
 
+        result = runner.invoke(agentc, ["publish"])
+        assert re.search(
+            "Tool catalog of ID [0-9a-zA-Z]+ has already been published, no items have been uploaded.", result.output
+        )
+        assert re.search(
+            "Prompt catalog of ID [0-9a-zA-Z]+ has already been published, no items have been uploaded.", result.output
+        )
+
         cluster = connection_factory()
         t1 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.tools;").execute()
         t2 = cluster.query("SELECT VALUE COUNT(*) FROM `travel-sample`.agent_catalog.prompts;").execute()
@@ -175,7 +183,7 @@ def test_publish_positive_2(
 
 
 @pytest.mark.slow
-def test_publish_positive_3(
+def test_publish_positive_4(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
     shared_server_factory: typing.Callable[[], ...],
