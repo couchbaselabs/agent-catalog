@@ -37,7 +37,7 @@ if [ "$exit_code" -ne 0 ]; then
   print_separator '!'
   echo "Tests failed with exit code: $exit_code"
   print_separator '!'
-  return "$exit_code"
+  exit "$exit_code"
 fi
 
 print_separator '-'
