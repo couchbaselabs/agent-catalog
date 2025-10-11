@@ -94,6 +94,7 @@ testpaths = [
 norecursedirs = [
     "examples"
 ]
+asyncio_mode = "auto"
 
 [tool.poetry-dynamic-versioning]
 enable = true
