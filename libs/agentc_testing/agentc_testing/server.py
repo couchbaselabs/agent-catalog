@@ -274,12 +274,14 @@ def shared_server_factory(tmp_path_factory) -> typing.Callable[[], docker.models
 
     try:
         container = _start_container(tmp_path_factory.mktemp(".couchbase"))
-        logger.info("Starting Couchbase.")
+
+        # noinspection PyBroadException
         try:
+            logger.info("Starting Couchbase.")
             _start_couchbase(container)
             skip_token = {1}
-        except docker.errors.APIError:
-            logger.info("Restarting Couchbase.")
+        except:
+            logger.info("Restarting Couchbase due to exception.")
             _restart_couchbase(container)
             skip_token = set()
 
