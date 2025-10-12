@@ -272,23 +272,21 @@ def shared_server_factory(tmp_path_factory) -> typing.Callable[[], docker.models
     os.environ["AGENT_CATALOG_DDL_RETRY_WAIT_SECONDS"] = "5"
     container = None
 
-    try:
-        container = _start_container(tmp_path_factory.mktemp(".couchbase"))
-
+    while container is None:
         # noinspection PyBroadException
         try:
-            logger.info("Starting Couchbase.")
-            _start_couchbase(container)
-            skip_token = {1}
+            container = _start_container(tmp_path_factory.mktemp(".couchbase"))
         except:
-            logger.info("Restarting Couchbase due to exception.")
-            _restart_couchbase(container)
-            skip_token = set()
+            logger.info("Last container was not properly shutdown. Shutting container down now...")
+            _stop_container(container)
+
+    try:
+        _start_couchbase(container)
+        skip_token = {1}
 
         # (we need to capture the container we spawn).
         def get_shared_server() -> docker.models.containers.Container:
             if len(skip_token) == 0:
-                logger.info("Restarting Couchbase.")
                 _restart_couchbase(container)
             else:
                 skip_token.pop()
