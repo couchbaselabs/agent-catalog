@@ -114,7 +114,12 @@ class EmbeddingModel(pydantic.BaseModel):
 
         if self.embedding_model_name is None:
             self.embedding_model_name = from_catalog_embedding_model.name
-            self.embedding_model_url = from_catalog_embedding_model.base_url
+            # add "/v1" to embedding model url if not present
+            openai_compatible_base_url = from_catalog_embedding_model.base_url
+            if not openai_compatible_base_url.endswith("/v1") and not from_catalog_embedding_model.kind == "sentence_transformers":
+                self.embedding_model_url = openai_compatible_base_url.rstrip("/") + "/v1"
+            else:
+                self.embedding_model_url = from_catalog_embedding_model.base_url
         elif (
             from_catalog_embedding_model is not None and self.embedding_model_name != from_catalog_embedding_model.name
         ):
