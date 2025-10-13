@@ -117,8 +117,8 @@ class EmbeddingModel(pydantic.BaseModel):
             # add "/v1" to embedding model url if not present
             openai_compatible_base_url = from_catalog_embedding_model.base_url
             if (
-                    not openai_compatible_base_url.endswith("/v1")
-                    and from_catalog_embedding_model.kind != "sentence_transformers"
+                not openai_compatible_base_url.endswith("/v1")
+                and from_catalog_embedding_model.kind != "sentence_transformers"
             ):
                 self.embedding_model_url = openai_compatible_base_url.rstrip("/") + "/v1"
             else:
