@@ -14,10 +14,10 @@ import requests
 import requests.adapters
 import time
 import typing
-import uuid
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_TEST_CONTAINER_NAME = "agentc_test_container"
 DEFAULT_COUCHBASE_CONN_STRING = "couchbase://127.0.0.1"
 DEFAULT_COUCHBASE_USERNAME = "Administrator"
 DEFAULT_COUCHBASE_PASSWORD = "password"
@@ -68,7 +68,7 @@ def _start_container(volume_path: pathlib.Path) -> docker.models.containers.Cont
     logger.info("Starting Couchbase container with ports: %s.", ports)
     return client.containers.run(
         image="couchbase",
-        name=f"agentc_{uuid.uuid4().hex}",
+        name=DEFAULT_TEST_CONTAINER_NAME,
         ports=ports,
         detach=True,
         remove=True,
@@ -213,6 +213,16 @@ def _stop_container(container: docker.models.containers.Container):
         logger.exception(e, exc_info=True, stack_info=True)
 
 
+def _fetch_orphan_container() -> docker.models.containers.Container:
+    logger.warning(f"Container not found, reconnecting to container {DEFAULT_TEST_CONTAINER_NAME}.")
+    try:
+        client = docker.from_env()
+        return client.containers.get(DEFAULT_TEST_CONTAINER_NAME)
+
+    except Exception as e:
+        logger.exception(e, exc_info=True, stack_info=True)
+
+
 @pytest.fixture
 def connection_factory() -> typing.Callable[[], couchbase.cluster.Cluster]:
     return lambda: couchbase.cluster.Cluster(
@@ -277,8 +287,8 @@ def shared_server_factory(tmp_path_factory) -> typing.Callable[[], docker.models
         try:
             container = _start_container(tmp_path_factory.mktemp(".couchbase"))
         except:
-            logger.info("Last container was not properly shutdown. Shutting container down now...")
-            _stop_container(container)
+            logger.warning("Last container was not properly shutdown!")
+            container = _fetch_orphan_container()
 
     try:
         _start_couchbase(container)
