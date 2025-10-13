@@ -309,12 +309,16 @@ def shared_server_factory(tmp_path_factory) -> typing.Callable[[], docker.models
     finally:
         if container is not None:
             _stop_container(container)
-        del os.environ["AGENT_CATALOG_CONN_STRING"]
-        del os.environ["AGENT_CATALOG_USERNAME"]
-        del os.environ["AGENT_CATALOG_PASSWORD"]
-        del os.environ["AGENT_CATALOG_BUCKET"]
-        del os.environ["AGENT_CATALOG_DDL_CREATE_INDEX_INTERVAL_SECONDS"]
-        del os.environ["AGENT_CATALOG_DDL_RETRY_WAIT_SECONDS"]
+        try:
+            del os.environ["AGENT_CATALOG_CONN_STRING"]
+            del os.environ["AGENT_CATALOG_USERNAME"]
+            del os.environ["AGENT_CATALOG_PASSWORD"]
+            del os.environ["AGENT_CATALOG_BUCKET"]
+            del os.environ["AGENT_CATALOG_DDL_CREATE_INDEX_INTERVAL_SECONDS"]
+            del os.environ["AGENT_CATALOG_DDL_RETRY_WAIT_SECONDS"]
+        except KeyError:
+            # We will ignore any key errors that pop up (this only seems to appear for async tests).
+            pass
 
 
 if __name__ == "__main__":
