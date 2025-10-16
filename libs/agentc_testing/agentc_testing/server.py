@@ -3,6 +3,7 @@ import couchbase.cluster
 import couchbase.options
 import datetime
 import docker
+import docker.errors
 import docker.models.containers
 import http
 import logging
@@ -13,10 +14,10 @@ import requests
 import requests.adapters
 import time
 import typing
-import uuid
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_TEST_CONTAINER_NAME = "agentc_test_container"
 DEFAULT_COUCHBASE_CONN_STRING = "couchbase://127.0.0.1"
 DEFAULT_COUCHBASE_USERNAME = "Administrator"
 DEFAULT_COUCHBASE_PASSWORD = "password"
@@ -67,7 +68,7 @@ def _start_container(volume_path: pathlib.Path) -> docker.models.containers.Cont
     logger.info("Starting Couchbase container with ports: %s.", ports)
     return client.containers.run(
         image="couchbase",
-        name=f"agentc_{uuid.uuid4().hex}",
+        name=DEFAULT_TEST_CONTAINER_NAME,
         ports=ports,
         detach=True,
         remove=True,
@@ -212,6 +213,16 @@ def _stop_container(container: docker.models.containers.Container):
         logger.exception(e, exc_info=True, stack_info=True)
 
 
+def _fetch_orphan_container() -> docker.models.containers.Container:
+    logger.warning(f"Container not found, reconnecting to container {DEFAULT_TEST_CONTAINER_NAME}.")
+    try:
+        client = docker.from_env()
+        return client.containers.get(DEFAULT_TEST_CONTAINER_NAME)
+
+    except Exception as e:
+        logger.exception(e, exc_info=True, stack_info=True)
+
+
 @pytest.fixture
 def connection_factory() -> typing.Callable[[], couchbase.cluster.Cluster]:
     return lambda: couchbase.cluster.Cluster(
@@ -271,8 +282,15 @@ def shared_server_factory(tmp_path_factory) -> typing.Callable[[], docker.models
     os.environ["AGENT_CATALOG_DDL_RETRY_WAIT_SECONDS"] = "5"
     container = None
 
+    while container is None:
+        # noinspection PyBroadException
+        try:
+            container = _start_container(tmp_path_factory.mktemp(".couchbase"))
+        except:
+            logger.warning("Last container was not properly shutdown!")
+            container = _fetch_orphan_container()
+
     try:
-        container = _start_container(tmp_path_factory.mktemp(".couchbase"))
         _start_couchbase(container)
         skip_token = {1}
 
@@ -291,12 +309,16 @@ def shared_server_factory(tmp_path_factory) -> typing.Callable[[], docker.models
     finally:
         if container is not None:
             _stop_container(container)
-        del os.environ["AGENT_CATALOG_CONN_STRING"]
-        del os.environ["AGENT_CATALOG_USERNAME"]
-        del os.environ["AGENT_CATALOG_PASSWORD"]
-        del os.environ["AGENT_CATALOG_BUCKET"]
-        del os.environ["AGENT_CATALOG_DDL_CREATE_INDEX_INTERVAL_SECONDS"]
-        del os.environ["AGENT_CATALOG_DDL_RETRY_WAIT_SECONDS"]
+        try:
+            del os.environ["AGENT_CATALOG_CONN_STRING"]
+            del os.environ["AGENT_CATALOG_USERNAME"]
+            del os.environ["AGENT_CATALOG_PASSWORD"]
+            del os.environ["AGENT_CATALOG_BUCKET"]
+            del os.environ["AGENT_CATALOG_DDL_CREATE_INDEX_INTERVAL_SECONDS"]
+            del os.environ["AGENT_CATALOG_DDL_RETRY_WAIT_SECONDS"]
+        except KeyError:
+            # We will ignore any key errors that pop up (this only seems to appear for async tests).
+            pass
 
 
 if __name__ == "__main__":
