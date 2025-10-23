@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Frequently Asked Questions &#8212; Agent Catalog 0.2.5a3.post3 documentation</title>
+    <title>Frequently Asked Questions &#8212; Agent Catalog 0.2.5a3.post4 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=50651e91" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=7230e44a" />
-    <script src="_static/documentation_options.js?v=a409ced3"></script>
+    <script src="_static/documentation_options.js?v=6f805e1e"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -155,7 +155,7 @@
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.5a3.post3 documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.5a3.post4 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -299,7 +299,7 @@ information about your application's performance.</p>
 </section>
 <section id="what-can-i-do-to-increase-log-ingestion-rate-into-my-couchbase-cluster">
 <h3>What can I do to increase log ingestion rate into my Couchbase cluster?<a class="headerlink" href="#what-can-i-do-to-increase-log-ingestion-rate-into-my-couchbase-cluster" title="Link to this heading">¶</a></h3>
-<p>When a <code class="xref py py-class docutils literal notranslate"><span class="pre">agentc.Span</span></code> instance is used, logs are continuously inserted into your Couchbase cluster.
+<p>When a <a class="reference internal" href="api.html#agentc.span.Span" title="agentc.span.Span"><code class="xref py py-class docutils literal notranslate"><span class="pre">agentc.span.Span</span></code></a> instance is used, logs are continuously inserted into your Couchbase cluster.
 The ingestion rate ultimately depends on your Couchbase cluster configuration and can be adjusted by scaling your
 nodes -- either horizontally by adding more data nodes or vertically by increasing the RAM per node.</p>
 <p>For more information on Cluster scaling, refer to the Couchbase documentation
@@ -308,8 +308,8 @@ nodes -- either horizontally by adding more data nodes or vertically by increasi
 <section id="what-does-agent-catalog-add-to-my-couchbase-bucket">
 <h3>What does Agent Catalog add to my Couchbase bucket?<a class="headerlink" href="#what-does-agent-catalog-add-to-my-couchbase-bucket" title="Link to this heading">¶</a></h3>
 <p>On <code class="code docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">init</span></code>, Agent Catalog creates two scopes: 1) <code class="code highlight sql docutils literal highlight-sql"><span class="n">agent_activity</span></code> and 2) <code class="code highlight sql docutils literal highlight-sql"><span class="n">agent_catalog</span></code>.
-The former holds all logs captured by <code class="xref py py-class docutils literal notranslate"><span class="pre">agentc.Span</span></code> instances` in the <code class="code highlight sql docutils literal highlight-sql"><span class="n">agent_activity</span><span class="p">.</span><span class="n">logs</span></code> collection
-(see <a class="reference external" href="analysis.html">here</a> for more information).
+The former holds all logs captured by <a class="reference internal" href="api.html#agentc.span.Span" title="agentc.span.Span"><code class="xref py py-class docutils literal notranslate"><span class="pre">agentc.span.Span</span></code></a> instances` in the <code class="code highlight sql docutils literal highlight-sql"><span class="n">agent_activity</span><span class="p">.</span><span class="n">logs</span></code>
+collection (see <a class="reference external" href="analysis.html">here</a> for more information).
 The latter contains three collections:</p>
 <ol class="arabic simple">
 <li><p><code class="code highlight sql docutils literal highlight-sql"><span class="n">agent_catalog</span><span class="p">.</span><span class="n">tools</span></code>, which holds all tool records across all snapshots yielded by <code class="code docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">publish</span></code>.</p></li>
@@ -360,6 +360,37 @@ By default, no TTL is used (thus logs never expire).</p>
 <p><a class="reference internal" href="config.html#agentc_core.config.config.LocalCatalogConfig.activity_rollover_bytes" title="agentc_core.config.config.LocalCatalogConfig.activity_rollover_bytes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">agentc_core.config.config.LocalCatalogConfig.activity_rollover_bytes</span></code></a>
 <a class="reference internal" href="config.html#agentc_core.config.config.LocalCatalogConfig.activity_path" title="agentc_core.config.config.LocalCatalogConfig.activity_path"><code class="xref py py-attr docutils literal notranslate"><span class="pre">agentc_core.config.config.LocalCatalogConfig.activity_path</span></code></a>
 <a class="reference internal" href="config.html#agentc_core.config.config.RemoteCatalogConfig.log_ttl" title="agentc_core.config.config.RemoteCatalogConfig.log_ttl"><code class="xref py py-attr docutils literal notranslate"><span class="pre">agentc_core.config.config.RemoteCatalogConfig.log_ttl</span></code></a></p>
+</div>
+</section>
+<section id="how-can-i-access-the-package-level-logs-generated-by-agent-catalog">
+<h3>How can I access the package-level logs generated by Agent Catalog?<a class="headerlink" href="#how-can-i-access-the-package-level-logs-generated-by-agent-catalog" title="Link to this heading">¶</a></h3>
+<p>Package-level logging (i.e., not logs captured by <a class="reference internal" href="api.html#agentc.span.Span" title="agentc.span.Span"><code class="xref py py-class docutils literal notranslate"><span class="pre">agentc.span.Span</span></code></a> instances) in Agent Catalog is handled by
+Python's <code class="code highlight python docutils literal highlight-python"><span class="n">logging</span></code> package.
+To see all package-level logs in the console while you run your application, set the <code class="docutils literal notranslate"><span class="pre">AGENT_CATALOG_DEBUG</span></code>
+variable to true:</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span>export AGENT_CATALOG_DEBUG=true
+</pre></div>
+</div>
+<p>This variable can also be set in your <code class="file docutils literal notranslate"><span class="pre">.env</span></code> file or as an argument when you construct your
+<a class="reference internal" href="api.html#agentc.catalog.Catalog" title="agentc.catalog.Catalog"><code class="xref py py-class docutils literal notranslate"><span class="pre">agentc.catalog.Catalog</span></code></a> instance (e.g., <code class="code highlight python docutils literal highlight-python"><span class="n">agentc</span><span class="o">.</span><span class="n">catalog</span><span class="o">.</span><span class="n">Catalog</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code> ).</p>
+<p>To save all package level logs to a file, you would add a <code class="code highlight python docutils literal highlight-python"><span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span></code> to the <code class="code highlight python docutils literal highlight-python"><span class="n">agentc_</span><span class="o">*</span></code>
+logger before any <code class="code highlight python docutils literal highlight-python"><span class="n">agentc</span><span class="o">.</span><span class="n">catalog</span><span class="o">.</span><span class="n">Catalog</span></code> calls occur (typically in the entrypoint of your application).
+For example, logging all <code class="code highlight python docutils literal highlight-python"><span class="n">agentc_core</span></code> debug-level package logs to a file <code class="file docutils literal notranslate"><span class="pre">agentc.log</span></code> for the
+<code class="code docutils literal notranslate"><span class="pre">with_langgraph</span></code> example can be realized by adding the following lines to the top of the <code class="file docutils literal notranslate"><span class="pre">main.py</span></code> file:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="n">debug_file_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;agentc.log&quot;</span><span class="p">)</span>
+<span class="n">debug_file_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;agentc_core&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">debug_file_handler</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;agentc_core&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The same code can be applied to all Python package that use the <code class="code highlight python docutils literal highlight-python"><span class="n">logging</span></code> package!
+For more fine-grained control over logging in general (e.g., using a different format), refer to the
+<code class="code highlight python docutils literal highlight-python"><span class="n">logging</span></code> documentation <a class="reference external" href="https://docs.python.org/3/howto/logging.html">here</a>.</p>
 </div>
 </section>
 </section>
@@ -490,6 +521,7 @@ application.</p>
 </li>
 <li><a class="reference internal" href="#logging-questions">Logging Questions</a><ul>
 <li><a class="reference internal" href="#how-can-i-manage-the-volume-of-logs-generated-by-agent-catalog">How can I manage the volume of logs generated by Agent Catalog?</a></li>
+<li><a class="reference internal" href="#how-can-i-access-the-package-level-logs-generated-by-agent-catalog">How can I access the package-level logs generated by Agent Catalog?</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#git-versioning-questions">Git Versioning Questions</a><ul>
