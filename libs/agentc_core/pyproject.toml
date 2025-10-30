@@ -43,9 +43,10 @@ openapi-pydantic = "^0.5.1"
 jsonschema = "^4.23.0"
 py-openapi-schema-to-json-schema = "^0.0.3"
 jsbeautifier = "^1.15.1"
-sentence-transformers = "^3.4.1"
-torch = "^2.8.0"
 isodate = "^0.7.2"
+
+torch = { version = "^2.9.0+cpu", source = "pytorch_cpu" }
+sentence-transformers = { version = "^3.4.1" }
 
 [tool.poetry.group.refiner]
 optional = true
@@ -68,6 +69,11 @@ develop = true
 [tool.poetry.group.dev.dependencies.agentc-cli]
 path = "../agentc_cli"
 develop = true
+
+[[tool.poetry.source]]
+name = "pytorch_cpu"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
 
 [tool.pytest.ini_options]
 markers = [

@@ -124,6 +124,11 @@ files = [
 poetry-plugin-export = ">=1.9"
 poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
 
+[[tool.poetry.source]]
+name = "pytorch_cpu"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
+
 [build-system]
 requires = [
     "poetry-core>=2.1.0",

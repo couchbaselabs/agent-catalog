@@ -25,7 +25,7 @@ RecordDescriptorUnionType = typing.Annotated[
     | SemanticSearchToolDescriptor
     | HTTPRequestToolDescriptor
     | PromptDescriptor,
-    pydantic.Field(discriminator="record_kind"),
+    pydantic.Discriminator("record_kind"),
 ]
 
 
