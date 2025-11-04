@@ -12,7 +12,7 @@ Installing from PyPI
     This section is in the works!
     We recommend installing from our pre-built packages in the meantime.
 
-1. Make sure you have :command:`python3.11` installed!
+1. Make sure you have :command:`python3.11` and `sentence-transformers <https://sbert.net/>`__) installed!
 
 2. Install ``agentc`` with ``pip``.
 
@@ -43,7 +43,7 @@ Installing from PyPI
 Installing from Pre-Built Package
 ---------------------------------
 
-1. Make sure you have :command:`python3.11` installed!
+1. Make sure you have :command:`python3.11` and `sentence-transformers <https://sbert.net/>`__) installed!
 
 2. Navigate to the releases page for Agent Catalog `here <https://github.com/couchbaselabs/agent-catalog/releases>`__
    and choose the latest version.
@@ -139,7 +139,13 @@ Installing from Source (with Anaconda)
       $ conda create -n my_agentc_env python=3.11
       $ conda activate my_agentc_env
 
-3. Navigate to this directory and install Agent Catalog with :command:`pip`:
+3. Add ``sentence-transformers`` to your new environment.
+
+   .. code-block:: ansi-shell-session
+
+      $ pip install sentence-transformers
+
+4. Navigate to this directory and install Agent Catalog with :command:`pip`:
 
    .. code-block:: ansi-shell-session
 

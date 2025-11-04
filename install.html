@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Installation &#8212; Agent Catalog 0.2.5a3.post4 documentation</title>
+    <title>Installation &#8212; Agent Catalog 0.0.0.post5 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=50651e91" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=7230e44a" />
-    <script src="_static/documentation_options.js?v=6f805e1e"></script>
+    <script src="_static/documentation_options.js?v=251b0014"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -155,7 +155,7 @@
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.5a3.post4 documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.0.0.post5 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -282,7 +282,7 @@
 We recommend installing from our pre-built packages in the meantime.</p>
 </div>
 <ol class="arabic">
-<li><p>Make sure you have <strong class="command">python3.11</strong> installed!</p></li>
+<li><p>Make sure you have <strong class="command">python3.11</strong> and <a class="reference external" href="https://sbert.net/">sentence-transformers</a>) installed!</p></li>
 <li><p>Install <code class="docutils literal notranslate"><span class="pre">agentc</span></code> with <code class="docutils literal notranslate"><span class="pre">pip</span></code>.</p>
 <div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>agentc
 </pre></div>
@@ -333,7 +333,7 @@ information.
 <section id="installing-from-pre-built-package">
 <h2>Installing from Pre-Built Package<a class="headerlink" href="#installing-from-pre-built-package" title="Link to this heading">¶</a></h2>
 <ol class="arabic">
-<li><p>Make sure you have <strong class="command">python3.11</strong> installed!</p></li>
+<li><p>Make sure you have <strong class="command">python3.11</strong> and <a class="reference external" href="https://sbert.net/">sentence-transformers</a>) installed!</p></li>
 <li><p>Navigate to the releases page for Agent Catalog <a class="reference external" href="https://github.com/couchbaselabs/agent-catalog/releases">here</a>
 and choose the latest version.
 Expand the &quot;Assets&quot; tab and download all <code class="docutils literal notranslate"><span class="pre">*.whl</span></code> files (e.g., <code class="docutils literal notranslate"><span class="pre">agentc-0.2.0+g59944db-py3-none-any.whl</span></code>) into
@@ -413,6 +413,11 @@ run the following command:</p>
 Again, you must activate your environment before running any <strong class="command">agentc</strong> commands!</p>
 <div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>my_agentc_env<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.11
 <span class="gp">$ </span>conda<span class="w"> </span>activate<span class="w"> </span>my_agentc_env
+</pre></div>
+</div>
+</li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">sentence-transformers</span></code> to your new environment.</p>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>sentence-transformers
 </pre></div>
 </div>
 </li>
