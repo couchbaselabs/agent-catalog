@@ -210,15 +210,39 @@ For more information about Pytest's command line tool, see
 
 ## Generating `requirements.txt`
 
-To generate the top-level `requirements.txt` file, use `poetry export` and remove all editable references (i.e., those
-that start with `-e` and possess local filesystem paths):
+The top-level `requirements.txt` file contains all dependencies for all `agentc` packages *and* package extras.
+This does not include soft dependencies like `sentence-transformers`.
 
-```bash
-poetry export \
-  -f requirements.txt \
-  --without-hashes \
-  --with dev \
-  | grep -v '^-e file' \
-  > requirements.txt
-```
+1. To generate this `requirements.txt` file, first start in a fresh virtual environment.
 
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+
+2. Next, run the build scripts to create a set of `.whl` files.
+
+   ```bash
+   ./scripts/pre-build.sh
+   ./scripts/build.sh
+   ./scripts/post-build.sh
+   ```
+
+3. Install these packages within your virtual environment.
+
+   ```bash
+   pip install dist/agentc-core*.whl
+   pip install dist/agentc-cli*.whl
+   pip install dist/agentc*.whl
+   pip install dist/agentc-l*.whl
+   ```
+
+4. Generate the `requirements.txt` file.
+
+   ```bash
+   pip freeze > requirements.txt
+   ```
+
+5. Replace all *local* `agentc` dependencies with the versions that are on (or are going to be on) PyPI.
+   This is necessary because the `requirements.txt` file will contain the local paths to the `agentc` packages.
+   For example, replace `agentc @ file:///path/to/agentc/repo/libs/agentc` with `agentc==0.1.0`.

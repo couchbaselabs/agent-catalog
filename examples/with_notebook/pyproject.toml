@@ -15,6 +15,7 @@ package-mode = false
 python = ">=3.11,<3.14"
 langgraph = "^0.5.2"
 couchbase = "^4.4.0"
+sentence-transformers = "^5.1.2"
 
 # For our Python REPL.
 langchain-experimental = "^0.3.4"

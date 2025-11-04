@@ -43,9 +43,11 @@ openapi-pydantic = "^0.5.1"
 jsonschema = "^4.23.0"
 py-openapi-schema-to-json-schema = "^0.0.3"
 jsbeautifier = "^1.15.1"
-sentence-transformers = "^3.4.1"
-torch = "^2.8.0"
 isodate = "^0.7.2"
+
+# These are "soft" dependencies!
+# sentence-transformers = "^3.4.1"
+# torch = "^2.8.0"
 
 [tool.poetry.group.refiner]
 optional = true

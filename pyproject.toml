@@ -33,6 +33,9 @@ agentc-langchain = { path = "libs/agentc_integrations/langchain", develop = true
 agentc-langgraph = { path = "libs/agentc_integrations/langgraph", develop = true }
 agentc-llamaindex = { path = "libs/agentc_integrations/llamaindex", develop = true }
 
+# sentence-transformers exists outside of agentc.
+sentence-transformers = "^5.1.2"
+
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
 pytest = "^8.3.2"
@@ -123,6 +126,11 @@ files = [
 [tool.poetry.requires-plugins]
 poetry-plugin-export = ">=1.9"
 poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
+
+[[tool.poetry.source]]
+name = "pytorch_cpu"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
 
 [build-system]
 requires = [
