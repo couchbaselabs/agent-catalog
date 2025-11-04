@@ -147,7 +147,17 @@ class EmbeddingModel(pydantic.BaseModel):
             self._embedding_model = _encode
 
         else:
-            import sentence_transformers
+            try:
+                import sentence_transformers
+            except ImportError as e:
+                msg = (
+                    "sentence-transformers package not found! "
+                    "Please install sentence-transformers using "
+                    "`pip install sentence-transformers` for pip environments, "
+                    "`poetry add sentence-transformers` for poetry environments, or "
+                    "`uv add sentence-transformers` for uv environments."
+                )
+                raise ImportError(msg) from e
 
             embedding_model = None
             last_error: Exception = None

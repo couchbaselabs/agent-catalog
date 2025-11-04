@@ -12,6 +12,7 @@ package-mode = false
 [tool.poetry.dependencies]
 python = ">=3.11,<3.14"
 langgraph = "^0.5.2"
+sentence-transformers = "^5.1.2"
 fastapi = {version = "^0.116.1", extras = ["standard"]}
 
 # TODO (GLENN): Replace this with the PyPI package once it's available.

@@ -9,7 +9,17 @@ from couchbase.logic.vector_search import VectorSearch
 from couchbase.options import ClusterOptions
 from couchbase.search import SearchOptions
 from datetime import timedelta
-from sentence_transformers import SentenceTransformer
+
+try:
+    from sentence_transformers import SentenceTransformer
+except ImportError as e:
+    msg = (
+        "sentence-transformers package not found! "
+        "Please install sentence-transformers using `pip install sentence-transformers` for pip "
+        " environments, `poetry add sentence-transformers` for poetry environments, or "
+        "`uv add sentence-transformers` for uv environments."
+    )
+    raise ImportError(msg) from e
 
 
 def _get_couchbase_cluster() -> Cluster:

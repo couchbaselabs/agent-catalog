@@ -33,6 +33,9 @@ agentc-langchain = { path = "libs/agentc_integrations/langchain", develop = true
 agentc-langgraph = { path = "libs/agentc_integrations/langgraph", develop = true }
 agentc-llamaindex = { path = "libs/agentc_integrations/llamaindex", develop = true }
 
+# sentence-transformers exists outside of agentc.
+sentence-transformers = "^5.1.2"
+
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
 pytest = "^8.3.2"
