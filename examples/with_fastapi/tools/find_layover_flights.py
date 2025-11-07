@@ -15,7 +15,9 @@ try:
         os.getenv("CB_CONN_STRING"),
         couchbase.options.ClusterOptions(
             authenticator=couchbase.auth.PasswordAuthenticator(
-                username=os.getenv("CB_USERNAME"), password=os.getenv("CB_PASSWORD")
+                username=os.getenv("CB_USERNAME"),
+                password=os.getenv("CB_PASSWORD"),
+                certpath=os.getenv("CB_CERTIFICATE"),
             )
         ),
     )
