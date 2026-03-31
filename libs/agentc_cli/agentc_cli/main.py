@@ -35,6 +35,9 @@ logging.getLogger("openapi_parser").setLevel(logging.ERROR)
 # Support abbreviated command aliases, ex: "agentc st" ==> "agentc status".
 # From: https://click_extra.palletsprojects.com/en/8.1.x/advanced/#command-aliases
 class AliasedGroup(click_extra.ExtraGroup):
+    def _get_default_subcommands(self, ctx) -> list[str] | None:
+        return []
+
     def get_command(self, ctx, cmd_name):
         rv = click_extra.Group.get_command(self, ctx, cmd_name)
         if rv is not None:
@@ -68,6 +71,7 @@ class AliasedGroup(click_extra.ExtraGroup):
             )
         )
     },
+    params=[],  # Note: 'click_extra' added their own version and verbosity by default. This disables that.
 )
 @click_extra.option(
     "-v",

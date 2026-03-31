@@ -307,17 +307,3 @@ The purpose of the :code:`status` command is to view *aggregate* information abo
   from agentc_cli.main import agentc
   invoke(agentc, args=["status", "--help"])
 
-TODO
-
-``version`` Command
--------------------
-
-The purpose of the :code:`version` command is to display the current version of the ``agentc`` package.
-
-.. click:run::
-  from agentc_cli.main import agentc
-  invoke(agentc, args=["version", "--help"])
-
-.. click:run::
-  from agentc_cli.main import agentc
-  invoke(agentc, args=["version"])

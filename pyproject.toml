@@ -60,7 +60,7 @@ autodoc-pydantic = "^2.2.0"
 piccolo_theme = "^0.24.0"
 sphinx_design = "^0.6.1"
 enum-tools = { version = "^0.12.0", extras = ["sphinx"] }
-click_extra = { version = "^4.15.0", extras = ["sphinx"] }
+click_extra = { version = ">4.0.0", extras = ["sphinx"] }
 
 # All packages for our examples (mainly here for convenience).
 [tool.poetry.group.examples.dependencies]
