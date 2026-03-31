@@ -1,6 +1,13 @@
+import os
 import pathlib
-import sentence_transformers
 import time
+
+# This is to quiet any errors we get from sentence transformers.
+os.environ["HF_HUB_VERBOSITY"] = "error"
+os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
+
+import sentence_transformers
 
 cache_folder = (pathlib.Path(__file__).parent.parent / "agentc_testing" / "resources" / "models").resolve()
 print(f"Cache Folder: {cache_folder}")

@@ -1,5 +1,11 @@
 import os
 import pytest
+
+# This is to quiet any errors we get from sentence transformers.
+os.environ["HF_HUB_VERBOSITY"] = "error"
+os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
+
 import sentence_transformers
 
 from agentc_core.defaults import DEFAULT_EMBEDDING_MODEL_NAME
