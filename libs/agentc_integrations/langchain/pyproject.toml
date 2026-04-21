@@ -23,12 +23,12 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.14"
-couchbase = "^4.3.6"
+couchbase = ">=4.0.0"
 joblib = "^1.4.2"
 langchain = ">=0.3.26"
 langchain-core = ">=0.3.68"
 langchain-openai = ">=0.1.25"
-langchain_couchbase = "^0.4.0"
+langchain_couchbase = ">=0.4.0"
 pydantic = "^2.10.7"
 requests = "^2.32.3"
 pydantic-settings = "^2.7.1"
