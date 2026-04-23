@@ -50,6 +50,7 @@ def initialize(options: CheckpointOptions = None, **kwargs) -> None:
     bucket_manager = cb.collections()
     msg, err = create_scope_and_collection(
         collection_manager=bucket_manager,
+        cluster=cluster,
         scope=options.scope,
         collection=options.checkpoint_collection,
         ddl_retry_attempts=options.ddl_retry_attempts,
@@ -61,6 +62,7 @@ def initialize(options: CheckpointOptions = None, **kwargs) -> None:
 
     msg, err = create_scope_and_collection(
         collection_manager=bucket_manager,
+        cluster=cluster,
         scope=options.scope,
         collection=options.tuple_collection,
         ddl_retry_attempts=options.ddl_retry_attempts,

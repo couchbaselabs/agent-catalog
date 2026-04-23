@@ -522,6 +522,7 @@ def check_if_scope_collection_exist(
 
 def create_scope_and_collection(
     collection_manager: couchbase.management.collections.CollectionManager,
+    cluster: couchbase.cluster.Cluster,
     scope: str,
     collection: str,
     ddl_retry_attempts: int,
@@ -549,11 +550,13 @@ def create_scope_and_collection(
             collection_exists = collection in collections
             if not collection_exists:
                 logger.debug(f"Collection {scope}.{collection} not found. Attempting to create collection now.")
-                collection_manager.create_collection(scope_name=scope, collection_name=collection)
+                cluster.query(f"CREATE COLLECTION `{scope}`.`{collection}`;").execute()
+                # collection_manager.create_collection(scope_name=scope, collection_name=collection)
                 logger.debug(f"Collection {scope}.{collection} was created successfully.")
         else:
             logger.debug(f"Collection {scope}.{collection} not found. Attempting to create collection now.")
-            collection_manager.create_collection(scope_name=scope, collection_name=collection)
+            cluster.query(f"CREATE COLLECTION `{scope}`.`{collection}`;").execute()
+            # collection_manager.create_collection(scope_name=scope, collection_name=collection)
             logger.debug(f"Collection {scope}.{collection} was created successfully.")
 
     except couchbase.exceptions.CouchbaseException as e:

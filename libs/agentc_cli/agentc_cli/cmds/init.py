@@ -127,7 +127,7 @@ def init_db_catalog(cfg: Config, cluster: couchbase.cluster.Cluster):
     collection_manager = cb.collections()
     logger.debug("Using bucket: %s", cfg.bucket)
 
-    init_metadata_collection(collection_manager, cfg, click_extra.secho)
+    init_metadata_collection(collection_manager, cluster, cfg, click_extra.secho)
     dims = len(cfg.EmbeddingModel("NAME").encode("test"))
     for kind in CATALOG_KINDS:
         init_catalog_collection(collection_manager, cfg, kind, dims, click_extra.secho)
@@ -156,6 +156,7 @@ def init_db_auditor(cfg: Config, cluster: couchbase.cluster.Cluster):
     click_extra.secho("Now creating scope and collections for the auditor.", fg="yellow")
     (msg, err) = create_scope_and_collection(
         bucket_manager,
+        cluster,
         scope=log_scope,
         collection=log_col,
         ddl_retry_attempts=cfg.ddl_retry_attempts,
