@@ -521,8 +521,8 @@ def check_if_scope_collection_exist(
 
 
 def create_scope_and_collection(
-    collection_manager: couchbase.management.collections.CollectionManager,
     cluster: couchbase.cluster.Cluster,
+    bucket: str,
     scope: str,
     collection: str,
     ddl_retry_attempts: int,
@@ -530,13 +530,15 @@ def create_scope_and_collection(
 ):
     """Create new Couchbase scope and collection within it if they do not exist"""
 
+    # TODO (GLENN): Mainly keeping the "checks" here so we don't break tests.
     # Create a new scope if it does not exist
     try:
+        collection_manager = cluster.bucket(bucket).collections()
         scopes = collection_manager.get_all_scopes()
         scope_exists = any(s.name == scope for s in scopes)
         if not scope_exists:
             logger.debug(f"Scope {scope} not found. Attempting to create scope now.")
-            collection_manager.create_scope(scope_name=scope)
+            cluster.query(f"CREATE SCOPE `{bucket}`.`{scope}`;").execute()
             logger.debug(f"Scope {scope} was created successfully.")
     except couchbase.exceptions.CouchbaseException as e:
         error_message = f"Encountered error while creating scope {scope}:\n{e.message}"
@@ -545,17 +547,11 @@ def create_scope_and_collection(
 
     # Create a new collection within the scope if collection does not exist
     try:
-        if scope_exists:
-            collections = [c.name for s in scopes if s.name == scope for c in s.collections]
-            collection_exists = collection in collections
-            if not collection_exists:
-                logger.debug(f"Collection {scope}.{collection} not found. Attempting to create collection now.")
-                cluster.query(f"CREATE COLLECTION `{scope}`.`{collection}`;").execute()
-                # collection_manager.create_collection(scope_name=scope, collection_name=collection)
-                logger.debug(f"Collection {scope}.{collection} was created successfully.")
-        else:
+        collections = [c.name for s in scopes if s.name == scope for c in s.collections]
+        collection_exists = collection in collections
+        if not collection_exists:
             logger.debug(f"Collection {scope}.{collection} not found. Attempting to create collection now.")
-            cluster.query(f"CREATE COLLECTION `{scope}`.`{collection}`;").execute()
+            cluster.query(f"CREATE COLLECTION `{bucket}`.`{scope}`.`{collection}`;").execute()
             # collection_manager.create_collection(scope_name=scope, collection_name=collection)
             logger.debug(f"Collection {scope}.{collection} was created successfully.")
 
@@ -565,6 +561,7 @@ def create_scope_and_collection(
         return error_message, e
 
     for _ in range(ddl_retry_attempts):
+        collection_manager = cluster.bucket(bucket).collections()
         if not check_if_scope_collection_exist(collection_manager, scope, collection, raise_exception=False):
             logger.debug("Scope and collection not found. Retrying...")
             time.sleep(ddl_retry_wait_seconds)

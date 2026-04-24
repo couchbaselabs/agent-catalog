@@ -147,16 +147,13 @@ def init_db_catalog(cfg: Config, cluster: couchbase.cluster.Cluster):
 
 
 def init_db_auditor(cfg: Config, cluster: couchbase.cluster.Cluster):
-    cb: couchbase.cluster.Bucket = cluster.bucket(cfg.bucket)
-    bucket_manager = cb.collections()
-
     # Create the scope and collection for the auditor.
     log_col = DEFAULT_ACTIVITY_LOG_COLLECTION
     log_scope = DEFAULT_ACTIVITY_SCOPE
     click_extra.secho("Now creating scope and collections for the auditor.", fg="yellow")
     (msg, err) = create_scope_and_collection(
-        bucket_manager,
         cluster,
+        cfg.bucket,
         scope=log_scope,
         collection=log_col,
         ddl_retry_attempts=cfg.ddl_retry_attempts,
