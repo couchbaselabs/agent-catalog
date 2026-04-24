@@ -130,7 +130,7 @@ def init_db_catalog(cfg: Config, cluster: couchbase.cluster.Cluster):
     init_metadata_collection(collection_manager, cluster, cfg, click_extra.secho)
     dims = len(cfg.EmbeddingModel("NAME").encode("test"))
     for kind in CATALOG_KINDS:
-        init_catalog_collection(collection_manager, cfg, kind, dims, click_extra.secho)
+        init_catalog_collection(collection_manager, cluster, cfg, kind, dims, click_extra.secho)
 
     # Create the analytics collections.
     click_extra.secho("Now creating the analytics collections for our catalog.", fg="yellow")
