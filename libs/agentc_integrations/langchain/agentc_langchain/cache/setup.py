@@ -22,6 +22,7 @@ def setup_exact_cache(options: CacheOptions):
         raise ValueError(msg)
 
 
+# TODO (GLENN): Getting a streaming error here. We'll need to revisit this later.
 def setup_semantic_cache(options: CacheOptions, embeddings: langchain_core.embeddings.Embeddings):
     setup_exact_cache(options)
 

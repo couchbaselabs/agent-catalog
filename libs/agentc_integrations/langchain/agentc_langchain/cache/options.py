@@ -11,8 +11,6 @@ from agentc_core.config import RemoteCatalogConfig
 from agentc_langchain.defaults import DEFAULT_COUCHBASE_CACHE_COLLECTION_NAME
 from agentc_langchain.defaults import DEFAULT_COUCHBASE_CACHE_DDL_RETRY_ATTEMPTS
 from agentc_langchain.defaults import DEFAULT_COUCHBASE_CACHE_DDL_RETRY_WAIT_SECONDS
-from agentc_langchain.defaults import DEFAULT_COUCHBASE_CACHE_INDEX_NAME
-from agentc_langchain.defaults import DEFAULT_COUCHBASE_CACHE_INDEX_SCORE_THRESHOLD
 from agentc_langchain.defaults import DEFAULT_COUCHBASE_CACHE_SCOPE_NAME
 
 
@@ -63,13 +61,13 @@ class CacheOptions(pydantic_settings.BaseSettings):
     This field is optional and defaults to ``langchain_llm_cache``.
     """
 
-    index_name: typing.Optional[str] = pydantic.Field(default=DEFAULT_COUCHBASE_CACHE_INDEX_NAME)
-    """ The name of the Couchbase FTS index used to query the cache.
-
-    This field will only be used if the cache is of type `semantic`.
-    If the cache is of type `semantic` and this field is not specified, this field defaults to
-    ``langchain_llm_cache_index``.
-    """
+    # index_name: typing.Optional[str] = pydantic.Field(default=DEFAULT_COUCHBASE_CACHE_INDEX_NAME)
+    # """ The name of the Couchbase FTS index used to query the cache.
+    #
+    # This field will only be used if the cache is of type `semantic`.
+    # If the cache is of type `semantic` and this field is not specified, this field defaults to
+    # ``langchain_llm_cache_index``.
+    # """
 
     ttl: typing.Optional[datetime.timedelta] = None
     """ The time-to-live (TTL) for the cache.
@@ -78,12 +76,12 @@ class CacheOptions(pydantic_settings.BaseSettings):
     This field is optional and defaults to None.
     """
 
-    score_threshold: typing.Optional[float] = pydantic.Field(default=DEFAULT_COUCHBASE_CACHE_INDEX_SCORE_THRESHOLD)
-    """ The score threshold used to quantify what constitutes as a "good" match.
-
-    This field will only be used if the cache is of type `semantic`.
-    If the cache is of type `semantic` and this field is not specified, this field defaults to 0.8.
-    """
+    # score_threshold: typing.Optional[float] = pydantic.Field(default=DEFAULT_COUCHBASE_CACHE_INDEX_SCORE_THRESHOLD)
+    # """ The score threshold used to quantify what constitutes as a "good" match.
+    #
+    # This field will only be used if the cache is of type `semantic`.
+    # If the cache is of type `semantic` and this field is not specified, this field defaults to 0.8.
+    # """
 
     create_if_not_exists: typing.Optional[bool] = False
     """ Create the required collections and/or indexes if they do not exist.

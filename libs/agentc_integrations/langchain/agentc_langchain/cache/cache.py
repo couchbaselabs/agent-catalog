@@ -1,52 +1,41 @@
-import langchain_core.embeddings
 import langchain_core.language_models
 import langchain_couchbase
 import typing
 
 from .options import CacheOptions
 from .setup import setup_exact_cache
-from .setup import setup_semantic_cache
 
 
 def initialize(
-    kind: typing.Literal["exact", "semantic"],
+    kind: typing.Literal["exact"],
     options: CacheOptions = None,
-    embeddings: langchain_core.embeddings.Embeddings = None,
     **kwargs,
 ) -> None:
-    """A function to create the collections and/or indexes required to use the :py:meth:`cache` function.
+    """A function to create the collections required to use the :py:meth:`cache` function.
 
     .. card:: Function Description
 
-        This function is a helper function for creating the default collection (and index, in the case of
-        :python:`kind="semantic"`) required for the :py:meth:`cache` function.
-        Below, we give a minimal working example of how to use this function to create a semantic cache backed by
+        This function is a helper function for creating the default collection required for the :py:meth:`cache`
+        function.
+        Below, we give a minimal working example of how to use this function to create an exact cache backed by
         Couchbase.
 
         .. code-block:: python
 
-            import langchain_openai
             import agentc_langchain.cache
 
-            embeddings = langchain_openai.OpenAIEmbeddings(model="text-embedding-3-small")
-            agentc_langchain.cache.initialize(
-                kind="semantic",
-                embeddings=embeddings
-            )
-
+            agentc_langchain.cache.initialize(kind="exact")
             chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o")
             caching_chat_model = agentc_langchain.cache.cache(
                 chat_model=chat_model,
-                kind="semantic",
-                embeddings=embeddings,
+                kind="exact",
             )
 
             # Response #2 is served from the cache.
             response_1 = caching_chat_model.invoke("Hello there!")
-            response_2 = caching_chat_model.invoke("Hello there!!")
+            response_2 = caching_chat_model.invoke("Hello there!")
 
     :param kind: The type of cache to attach to the chat model.
-    :param embeddings: The embeddings to use when attaching a 'semantic' cache to the chat model.
     :param options: The options to use when attaching a cache to the chat model.
     :param kwargs: Keyword arguments to be forwarded to a :py:class:`CacheOptions` constructor (ignored if options is
                    present).
@@ -56,20 +45,17 @@ def initialize(
     options.create_if_not_exists = True
     if kind.lower() == "exact":
         setup_exact_cache(options)
-    elif kind.lower() == "semantic":
-        setup_semantic_cache(options, embeddings)
     else:
-        raise ValueError("Illegal kind specified! 'kind' must be 'exact' or 'semantic'.")
+        raise ValueError("Illegal kind specified! 'kind' must be 'exact'.")
 
 
 def cache(
     chat_model: langchain_core.language_models.BaseChatModel,
-    kind: typing.Literal["exact", "semantic"],
-    embeddings: langchain_core.embeddings.Embeddings = None,
+    kind: typing.Literal["exact"],
     options: CacheOptions = None,
     **kwargs,
 ) -> langchain_core.language_models.BaseChatModel:
-    """A function to attach a Couchbase-backed exact or semantic cache to a ChatModel.
+    """A function to attach a Couchbase-backed exact cache to a ChatModel.
 
     .. card:: Function Description
 
@@ -95,40 +81,18 @@ def cache(
             response_1 = caching_chat_model.invoke("Hello there!")
             response_2 = caching_chat_model.invoke("Hello there!")
 
-        To use this function to store and retrieve LLM responses via semantic similarity, use the
-        :python:`kind="semantic"` argument with an :py:class:`langchain_core.embeddings.Embeddings` instance:
-
-        .. code-block:: python
-
-            import langchain_openai
-            import agentc_langchain.cache
-
-            chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o")
-            embeddings = langchain_openai.OpenAIEmbeddings(model="text-embedding-3-small")
-            caching_chat_model = agentc_langchain.cache.cache(
-                chat_model=chat_model,
-                kind="semantic",
-                embeddings=embeddings,
-                create_if_not_exists=True
-            )
-
-            # Response #2 is served from the cache.
-            response_1 = caching_chat_model.invoke("Hello there!")
-            response_2 = caching_chat_model.invoke("Hello there!!")
-
         By default, the Couchbase initialization of the cache is separate from the cache's usage (storage and
         retrieval).
         To explicitly initialize the cache yourself, use the :py:meth:`initialize` method.
 
     .. seealso::
 
-        This method uses the ``langchain_couchbase.cache.CouchbaseCache`` and
-        ``langchain_couchbase.cache.CouchbaseSemanticCache`` classes from the ``langchain_couchbase`` package.
+        This method uses the ``langchain_couchbase.cache.CouchbaseCache`` class from the ``langchain_couchbase``
+        package.
         See `here <https://api.python.langchain.com/en/latest/couchbase/cache.html>`__ for more details.
 
     :param chat_model: The LangChain chat model to cache responses for.
     :param kind: The type of cache to attach to the chat model.
-    :param embeddings: The embeddings to use when attaching a 'semantic' cache to the chat model.
     :param options: The options to use when attaching a cache to the chat model.
     :param kwargs: Keyword arguments to be forwarded to a :py:class:`CacheOptions` constructor (ignored if options is
                    present).
@@ -137,7 +101,7 @@ def cache(
     if options is None:
         options = CacheOptions(**kwargs)
     if options.create_if_not_exists:
-        initialize(kind=kind, options=options, embeddings=embeddings)
+        initialize(kind=kind, options=options)
 
     # Attach our cache to the chat model.
     if kind.lower() == "exact":
@@ -146,18 +110,6 @@ def cache(
             bucket_name=options.bucket,
             scope_name=options.scope,
             collection_name=options.collection,
-            ttl=options.ttl,
-        )
-        chat_model.cache = llm_cache
-    elif kind.lower() == "semantic":
-        llm_cache = langchain_couchbase.cache.CouchbaseSemanticCache(
-            cluster=options.Cluster(),
-            embedding=embeddings,
-            bucket_name=options.bucket,
-            scope_name=options.scope,
-            collection_name=options.collection,
-            index_name=options.index_name,
-            score_threshold=options.score_threshold,
             ttl=options.ttl,
         )
         chat_model.cache = llm_cache
