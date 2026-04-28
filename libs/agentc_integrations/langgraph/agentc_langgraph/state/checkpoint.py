@@ -46,10 +46,9 @@ def initialize(options: CheckpointOptions = None, **kwargs) -> None:
     if options is None:
         options = CheckpointOptions(**kwargs)
     cluster = options.Cluster()
-    cb = cluster.bucket(bucket_name=options.bucket)
-    bucket_manager = cb.collections()
     msg, err = create_scope_and_collection(
-        collection_manager=bucket_manager,
+        cluster=cluster,
+        bucket=options.bucket,
         scope=options.scope,
         collection=options.checkpoint_collection,
         ddl_retry_attempts=options.ddl_retry_attempts,
@@ -60,7 +59,8 @@ def initialize(options: CheckpointOptions = None, **kwargs) -> None:
     time.sleep(options.ddl_retry_wait_seconds)
 
     msg, err = create_scope_and_collection(
-        collection_manager=bucket_manager,
+        cluster=cluster,
+        bucket=options.bucket,
         scope=options.scope,
         collection=options.tuple_collection,
         ddl_retry_attempts=options.ddl_retry_attempts,

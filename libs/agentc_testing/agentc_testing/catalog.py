@@ -7,6 +7,7 @@ import os
 import pathlib
 import pytest
 import shutil
+import time
 import typing
 
 logger = logging.getLogger(__name__)
@@ -193,6 +194,22 @@ def _build_environment(
     # Initialize the git repository.
     _initialize_git(directory, env_kind, repo)
 
+    def _retry_step(func, max_retries=3, delay=1):
+        results = None
+        for attempt in range(max_retries):
+            results = func()
+            # Check if any result contains "failed with" in its output.
+            has_failure = any(
+                "failed with" in (result.output if hasattr(result, "output") else str(result))
+                for result in (results if isinstance(results, list) else [results])
+            )
+            if not has_failure:
+                return results
+            if attempt < max_retries - 1:
+                logger.warning(f"Step failed, retrying (attempt {attempt + 1}/{max_retries})...")
+                time.sleep(delay)
+        return results
+
     # If we are not using the index command, we can return early...
     build_results = list()
     if env_kind == EnvironmentKind.EMPTY:
@@ -200,13 +217,13 @@ def _build_environment(
         return Environment(build_results=build_results, repository=repo)
 
     # ...otherwise we need to initialize our catalog...
-    build_results.append(_initialize_catalog(env_kind, click_runner, click_command, *init_args))
+    build_results.append(_retry_step(lambda: _initialize_catalog(env_kind, click_runner, click_command, *init_args)))
     if env_kind == EnvironmentKind.NON_INDEXED_ALL_TRAVEL:
         logger.info(f"{env_kind}: %s", build_results)
         return Environment(build_results=build_results, repository=repo)
 
     # ...and, call the index command.
-    build_results.append(_index_catalog(env_kind, click_runner, click_command, *index_args))
+    build_results.append(_retry_step(lambda: _index_catalog(env_kind, click_runner, click_command, *index_args)))
     if env_kind not in [
         EnvironmentKind.PUBLISHED_ALL_TRAVEL,
         EnvironmentKind.PUBLISHED_TOOLS_TRAVEL,
@@ -216,7 +233,7 @@ def _build_environment(
         return Environment(build_results=build_results, repository=repo)
 
     # Call our publish command. Note that this assumes a container / CB instance is active!
-    build_results.append(_publish_catalog(env_kind, click_runner, click_command, *publish_args))
+    build_results.append(_retry_step(lambda: _publish_catalog(env_kind, click_runner, click_command, *publish_args)))
     logger.info(f"{env_kind}: %s", build_results)
     return Environment(build_results=build_results, repository=repo)
 

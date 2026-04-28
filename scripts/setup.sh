@@ -34,7 +34,8 @@ else
 fi
 
 # Verify that Agent Catalog is correctly installed.
-if poetry run agentc | grep -q "The Couchbase Agent Catalog command line tool."; then
+# (note: the weird `sed` is for stripping ANSI codes for color and formatting).
+if poetry run agentc 2>&1 | sed 's/\x1b\[[0-9;]*m//g' | grep -q "The Couchbase Agent Catalog command line tool."; then
   echo "Agent Catalog has been installed successfully."
 else
   echo "Agent Catalog has not been correctly installed."

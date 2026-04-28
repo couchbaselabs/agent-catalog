@@ -9,10 +9,10 @@ from agentc_core.remote.util.ddl import create_vector_index
 
 
 def setup_exact_cache(options: CacheOptions):
-    cb = options.Cluster().bucket(bucket_name=options.bucket)
-    bucket_manager = cb.collections()
+    cb = options.Cluster()
     msg, err = create_scope_and_collection(
-        collection_manager=bucket_manager,
+        cluster=cb,
+        bucket=options.bucket,
         scope=options.scope,
         collection=options.collection,
         ddl_retry_attempts=options.ddl_retry_attempts,
@@ -22,6 +22,7 @@ def setup_exact_cache(options: CacheOptions):
         raise ValueError(msg)
 
 
+# TODO (GLENN): Getting a streaming error here. We'll need to revisit this later.
 def setup_semantic_cache(options: CacheOptions, embeddings: langchain_core.embeddings.Embeddings):
     setup_exact_cache(options)
 

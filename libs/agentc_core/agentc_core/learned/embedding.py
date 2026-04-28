@@ -2,6 +2,7 @@ import agentc_core.learned.model
 import couchbase.cluster
 import couchbase.exceptions
 import logging
+import os
 import pathlib
 import pydantic
 import typing
@@ -148,6 +149,11 @@ class EmbeddingModel(pydantic.BaseModel):
 
         else:
             try:
+                # This is to quiet any errors we get from sentence transformers.
+                os.environ["HF_HUB_VERBOSITY"] = "error"
+                os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+                os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
+
                 import sentence_transformers
             except ImportError as e:
                 msg = (

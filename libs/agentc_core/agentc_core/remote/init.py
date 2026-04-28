@@ -17,12 +17,14 @@ logger = logging.getLogger(__name__)
 
 def init_metadata_collection(
     collection_manager: couchbase.management.collections.CollectionManager,
+    cluster: couchbase.cluster.Cluster,
     cfg: Config,
     printer: typing.Callable = print,
 ):
     logger.info("Starting metadata collection initialization.")
     (msg, err) = create_scope_and_collection(
-        collection_manager,
+        cluster,
+        cfg.bucket,
         scope=DEFAULT_CATALOG_SCOPE,
         collection=DEFAULT_CATALOG_METADATA_COLLECTION,
         ddl_retry_attempts=cfg.ddl_retry_attempts,
@@ -42,6 +44,7 @@ def init_metadata_collection(
 
 def init_catalog_collection(
     collection_manager: couchbase.management.collections.CollectionManager,
+    cluster: couchbase.cluster.Cluster,
     cfg: Config,
     kind: typing.Literal["tool", "prompt"],
     dims: int,
@@ -51,7 +54,8 @@ def init_catalog_collection(
     printer(f"Now creating the catalog collection for the {kind} catalog.", fg="yellow")
     catalog_col = DEFAULT_CATALOG_TOOL_COLLECTION if kind == "tool" else DEFAULT_CATALOG_PROMPT_COLLECTION
     (msg, err) = create_scope_and_collection(
-        collection_manager,
+        cluster,
+        cfg.bucket,
         scope=DEFAULT_CATALOG_SCOPE,
         collection=catalog_col,
         ddl_retry_attempts=cfg.ddl_retry_attempts,

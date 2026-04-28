@@ -127,10 +127,10 @@ def init_db_catalog(cfg: Config, cluster: couchbase.cluster.Cluster):
     collection_manager = cb.collections()
     logger.debug("Using bucket: %s", cfg.bucket)
 
-    init_metadata_collection(collection_manager, cfg, click_extra.secho)
+    init_metadata_collection(collection_manager, cluster, cfg, click_extra.secho)
     dims = len(cfg.EmbeddingModel("NAME").encode("test"))
     for kind in CATALOG_KINDS:
-        init_catalog_collection(collection_manager, cfg, kind, dims, click_extra.secho)
+        init_catalog_collection(collection_manager, cluster, cfg, kind, dims, click_extra.secho)
 
     # Create the analytics collections.
     click_extra.secho("Now creating the analytics collections for our catalog.", fg="yellow")
@@ -147,15 +147,13 @@ def init_db_catalog(cfg: Config, cluster: couchbase.cluster.Cluster):
 
 
 def init_db_auditor(cfg: Config, cluster: couchbase.cluster.Cluster):
-    cb: couchbase.cluster.Bucket = cluster.bucket(cfg.bucket)
-    bucket_manager = cb.collections()
-
     # Create the scope and collection for the auditor.
     log_col = DEFAULT_ACTIVITY_LOG_COLLECTION
     log_scope = DEFAULT_ACTIVITY_SCOPE
     click_extra.secho("Now creating scope and collections for the auditor.", fg="yellow")
     (msg, err) = create_scope_and_collection(
-        bucket_manager,
+        cluster,
+        cfg.bucket,
         scope=log_scope,
         collection=log_col,
         ddl_retry_attempts=cfg.ddl_retry_attempts,
