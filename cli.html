@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>agentc Command Documentation &#8212; Agent Catalog 0.2.5a4.post1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=50651e91" />
+    <title>agentc Command Documentation &#8212; Agent Catalog 0.2.5a4.post2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=ecdef530" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=7230e44a" />
-    <script src="_static/documentation_options.js?v=46526aca"></script>
+    <script src="_static/documentation_options.js?v=71aae0a0"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -29,123 +29,6 @@
 
 <div id="top_nav">
     
-        <div id="notification_banner" data-banner-hiding="temporary" v-show="!permanentlyHidden">
-    <p v-if="visible" id="content">You are viewing documentation for a pre-GA (alpha) version of Couchbase Agent Catalog!</p>
-    <a class="close" href="#" @click.prevent="toggleVisible()">[[ visible ? '&#x25B2; HIDE' : '&#x25BC; SHOW BANNER' ]]</a>
-</div>
-
-<script>
-(function() {
-    const topNav = document.querySelector('#top_nav')
-    const notificationContent = document.querySelector('#notification_banner p#content').innerText
-    const localStorageKey = 'readNotification'
-    const bannerHiding = document.querySelector('#notification_banner').dataset['bannerHiding']
-    const cssVariableName = '--navbarHeight'
-    const rootElement = document.documentElement
-
-    /*************************************************************************/
-    // Local storage for remembering if the user has read the notification.
-
-    function checkAlreadyRead() {
-        return localStorage.getItem(localStorageKey) == notificationContent
-    }
-
-    function setRead() {
-        localStorage.setItem(localStorageKey, notificationContent)
-    }
-
-    function clearRead() {
-        localStorage.removeItem(localStorageKey)
-    }
-
-    const alreadyRead = checkAlreadyRead()
-    const permanentlyHidden = alreadyRead && bannerHiding == 'permanent'
-
-    /*************************************************************************/
-    // Updating a CSS variable so other elements adjust to the nav bar height.
-
-    function updateNavbarHeight() {
-        // Only update it if the delta is significant. Otherwise it causes
-        // unnecessary browser repaints.
-        const documentStyles = getComputedStyle(rootElement)
-        // We store the value in REM, so need to convert to pixels
-        const currentValue = parseFloat(
-            documentStyles.getPropertyValue(cssVariableName)
-        ) * parseFloat(documentStyles.fontSize)
-
-        const newValue = topNav.clientHeight
-
-        if (newValue - 5 > currentValue) {
-            console.log(`Updating ${cssVariableName} - overlapping`)
-            rootElement.style.setProperty(
-                cssVariableName, newValue + "px"
-            );
-        } else if (currentValue - newValue >= 30) {
-            console.log(`Updating ${cssVariableName} - gap too large`)
-            rootElement.style.setProperty(
-                cssVariableName, newValue + "px"
-            );
-        }
-    }
-
-    /*************************************************************************/
-    // After loading the page, and resizing the window, recalculate the nav bar
-    // height.
-
-    if (!permanentlyHidden) {
-        // This height is approximately correct when there's a banner, so
-        // shouldn't require any page reflow:
-        rootElement.style.setProperty(
-            '--navbarHeight', "5.5rem"
-        );
-
-        document.addEventListener("DOMContentLoaded", function() {
-            updateNavbarHeight()
-        });
-
-        var interval = undefined
-
-        window.addEventListener('resize', () => {
-            if (interval) {
-                clearTimeout(interval)
-            }
-            interval = setTimeout(() => {
-                console.log("Finished resizing")
-                updateNavbarHeight()
-            }, 100)
-        })
-    }
-
-    /*************************************************************************/
-
-    PetiteVue.createApp({
-        visible: !alreadyRead,
-        permanentlyHidden: permanentlyHidden,
-        bannerHiding: bannerHiding,
-        $delimiters: ['[[', ']]'],
-        toggleVisible() {
-            this.visible = !this.visible
-
-            if (this.visible) {
-                clearRead()
-            } else {
-                setRead()
-            }
-
-            if (!this.visible && bannerHiding == 'permanent') {
-                this.permanentlyHidden = true
-            }
-
-            // Run this after Vue has had time to update the DOM:
-            setTimeout(
-                updateNavbarHeight,
-                0
-            )
-        }
-    }).mount('#notification_banner')
-})()
-</script>
-    
 
     <nav>
         
@@ -155,7 +38,7 @@
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.5a4.post1 documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.5a4.post2 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -275,52 +158,11 @@
   <section id="agentc-command-documentation">
 <h1><code class="docutils literal notranslate"><span class="pre">agentc</span></code> Command Documentation<a class="headerlink" href="#agentc-command-documentation" title="Link to this heading">¶</a></h1>
 <p>The <strong class="command">agentc</strong> command line tool acts as an interface for your Agent Catalog instance.</p>
-<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">COMMAND [ARGS]...</span>
-
-  The Couchbase Agent Catalog command line tool.
-
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">-v</span>, <span class=" -Color -Color-Cyan -C-Cyan">--verbose</span>  Flag to enable verbose output.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">0</span><span class=" -Color -Color-Faint -C-Faint">; 0&lt;=x&lt;=2]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">-i</span>, <span class=" -Color -Color-Cyan -C-Cyan">--interactive</span> / <span class=" -Color -Color-Cyan -C-Cyan">-ni</span>, <span class=" -Color -Color-Cyan -C-Cyan">--no-interactive</span>
-                 Flag to enable interactive mode.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">i</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>     Show this message and exit.
-
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Commands:</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">add</span>      Interactively create a new tool or prompt and save it to the...
-  <span class=" -Color -Color-Cyan -C-Cyan">clean</span>    Delete all or specific (catalog and/or activity) Agent Catalog...
-  <span class=" -Color -Color-Cyan -C-Cyan">env</span>      Return all Agent Catalog related environment and configuration...
-  <span class=" -Color -Color-Cyan -C-Cyan">execute</span>  Search for and subsequently execute a specific tool.
-  <span class=" -Color -Color-Cyan -C-Cyan">find</span>     Find items from the catalog based on a natural language string...
-  <span class=" -Color -Color-Cyan -C-Cyan">index</span>    Walk the source directory trees (sources) to index source files...
-  <span class=" -Color -Color-Cyan -C-Cyan">init</span>     Initialize the necessary files/collections for your working Agent...
-  <span class=" -Color -Color-Cyan -C-Cyan">ls</span>       List all indexed tools and/or prompts in the catalog.
-  <span class=" -Color -Color-Cyan -C-Cyan">publish</span>  Upload the local catalog and/or logs to a Couchbase instance.
-  <span class=" -Color -Color-Cyan -C-Cyan">status</span>   Show the (aggregate) status of your Agent Catalog environment.
-  <span class=" -Color -Color-Cyan -C-Cyan">version</span>  Show the current version of Agent Catalog.
-
-See https://couchbaselabs.github.io/agent-catalog/index.html for more
-information.
-</pre></div>
-</div>
 <p>All sub-commands have a verbosity option (<code class="code docutils literal notranslate"><span class="pre">-v,</span> <span class="pre">--verbose</span></code>, by default verbosity is 0) and an interactive option
 (<code class="code docutils literal notranslate"><span class="pre">-i,</span> <span class="pre">--interactive</span> <span class="pre">/</span> <span class="pre">-ni,</span> <span class="pre">--no-interactive</span></code>, by default interactivity is enabled).</p>
 <section id="add-command">
 <h2><code class="docutils literal notranslate"><span class="pre">add</span></code> Command<a class="headerlink" href="#add-command" title="Link to this heading">¶</a></h2>
 <p>The primary purpose of the <code class="code docutils literal notranslate"><span class="pre">add</span></code> command is to import templates for declarative Agent Catalog tools (and prompts).</p>
-<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>add<span class="w"> </span>--help
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc add</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span>
-
-  Interactively create a new tool or <span class=" -Color -Color-Magenta -C-Magenta">prompt</span> and save it to the filesystem
-  (output). You MUST edit the generated file as per your requirements!
-
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">-o</span>, <span class=" -Color -Color-Cyan -C-Cyan">--output</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">DIRECTORY</span>  Location to save the generated tool / <span class=" -Color -Color-Magenta -C-Magenta">prompt</span> to.
-                          Defaults to your current working directory.
-  <span class=" -Color -Color-Cyan -C-Cyan">--kind</span> [<span class=" -Color -Color-Magenta -C-Magenta">python_function</span>|<span class=" -Color -Color-Magenta -C-Magenta">sqlpp_query</span>|<span class=" -Color -Color-Magenta -C-Magenta">semantic_search</span>|<span class=" -Color -Color-Magenta -C-Magenta">http_request</span>|<span class=" -Color -Color-Magenta -C-Magenta">prompt</span>]
-  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>              Show this message and exit.
-</pre></div>
-</div>
 <p>See  <a class="reference external" href="catalog.html">here</a> for more information on the types of catalog entries Agent Catalog currently recognizes.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -351,33 +193,6 @@ to the top of your function.</p>
 <section id="clean-command">
 <h2><code class="docutils literal notranslate"><span class="pre">clean</span></code> Command<a class="headerlink" href="#clean-command" title="Link to this heading">¶</a></h2>
 <p>The purpose of the <code class="code docutils literal notranslate"><span class="pre">clean</span></code> command is to &quot;clean&quot; / prune data from your local and / or remote catalog.</p>
-<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>clean<span class="w"> </span>--help
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc clean</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span>
-                    [[<span class=" -Color -Color-Magenta -C-Magenta">catalog</span>|<span class=" -Color -Color-Magenta -C-Magenta">activity</span>]]...
-
-  Delete all or specific (<span class=" -Color -Color-Magenta -C-Magenta">catalog</span> and/or <span class=" -Color -Color-Magenta -C-Magenta">activity</span>) Agent Catalog related files /
-  collections.
-
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--db</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-db</span>            Flag to perform / not-perform a DB clean.  <span class=" -Color -Color-Faint -C-Faint">[default:</span>
-<span class=" -Color -Color-Faint -C-Faint">                            </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">db</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--local</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-local</span>      Flag to perform / not-perform a local FS clean.
-                            <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">local</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--tools</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-tools</span>      Flag to clean / avoid-cleaning the tool-<span class=" -Color -Color-Magenta -C-Magenta">catalog</span>.
-                            <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">tools</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--prompts</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-prompts</span>  Flag to clean / avoid-cleaning the prompt-<span class=" -Color -Color-Magenta -C-Magenta">catalog</span>.
-                            <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">prompts</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--bucket</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>             Name of the Couchbase bucket to remove Agent Catalog
-                            from.
-  <span class=" -Color -Color-Cyan -C-Cyan">-cid</span>, <span class=" -Color -Color-Cyan -C-Cyan">--</span><span class=" -Color -Color-Magenta -C-Magenta">catalog</span>-id <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>   Catalog ID used to remove a specific <span class=" -Color -Color-Magenta -C-Magenta">catalog</span> version
-                            from the DB <span class=" -Color -Color-Magenta -C-Magenta">catalog</span>.
-  <span class=" -Color -Color-Cyan -C-Cyan">-y</span>, <span class=" -Color -Color-Cyan -C-Cyan">--yes</span>                 Flag to delete local-FS and DB <span class=" -Color -Color-Magenta -C-Magenta">catalog</span> data without
-                            confirmation.
-  <span class=" -Color -Color-Cyan -C-Cyan">-d</span>, <span class=" -Color -Color-Cyan -C-Cyan">--date</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>           Datetime of the oldest log entry to keep (older log
-                            entries will be deleted).
-  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>                Show this message and exit.
-</pre></div>
-</div>
 <p>For remote catalogs possessing multiple catalog versions, you can specify a set of catalog IDs (i.e., Git SHAs) via the
 <code class="code docutils literal notranslate"><span class="pre">--catalog-id</span></code> flag to delete their associated entries from the remote catalog.
 For example, running the command below will delete all tool + prompt + metadata entries associated with catalog versions
@@ -390,48 +205,10 @@ For example, running the command below will delete all tool + prompt + metadata 
 <h2><code class="docutils literal notranslate"><span class="pre">env</span></code> Command<a class="headerlink" href="#env-command" title="Link to this heading">¶</a></h2>
 <p>The <code class="code docutils literal notranslate"><span class="pre">env</span></code> command displays the current configuration of Agent Catalog as a JSON object (see <a class="reference external" href="config.html">here</a>
 for all configuration fields).</p>
-<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>env<span class="w"> </span>--help
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc env</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span>
-
-  Return all Agent Catalog related environment and configuration parameters as a
-  JSON object.
-
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>  Show this message and exit.
-</pre></div>
-</div>
 </section>
 <section id="execute-command">
 <h2><code class="docutils literal notranslate"><span class="pre">execute</span></code> Command<a class="headerlink" href="#execute-command" title="Link to this heading">¶</a></h2>
 <p>The <code class="code docutils literal notranslate"><span class="pre">execute</span></code> command is a helper command that allows users to directly invoke tools indexed by Agent Catalog.</p>
-<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>execute<span class="w"> </span>--help
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc execute</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span>
-
-  Search for and subsequently execute a specific tool.
-
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--query</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>             User query describing the task for which tools /
-                           prompts are needed. This field or <span class=" -Color -Color-Cyan -C-Cyan">--name</span> must be
-                           specified.
-  <span class=" -Color -Color-Cyan -C-Cyan">--name</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>              Name of catalog item to retrieve from the catalog
-                           directly. This field or <span class=" -Color -Color-Cyan -C-Cyan">--query</span> must be specified.
-  <span class=" -Color -Color-Cyan -C-Cyan">--bucket</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>            Name of the Couchbase bucket to search.
-  <span class=" -Color -Color-Cyan -C-Cyan">--dirty</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-dirty</span>     Flag to process and search amongst dirty source
-                           files.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">dirty</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--refiner</span> [<span class=" -Color -Color-Magenta -C-Magenta">ClosestCluster</span>|<span class=" -Color -Color-Magenta -C-Magenta">None</span>]
-                           Class to post-process (rerank, prune, etc...) find
-                           results.
-  <span class=" -Color -Color-Cyan -C-Cyan">-an</span>, <span class=" -Color -Color-Cyan -C-Cyan">--annotations</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>  Tool-specific annotations to filter by, specified
-                           using KEY=&quot;VALUE&quot; (AND|OR KEY=&quot;VALUE&quot;)*.
-  <span class=" -Color -Color-Cyan -C-Cyan">-cid</span>, <span class=" -Color -Color-Cyan -C-Cyan">--catalog-id</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>  Catalog ID that uniquely specifies a catalog version
-                           / snapshot (git commit id).  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">__LATEST__</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--db</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-db</span>           Flag to include / exclude items from the DB-catalog
-                           while searching.
-  <span class=" -Color -Color-Cyan -C-Cyan">--local</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-local</span>     Flag to include / exclude items from the local-FS-
-                           catalog while searching.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">local</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>               Show this message and exit.
-</pre></div>
-</div>
 <p>The arguments for <code class="code docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">execute</span></code> are identical to that of <code class="code docutils literal notranslate"><span class="pre">agentc</span> <span class="pre">find</span></code> (with the exception of the
 <code class="code docutils literal notranslate"><span class="pre">{tools|prompts}</span></code> argument).
 <code class="code docutils literal notranslate"><span class="pre">execute</span></code> is useful for verifying declarative tools before running them in your application (e.g., validating
@@ -441,36 +218,6 @@ the results of your SQL++ query, checking the results of your semantic search, e
 <h2><code class="docutils literal notranslate"><span class="pre">find</span></code> Command<a class="headerlink" href="#find-command" title="Link to this heading">¶</a></h2>
 <p>The primary purpose of the <code class="code docutils literal notranslate"><span class="pre">find</span></code> command is to validate the <code class="code docutils literal notranslate"><span class="pre">query</span></code> or <code class="code docutils literal notranslate"><span class="pre">name</span></code> arguments used by
 a call to <code class="code docutils literal notranslate"><span class="pre">agentc.Catalog:find</span></code>.</p>
-<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>find<span class="w"> </span>--help
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc find</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span> {<span class=" -Color -Color-Magenta -C-Magenta">tools</span>|<span class=" -Color -Color-Magenta -C-Magenta">prompts</span>}
-
-  Find items from the catalog based on a natural language string (query) or by
-  name.
-
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--query</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>             User query describing the task for which <span class=" -Color -Color-Magenta -C-Magenta">tools</span> /
-                           <span class=" -Color -Color-Magenta -C-Magenta">prompts</span> are needed. This field or <span class=" -Color -Color-Cyan -C-Cyan">--name</span> must be
-                           specified.
-  <span class=" -Color -Color-Cyan -C-Cyan">--name</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>              Name of catalog item to retrieve from the catalog
-                           directly. This field or <span class=" -Color -Color-Cyan -C-Cyan">--query</span> must be specified.
-  <span class=" -Color -Color-Cyan -C-Cyan">--bucket</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>            Name of the Couchbase bucket to search.
-  <span class=" -Color -Color-Cyan -C-Cyan">--limit</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">INTEGER</span>          Maximum number of results to show.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">1</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--dirty</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-dirty</span>     Flag to process and search amongst dirty source
-                           files.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">dirty</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--refiner</span> [<span class=" -Color -Color-Magenta -C-Magenta">ClosestCluster</span>|<span class=" -Color -Color-Magenta -C-Magenta">None</span>]
-                           Class to post-process (rerank, prune, etc...) find
-                           results.
-  <span class=" -Color -Color-Cyan -C-Cyan">-an</span>, <span class=" -Color -Color-Cyan -C-Cyan">--annotations</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>  Tool-specific annotations to filter by, specified
-                           using KEY=&quot;VALUE&quot; (AND|OR KEY=&quot;VALUE&quot;)*.
-  <span class=" -Color -Color-Cyan -C-Cyan">-cid</span>, <span class=" -Color -Color-Cyan -C-Cyan">--catalog-id</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>  Catalog ID that uniquely specifies a catalog version
-                           / snapshot (git commit id).  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">__LATEST__</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--db</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-db</span>           Flag to include / exclude items from the DB-catalog
-                           while searching.
-  <span class=" -Color -Color-Cyan -C-Cyan">--local</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-local</span>     Flag to include / exclude items from the local-FS-
-                           catalog while searching.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">local</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>               Show this message and exit.
-</pre></div>
-</div>
 <section id="search-by-name">
 <h3>Search By Name<a class="headerlink" href="#search-by-name" title="Link to this heading">¶</a></h3>
 <p>To find a tool or prompt directly by name, use the <code class="code docutils literal notranslate"><span class="pre">--name</span></code> option.
@@ -585,22 +332,6 @@ Python Program</label><div class="sd-tab-content docutils">
 <section id="index-command">
 <h2><code class="docutils literal notranslate"><span class="pre">index</span></code> Command<a class="headerlink" href="#index-command" title="Link to this heading">¶</a></h2>
 <p>The purpose of the <code class="code docutils literal notranslate"><span class="pre">index</span></code> command is to build a <em>local</em> index of all tools and prompts.</p>
-<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>index<span class="w"> </span>--help
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc index</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[SOURCES]...</span>
-
-  Walk the source directory trees (<span class=" -Color -Color-Cyan -C-Cyan">sources</span>) to index source files into the local
-  catalog. Source files that will be scanned include *.py, *.sqlpp, *.yaml, etc.
-
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--prompts</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-prompts</span>  Flag to look for / ignore prompts when indexing
-                            source files into the local catalog.  <span class=" -Color -Color-Faint -C-Faint">[default:</span>
-<span class=" -Color -Color-Faint -C-Faint">                            </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">prompts</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--tools</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-tools</span>      Flag to look for / ignore tools when indexing source
-                            files into the local catalog.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">tools</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--dry-run</span>                 Flag to prevent catalog changes.
-  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>                Show this message and exit.
-</pre></div>
-</div>
 <p>By default, the <code class="code docutils literal notranslate"><span class="pre">index</span></code> command will look for both tools and prompts in the given <code class="docutils literal notranslate"><span class="pre">SOURCES</span></code>.
 To avoid searching for tools or prompts specifically, use the <code class="docutils literal notranslate"><span class="pre">--no-tools</span></code> and <code class="docutils literal notranslate"><span class="pre">--no-prompts</span></code> flags respectively.
 In the example below, Agent Catalog will scan the directories <code class="file docutils literal notranslate"><span class="pre">my_tools_1</span></code>, <code class="file docutils literal notranslate"><span class="pre">my_tools_2</span></code>, and
@@ -612,23 +343,6 @@ In the example below, Agent Catalog will scan the directories <code class="file 
 <section id="init-command">
 <h2><code class="docutils literal notranslate"><span class="pre">init</span></code> Command<a class="headerlink" href="#init-command" title="Link to this heading">¶</a></h2>
 <p>The purpose of the <code class="code docutils literal notranslate"><span class="pre">init</span></code> command is to initialize your Agent Catalog environment (both locally and on Couchbase).</p>
-<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>init<span class="w"> </span>--help
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc init</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span>
-                   [[<span class=" -Color -Color-Magenta -C-Magenta">catalog</span>|<span class=" -Color -Color-Magenta -C-Magenta">activity</span>]]...
-
-  Initialize the necessary files/collections for your working Agent Catalog
-  environment.
-
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--db</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-db</span>        Flag to enable / disable DB initialization.  <span class=" -Color -Color-Faint -C-Faint">[default:</span>
-<span class=" -Color -Color-Faint -C-Faint">                        </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">db</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--local</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-local</span>  Flag to enable / disable local FS initialization.
-                        <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">local</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--add-hook-for</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>   Source directory to add a post-commit hook for.
-  <span class=" -Color -Color-Cyan -C-Cyan">--bucket</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>         Name of the Couchbase bucket to initialize in.
-  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>            Show this message and exit.
-</pre></div>
-</div>
 <p>The <code class="code docutils literal notranslate"><span class="pre">init</span></code> command must be run at least once for each Agent Catalog environment.
 By default, <code class="code docutils literal notranslate"><span class="pre">init</span></code> will run both locally and on Couchbase, initializing your catalog environment and your
 activity environment on each.
@@ -642,21 +356,6 @@ In the example below, the catalog environment and the activity environment is on
 <section id="ls-command">
 <h2><code class="docutils literal notranslate"><span class="pre">ls</span></code> Command<a class="headerlink" href="#ls-command" title="Link to this heading">¶</a></h2>
 <p>The purpose of the <code class="code docutils literal notranslate"><span class="pre">ls</span></code> command is to list out all items in the latest version of your Agent Catalog instance.</p>
-<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>ls<span class="w"> </span>--help
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc ls</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span> [[<span class=" -Color -Color-Magenta -C-Magenta">tools</span>|<span class=" -Color -Color-Magenta -C-Magenta">prompts</span>]]...
-
-  List all indexed <span class=" -Color -Color-Magenta -C-Magenta">tools</span> and/or <span class=" -Color -Color-Magenta -C-Magenta">prompts</span> in the catalog.
-
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--db</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-db</span>        Flag to force a DB-only search.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">no-db</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--local</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-local</span>  Flag to force a local-only search.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">local</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--dirty</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-dirty</span>  Flag to process and search amongst dirty source files.
-                        <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">dirty</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--bucket</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>         Name of Couchbase bucket that is being used for Agent
-                        Catalog.
-  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>            Show this message and exit.
-</pre></div>
-</div>
 <p>By default, the <code class="code docutils literal notranslate"><span class="pre">ls</span></code> command will only list items in a local and potentially <em>dirty</em> catalog instance.
 To list out all items in your Couchbase instance requires the <code class="docutils literal notranslate"><span class="pre">--db</span></code> flag.
 A common use case for this command involves running this command after <code class="code docutils literal notranslate"><span class="pre">index</span></code> to see whether or not a certain
@@ -672,21 +371,6 @@ To view aggregate information about your catalog, use the <code class="code docu
 <h2><code class="docutils literal notranslate"><span class="pre">publish</span></code> Command<a class="headerlink" href="#publish-command" title="Link to this heading">¶</a></h2>
 <p>The primary purpose of the <code class="code docutils literal notranslate"><span class="pre">publish</span></code> command is to &quot;snapshot&quot; your local catalog instance and persist this
 snapshot to Couchbase.</p>
-<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>publish<span class="w"> </span>--help
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc publish</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span>
-                      [[<span class=" -Color -Color-Magenta -C-Magenta">tools</span>|<span class=" -Color -Color-Magenta -C-Magenta">prompts</span>|<span class=" -Color -Color-Magenta -C-Magenta">logs</span>]]...
-
-  Upload the local catalog and/or <span class=" -Color -Color-Magenta -C-Magenta">logs</span> to a Couchbase instance. By default, only
-  <span class=" -Color -Color-Magenta -C-Magenta">tools</span> and <span class=" -Color -Color-Magenta -C-Magenta">prompts</span> are published unless log is explicitly specified.
-
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--bucket</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>  Name of the Couchbase bucket to publish to.
-  <span class=" -Color -Color-Cyan -C-Cyan">-an</span>, <span class=" -Color -Color-Cyan -C-Cyan">--annotations</span> &lt;<span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span> TEXT&gt;...
-                 Snapshot level annotations to be added while publishing
-                 catalogs.
-  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>     Show this message and exit.
-</pre></div>
-</div>
 <p>The <code class="code docutils literal notranslate"><span class="pre">publish</span></code> command, similar to all other Couchbase-interfacing commands (e.g., <code class="code docutils literal notranslate"><span class="pre">clean</span></code>, <code class="code docutils literal notranslate"><span class="pre">find</span></code>,
 etc...) reads Couchbase authentication details from your environment.
 To override the bucket being published to, users can specify the bucket name directly via the <code class="docutils literal notranslate"><span class="pre">--bucket</span></code> option.
@@ -705,41 +389,6 @@ In the example below, only tools are published:</p>
 <section id="status-command">
 <h2><code class="docutils literal notranslate"><span class="pre">status</span></code> Command<a class="headerlink" href="#status-command" title="Link to this heading">¶</a></h2>
 <p>The purpose of the <code class="code docutils literal notranslate"><span class="pre">status</span></code> command is to view <em>aggregate</em> information about your Agent Catalog instance.</p>
-<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>status<span class="w"> </span>--help
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc status</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span>
-                     [[<span class=" -Color -Color-Magenta -C-Magenta">tools</span>|<span class=" -Color -Color-Magenta -C-Magenta">prompts</span>]]...
-
-  Show the (aggregate) status of your Agent Catalog environment.
-
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--dirty</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-dirty</span>  Flag to process and compare against dirty source files.
-                        <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">dirty</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--db</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-db</span>        Flag to include / exclude items from the DB-catalog
-                        while displaying status.
-  <span class=" -Color -Color-Cyan -C-Cyan">--local</span> / <span class=" -Color -Color-Cyan -C-Cyan">--no-local</span>  Flag to include / exclude items from the local-FS-
-                        catalog while displaying status.  <span class=" -Color -Color-Faint -C-Faint">[default: </span><span class=" -Color -Color-Faint -Color-Faint-Green -C-Faint -C-Green">local</span><span class=" -Color -Color-Faint -C-Faint">]</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">--bucket</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">TEXT</span>         Name of the Couchbase bucket hosting the Agent Catalog.
-  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>            Show this message and exit.
-</pre></div>
-</div>
-<p>TODO</p>
-</section>
-<section id="version-command">
-<h2><code class="docutils literal notranslate"><span class="pre">version</span></code> Command<a class="headerlink" href="#version-command" title="Link to this heading">¶</a></h2>
-<p>The purpose of the <code class="code docutils literal notranslate"><span class="pre">version</span></code> command is to display the current version of the <code class="docutils literal notranslate"><span class="pre">agentc</span></code> package.</p>
-<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>version<span class="w"> </span>--help
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Usage:</span> <span class=" -Color -Color-Cyan -C-Cyan">agentc version</span> <span class=" -Color -Color-Faint -Color-Faint-Cyan -C-Faint -C-Cyan">[OPTIONS]</span>
-
-  Show the current version of Agent Catalog.
-
-<span class=" -Color -Color-Bold -Color-Bold-BrightBlue -C-Bold -C-BrightBlue">Options:</span>
-  <span class=" -Color -Color-Cyan -C-Cyan">-h</span>, <span class=" -Color -Color-Cyan -C-Cyan">--help</span>  Show this message and exit.
-</pre></div>
-</div>
-<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>version
-<span class=" -Color -Color-Bold -C-Bold">0.2.5a4.post1</span>
-</pre></div>
-</div>
 </section>
 </section>
 
@@ -774,7 +423,6 @@ In the example below, only tools are published:</p>
 <li><a class="reference internal" href="#ls-command"><code class="docutils literal notranslate"><span class="pre">ls</span></code> Command</a></li>
 <li><a class="reference internal" href="#publish-command"><code class="docutils literal notranslate"><span class="pre">publish</span></code> Command</a></li>
 <li><a class="reference internal" href="#status-command"><code class="docutils literal notranslate"><span class="pre">status</span></code> Command</a></li>
-<li><a class="reference internal" href="#version-command"><code class="docutils literal notranslate"><span class="pre">version</span></code> Command</a></li>
 </ul>
 </li>
 </ul>
@@ -805,7 +453,7 @@ In the example below, only tools are published:</p>
 
     <div class="footer" role="contentinfo">
     &#169; Copyright 2025, Couchbase.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
 
 <p id="theme_credit">Styled using the <a href="https://github.com/piccolo-orm/piccolo_theme">Piccolo Theme</a></p>

@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Package Documentation &#8212; Agent Catalog 0.2.5a4.post1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=50651e91" />
+    <title>Package Documentation &#8212; Agent Catalog 0.2.5a4.post2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=ecdef530" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=7230e44a" />
-    <script src="_static/documentation_options.js?v=46526aca"></script>
+    <script src="_static/documentation_options.js?v=71aae0a0"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -29,123 +29,6 @@
 
 <div id="top_nav">
     
-        <div id="notification_banner" data-banner-hiding="temporary" v-show="!permanentlyHidden">
-    <p v-if="visible" id="content">You are viewing documentation for a pre-GA (alpha) version of Couchbase Agent Catalog!</p>
-    <a class="close" href="#" @click.prevent="toggleVisible()">[[ visible ? '&#x25B2; HIDE' : '&#x25BC; SHOW BANNER' ]]</a>
-</div>
-
-<script>
-(function() {
-    const topNav = document.querySelector('#top_nav')
-    const notificationContent = document.querySelector('#notification_banner p#content').innerText
-    const localStorageKey = 'readNotification'
-    const bannerHiding = document.querySelector('#notification_banner').dataset['bannerHiding']
-    const cssVariableName = '--navbarHeight'
-    const rootElement = document.documentElement
-
-    /*************************************************************************/
-    // Local storage for remembering if the user has read the notification.
-
-    function checkAlreadyRead() {
-        return localStorage.getItem(localStorageKey) == notificationContent
-    }
-
-    function setRead() {
-        localStorage.setItem(localStorageKey, notificationContent)
-    }
-
-    function clearRead() {
-        localStorage.removeItem(localStorageKey)
-    }
-
-    const alreadyRead = checkAlreadyRead()
-    const permanentlyHidden = alreadyRead && bannerHiding == 'permanent'
-
-    /*************************************************************************/
-    // Updating a CSS variable so other elements adjust to the nav bar height.
-
-    function updateNavbarHeight() {
-        // Only update it if the delta is significant. Otherwise it causes
-        // unnecessary browser repaints.
-        const documentStyles = getComputedStyle(rootElement)
-        // We store the value in REM, so need to convert to pixels
-        const currentValue = parseFloat(
-            documentStyles.getPropertyValue(cssVariableName)
-        ) * parseFloat(documentStyles.fontSize)
-
-        const newValue = topNav.clientHeight
-
-        if (newValue - 5 > currentValue) {
-            console.log(`Updating ${cssVariableName} - overlapping`)
-            rootElement.style.setProperty(
-                cssVariableName, newValue + "px"
-            );
-        } else if (currentValue - newValue >= 30) {
-            console.log(`Updating ${cssVariableName} - gap too large`)
-            rootElement.style.setProperty(
-                cssVariableName, newValue + "px"
-            );
-        }
-    }
-
-    /*************************************************************************/
-    // After loading the page, and resizing the window, recalculate the nav bar
-    // height.
-
-    if (!permanentlyHidden) {
-        // This height is approximately correct when there's a banner, so
-        // shouldn't require any page reflow:
-        rootElement.style.setProperty(
-            '--navbarHeight', "5.5rem"
-        );
-
-        document.addEventListener("DOMContentLoaded", function() {
-            updateNavbarHeight()
-        });
-
-        var interval = undefined
-
-        window.addEventListener('resize', () => {
-            if (interval) {
-                clearTimeout(interval)
-            }
-            interval = setTimeout(() => {
-                console.log("Finished resizing")
-                updateNavbarHeight()
-            }, 100)
-        })
-    }
-
-    /*************************************************************************/
-
-    PetiteVue.createApp({
-        visible: !alreadyRead,
-        permanentlyHidden: permanentlyHidden,
-        bannerHiding: bannerHiding,
-        $delimiters: ['[[', ']]'],
-        toggleVisible() {
-            this.visible = !this.visible
-
-            if (this.visible) {
-                clearRead()
-            } else {
-                setRead()
-            }
-
-            if (!this.visible && bannerHiding == 'permanent') {
-                this.permanentlyHidden = true
-            }
-
-            // Run this after Vue has had time to update the DOM:
-            setTimeout(
-                updateNavbarHeight,
-                0
-            )
-        }
-    }).mount('#notification_banner')
-})()
-</script>
-    
 
     <nav>
         
@@ -155,7 +38,7 @@
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.5a4.post1 documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.5a4.post2 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -446,7 +329,7 @@ configuration of this <code class="xref py py-class docutils literal notranslate
 
 <dl class="py property">
 <dt class="sig sig-object py" id="agentc.catalog.Catalog.version">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">version</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">VersionDescriptor</span></em><a class="headerlink" href="#agentc.catalog.Catalog.version" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">version</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">VersionDescriptor</span></em><a class="headerlink" href="#agentc.catalog.Catalog.version" title="Link to this definition">¶</a></dt>
 <dd><p>The version of the catalog currently being served (i.e., the latest version).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -862,7 +745,7 @@ annotation:</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="agentc.span.Span.identifier">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">identifier</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#agentc.span.Span.Identifier" title="agentc_core.activity.span.Span.Identifier"><span class="pre">Identifier</span></a></em><a class="headerlink" href="#agentc.span.Span.identifier" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">identifier</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#agentc.span.Span.Identifier" title="agentc_core.activity.span.Span.Identifier"><span class="pre">Identifier</span></a></em><a class="headerlink" href="#agentc.span.Span.identifier" title="Link to this definition">¶</a></dt>
 <dd><p>A unique identifier for this span.</p>
 </dd></dl>
 
@@ -875,7 +758,7 @@ annotation:</p>
 <h3>LangChain<a class="headerlink" href="#langchain" title="Link to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="agentc_langchain.chat.Callback">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_langchain.chat.</span></span><span class="sig-name descname"><span class="pre">Callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tools</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langchain/chat/chat.html#Callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langchain.chat.Callback" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_langchain.chat.</span></span><span class="sig-name descname"><span class="pre">Callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tools</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langchain/chat/chat.html#Callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langchain.chat.Callback" title="Link to this definition">¶</a></dt>
 <dd><p>A callback that will log all LLM calls using the given span as the root.</p>
 <div class="sd-card sd-sphinx-override sd-mb-3 sd-shadow-sm docutils">
 <div class="sd-card-body docutils">
@@ -959,8 +842,8 @@ For example:</p>
 
 <dl class="py function" id="module-agentc_langchain.cache">
 <dt class="sig sig-object py" id="agentc_langchain.cache.cache">
-<span class="sig-prename descclassname"><span class="pre">agentc_langchain.cache.</span></span><span class="sig-name descname"><span class="pre">cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chat_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embeddings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langchain/cache/cache.html#cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langchain.cache.cache" title="Link to this definition">¶</a></dt>
-<dd><p>A function to attach a Couchbase-backed exact or semantic cache to a ChatModel.</p>
+<span class="sig-prename descclassname"><span class="pre">agentc_langchain.cache.</span></span><span class="sig-name descname"><span class="pre">cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chat_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langchain/cache/cache.html#cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langchain.cache.cache" title="Link to this definition">¶</a></dt>
+<dd><p>A function to attach a Couchbase-backed exact cache to a ChatModel.</p>
 <div class="sd-card sd-sphinx-override sd-mb-3 sd-shadow-sm docutils">
 <div class="sd-card-body docutils">
 <div class="sd-card-title sd-font-weight-bold docutils">
@@ -984,25 +867,6 @@ via exact prompt matching:</p>
 <span class="n">response_2</span> <span class="o">=</span> <span class="n">caching_chat_model</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="s2">&quot;Hello there!&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sd-card-text">To use this function to store and retrieve LLM responses via semantic similarity, use the
-<code class="code highlight python docutils literal highlight-python"><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;semantic&quot;</span></code> argument with an <code class="xref py py-class docutils literal notranslate"><span class="pre">langchain_core.embeddings.Embeddings</span></code> instance:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">langchain_openai</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">agentc_langchain.cache</span>
-
-<span class="n">chat_model</span> <span class="o">=</span> <span class="n">langchain_openai</span><span class="o">.</span><span class="n">chat_models</span><span class="o">.</span><span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">)</span>
-<span class="n">embeddings</span> <span class="o">=</span> <span class="n">langchain_openai</span><span class="o">.</span><span class="n">OpenAIEmbeddings</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;text-embedding-3-small&quot;</span><span class="p">)</span>
-<span class="n">caching_chat_model</span> <span class="o">=</span> <span class="n">agentc_langchain</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">cache</span><span class="p">(</span>
-    <span class="n">chat_model</span><span class="o">=</span><span class="n">chat_model</span><span class="p">,</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;semantic&quot;</span><span class="p">,</span>
-    <span class="n">embeddings</span><span class="o">=</span><span class="n">embeddings</span><span class="p">,</span>
-    <span class="n">create_if_not_exists</span><span class="o">=</span><span class="kc">True</span>
-<span class="p">)</span>
-
-<span class="c1"># Response #2 is served from the cache.</span>
-<span class="n">response_1</span> <span class="o">=</span> <span class="n">caching_chat_model</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="s2">&quot;Hello there!&quot;</span><span class="p">)</span>
-<span class="n">response_2</span> <span class="o">=</span> <span class="n">caching_chat_model</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="s2">&quot;Hello there!!&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
 <p class="sd-card-text">By default, the Couchbase initialization of the cache is separate from the cache's usage (storage and
 retrieval).
 To explicitly initialize the cache yourself, use the <a class="reference internal" href="#agentc_langchain.cache.initialize" title="agentc_langchain.cache.initialize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">initialize()</span></code></a> method.</p>
@@ -1010,16 +874,15 @@ To explicitly initialize the cache yourself, use the <a class="reference interna
 </div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p>This method uses the <code class="docutils literal notranslate"><span class="pre">langchain_couchbase.cache.CouchbaseCache</span></code> and
-<code class="docutils literal notranslate"><span class="pre">langchain_couchbase.cache.CouchbaseSemanticCache</span></code> classes from the <code class="docutils literal notranslate"><span class="pre">langchain_couchbase</span></code> package.
+<p>This method uses the <code class="docutils literal notranslate"><span class="pre">langchain_couchbase.cache.CouchbaseCache</span></code> class from the <code class="docutils literal notranslate"><span class="pre">langchain_couchbase</span></code>
+package.
 See <a class="reference external" href="https://api.python.langchain.com/en/latest/couchbase/cache.html">here</a> for more details.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>chat_model</strong> (<em>BaseChatModel</em>) -- The LangChain chat model to cache responses for.</p></li>
-<li><p><strong>kind</strong> (<em>Literal</em><em>[</em><em>'exact'</em><em>, </em><em>'semantic'</em><em>]</em>) -- The type of cache to attach to the chat model.</p></li>
-<li><p><strong>embeddings</strong> (<em>Embeddings</em>) -- The embeddings to use when attaching a 'semantic' cache to the chat model.</p></li>
+<li><p><strong>kind</strong> (<em>Literal</em><em>[</em><em>'exact'</em><em>]</em>) -- The type of cache to attach to the chat model.</p></li>
 <li><p><strong>options</strong> (<a class="reference internal" href="#agentc_langchain.cache.CacheOptions" title="agentc_langchain.cache.options.CacheOptions"><em>CacheOptions</em></a>) -- The options to use when attaching a cache to the chat model.</p></li>
 <li><p><strong>kwargs</strong> -- Keyword arguments to be forwarded to a <a class="reference internal" href="#agentc_langchain.cache.CacheOptions" title="agentc_langchain.cache.CacheOptions"><code class="xref py py-class docutils literal notranslate"><span class="pre">CacheOptions</span></code></a> constructor (ignored if options is
 present).</p></li>
@@ -1036,35 +899,28 @@ present).</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="agentc_langchain.cache.initialize">
-<span class="sig-prename descclassname"><span class="pre">agentc_langchain.cache.</span></span><span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embeddings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langchain/cache/cache.html#initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langchain.cache.initialize" title="Link to this definition">¶</a></dt>
-<dd><p>A function to create the collections and/or indexes required to use the <a class="reference internal" href="#agentc_langchain.cache.cache" title="agentc_langchain.cache.cache"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cache()</span></code></a> function.</p>
+<span class="sig-prename descclassname"><span class="pre">agentc_langchain.cache.</span></span><span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langchain/cache/cache.html#initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langchain.cache.initialize" title="Link to this definition">¶</a></dt>
+<dd><p>A function to create the collections required to use the <a class="reference internal" href="#agentc_langchain.cache.cache" title="agentc_langchain.cache.cache"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cache()</span></code></a> function.</p>
 <div class="sd-card sd-sphinx-override sd-mb-3 sd-shadow-sm docutils">
 <div class="sd-card-body docutils">
 <div class="sd-card-title sd-font-weight-bold docutils">
 Function Description</div>
-<p class="sd-card-text">This function is a helper function for creating the default collection (and index, in the case of
-<code class="code highlight python docutils literal highlight-python"><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;semantic&quot;</span></code>) required for the <a class="reference internal" href="#agentc_langchain.cache.cache" title="agentc_langchain.cache.cache"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cache()</span></code></a> function.
-Below, we give a minimal working example of how to use this function to create a semantic cache backed by
+<p class="sd-card-text">This function is a helper function for creating the default collection required for the <a class="reference internal" href="#agentc_langchain.cache.cache" title="agentc_langchain.cache.cache"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cache()</span></code></a>
+function.
+Below, we give a minimal working example of how to use this function to create an exact cache backed by
 Couchbase.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">langchain_openai</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">agentc_langchain.cache</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">agentc_langchain.cache</span>
 
-<span class="n">embeddings</span> <span class="o">=</span> <span class="n">langchain_openai</span><span class="o">.</span><span class="n">OpenAIEmbeddings</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;text-embedding-3-small&quot;</span><span class="p">)</span>
-<span class="n">agentc_langchain</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;semantic&quot;</span><span class="p">,</span>
-    <span class="n">embeddings</span><span class="o">=</span><span class="n">embeddings</span>
-<span class="p">)</span>
-
+<span class="n">agentc_langchain</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;exact&quot;</span><span class="p">)</span>
 <span class="n">chat_model</span> <span class="o">=</span> <span class="n">langchain_openai</span><span class="o">.</span><span class="n">chat_models</span><span class="o">.</span><span class="n">ChatOpenAI</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">)</span>
 <span class="n">caching_chat_model</span> <span class="o">=</span> <span class="n">agentc_langchain</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">cache</span><span class="p">(</span>
     <span class="n">chat_model</span><span class="o">=</span><span class="n">chat_model</span><span class="p">,</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;semantic&quot;</span><span class="p">,</span>
-    <span class="n">embeddings</span><span class="o">=</span><span class="n">embeddings</span><span class="p">,</span>
+    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;exact&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># Response #2 is served from the cache.</span>
 <span class="n">response_1</span> <span class="o">=</span> <span class="n">caching_chat_model</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="s2">&quot;Hello there!&quot;</span><span class="p">)</span>
-<span class="n">response_2</span> <span class="o">=</span> <span class="n">caching_chat_model</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="s2">&quot;Hello there!!&quot;</span><span class="p">)</span>
+<span class="n">response_2</span> <span class="o">=</span> <span class="n">caching_chat_model</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="s2">&quot;Hello there!&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1072,8 +928,7 @@ Couchbase.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>kind</strong> (<em>Literal</em><em>[</em><em>'exact'</em><em>, </em><em>'semantic'</em><em>]</em>) -- The type of cache to attach to the chat model.</p></li>
-<li><p><strong>embeddings</strong> (<em>Embeddings</em>) -- The embeddings to use when attaching a 'semantic' cache to the chat model.</p></li>
+<li><p><strong>kind</strong> (<em>Literal</em><em>[</em><em>'exact'</em><em>]</em>) -- The type of cache to attach to the chat model.</p></li>
 <li><p><strong>options</strong> (<a class="reference internal" href="#agentc_langchain.cache.CacheOptions" title="agentc_langchain.cache.options.CacheOptions"><em>CacheOptions</em></a>) -- The options to use when attaching a cache to the chat model.</p></li>
 <li><p><strong>kwargs</strong> -- Keyword arguments to be forwarded to a <a class="reference internal" href="#agentc_langchain.cache.CacheOptions" title="agentc_langchain.cache.CacheOptions"><code class="xref py py-class docutils literal notranslate"><span class="pre">CacheOptions</span></code></a> constructor (ignored if options is
 present).</p></li>
@@ -1104,10 +959,8 @@ present).</p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_if_not_exists</span> <span class="pre">(bool</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ddl_retry_attempts</span> <span class="pre">(int</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ddl_retry_wait_seconds</span> <span class="pre">(float</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">index_name</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">password</span> <span class="pre">(pydantic.types.SecretStr</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">scope</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_threshold</span> <span class="pre">(float</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ttl</span> <span class="pre">(datetime.timedelta</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">username</span> <span class="pre">(str</span> <span class="pre">|</span> <span class="pre">None)</span></code></p></li>
 </ul>
@@ -1217,22 +1070,6 @@ By default, this value is 5 seconds.</p>
 </dd></dl>
 
 <dl class="py attribute pydantic_field">
-<dt class="sig sig-object py" id="agentc_langchain.cache.CacheOptions.index_name">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">index_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'langchain_llm_cache_index'</span></em><a class="headerlink" href="#agentc_langchain.cache.CacheOptions.index_name" title="Link to this definition">¶</a></dt>
-<dd><p>The name of the Couchbase FTS index used to query the cache.</p>
-<p>This field will only be used if the cache is of type <cite>semantic</cite>.
-If the cache is of type <cite>semantic</cite> and this field is not specified, this field defaults to
-<code class="docutils literal notranslate"><span class="pre">langchain_llm_cache_index</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Validated by<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pull_cluster_from_agent_catalog</span></code></p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute pydantic_field">
 <dt class="sig sig-object py" id="agentc_langchain.cache.CacheOptions.password">
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">password</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SecretStr</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc_langchain.cache.CacheOptions.password" title="Link to this definition">¶</a></dt>
 <dd><p>Password associated with the Couchbase instance hosting the cache.</p>
@@ -1251,21 +1088,6 @@ If the cache is of type <cite>semantic</cite> and this field is not specified, t
 <em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scope</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'agent_activity'</span></em><a class="headerlink" href="#agentc_langchain.cache.CacheOptions.scope" title="Link to this definition">¶</a></dt>
 <dd><p>The name of the Couchbase scope hosting the cache.</p>
 <p>This field is optional and defaults to <code class="docutils literal notranslate"><span class="pre">agent_activity</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Validated by<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">_pull_cluster_from_agent_catalog</span></code></p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute pydantic_field">
-<dt class="sig sig-object py" id="agentc_langchain.cache.CacheOptions.score_threshold">
-<em class="property"><span class="pre">field</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">score_threshold</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.8</span></em><a class="headerlink" href="#agentc_langchain.cache.CacheOptions.score_threshold" title="Link to this definition">¶</a></dt>
-<dd><p>The score threshold used to quantify what constitutes as a &quot;good&quot; match.</p>
-<p>This field will only be used if the cache is of type <cite>semantic</cite>.
-If the cache is of type <cite>semantic</cite> and this field is not specified, this field defaults to 0.8.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Validated by<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1311,7 +1133,7 @@ This field is optional and defaults to None.</p>
 <span id="langgraph"></span><h3>LangGraph<a class="headerlink" href="#module-agentc_langgraph.tool" title="Link to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="agentc_langgraph.tool.ToolNode">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_langgraph.tool.</span></span><span class="sig-name descname"><span class="pre">ToolNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langgraph/tool/node.html#ToolNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langgraph.tool.ToolNode" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_langgraph.tool.</span></span><span class="sig-name descname"><span class="pre">ToolNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langgraph/tool/node.html#ToolNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langgraph.tool.ToolNode" title="Link to this definition">¶</a></dt>
 <dd><p>A tool node that logs tool results to a span.</p>
 <div class="sd-card sd-sphinx-override sd-mb-3 sd-shadow-sm docutils">
 <div class="sd-card-body docutils">
@@ -1381,7 +1203,7 @@ logged with <code class="xref py py-class docutils literal notranslate"><span cl
 
 <dl class="py class" id="module-agentc_langgraph.agent">
 <dt class="sig sig-object py" id="agentc_langgraph.agent.ReActAgent">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_langgraph.agent.</span></span><span class="sig-name descname"><span class="pre">ReActAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chat_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">span</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langgraph/agent/agent.html#ReActAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langgraph.agent.ReActAgent" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_langgraph.agent.</span></span><span class="sig-name descname"><span class="pre">ReActAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chat_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">span</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langgraph/agent/agent.html#ReActAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langgraph.agent.ReActAgent" title="Link to this definition">¶</a></dt>
 <dd><p>A helper ReAct agent base class that integrates with Agent Catalog.</p>
 <div class="sd-card sd-sphinx-override sd-mb-3 sd-shadow-sm docutils">
 <div class="sd-card-body docutils">
@@ -1488,7 +1310,7 @@ First, our prompt:</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="agentc_langgraph.agent.ReActAgent.ainvoke">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ainvoke</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langgraph/agent/agent.html#ReActAgent.ainvoke"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langgraph.agent.ReActAgent.ainvoke" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ainvoke</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langgraph/agent/agent.html#ReActAgent.ainvoke"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langgraph.agent.ReActAgent.ainvoke" title="Link to this definition">¶</a></dt>
 <dd><p>Transform a single input into an output.</p>
 <dl>
 <dt>Args:</dt><dd><p>input: The input to the <code class="docutils literal notranslate"><span class="pre">Runnable</span></code>.
@@ -1556,7 +1378,7 @@ for more details. Defaults to None.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="agentc_langgraph.agent.State">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_langgraph.agent.</span></span><span class="sig-name descname"><span class="pre">State</span></span><a class="reference internal" href="_modules/agentc_langgraph/agent/agent.html#State"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langgraph.agent.State" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_langgraph.agent.</span></span><span class="sig-name descname"><span class="pre">State</span></span><a class="reference internal" href="_modules/agentc_langgraph/agent/agent.html#State"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langgraph.agent.State" title="Link to this definition">¶</a></dt>
 <dd><p>An (optional) state class for use with Agent Catalog's LangGraph helper classes.</p>
 <div class="sd-card sd-sphinx-override sd-mb-3 sd-shadow-sm docutils">
 <div class="sd-card-body docutils">
@@ -1572,7 +1394,7 @@ This class is essentially identical to the default state schema for LangGraph (i
 
 <dl class="py class" id="module-agentc_langgraph.graph">
 <dt class="sig sig-object py" id="agentc_langgraph.graph.GraphRunnable">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_langgraph.graph.</span></span><span class="sig-name descname"><span class="pre">GraphRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">span</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langgraph/graph/graph.html#GraphRunnable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langgraph.graph.GraphRunnable" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_langgraph.graph.</span></span><span class="sig-name descname"><span class="pre">GraphRunnable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">span</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langgraph/graph/graph.html#GraphRunnable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langgraph.graph.GraphRunnable" title="Link to this definition">¶</a></dt>
 <dd><p>A helper class that wraps the &quot;Runnable&quot; interface with <code class="xref py py-class docutils literal notranslate"><span class="pre">agentc.Span</span></code>.</p>
 <div class="sd-card sd-sphinx-override sd-mb-3 sd-shadow-sm docutils">
 <div class="sd-card-body docutils">
@@ -1646,7 +1468,7 @@ around using LangGraph's prebuilt ReAct agent and Agent Catalog.</p>
 
 <dl class="py class" id="module-agentc_langgraph.state">
 <dt class="sig sig-object py" id="agentc_langgraph.state.CheckpointSaver">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_langgraph.state.</span></span><span class="sig-name descname"><span class="pre">CheckpointSaver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serde</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langgraph/state/checkpoint.html#CheckpointSaver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langgraph.state.CheckpointSaver" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_langgraph.state.</span></span><span class="sig-name descname"><span class="pre">CheckpointSaver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">serde</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langgraph/state/checkpoint.html#CheckpointSaver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langgraph.state.CheckpointSaver" title="Link to this definition">¶</a></dt>
 <dd><p>Checkpoint saver class to persist LangGraph states in a Couchbase instance.</p>
 <div class="sd-card sd-sphinx-override sd-mb-3 sd-shadow-sm docutils">
 <div class="sd-card-body docutils">
@@ -1967,7 +1789,7 @@ By default, this value is 5 seconds.</p>
 <span id="llamaindex"></span><h3>LlamaIndex<a class="headerlink" href="#module-agentc_llamaindex.chat" title="Link to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="agentc_llamaindex.chat.Callback">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_llamaindex.chat.</span></span><span class="sig-name descname"><span class="pre">Callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_starts_to_ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_ends_to_ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_llamaindex/chat/chat.html#Callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_llamaindex.chat.Callback" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_llamaindex.chat.</span></span><span class="sig-name descname"><span class="pre">Callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_starts_to_ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_ends_to_ignore</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_llamaindex/chat/chat.html#Callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_llamaindex.chat.Callback" title="Link to this definition">¶</a></dt>
 <dd><p>All callback that will log all LlamaIndex events using the given span as the root.</p>
 <div class="sd-card sd-sphinx-override sd-mb-3 sd-shadow-sm docutils">
 <div class="sd-card-body docutils">
@@ -2069,10 +1891,8 @@ Below, we provide an example of how to use this class.</p>
 <li><a class="reference internal" href="#agentc_langchain.cache.CacheOptions.create_if_not_exists"><code class="docutils literal notranslate"><span class="pre">CacheOptions.create_if_not_exists</span></code></a></li>
 <li><a class="reference internal" href="#agentc_langchain.cache.CacheOptions.ddl_retry_attempts"><code class="docutils literal notranslate"><span class="pre">CacheOptions.ddl_retry_attempts</span></code></a></li>
 <li><a class="reference internal" href="#agentc_langchain.cache.CacheOptions.ddl_retry_wait_seconds"><code class="docutils literal notranslate"><span class="pre">CacheOptions.ddl_retry_wait_seconds</span></code></a></li>
-<li><a class="reference internal" href="#agentc_langchain.cache.CacheOptions.index_name"><code class="docutils literal notranslate"><span class="pre">CacheOptions.index_name</span></code></a></li>
 <li><a class="reference internal" href="#agentc_langchain.cache.CacheOptions.password"><code class="docutils literal notranslate"><span class="pre">CacheOptions.password</span></code></a></li>
 <li><a class="reference internal" href="#agentc_langchain.cache.CacheOptions.scope"><code class="docutils literal notranslate"><span class="pre">CacheOptions.scope</span></code></a></li>
-<li><a class="reference internal" href="#agentc_langchain.cache.CacheOptions.score_threshold"><code class="docutils literal notranslate"><span class="pre">CacheOptions.score_threshold</span></code></a></li>
 <li><a class="reference internal" href="#agentc_langchain.cache.CacheOptions.ttl"><code class="docutils literal notranslate"><span class="pre">CacheOptions.ttl</span></code></a></li>
 <li><a class="reference internal" href="#agentc_langchain.cache.CacheOptions.username"><code class="docutils literal notranslate"><span class="pre">CacheOptions.username</span></code></a></li>
 </ul>
@@ -2143,7 +1963,7 @@ Below, we provide an example of how to use this class.</p>
 
     <div class="footer" role="contentinfo">
     &#169; Copyright 2025, Couchbase.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
 
 <p id="theme_credit">Styled using the <a href="https://github.com/piccolo-orm/piccolo_theme">Piccolo Theme</a></p>

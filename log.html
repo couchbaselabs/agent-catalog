@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Log Records &#8212; Agent Catalog 0.2.5a4.post1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=50651e91" />
+    <title>Log Records &#8212; Agent Catalog 0.2.5a4.post2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=ecdef530" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=7230e44a" />
-    <script src="_static/documentation_options.js?v=46526aca"></script>
+    <script src="_static/documentation_options.js?v=71aae0a0"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -29,123 +29,6 @@
 
 <div id="top_nav">
     
-        <div id="notification_banner" data-banner-hiding="temporary" v-show="!permanentlyHidden">
-    <p v-if="visible" id="content">You are viewing documentation for a pre-GA (alpha) version of Couchbase Agent Catalog!</p>
-    <a class="close" href="#" @click.prevent="toggleVisible()">[[ visible ? '&#x25B2; HIDE' : '&#x25BC; SHOW BANNER' ]]</a>
-</div>
-
-<script>
-(function() {
-    const topNav = document.querySelector('#top_nav')
-    const notificationContent = document.querySelector('#notification_banner p#content').innerText
-    const localStorageKey = 'readNotification'
-    const bannerHiding = document.querySelector('#notification_banner').dataset['bannerHiding']
-    const cssVariableName = '--navbarHeight'
-    const rootElement = document.documentElement
-
-    /*************************************************************************/
-    // Local storage for remembering if the user has read the notification.
-
-    function checkAlreadyRead() {
-        return localStorage.getItem(localStorageKey) == notificationContent
-    }
-
-    function setRead() {
-        localStorage.setItem(localStorageKey, notificationContent)
-    }
-
-    function clearRead() {
-        localStorage.removeItem(localStorageKey)
-    }
-
-    const alreadyRead = checkAlreadyRead()
-    const permanentlyHidden = alreadyRead && bannerHiding == 'permanent'
-
-    /*************************************************************************/
-    // Updating a CSS variable so other elements adjust to the nav bar height.
-
-    function updateNavbarHeight() {
-        // Only update it if the delta is significant. Otherwise it causes
-        // unnecessary browser repaints.
-        const documentStyles = getComputedStyle(rootElement)
-        // We store the value in REM, so need to convert to pixels
-        const currentValue = parseFloat(
-            documentStyles.getPropertyValue(cssVariableName)
-        ) * parseFloat(documentStyles.fontSize)
-
-        const newValue = topNav.clientHeight
-
-        if (newValue - 5 > currentValue) {
-            console.log(`Updating ${cssVariableName} - overlapping`)
-            rootElement.style.setProperty(
-                cssVariableName, newValue + "px"
-            );
-        } else if (currentValue - newValue >= 30) {
-            console.log(`Updating ${cssVariableName} - gap too large`)
-            rootElement.style.setProperty(
-                cssVariableName, newValue + "px"
-            );
-        }
-    }
-
-    /*************************************************************************/
-    // After loading the page, and resizing the window, recalculate the nav bar
-    // height.
-
-    if (!permanentlyHidden) {
-        // This height is approximately correct when there's a banner, so
-        // shouldn't require any page reflow:
-        rootElement.style.setProperty(
-            '--navbarHeight', "5.5rem"
-        );
-
-        document.addEventListener("DOMContentLoaded", function() {
-            updateNavbarHeight()
-        });
-
-        var interval = undefined
-
-        window.addEventListener('resize', () => {
-            if (interval) {
-                clearTimeout(interval)
-            }
-            interval = setTimeout(() => {
-                console.log("Finished resizing")
-                updateNavbarHeight()
-            }, 100)
-        })
-    }
-
-    /*************************************************************************/
-
-    PetiteVue.createApp({
-        visible: !alreadyRead,
-        permanentlyHidden: permanentlyHidden,
-        bannerHiding: bannerHiding,
-        $delimiters: ['[[', ']]'],
-        toggleVisible() {
-            this.visible = !this.visible
-
-            if (this.visible) {
-                clearRead()
-            } else {
-                setRead()
-            }
-
-            if (!this.visible && bannerHiding == 'permanent') {
-                this.permanentlyHidden = true
-            }
-
-            // Run this after Vue has had time to update the DOM:
-            setTimeout(
-                updateNavbarHeight,
-                0
-            )
-        }
-    }).mount('#notification_banner')
-})()
-</script>
-    
 
     <nav>
         
@@ -155,7 +38,7 @@
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.5a4.post1 documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.2.5a4.post2 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -1185,7 +1068,7 @@ via the <a class="reference internal" href="api.html#agentc.span.Span.log" title
 <h2>Content in Logs<a class="headerlink" href="#content-in-logs" title="Link to this heading">¶</a></h2>
 <dl class="py class enum">
 <dt class="sig sig-object py" id="agentc_core.activity.models.content.Kind">
-<em class="property"><span class="pre">enum</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_core.activity.models.content.</span></span><span class="sig-name descname"><span class="pre">Kind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_core/activity/models/content.html#Kind"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_core.activity.models.content.Kind" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">enum</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">agentc_core.activity.models.content.</span></span><span class="sig-name descname"><span class="pre">Kind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_core/activity/models/content.html#Kind"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_core.activity.models.content.Kind" title="Link to this definition">¶</a></dt>
 <dd><p>The different types of log content that are recognized.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Member Type<span class="colon">:</span></dt>
@@ -2846,7 +2729,7 @@ For example, the following code snippet generates two logs with the same key but
 
     <div class="footer" role="contentinfo">
     &#169; Copyright 2025, Couchbase.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     </div>
 
 <p id="theme_credit">Styled using the <a href="https://github.com/piccolo-orm/piccolo_theme">Piccolo Theme</a></p>
