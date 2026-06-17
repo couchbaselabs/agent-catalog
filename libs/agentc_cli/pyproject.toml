@@ -28,7 +28,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.14"
-click-extra = ">4.0.0"
+click_extra = { version = "^7.14.1,<7.15.0" }
 tqdm = "^4.67.1"
 dateparser = "^1.2.2"
 texteditor = "^1.4.1"

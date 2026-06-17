@@ -200,12 +200,27 @@ For more information about Pytest's command line tool, see
    If this release is non-production-ready, check the "Set as a Pre-Release" box.
    When you are finished with your changes, hit "Publish Release".
 
-5. To conclude, run the `publish` workflow (in the future, we may decide to automate this step).
-   On the GitHub page for this repo ([here](https://github.com/couchbaselabs/agent-catalog)), click "Actions".
-   On the left sidebar, select the `publish` workflow.
-   Finally, select the branch to publish (this should be `master`) and click `Run workflow`.
-   This should run the GitHub workflow to publish the repository with the given tag to PyPI (specifically, the
-   script `scripts/publish.sh` will run).
+5. Run the `publish` workflow on Jenkins to `testpypi`.
+   On the following Jenkins page [here](https://server.jenkins.couchbase.com/job/PyPI-publish/), click "Build with
+   Parameters" on the left sidebar.
+   Under "Version", enter the version you just published (e.g., v0.1.0).
+   Select `testpypi` as the target repository (this should be the default).
+   Finally, click "Build".
+
+6. Verify that the package is available on `testpypi` and that you can install it with the following command:
+
+   ```bash
+   pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple agentc==0.1.0
+   ```
+
+    Running `agentc` should print the help message.
+
+7. If everything looks good, you can now publish the package to PyPI.
+   On the Jenkins page for this repo [here](https://server.jenkins.couchbase.com/job/PyPI-publish/), click "Build with
+   Parameters" on the left sidebar.
+   Under "Version", enter the version you just published (e.g., v0.1.0).
+   Select `pypi` as the target repository.
+   Finally, click "Build".
 
 
 ## Generating `requirements.txt`

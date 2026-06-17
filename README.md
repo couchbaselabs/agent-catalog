@@ -158,3 +158,5 @@ The mono-repo for the Couchbase Agent Catalog project.
 Refer to [`docs/`](docs) to build our technical documentation (also hosted
 [here](https://couchbaselabs.github.io/agent-catalog/index.html)) and explore Couchbase Agent Catalog before authoring
 your agent applications.
+For more information about the Agent Catalog and other AI Data Plane services, see the documentation
+[here](https://docs.couchbase.com/ai/build/integrate-agent-with-catalog.html).

@@ -17,7 +17,7 @@ for i in range(3):
         print(f"Downloading the sentence-transformers/all-MiniLM-L12-v2 model. Attempt #{i + 1}")
         sentence_transformers.SentenceTransformer(
             "sentence-transformers/all-MiniLM-L12-v2",
-            tokenizer_kwargs={"clean_up_tokenization_spaces": True},
+            processor_kwargs={"clean_up_tokenization_spaces": True},
             cache_folder=str(cache_folder.absolute()),
         )
         break
