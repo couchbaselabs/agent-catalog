@@ -21,6 +21,7 @@ documentation = "https://couchbaselabs.github.io/agent-catalog/index.html"
 name = "agent-catalog"
 version = "0.0.0"
 package-mode = false
+readme = "description.md"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.14"
