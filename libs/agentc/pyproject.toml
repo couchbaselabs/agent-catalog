@@ -28,6 +28,7 @@ packages = [
 [tool.poetry.dependencies]
 python = ">=3.11,<3.14"
 pydantic-settings = "^2.7.1"
+python-dotenv = ">=1.2.1"
 
 # The version of these packages will be updated dynamically.
 agentc-core = { path = "../agentc_core", develop = true }

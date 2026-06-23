@@ -15,7 +15,8 @@ package-mode = false
 python = ">=3.11,<3.14"
 langgraph = "^0.5.2"
 couchbase = ">=4.6.0"
-sentence-transformers = "^5.1.2"
+sentence-transformers = ">=5.1.2"
+torch = ">=2.10.0"
 
 # For our Python REPL.
 langchain-experimental = "^0.3.4"
@@ -31,6 +32,8 @@ matplotlib = "^3.10.3"
 jupyter = "^1.1.1"
 ipykernel = "^6.29.5"
 notebook = "^7.4.4"
+transformers = ">=5.1.0"
+filelock = ">=3.20.3"
 
 # TODO (GLENN): Replace this with the PyPI package once it's available.
 # The agentc project (the front-facing parts)!

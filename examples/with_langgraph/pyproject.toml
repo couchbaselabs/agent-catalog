@@ -11,8 +11,11 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.14"
-langgraph = "^0.5.2"
-sentence-transformers = "^5.1.2"
+langgraph = ">=0.5.2"
+sentence-transformers = ">=5.1.2"
+transformers = ">=5.1.0"
+filelock = ">=3.20.3"
+torch = ">=2.10.0"
 
 # TODO (GLENN): Replace this with the PyPI package once it's available.
 # The agentc project (the front-facing parts)!

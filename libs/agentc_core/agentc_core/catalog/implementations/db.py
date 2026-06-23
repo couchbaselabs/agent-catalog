@@ -18,6 +18,7 @@ from agentc_core.record.descriptor import RecordDescriptor
 from agentc_core.record.descriptor import RecordKind
 from agentc_core.remote.util.query import execute_query
 from agentc_core.remote.util.query import execute_query_with_parameters
+from agentc_core.remote.util.query import quote_sql_keyspace
 from agentc_core.tool.descriptor import HTTPRequestToolDescriptor
 from agentc_core.tool.descriptor import PythonToolDescriptor
 from agentc_core.tool.descriptor import SemanticSearchToolDescriptor
@@ -27,6 +28,23 @@ from couchbase.exceptions import KeyspaceNotFoundException
 from couchbase.exceptions import ScopeNotFoundException
 
 logger = logging.getLogger(__name__)
+
+
+def _descriptor_from_row(row: dict[str, typing.Any]) -> RecordDescriptor:
+    match row["record_kind"]:
+        case RecordKind.SemanticSearch.value:
+            return SemanticSearchToolDescriptor.model_validate(row)
+        case RecordKind.PythonFunction.value:
+            return PythonToolDescriptor.model_validate(row)
+        case RecordKind.SQLPPQuery.value:
+            return SQLPPQueryToolDescriptor.model_validate(row)
+        case RecordKind.HTTPRequest.value:
+            return HTTPRequestToolDescriptor.model_validate(row)
+        case RecordKind.Prompt.value:
+            return PromptDescriptor.model_validate(row)
+        case _:
+            kind = row["record_kind"]
+            raise LookupError(f"Unknown record encountered of kind = '{kind}'!")
 
 
 class CatalogDB(pydantic.BaseModel, CatalogBase):
@@ -42,14 +60,9 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
     @pydantic.model_validator(mode="after")
     def _cluster_should_be_reachable(self) -> "CatalogDB":
         collection = DEFAULT_CATALOG_TOOL_COLLECTION if self.kind == "tool" else DEFAULT_CATALOG_PROMPT_COLLECTION
+        keyspace = quote_sql_keyspace(self.bucket, DEFAULT_CATALOG_SCOPE, collection)
         try:
-            self.cluster.query(
-                f"""
-                FROM   `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}`
-                SELECT 1
-                LIMIT  1;
-            """,
-            ).execute()
+            self.cluster.query(f"FROM {keyspace} SELECT 1 LIMIT 1;").execute()
             return self
         except (ScopeNotFoundException, KeyspaceNotFoundException) as e:
             raise ValueError("Catalog does not exist! Please run 'agentc publish' first.") from e
@@ -70,9 +83,9 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
         if name is not None:
             if snapshot == LATEST_SNAPSHOT_VERSION:
                 snapshot = self.version.identifier
-            # TODO (GLENN): Need to add some validation around bucket (to prevent injection)
+            keyspace = quote_sql_keyspace(self.bucket, DEFAULT_CATALOG_SCOPE, collection)
             sqlpp_query = f"""
-                FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}` AS a
+                FROM {keyspace} AS a
                 WHERE a.name = $name AND a.catalog_identifier = $snapshot
                 SELECT a.*;
             """
@@ -96,6 +109,8 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
 
             # Index used (in the future, we may need to condition on the catalog schema version).
             idx = f"v2_AgentCatalog{self.kind.capitalize()}sEmbeddingIndex"
+            keyspace = quote_sql_keyspace(self.bucket, DEFAULT_CATALOG_SCOPE, collection)
+            index_name = f"{self.bucket}.{DEFAULT_CATALOG_SCOPE}.{idx}"
 
             # User has specified a snapshot id
             if snapshot is not None:
@@ -105,7 +120,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                 sqlpp_query = f"""
                     SELECT a.* FROM (
                         SELECT t.*, SEARCH_SCORE() AS score
-                        FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}` AS t
+                        FROM {keyspace} AS t
                         WHERE SEARCH(
                             t,
                             {{
@@ -113,27 +128,33 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                                 'knn': [
                                     {{
                                         'field': 'embedding_{dim}',
-                                        'vector': {query_embeddings},
+                                        'vector': $query_embeddings,
                                         'k': 10
                                     }}
                                 ]
                             }},
                             {{
-                                'index': '{self.bucket}.{DEFAULT_CATALOG_SCOPE}.{idx}'
+                                'index': $index_name
                             }}
                         )
                     ) AS a
-                    WHERE {annotation_condition} AND a.catalog_identifier="{snapshot}"
+                    WHERE {annotation_condition} AND a.catalog_identifier = $snapshot
                     ORDER BY a.score DESC
-                    LIMIT {limit};
+                    LIMIT $limit;
                 """
+                params = {
+                    "index_name": index_name,
+                    "query_embeddings": query_embeddings,
+                    "snapshot": snapshot,
+                    "limit": limit,
+                }
 
             # No snapshot id has been mentioned
             else:
                 sqlpp_query = f"""
                     SELECT a.* FROM (
                         SELECT t.*, SEARCH_SCORE() AS score
-                        FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}` as t
+                        FROM {keyspace} as t
                         WHERE SEARCH(
                             t,
                             {{
@@ -141,23 +162,24 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                                 'knn': [
                                     {{
                                         'field': 'embedding_{dim}',
-                                        'vector': {query_embeddings},
+                                        'vector': $query_embeddings,
                                         'k': 10
                                     }}
                                 ]
                             }},
                             {{
-                                'index': '{self.bucket}.{DEFAULT_CATALOG_SCOPE}.{idx}'
+                                'index': $index_name
                             }}
                         )
                     ) AS a
                     WHERE {annotation_condition}
                     ORDER BY a.score DESC
-                    LIMIT {limit};
+                    LIMIT $limit;
                 """
+                params = {"index_name": index_name, "query_embeddings": query_embeddings, "limit": limit}
 
             # Execute query after filtering by catalog_identifier if provided
-            res, err = execute_query(self.cluster, sqlpp_query)
+            res, err = execute_query_with_parameters(self.cluster, sqlpp_query, params)
             if err is not None:
                 logger.error(err)
                 return []
@@ -173,25 +195,10 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
         #                Format catalog items into SearchResults and child types                   #
         # ---------------------------------------------------------------------------------------- #
 
-        # TODO (GLENN): There should be validation here to ensure that the record_kind aligns with the kind attribute.
         # List of catalog items from query
         descriptors: list[RecordDescriptor] = []
         for row in resp:
-            match row["record_kind"]:
-                case RecordKind.SemanticSearch.value:
-                    descriptor = SemanticSearchToolDescriptor.model_validate(row)
-                case RecordKind.PythonFunction.value:
-                    descriptor = PythonToolDescriptor.model_validate(row)
-                case RecordKind.SQLPPQuery.value:
-                    descriptor = SQLPPQueryToolDescriptor.model_validate(row)
-                case RecordKind.HTTPRequest.value:
-                    descriptor = HTTPRequestToolDescriptor.model_validate(row)
-                case RecordKind.Prompt.value:
-                    descriptor = PromptDescriptor.model_validate(row)
-                case _:
-                    kind = row["record_kind"]
-                    raise LookupError(f"Unknown record encountered of kind = '{kind}'!")
-            descriptors.append(descriptor)
+            descriptors.append(_descriptor_from_row(row))
 
         # We compute the true cosine distance here (Couchbase uses a different score :-)).
         if name is not None:
@@ -204,59 +211,40 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
     def __iter__(self) -> typing.Iterator[RecordDescriptor]:
         """Return all items in a DB catalog."""
         collection = DEFAULT_CATALOG_TOOL_COLLECTION if self.kind == "tool" else DEFAULT_CATALOG_PROMPT_COLLECTION
-        query = f"""
-            FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}` AS t
-            SELECT t.*;
-        """
+        keyspace = quote_sql_keyspace(self.bucket, DEFAULT_CATALOG_SCOPE, collection)
+        query = f"FROM {keyspace} AS t SELECT t.*;"
         res, err = execute_query(self.cluster, query)
         if err is not None:
             logger.error(err)
             return
-
-        # TODO (GLENN): There should be validation here to ensure that the record_kind aligns with the kind attribute.
-        # TODO (GLENN): Consolidate the code below and the same code in the find method.
         for row in res:
-            match row["record_kind"]:
-                case RecordKind.SemanticSearch.value:
-                    descriptor = SemanticSearchToolDescriptor.model_validate(row)
-                case RecordKind.PythonFunction.value:
-                    descriptor = PythonToolDescriptor.model_validate(row)
-                case RecordKind.SQLPPQuery.value:
-                    descriptor = SQLPPQueryToolDescriptor.model_validate(row)
-                case RecordKind.HTTPRequest.value:
-                    descriptor = HTTPRequestToolDescriptor.model_validate(row)
-                case RecordKind.Prompt.value:
-                    descriptor = PromptDescriptor.model_validate(row)
-                case _:
-                    kind = row["record_kind"]
-                    raise LookupError(f"Unknown record encountered of kind = '{kind}'!")
-            yield descriptor
+            yield _descriptor_from_row(row)
 
     def __len__(self):
         collection = DEFAULT_CATALOG_TOOL_COLLECTION if self.kind == "tool" else DEFAULT_CATALOG_PROMPT_COLLECTION
-        query = f"""
-            FROM `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{collection}`
-            SELECT VALUE COUNT(*);
-        """
+        keyspace = quote_sql_keyspace(self.bucket, DEFAULT_CATALOG_SCOPE, collection)
+        query = f"FROM {keyspace} SELECT VALUE COUNT(*);"
         res, err = execute_query(self.cluster, query)
         if err is not None:
             logger.error(err)
             raise err
         for row in res:
             return row
+        return None
 
     @property
     def version(self) -> VersionDescriptor:
         """Returns the latest version of the catalog."""
         kind = CatalogKind.Tool if self.kind == "tool" else CatalogKind.Prompt
+        keyspace = quote_sql_keyspace(self.bucket, DEFAULT_CATALOG_SCOPE, DEFAULT_CATALOG_METADATA_COLLECTION)
         ts_query = f"""
-            FROM     `{self.bucket}`.`{DEFAULT_CATALOG_SCOPE}`.`{DEFAULT_CATALOG_METADATA_COLLECTION}` AS t
-            WHERE    t.kind = "{kind}"
-            SELECT   VALUE  t.version
+            FROM {keyspace} AS t
+            WHERE t.kind = $kind
+            SELECT VALUE t.version
             ORDER BY STR_TO_MILLIS(t.version.timestamp) DESC
-            LIMIT    1
+            LIMIT 1
         """
-        res, err = execute_query(self.cluster, ts_query)
+        res, err = execute_query_with_parameters(self.cluster, ts_query, {"kind": kind.value})
         if err is not None:
             logger.error(err)
             raise LookupError(f"No results found? -- Error: {err}")
