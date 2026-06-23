@@ -1,6 +1,8 @@
 import couchbase.cluster
 import logging
+import math
 import pydantic
+import re
 import typing
 
 from agentc_core.annotation import AnnotationPredicate
@@ -45,6 +47,32 @@ def _descriptor_from_row(row: dict[str, typing.Any]) -> RecordDescriptor:
         case _:
             kind = row["record_kind"]
             raise LookupError(f"Unknown record encountered of kind = '{kind}'!")
+
+
+_VALID_INDEX_NAME_RE = re.compile(r"^[A-Za-z0-9_.:-]{1,256}$")
+
+
+def _sanitize_search_index_name(index_name: str) -> str:
+    if not isinstance(index_name, str):
+        raise TypeError("index_name must be a string")
+    if not _VALID_INDEX_NAME_RE.fullmatch(index_name):
+        raise ValueError("Invalid index_name format")
+    return index_name
+
+
+def _sanitize_query_embeddings(query_embeddings: list[typing.Any]) -> list[float]:
+    if not isinstance(query_embeddings, list) or len(query_embeddings) == 0:
+        raise ValueError("query_embeddings must be a non-empty list")
+
+    cleaned_embeddings: list[float] = []
+    for embedding in query_embeddings:
+        if not isinstance(embedding, (int, float)):
+            raise TypeError("query_embeddings must contain only numeric values")
+        embedding_value = float(embedding)
+        if not math.isfinite(embedding_value):
+            raise ValueError("query_embeddings cannot contain NaN or Infinity")
+        cleaned_embeddings.append(embedding_value)
+    return cleaned_embeddings
 
 
 class CatalogDB(pydantic.BaseModel, CatalogBase):
@@ -111,6 +139,8 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             idx = f"v2_AgentCatalog{self.kind.capitalize()}sEmbeddingIndex"
             keyspace = quote_sql_keyspace(self.bucket, DEFAULT_CATALOG_SCOPE, collection)
             index_name = f"{self.bucket}.{DEFAULT_CATALOG_SCOPE}.{idx}"
+            safe_index_name = _sanitize_search_index_name(index_name)
+            safe_query_embeddings = _sanitize_query_embeddings(query_embeddings)
 
             # User has specified a snapshot id
             if snapshot is not None:
@@ -134,7 +164,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                                 ]
                             }},
                             {{
-                                'index': $index_name
+                                'index': '{safe_index_name}'
                             }}
                         )
                     ) AS a
@@ -143,8 +173,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                     LIMIT $limit;
                 """
                 params = {
-                    "index_name": index_name,
-                    "query_embeddings": query_embeddings,
+                    "query_embeddings": safe_query_embeddings,
                     "snapshot": snapshot,
                     "limit": limit,
                 }
@@ -168,7 +197,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                                 ]
                             }},
                             {{
-                                'index': $index_name
+                                'index': '{safe_index_name}'
                             }}
                         )
                     ) AS a
@@ -176,7 +205,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                     ORDER BY a.score DESC
                     LIMIT $limit;
                 """
-                params = {"index_name": index_name, "query_embeddings": query_embeddings, "limit": limit}
+                params = {"query_embeddings": safe_query_embeddings, "limit": limit}
 
             # Execute query after filtering by catalog_identifier if provided
             res, err = execute_query_with_parameters(self.cluster, sqlpp_query, params)
