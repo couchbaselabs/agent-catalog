@@ -1,4 +1,5 @@
 import couchbase.cluster
+import json
 import logging
 import math
 import pydantic
@@ -60,7 +61,7 @@ def _sanitize_search_index_name(index_name: str) -> str:
     return index_name
 
 
-def _sanitize_query_embeddings(query_embeddings: list[typing.Any]) -> list[float]:
+def _serialize_query_embeddings(query_embeddings: list[typing.Any]) -> str:
     if not isinstance(query_embeddings, list) or len(query_embeddings) == 0:
         raise ValueError("query_embeddings must be a non-empty list")
 
@@ -72,7 +73,8 @@ def _sanitize_query_embeddings(query_embeddings: list[typing.Any]) -> list[float
         if not math.isfinite(embedding_value):
             raise ValueError("query_embeddings cannot contain NaN or Infinity")
         cleaned_embeddings.append(embedding_value)
-    return cleaned_embeddings
+    # JSON serialization produces a safe SQL++ array literal.
+    return json.dumps(cleaned_embeddings, separators=(",", ":"))
 
 
 class CatalogDB(pydantic.BaseModel, CatalogBase):
@@ -140,7 +142,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
             keyspace = quote_sql_keyspace(self.bucket, DEFAULT_CATALOG_SCOPE, collection)
             index_name = f"{self.bucket}.{DEFAULT_CATALOG_SCOPE}.{idx}"
             safe_index_name = _sanitize_search_index_name(index_name)
-            safe_query_embeddings = _sanitize_query_embeddings(query_embeddings)
+            safe_query_embeddings = _serialize_query_embeddings(query_embeddings)
 
             # User has specified a snapshot id
             if snapshot is not None:
@@ -158,7 +160,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                                 'knn': [
                                     {{
                                         'field': 'embedding_{dim}',
-                                        'vector': $query_embeddings,
+                                        'vector': {safe_query_embeddings},
                                         'k': 10
                                     }}
                                 ]
@@ -173,7 +175,6 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                     LIMIT $limit;
                 """
                 params = {
-                    "query_embeddings": safe_query_embeddings,
                     "snapshot": snapshot,
                     "limit": limit,
                 }
@@ -191,7 +192,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                                 'knn': [
                                     {{
                                         'field': 'embedding_{dim}',
-                                        'vector': $query_embeddings,
+                                        'vector': {safe_query_embeddings},
                                         'k': 10
                                     }}
                                 ]
@@ -205,7 +206,7 @@ class CatalogDB(pydantic.BaseModel, CatalogBase):
                     ORDER BY a.score DESC
                     LIMIT $limit;
                 """
-                params = {"query_embeddings": safe_query_embeddings, "limit": limit}
+                params = {"limit": limit}
 
             # Execute query after filtering by catalog_identifier if provided
             res, err = execute_query_with_parameters(self.cluster, sqlpp_query, params)
