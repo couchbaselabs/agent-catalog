@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Package Documentation &#8212; Agent Catalog 1.1.0.post2 documentation</title>
+    <title>Package Documentation &#8212; Agent Catalog 1.1.0.post3 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=ecdef530" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=7230e44a" />
-    <script src="_static/documentation_options.js?v=bfba44fb"></script>
+    <script src="_static/documentation_options.js?v=1bc2c0e2"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -38,7 +38,7 @@
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">Agent Catalog 1.1.0.post2 documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog 1.1.0.post3 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -1313,16 +1313,16 @@ First, our prompt:</p>
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ainvoke</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langgraph/agent/agent.html#ReActAgent.ainvoke"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langgraph.agent.ReActAgent.ainvoke" title="Link to this definition">¶</a></dt>
 <dd><p>Transform a single input into an output.</p>
 <dl>
-<dt>Args:</dt><dd><p>input: The input to the <code class="docutils literal notranslate"><span class="pre">Runnable</span></code>.
-config: A config to use when invoking the <code class="docutils literal notranslate"><span class="pre">Runnable</span></code>.</p>
+<dt>Args:</dt><dd><p>input: The input to the <cite>Runnable</cite>.
+config: A config to use when invoking the <cite>Runnable</cite>.</p>
 <blockquote>
-<div><p>The config supports standard keys like <code class="docutils literal notranslate"><span class="pre">'tags'</span></code>, <code class="docutils literal notranslate"><span class="pre">'metadata'</span></code> for
-tracing purposes, <code class="docutils literal notranslate"><span class="pre">'max_concurrency'</span></code> for controlling how much work to
-do in parallel, and other keys. Please refer to the <code class="docutils literal notranslate"><span class="pre">RunnableConfig</span></code>
-for more details. Defaults to None.</p>
+<div><p>The config supports standard keys like <cite>'tags'</cite>, <cite>'metadata'</cite> for
+tracing purposes, <cite>'max_concurrency'</cite> for controlling how much work to
+do in parallel, and other keys.</p>
+<p>Please refer to <cite>RunnableConfig</cite> for more details.</p>
 </div></blockquote>
 </dd>
-<dt>Returns:</dt><dd><p>The output of the <code class="docutils literal notranslate"><span class="pre">Runnable</span></code>.</p>
+<dt>Returns:</dt><dd><p>The output of the <cite>Runnable</cite>.</p>
 </dd>
 </dl>
 <dl class="field-list simple">
@@ -1343,16 +1343,16 @@ for more details. Defaults to None.</p>
 <span class="sig-name descname"><span class="pre">invoke</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/agentc_langgraph/agent/agent.html#ReActAgent.invoke"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#agentc_langgraph.agent.ReActAgent.invoke" title="Link to this definition">¶</a></dt>
 <dd><p>Transform a single input into an output.</p>
 <dl>
-<dt>Args:</dt><dd><p>input: The input to the <code class="docutils literal notranslate"><span class="pre">Runnable</span></code>.
-config: A config to use when invoking the <code class="docutils literal notranslate"><span class="pre">Runnable</span></code>.</p>
+<dt>Args:</dt><dd><p>input: The input to the <cite>Runnable</cite>.
+config: A config to use when invoking the <cite>Runnable</cite>.</p>
 <blockquote>
-<div><p>The config supports standard keys like <code class="docutils literal notranslate"><span class="pre">'tags'</span></code>, <code class="docutils literal notranslate"><span class="pre">'metadata'</span></code> for
-tracing purposes, <code class="docutils literal notranslate"><span class="pre">'max_concurrency'</span></code> for controlling how much work to
-do in parallel, and other keys. Please refer to the <code class="docutils literal notranslate"><span class="pre">RunnableConfig</span></code>
-for more details. Defaults to None.</p>
+<div><p>The config supports standard keys like <cite>'tags'</cite>, <cite>'metadata'</cite> for
+tracing purposes, <cite>'max_concurrency'</cite> for controlling how much work to
+do in parallel, and other keys.</p>
+<p>Please refer to <cite>RunnableConfig</cite> for more details.</p>
 </div></blockquote>
 </dd>
-<dt>Returns:</dt><dd><p>The output of the <code class="docutils literal notranslate"><span class="pre">Runnable</span></code>.</p>
+<dt>Returns:</dt><dd><p>The output of the <cite>Runnable</cite>.</p>
 </dd>
 </dl>
 <dl class="field-list simple">
@@ -1371,7 +1371,7 @@ for more details. Defaults to None.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="agentc_langgraph.agent.ReActAgent.name">
 <span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#agentc_langgraph.agent.ReActAgent.name" title="Link to this definition">¶</a></dt>
-<dd><p>The name of the <code class="docutils literal notranslate"><span class="pre">Runnable</span></code>. Used for debugging and tracing.</p>
+<dd><p>The name of the <cite>Runnable</cite>. Used for debugging and tracing.</p>
 </dd></dl>
 
 </dd></dl>
