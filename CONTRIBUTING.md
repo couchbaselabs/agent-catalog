@@ -246,10 +246,10 @@ This does not include soft dependencies like `sentence-transformers`.
 3. Install these packages within your virtual environment.
 
    ```bash
-   pip install dist/agentc-core*.whl
-   pip install dist/agentc-cli*.whl
+   pip install dist/agentc_core*.whl
+   pip install dist/agentc_cli*.whl
    pip install dist/agentc*.whl
-   pip install dist/agentc-l*.whl
+   pip install dist/agentc_l*.whl
    ```
 
 4. Generate the `requirements.txt` file.

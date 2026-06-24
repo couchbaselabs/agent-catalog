@@ -21,7 +21,7 @@ jobs:
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
 
       - name: Set up Python Poetry
-        uses: mishaga/action-poetry@1
+        uses: mishaga/action-poetry@61dcf5051fb647e78e618f2b37482593b5b894c0
         with:
           python-version: "3.12"
           poetry-version: "latest"
@@ -43,7 +43,7 @@ jobs:
           make html
 
       - name: Deploy build/html to gh-pages
-        uses: s0/git-publish-subdir-action@develop
+        uses: s0/git-publish-subdir-action@ac113f6bfe8896e85a373534242c949a7ea74c98
         env:
           REPO: self
           BRANCH: gh-pages
