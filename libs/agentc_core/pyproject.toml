@@ -46,6 +46,7 @@ jsbeautifier = "^1.15.1"
 isodate = "^0.7.2"
 orjson = ">=3.11.6"
 urllib3 = ">=2.7.0"
+idna = ">=3.15"
 
 # These are "soft" dependencies!
 # sentence-transformers = "..."

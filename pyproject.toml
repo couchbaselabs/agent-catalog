@@ -39,6 +39,7 @@ sentence-transformers = ">=5.1.2"
 transformers = ">=5.1.0"
 filelock = ">=3.20.3"
 torch = ">=2.10.0"
+huggingface-hub = ">=1.16.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"

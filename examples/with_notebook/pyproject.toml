@@ -17,6 +17,7 @@ langgraph = "^0.5.2"
 couchbase = ">=4.6.0"
 sentence-transformers = ">=5.1.2"
 torch = ">=2.10.0"
+huggingface-hub = ">=1.16.0"
 
 # For our Python REPL.
 langchain-experimental = "^0.3.4"
