@@ -7,6 +7,7 @@ authors = [
     { name = "Thejas N U", email = "thejas.nu@couchbase.com" }
 ]
 license = "Apache-2.0"
+readme = "description.md"
 dynamic = ["version"]
 requires-python = ">=3.11,<3.14"
 
@@ -21,6 +22,7 @@ agentc = "agentc.__main__:main"
 [tool.poetry]
 name = "agentc"
 version = "0.0.0"
+readme = "description.md"
 packages = [
     { include = "agentc" },
 ]
