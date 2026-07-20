@@ -131,6 +131,7 @@ ENV/
 env.bak/
 venv.bak/
 .git_save/*
+.vscode/
 
 # Spyder project settings
 .spyderproject
