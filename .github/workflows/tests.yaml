@@ -23,7 +23,7 @@ jobs:
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
 
       - name: Set up Python Poetry
-        uses: mishaga/action-poetry@1
+        uses: mishaga/action-poetry@61dcf5051fb647e78e618f2b37482593b5b894c0
         with:
           python-version: "3.12"
           poetry-version: "latest"
@@ -52,7 +52,7 @@ jobs:
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
 
       - name: Verify toml files exist
-        uses: thebinaryfelix/check-file-existence-action@1.0.0
+        uses: thebinaryfelix/check-file-existence-action@fef222387dab4e18c8d7b379f209e8ef847b154d
         with:
           files: "pyproject.toml,\
             libs/agentc/pyproject.toml,\
@@ -64,14 +64,14 @@ jobs:
             libs/agentc_testing/pyproject.toml"
 
       - name: Set up Python Poetry
-        uses: mishaga/action-poetry@1
+        uses: mishaga/action-poetry@61dcf5051fb647e78e618f2b37482593b5b894c0
         with:
           python-version: "3.12"
           poetry-version: "latest"
           shell: "bash"
 
       - name: Run pre-commit checks
-        uses: pre-commit/action@v3.0.1
+        uses: pre-commit/action@1b06ec171f2f6faa71ed760c4042bd969e4f8b43
 
       - name: Install repository with Poetry
         run: scripts/setup.sh dev
@@ -95,7 +95,7 @@ jobs:
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
 
       - name: Set up Python Poetry
-        uses: mishaga/action-poetry@1
+        uses: mishaga/action-poetry@61dcf5051fb647e78e618f2b37482593b5b894c0
         with:
           python-version: "3.12"
           poetry-version: "latest"
@@ -123,7 +123,7 @@ jobs:
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
 
       - name: Set up Python Poetry
-        uses: mishaga/action-poetry@1
+        uses: mishaga/action-poetry@61dcf5051fb647e78e618f2b37482593b5b894c0
         with:
           python-version: "3.12"
           poetry-version: "latest"

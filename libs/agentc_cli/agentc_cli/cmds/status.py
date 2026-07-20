@@ -25,7 +25,8 @@ from agentc_core.defaults import DEFAULT_CATALOG_TOOL_COLLECTION
 from agentc_core.defaults import DEFAULT_PROMPT_CATALOG_FILE
 from agentc_core.defaults import DEFAULT_SCAN_DIRECTORY_OPTS
 from agentc_core.defaults import DEFAULT_TOOL_CATALOG_FILE
-from agentc_core.remote.util.query import execute_query
+from agentc_core.remote.util.query import execute_query_with_parameters
+from agentc_core.remote.util.query import quote_sql_keyspace
 from agentc_core.version import VersionDescriptor
 from couchbase.exceptions import KeyspaceNotFoundException
 from couchbase.exceptions import ScopeNotFoundException
@@ -119,17 +120,19 @@ def get_db_status(
     kind: typing.Literal["tool", "prompt"], bucket: str, cluster: couchbase.cluster.Cluster, compare: bool
 ) -> str | None:
     collection = DEFAULT_CATALOG_TOOL_COLLECTION if kind == "tool" else DEFAULT_CATALOG_PROMPT_COLLECTION
+    metadata_keyspace = quote_sql_keyspace(bucket, DEFAULT_CATALOG_SCOPE, DEFAULT_CATALOG_METADATA_COLLECTION)
+    catalog_keyspace = quote_sql_keyspace(bucket, DEFAULT_CATALOG_SCOPE, collection)
     if compare:
         query_get_metadata = f"""
                 SELECT a.*, subquery.distinct_identifier_count
-                FROM `{bucket}`.{DEFAULT_CATALOG_SCOPE}.{DEFAULT_CATALOG_METADATA_COLLECTION} AS a
+                FROM {metadata_keyspace} AS a
                 JOIN (
                     SELECT b.catalog_identifier, COUNT(b.catalog_identifier) AS distinct_identifier_count
-                    FROM `{bucket}`.{DEFAULT_CATALOG_SCOPE}.{collection} AS b
+                    FROM {catalog_keyspace} AS b
                     GROUP BY b.catalog_identifier
                 ) AS subquery
                 ON a.version.identifier = subquery.catalog_identifier
-                WHERE a.kind = "{kind}"
+                WHERE a.kind = $kind
                 ORDER BY a.version.timestamp DESC
                 LIMIT 1;
             """
@@ -137,18 +140,18 @@ def get_db_status(
         # Query to get the metadata based on the kind of catalog
         query_get_metadata = f"""
             SELECT a.*, subquery.distinct_identifier_count
-            FROM `{bucket}`.{DEFAULT_CATALOG_SCOPE}.{DEFAULT_CATALOG_METADATA_COLLECTION} AS a
+            FROM {metadata_keyspace} AS a
             JOIN (
                 SELECT b.catalog_identifier, COUNT(b.catalog_identifier) AS distinct_identifier_count
-                FROM `{bucket}`.{DEFAULT_CATALOG_SCOPE}.{collection} AS b
+                FROM {catalog_keyspace} AS b
                 GROUP BY b.catalog_identifier
             ) AS subquery
             ON a.version.identifier = subquery.catalog_identifier
-            WHERE a.kind = "{kind}";
+            WHERE a.kind = $kind;
         """
 
     # Execute query after filtering by catalog_identifier if provided
-    res, err = execute_query(cluster, query_get_metadata)
+    res, err = execute_query_with_parameters(cluster, query_get_metadata, {"kind": kind})
     if err is not None:
         logger.warning(err)
         return None

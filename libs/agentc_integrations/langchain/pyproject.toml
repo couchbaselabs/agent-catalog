@@ -26,12 +26,15 @@ python = ">=3.11,<3.14"
 couchbase = ">=4.6.0"
 joblib = "^1.4.2"
 langchain = ">=0.3.26"
-langchain-core = ">=0.3.68"
+langchain-core = ">=1.2.22"
 langchain-openai = ">=0.1.25"
 langchain_couchbase = ">=0.4.0"
 pydantic = "^2.10.7"
-requests = "^2.32.3"
+requests = ">=2.33.0"
 pydantic-settings = "^2.7.1"
+
+# Note: langsmith is automatically installed by langchain.
+langsmith = ">=0.8.18"
 
 # The version of this package will be updated dynamically.
 agentc-core = { path = "../../agentc_core", develop = true }

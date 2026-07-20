@@ -171,7 +171,7 @@ class EmbeddingModel(pydantic.BaseModel):
                 try:
                     embedding_model = sentence_transformers.SentenceTransformer(
                         self.embedding_model_name,
-                        tokenizer_kwargs={"clean_up_tokenization_spaces": True},
+                        processor_kwargs={"clean_up_tokenization_spaces": True},
                         cache_folder=self.sentence_transformers_model_cache,
                         local_files_only=i == 0,
                     )

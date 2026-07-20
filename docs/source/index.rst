@@ -3,6 +3,8 @@ Couchbase Agent Catalog Project
 
 Welcome to the Couchbase Agent Catalog (`agentc`) project!
 The purpose of the `agentc` project is to make building **reliable** agents more accessible.
+For more information about the Agent Catalog and other AI Data Plane services, see the documentation
+`here <https://docs.couchbase.com/ai/build/integrate-agent-with-catalog.html>`__.
 
 Table of Contents
 -----------------

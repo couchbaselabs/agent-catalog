@@ -32,7 +32,9 @@ def cmd_index(
     kinds: list[typing.Literal["tool", "prompt"]],
     dry_run: bool = False,
 ):
-    assert all(k in {"tool", "prompt"} for k in kinds)
+    invalid_kinds = [k for k in kinds if k not in {"tool", "prompt"}]
+    if invalid_kinds:
+        raise ValueError(f"Invalid kinds: {invalid_kinds}. Expected only 'tool' and/or 'prompt'.")
     if cfg is None:
         cfg = Config()
 

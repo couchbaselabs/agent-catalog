@@ -30,7 +30,7 @@ couchbase = ">=4.6.0"
 joblib = "^1.4.2"
 llama-index = "^0.13.4"
 pydantic = "^2.10.6"
-requests = "^2.32.3"
+requests = ">=2.33.0"
 pydantic-settings = "^2.7.1"
 pypdf = "^6.0.0"
 
