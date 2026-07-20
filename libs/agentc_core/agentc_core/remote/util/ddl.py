@@ -352,7 +352,7 @@ def create_vector_index(
 
 def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "prompt", "metadata", "log"], print_progress):
     """Creates required indexes for runtime"""
-    progress_bar = tqdm.tqdm(range(3 if kind not in {"metadata", "log"} else 1))
+    progress_bar = tqdm.tqdm(range(3 if kind not in {"metadata"} else 1))
     progress_bar_it = iter(progress_bar)
     completion_status = True
     all_errs = ""
@@ -392,6 +392,40 @@ def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "prompt", "meta
                 ON `{cfg.bucket}`.`{DEFAULT_ACTIVITY_SCOPE}`.`{DEFAULT_ACTIVITY_LOG_COLLECTION}` USING GSI;
             """,
             primary_idx_metadata_name,
+            print_progress,
+            progress_bar,
+            progress_bar_it,
+        )
+        listing_idx_name = "v2_AgentCatalogLogsAgentActivityListing"
+        completion_status = create_index(
+            all_errs,
+            cfg,
+            cluster,
+            completion_status,
+            f"""
+                CREATE INDEX IF NOT EXISTS `{listing_idx_name}`
+                ON `{cfg.bucket}`.`{DEFAULT_ACTIVITY_SCOPE}`.`{DEFAULT_ACTIVITY_LOG_COLLECTION}`
+                (`span`.`name`[0], `span`.`session`, STR_TO_MILLIS(`timestamp`))
+                WHERE `span`.`name`[0] IS NOT MISSING;
+            """,
+            listing_idx_name,
+            print_progress,
+            progress_bar,
+            progress_bar_it,
+        )
+        session_details_idx_name = "v2_AgentCatalogLogsAgentActivitySessionDetails"
+        completion_status = create_index(
+            all_errs,
+            cfg,
+            cluster,
+            completion_status,
+            f"""
+                CREATE INDEX IF NOT EXISTS `{session_details_idx_name}`
+                ON `{cfg.bucket}`.`{DEFAULT_ACTIVITY_SCOPE}`.`{DEFAULT_ACTIVITY_LOG_COLLECTION}`
+                (`span`.`session`, `span`.`name`[0], `content`.`kind`, STR_TO_MILLIS(`timestamp`))
+                WHERE `span`.`session` IS NOT MISSING;
+            """,
+            session_details_idx_name,
             print_progress,
             progress_bar,
             progress_bar_it,
