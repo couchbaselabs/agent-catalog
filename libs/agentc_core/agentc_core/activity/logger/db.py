@@ -1,3 +1,4 @@
+import couchbase.exceptions
 import couchbase.options
 import logging
 import textwrap
@@ -43,5 +44,20 @@ class DBLogger(BaseLogger):
         # Grab our TTL for our logs.
         self.ttl = cfg.log_ttl
 
+        # The number of log records we have failed to write to Couchbase (see _accept below).
+        self.dropped_log_count = 0
+
     def _accept(self, log_obj: Log, log_json: dict):
-        self.cb_coll.insert(log_obj.identifier, log_json, couchbase.options.InsertOptions(expiry=self.ttl))
+        try:
+            self.cb_coll.insert(log_obj.identifier, log_json, couchbase.options.InsertOptions(expiry=self.ttl))
+        except couchbase.exceptions.CouchbaseException as e:
+            # An agent should never crash because its activity log could not be written. We warn (instead of raising)
+            # and continue, mirroring how we handle a cluster that is unreachable at Span-instantiation time.
+            self.dropped_log_count += 1
+            logger.warning(
+                "Could not write the log record %s to Couchbase (%d record(s) dropped for this logger so far). "
+                "Swallowing exception %s.",
+                log_obj.identifier,
+                self.dropped_log_count,
+                str(e),
+            )
