@@ -18,5 +18,7 @@ class ChainLogger(BaseLogger):
         self.local_logger = local_logger
 
     def _accept(self, log_obj: Log, log_json: dict):
-        self.db_logger._accept(log_obj, log_json)
+        # We write locally first: the local log is our durable fallback, so a slow or failing cluster must never cost
+        # us the on-disk copy of a record.
         self.local_logger._accept(log_obj, log_json)
+        self.db_logger._accept(log_obj, log_json)
