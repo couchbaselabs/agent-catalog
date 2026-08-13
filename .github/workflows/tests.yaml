@@ -2,10 +2,10 @@ name: tests
 run-name: 👁️ ${{ github.actor }} has pushed a new commit!
 
 on:
-  push:
-    # The PR process requires that these tests pass before merging, so running these again is unnecessary.
-    branches-ignore:
-      - master
+  workflow_dispatch:
+
+  pull_request:
+    branches: [ "master" ]
 
 permissions:
   contents: read
