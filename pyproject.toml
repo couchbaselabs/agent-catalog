@@ -35,12 +35,12 @@ agentc-langgraph = { path = "libs/agentc_integrations/langgraph", develop = true
 agentc-llamaindex = { path = "libs/agentc_integrations/llamaindex", develop = true }
 
 # sentence-transformers exists outside of agentc.
-sentence-transformers = ">=5.7.0"
+sentence-transformers = ">=5.1.2"
+datasets = ">=2.5.0"
 transformers = ">=5.15.0"
 filelock = ">=3.20.3"
 torch = ">=2.10.0"
 huggingface-hub = ">=1.16.0"
-fsspec = ">=2026.7.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"

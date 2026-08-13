@@ -631,7 +631,7 @@ def test_ls_local_both_tools_prompts(
         assert "PROMPT" in output and "TOOL" in output and len(re.findall(r"\b1\.\s.+", output)) == 2
 
 
-@pytest.mark.smoke
+@pytest.mark.slow
 def test_init_local(
     temporary_directory: typing.Generator[pathlib.Path, None, None],
     environment_factory: typing.Callable[..., Environment],
