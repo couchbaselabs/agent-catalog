@@ -47,7 +47,7 @@ pre-commit = "^3.2.2"
 pytest = "^8.3.2"
 pytest-retry = "^1.7.0"
 pytest-asyncio = "^1.1.0"
-virtualenv = "<20.33.0"
+virtualenv = ">=21.7.4"
 
 # An internal testing package for the Agent Catalog.
 [tool.poetry.group.dev.dependencies.agentc-testing]

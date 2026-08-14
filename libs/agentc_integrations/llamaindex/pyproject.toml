@@ -34,6 +34,7 @@ pydantic = "^2.10.6"
 requests = ">=2.33.0"
 pydantic-settings = "^2.7.1"
 pypdf = "^6.0.0"
+nltk = ">=3.10.3"
 
 # The version of this package will be updated dynamically.
 agentc-core = { path = "../../agentc_core", develop = true }
