@@ -6,4 +6,4 @@ from agentc_core.catalog.catalog import Catalog
 __all__ = ["catalog", "Catalog", "span", "Span"]
 
 # DO NOT edit this value, the plugin "poetry-dynamic-versioning" will automatically set this.
-__version__ = "1.1.3.post2"
+__version__ = "0.0.0"
