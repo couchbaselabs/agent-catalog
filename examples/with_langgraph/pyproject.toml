@@ -13,7 +13,8 @@ package-mode = false
 python = ">=3.11,<3.14"
 langgraph = ">=0.5.2"
 sentence-transformers = ">=5.1.2"
-transformers = ">=5.1.0"
+datasets = ">=2.5.0"
+transformers = ">=5.15.0"
 filelock = ">=3.20.3"
 torch = ">=2.10.0"
 huggingface-hub = ">=1.16.0"
@@ -38,7 +39,8 @@ optional = true
 
 [tool.poetry.group.analysis.dependencies]
 ragas = "^0.2.15"
-jupyterlab = "^4.2.7"
+jupyterlab = "^4.6.3"
+tornado = "^6.5.8"
 ipywidgets = "^8.1.5"
 pytest = "^8.3.4"
 

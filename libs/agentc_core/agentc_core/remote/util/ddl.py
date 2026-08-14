@@ -81,10 +81,12 @@ def is_fts_index_present(
             else:
                 raise RuntimeError("Couldn't check for the existing vector indexes!")
 
-        # TODO (GLENN): Catch a narrower exception here + log the fact an exception was raised.
-        except Exception as e:
-            logger.debug(f"Swallowing exception {str(e)}.")
+        except requests.exceptions.RequestException as e:
+            logger.debug(f"Could not reach FTS node '{fts_node_hostname}': {str(e)}. Trying next node.")
             continue
+        except (ValueError, KeyError, RuntimeError) as e:
+            logger.error(f"Received a malformed or error response from FTS node '{fts_node_hostname}': {str(e)}")
+            return False, e
 
     # if there is exception in all nodes then no nodes are alive
     return False, RuntimeError("Couldn't make request to any of the nodes with 'search' service!")
@@ -121,8 +123,11 @@ def get_fts_nodes_hostname(cfg: Config) -> tuple[list[str] | None, Exception | N
         else:
             return None, RuntimeError("Couldn't check for the existing fts nodes!")
 
-    # TODO (GLENN): Catch a narrower exception here + log the fact an exception was raised.
-    except Exception as e:
+    except requests.exceptions.RequestException as e:
+        logger.debug(f"Could not reach host '{host}': {str(e)}.")
+        return None, e
+    except (ValueError, KeyError) as e:
+        logger.error(f"Received a malformed response from host '{host}': {str(e)}")
         return None, e
 
 
@@ -245,16 +250,19 @@ def create_vector_index(
                         "PUT", create_vector_index_http_url, headers=headers, auth=auth, data=payload
                     )
 
-                if json.loads(response.text)["status"] == "ok":
+                json_response = json.loads(response.text)
+                if json_response["status"] == "ok":
                     logger.info("Created vector index!!")
                     return qualified_index_name, None
-                elif json.loads(response.text)["status"] == "fail":
-                    raise Exception(json.loads(response.text)["error"])
+                elif json_response["status"] == "fail":
+                    raise RuntimeError(json_response["error"])
 
-            # TODO (GLENN): Catch a narrower exception here + log the fact an exception was raised.
-            except Exception as e:
-                logger.debug(f"Swallowing exception {str(e)}.")
+            except requests.exceptions.RequestException as e:
+                logger.debug(f"Could not reach FTS node '{fts_node_hostname}': {str(e)}. Trying next node.")
                 continue
+            except (ValueError, KeyError, RuntimeError) as e:
+                logger.error(f"Received a malformed or error response from FTS node '{fts_node_hostname}': {str(e)}")
+                return None, e
 
         # if there is exception in all nodes then no nodes are alive
         return None, RuntimeError("Couldn't make request to any of the nodes with 'search' service!")
@@ -326,22 +334,19 @@ def create_vector_index(
                         "PUT", update_vector_index_http_url, headers=headers, auth=auth, data=payload
                     )
 
-                if json.loads(response.text)["status"] == "ok":
+                json_response = json.loads(response.text)
+                if json_response["status"] == "ok":
                     logger.info("Updated vector index!!")
                     return "Success", None
-                elif json.loads(response.text)["status"] == "fail":
-                    raise Exception(json.loads(response.text)["error"])
+                elif json_response["status"] == "fail":
+                    raise RuntimeError(json_response["error"])
 
-                if json.loads(response.text)["status"] == "ok":
-                    logger.info("Updated vector index!!")
-                    return "Success", None
-                elif json.loads(response.text)["status"] == "fail":
-                    raise Exception(json.loads(response.text)["error"])
-
-            # TODO (GLENN): Catch a narrower exception here + log the fact an exception was raised.
-            except Exception as e:
-                logger.debug(f"Swallowing exception {str(e)}.")
+            except requests.exceptions.RequestException as e:
+                logger.debug(f"Could not reach FTS node '{fts_node_hostname}': {str(e)}. Trying next node.")
                 continue
+            except (ValueError, KeyError, RuntimeError) as e:
+                logger.error(f"Received a malformed or error response from FTS node '{fts_node_hostname}': {str(e)}")
+                return None, e
 
         # if there is exception in all nodes then no nodes are alive
         return None, RuntimeError("Couldn't make request to any of the nodes with 'search' service!")
@@ -352,7 +357,7 @@ def create_vector_index(
 
 def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "prompt", "metadata", "log"], print_progress):
     """Creates required indexes for runtime"""
-    progress_bar = tqdm.tqdm(range(3 if kind not in {"metadata", "log"} else 1))
+    progress_bar = tqdm.tqdm(range(3 if kind not in {"metadata"} else 1))
     progress_bar_it = iter(progress_bar)
     completion_status = True
     all_errs = ""
@@ -392,6 +397,40 @@ def create_gsi_indexes(cfg: Config, kind: typing.Literal["tool", "prompt", "meta
                 ON `{cfg.bucket}`.`{DEFAULT_ACTIVITY_SCOPE}`.`{DEFAULT_ACTIVITY_LOG_COLLECTION}` USING GSI;
             """,
             primary_idx_metadata_name,
+            print_progress,
+            progress_bar,
+            progress_bar_it,
+        )
+        listing_idx_name = "v2_AgentCatalogLogsAgentActivityListing"
+        completion_status = create_index(
+            all_errs,
+            cfg,
+            cluster,
+            completion_status,
+            f"""
+                CREATE INDEX IF NOT EXISTS `{listing_idx_name}`
+                ON `{cfg.bucket}`.`{DEFAULT_ACTIVITY_SCOPE}`.`{DEFAULT_ACTIVITY_LOG_COLLECTION}`
+                (`span`.`name`[0], `span`.`session`, STR_TO_MILLIS(`timestamp`))
+                WHERE `span`.`name`[0] IS NOT MISSING;
+            """,
+            listing_idx_name,
+            print_progress,
+            progress_bar,
+            progress_bar_it,
+        )
+        session_details_idx_name = "v2_AgentCatalogLogsAgentActivitySessionDetails"
+        completion_status = create_index(
+            all_errs,
+            cfg,
+            cluster,
+            completion_status,
+            f"""
+                CREATE INDEX IF NOT EXISTS `{session_details_idx_name}`
+                ON `{cfg.bucket}`.`{DEFAULT_ACTIVITY_SCOPE}`.`{DEFAULT_ACTIVITY_LOG_COLLECTION}`
+                (`span`.`session`, `span`.`name`[0], `content`.`kind`, STR_TO_MILLIS(`timestamp`))
+                WHERE `span`.`session` IS NOT MISSING;
+            """,
+            session_details_idx_name,
             print_progress,
             progress_bar,
             progress_bar_it,

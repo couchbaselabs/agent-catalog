@@ -11,7 +11,7 @@ aiosqlite==0.22.1
 alabaster==1.0.0
 annotated-doc==0.0.4
 annotated-types==0.7.0
-anyio==4.14.0
+anyio==4.14.2
 apeye==1.4.1
 apeye-core==1.1.5
 appdirs==1.4.4
