@@ -5,6 +5,7 @@ authors = [
     { name = "Glenn Galvizo", email = "glenn.galvizo@couchbase.com" }
 ]
 license = "Apache-2.0"
+readme = "description.md"
 dynamic = ["version"]
 requires-python = ">=3.11,<3.14"
 
