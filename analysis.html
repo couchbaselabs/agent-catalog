@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Log Analysis &#8212; Agent Catalog 0.0.0.post5 documentation</title>
+    <title>Log Analysis &#8212; Agent Catalog 1.1.4.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=ecdef530" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=7230e44a" />
-    <script src="_static/documentation_options.js?v=251b0014"></script>
+    <script src="_static/documentation_options.js?v=c9562da9"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -38,7 +38,7 @@
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.0.0.post5 documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog 1.1.4.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -177,21 +177,21 @@ collection from the Analytics Service below:</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">couchbase.options</span>
 
 <span class="n">auth</span> <span class="o">=</span> <span class="n">couchbase</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">PasswordAuthenticator</span><span class="p">(</span>
-    <span class="n">username</span><span class="o">=</span><span class="s2">&quot;Administrator&quot;</span><span class="p">,</span>
-    <span class="n">password</span><span class="o">=</span><span class="s2">&quot;password&quot;</span>
+    <span class="n">username</span><span class="o">=</span><span class="s2">"Administrator"</span><span class="p">,</span>
+    <span class="n">password</span><span class="o">=</span><span class="s2">"password"</span>
 <span class="p">)</span>
 <span class="n">cluster</span> <span class="o">=</span> <span class="n">couchbase</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">Cluster</span><span class="p">(</span>
-    <span class="s2">&quot;couchbase:127.0.0.1&quot;</span><span class="p">,</span>
+    <span class="s2">"couchbase:127.0.0.1"</span><span class="p">,</span>
     <span class="n">options</span><span class="o">=</span><span class="n">couchbase</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">ClusterOptions</span><span class="p">(</span><span class="n">auth</span><span class="p">)</span>
 <span class="p">)</span>
 
-<span class="n">query</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">analytics_query</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">analytics_query</span><span class="p">(</span><span class="s2">"""</span>
 <span class="s2">    FROM</span>
 <span class="s2">        [MY_BUCKET].agent_activity.logs l</span>
 <span class="s2">    SELECT</span>
 <span class="s2">        l.*</span>
 <span class="s2">    LIMIT 100;</span>
-<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="s2">"""</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">query</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 </pre></div>
@@ -226,8 +226,8 @@ named <code class="code highlight python docutils literal highlight-python"><spa
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-0">
 Analytics Service</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bucket</span> <span class="o">=</span> <span class="s2">&quot;MY_BUCKET&quot;</span>
-<span class="n">query</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">analytics_query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bucket</span> <span class="o">=</span> <span class="s2">"MY_BUCKET"</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">analytics_query</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
 <span class="s2">    FROM</span>
 <span class="s2">        `</span><span class="si">{</span><span class="n">bucket</span><span class="si">}</span><span class="s2">`.agent_activity.Sessions s</span>
 <span class="s2">    SELECT</span>
@@ -238,7 +238,7 @@ Analytics Service</label><div class="sd-tab-content docutils">
 <span class="s2">        s.content,</span>
 <span class="s2">        s.ann</span>
 <span class="s2">    LIMIT 10;</span>
-<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="s2">"""</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">query</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 </pre></div>
@@ -247,8 +247,8 @@ Analytics Service</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-1">
 Query Service</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bucket</span> <span class="o">=</span> <span class="s2">&quot;MY_BUCKET&quot;</span>
-<span class="n">query</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bucket</span> <span class="o">=</span> <span class="s2">"MY_BUCKET"</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
 <span class="s2">    FROM</span>
 <span class="s2">        `</span><span class="si">{</span><span class="n">bucket</span><span class="si">}</span><span class="s2">`.agent_activity.Sessions() s</span>
 <span class="s2">    SELECT</span>
@@ -259,7 +259,7 @@ Query Service</label><div class="sd-tab-content docutils">
 <span class="s2">        s.content,</span>
 <span class="s2">        s.ann</span>
 <span class="s2">    LIMIT 10;</span>
-<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="s2">"""</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">query</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 </pre></div>
@@ -292,8 +292,8 @@ LLMs, the tools executed, etc...).</p></li>
 <input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-2">
 Analytics Service</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bucket</span> <span class="o">=</span> <span class="s2">&quot;MY_BUCKET&quot;</span>
-<span class="n">query</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">analytics_query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bucket</span> <span class="o">=</span> <span class="s2">"MY_BUCKET"</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">analytics_query</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
 <span class="s2">    FROM</span>
 <span class="s2">        `</span><span class="si">{</span><span class="n">bucket</span><span class="si">}</span><span class="s2">`.agent_activity.Exchanges e</span>
 <span class="s2">    SELECT</span>
@@ -305,7 +305,7 @@ Analytics Service</label><div class="sd-tab-content docutils">
 <span class="s2">    ORDER BY</span>
 <span class="s2">        e.output.timestamp DESC</span>
 <span class="s2">    LIMIT 1;</span>
-<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="s2">"""</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">query</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 </pre></div>
@@ -314,8 +314,8 @@ Analytics Service</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-3">
 Query Service</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bucket</span> <span class="o">=</span> <span class="s2">&quot;MY_BUCKET&quot;</span>
-<span class="n">query</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bucket</span> <span class="o">=</span> <span class="s2">"MY_BUCKET"</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
 <span class="s2">    FROM</span>
 <span class="s2">        `</span><span class="si">{</span><span class="n">bucket</span><span class="si">}</span><span class="s2">`.agent_activity.Exchanges() e</span>
 <span class="s2">    SELECT</span>
@@ -327,7 +327,7 @@ Query Service</label><div class="sd-tab-content docutils">
 <span class="s2">    ORDER BY</span>
 <span class="s2">        e.output.timestamp DESC</span>
 <span class="s2">    LIMIT 1;</span>
-<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="s2">"""</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">query</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 </pre></div>
@@ -355,8 +355,8 @@ Service:</p>
 <input checked="checked" id="sd-tab-item-4" name="sd-tab-set-2" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-4">
 Analytics Service</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bucket</span> <span class="o">=</span> <span class="s2">&quot;MY_BUCKET&quot;</span>
-<span class="n">query</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">analytics_query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bucket</span> <span class="o">=</span> <span class="s2">"MY_BUCKET"</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">analytics_query</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
 <span class="s2">    FROM</span>
 <span class="s2">        `</span><span class="si">{</span><span class="n">bucket</span><span class="si">}</span><span class="s2">`.agent_activity.ToolInvocations ti</span>
 <span class="s2">    SELECT</span>
@@ -367,7 +367,7 @@ Analytics Service</label><div class="sd-tab-content docutils">
 <span class="s2">    ORDER BY</span>
 <span class="s2">        ti.tool_result.timestamp DESC</span>
 <span class="s2">    LIMIT 1;</span>
-<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="s2">"""</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">query</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 </pre></div>
@@ -376,7 +376,7 @@ Analytics Service</label><div class="sd-tab-content docutils">
 <input id="sd-tab-item-5" name="sd-tab-set-2" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-5">
 Query Service</label><div class="sd-tab-content docutils">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
 <span class="s2">    FROM</span>
 <span class="s2">        `</span><span class="si">{</span><span class="n">bucket</span><span class="si">}</span><span class="s2">`.agent_activity.ToolInvocations() ti</span>
 <span class="s2">    SELECT</span>
@@ -387,7 +387,7 @@ Query Service</label><div class="sd-tab-content docutils">
 <span class="s2">    ORDER BY</span>
 <span class="s2">        ti.tool_result.timestamp DESC</span>
 <span class="s2">    LIMIT 1;</span>
-<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="s2">"""</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">query</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 </pre></div>

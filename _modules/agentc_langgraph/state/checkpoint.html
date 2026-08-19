@@ -4,14 +4,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>agentc_langgraph.state.checkpoint &#8212; Agent Catalog 0.0.0.post5 documentation</title>
+    <title>agentc_langgraph.state.checkpoint &#8212; Agent Catalog 1.1.4.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=ecdef530" />
     <link rel="stylesheet" type="text/css" href="../../../_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=7230e44a" />
-    <script src="../../../_static/documentation_options.js?v=251b0014"></script>
+    <script src="../../../_static/documentation_options.js?v=c9562da9"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -400,7 +400,7 @@ window.addEventListener("load", load);
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.0.0.post5 documentation</a></h1>
+        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 1.1.4.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -534,7 +534,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="initialize">
 <a class="viewcode-back" href="../../../api.html#agentc_langgraph.state.initialize">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">initialize</span><span class="p">(</span><span class="n">options</span><span class="p">:</span> <span class="n">CheckpointOptions</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A function to create the collections required to use the checkpoint savers in this module.</span>
+<span class="w">    </span><span class="sd">"""A function to create the collections required to use the checkpoint savers in this module.</span>
 
 <span class="sd">    .. card:: Function Description</span>
 
@@ -552,19 +552,19 @@ window.addEventListener("load", load);
 <span class="sd">            agentc_langgraph.state.initialize()</span>
 
 <span class="sd">            # Pass our checkpoint saver to the create_react_agent method.</span>
-<span class="sd">            chat_model = langchain_openai.ChatOpenAI(name=&quot;gpt-4o&quot;)</span>
+<span class="sd">            chat_model = langchain_openai.ChatOpenAI(name="gpt-4o")</span>
 <span class="sd">            agent = langgraph.prebuilt.create_react_agent(</span>
 <span class="sd">                model=chat_model,</span>
 <span class="sd">                tools=list(),</span>
 <span class="sd">                checkpointer=CheckpointSaver()</span>
 <span class="sd">            )</span>
-<span class="sd">            config = {&quot;configurable&quot;: {&quot;thread_id&quot;: &quot;1&quot;}}</span>
-<span class="sd">            agent.invoke({&quot;messages&quot;: [(&quot;human&quot;, &quot;Hello there!&quot;)]}, config)</span>
+<span class="sd">            config = {"configurable": {"thread_id": "1"}}</span>
+<span class="sd">            agent.invoke({"messages": [("human", "Hello there!")]}, config)</span>
 
 <span class="sd">    :param options: The options to use when saving checkpoints to Couchbase.</span>
 <span class="sd">    :param kwargs: Keyword arguments to be forwarded to a :py:class:`CheckpointOptions` constructor (ignored if</span>
 <span class="sd">                   options is present).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">options</span> <span class="o">=</span> <span class="n">CheckpointOptions</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">cluster</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">Cluster</span><span class="p">()</span>
@@ -596,14 +596,14 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="CheckpointSaver">
 <a class="viewcode-back" href="../../../api.html#agentc_langgraph.state.CheckpointSaver">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CheckpointSaver</span><span class="p">(</span><span class="n">langgraph</span><span class="o">.</span><span class="n">checkpoint</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">BaseCheckpointSaver</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checkpoint saver class to persist LangGraph states in a Couchbase instance.</span>
+<span class="w">    </span><span class="sd">"""Checkpoint saver class to persist LangGraph states in a Couchbase instance.</span>
 
 <span class="sd">    .. card:: Class Description</span>
 
 <span class="sd">        Instances of this class are used by LangGraph (passed in during :py:meth:`compile()` time)</span>
 <span class="sd">        to save checkpoints of agent state.</span>
 
-<span class="sd">        Below, we give a minimal working example of how to use this class with LangGraph&#39;s prebuilt ReAct agent.</span>
+<span class="sd">        Below, we give a minimal working example of how to use this class with LangGraph's prebuilt ReAct agent.</span>
 
 <span class="sd">        .. code-block:: python</span>
 
@@ -612,17 +612,17 @@ window.addEventListener("load", load);
 <span class="sd">            import agentc_langgraph.state</span>
 
 <span class="sd">            # Pass our checkpoint saver to the create_react_agent method.</span>
-<span class="sd">            chat_model = langchain_openai.ChatOpenAI(name=&quot;gpt-4o&quot;)</span>
+<span class="sd">            chat_model = langchain_openai.ChatOpenAI(name="gpt-4o")</span>
 <span class="sd">            agent = langgraph.prebuilt.create_react_agent(</span>
 <span class="sd">                model=chat_model,</span>
 <span class="sd">                tools=list(),</span>
 <span class="sd">                checkpointer=CheckpointSaver(create_if_not_exists=True)</span>
 <span class="sd">            )</span>
-<span class="sd">            config = {&quot;configurable&quot;: {&quot;thread_id&quot;: &quot;1&quot;}}</span>
-<span class="sd">            agent.invoke({&quot;messages&quot;: [(&quot;human&quot;, &quot;Hello!)]}, config)</span>
+<span class="sd">            config = {"configurable": {"thread_id": "1"}}</span>
+<span class="sd">            agent.invoke({"messages": [("human", "Hello!)]}, config)</span>
 
-<span class="sd">        To use this method with Agent Catalog&#39;s :py:class:`agentc_langgraph.graph.GraphRunnable` class, pass the</span>
-<span class="sd">        checkpoint saver to your workflow&#39;s ``compile()`` method (see the documentation for LangGraph&#39;s</span>
+<span class="sd">        To use this method with Agent Catalog's :py:class:`agentc_langgraph.graph.GraphRunnable` class, pass the</span>
+<span class="sd">        checkpoint saver to your workflow's ``compile()`` method (see the documentation for LangGraph's</span>
 <span class="sd">        ``Graph.compile()`` method `here &lt;https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.graph.Graph.compile&gt;`__</span>
 <span class="sd">        for more information.</span>
 
@@ -645,19 +645,19 @@ window.addEventListener("load", load);
 
 <span class="sd">                def compile(self):</span>
 <span class="sd">                    research_agent = langgraph.prebuilt.create_react_agent(</span>
-<span class="sd">                        model=langchain_openai.ChatOpenAI(model=&quot;gpt-4o&quot;),</span>
+<span class="sd">                        model=langchain_openai.ChatOpenAI(model="gpt-4o"),</span>
 <span class="sd">                        tools=[self.search_web]</span>
 <span class="sd">                    )</span>
 <span class="sd">                    summary_agent = langgraph.prebuilt.create_react_agent(</span>
-<span class="sd">                        model=langchain_openai.ChatOpenAI(model=&quot;gpt-4o&quot;),</span>
+<span class="sd">                        model=langchain_openai.ChatOpenAI(model="gpt-4o"),</span>
 <span class="sd">                        tools=[self.summarize_results]</span>
 <span class="sd">                    )</span>
 <span class="sd">                    workflow = langgraph.graph.StateGraph(agentc_langgraph.graph.State)</span>
-<span class="sd">                    workflow.add_node(&quot;research_agent&quot;, research_agent)</span>
-<span class="sd">                    workflow.add_node(&quot;summary_agent&quot;, summary_agent)</span>
-<span class="sd">                    workflow.add_edge(&quot;research_agent&quot;, &quot;summary_agent&quot;)</span>
-<span class="sd">                    workflow.add_edge(&quot;summary_agent&quot;, langgraph.graph.END)</span>
-<span class="sd">                    workflow.set_entry_point(&quot;research_agent&quot;)</span>
+<span class="sd">                    workflow.add_node("research_agent", research_agent)</span>
+<span class="sd">                    workflow.add_node("summary_agent", summary_agent)</span>
+<span class="sd">                    workflow.add_edge("research_agent", "summary_agent")</span>
+<span class="sd">                    workflow.add_edge("summary_agent", langgraph.graph.END)</span>
+<span class="sd">                    workflow.set_entry_point("research_agent")</span>
 <span class="sd">                    checkpointer = agentc_langgraph.state.CheckpointSaver(create_if_not_exists=True)</span>
 <span class="sd">                    return workflow.compile(checkpointer=checkpointer)</span>
 
@@ -671,7 +671,7 @@ window.addEventListener("load", load);
 <span class="sd">            This class is a wrapper around the ``langgraph_checkpointer_couchbase.CouchbaseSaver`` class.</span>
 <span class="sd">            See `here &lt;https://pypi.org/project/langgraph-checkpointer-couchbase/&gt;`__ for more information.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -728,7 +728,7 @@ window.addEventListener("load", load);
         <span class="n">config</span><span class="p">:</span> <span class="n">langchain_core</span><span class="o">.</span><span class="n">runnables</span><span class="o">.</span><span class="n">RunnableConfig</span><span class="p">,</span>
         <span class="n">writes</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]],</span>
         <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">task_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">task_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sync_saver</span><span class="o">.</span><span class="n">put_writes</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">writes</span><span class="o">=</span><span class="n">writes</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">)</span></div>
 
@@ -742,14 +742,14 @@ window.addEventListener("load", load);
         <span class="o">*</span><span class="p">,</span>
         <span class="n">serde</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">langgraph</span><span class="o">.</span><span class="n">checkpoint</span><span class="o">.</span><span class="n">serde</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">SerializerProtocol</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;AsyncCheckpointSaver&quot;</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"AsyncCheckpointSaver"</span><span class="p">:</span>
         <span class="n">options</span><span class="p">:</span> <span class="n">CheckpointOptions</span> <span class="o">=</span> <span class="n">options</span> <span class="k">if</span> <span class="n">options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CheckpointOptions</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">create_if_not_exists</span><span class="p">:</span>
             <span class="n">initialize</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
 
         <span class="c1"># Connect to our cluster.</span>
         <span class="n">cluster</span><span class="p">:</span> <span class="n">acouchbase</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">Cluster</span> <span class="o">=</span> <span class="k">await</span> <span class="n">options</span><span class="o">.</span><span class="n">AsyncCluster</span><span class="p">()</span>
-        <span class="n">saver</span><span class="p">:</span> <span class="s2">&quot;AsyncCheckpointSaver&quot;</span> <span class="o">=</span> <span class="n">AsyncCheckpointSaver</span><span class="p">(</span>
+        <span class="n">saver</span><span class="p">:</span> <span class="s2">"AsyncCheckpointSaver"</span> <span class="o">=</span> <span class="n">AsyncCheckpointSaver</span><span class="p">(</span>
             <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
             <span class="n">cluster</span><span class="o">=</span><span class="n">cluster</span><span class="p">,</span>
             <span class="n">serde</span><span class="o">=</span><span class="n">serde</span><span class="p">,</span>
@@ -815,7 +815,7 @@ window.addEventListener("load", load);
         <span class="n">config</span><span class="p">:</span> <span class="n">langchain_core</span><span class="o">.</span><span class="n">runnables</span><span class="o">.</span><span class="n">RunnableConfig</span><span class="p">,</span>
         <span class="n">writes</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]],</span>
         <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">task_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">task_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">async_saver</span><span class="o">.</span><span class="n">aput_writes</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">writes</span><span class="o">=</span><span class="n">writes</span><span class="p">,</span> <span class="n">task_id</span><span class="o">=</span><span class="n">task_id</span><span class="p">)</span>
 </pre></div>

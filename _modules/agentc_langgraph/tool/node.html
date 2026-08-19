@@ -4,14 +4,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>agentc_langgraph.tool.node &#8212; Agent Catalog 0.0.0.post5 documentation</title>
+    <title>agentc_langgraph.tool.node &#8212; Agent Catalog 1.1.4.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=ecdef530" />
     <link rel="stylesheet" type="text/css" href="../../../_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=7230e44a" />
-    <script src="../../../_static/documentation_options.js?v=251b0014"></script>
+    <script src="../../../_static/documentation_options.js?v=c9562da9"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -400,7 +400,7 @@ window.addEventListener("load", load);
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.0.0.post5 documentation</a></h1>
+        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 1.1.4.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -531,7 +531,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="ToolNode">
 <a class="viewcode-back" href="../../../api.html#agentc_langgraph.tool.ToolNode">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ToolNode</span><span class="p">(</span><span class="n">langgraph</span><span class="o">.</span><span class="n">prebuilt</span><span class="o">.</span><span class="n">ToolNode</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A tool node that logs tool results to a span.</span>
+<span class="w">    </span><span class="sd">"""A tool node that logs tool results to a span.</span>
 
 <span class="sd">    .. card:: Class Description</span>
 
@@ -555,18 +555,18 @@ window.addEventListener("load", load);
 
 <span class="sd">            # Create a span to bind to the chat model messages.</span>
 <span class="sd">            catalog = agentc.Catalog()</span>
-<span class="sd">            root_span = catalog.Span(name=&quot;root_span&quot;)</span>
+<span class="sd">            root_span = catalog.Span(name="root_span")</span>
 
 <span class="sd">            # Create a chat model.</span>
-<span class="sd">            chat_model = langchain_openai.chat_models.ChatOpenAI(model=&quot;gpt-4o&quot;, callbacks=[])</span>
+<span class="sd">            chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o", callbacks=[])</span>
 
 <span class="sd">            # Create a callback with the appropriate span, and attach it to the chat model.</span>
-<span class="sd">            my_agent_span = root_span.new(name=&quot;my_agent&quot;)</span>
+<span class="sd">            my_agent_span = root_span.new(name="my_agent")</span>
 <span class="sd">            callback = agentc_langchain.chat.Callback(span=my_agent_span)</span>
 <span class="sd">            chat_model.callbacks.append(callback)</span>
 
 <span class="sd">            # Grab the correct tools and output from the catalog.</span>
-<span class="sd">            my_agent_prompt = catalog.find(&quot;prompt&quot;, name=&quot;my_agent&quot;)</span>
+<span class="sd">            my_agent_prompt = catalog.find("prompt", name="my_agent")</span>
 <span class="sd">            my_agent_tools = agentc_langgraph.tool.ToolNode(</span>
 <span class="sd">                span=my_agent_span,</span>
 <span class="sd">                tools=[</span>
@@ -591,7 +591,7 @@ window.addEventListener("load", load);
 <span class="sd">        For all constructor parameters, see the documentation for :py:class:`langgraph.prebuilt.ToolNode`</span>
 <span class="sd">        `here &lt;https://langchain-ai.github.io/langgraph/reference/prebuilt/#langgraph.prebuilt.tool_node.ToolNode&gt;`__.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">span</span><span class="p">:</span> <span class="n">Span</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">span</span> <span class="o">=</span> <span class="n">span</span>
@@ -600,7 +600,7 @@ window.addEventListener("load", load);
     <span class="k">def</span><span class="w"> </span><span class="nf">_run_one</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">call</span><span class="p">:</span> <span class="n">langchain_core</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">ToolCall</span><span class="p">,</span>
-        <span class="n">input_type</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span> <span class="s2">&quot;tool_calls&quot;</span><span class="p">],</span>
+        <span class="n">input_type</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"list"</span><span class="p">,</span> <span class="s2">"dict"</span><span class="p">,</span> <span class="s2">"tool_calls"</span><span class="p">],</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">langchain_core</span><span class="o">.</span><span class="n">runnables</span><span class="o">.</span><span class="n">RunnableConfig</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">langchain_core</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">ToolMessage</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ToolNode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_run_one</span><span class="p">(</span><span class="n">call</span><span class="p">,</span> <span class="n">input_type</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
@@ -614,7 +614,7 @@ window.addEventListener("load", load);
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_arun_one</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">call</span><span class="p">:</span> <span class="n">langchain_core</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">ToolCall</span><span class="p">,</span>
-        <span class="n">input_type</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span> <span class="s2">&quot;tool_calls&quot;</span><span class="p">],</span>
+        <span class="n">input_type</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"list"</span><span class="p">,</span> <span class="s2">"dict"</span><span class="p">,</span> <span class="s2">"tool_calls"</span><span class="p">],</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">langchain_core</span><span class="o">.</span><span class="n">runnables</span><span class="o">.</span><span class="n">RunnableConfig</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">langchain_core</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">ToolMessage</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="nb">super</span><span class="p">(</span><span class="n">ToolNode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_arun_one</span><span class="p">(</span><span class="n">call</span><span class="p">,</span> <span class="n">input_type</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>

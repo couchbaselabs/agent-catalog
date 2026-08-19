@@ -4,14 +4,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>agentc_langchain.chat.chat &#8212; Agent Catalog 0.0.0.post5 documentation</title>
+    <title>agentc_langchain.chat.chat &#8212; Agent Catalog 1.1.4.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=ecdef530" />
     <link rel="stylesheet" type="text/css" href="../../../_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=7230e44a" />
-    <script src="../../../_static/documentation_options.js?v=251b0014"></script>
+    <script src="../../../_static/documentation_options.js?v=c9562da9"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -400,7 +400,7 @@ window.addEventListener("load", load);
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.0.0.post5 documentation</a></h1>
+        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 1.1.4.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -549,79 +549,79 @@ window.addEventListener("load", load);
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_ai_content_from_generation</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="n">BaseMessage</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Content</span><span class="p">]:</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">AIMessage</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">text</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">text</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">""</span><span class="p">:</span>
             <span class="k">yield</span> <span class="n">ChatCompletionContent</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">text</span><span class="p">()),</span> <span class="n">meta</span><span class="o">=</span><span class="n">message</span><span class="o">.</span><span class="n">response_metadata</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">tool_call</span> <span class="ow">in</span> <span class="n">message</span><span class="o">.</span><span class="n">tool_calls</span><span class="p">:</span>
             <span class="k">yield</span> <span class="n">ToolCallContent</span><span class="p">(</span>
-                <span class="n">tool_name</span><span class="o">=</span><span class="n">tool_call</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
-                <span class="n">tool_args</span><span class="o">=</span><span class="n">tool_call</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">],</span>
-                <span class="n">tool_call_id</span><span class="o">=</span><span class="n">tool_call</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+                <span class="n">tool_name</span><span class="o">=</span><span class="n">tool_call</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span>
+                <span class="n">tool_args</span><span class="o">=</span><span class="n">tool_call</span><span class="p">[</span><span class="s2">"args"</span><span class="p">],</span>
+                <span class="n">tool_call_id</span><span class="o">=</span><span class="n">tool_call</span><span class="p">[</span><span class="s2">"id"</span><span class="p">],</span>
                 <span class="n">meta</span><span class="o">=</span><span class="n">message</span><span class="o">.</span><span class="n">response_metadata</span><span class="p">,</span>
-                <span class="n">status</span><span class="o">=</span><span class="s2">&quot;success&quot;</span><span class="p">,</span>
+                <span class="n">status</span><span class="o">=</span><span class="s2">"success"</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">for</span> <span class="n">invalid_tool_call</span> <span class="ow">in</span> <span class="n">message</span><span class="o">.</span><span class="n">invalid_tool_calls</span><span class="p">:</span>
             <span class="k">yield</span> <span class="n">ToolCallContent</span><span class="p">(</span>
-                <span class="n">tool_name</span><span class="o">=</span><span class="n">invalid_tool_call</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
-                <span class="n">tool_args</span><span class="o">=</span><span class="n">invalid_tool_call</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">],</span>
-                <span class="n">tool_call_id</span><span class="o">=</span><span class="n">invalid_tool_call</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
-                <span class="n">status</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">,</span>
+                <span class="n">tool_name</span><span class="o">=</span><span class="n">invalid_tool_call</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span>
+                <span class="n">tool_args</span><span class="o">=</span><span class="n">invalid_tool_call</span><span class="p">[</span><span class="s2">"args"</span><span class="p">],</span>
+                <span class="n">tool_call_id</span><span class="o">=</span><span class="n">invalid_tool_call</span><span class="p">[</span><span class="s2">"id"</span><span class="p">],</span>
+                <span class="n">status</span><span class="o">=</span><span class="s2">"error"</span><span class="p">,</span>
                 <span class="n">meta</span><span class="o">=</span><span class="n">message</span><span class="o">.</span><span class="n">response_metadata</span><span class="p">,</span>
                 <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
-                    <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="n">invalid_tool_call</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">],</span>
+                    <span class="s2">"error"</span><span class="p">:</span> <span class="n">invalid_tool_call</span><span class="p">[</span><span class="s2">"error"</span><span class="p">],</span>
                 <span class="p">},</span>
             <span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_content_from_message</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="n">BaseMessage</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Content</span><span class="p">]:</span>
     <span class="k">match</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
-        <span class="k">case</span> <span class="s2">&quot;ai&quot;</span> <span class="o">|</span> <span class="s2">&quot;AIMessageChunk&quot;</span><span class="p">:</span>
+        <span class="k">case</span> <span class="s2">"ai"</span> <span class="o">|</span> <span class="s2">"AIMessageChunk"</span><span class="p">:</span>
             <span class="n">ai_message</span><span class="p">:</span> <span class="n">AIMessage</span> <span class="o">=</span> <span class="n">message</span>
             <span class="k">yield</span> <span class="n">SystemContent</span><span class="p">(</span>
                 <span class="n">value</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">ai_message</span><span class="o">.</span><span class="n">content</span><span class="p">),</span>
                 <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
-                    <span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
-                    <span class="s2">&quot;response_metadata&quot;</span><span class="p">:</span> <span class="n">ai_message</span><span class="o">.</span><span class="n">response_metadata</span><span class="p">,</span>
-                    <span class="s2">&quot;tool_calls&quot;</span><span class="p">:</span> <span class="n">ai_message</span><span class="o">.</span><span class="n">tool_calls</span><span class="p">,</span>
-                    <span class="s2">&quot;invalid_tool_calls&quot;</span><span class="p">:</span> <span class="n">ai_message</span><span class="o">.</span><span class="n">invalid_tool_calls</span><span class="p">,</span>
+                    <span class="s2">"kind"</span><span class="p">:</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                    <span class="s2">"response_metadata"</span><span class="p">:</span> <span class="n">ai_message</span><span class="o">.</span><span class="n">response_metadata</span><span class="p">,</span>
+                    <span class="s2">"tool_calls"</span><span class="p">:</span> <span class="n">ai_message</span><span class="o">.</span><span class="n">tool_calls</span><span class="p">,</span>
+                    <span class="s2">"invalid_tool_calls"</span><span class="p">:</span> <span class="n">ai_message</span><span class="o">.</span><span class="n">invalid_tool_calls</span><span class="p">,</span>
                 <span class="p">},</span>
             <span class="p">)</span>
 
-        <span class="k">case</span> <span class="s2">&quot;function&quot;</span> <span class="o">|</span> <span class="s2">&quot;FunctionMessageChunk&quot;</span><span class="p">:</span>
+        <span class="k">case</span> <span class="s2">"function"</span> <span class="o">|</span> <span class="s2">"FunctionMessageChunk"</span><span class="p">:</span>
             <span class="n">function_message</span><span class="p">:</span> <span class="n">FunctionMessage</span> <span class="o">=</span> <span class="n">message</span>
             <span class="k">yield</span> <span class="n">SystemContent</span><span class="p">(</span>
                 <span class="n">value</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">function_message</span><span class="o">.</span><span class="n">content</span><span class="p">),</span>
                 <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
-                    <span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                    <span class="s2">"kind"</span><span class="p">:</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
                 <span class="p">},</span>
             <span class="p">)</span>
 
-        <span class="k">case</span> <span class="s2">&quot;tool&quot;</span> <span class="o">|</span> <span class="s2">&quot;ToolMessageChunk&quot;</span><span class="p">:</span>
+        <span class="k">case</span> <span class="s2">"tool"</span> <span class="o">|</span> <span class="s2">"ToolMessageChunk"</span><span class="p">:</span>
             <span class="n">tool_message</span><span class="p">:</span> <span class="n">ToolMessage</span> <span class="o">=</span> <span class="n">message</span>
             <span class="k">yield</span> <span class="n">SystemContent</span><span class="p">(</span>
                 <span class="n">value</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">tool_message</span><span class="o">.</span><span class="n">content</span><span class="p">),</span>
                 <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
-                    <span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
-                    <span class="s2">&quot;tool_call_id&quot;</span><span class="p">:</span> <span class="n">tool_message</span><span class="o">.</span><span class="n">tool_call_id</span><span class="p">,</span>
-                    <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">tool_message</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+                    <span class="s2">"kind"</span><span class="p">:</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                    <span class="s2">"tool_call_id"</span><span class="p">:</span> <span class="n">tool_message</span><span class="o">.</span><span class="n">tool_call_id</span><span class="p">,</span>
+                    <span class="s2">"status"</span><span class="p">:</span> <span class="n">tool_message</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
                 <span class="p">},</span>
             <span class="p">)</span>
 
-        <span class="k">case</span> <span class="s2">&quot;human&quot;</span> <span class="o">|</span> <span class="s2">&quot;HumanMessageChunk&quot;</span><span class="p">:</span>
+        <span class="k">case</span> <span class="s2">"human"</span> <span class="o">|</span> <span class="s2">"HumanMessageChunk"</span><span class="p">:</span>
             <span class="n">human_message</span><span class="p">:</span> <span class="n">HumanMessage</span> <span class="o">=</span> <span class="n">message</span>
-            <span class="k">yield</span> <span class="n">SystemContent</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">human_message</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="n">human_message</span><span class="p">})</span>
+            <span class="k">yield</span> <span class="n">SystemContent</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">human_message</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s2">"kind"</span><span class="p">:</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s2">"meta"</span><span class="p">:</span> <span class="n">human_message</span><span class="p">})</span>
 
-        <span class="k">case</span> <span class="s2">&quot;system&quot;</span> <span class="o">|</span> <span class="s2">&quot;SystemMessageChunk&quot;</span><span class="p">:</span>
+        <span class="k">case</span> <span class="s2">"system"</span> <span class="o">|</span> <span class="s2">"SystemMessageChunk"</span><span class="p">:</span>
             <span class="n">system_message</span><span class="p">:</span> <span class="n">SystemMessage</span> <span class="o">=</span> <span class="n">message</span>
-            <span class="k">yield</span> <span class="n">SystemContent</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">system_message</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="n">system_message</span><span class="p">})</span>
+            <span class="k">yield</span> <span class="n">SystemContent</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">system_message</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s2">"kind"</span><span class="p">:</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s2">"meta"</span><span class="p">:</span> <span class="n">system_message</span><span class="p">})</span>
 
         <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
             <span class="n">base_message</span><span class="p">:</span> <span class="n">BaseMessage</span> <span class="o">=</span> <span class="n">message</span>
             <span class="k">yield</span> <span class="n">SystemContent</span><span class="p">(</span>
                 <span class="n">value</span><span class="o">=</span><span class="n">base_message</span><span class="o">.</span><span class="n">content</span><span class="p">,</span>
                 <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
-                    <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="n">base_message</span><span class="p">,</span>
-                    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">base_message</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-                    <span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                    <span class="s2">"meta"</span><span class="p">:</span> <span class="n">base_message</span><span class="p">,</span>
+                    <span class="s2">"id"</span><span class="p">:</span> <span class="n">base_message</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                    <span class="s2">"kind"</span><span class="p">:</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
                 <span class="p">},</span>
             <span class="p">)</span>
 
@@ -629,7 +629,7 @@ window.addEventListener("load", load);
 <span class="k">def</span><span class="w"> </span><span class="nf">_model_from_message</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="n">BaseMessage</span><span class="p">,</span> <span class="n">chat_model</span><span class="p">:</span> <span class="n">BaseChatModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">AIMessage</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">response_metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">message</span><span class="o">.</span><span class="n">response_metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model_name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">message</span><span class="o">.</span><span class="n">response_metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"model_name"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">chat_model</span>
     <span class="k">return</span> <span class="kc">None</span>
@@ -644,7 +644,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="Callback">
 <a class="viewcode-back" href="../../../api.html#agentc_langchain.chat.Callback">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Callback</span><span class="p">(</span><span class="n">BaseCallbackHandler</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A callback that will log all LLM calls using the given span as the root.</span>
+<span class="w">    </span><span class="sd">"""A callback that will log all LLM calls using the given span as the root.</span>
 
 <span class="sd">    .. card:: Class Description</span>
 
@@ -665,17 +665,17 @@ window.addEventListener("load", load);
 
 <span class="sd">            # Create a span to bind to the chat model messages.</span>
 <span class="sd">            catalog = agentc.Catalog()</span>
-<span class="sd">            root_span = catalog.Span(name=&quot;root_span&quot;)</span>
+<span class="sd">            root_span = catalog.Span(name="root_span")</span>
 
 <span class="sd">            # Create a chat model.</span>
-<span class="sd">            chat_model = langchain_openai.chat_models.ChatOpenAI(model=&quot;gpt-4o&quot;, callbacks=[])</span>
+<span class="sd">            chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o", callbacks=[])</span>
 
 <span class="sd">            # Create a callback with the appropriate span, and attach it to the chat model.</span>
-<span class="sd">            my_agent_span = root_span.new(name=&quot;my_agent&quot;)</span>
+<span class="sd">            my_agent_span = root_span.new(name="my_agent")</span>
 <span class="sd">            callback = agentc_langchain.chat.Callback(span=my_agent_span)</span>
 <span class="sd">            chat_model.callbacks.append(callback)</span>
 <span class="sd">            result = chat_model.invoke(messages=[</span>
-<span class="sd">                langchain_core.messages.SystemMessage(content=&quot;Hello, world!&quot;)</span>
+<span class="sd">                langchain_core.messages.SystemMessage(content="Hello, world!")</span>
 <span class="sd">            ])</span>
 
 <span class="sd">        To record the exact tools and output used by the chat model, you can pass in the tools and output to the</span>
@@ -692,20 +692,20 @@ window.addEventListener("load", load);
 
 <span class="sd">            # Create a span to bind to the chat model messages.</span>
 <span class="sd">            catalog = agentc.Catalog()</span>
-<span class="sd">            root_span = catalog.Span(name=&quot;root_span&quot;)</span>
+<span class="sd">            root_span = catalog.Span(name="root_span")</span>
 
 <span class="sd">            # Create a chat model.</span>
-<span class="sd">            chat_model = langchain_openai.chat_models.ChatOpenAI(model=&quot;gpt-4o&quot;, callbacks=[])</span>
+<span class="sd">            chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o", callbacks=[])</span>
 
 <span class="sd">            # Grab the correct tools and output from the catalog.</span>
-<span class="sd">            my_agent_prompt = catalog.find(&quot;prompt&quot;, name=&quot;my_agent&quot;)</span>
+<span class="sd">            my_agent_prompt = catalog.find("prompt", name="my_agent")</span>
 <span class="sd">            my_agent_tools = [</span>
 <span class="sd">                langchain_core.tools.StructuredTool.from_function(tool.func) for tool in my_agent_prompt.tools</span>
 <span class="sd">            ]</span>
 <span class="sd">            my_agent_output = my_agent_prompt.output</span>
 
 <span class="sd">            # Create a callback with the appropriate span, tools, and output, and attach it to the chat model.</span>
-<span class="sd">            my_agent_span = root_span.new(name=&quot;my_agent&quot;)</span>
+<span class="sd">            my_agent_span = root_span.new(name="my_agent")</span>
 <span class="sd">            callback = agentc_langchain.chat.Callback(</span>
 <span class="sd">                span=my_agent_span,</span>
 <span class="sd">                tools=my_agent_tools,</span>
@@ -716,22 +716,22 @@ window.addEventListener("load", load);
 <span class="sd">                langchain_core.messages.SystemMessage(content=my_agent_prompt.content)</span>
 <span class="sd">            ])</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">span</span><span class="p">:</span> <span class="n">Span</span><span class="p">,</span> <span class="n">tools</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">|</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        :param span: The root span to bind to the chat model messages.</span>
 <span class="sd">        :param tools: The tools that being used by the chat model (i.e., those passed in</span>
 <span class="sd">                      :py:meth:`BaseChatModel.bind_tools`).</span>
 <span class="sd">        :param output: The output type that being used by the chat model (i.e., those passed in</span>
 <span class="sd">                       :py:meth`:BaseChatModel.with_structured_output:).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">span</span><span class="p">:</span> <span class="n">Span</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;agentc_langchain.chat.Callback&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">span</span><span class="p">:</span> <span class="n">Span</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"agentc_langchain.chat.Callback"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="n">output</span> <span class="ow">or</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RequestHeaderContent</span><span class="o">.</span><span class="n">Tool</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">tools</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">tool</span> <span class="ow">in</span> <span class="n">tools</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">tool</span><span class="o">.</span><span class="n">args_schema</span><span class="p">,</span> <span class="s2">&quot;model_json_schema&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">tool</span><span class="o">.</span><span class="n">args_schema</span><span class="p">,</span> <span class="s2">"model_json_schema"</span><span class="p">):</span>
                     <span class="n">args_schema</span> <span class="o">=</span> <span class="n">tool</span><span class="o">.</span><span class="n">args_schema</span><span class="o">.</span><span class="n">model_json_schema</span><span class="p">()</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">args_schema</span> <span class="o">=</span> <span class="n">tool</span><span class="o">.</span><span class="n">args_schema</span>
@@ -766,9 +766,9 @@ window.addEventListener("load", load);
                 <span class="n">output</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
                 <span class="n">meta</span><span class="o">=</span><span class="n">serialized</span><span class="p">,</span>
                 <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
-                    <span class="s2">&quot;run_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">run_id</span><span class="p">),</span>
-                    <span class="s2">&quot;parent_run_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">parent_run_id</span><span class="p">)</span> <span class="k">if</span> <span class="n">parent_run_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-                    <span class="s2">&quot;tags&quot;</span><span class="p">:</span> <span class="n">tags</span><span class="p">,</span>
+                    <span class="s2">"run_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">run_id</span><span class="p">),</span>
+                    <span class="s2">"parent_run_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">parent_run_id</span><span class="p">)</span> <span class="k">if</span> <span class="n">parent_run_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">"tags"</span><span class="p">:</span> <span class="n">tags</span><span class="p">,</span>
                 <span class="p">},</span>
             <span class="p">)</span>
         <span class="p">)</span>
@@ -787,7 +787,7 @@ window.addEventListener("load", load);
         <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">generation_set</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">generations</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LLM has returned the message: </span><span class="si">{</span><span class="n">generation_set</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"LLM has returned the message: </span><span class="si">{</span><span class="n">generation_set</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">generation</span> <span class="ow">in</span> <span class="n">generation_set</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">_ai_content_from_generation</span><span class="p">(</span><span class="n">generation</span><span class="o">.</span><span class="n">message</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">span</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
@@ -801,17 +801,17 @@ window.addEventListener("load", load);
 
 
 <span class="nd">@typing_extensions</span><span class="o">.</span><span class="n">deprecated</span><span class="p">(</span>
-    <span class="s2">&quot;agentc_langchain.chat.audit has been deprecated. &quot;</span> <span class="s2">&quot;Please use agentc_langchain.chat.Callback instead.&quot;</span>
+    <span class="s2">"agentc_langchain.chat.audit has been deprecated. "</span> <span class="s2">"Please use agentc_langchain.chat.Callback instead."</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">audit</span><span class="p">(</span><span class="n">chat_model</span><span class="p">:</span> <span class="n">BaseChatModel</span><span class="p">,</span> <span class="n">span</span><span class="p">:</span> <span class="n">Span</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseChatModel</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A method to (dynamically) dispatch the :py:meth:`BaseChatModel._generate` and :py:meth:`BaseChatModel._stream`</span>
+<span class="w">    </span><span class="sd">"""A method to (dynamically) dispatch the :py:meth:`BaseChatModel._generate` and :py:meth:`BaseChatModel._stream`</span>
 <span class="sd">    methods (as well as their asynchronous variants :py:meth:`BaseChatModel._agenerate` and</span>
 <span class="sd">    :py:meth:`BaseChatModel._astream`) to methods that log LLM calls.</span>
 
 <span class="sd">    :param chat_model: The LangChain chat model to audit.</span>
 <span class="sd">    :param span: The Agent Catalog Span to bind to the chat model messages.</span>
 <span class="sd">    :return: The same LangChain chat model that was passed in, but with methods dispatched to audit LLM calls.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">generate_dispatch</span> <span class="o">=</span> <span class="n">chat_model</span><span class="o">.</span><span class="n">_generate</span>
     <span class="n">agenerate_dispatch</span> <span class="o">=</span> <span class="n">chat_model</span><span class="o">.</span><span class="n">_agenerate</span>
     <span class="n">stream_dispatch</span> <span class="o">=</span> <span class="n">chat_model</span><span class="o">.</span><span class="n">_stream</span>
@@ -826,8 +826,8 @@ window.addEventListener("load", load);
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChatResult</span><span class="p">:</span>
         <span class="n">results</span> <span class="o">=</span> <span class="n">generate_dispatch</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">run_manager</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">generations</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LLM has returned the message: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">with</span> <span class="n">span</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;_generate&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">generation</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"LLM has returned the message: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">span</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"_generate"</span><span class="p">)</span> <span class="k">as</span> <span class="n">generation</span><span class="p">:</span>
                 <span class="c1"># Each generation gets its own span.</span>
                 <span class="n">_accept_input_messages</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">generation</span><span class="p">)</span>
                 <span class="n">generation</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
@@ -846,10 +846,10 @@ window.addEventListener("load", load);
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterator</span><span class="p">[</span><span class="n">ChatGenerationChunk</span><span class="p">]:</span>
         <span class="n">iterator</span> <span class="o">=</span> <span class="n">stream_dispatch</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">run_manager</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="c1"># For sanity at analytics-time, we&#39;ll aggregate the chunks here.</span>
+        <span class="c1"># For sanity at analytics-time, we'll aggregate the chunks here.</span>
         <span class="n">result_chunk</span><span class="p">:</span> <span class="n">ChatGenerationChunk</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LLM has returned the chunk: </span><span class="si">{</span><span class="n">chunk</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"LLM has returned the chunk: </span><span class="si">{</span><span class="n">chunk</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">result_chunk</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">result_chunk</span> <span class="o">=</span> <span class="n">chunk</span>
             <span class="k">else</span><span class="p">:</span>
@@ -857,7 +857,7 @@ window.addEventListener("load", load);
             <span class="k">yield</span> <span class="n">chunk</span>
 
         <span class="c1"># We have exhausted our iterator. Log the resultant chunk.</span>
-        <span class="k">with</span> <span class="n">span</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;_stream&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">generation</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">span</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"_stream"</span><span class="p">)</span> <span class="k">as</span> <span class="n">generation</span><span class="p">:</span>
             <span class="n">_accept_input_messages</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">generation</span><span class="p">)</span>
             <span class="n">generation</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
                 <span class="n">content</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">_content_from_message</span><span class="p">(</span><span class="n">result_chunk</span><span class="o">.</span><span class="n">message</span><span class="p">))[</span><span class="mi">0</span><span class="p">],</span>
@@ -874,8 +874,8 @@ window.addEventListener("load", load);
         <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">agenerate_dispatch</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">run_manager</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">generations</span><span class="p">:</span>
             <span class="c1"># Each generation gets its own span.</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LLM has returned the message: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">with</span> <span class="n">span</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;_agenerate&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">generation</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"LLM has returned the message: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">span</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"_agenerate"</span><span class="p">)</span> <span class="k">as</span> <span class="n">generation</span><span class="p">:</span>
                 <span class="n">_accept_input_messages</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">generation</span><span class="p">)</span>
                 <span class="n">generation</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
                     <span class="n">content</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">_content_from_message</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">message</span><span class="p">))[</span><span class="mi">0</span><span class="p">],</span>
@@ -893,10 +893,10 @@ window.addEventListener("load", load);
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">AsyncIterator</span><span class="p">[</span><span class="n">ChatGenerationChunk</span><span class="p">]:</span>
         <span class="n">iterator</span> <span class="o">=</span> <span class="n">astream_dispatch</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">run_manager</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="c1"># For sanity at analytics-time, we&#39;ll aggregate the chunks here.</span>
+        <span class="c1"># For sanity at analytics-time, we'll aggregate the chunks here.</span>
         <span class="n">result_chunk</span><span class="p">:</span> <span class="n">ChatGenerationChunk</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LLM has returned the chunk: </span><span class="si">{</span><span class="n">chunk</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"LLM has returned the chunk: </span><span class="si">{</span><span class="n">chunk</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">result_chunk</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">result_chunk</span> <span class="o">=</span> <span class="n">chunk</span>
             <span class="k">else</span><span class="p">:</span>
@@ -904,7 +904,7 @@ window.addEventListener("load", load);
             <span class="k">yield</span> <span class="n">chunk</span>
 
         <span class="c1"># We have exhausted our iterator. Log the resultant chunk.</span>
-        <span class="k">with</span> <span class="n">span</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;_astream&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">generation</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">span</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"_astream"</span><span class="p">)</span> <span class="k">as</span> <span class="n">generation</span><span class="p">:</span>
             <span class="n">_accept_input_messages</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="n">generation</span><span class="p">)</span>
             <span class="n">generation</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
                 <span class="n">content</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">_content_from_message</span><span class="p">(</span><span class="n">result_chunk</span><span class="o">.</span><span class="n">message</span><span class="p">))[</span><span class="mi">0</span><span class="p">],</span>
@@ -912,10 +912,10 @@ window.addEventListener("load", load);
             <span class="p">)</span>
 
     <span class="c1"># Note: Pydantic fiddles around with __setattr__, so we need to skirt around this.</span>
-    <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">chat_model</span><span class="p">,</span> <span class="s2">&quot;_generate&quot;</span><span class="p">,</span> <span class="n">_generate</span><span class="o">.</span><span class="fm">__get__</span><span class="p">(</span><span class="n">chat_model</span><span class="p">,</span> <span class="n">BaseChatModel</span><span class="p">))</span>
-    <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">chat_model</span><span class="p">,</span> <span class="s2">&quot;_stream&quot;</span><span class="p">,</span> <span class="n">_stream</span><span class="o">.</span><span class="fm">__get__</span><span class="p">(</span><span class="n">chat_model</span><span class="p">,</span> <span class="n">BaseChatModel</span><span class="p">))</span>
-    <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">chat_model</span><span class="p">,</span> <span class="s2">&quot;_agenerate&quot;</span><span class="p">,</span> <span class="n">_agenerate</span><span class="o">.</span><span class="fm">__get__</span><span class="p">(</span><span class="n">chat_model</span><span class="p">,</span> <span class="n">BaseChatModel</span><span class="p">))</span>
-    <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">chat_model</span><span class="p">,</span> <span class="s2">&quot;_astream&quot;</span><span class="p">,</span> <span class="n">_astream</span><span class="o">.</span><span class="fm">__get__</span><span class="p">(</span><span class="n">chat_model</span><span class="p">,</span> <span class="n">BaseChatModel</span><span class="p">))</span>
+    <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">chat_model</span><span class="p">,</span> <span class="s2">"_generate"</span><span class="p">,</span> <span class="n">_generate</span><span class="o">.</span><span class="fm">__get__</span><span class="p">(</span><span class="n">chat_model</span><span class="p">,</span> <span class="n">BaseChatModel</span><span class="p">))</span>
+    <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">chat_model</span><span class="p">,</span> <span class="s2">"_stream"</span><span class="p">,</span> <span class="n">_stream</span><span class="o">.</span><span class="fm">__get__</span><span class="p">(</span><span class="n">chat_model</span><span class="p">,</span> <span class="n">BaseChatModel</span><span class="p">))</span>
+    <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">chat_model</span><span class="p">,</span> <span class="s2">"_agenerate"</span><span class="p">,</span> <span class="n">_agenerate</span><span class="o">.</span><span class="fm">__get__</span><span class="p">(</span><span class="n">chat_model</span><span class="p">,</span> <span class="n">BaseChatModel</span><span class="p">))</span>
+    <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">chat_model</span><span class="p">,</span> <span class="s2">"_astream"</span><span class="p">,</span> <span class="n">_astream</span><span class="o">.</span><span class="fm">__get__</span><span class="p">(</span><span class="n">chat_model</span><span class="p">,</span> <span class="n">BaseChatModel</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">chat_model</span>
 </pre></div>
 

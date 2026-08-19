@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>agentc Command Documentation &#8212; Agent Catalog 0.0.0.post5 documentation</title>
+    <title>agentc Command Documentation &#8212; Agent Catalog 1.1.4.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=ecdef530" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=7230e44a" />
-    <script src="_static/documentation_options.js?v=251b0014"></script>
+    <script src="_static/documentation_options.js?v=c9562da9"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -38,7 +38,7 @@
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.0.0.post5 documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog 1.1.4.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -181,10 +181,10 @@ to the top of your function.</p>
 
 <span class="nd">@agentc</span><span class="o">.</span><span class="n">catalog</span><span class="o">.</span><span class="n">tool</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">positive_sentiment_analysis_tool</span><span class="p">(</span><span class="n">text_to_analyze</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Using the given text, return a number between 0 and 1.</span>
+<span class="w">    </span><span class="sd">""" Using the given text, return a number between 0 and 1.</span>
 <span class="sd">        A value of 0 means the text is not positive.</span>
 <span class="sd">        A value of 1 means the text is positive.</span>
-<span class="sd">        A vale of 0.5 means the text is slightly positive. &quot;&quot;&quot;</span>
+<span class="sd">        A vale of 0.5 means the text is slightly positive. """</span>
     <span class="o">...</span>
 </pre></div>
 </div>
@@ -236,7 +236,7 @@ Python Program</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">agentc</span>
 
 <span class="n">catalog</span> <span class="o">=</span> <span class="n">agentc</span><span class="o">.</span><span class="n">Catalog</span><span class="p">()</span>
-<span class="n">my_tool</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;find_user_by_id&quot;</span><span class="p">)</span>
+<span class="n">my_tool</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"tool"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"find_user_by_id"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -253,7 +253,7 @@ To find 3 tools semantically related to &quot;finding users&quot;, you would wri
 <input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-2">
 Command Line</label><div class="sd-tab-content docutils">
-<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>find<span class="w"> </span>tool<span class="w"> </span>--query<span class="w"> </span><span class="s2">&quot;finding users&quot;</span><span class="w"> </span>--limit<span class="w"> </span><span class="m">3</span>
+<div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>agentc<span class="w"> </span>find<span class="w"> </span>tool<span class="w"> </span>--query<span class="w"> </span><span class="s2">"finding users"</span><span class="w"> </span>--limit<span class="w"> </span><span class="m">3</span>
 </pre></div>
 </div>
 </div>
@@ -263,7 +263,7 @@ Python Program</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">agentc</span>
 
 <span class="n">catalog</span> <span class="o">=</span> <span class="n">agentc</span><span class="o">.</span><span class="n">Catalog</span><span class="p">()</span>
-<span class="n">my_tools</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="s2">&quot;finding users&quot;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">my_tools</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"tool"</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="s2">"finding users"</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -279,7 +279,7 @@ For example, to search for the most related prompt to &quot;frontdesk agent&quot
 <label class="sd-tab-label" for="sd-tab-item-4">
 Command Line</label><div class="sd-tab-content docutils">
 <div class="highlight-ansi-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="c1"># Use single quotes to interpret the annotations string as a literal here!</span>
-<span class="gp">$ </span>agentc<span class="w"> </span>find<span class="w"> </span>prompt<span class="w"> </span>--query<span class="w"> </span><span class="s2">&quot;frontdesk agent&quot;</span><span class="w"> </span>--annotations<span class="w"> </span><span class="s1">&#39;domain=&quot;healthcare&quot;&#39;</span>
+<span class="gp">$ </span>agentc<span class="w"> </span>find<span class="w"> </span>prompt<span class="w"> </span>--query<span class="w"> </span><span class="s2">"frontdesk agent"</span><span class="w"> </span>--annotations<span class="w"> </span><span class="s1">'domain="healthcare"'</span>
 </pre></div>
 </div>
 </div>
@@ -289,7 +289,7 @@ Python Program</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">agentc</span>
 
 <span class="n">catalog</span> <span class="o">=</span> <span class="n">agentc</span><span class="o">.</span><span class="n">Catalog</span><span class="p">()</span>
-<span class="n">prompt</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;prompt&quot;</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="s2">&quot;frontdesk agent&quot;</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="s1">&#39;domain=&quot;healthcare&quot;&#39;</span><span class="p">)</span>
+<span class="n">prompt</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"prompt"</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="s2">"frontdesk agent"</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="s1">'domain="healthcare"'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -322,7 +322,7 @@ Python Program</label><div class="sd-tab-content docutils">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">agentc</span>
 
 <span class="n">catalog</span> <span class="o">=</span> <span class="n">agentc</span><span class="o">.</span><span class="n">Catalog</span><span class="p">(</span><span class="n">conn_string</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-<span class="n">tool</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;get_most_popular_categories&quot;</span><span class="p">)</span>
+<span class="n">tool</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"tool"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"get_most_popular_categories"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

@@ -4,14 +4,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>agentc_langchain.cache.cache &#8212; Agent Catalog 0.0.0.post5 documentation</title>
+    <title>agentc_langchain.cache.cache &#8212; Agent Catalog 1.1.4.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=ecdef530" />
     <link rel="stylesheet" type="text/css" href="../../../_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=7230e44a" />
-    <script src="../../../_static/documentation_options.js?v=251b0014"></script>
+    <script src="../../../_static/documentation_options.js?v=c9562da9"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -400,7 +400,7 @@ window.addEventListener("load", load);
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.0.0.post5 documentation</a></h1>
+        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 1.1.4.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -529,11 +529,11 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="initialize">
 <a class="viewcode-back" href="../../../api.html#agentc_langchain.cache.initialize">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">initialize</span><span class="p">(</span>
-    <span class="n">kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;exact&quot;</span><span class="p">],</span>
+    <span class="n">kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"exact"</span><span class="p">],</span>
     <span class="n">options</span><span class="p">:</span> <span class="n">CacheOptions</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A function to create the collections required to use the :py:meth:`cache` function.</span>
+<span class="w">    </span><span class="sd">"""A function to create the collections required to use the :py:meth:`cache` function.</span>
 
 <span class="sd">    .. card:: Function Description</span>
 
@@ -546,29 +546,29 @@ window.addEventListener("load", load);
 
 <span class="sd">            import agentc_langchain.cache</span>
 
-<span class="sd">            agentc_langchain.cache.initialize(kind=&quot;exact&quot;)</span>
-<span class="sd">            chat_model = langchain_openai.chat_models.ChatOpenAI(model=&quot;gpt-4o&quot;)</span>
+<span class="sd">            agentc_langchain.cache.initialize(kind="exact")</span>
+<span class="sd">            chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o")</span>
 <span class="sd">            caching_chat_model = agentc_langchain.cache.cache(</span>
 <span class="sd">                chat_model=chat_model,</span>
-<span class="sd">                kind=&quot;exact&quot;,</span>
+<span class="sd">                kind="exact",</span>
 <span class="sd">            )</span>
 
 <span class="sd">            # Response #2 is served from the cache.</span>
-<span class="sd">            response_1 = caching_chat_model.invoke(&quot;Hello there!&quot;)</span>
-<span class="sd">            response_2 = caching_chat_model.invoke(&quot;Hello there!&quot;)</span>
+<span class="sd">            response_1 = caching_chat_model.invoke("Hello there!")</span>
+<span class="sd">            response_2 = caching_chat_model.invoke("Hello there!")</span>
 
 <span class="sd">    :param kind: The type of cache to attach to the chat model.</span>
 <span class="sd">    :param options: The options to use when attaching a cache to the chat model.</span>
 <span class="sd">    :param kwargs: Keyword arguments to be forwarded to a :py:class:`CacheOptions` constructor (ignored if options is</span>
 <span class="sd">                   present).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">options</span> <span class="o">=</span> <span class="n">CacheOptions</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">options</span><span class="o">.</span><span class="n">create_if_not_exists</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="k">if</span> <span class="n">kind</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;exact&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">kind</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"exact"</span><span class="p">:</span>
         <span class="n">setup_exact_cache</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Illegal kind specified! &#39;kind&#39; must be &#39;exact&#39;.&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Illegal kind specified! 'kind' must be 'exact'."</span><span class="p">)</span></div>
 
 
 
@@ -576,11 +576,11 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../api.html#agentc_langchain.cache.cache">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">cache</span><span class="p">(</span>
     <span class="n">chat_model</span><span class="p">:</span> <span class="n">langchain_core</span><span class="o">.</span><span class="n">language_models</span><span class="o">.</span><span class="n">BaseChatModel</span><span class="p">,</span>
-    <span class="n">kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;exact&quot;</span><span class="p">],</span>
+    <span class="n">kind</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Literal</span><span class="p">[</span><span class="s2">"exact"</span><span class="p">],</span>
     <span class="n">options</span><span class="p">:</span> <span class="n">CacheOptions</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">langchain_core</span><span class="o">.</span><span class="n">language_models</span><span class="o">.</span><span class="n">BaseChatModel</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A function to attach a Couchbase-backed exact cache to a ChatModel.</span>
+<span class="w">    </span><span class="sd">"""A function to attach a Couchbase-backed exact cache to a ChatModel.</span>
 
 <span class="sd">    .. card:: Function Description</span>
 
@@ -595,18 +595,18 @@ window.addEventListener("load", load);
 <span class="sd">            import langchain_openai</span>
 <span class="sd">            import agentc_langchain.cache</span>
 
-<span class="sd">            chat_model = langchain_openai.chat_models.ChatOpenAI(model=&quot;gpt-4o&quot;)</span>
+<span class="sd">            chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o")</span>
 <span class="sd">            caching_chat_model = agentc_langchain.cache.cache(</span>
 <span class="sd">                chat_model=chat_model,</span>
-<span class="sd">                kind=&quot;exact&quot;,</span>
+<span class="sd">                kind="exact",</span>
 <span class="sd">                create_if_not_exists=True</span>
 <span class="sd">            )</span>
 
 <span class="sd">            # Response #2 is served from the cache.</span>
-<span class="sd">            response_1 = caching_chat_model.invoke(&quot;Hello there!&quot;)</span>
-<span class="sd">            response_2 = caching_chat_model.invoke(&quot;Hello there!&quot;)</span>
+<span class="sd">            response_1 = caching_chat_model.invoke("Hello there!")</span>
+<span class="sd">            response_2 = caching_chat_model.invoke("Hello there!")</span>
 
-<span class="sd">        By default, the Couchbase initialization of the cache is separate from the cache&#39;s usage (storage and</span>
+<span class="sd">        By default, the Couchbase initialization of the cache is separate from the cache's usage (storage and</span>
 <span class="sd">        retrieval).</span>
 <span class="sd">        To explicitly initialize the cache yourself, use the :py:meth:`initialize` method.</span>
 
@@ -622,14 +622,14 @@ window.addEventListener("load", load);
 <span class="sd">    :param kwargs: Keyword arguments to be forwarded to a :py:class:`CacheOptions` constructor (ignored if options is</span>
 <span class="sd">                   present).</span>
 <span class="sd">    :return: The same LangChain chat model that was passed in, but with a cache attached.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">options</span> <span class="o">=</span> <span class="n">CacheOptions</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">create_if_not_exists</span><span class="p">:</span>
         <span class="n">initialize</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
 
     <span class="c1"># Attach our cache to the chat model.</span>
-    <span class="k">if</span> <span class="n">kind</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;exact&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">kind</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"exact"</span><span class="p">:</span>
         <span class="n">llm_cache</span> <span class="o">=</span> <span class="n">langchain_couchbase</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">CouchbaseCache</span><span class="p">(</span>
             <span class="n">cluster</span><span class="o">=</span><span class="n">options</span><span class="o">.</span><span class="n">Cluster</span><span class="p">(),</span>
             <span class="n">bucket_name</span><span class="o">=</span><span class="n">options</span><span class="o">.</span><span class="n">bucket</span><span class="p">,</span>
@@ -639,7 +639,7 @@ window.addEventListener("load", load);
         <span class="p">)</span>
         <span class="n">chat_model</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">llm_cache</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Illegal kind specified! &#39;kind&#39; must be &#39;exact&#39; or &#39;semantic&#39;.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Illegal kind specified! 'kind' must be 'exact' or 'semantic'."</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">chat_model</span></div>
 
 </pre></div>

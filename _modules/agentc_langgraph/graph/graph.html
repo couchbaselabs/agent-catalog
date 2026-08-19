@@ -4,14 +4,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>agentc_langgraph.graph.graph &#8212; Agent Catalog 0.0.0.post5 documentation</title>
+    <title>agentc_langgraph.graph.graph &#8212; Agent Catalog 1.1.4.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=ecdef530" />
     <link rel="stylesheet" type="text/css" href="../../../_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=7230e44a" />
-    <script src="../../../_static/documentation_options.js?v=251b0014"></script>
+    <script src="../../../_static/documentation_options.js?v=c9562da9"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -400,7 +400,7 @@ window.addEventListener("load", load);
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.0.0.post5 documentation</a></h1>
+        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 1.1.4.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -528,19 +528,19 @@ window.addEventListener("load", load);
 <span class="kn">from</span><span class="w"> </span><span class="nn">agentc_core.catalog</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 
 <span class="c1"># The type of our state.</span>
-<span class="n">S</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;S&quot;</span><span class="p">)</span>
+<span class="n">S</span> <span class="o">=</span> <span class="n">typing</span><span class="o">.</span><span class="n">TypeVar</span><span class="p">(</span><span class="s2">"S"</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="GraphRunnable">
 <a class="viewcode-back" href="../../../api.html#agentc_langgraph.graph.GraphRunnable">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GraphRunnable</span><span class="p">(</span><span class="n">langchain_core</span><span class="o">.</span><span class="n">runnables</span><span class="o">.</span><span class="n">Runnable</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A helper class that wraps the &quot;Runnable&quot; interface with :py:class:`agentc.Span`.</span>
+<span class="w">    </span><span class="sd">"""A helper class that wraps the "Runnable" interface with :py:class:`agentc.Span`.</span>
 
 <span class="sd">    .. card:: Class Description</span>
 
 <span class="sd">        This class is meant to handle some of the boilerplate around using :py:class:`agentc.Span` instances and</span>
 <span class="sd">        LangGraph compiled graphs.</span>
-<span class="sd">        Specifically, this class builds a new span on instantiation and wraps all ``Runnable`` methods in a Span&#39;s</span>
+<span class="sd">        Specifically, this class builds a new span on instantiation and wraps all ``Runnable`` methods in a Span's</span>
 <span class="sd">        context manager.</span>
 
 <span class="sd">        Below, we illustrate an example implementation of this class for a two-agent system.</span>
@@ -564,37 +564,37 @@ window.addEventListener("load", load);
 
 <span class="sd">                def compile(self):</span>
 <span class="sd">                    research_agent = langgraph.prebuilt.create_react_agent(</span>
-<span class="sd">                        model=langchain_openai.ChatOpenAI(model=&quot;gpt-4o&quot;),</span>
+<span class="sd">                        model=langchain_openai.ChatOpenAI(model="gpt-4o"),</span>
 <span class="sd">                        tools=[self.search_web]</span>
 <span class="sd">                    )</span>
 <span class="sd">                    summary_agent = langgraph.prebuilt.create_react_agent(</span>
-<span class="sd">                        model=langchain_openai.ChatOpenAI(model=&quot;gpt-4o&quot;),</span>
+<span class="sd">                        model=langchain_openai.ChatOpenAI(model="gpt-4o"),</span>
 <span class="sd">                        tools=[self.summarize_results]</span>
 <span class="sd">                    )</span>
 <span class="sd">                    workflow = langgraph.graph.StateGraph(agentc_langgraph.graph.State)</span>
-<span class="sd">                    workflow.add_node(&quot;research_agent&quot;, research_agent)</span>
-<span class="sd">                    workflow.add_node(&quot;summary_agent&quot;, summary_agent)</span>
-<span class="sd">                    workflow.add_edge(&quot;research_agent&quot;, &quot;summary_agent&quot;)</span>
-<span class="sd">                    workflow.add_edge(&quot;summary_agent&quot;, langgraph.graph.END)</span>
-<span class="sd">                    workflow.set_entry_point(&quot;research_agent&quot;)</span>
+<span class="sd">                    workflow.add_node("research_agent", research_agent)</span>
+<span class="sd">                    workflow.add_node("summary_agent", summary_agent)</span>
+<span class="sd">                    workflow.add_edge("research_agent", "summary_agent")</span>
+<span class="sd">                    workflow.add_edge("summary_agent", langgraph.graph.END)</span>
+<span class="sd">                    workflow.set_entry_point("research_agent")</span>
 <span class="sd">                    return workflow.compile()</span>
 
-<span class="sd">            if __name__ == &#39;__main__&#39;:</span>
+<span class="sd">            if __name__ == '__main__':</span>
 <span class="sd">                catalog = agentc.Catalog()</span>
 <span class="sd">                state = MyResearchState(messages=[], is_last_step=False)</span>
 <span class="sd">                MyResearcherApp(catalog=catalog).invoke(input=state)</span>
 
 <span class="sd">        .. note::</span>
 
-<span class="sd">            For more information around LangGraph&#39;s (LangChain&#39;s) ``Runnable`` interface, see LangChain&#39;s documentation</span>
+<span class="sd">            For more information around LangGraph's (LangChain's) ``Runnable`` interface, see LangChain's documentation</span>
 <span class="sd">            `here &lt;https://python.langchain.com/api_reference/core/runnables/langchain_core.runnables.base.Runnable.html&gt;`__.</span>
 
 <span class="sd">        .. tip::</span>
 
 <span class="sd">            The example above does not use tools and prompts managed by Agent Catalog.</span>
 <span class="sd">            See :py:class:`agentc_langgraph.agent.ReActAgent` for a helper class that handles some of the boilerplate</span>
-<span class="sd">            around using LangGraph&#39;s prebuilt ReAct agent and Agent Catalog.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">            around using LangGraph's prebuilt ReAct agent and Agent Catalog.</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">catalog</span><span class="p">:</span> <span class="n">Catalog</span><span class="p">,</span> <span class="n">span</span><span class="p">:</span> <span class="n">Span</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">catalog</span><span class="p">:</span> <span class="n">Catalog</span> <span class="o">=</span> <span class="n">catalog</span>

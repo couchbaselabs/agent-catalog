@@ -4,14 +4,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>agentc_core.activity.models.log &#8212; Agent Catalog 0.0.0.post5 documentation</title>
+    <title>agentc_core.activity.models.log &#8212; Agent Catalog 1.1.4.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=ecdef530" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=7230e44a" />
-    <script src="../../../../_static/documentation_options.js?v=251b0014"></script>
+    <script src="../../../../_static/documentation_options.js?v=c9562da9"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -400,7 +400,7 @@ window.addEventListener("load", load);
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="../../../../index.html" title="Go to homepage">Agent Catalog 0.0.0.post5 documentation</a></h1>
+        <h1><a href="../../../../index.html" title="Go to homepage">Agent Catalog 1.1.4.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -529,7 +529,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="Log">
 <a class="viewcode-back" href="../../../../log.html#agentc_core.activity.models.log.Log">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Log</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A :py:class:`Log` instance represents a single log record that is bound to a part of the application</span>
+<span class="w">    </span><span class="sd">"""A :py:class:`Log` instance represents a single log record that is bound to a part of the application</span>
 <span class="sd">    **versioned** according to :py:attr:`catalog_version`.</span>
 
 <span class="sd">    .. attention::</span>
@@ -538,7 +538,7 @@ window.addEventListener("load", load);
 <span class="sd">        Only :py:class:`Content` instances should be created directly, and then passed to a :py:class:`Span` instance</span>
 <span class="sd">        via the :py:meth:`agentc.span.Span.log` method.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="Log.Span">
 <a class="viewcode-back" href="../../../../log.html#agentc_core.activity.models.log.Log.Span">[docs]</a>
@@ -546,43 +546,43 @@ window.addEventListener("load", load);
         <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">ConfigDict</span><span class="p">(</span><span class="n">use_enum_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="n">session</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The &#39;session&#39; (a runtime identifier) that this span is associated with.&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">"The 'session' (a runtime identifier) that this span is associated with."</span><span class="p">,</span>
             <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="n">name</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The name of the span. This is a list of names that represent the span hierarchy.&quot;</span><span class="p">,</span>
-            <span class="n">examples</span><span class="o">=</span><span class="p">[[</span><span class="s2">&quot;my_application&quot;</span><span class="p">,</span> <span class="s2">&quot;my_agent&quot;</span><span class="p">,</span> <span class="s2">&quot;my_task&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;my_application&quot;</span><span class="p">,</span> <span class="s2">&quot;my_agent&quot;</span><span class="p">]],</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">"The name of the span. This is a list of names that represent the span hierarchy."</span><span class="p">,</span>
+            <span class="n">examples</span><span class="o">=</span><span class="p">[[</span><span class="s2">"my_application"</span><span class="p">,</span> <span class="s2">"my_agent"</span><span class="p">,</span> <span class="s2">"my_task"</span><span class="p">],</span> <span class="p">[</span><span class="s2">"my_application"</span><span class="p">,</span> <span class="s2">"my_agent"</span><span class="p">]],</span>
         <span class="p">)</span></div>
 
 
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">ConfigDict</span><span class="p">(</span><span class="n">use_enum_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A unique identifier for this record. This field is typically a UUID.&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"A unique identifier for this record. This field is typically a UUID."</span><span class="p">,</span>
         <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">span</span><span class="p">:</span> <span class="s2">&quot;Log.Span&quot;</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The span (i.e., a list of names and a session ID) that this record is associated with.&quot;</span>
+    <span class="n">span</span><span class="p">:</span> <span class="s2">"Log.Span"</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"The span (i.e., a list of names and a session ID) that this record is associated with."</span>
     <span class="p">)</span>
 
     <span class="n">timestamp</span><span class="p">:</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">AwareDatetime</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Timestamp of the generated record. This field must have a timezone attached as well.&quot;</span><span class="p">,</span>
-        <span class="n">examples</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2024-08-26T12:02:59.500Z&quot;</span><span class="p">,</span> <span class="s2">&quot;2024-08-26T12:02:59.500+00:00&quot;</span><span class="p">],</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Timestamp of the generated record. This field must have a timezone attached as well."</span><span class="p">,</span>
+        <span class="n">examples</span><span class="o">=</span><span class="p">[</span><span class="s2">"2024-08-26T12:02:59.500Z"</span><span class="p">,</span> <span class="s2">"2024-08-26T12:02:59.500+00:00"</span><span class="p">],</span>
     <span class="p">)</span>
 
     <span class="n">content</span><span class="p">:</span> <span class="n">Content</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;The content of the record. This should be as close to the producer as possible.&quot;</span><span class="p">,</span>
-        <span class="n">discriminator</span><span class="o">=</span><span class="s2">&quot;kind&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"The content of the record. This should be as close to the producer as possible."</span><span class="p">,</span>
+        <span class="n">discriminator</span><span class="o">=</span><span class="s2">"kind"</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">annotations</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Additional annotations that can be added to the message.&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Additional annotations that can be added to the message."</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">)</span>
 
     <span class="n">catalog_version</span><span class="p">:</span> <span class="n">VersionDescriptor</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A unique identifier that defines a catalog version / snapshot / commit.&quot;</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"A unique identifier that defines a catalog version / snapshot / commit."</span>
     <span class="p">)</span></div>
 
 </pre></div>

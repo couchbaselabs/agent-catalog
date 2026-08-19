@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Frequently Asked Questions &#8212; Agent Catalog 0.0.0.post5 documentation</title>
+    <title>Frequently Asked Questions &#8212; Agent Catalog 1.1.4.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=ecdef530" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=7230e44a" />
-    <script src="_static/documentation_options.js?v=251b0014"></script>
+    <script src="_static/documentation_options.js?v=c9562da9"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -38,7 +38,7 @@
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.0.0.post5 documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog 1.1.4.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -262,11 +262,11 @@ For example, logging all <code class="code highlight python docutils literal hig
 <code class="code docutils literal notranslate"><span class="pre">with_langgraph</span></code> example can be realized by adding the following lines to the top of the <code class="file docutils literal notranslate"><span class="pre">main.py</span></code> file:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
-<span class="n">debug_file_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;agentc.log&quot;</span><span class="p">)</span>
+<span class="n">debug_file_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">"agentc.log"</span><span class="p">)</span>
 <span class="n">debug_file_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 
-<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;agentc_core&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">debug_file_handler</span><span class="p">)</span>
-<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;agentc_core&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">"agentc_core"</span><span class="p">)</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">debug_file_handler</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">"agentc_core"</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition tip">
@@ -308,8 +308,8 @@ For this example, we will focus on tools:</p>
 <span class="go">            repo version    :</span>
 <span class="go">                    time of publish: 2024-10-23 07:16:15.058405+00:00</span>
 <span class="go">                    catalog identifier: 53010a92d74e96851fb36fc2c69b9c3337140890</span>
-<span class="go">            embedding model : {&#39;base_url&#39;: None, &#39;name&#39;: &#39;sentence-transformers/all-MiniLM-L12-v2&#39;}</span>
-<span class="go">            source dirs     : [&#39;src/resources/agent_c/tools&#39;]</span>
+<span class="go">            embedding model : {'base_url': None, 'name': 'sentence-transformers/all-MiniLM-L12-v2'}</span>
+<span class="go">            source dirs     : ['src/resources/agent_c/tools']</span>
 <span class="go">            number of items : 24</span>
 
 <span class="hll"><span class="go">    catalog id: fe25a5755bfa9af68e1f1fae9ac45e9e37b37611</span>
@@ -319,8 +319,8 @@ For this example, we will focus on tools:</p>
 <span class="go">            repo version    :</span>
 <span class="go">                    time of publish: 2024-10-16 05:34:38.523755+00:00</span>
 <span class="go">                    catalog identifier: fe25a5755bfa9af68e1f1fae9ac45e9e37b37611</span>
-<span class="go">            embedding model : {&#39;base_url&#39;: None, &#39;name&#39;: &#39;sentence-transformers/all-MiniLM-L12-v2&#39;}</span>
-<span class="go">            source dirs     : [&#39;src/resources/tools&#39;]</span>
+<span class="go">            embedding model : {'base_url': None, 'name': 'sentence-transformers/all-MiniLM-L12-v2'}</span>
+<span class="go">            source dirs     : ['src/resources/tools']</span>
 <span class="go">            number of items : 2</span>
 
 <span class="go">-----------------------------------------------------------------</span>

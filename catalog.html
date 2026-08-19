@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Agent Catalog Record Entries &#8212; Agent Catalog 0.0.0.post5 documentation</title>
+    <title>Agent Catalog Record Entries &#8212; Agent Catalog 1.1.4.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=ecdef530" />
     <link rel="stylesheet" type="text/css" href="_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="_static/custom.css?v=7230e44a" />
-    <script src="_static/documentation_options.js?v=251b0014"></script>
+    <script src="_static/documentation_options.js?v=c9562da9"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -38,7 +38,7 @@
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="index.html" title="Go to homepage">Agent Catalog 0.0.0.post5 documentation</a></h1>
+        <h1><a href="index.html" title="Go to homepage">Agent Catalog 1.1.4.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -181,19 +181,19 @@ To signal to Agent Catalog that you want to mark a function as a tool, you must 
     <span class="n">sales_formula</span><span class="p">:</span> <span class="nb">str</span>
 
 
-<span class="c1"># Only functions decorated with &quot;tool&quot; will be indexed.</span>
+<span class="c1"># Only functions decorated with "tool" will be indexed.</span>
 <span class="c1"># All other functions / module members will be ignored by the indexer.</span>
 <span class="nd">@tool</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_sales_for_this_week</span><span class="p">(</span><span class="n">sales_model</span><span class="p">:</span> <span class="n">SalesModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A description for the function bound to the tool. This is mandatory for tools.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""A description for the function bound to the tool. This is mandatory for tools."""</span>
 
     <span class="k">return</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="mf">0.99</span> <span class="o">+</span> <span class="mf">2.00</span> <span class="o">%</span> <span class="mf">6.0</span>
 
 
 <span class="c1"># You can also specify the name and description of the tool explicitly, as well as any annotations you wish to attach.</span>
-<span class="nd">@tool</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;compute_sales_for_the_month&quot;</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;sales&quot;</span><span class="p">})</span>
+<span class="nd">@tool</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"compute_sales_for_the_month"</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"sales"</span><span class="p">})</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_sales_for_the_month</span><span class="p">(</span><span class="n">sales_model</span><span class="p">:</span> <span class="n">SalesModel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A description for the function bound to the tool. This is mandatory for tools.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""A description for the function bound to the tool. This is mandatory for tools."""</span>
 
     <span class="k">return</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="mf">0.99</span> <span class="o">+</span> <span class="mf">2.00</span> <span class="o">%</span> <span class="mf">6.0</span>
 </pre></div>
@@ -226,41 +226,41 @@ description: &gt;
 # See https://json-schema.org/learn/getting-started-step-by-step for more info.
 input: &gt;
     {
-      &quot;type&quot;: &quot;object&quot;,
-      &quot;properties&quot;: {
-        &quot;orderdate_start&quot;: { &quot;type&quot;: &quot;string&quot; },
-        &quot;orderdate_end&quot;: { &quot;type&quot;: &quot;string&quot; }
+      "type": "object",
+      "properties": {
+        "orderdate_start": { "type": "string" },
+        "orderdate_end": { "type": "string" }
       }
     }
 
 # The outputs used describe the structure of the SQL++ query result.
 # Outputs are described using a JSON object that follows the JSON schema standard.
 # This field is optional, and will be used to build a Pydantic model.
-# We recommend using the &#39;INFER&#39; command to build a JSON schema from your query results.
+# We recommend using the 'INFER' command to build a JSON schema from your query results.
 # See https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/infer.html.
 # In the future, this field will be optional (we will INFER the query automatically for you).
 # output: &gt;
 #     {
-#       &quot;type&quot;: &quot;array&quot;,
-#       &quot;items&quot;: {
-#         &quot;type&quot;: &quot;object&quot;,
-#         &quot;properties&quot;: {
-#           &quot;cust_id&quot;: { &quot;type&quot;: &quot;string&quot; },
-#           &quot;first_name&quot;: { &quot;type&quot;: &quot;string&quot; },
-#           &quot;last_name&quot;: { &quot;type&quot;: &quot;string&quot; },
-#           &quot;item_cnt&quot;: { &quot;type&quot;: &quot;integer&quot; }
+#       "type": "array",
+#       "items": {
+#         "type": "object",
+#         "properties": {
+#           "cust_id": { "type": "string" },
+#           "first_name": { "type": "string" },
+#           "last_name": { "type": "string" },
+#           "item_cnt": { "type": "integer" }
 #         }
 #       }
 #     }
 
 # As a supplement to the tool similarity search, users can optionally specify search annotations.
-# The values of these annotations MUST be strings (e.g., not &#39;true&#39;, but &#39;&quot;true&quot;&#39;).
+# The values of these annotations MUST be strings (e.g., not 'true', but '"true"').
 # This field is optional, and does not have to be present.
 annotations:
-  gdpr_2016_compliant: &quot;false&quot;
-  ccpa_2019_compliant: &quot;true&quot;
+  gdpr_2016_compliant: "false"
+  ccpa_2019_compliant: "true"
 
-# The &quot;secrets&quot; field defines search keys that will be used to query a &quot;secrets&quot; manager.
+# The "secrets" field defines search keys that will be used to query a "secrets" manager.
 # Note that these values are NOT the secrets themselves, rather they are used to lookup secrets.
 secrets:
 
@@ -282,7 +282,7 @@ FROM
   o.items   AS i
 WHERE
   -- Parameters specified in the input field of the tool metadata above correspond to named parameters here.
-  -- The &#39;$&#39; syntax is used to denote a named parameter.
+  -- The '$' syntax is used to denote a named parameter.
   -- See https://docs.couchbase.com/server/current/n1ql/n1ql-rest-api/exnamed.html for more details.
   ( o.orderdate BETWEEN $orderdate_start AND $orderdate_end ) AND
   c.cust_id = o.cust_id
@@ -318,23 +318,23 @@ To create a semantic search tool, you must author a <code class="docutils litera
 <span class="c1"># See https://json-schema.org/learn/getting-started-step-by-step for more info.</span>
 <span class="nb">input</span><span class="p">:</span> <span class="o">&gt;</span>
   <span class="p">{</span>
-    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-      <span class="s2">&quot;search_tags&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span> <span class="p">}</span>
+    <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"object"</span><span class="p">,</span>
+    <span class="s2">"properties"</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">"search_tags"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"array"</span><span class="p">,</span>
+        <span class="s2">"items"</span><span class="p">:</span> <span class="p">{</span> <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span> <span class="p">}</span>
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">}</span>
 
 <span class="c1"># As a supplement to the tool similarity search, users can optionally specify search annotations.</span>
-<span class="c1"># The values of these annotations MUST be strings (e.g., not &#39;true&#39;, but &#39;&quot;true&quot;&#39;).</span>
+<span class="c1"># The values of these annotations MUST be strings (e.g., not 'true', but '"true"').</span>
 <span class="c1"># This field is optional, and does not have to be present.</span>
 <span class="n">annotations</span><span class="p">:</span>
-  <span class="n">gdpr_2016_compliant</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span>
-  <span class="n">ccpa_2019_compliant</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+  <span class="n">gdpr_2016_compliant</span><span class="p">:</span> <span class="s2">"false"</span>
+  <span class="n">ccpa_2019_compliant</span><span class="p">:</span> <span class="s2">"true"</span>
 
-<span class="c1"># The &quot;secrets&quot; field defines search keys that will be used to query a &quot;secrets&quot; manager.</span>
+<span class="c1"># The "secrets" field defines search keys that will be used to query a "secrets" manager.</span>
 <span class="c1"># Note that these values are NOT the secrets themselves, rather they are used to lookup secrets.</span>
 <span class="n">secrets</span><span class="p">:</span>
 
@@ -393,11 +393,11 @@ One tool is generated per specified endpoint.</p>
 <span class="n">record_kind</span><span class="p">:</span> <span class="n">http_request</span>
 
 <span class="c1"># As a supplement to the tool similarity search, users can optionally specify search annotations.</span>
-<span class="c1"># The values of these annotations MUST be strings (e.g., not &#39;true&#39;, but &#39;&quot;true&quot;&#39;).</span>
+<span class="c1"># The values of these annotations MUST be strings (e.g., not 'true', but '"true"').</span>
 <span class="c1"># This field is optional, and does not have to be present.</span>
 <span class="n">annotations</span><span class="p">:</span>
-  <span class="n">gdpr_2016_compliant</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span>
-  <span class="n">ccpa_2019_compliant</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+  <span class="n">gdpr_2016_compliant</span><span class="p">:</span> <span class="s2">"false"</span>
+  <span class="n">ccpa_2019_compliant</span><span class="p">:</span> <span class="s2">"true"</span>
 
 <span class="c1"># HTTP requests must be specified using an OpenAPI spec.</span>
 <span class="n">open_api</span><span class="p">:</span>
@@ -441,31 +441,31 @@ types, etc...) given to an LLM (or an agent framework).</p>
 <span class="c1"># This field is mandatory, and will be used when searching for prompts by name.</span>
 <span class="n">name</span><span class="p">:</span> <span class="n">route_finding_agent</span>
 
-<span class="c1"># A description of the prompt&#39;s purpose (e.g., where this prompt will be used).</span>
+<span class="c1"># A description of the prompt's purpose (e.g., where this prompt will be used).</span>
 <span class="c1"># This field is mandatory, and will be used (indirectly) when performing semantic search for prompts.</span>
 <span class="n">description</span><span class="p">:</span> <span class="o">&gt;</span>
   <span class="n">Instructions</span> <span class="n">on</span> <span class="n">how</span> <span class="n">to</span> <span class="n">find</span> <span class="n">routes</span> <span class="n">between</span> <span class="n">two</span> <span class="n">specific</span> <span class="n">airports</span><span class="o">.</span>
 
 <span class="c1"># As a supplement to the description similarity search, users can optionally specify search annotations.</span>
-<span class="c1"># The values of these annotations MUST be strings (e.g., not &#39;true&#39;, but &#39;&quot;true&quot;&#39;).</span>
+<span class="c1"># The values of these annotations MUST be strings (e.g., not 'true', but '"true"').</span>
 <span class="c1"># This field is optional, and does not have to be present.</span>
 <span class="n">annotations</span><span class="p">:</span>
-  <span class="n">organization</span><span class="p">:</span> <span class="s2">&quot;sequoia&quot;</span>
+  <span class="n">organization</span><span class="p">:</span> <span class="s2">"sequoia"</span>
 
 <span class="c1"># The input to an LLM will _generally_ (more often than not) be accompanied by a small collection of tools.</span>
 <span class="c1"># This field is used at provider time to search the catalog for tools.</span>
 <span class="c1"># This field is optional, and does not have to be present.</span>
 <span class="n">tools</span><span class="p">:</span>
-  <span class="c1"># Tools can be specified using the same parameters found in Catalog.find(&quot;tool&quot;, ...).</span>
+  <span class="c1"># Tools can be specified using the same parameters found in Catalog.find("tool", ...).</span>
   <span class="c1"># For instance, we can condition on the tool name...</span>
-  <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="s2">&quot;find_indirect_routes&quot;</span>
+  <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="s2">"find_indirect_routes"</span>
 
   <span class="c1"># ...the tool name and some annotations...</span>
-  <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="s2">&quot;find_direct_routes&quot;</span>
-    <span class="n">annotations</span><span class="p">:</span> <span class="n">gdpr_2016_compliant</span> <span class="o">=</span> <span class="s2">&quot;true&quot;</span>
+  <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="s2">"find_direct_routes"</span>
+    <span class="n">annotations</span><span class="p">:</span> <span class="n">gdpr_2016_compliant</span> <span class="o">=</span> <span class="s2">"true"</span>
 
   <span class="c1"># ...or even a semantic search via the tool description.</span>
-  <span class="o">-</span> <span class="n">query</span><span class="p">:</span> <span class="s2">&quot;finding flights by name&quot;</span>
+  <span class="o">-</span> <span class="n">query</span><span class="p">:</span> <span class="s2">"finding flights by name"</span>
     <span class="n">limit</span><span class="p">:</span> <span class="mi">2</span>
 
 <span class="c1"># The output type (expressed in JSON-schema) associated with this prompt.</span>
@@ -477,10 +477,10 @@ types, etc...) given to an LLM (or an agent framework).</p>
   <span class="n">properties</span><span class="p">:</span>
     <span class="n">source</span><span class="p">:</span>
       <span class="nb">type</span><span class="p">:</span> <span class="n">string</span>
-      <span class="n">description</span><span class="p">:</span> <span class="s2">&quot;The IATA code for the source airport.&quot;</span>
+      <span class="n">description</span><span class="p">:</span> <span class="s2">"The IATA code for the source airport."</span>
     <span class="n">dest</span><span class="p">:</span>
       <span class="nb">type</span><span class="p">:</span> <span class="n">string</span>
-      <span class="n">description</span><span class="p">:</span> <span class="s2">&quot;The IATA code for the destination airport.&quot;</span>
+      <span class="n">description</span><span class="p">:</span> <span class="s2">"The IATA code for the destination airport."</span>
 
 <span class="c1"># The textual input to the model.</span>
 <span class="c1"># This can either be a single string or an arbitrarily nested dictionary.</span>
@@ -522,12 +522,12 @@ This is useful for agent frameworks that require specific small snippets of text
 <span class="kn">import</span><span class="w"> </span><span class="nn">your_favorite_agent_framework</span>
 
 <span class="n">catalog</span> <span class="o">=</span> <span class="n">agentc</span><span class="o">.</span><span class="n">Catalog</span><span class="p">()</span>
-<span class="n">my_prompt</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;prompt&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my_prompt&quot;</span><span class="p">)</span>
+<span class="n">my_prompt</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"prompt"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"my_prompt"</span><span class="p">)</span>
 <span class="n">my_agent</span> <span class="o">=</span> <span class="n">your_favorite_agent_framework</span><span class="o">.</span><span class="n">Agent</span><span class="p">(</span>
-    <span class="n">instructions</span><span class="o">=</span><span class="n">my_prompt</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="s2">&quot;agent_instructions&quot;</span><span class="p">],</span>
+    <span class="n">instructions</span><span class="o">=</span><span class="n">my_prompt</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="s2">"agent_instructions"</span><span class="p">],</span>
     <span class="n">output</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
-        <span class="s2">&quot;instructions&quot;</span><span class="p">:</span> <span class="n">my_prompt</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="s2">&quot;format_instructions&quot;</span><span class="p">]</span>
+        <span class="s2">"type"</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+        <span class="s2">"instructions"</span><span class="p">:</span> <span class="n">my_prompt</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="s2">"format_instructions"</span><span class="p">]</span>
     <span class="p">}</span>
 <span class="p">)</span>
 </pre></div>

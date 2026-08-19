@@ -4,14 +4,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>agentc_langgraph.state.options &#8212; Agent Catalog 0.0.0.post5 documentation</title>
+    <title>agentc_langgraph.state.options &#8212; Agent Catalog 1.1.4.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=ecdef530" />
     <link rel="stylesheet" type="text/css" href="../../../_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=7230e44a" />
-    <script src="../../../_static/documentation_options.js?v=251b0014"></script>
+    <script src="../../../_static/documentation_options.js?v=c9562da9"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -400,7 +400,7 @@ window.addEventListener("load", load);
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.0.0.post5 documentation</a></h1>
+        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 1.1.4.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -539,84 +539,84 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../api.html#agentc_langgraph.state.CheckpointOptions">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CheckpointOptions</span><span class="p">(</span><span class="n">pydantic_settings</span><span class="o">.</span><span class="n">BaseSettings</span><span class="p">):</span>
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic_settings</span><span class="o">.</span><span class="n">SettingsConfigDict</span><span class="p">(</span>
-        <span class="n">env_file</span><span class="o">=</span><span class="s2">&quot;.env&quot;</span><span class="p">,</span> <span class="n">env_prefix</span><span class="o">=</span><span class="s2">&quot;AGENT_CATALOG_LANGGRAPH_CHECKPOINT_&quot;</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;allow&quot;</span>
+        <span class="n">env_file</span><span class="o">=</span><span class="s2">".env"</span><span class="p">,</span> <span class="n">env_prefix</span><span class="o">=</span><span class="s2">"AGENT_CATALOG_LANGGRAPH_CHECKPOINT_"</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">"allow"</span>
     <span class="p">)</span>
 
     <span class="c1"># Connection-specific details.</span>
     <span class="n">conn_string</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; The connection string to the Couchbase cluster hosting the cache.</span>
+<span class="w">    </span><span class="sd">""" The connection string to the Couchbase cluster hosting the cache.</span>
 
 <span class="sd">    This field **must** be specified.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">username</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Username associated with the Couchbase instance hosting the cache.</span>
+<span class="w">    </span><span class="sd">""" Username associated with the Couchbase instance hosting the cache.</span>
 
 <span class="sd">    This field **must** be specified.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">password</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">pydantic</span><span class="o">.</span><span class="n">SecretStr</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Password associated with the Couchbase instance hosting the cache.</span>
+<span class="w">    </span><span class="sd">""" Password associated with the Couchbase instance hosting the cache.</span>
 
 <span class="sd">    This field **must** be specified.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">conn_root_certificate</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Path to the root certificate file for the Couchbase cluster.</span>
+<span class="w">    </span><span class="sd">""" Path to the root certificate file for the Couchbase cluster.</span>
 
 <span class="sd">    This field is optional and only required if the Couchbase cluster is using a self-signed certificate.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># Collection-specific details.</span>
     <span class="n">bucket</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; The name of the Couchbase bucket hosting the checkpoints.</span>
+<span class="w">    </span><span class="sd">""" The name of the Couchbase bucket hosting the checkpoints.</span>
 
 <span class="sd">    This field **must** be specified.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">scope</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_COUCHBASE_CHECKPOINT_SCOPE_NAME</span><span class="p">)</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; The name of the Couchbase scope hosting the checkpoints.</span>
+<span class="w">    </span><span class="sd">""" The name of the Couchbase scope hosting the checkpoints.</span>
 
 <span class="sd">    This field is optional and defaults to ``agent_activity``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">checkpoint_collection</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span>
         <span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_COUCHBASE_CHECKPOINT_THREAD_COLLECTION_NAME</span>
     <span class="p">)</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; The name of the Couchbase collection hosting the checkpoints threads.</span>
+<span class="w">    </span><span class="sd">""" The name of the Couchbase collection hosting the checkpoints threads.</span>
 
 <span class="sd">    This field is optional and defaults to ``langgraph_checkpoint_thread``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">tuple_collection</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_COUCHBASE_CHECKPOINT_TUPLE_COLLECTION_NAME</span><span class="p">)</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; The name of the Couchbase collection hosting the checkpoints tuples.</span>
+<span class="w">    </span><span class="sd">""" The name of the Couchbase collection hosting the checkpoints tuples.</span>
 
 <span class="sd">    This field is optional and defaults to ``langgraph_checkpoint_tuple``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">create_if_not_exists</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Create the required collections if they do not exist.</span>
+<span class="w">    </span><span class="sd">""" Create the required collections if they do not exist.</span>
 
 <span class="sd">    When raised (i.e., this value is set to :python:`True`), the collections will be created if they do not exist.</span>
 <span class="sd">    Lower this flag (set this to :python:`False`) to instead raise an error if the collections do not exist.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">ddl_retry_attempts</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_COUCHBASE_CHECKPOINT_DDL_RETRY_ATTEMPTS</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Maximum number of attempts to retry DDL operations.</span>
+<span class="w">    </span><span class="sd">""" Maximum number of attempts to retry DDL operations.</span>
 
 <span class="sd">    This value is only used on setup (i.e., the first time the checkpointer is requested).</span>
 <span class="sd">    If the number of attempts is exceeded, the command will fail.</span>
 <span class="sd">    By default, this value is 3 attempts.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">ddl_retry_wait_seconds</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_COUCHBASE_CHECKPOINT_DDL_RETRY_WAIT_SECONDS</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Wait time (in seconds) between DDL operation retries.</span>
+<span class="w">    </span><span class="sd">""" Wait time (in seconds) between DDL operation retries.</span>
 
 <span class="sd">    This value is only used on setup (i.e., the first time the checkpointer is requested).</span>
 <span class="sd">    By default, this value is 5 seconds.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"after"</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_pull_cluster_from_agent_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">RemoteCatalogConfig</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn_string</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

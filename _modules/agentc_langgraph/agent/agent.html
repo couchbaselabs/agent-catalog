@@ -4,14 +4,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>agentc_langgraph.agent.agent &#8212; Agent Catalog 0.0.0.post5 documentation</title>
+    <title>agentc_langgraph.agent.agent &#8212; Agent Catalog 1.1.4.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=ecdef530" />
     <link rel="stylesheet" type="text/css" href="../../../_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=7230e44a" />
-    <script src="../../../_static/documentation_options.js?v=251b0014"></script>
+    <script src="../../../_static/documentation_options.js?v=c9562da9"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -400,7 +400,7 @@ window.addEventListener("load", load);
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.0.0.post5 documentation</a></h1>
+        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 1.1.4.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -538,7 +538,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="State">
 <a class="viewcode-back" href="../../../api.html#agentc_langgraph.agent.State">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">State</span><span class="p">(</span><span class="n">typing</span><span class="o">.</span><span class="n">TypedDict</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;An (optional) state class for use with Agent Catalog&#39;s LangGraph helper classes.</span>
+<span class="w">    </span><span class="sd">"""An (optional) state class for use with Agent Catalog's LangGraph helper classes.</span>
 
 <span class="sd">    .. card:: Class Description</span>
 
@@ -547,7 +547,7 @@ window.addEventListener("load", load);
 <span class="sd">        This class is essentially identical to the default state schema for LangGraph (i.e.,</span>
 <span class="sd">        ``messages`` and ``is_last_step``) *but* with the inclusion of a new ``previous_node`` field.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">langchain_core</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">BaseMessage</span><span class="p">]</span>
     <span class="n">is_last_step</span><span class="p">:</span> <span class="nb">bool</span>
@@ -558,11 +558,11 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="ReActAgent">
 <a class="viewcode-back" href="../../../api.html#agentc_langgraph.agent.ReActAgent">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ReActAgent</span><span class="p">(</span><span class="n">langchain_core</span><span class="o">.</span><span class="n">runnables</span><span class="o">.</span><span class="n">Runnable</span><span class="p">[</span><span class="n">State</span><span class="p">,</span> <span class="n">State</span> <span class="o">|</span> <span class="n">langgraph</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">Command</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A helper ReAct agent base class that integrates with Agent Catalog.</span>
+<span class="w">    </span><span class="sd">"""A helper ReAct agent base class that integrates with Agent Catalog.</span>
 
 <span class="sd">    .. card:: Class Description</span>
 
-<span class="sd">        This class is meant to handle some of the boilerplate around using Agent Catalog with LangGraph&#39;s prebuilt</span>
+<span class="sd">        This class is meant to handle some of the boilerplate around using Agent Catalog with LangGraph's prebuilt</span>
 <span class="sd">        ReAct agent.</span>
 <span class="sd">        More specifically, this class performs the following:</span>
 
@@ -590,10 +590,10 @@ window.addEventListener("load", load);
 <span class="sd">              properties:</span>
 <span class="sd">                source:</span>
 <span class="sd">                  type: string</span>
-<span class="sd">                  description: &quot;The IATA code for the source airport.&quot;</span>
+<span class="sd">                  description: "The IATA code for the source airport."</span>
 <span class="sd">                dest:</span>
 <span class="sd">                  type: string</span>
-<span class="sd">                  description: &quot;The IATA code for the destination airport.&quot;</span>
+<span class="sd">                  description: "The IATA code for the destination airport."</span>
 <span class="sd">              required: [source, dest]</span>
 
 <span class="sd">            content:</span>
@@ -622,12 +622,12 @@ window.addEventListener("load", load);
 
 <span class="sd">            class EndpointFindingAgent(agentc_langgraph.agent.ReActAgent):</span>
 <span class="sd">                def __init__(self, catalog: agentc.Catalog, span: agentc.Span, **kwargs):</span>
-<span class="sd">                    chat_model = langchain_openai.chat_models.ChatOpenAI(model=&quot;gpt-4o&quot;, temperature=0)</span>
+<span class="sd">                    chat_model = langchain_openai.chat_models.ChatOpenAI(model="gpt-4o", temperature=0)</span>
 <span class="sd">                    super().__init__(</span>
 <span class="sd">                        chat_model=chat_model,</span>
 <span class="sd">                        catalog=catalog,</span>
 <span class="sd">                        span=span,</span>
-<span class="sd">                        prompt_name=&quot;endpoint_finding_node&quot;,</span>
+<span class="sd">                        prompt_name="endpoint_finding_node",</span>
 <span class="sd">                         **kwargs</span>
 <span class="sd">                    )</span>
 
@@ -636,16 +636,16 @@ window.addEventListener("load", load);
 <span class="sd">                    agent = self.create_react_agent(span)</span>
 <span class="sd">                    response = agent.invoke(input=state, config=config)</span>
 
-<span class="sd">                    # &#39;source&#39; and &#39;dest&#39; comes from the prompt&#39;s output format.</span>
-<span class="sd">                    # Note this is a direct mutation on the &quot;state&quot; given to the Span!</span>
-<span class="sd">                    structured_response = response[&quot;structured_response&quot;]</span>
-<span class="sd">                    state[&quot;endpoints&quot;] = {&quot;source&quot;: structured_response[&quot;source&quot;], &quot;destination&quot;: structured_response[&quot;dest&quot;]}</span>
-<span class="sd">                    state[&quot;messages&quot;].append(response[&quot;messages&quot;][-1])</span>
+<span class="sd">                    # 'source' and 'dest' comes from the prompt's output format.</span>
+<span class="sd">                    # Note this is a direct mutation on the "state" given to the Span!</span>
+<span class="sd">                    structured_response = response["structured_response"]</span>
+<span class="sd">                    state["endpoints"] = {"source": structured_response["source"], "destination": structured_response["dest"]}</span>
+<span class="sd">                    state["messages"].append(response["messages"][-1])</span>
 <span class="sd">                    return state</span>
 
-<span class="sd">            if __name__ == &#39;__main__&#39;:</span>
+<span class="sd">            if __name__ == '__main__':</span>
 <span class="sd">                catalog = agentc.Catalog()</span>
-<span class="sd">                span = catalog.Span(name=&quot;root_span&quot;)</span>
+<span class="sd">                span = catalog.Span(name="root_span")</span>
 <span class="sd">                my_agent = EndpointFindingAgent(catalog=catalog, span=span)</span>
 
 <span class="sd">    .. note::</span>
@@ -653,7 +653,7 @@ window.addEventListener("load", load);
 <span class="sd">        For all constructor parameters, see the documentation for :py:class:`langgraph.prebuilt.create_react_agent`</span>
 <span class="sd">        `here &lt;https://langchain-ai.github.io/langgraph/reference/prebuilt/#langgraph.prebuilt.chat_agent_executor.create_react_agent&gt;`__.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -676,7 +676,7 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">:</span> <span class="n">Prompt</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prompt_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">prompt_name</span>
         <span class="k">if</span> <span class="n">prompt_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">:</span> <span class="n">Prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;prompt&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">prompt_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">:</span> <span class="n">Prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">catalog</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">"prompt"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">prompt_name</span><span class="p">)</span>
 
             <span class="c1"># LangChain agents expect LangChain tools, so we will convert the *pure Python functions* we get from Agent</span>
             <span class="c1"># Catalog into LangChain tools here.</span>
@@ -690,37 +690,37 @@ window.addEventListener("load", load);
 
             <span class="k">elif</span> <span class="p">(</span>
                 <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-                <span class="ow">and</span> <span class="s2">&quot;agent_instructions&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span>
-                <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="s2">&quot;agent_instructions&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="s2">"agent_instructions"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span>
+                <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="s2">"agent_instructions"</span><span class="p">],</span> <span class="nb">str</span><span class="p">)</span>
             <span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">prompt_content</span> <span class="o">=</span> <span class="n">langchain_core</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">SystemMessage</span><span class="p">(</span>
-                    <span class="n">content</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="s2">&quot;agent_instructions&quot;</span><span class="p">]</span>
+                    <span class="n">content</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="s2">"agent_instructions"</span><span class="p">]</span>
                 <span class="p">)</span>
             <span class="k">elif</span> <span class="p">(</span>
                 <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-                <span class="ow">and</span> <span class="s2">&quot;agent_instructions&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span>
-                <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="s2">&quot;agent_instructions&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="s2">"agent_instructions"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span>
+                <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="s2">"agent_instructions"</span><span class="p">],</span> <span class="nb">list</span><span class="p">)</span>
             <span class="p">):</span>
                 <span class="n">prompt_parts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">langchain_core</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">BaseMessage</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="s2">&quot;agent_instructions&quot;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="s2">"agent_instructions"</span><span class="p">]:</span>
                     <span class="n">prompt_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">langchain_core</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">SystemMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">part</span><span class="p">))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">prompt_content</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">_m</span><span class="p">:</span> <span class="n">prompt_parts</span> <span class="o">+</span> <span class="n">_m</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">prompt_content</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">_m</span><span class="p">:</span> <span class="n">prompt_parts</span> <span class="o">+</span> <span class="n">_m</span><span class="p">[</span><span class="s2">"messages"</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">                    Prompt content must be either a string, **or** a dictionary with &#39;agent_instructions&#39;.</span>
-<span class="s2">                    If &#39;agent_instructions&#39; is specified, this field must be a string **or** a list of strings.</span>
-<span class="s2">                &quot;&quot;&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"""</span>
+<span class="s2">                    Prompt content must be either a string, **or** a dictionary with 'agent_instructions'.</span>
+<span class="s2">                    If 'agent_instructions' is specified, this field must be a string **or** a list of strings.</span>
+<span class="s2">                """</span><span class="p">)</span>
 
             <span class="c1"># Grab our response format.</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">output</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;output_format_instructions&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="s2">&quot;output_format_instructions&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">"output_format_instructions"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="s2">"output_format_instructions"</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="o">.</span><span class="n">output</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">create_react_agent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">span</span><span class="p">:</span> <span class="n">Span</span><span class="p">,</span> <span class="n">tools</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Sequence</span><span class="p">[</span><span class="n">langchain_core</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">Tool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;A wrapper around LangGraph&#39;s create_react_agent for use with Agent Catalog.</span>
+<span class="w">        </span><span class="sd">"""A wrapper around LangGraph's create_react_agent for use with Agent Catalog.</span>
 
 <span class="sd">        :param span: The :py:class:`agentc.Span` instance to use for all logs generated by this agent.</span>
 <span class="sd">        :param tools: An optional list of LangChain tools to provide to create the agent with.</span>
@@ -729,7 +729,7 @@ window.addEventListener("load", load);
 
 <span class="sd">            For all possible arguments that can be used with this method, see the documentation for</span>
 <span class="sd">            :py:class:`langgraph.prebuilt.chat_agent_executor.create_react_agent` `here &lt;https://langchain-ai.github.io/langgraph/reference/prebuilt/#langgraph.prebuilt.chat_agent_executor.create_react_agent&gt;`__.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">agent_tools</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">tools</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">agent_tools</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tools</span><span class="p">)</span>
@@ -744,9 +744,9 @@ window.addEventListener("load", load);
         <span class="c1"># A new agent object is created for each invocation of this node.</span>
         <span class="n">agent_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">agent_kwargs</span><span class="p">[</span><span class="s2">&quot;prompt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_content</span>
+            <span class="n">agent_kwargs</span><span class="p">[</span><span class="s2">"prompt"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_content</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">agent_kwargs</span><span class="p">[</span><span class="s2">&quot;response_format&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span>
+            <span class="n">agent_kwargs</span><span class="p">[</span><span class="s2">"response_format"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span>
         <span class="k">return</span> <span class="n">langgraph</span><span class="o">.</span><span class="n">prebuilt</span><span class="o">.</span><span class="n">create_react_agent</span><span class="p">(</span>
             <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chat_model</span><span class="p">,</span>
             <span class="n">tools</span><span class="o">=</span><span class="n">tool_node</span><span class="p">,</span>
@@ -774,26 +774,26 @@ window.addEventListener("load", load);
         <span class="n">node_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
 
         <span class="c1"># Below, we build a Span instance which will bind all logs to our class name.</span>
-        <span class="c1"># The &quot;input&quot; parameter is expected to be modified by the code in the WITH block.</span>
+        <span class="c1"># The "input" parameter is expected to be modified by the code in the WITH block.</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">span</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">node_name</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">agent_name</span><span class="o">=</span><span class="n">node_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">span</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="s2">&quot;previous_node&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="s2">"previous_node"</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">span</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
                     <span class="n">content</span><span class="o">=</span><span class="n">agentc_core</span><span class="o">.</span><span class="n">activity</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">EdgeContent</span><span class="p">(</span>
-                        <span class="n">source</span><span class="o">=</span><span class="nb">input</span><span class="p">[</span><span class="s2">&quot;previous_node&quot;</span><span class="p">],</span> <span class="n">dest</span><span class="o">=</span><span class="n">span</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="nb">input</span>
+                        <span class="n">source</span><span class="o">=</span><span class="nb">input</span><span class="p">[</span><span class="s2">"previous_node"</span><span class="p">],</span> <span class="n">dest</span><span class="o">=</span><span class="n">span</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="nb">input</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
             <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_invoke</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="nb">input</span><span class="p">[</span><span class="s2">&quot;previous_node&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">name</span>
+                <span class="nb">input</span><span class="p">[</span><span class="s2">"previous_node"</span><span class="p">]</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">name</span>
                 <span class="k">return</span> <span class="n">result</span>
 
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">langgraph</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">Command</span><span class="p">):</span>
-                <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">[</span><span class="s2">&quot;previous_node&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">[</span><span class="s2">"previous_node"</span><span class="p">]</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">name</span>
                 <span class="nb">input</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">result</span>
 
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;_invoke() must return an instance of State OR a LangGraph Command.&quot;</span><span class="p">)</span></div>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"_invoke() must return an instance of State OR a LangGraph Command."</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ReActAgent.ainvoke">
@@ -807,26 +807,26 @@ window.addEventListener("load", load);
         <span class="n">node_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
 
         <span class="c1"># Below, we build a Span instance which will bind all logs to our class name.</span>
-        <span class="c1"># The &quot;input&quot; parameter is expected to be modified by the code in the WITH block.</span>
+        <span class="c1"># The "input" parameter is expected to be modified by the code in the WITH block.</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">span</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">node_name</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">agent_name</span><span class="o">=</span><span class="n">node_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">span</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="s2">&quot;previous_node&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="s2">"previous_node"</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">span</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
                     <span class="n">content</span><span class="o">=</span><span class="n">agentc_core</span><span class="o">.</span><span class="n">activity</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">EdgeContent</span><span class="p">(</span>
-                        <span class="n">source</span><span class="o">=</span><span class="nb">input</span><span class="p">[</span><span class="s2">&quot;previous_node&quot;</span><span class="p">],</span> <span class="n">dest</span><span class="o">=</span><span class="n">span</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="nb">input</span>
+                        <span class="n">source</span><span class="o">=</span><span class="nb">input</span><span class="p">[</span><span class="s2">"previous_node"</span><span class="p">],</span> <span class="n">dest</span><span class="o">=</span><span class="n">span</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="nb">input</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
             <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ainvoke</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="nb">input</span><span class="p">[</span><span class="s2">&quot;previous_node&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">name</span>
+                <span class="nb">input</span><span class="p">[</span><span class="s2">"previous_node"</span><span class="p">]</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">name</span>
                 <span class="k">return</span> <span class="n">result</span>
 
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">langgraph</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">Command</span><span class="p">):</span>
-                <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">[</span><span class="s2">&quot;previous_node&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">[</span><span class="s2">"previous_node"</span><span class="p">]</span> <span class="o">=</span> <span class="n">span</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">name</span>
                 <span class="nb">input</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">update</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">result</span>
 
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;_ainvoke() must return an instance of State OR a LangGraph Command.&quot;</span><span class="p">)</span></div>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"_ainvoke() must return an instance of State OR a LangGraph Command."</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

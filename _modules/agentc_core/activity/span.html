@@ -4,14 +4,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>agentc_core.activity.span &#8212; Agent Catalog 0.0.0.post5 documentation</title>
+    <title>agentc_core.activity.span &#8212; Agent Catalog 1.1.4.post1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=ecdef530" />
     <link rel="stylesheet" type="text/css" href="../../../_static/basic_mod.css?v=9b2032db" />
     <link rel="stylesheet" type="text/css" href="../../../_static/autodoc_pydantic.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=7230e44a" />
-    <script src="../../../_static/documentation_options.js?v=251b0014"></script>
+    <script src="../../../_static/documentation_options.js?v=c9562da9"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -400,7 +400,7 @@ window.addEventListener("load", load);
         <p id="toggle_sidebar">
             <a href="#" title="Toggle sidebar">|||</a>
         </p>
-        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 0.0.0.post5 documentation</a></h1>
+        <h1><a href="../../../index.html" title="Go to homepage">Agent Catalog 1.1.4.post1 documentation</a></h1>
 
         <a id="mode_toggle" href="#" @click.prevent="handleClick" :title="mode">
     <template v-if="mode == 'light'">
@@ -545,7 +545,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="Span">
 <a class="viewcode-back" href="../../../api.html#agentc.span.Span">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Span</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A structured logging context for agent activity.</span>
+<span class="w">    </span><span class="sd">"""A structured logging context for agent activity.</span>
 
 <span class="sd">    .. card:: Class Description</span>
 
@@ -563,11 +563,11 @@ window.addEventListener("load", load);
 
 <span class="sd">            import agentc</span>
 <span class="sd">            catalog = agentc.Catalog()</span>
-<span class="sd">            root_span = catalog.Span(name=&quot;root&quot;)</span>
-<span class="sd">            child_1_span = root_span.new(name=&quot;child_1&quot;)</span>
-<span class="sd">            child_2_span = root_span.new(name=&quot;child_2&quot;)</span>
+<span class="sd">            root_span = catalog.Span(name="root")</span>
+<span class="sd">            child_1_span = root_span.new(name="child_1")</span>
+<span class="sd">            child_2_span = root_span.new(name="child_2")</span>
 
-<span class="sd">        In practice, you&#39;ll likely use different spans for different agents and/or different tasks.</span>
+<span class="sd">        In practice, you'll likely use different spans for different agents and/or different tasks.</span>
 <span class="sd">        Below we give a small LangGraph example using spans for different agents:</span>
 
 <span class="sd">        .. code-block:: python</span>
@@ -576,29 +576,29 @@ window.addEventListener("load", load);
 <span class="sd">            import langgraph.graph</span>
 
 <span class="sd">            catalog = agentc.Catalog()</span>
-<span class="sd">            root_span = catalog.Span(name=&quot;flight_planner&quot;)</span>
+<span class="sd">            root_span = catalog.Span(name="flight_planner")</span>
 
 <span class="sd">            def front_desk_agent(...):</span>
-<span class="sd">                with root_span.new(name=&quot;front_desk_agent&quot;) as front_desk_span:</span>
+<span class="sd">                with root_span.new(name="front_desk_agent") as front_desk_span:</span>
 <span class="sd">                    ...</span>
 
 <span class="sd">            def route_finding_agent(...):</span>
-<span class="sd">                with root_span.new(name=&quot;route_finding_agent&quot;) as route_finding_span:</span>
+<span class="sd">                with root_span.new(name="route_finding_agent") as route_finding_span:</span>
 <span class="sd">                    ...</span>
 
 <span class="sd">            workflow = langgraph.graph.StateGraph()</span>
-<span class="sd">            workflow.add_node(&quot;front_desk_agent&quot;, front_desk_agent)</span>
-<span class="sd">            workflow.add_node(&quot;route_finding_agent&quot;, route_finding_agent)</span>
-<span class="sd">            workflow.set_entry_point(&quot;front_desk_agent&quot;)</span>
-<span class="sd">            workflow.add_edge(&quot;front_desk_agent&quot;, &quot;route_finding_agent&quot;)</span>
+<span class="sd">            workflow.add_node("front_desk_agent", front_desk_agent)</span>
+<span class="sd">            workflow.add_node("route_finding_agent", route_finding_agent)</span>
+<span class="sd">            workflow.set_entry_point("front_desk_agent")</span>
+<span class="sd">            workflow.add_edge("front_desk_agent", "route_finding_agent")</span>
 <span class="sd">            ...</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="Span.Identifier">
 <a class="viewcode-back" href="../../../api.html#agentc.span.Span.Identifier">[docs]</a>
     <span class="k">class</span><span class="w"> </span><span class="nc">Identifier</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The unique identifier for a :py:class:`Span`.</span>
+<span class="w">        </span><span class="sd">"""The unique identifier for a :py:class:`Span`.</span>
 
 <span class="sd">        .. card:: Class Description</span>
 
@@ -606,56 +606,56 @@ window.addEventListener("load", load);
 
 <span class="sd">            1. an application-defined multipart name and...</span>
 <span class="sd">            2. a session identifier unique to each run of the application.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">model_config</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="n">name</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The name of the :py:class:`Span`.</span>
+<span class="w">        </span><span class="sd">""" The name of the :py:class:`Span`.</span>
 
 <span class="sd">        Names are built up from the root of the span tree to the leaf, thus the first element of :py:attr:`name` is the</span>
 <span class="sd">        name of the root and the last element is the name of the current span (i.e., the leaf).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">session</span><span class="p">:</span> <span class="nb">str</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The session identifier of the :py:class:`Span`.</span>
+<span class="w">        </span><span class="sd">""" The session identifier of the :py:class:`Span`.</span>
 
 <span class="sd">        Sessions must be unique to each run of the application.</span>
 <span class="sd">        By default, we generate these as UUIDs (see :py:attr:`GlobalSpan.session`).</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+<span class="sd">    """</span></div>
 
 
     <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Log</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Method which handles the logging implementation. &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">""" Method which handles the logging implementation. """</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Name to bind to each message logged within this span. &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">""" Name to bind to each message logged within this span. """</span>
 
-    <span class="n">parent</span><span class="p">:</span> <span class="s2">&quot;Span&quot;</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Parent span of this span (i.e., the span that had :py:meth:`new` called on it). &quot;&quot;&quot;</span>
+    <span class="n">parent</span><span class="p">:</span> <span class="s2">"Span"</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">""" Parent span of this span (i.e., the span that had :py:meth:`new` called on it). """</span>
 
     <span class="n">state</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; A JSON-serializable object that will be logged on entering and exiting this span. &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">""" A JSON-serializable object that will be logged on entering and exiting this span. """</span>
 
     <span class="n">iterable</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Flag to indicate whether or not this span should be iterable. &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">""" Flag to indicate whether or not this span should be iterable. """</span>
 
-    <span class="n">blacklist</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Kind</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">,</span> <span class="n">examples</span><span class="o">=</span><span class="p">[[</span><span class="s2">&quot;system&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">]])</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; List of content types to filter. &quot;&quot;&quot;</span>
+    <span class="n">blacklist</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Kind</span><span class="p">]</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">,</span> <span class="n">examples</span><span class="o">=</span><span class="p">[[</span><span class="s2">"system"</span><span class="p">],</span> <span class="p">[</span><span class="s2">"system"</span><span class="p">,</span> <span class="s2">"user"</span><span class="p">]])</span>
+<span class="w">    </span><span class="sd">""" List of content types to filter. """</span>
 
     <span class="n">kwargs</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Annotations to apply to all messages logged within this span. &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">""" Annotations to apply to all messages logged within this span. """</span>
 
     <span class="n">_logs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Log</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"after"</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_iterable_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterable</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Iterable span requested for </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Iterable span requested for </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_logs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
-            <span class="c1"># The logs captured here (and this instance&#39;s children) belong to this specific span.</span>
-            <span class="c1"># The &quot;iterable&quot; field itself is not propagated to children.</span>
+            <span class="c1"># The logs captured here (and this instance's children) belong to this specific span.</span>
+            <span class="c1"># The "iterable" field itself is not propagated to children.</span>
             <span class="n">original_logger</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span>
 
             <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">original_logger</span><span class="p">)</span>
@@ -672,34 +672,34 @@ window.addEventListener("load", load);
 <a class="viewcode-back" href="../../../api.html#agentc.span.Span.new">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">new</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">iterable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">blacklist</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Kind</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Span&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new span under the current :py:class:`Span`.</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Span"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Create a new span under the current :py:class:`Span`.</span>
 
 <span class="sd">        .. card:: Method Description</span>
 
 <span class="sd">            Spans require a name and a session (see :py:attr:`identifier`).</span>
 <span class="sd">            Aside from :py:attr:`name`, :py:attr:`state`, and :py:attr:`iterable`, you can also pass additional keywords</span>
 <span class="sd">            that will be applied as annotations to each :py:meth:`log` call within a span.</span>
-<span class="sd">            As an example, the following code illustrates the use of :py:attr:`kwargs` to add a span-wide &quot;alpha&quot;</span>
+<span class="sd">            As an example, the following code illustrates the use of :py:attr:`kwargs` to add a span-wide "alpha"</span>
 <span class="sd">            annotation:</span>
 
 <span class="sd">            .. code-block:: python</span>
 
 <span class="sd">                import agentc</span>
 <span class="sd">                catalog = agentc.Catalog()</span>
-<span class="sd">                root_span = catalog.Span(name=&quot;flight_planner&quot;)</span>
-<span class="sd">                with root_span.new(name=&quot;find_airports_task&quot;, alpha=&quot;SDGD&quot;) as child_span:</span>
-<span class="sd">                    child_span.log(content=agentc.span.UserContent(value=&quot;Hello, world!&quot;, &quot;beta&quot;: &quot;412d&quot;))</span>
+<span class="sd">                root_span = catalog.Span(name="flight_planner")</span>
+<span class="sd">                with root_span.new(name="find_airports_task", alpha="SDGD") as child_span:</span>
+<span class="sd">                    child_span.log(content=agentc.span.UserContent(value="Hello, world!", "beta": "412d"))</span>
 
 <span class="sd">            The example code above will generate the three logs below (for brevity, we only show the ``content`` and</span>
 <span class="sd">             ``annotations`` fields):</span>
 
 <span class="sd">            .. code-block:: json</span>
 
-<span class="sd">                { &quot;content&quot;: { &quot;kind&quot;: &quot;begin&quot; }, &quot;annotations&quot;: { &quot;alpha&quot;: &quot;SDGD&quot;} }</span>
-<span class="sd">                { &quot;content&quot;: { &quot;kind&quot;: &quot;user&quot;, &quot;value&quot;: &quot;Hello, world!&quot; },</span>
-<span class="sd">                  &quot;annotations&quot;: { &quot;alpha&quot;: &quot;SDGD&quot;, &quot;beta&quot;: &quot;412d&quot; } }</span>
-<span class="sd">                { &quot;content&quot; : { &quot;kind&quot;: &quot;end&quot; }, &quot;annotations&quot;: { &quot;alpha&quot;: &quot;SDGD&quot; } }</span>
+<span class="sd">                { "content": { "kind": "begin" }, "annotations": { "alpha": "SDGD"} }</span>
+<span class="sd">                { "content": { "kind": "user", "value": "Hello, world!" },</span>
+<span class="sd">                  "annotations": { "alpha": "SDGD", "beta": "412d" } }</span>
+<span class="sd">                { "content" : { "kind": "end" }, "annotations": { "alpha": "SDGD" } }</span>
 
 <span class="sd">        :param name: The name of the span.</span>
 <span class="sd">        :param state: The starting state of the span. This will be recorded upon entering and exiting the span.</span>
@@ -707,7 +707,7 @@ window.addEventListener("load", load);
 <span class="sd">        :param blacklist: A set of content types to skip logging. By default, there is no blacklist.</span>
 <span class="sd">        :param kwargs: Additional annotations to apply to the span.</span>
 <span class="sd">        :return: A new :py:class:`Span` instance.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># **kwargs take precedence over self.kwargs.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -733,7 +733,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="Span.log">
 <a class="viewcode-back" href="../../../api.html#agentc.span.Span.log">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="n">Content</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Accept some content (with optional annotations specified by :python:`kwargs`) and generate a</span>
+<span class="w">        </span><span class="sd">"""Accept some content (with optional annotations specified by :python:`kwargs`) and generate a</span>
 <span class="sd">        corresponding log entry.</span>
 
 <span class="sd">        .. card:: Method Description</span>
@@ -743,10 +743,10 @@ window.addEventListener("load", load);
 <span class="sd">            Users can capture events that occur in popular frameworks like LangChain and LlamaIndex using our helper</span>
 <span class="sd">            packages (see :py:mod:`agentc_langchain`, :py:mod:`agentc_langgraph`, and :py:mod:`agentc_llamaindex`) but</span>
 <span class="sd">            must use those packages in conjunction with this :py:meth:`log` method to capture the full breadth of their</span>
-<span class="sd">            application&#39;s activity.</span>
+<span class="sd">            application's activity.</span>
 <span class="sd">            See `here &lt;log.html&gt;`__ for a list of all available log content types.</span>
 
-<span class="sd">            Users can also use Python&#39;s ``[]`` syntax to write arbitrary JSON-serializable content as a key-value</span>
+<span class="sd">            Users can also use Python's ``[]`` syntax to write arbitrary JSON-serializable content as a key-value</span>
 <span class="sd">            (:py:class:`KeyValueContent`) pair.</span>
 <span class="sd">            This is useful for logging arbitrary data like metrics during evaluations.</span>
 <span class="sd">            In the example below, we illustrate an example of a system-wide evaluation suite that uses this ``[]``</span>
@@ -759,19 +759,19 @@ window.addEventListener("load", load);
 <span class="sd">                import agentc</span>
 
 <span class="sd">                catalog = agentc.Catalog()</span>
-<span class="sd">                evaluation_span = catalog.Span(name=&quot;evaluation_suite&quot;)</span>
-<span class="sd">                with open(&quot;my-evaluation-suite.json&quot;) as fp:</span>
+<span class="sd">                evaluation_span = catalog.Span(name="evaluation_suite")</span>
+<span class="sd">                with open("my-evaluation-suite.json") as fp:</span>
 <span class="sd">                    for i, line in enumerate(fp):</span>
-<span class="sd">                        with evaluation_span.new(name=f&quot;evaluation{i}&quot;) as span:</span>
+<span class="sd">                        with evaluation_span.new(name=f"evaluation{i}") as span:</span>
 <span class="sd">                            output = my_agent_app(span)</span>
-<span class="sd">                            span[&quot;positive_sentiment&quot;] = my_output_evaluator.positive(output)</span>
+<span class="sd">                            span["positive_sentiment"] = my_output_evaluator.positive(output)</span>
 <span class="sd">                            span.log(</span>
 <span class="sd">                                content={</span>
-<span class="sd">                                    &quot;kind&quot;: &quot;key-value&quot;,</span>
-<span class="sd">                                    &quot;key&quot;: &quot;negative_sentiment&quot;,</span>
-<span class="sd">                                    &quot;value&quot;: my_output_evaluator.negative(output)</span>
+<span class="sd">                                    "kind": "key-value",</span>
+<span class="sd">                                    "key": "negative_sentiment",</span>
+<span class="sd">                                    "value": my_output_evaluator.negative(output)</span>
 <span class="sd">                                    },</span>
-<span class="sd">                                alpha=&quot;SDGD&quot;</span>
+<span class="sd">                                alpha="SDGD"</span>
 <span class="sd">                            )</span>
 
 <span class="sd">            All keywords passed to the :py:meth:`log` method will be applied as annotations to the log entry.</span>
@@ -780,11 +780,11 @@ window.addEventListener("load", load);
 
 <span class="sd">        :param content: The content to log.</span>
 <span class="sd">        :param kwargs: Additional annotations to apply to the log.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">new_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">}</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">kwargs</span>
         <span class="n">identifier</span><span class="p">:</span> <span class="n">Span</span><span class="o">.</span><span class="n">Identifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span>
         <span class="k">if</span> <span class="n">content</span><span class="o">.</span><span class="n">kind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blacklist</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Log </span><span class="si">%s</span><span class="s2"> has been blacklisted.&quot;</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Log </span><span class="si">%s</span><span class="s2"> has been blacklisted."</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
             <span class="k">return</span>
         <span class="n">_log</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">,</span> <span class="n">session_id</span><span class="o">=</span><span class="n">identifier</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">span_name</span><span class="o">=</span><span class="n">identifier</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">new_kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterable</span><span class="p">:</span>
@@ -793,8 +793,8 @@ window.addEventListener("load", load);
 
     <span class="nd">@pydantic</span><span class="o">.</span><span class="n">computed_field</span>
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Span.Identifier&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;A unique identifier for this span.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Span.Identifier"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""A unique identifier for this span."""</span>
         <span class="n">name_stack</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
         <span class="n">working</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="k">while</span> <span class="n">working</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -805,7 +805,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="Span.enter">
 <a class="viewcode-back" href="../../../api.html#agentc.span.Span.enter">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">enter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record a :py:class:`BeginContent` log entry for this span.</span>
+<span class="w">        </span><span class="sd">"""Record a :py:class:`BeginContent` log entry for this span.</span>
 
 <span class="sd">        .. card:: Method Description</span>
 
@@ -819,17 +819,17 @@ window.addEventListener("load", load);
 <span class="sd">                import agentc</span>
 
 <span class="sd">                catalog = agentc.Catalog()</span>
-<span class="sd">                incoming_state = {&quot;flights&quot;: []}</span>
-<span class="sd">                with catalog.Span(name=&quot;flight_planner&quot;, state=incoming_state) as span:</span>
+<span class="sd">                incoming_state = {"flights": []}</span>
+<span class="sd">                with catalog.Span(name="flight_planner", state=incoming_state) as span:</span>
 <span class="sd">                    flight_planner_implementation()</span>
 
 <span class="sd">            On entering the context, one log is generated possessing the content below:</span>
 
 <span class="sd">            .. code-block:: json</span>
 
-<span class="sd">                { &quot;kind&quot;: &quot;begin&quot;, &quot;state&quot;: {&quot;flights&quot;: []} }</span>
+<span class="sd">                { "kind": "begin", "state": {"flights": []} }</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">BeginContent</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">BeginContent</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
@@ -837,7 +837,7 @@ window.addEventListener("load", load);
 <div class="viewcode-block" id="Span.exit">
 <a class="viewcode-back" href="../../../api.html#agentc.span.Span.exit">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record a :py:class:`EndContent` log entry for this span.</span>
+<span class="w">        </span><span class="sd">"""Record a :py:class:`EndContent` log entry for this span.</span>
 
 <span class="sd">        .. card:: Method Description</span>
 
@@ -851,16 +851,16 @@ window.addEventListener("load", load);
 <span class="sd">                import agentc</span>
 
 <span class="sd">                catalog = agentc.Catalog()</span>
-<span class="sd">                incoming_state = {&quot;flights&quot;: []}</span>
-<span class="sd">                with catalog.Span(name=&quot;flight_planner&quot;, state=incoming_state) as span:</span>
+<span class="sd">                incoming_state = {"flights": []}</span>
+<span class="sd">                with catalog.Span(name="flight_planner", state=incoming_state) as span:</span>
 <span class="sd">                    ... = flight_planner_implementation(...)</span>
-<span class="sd">                    incoming_state[&quot;flights&quot;] = [{&quot;flight_number&quot;: &quot;AA123&quot;, &quot;status&quot;: &quot;on_time&quot;}]</span>
+<span class="sd">                    incoming_state["flights"] = [{"flight_number": "AA123", "status": "on_time"}]</span>
 
 <span class="sd">            On exiting the context, one log is generated possessing the content below:</span>
 
 <span class="sd">            .. code-block:: json</span>
 
-<span class="sd">                { &quot;kind&quot;: &quot;end&quot;, &quot;state&quot;: {&quot;flights&quot;: [{&quot;flight_number&quot;: &quot;AA123&quot;, &quot;status&quot;: &quot;on_time&quot;}]} }</span>
+<span class="sd">                { "kind": "end", "state": {"flights": [{"flight_number": "AA123", "status": "on_time"}]} }</span>
 
 <span class="sd">        .. note::</span>
 
@@ -873,18 +873,18 @@ window.addEventListener("load", load);
 <span class="sd">                import agentc</span>
 
 <span class="sd">                catalog = agentc.Catalog()</span>
-<span class="sd">                immutable_incoming_state = {&quot;flights&quot;: []}</span>
-<span class="sd">                with catalog.Span(name=&quot;flight_planner&quot;, state=incoming_state) as span:</span>
+<span class="sd">                immutable_incoming_state = {"flights": []}</span>
+<span class="sd">                with catalog.Span(name="flight_planner", state=incoming_state) as span:</span>
 <span class="sd">                    ... = flight_planner_implementation(...)</span>
-<span class="sd">                    span.state = {&quot;flights&quot;: [{&quot;flight_number&quot;: &quot;AA123&quot;, &quot;status&quot;: &quot;on_time&quot;}]}</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">                    span.state = {"flights": [{"flight_number": "AA123", "status": "on_time"}]}</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">EndContent</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">EndContent</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="Span.logs">
 <a class="viewcode-back" href="../../../api.html#agentc.span.Span.logs">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">logs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Log</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the logs generated by the tree of :py:class:`Span` nodes rooted from this :py:class:`Span` instance.</span>
+<span class="w">        </span><span class="sd">"""Return the logs generated by the tree of :py:class:`Span` nodes rooted from this :py:class:`Span` instance.</span>
 
 <span class="sd">        .. card:: Method Description</span>
 
@@ -897,10 +897,10 @@ window.addEventListener("load", load);
 <span class="sd">                import agentc</span>
 
 <span class="sd">                catalog = agentc.Catalog()</span>
-<span class="sd">                span = catalog.Span(name=&quot;flight_planner&quot;, iterable=True)</span>
+<span class="sd">                span = catalog.Span(name="flight_planner", iterable=True)</span>
 <span class="sd">                for log in span:</span>
 <span class="sd">                    match log.content.kind:</span>
-<span class="sd">                        case &quot;begin&quot;:</span>
+<span class="sd">                        case "begin":</span>
 <span class="sd">                            ...</span>
 
 <span class="sd">        .. tip::</span>
@@ -910,9 +910,9 @@ window.addEventListener("load", load);
 <span class="sd">            To perform efficient aggregate analysis of your logs, consider querying the ``agent_activity.logs``</span>
 <span class="sd">            collection in your Couchbase cluster using SQL++ instead.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterable</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This span is not iterable. To iterate over logs, set &#39;iterable&#39;=True on instantiation.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"This span is not iterable. To iterate over logs, set 'iterable'=True on instantiation."</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logs</span></div>
 
 
@@ -929,51 +929,51 @@ window.addEventListener("load", load);
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterable</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This span is not iterable. To iterate over logs, set &#39;iterable&#39;=True on instantiation.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"This span is not iterable. To iterate over logs, set 'iterable'=True on instantiation."</span><span class="p">)</span>
         <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logs</span></div>
 
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">GlobalSpan</span><span class="p">(</span><span class="n">Span</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;An auditor of various events (e.g., LLM completions) given a catalog.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""An auditor of various events (e.g., LLM completions) given a catalog."""</span>
 
     <span class="c1"># Note: this is more of a composite type rather than a union type.</span>
     <span class="n">config</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="n">LocalCatalogConfig</span><span class="p">,</span> <span class="n">RemoteCatalogConfig</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Config (configuration) instance associated with this activity. &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">""" Config (configuration) instance associated with this activity. """</span>
 
     <span class="n">session</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; The run (alternative: session) that this span is associated with. &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">""" The run (alternative: session) that this span is associated with. """</span>
 
     <span class="n">version</span><span class="p">:</span> <span class="n">VersionDescriptor</span> <span class="o">=</span> <span class="n">pydantic</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Catalog version to bind all messages logged within this auditor. &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">""" Catalog version to bind all messages logged within this auditor. """</span>
 
     <span class="n">logger</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">_local_logger</span><span class="p">:</span> <span class="n">LocalLogger</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">_db_logger</span><span class="p">:</span> <span class="n">DBLogger</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">_chain_logger</span><span class="p">:</span> <span class="n">ChainLogger</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"after"</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_find_local_activity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">activity_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s2">&quot;activity_path&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model_fields_set</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">activity_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s2">"activity_path"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model_fields_set</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="c1"># Note: this method sets the self.config.activity_path attribute if found.</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ActivityPath</span><span class="p">()</span>
             <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Local activity (folder) not found while trying to initialize a Span instance. &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;Swallowing exception </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+                    <span class="sa">f</span><span class="s2">"Local activity (folder) not found while trying to initialize a Span instance. "</span>
+                    <span class="sa">f</span><span class="s2">"Swallowing exception </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span>
                 <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"after"</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_auditor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">typing</span><span class="o">.</span><span class="n">Self</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">activity_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">conn_string</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">error_message</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="s2">"""</span>
 <span class="s2">                Could not initialize a local or remote auditor!</span>
 <span class="s2">                If this is a new project, please run the command `agentc init` before instantiating an auditor.</span>
 <span class="s2">                If you are intending to use a remote-only auditor, please ensure that all of the relevant variables</span>
 <span class="s2">                (i.e., conn_string, username, password, and bucket) are set.</span>
-<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+<span class="s2">            """</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
 
@@ -990,25 +990,25 @@ window.addEventListener("load", load);
                 <span class="bp">self</span><span class="o">.</span><span class="n">_db_logger</span> <span class="o">=</span> <span class="n">DBLogger</span><span class="p">(</span><span class="n">cfg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">catalog_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">except</span> <span class="p">(</span><span class="n">couchbase</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">CouchbaseException</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Could not connect to the Couchbase cluster. &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;Skipping remote auditor and swallowing exception </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+                    <span class="sa">f</span><span class="s2">"Could not connect to the Couchbase cluster. "</span>
+                    <span class="sa">f</span><span class="s2">"Skipping remote auditor and swallowing exception </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span>
                 <span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_db_logger</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="c1"># If we have both a local and remote auditor, we&#39;ll use both.</span>
+        <span class="c1"># If we have both a local and remote auditor, we'll use both.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_db_logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using both a local auditor and a remote auditor.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Using both a local auditor and a remote auditor."</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_chain_logger</span> <span class="o">=</span> <span class="n">ChainLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_local_logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_db_logger</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chain_logger</span><span class="o">.</span><span class="n">log</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using a local auditor (a connection to a remote auditor could not be established).&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Using a local auditor (a connection to a remote auditor could not be established)."</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_logger</span><span class="o">.</span><span class="n">log</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_db_logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using a remote auditor (a local auditor could not be instantiated).&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Using a remote auditor (a local auditor could not be instantiated)."</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_db_logger</span><span class="o">.</span><span class="n">log</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># We should never reach this point (this error is handled above).</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not instantiate an auditor.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Could not instantiate an auditor."</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">new</span><span class="p">(</span>
@@ -1019,7 +1019,7 @@ window.addEventListener("load", load);
         <span class="n">blacklist</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Kind</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Span</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new span under the current :py:class:`GlobalSpan`.</span>
+<span class="w">        </span><span class="sd">"""Create a new span under the current :py:class:`GlobalSpan`.</span>
 
 <span class="sd">        :param name: The name of the span.</span>
 <span class="sd">        :param state: The starting state of the span. This will be recorded upon entering and exiting the span.</span>
@@ -1027,7 +1027,7 @@ window.addEventListener("load", load);
 <span class="sd">        :param kwargs: Additional annotations to apply to the span.</span>
 <span class="sd">        :param blacklist: A set of content types to skip logging. By default, there is no blacklist.</span>
 <span class="sd">        :return: A new :py:class:`Span` instance.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">Span</span><span class="p">(</span>
             <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
