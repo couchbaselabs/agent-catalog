@@ -7,11 +7,6 @@ Installation
 Installing from PyPI
 --------------------
 
-.. note::
-
-    This section is in the works!
-    We recommend installing from our pre-built packages in the meantime.
-
 1. Make sure you have :command:`python3.11` and `sentence-transformers <https://sbert.net/>`__) installed!
 
 2. Install ``agentc`` with ``pip``.
