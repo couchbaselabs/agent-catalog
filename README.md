@@ -16,8 +16,6 @@ The mono-repo for the Couchbase Agent Catalog project.
 
 ### Installing from PyPI
 
-*Note: this section is in the works! We recommend installing from our pre-built packages in the meantime.*
-
 1. Make sure you have `python3.11` installed!
 
 2. Use `pip` to install the `agentc` package.
